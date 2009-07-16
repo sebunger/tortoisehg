@@ -1,0 +1,5 @@
+tortoisehg (0.8-1) unstable; urgency=low
+
+  * Initial release (Closes: #535902).
+
+ -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Thu, 16 Jul 2009 12:56:38 +0200
