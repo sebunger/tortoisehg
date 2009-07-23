@@ -2,11 +2,14 @@ Source: tortoisehg
 Section: devel
 Priority: optional
 Maintainer: Ludovico Cavedon <ludovico.cavedon@gmail.com>
+DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python-dev,
  python-support (>= 0.5.3), python-setuptools (>= 0.6a9), 
 Build-Depends-Indep: docbook-xsl, docbook-xml, xsltproc
 Standards-Version: 3.8.2
 Homepage: http://bitbucket.org/tortoisehg/stable/wiki/Home
+Vcs-Git: git://git.debian.org/git/collab-maint/tortoisehg.git
+Vcs-Browser: http://git.debian.org/?p=collab-maint/tortoisehg.git
 XS-Python-Version: current
 
 Package: tortoisehg
