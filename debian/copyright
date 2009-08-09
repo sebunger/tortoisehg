@@ -57,6 +57,9 @@ Copyright: Copyright 2007, Henry Ludemann <misc@hl.id.au>
 Copyright: Copyright 2007, TK Soh <teekaysoh@gmail.com>
 License: GPL-2+
 
+Files: thgutil/thread2.py
+Copyright: TODO
+
 Files: thgutil/iniparse/*
 Copyright: Copyright 2004, Paramjit Oberoi <param.cs.wisc.edu
 Copyright: Copyright 2001-2003, Python Software Foundation
@@ -350,6 +353,11 @@ License: PSF-2
  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
  OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Files: icons/*
+Copyright: Copyright 2009, Steve Borho <steve@borho.org>
+Copyright: Copyright TortoiseHG TODO
+License: GPL-2+
 
 Files: debian/*
 Copyright: Copyright 2009, Ludovico Cavedon <ludovico.cavedon@gmail.com>
