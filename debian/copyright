@@ -58,7 +58,7 @@ Copyright: Copyright 2007, TK Soh <teekaysoh@gmail.com>
 License: GPL-2+
 
 Files: thgutil/thread2.py
-Copyright: TODO
+Copyright: PD
 
 Files: thgutil/iniparse/*
 Copyright: Copyright 2004, Paramjit Oberoi <param.cs.wisc.edu
@@ -356,8 +356,8 @@ License: PSF-2
 
 Files: icons/*
 Copyright: Copyright 2009, Steve Borho <steve@borho.org>
-Copyright: Copyright TortoiseHG TODO
-License: GPL-2+
+Copyright: Copyright 2006-2009, The TortoiseSVN Project
+License: GPL-2
 
 Files: debian/*
 Copyright: Copyright 2009, Ludovico Cavedon <ludovico.cavedon@gmail.com>
