@@ -46,7 +46,7 @@ get-orig-source:
 	sed -i -e "s/or 'unknown'/or '$(UPVERSION)'/" ../tempdir/stable/setup.py
 	echo 'include i18n/*' >> ../tempdir/stable/MANIFEST.in
 	cd ../tempdir/stable && python setup.py sdist
-	mv ../tempdir/stable/dist/tortoisehg-$(UPVERSION).tar.gz ../tortoisehg_$(UPVERSION).orig.tar.gz
+	mv ../tempdir/stable/dist/tortoisehg-$(UPVERSION).tar.gz ../tortoisehg_$(SRCVERSION).orig.tar.gz
 	rm -r ../tempdir
 	rm ../$(UPVERSION).gz
 

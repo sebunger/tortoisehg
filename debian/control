@@ -6,7 +6,7 @@ DM-Upload-Allowed: yes
 Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python-dev,
  python-support (>= 0.5.3), python-setuptools (>= 0.6a9), quilt
 Build-Depends-Indep: docbook-xsl, docbook-xml, xsltproc
-Standards-Version: 3.8.2
+Standards-Version: 3.8.3
 Homepage: http://bitbucket.org/tortoisehg/stable/wiki/Home
 Vcs-Git: git://git.debian.org/git/collab-maint/tortoisehg.git
 Vcs-Browser: http://git.debian.org/?p=collab-maint/tortoisehg.git

@@ -1,4 +1,4 @@
-tortoisehg (0.8-1) unstable; urgency=low
+tortoisehg (0.8+dfsg1-1) unstable; urgency=low
 
   * Initial release (Closes: #535902).
   * Merge changes from Max Bowsher Ubuntu PPA package:
