@@ -46,7 +46,7 @@ class build_mo(build):
                 cmd.append('-c')
             self.mkpath(modir)
             self.make_file([pofile], mofile, spawn, (cmd,))
-            self.distribution.data_files.append((join('locale', modir),
+            self.distribution.data_files.append((join('tortoisehg', modir),
                                                  [mofile]))
 
 build.sub_commands.append(('build_mo', None))
@@ -147,11 +147,11 @@ try:
     l = os.popen('hg -R . id -it').read().split()
     while len(l) > 1 and l[-1][0].isalpha(): # remove non-numbered tags
         l.pop()
-    version = l and l[-1] or 'unknown' # latest tag or revision number
+    version = l and l[-1] or '0.8' # latest tag or revision number
     if version.endswith('+'):
         version += time.strftime('%Y%m%d')
 except OSError:
-    version = "unknown"
+    version = "0.8"
 
 verfile = os.path.join("thgutil", "__version__.py")
 if version != 'unknown' or not os.path.exists(verfile):
