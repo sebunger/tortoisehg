@@ -1,0 +1,13 @@
+The current version of this packages does not distribute with the original
+upstream tarball because it is missing some source files (i.e. .po files).
+
+The source tarball distributed with Debian is packaged from the upstream
+Mercurial repository, according to the steps in the debian/rules file [1].
+
+[1] http://git.debian.org/?p=collab-maint/tortoisehg.git;a=blob;f=debian/rules;hb=refs/heads/0.8
+
+The source package uses quilt for the modifications of the upstream source.
+If you want to change something it is best to use the quilt approach as
+documented in
+        /usr/share/doc/quilt/README.source
+
