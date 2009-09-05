@@ -1,0 +1,14 @@
+Description: fix patch of copyright text
+Author: Max Bowsher <maxb@f2s.com>
+Forwarded: not-needed
+
+Index: tortoisehg/thgutil/config.py
+===================================================================
+--- tortoisehg.orig/thgutil/config.py	2009-09-05 11:58:26.000000000 -0700
++++ tortoisehg/thgutil/config.py	2009-09-05 12:51:56.000000000 -0700
+@@ -1,4 +1,4 @@
+ bin_path     = "/usr/bin"
+-license_path = "/usr/share/doc/tortoisehg/Copying.txt.gz"
++license_path = "/usr/share/common-licenses/GPL-2"
+ locale_path  = "/usr/share/locale"
+ icon_path    = "/usr/share/pixmaps/tortoisehg/icons"

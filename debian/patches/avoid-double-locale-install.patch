@@ -1,0 +1,18 @@
+Description: avoid double installation of .mo files
+Author: Ludovico Cavedon <ludovico.cavedon@gmail.com>
+
+Index: tortoisehg/setup.py
+===================================================================
+--- tortoisehg.orig/setup.py	2009-09-05 12:54:41.000000000 -0700
++++ tortoisehg/setup.py	2009-09-05 12:54:50.000000000 -0700
+@@ -46,8 +46,8 @@
+                 cmd.append('-c')
+             self.mkpath(modir)
+             self.make_file([pofile], mofile, spawn, (cmd,))
+-            self.distribution.data_files.append((join('tortoisehg', modir),
+-                                                 [mofile]))
++            #self.distribution.data_files.append((join('tortoisehg', modir),
++            #                                     [mofile]))
+ 
+ build.sub_commands.append(('build_mo', None))
+ 

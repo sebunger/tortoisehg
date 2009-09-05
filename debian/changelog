@@ -1,5 +1,8 @@
 tortoisehg (0.8-1) unstable; urgency=low
 
   * Initial release (Closes: #535902).
+  * Merge changes from Max Bowsher Ubuntu PPA package:
+    - update copyright statement
+    - fix-license-path.patch
 
- -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Thu, 16 Jul 2009 12:56:38 +0200
+ -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Sat, 05 Sep 2009 13:06:42 -0700
