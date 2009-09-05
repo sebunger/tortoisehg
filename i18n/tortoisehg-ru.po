@@ -1,0 +1,3680 @@
+# Russian translation for tortoisehg
+# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# This file is distributed under the same license as the tortoisehg package.
+# Alil Adamov <diagiman@gmail.com>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tortoisehg\n"
+"Report-Msgid-Bugs-To: Alil Adamov <diagiman@gmail.com>\n"
+"POT-Creation-Date: 2009-06-28 05:54+0000\n"
+"PO-Revision-Date: 2009-07-01 10:03+0000\n"
+"Last-Translator: Alil Adamov <diagiman@gmail.com>\n"
+"Language-Team: Russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2009-07-01 19:32+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: hggtk\about.py:52
+msgid "Several icons are courtesy of the TortoiseSVN project"
+msgstr "Некоторые значки взяты из проекта TortoiseSVN"
+
+#: hggtk\backout.py:24
+msgid "Backout changeset - "
+msgstr "Восстановить набор изменений - "
+
+#: hggtk\backout.py:37
+msgid "Changeset Description"
+msgstr "Описание Набора изменений"
+
+#: hggtk\backout.py:50
+msgid "Backed out changeset: "
+msgstr "Восстановленный набор изменений: "
+
+#: hggtk\backout.py:56
+msgid "Backout commit message"
+msgstr "Заметка фиксации восстановления"
+
+#: hggtk\backout.py:61
+msgid ""
+"Commit message text for new changeset that reverses the  effect of the "
+"change being backed out."
+msgstr ""
+"Текст заметки фиксации для нового набора изменений, который возобновляет "
+"действие восстаналиваемого изменения"
+
+#: hggtk\backout.py:73 hggtk\bugreport.py:43 hggtk\hgcmd.py:41
+#: hggtk\hginit.py:84 hggtk\merge.py:72 hggtk\taskbarui.py:32
+#: hggtk\update.py:70
+msgid "Close"
+msgstr "Закрыть"
+
+#: hggtk\backout.py:80
+msgid "Backout"
+msgstr "Восстановить"
+
+#: hggtk\backout.py:95 hggtk\merge.py:104
+msgid "rev"
+msgstr "ревизия"
+
+#: hggtk\backout.py:96 hggtk\merge.py:105
+msgid "summary"
+msgstr "сводка"
+
+#: hggtk\backout.py:97 hggtk\merge.py:106
+msgid "user"
+msgstr "пользователь"
+
+#: hggtk\backout.py:98 hggtk\merge.py:107
+msgid "date"
+msgstr "дата"
+
+#: hggtk\backout.py:101 hggtk\merge.py:111
+msgid "branch"
+msgstr "ветка"
+
+#: hggtk\backout.py:103 hggtk\merge.py:113
+msgid "tags"
+msgstr "метки"
+
+#: hggtk\bugreport.py:23
+msgid "TortoiseHg Bug Report"
+msgstr "Отчет об ошибке TortoiseHg"
+
+#: hggtk\bugreport.py:48
+msgid ""
+"** Please report this bug to tortoisehg-discuss@lists.sourceforge.net or "
+"http://bitbucket.org/tortoisehg/stable/issues\n"
+msgstr ""
+"** Пожалуйста, сообщите об этой ошибке по адресу tortoisehg-"
+"discuss@lists.sourceforge.net или "
+"http://bitbucket.org/tortoisehg/stable/issues\n"
+
+#: hggtk\changeset.py:39
+msgid "_Other parent"
+msgstr "Другой родитель"
+
+#: hggtk\changeset.py:40
+msgid "diff other parent"
+msgstr "различия с другим родителем"
+
+#: hggtk\changeset.py:104
+msgid "[All Files]"
+msgstr "[Все файлы]"
+
+#: hggtk\changeset.py:147
+msgid "changeset:"
+msgstr "набор изменений:"
+
+#: hggtk\changeset.py:149
+msgid "branch:"
+msgstr "ветка:"
+
+#: hggtk\changeset.py:150
+msgid "user/date:"
+msgstr "пользователь/дата:"
+
+#: hggtk\changeset.py:158
+msgid "parent:"
+msgstr "родитель:"
+
+#: hggtk\changeset.py:171
+msgid "child:"
+msgstr "наследник:"
+
+#: hggtk\changeset.py:177
+msgid "tags:"
+msgstr "метки:"
+
+#: hggtk\changeset.py:197
+msgid " %s is larger than the specified max diff size"
+msgstr " %s превышает указанный максимальный размер файла различий"
+
+#: hggtk\changeset.py:292
+msgid "_visual diff"
+msgstr "визуальные различия"
+
+#: hggtk\changeset.py:293
+msgid "diff to _local"
+msgstr "различия с локальным"
+
+#: hggtk\changeset.py:294
+msgid "_view at revision"
+msgstr "показать для ревизии"
+
+#: hggtk\changeset.py:295
+msgid "_save at revision"
+msgstr "сохранить для ревизии"
+
+#: hggtk\changeset.py:297 hggtk\datamine.py:117
+msgid "_file history"
+msgstr "история файла"
+
+#: hggtk\changeset.py:298 hggtk\datamine.py:116
+msgid "_annotate file"
+msgstr "комментировать файл"
+
+#: hggtk\changeset.py:300
+msgid "_revert file contents"
+msgstr "возвратить содержимое файла"
+
+#: hggtk\changeset.py:358
+msgid "Stat"
+msgstr "Стат"
+
+#: hggtk\changeset.py:360 hggtk\hgignore.py:109
+msgid "Files"
+msgstr "Файлы"
+
+#: hggtk\changeset.py:482
+msgid "Save file to"
+msgstr "Сохранить файл в"
+
+#: hggtk\changeset.py:547
+msgid "Confirm revert file to old revision"
+msgstr "Подтвердить возвращение файла к старой ревизии"
+
+#: hggtk\changeset.py:548
+msgid "Revert %s to contents at revision %d?"
+msgstr "Вернуть содержимое %s к ревизии %d?"
+
+#: hggtk\changeset.py:560 hggtk\synch.py:635
+msgid "Toggle _Wordwrap"
+msgstr "Переносить по словам"
+
+#: hggtk\clone.py:25
+msgid "TortoiseHg Clone"
+msgstr "TortoiseHg Клонирование"
+
+#: hggtk\clone.py:47
+msgid "Source Path:"
+msgstr "Путь к источнику:"
+
+#: hggtk\clone.py:65 hggtk\clone.py:101
+msgid "Browse..."
+msgstr "Обзор..."
+
+#: hggtk\clone.py:84
+msgid "Destination Path:"
+msgstr "Путь назначения:"
+
+#: hggtk\clone.py:116
+msgid "Clone To Revision:"
+msgstr "Клонировать До Ревизии:"
+
+#: hggtk\clone.py:127
+msgid "do not update the new working directory"
+msgstr "не обновлять новый рабочий каталог"
+
+#: hggtk\clone.py:128
+msgid "use pull protocol to copy metadata"
+msgstr "использовать протокол затягивания для копирования метаданных"
+
+#: hggtk\clone.py:129
+msgid "use uncompressed transfer"
+msgstr "несжимать передачу"
+
+#: hggtk\clone.py:130 hggtk\synch.py:149
+msgid "use proxy server"
+msgstr "использовать прокси сервер"
+
+#: hggtk\clone.py:143
+msgid "Remote Cmd:"
+msgstr "Удалённая команда:"
+
+#: hggtk\clone.py:157 hggtk\thgshelve.py:151
+msgid "Cancel"
+msgstr "Отменить"
+
+#: hggtk\clone.py:165
+msgid "Clone"
+msgstr "Клонировать"
+
+#: hggtk\clone.py:178
+msgid "Select Destination Folder"
+msgstr "Выберите Папку Назначения"
+
+#: hggtk\clone.py:186
+msgid "Select Source Folder"
+msgstr "Выберите Исходную Папку"
+
+#: hggtk\clone.py:232
+msgid "Source path is empty"
+msgstr "Исходный путь пуст"
+
+#: hggtk\clone.py:233
+msgid "Please enter a valid source path"
+msgstr "Пожалуйста, введите верный исходный путь"
+
+#: hggtk\clone.py:238
+msgid "Source and dest are the same"
+msgstr "Источник и назначение совпадают"
+
+#: hggtk\clone.py:239
+msgid "Please specify a different destination"
+msgstr "Пожалуйста укажите другое назначение"
+
+#: hggtk\clone.py:284
+msgid "Clone aborted"
+msgstr "Клонирование прервано"
+
+#: hggtk\clone.py:287
+msgid "Clone error"
+msgstr "Ошибка при клонировании"
+
+#: hggtk\commit.py:33
+msgid "Branch Operations"
+msgstr "Действия над Ветками"
+
+#: hggtk\commit.py:37
+msgid "Changes take effect on next commit"
+msgstr "Изменения вступят в силу при следующей фиксации"
+
+#: hggtk\commit.py:38
+msgid "No branch changes"
+msgstr "Ветка не изменена"
+
+#: hggtk\commit.py:40
+msgid "Open a new named branch"
+msgstr "Открыть новую именованную ветку"
+
+#: hggtk\commit.py:42
+msgid "Close current named branch"
+msgstr "Закрыть текущую именованную ветку"
+
+#: hggtk\commit.py:154
+msgid "_Undo"
+msgstr "Отменить"
+
+#: hggtk\commit.py:155
+msgid "undo recent commit"
+msgstr "отменить последнюю фиксацию"
+
+#: hggtk\commit.py:156 hggtk\commit.py:364 hggtk\commit.py:373
+#: hggtk\commit.py:381 hggtk\commit.py:382
+msgid "_Commit"
+msgstr "Фиксировать"
+
+#: hggtk\commit.py:157 hggtk\commit.py:383
+msgid "commit"
+msgstr "фиксировать"
+
+#: hggtk\commit.py:169
+msgid "Confirm Discard Message"
+msgstr "Подтвердить Отказ от Заметки"
+
+#: hggtk\commit.py:170
+msgid "Discard current commit message?"
+msgstr "Отказаться от текущей заметки фиксации?"
+
+#: hggtk\commit.py:230
+msgid "Recent Commit Messages..."
+msgstr "Недавние Заметки Фиксации"
+
+#: hggtk\commit.py:269 hggtk\commit.py:270 hggtk\commit.py:271
+#: hggtk\commit.py:274
+msgid "_commit"
+msgstr "фиксировать"
+
+#: hggtk\commit.py:292
+msgid "Confirm Exit"
+msgstr "Подтвердите выход"
+
+#: hggtk\commit.py:293
+msgid "Save commit message at exit?"
+msgstr "Сохранить заметку фиксации при выходе?"
+
+#: hggtk\commit.py:320
+msgid "new branch: "
+msgstr "новая ветка: "
+
+#: hggtk\commit.py:322
+msgid "close branch: "
+msgstr "закрыть ветку: "
+
+#: hggtk\commit.py:324
+msgid "branch: "
+msgstr "ветка: "
+
+#: hggtk\commit.py:334 hggtk\status.py:204
+msgid "Re_vert"
+msgstr "Возвратить"
+
+#: hggtk\commit.py:335 hggtk\status.py:206 hggtk\thgconfig.py:744
+msgid "_Add"
+msgstr "Добавить"
+
+#: hggtk\commit.py:336 hggtk\status.py:211 hggtk\thgconfig.py:754
+msgid "_Remove"
+msgstr "Удалить"
+
+#: hggtk\commit.py:337 hggtk\status.py:208
+msgid "Move"
+msgstr "Переместить"
+
+#: hggtk\commit.py:348
+msgid "merge"
+msgstr "слияние"
+
+#: hggtk\commit.py:366 hggtk\commit.py:367 hggtk\commit.py:374
+#: hggtk\commit.py:375
+msgid "QNew"
+msgstr "Новая заплатка"
+
+#: hggtk\commit.py:370 hggtk\commit.py:371
+msgid "QRefresh"
+msgstr "Обновить заплатку"
+
+#: hggtk\commit.py:406 hggtk\commit.py:561
+msgid "Nothing Commited"
+msgstr "Ничего Не Фиксировано"
+
+#: hggtk\commit.py:407
+msgid "No committable files selected"
+msgstr "Нет выбранных файлов для фиксации"
+
+#: hggtk\commit.py:424 hggtk\commit.py:479 hggtk\merge.py:83
+#: hggtk\thgconfig.py:465
+msgid "Commit"
+msgstr "Фиксировать"
+
+#: hggtk\commit.py:425
+msgid "Unable to create "
+msgstr "Невозможно создать "
+
+#: hggtk\commit.py:480
+msgid "Unable to apply patch"
+msgstr "Невозможно применить заплатку"
+
+#: hggtk\commit.py:518
+msgid "Confirm Undo commit"
+msgstr "Подтвердить Отмену фиксации"
+
+#: hggtk\commit.py:519
+msgid "Undo last commit"
+msgstr "Отменить последнюю фиксацию"
+
+#: hggtk\commit.py:525 hggtk\commit.py:540
+msgid "Undo commit"
+msgstr "Отменить фиксацию"
+
+#: hggtk\commit.py:526
+msgid ""
+"Unable to undo!\n"
+"\n"
+"Tip revision differs from last commit."
+msgstr ""
+"Невозможно отменить!\n"
+"\n"
+"Оконечная ревизия отличается от последней фиксации."
+
+#: hggtk\commit.py:541
+msgid "Errors during rollback!"
+msgstr "Ошибки при откате!"
+
+#: hggtk\commit.py:548
+msgid "Confirm Add/Remove"
+msgstr "Подтвердить Добавление/Удаление"
+
+#: hggtk\commit.py:549
+msgid "Add/Remove the following files?"
+msgstr "Добавить/Удалить указанные файлы?"
+
+#: hggtk\commit.py:562 hggtk\tagadd.py:174
+msgid "Please enter commit message"
+msgstr "Пожалуйста введите заметку фиксации"
+
+#: hggtk\commit.py:570
+msgid "Error"
+msgstr "Ошибка"
+
+#: hggtk\commit.py:571
+msgid "Message format configuration error"
+msgstr "Ошибка настройки формата заметки"
+
+#: hggtk\commit.py:580 hggtk\commit.py:588 hggtk\commit.py:600
+msgid "Confirm Commit"
+msgstr "Подтвердить Фиксацию"
+
+#: hggtk\commit.py:581
+msgid ""
+"The summary line length of %i is greater than %i.\n"
+"\n"
+"Ignore format policy and continue commit?"
+msgstr ""
+"Длина строки сводки %i больше чем %i.\n"
+"\n"
+"Игнорировать правила форматирования и продолжить фиксацию?"
+
+#: hggtk\commit.py:589
+msgid ""
+"The summary line is not followed by a blank line.\n"
+"\n"
+"Ignore format policy and continue commit?"
+msgstr ""
+"После строки сводки нет пустой строки.\n"
+"\n"
+"Игнорировать правила форматирования и продолжить фиксацию?"
+
+#: hggtk\commit.py:601
+msgid ""
+"The following lines are over the %i-character limit: %s.\n"
+"\n"
+"Ignore format policy and continue commit?"
+msgstr ""
+"Следующие строки превышают %i-символьное ограничение: %s.\n"
+"\n"
+"Игнорировать правила форматирования и продолжить фиксацию?"
+
+#: hggtk\commit.py:615
+msgid "Commit: Invalid username"
+msgstr "Фиксация: Неверное имя пользователя"
+
+#: hggtk\commit.py:616
+msgid ""
+"Your username has not been configured.\n"
+"\n"
+"Please configure your username and try again"
+msgstr ""
+"Вы не указали свое имя пользователя.\n"
+"\n"
+"Пожалуйста укажите имя пользователя и попробуйте снова"
+
+#: hggtk\commit.py:638
+msgid "Confirm Override Branch"
+msgstr "Подтвердить Замещение Ветки"
+
+#: hggtk\commit.py:639
+msgid ""
+"A branch named \"%s\" already exists,\n"
+"override?"
+msgstr ""
+"Ветка с именем \"%s\" уже существует,\n"
+"заместить?"
+
+#: hggtk\commit.py:644
+msgid "Confirm New Branch"
+msgstr "Подтвердить Новую Ветку"
+
+#: hggtk\commit.py:645
+msgid "Create new named branch \"%s\"?"
+msgstr "Создать новую именованную ветку \"%s\"?"
+
+#: hggtk\commit.py:715
+msgid "Paste _Filenames"
+msgstr "Вставить Имена файлов"
+
+#: hggtk\commit.py:716
+msgid "App_ly Format"
+msgstr "Применить Формат"
+
+#: hggtk\commit.py:717
+msgid "C_onfigure Format"
+msgstr "Настроить Формат"
+
+#: hggtk\commit.py:743 hggtk\hgemail.py:307 hggtk\hgemail.py:312
+#: hggtk\hgemail.py:321
+msgid "Info required"
+msgstr "Необходима информация"
+
+#: hggtk\commit.py:744
+msgid "Message format needs to be configured"
+msgstr "Необходимо настроить формат сообщения"
+
+#: hggtk\commit.py:756 hggtk\commit.py:761
+msgid "Warning"
+msgstr "Предупреждение"
+
+#: hggtk\commit.py:757
+msgid "The summary line length of %i is greater than %i"
+msgstr "Длина %i строки сводки больше чем %i"
+
+#: hggtk\commit.py:762
+msgid "The summary line is not followed by a blank line"
+msgstr "После строки сводки нет пустой строки"
+
+#: hggtk\datamine.py:35
+msgid "DataMining"
+msgstr "Поиск данных"
+
+#: hggtk\datamine.py:44 hggtk\hgcmd.py:37 hggtk\recovery.py:43
+#: hggtk\serve.py:61 hggtk\synch.py:60
+msgid "Stop"
+msgstr "Остановить"
+
+#: hggtk\datamine.py:46
+msgid "Stop operation on current tab"
+msgstr "Остановить действие на текущей вкладке"
+
+#: hggtk\datamine.py:48
+msgid "New Search"
+msgstr "Новый Поиск"
+
+#: hggtk\datamine.py:50
+msgid "Open new search tab"
+msgstr "Открыть новую вкладку поиска"
+
+#: hggtk\datamine.py:61 hggtk\thgconfig.py:947
+msgid "Invalid path"
+msgstr "Неверный путь"
+
+#: hggtk\datamine.py:62
+msgid "Cannot annotate directory: %s"
+msgstr "Невозможно аннотировать папку: %s"
+
+#: hggtk\datamine.py:104
+msgid "Filename"
+msgstr "Имя файла"
+
+#: hggtk\datamine.py:107 hggtk\datamine.py:525 hggtk\logview\treeview.py:423
+#: hggtk\thgconfig.py:160 hggtk\thgconfig.py:233
+msgid "User"
+msgstr "Пользователь"
+
+#: hggtk\datamine.py:115 hggtk\datamine.py:124 hggtk\history.py:391
+msgid "di_splay change"
+msgstr "показать изменение"
+
+#: hggtk\datamine.py:123
+msgid "_zoom to change"
+msgstr "раскрыть изменение"
+
+#: hggtk\datamine.py:125
+msgid "_annotate parent"
+msgstr "аннотировать родителя"
+
+#: hggtk\datamine.py:216
+msgid "Search"
+msgstr "Поиск"
+
+#: hggtk\datamine.py:217 hggtk\hgignore.py:49
+msgid "Regexp:"
+msgstr "Регулярное выражение:"
+
+#: hggtk\datamine.py:219
+msgid "Includes:"
+msgstr "Включает:"
+
+#: hggtk\datamine.py:221
+msgid "Excludes:"
+msgstr "Исключает:"
+
+#: hggtk\datamine.py:224
+msgid "Start this search"
+msgstr "Начать поиск"
+
+#: hggtk\datamine.py:225
+msgid "Regular expression search pattern"
+msgstr "Шаблон поиска по регулярному выражению"
+
+#: hggtk\datamine.py:226
+msgid ""
+"Comma separated list of inclusion patterns.  By default, the entire "
+"repository is searched."
+msgstr ""
+"Список шаблонов включения разделённых запятыми.  По-умолчанию, поиск ведётся "
+"по всему хранилищу."
+
+#: hggtk\datamine.py:229
+msgid ""
+"Comma separated list of exclusion patterns.  Exclusion patterns are applied "
+"after inclusion patterns."
+msgstr ""
+"Список шаблонов исключения разделённых запятыми.  Шаблоны исключения "
+"применяются после шаблонов включения."
+
+#: hggtk\datamine.py:235
+msgid "Follow copies and renames"
+msgstr "Отслеживать копии и переименования"
+
+#: hggtk\datamine.py:236
+msgid "Ignore case"
+msgstr "Игнорировать регистр"
+
+#: hggtk\datamine.py:237
+msgid "Show line numbers"
+msgstr "Показывать номера строк"
+
+#: hggtk\datamine.py:238
+msgid "Show all matching revisions"
+msgstr "Показывать все соответствующие ревизии"
+
+#: hggtk\datamine.py:266 hggtk\datamine.py:523 hggtk\logview\treeview.py:372
+msgid "Rev"
+msgstr "Ревизия"
+
+#: hggtk\datamine.py:267 hggtk\datamine.py:524
+msgid "File"
+msgstr "Файл"
+
+#: hggtk\datamine.py:268
+msgid "Matches"
+msgstr "Соотвествия"
+
+#: hggtk\datamine.py:290
+msgid "Search %d"
+msgstr "Поиск %d"
+
+#: hggtk\datamine.py:332
+msgid "No regular expression given"
+msgstr "Регулярное выражение не задано"
+
+#: hggtk\datamine.py:333
+msgid "You must provide a search expression"
+msgstr "Необходимо указать выражение для поиска"
+
+#: hggtk\datamine.py:361
+msgid "Search \"%s\""
+msgstr "Поиск \"%s\""
+
+#: hggtk\datamine.py:473
+msgid "File is unrevisioned"
+msgstr "Файла нет в ревизиях"
+
+#: hggtk\datamine.py:474
+msgid "Unable to annotate "
+msgstr "Невозможно аннотировать "
+
+#: hggtk\datamine.py:494
+msgid "Follow"
+msgstr "Отслеживать"
+
+#: hggtk\datamine.py:522
+msgid "Line"
+msgstr "Строка"
+
+#: hggtk\datamine.py:526 hggtk\guess.py:100
+msgid "Source"
+msgstr "Источник"
+
+#: hggtk\datamine.py:618
+msgid "Follow Rename:"
+msgstr "Отслеживать Переименование:"
+
+#: hggtk\dialog.py:33
+msgid "TortoiseHg Prompt"
+msgstr "TortoiseHg Вывод"
+
+#: hggtk\gdialog.py:377
+msgid " Aborted"
+msgstr " Прервано"
+
+#: hggtk\gdialog.py:388
+msgid " Messages and Errors"
+msgstr " Сообщения и Ошибки"
+
+#: hggtk\gdialog.py:399
+msgid "No visual diff configured"
+msgstr "Не указан визуализатор различий"
+
+#: hggtk\gdialog.py:400
+msgid "Please select a visual diff application."
+msgstr "Пожалуйста выберите приложение для визуализации различий."
+
+#: hggtk\gdialog.py:459
+msgid "making snapshot of %d files from rev %s\n"
+msgstr "создается снимок %d файлов для ревизии %s\n"
+
+#: hggtk\gdialog.py:492
+msgid "edit failed"
+msgstr "неудача при редактировании"
+
+#: hggtk\gdialog.py:500 hggtk\thgconfig.py:543
+msgid "No visual editor configured"
+msgstr "Не указан визуальный редактор"
+
+#: hggtk\gdialog.py:501 hggtk\thgconfig.py:544
+msgid "Please configure a visual editor."
+msgstr "Пожалуйста укажите визуальный редактор."
+
+#: hggtk\gtklib.py:88
+msgid "Running"
+msgstr "Выполняется"
+
+#: hggtk\gtklib.py:94
+msgid "Done"
+msgstr "Выполнено"
+
+#: hggtk\gtklib.py:176
+msgid "Save File"
+msgstr "Сохранить Файл"
+
+#: hggtk\gtklib.py:177
+msgid "All files"
+msgstr "Все файлы"
+
+#: hggtk\gtklib.py:254
+msgid "Select Folder"
+msgstr "Выбор Папки"
+
+#: hggtk\guess.py:48
+msgid "Detect Copies/Renames in "
+msgstr "Определение Копий/Переименований в "
+
+#: hggtk\guess.py:57
+msgid "Minimum Simularity Percentage"
+msgstr "Минимальный Процент Похожести"
+
+#: hggtk\guess.py:77
+msgid "Find Renames"
+msgstr "Найти Переименования"
+
+#: hggtk\guess.py:78
+msgid "Find Copies"
+msgstr "Найти Копии"
+
+#: hggtk\guess.py:86
+msgid "Unrevisioned Files"
+msgstr "Файлы не входящие в ревизии"
+
+#: hggtk\guess.py:107
+msgid "Dest"
+msgstr "Приемник"
+
+#: hggtk\guess.py:125
+msgid "Accept Match"
+msgstr "Принять Соотвествие"
+
+#: hggtk\guess.py:131
+msgid "Candidate Matches"
+msgstr "Кандидаты на Соотвествие"
+
+#: hggtk\guess.py:142
+msgid "Differences from Source to Dest"
+msgstr "Различия между Источником и Приемником"
+
+#: hggtk\guess.py:238
+msgid "finding source of "
+msgstr "поиск источника "
+
+#: hggtk\guess.py:350
+msgid ""
+"== %s and %s have identical contents ==\n"
+"\n"
+msgstr ""
+"== %s и %s имеют одинаковое содержимое ==\n"
+"\n"
+
+#: hggtk\hgcmd.py:149
+msgid ""
+"\n"
+"[command interrupted]"
+msgstr ""
+"\n"
+"[команда превана]"
+
+#: hggtk\hgemail.py:37
+msgid "send"
+msgstr "отправить"
+
+#: hggtk\hgemail.py:39
+msgid "Send email(s)"
+msgstr "Отправить почту"
+
+#: hggtk\hgemail.py:40
+msgid "test"
+msgstr "тест"
+
+#: hggtk\hgemail.py:42
+msgid "Show email(s) which would be sent"
+msgstr "Показать письма для отправки"
+
+#: hggtk\hgemail.py:44
+msgid "configure"
+msgstr "настроить"
+
+#: hggtk\hgemail.py:46
+msgid "Configure email settings"
+msgstr "Настройка параметров почты"
+
+#: hggtk\hgemail.py:56
+msgid "Email outgoing changes"
+msgstr "Отправка по почте исходящих изменений"
+
+#: hggtk\hgemail.py:58
+msgid "Email revision(s) "
+msgstr "Отправить по почте ревизию(и) "
+
+#: hggtk\hgemail.py:60
+msgid "Email Mercurial Patches"
+msgstr "Отправить по почте Заплатки Mercurial"
+
+#: hggtk\hgemail.py:64
+msgid "Envelope"
+msgstr "Конверт"
+
+#: hggtk\hgemail.py:65 hggtk\taskbarui.py:45
+msgid "Options"
+msgstr "Настройки"
+
+#: hggtk\hgemail.py:77
+msgid "To:"
+msgstr "Получатель:"
+
+#: hggtk\hgemail.py:88
+msgid "Cc:"
+msgstr "Копии:"
+
+#: hggtk\hgemail.py:99
+msgid "From:"
+msgstr "От:"
+
+#: hggtk\hgemail.py:108
+msgid "In-Reply-To:"
+msgstr "В ответ  на:"
+
+#: hggtk\hgemail.py:115
+msgid "Message identifier to reply to, for threading"
+msgstr ""
+"Идентификатор сообщения для ответа, используется для формирования нити "
+"обсуждения"
+
+#: hggtk\hgemail.py:121
+msgid "Send changesets as HG patches"
+msgstr "Отправить наборы изменений как заплатки HG"
+
+#: hggtk\hgemail.py:124
+msgid ""
+"HG patches (as generated by export command) are compatible with most patch "
+"programs.  They include a header which contains the most important changeset "
+"metadata."
+msgstr ""
+"Заплатки HG (сгенерированные командой export) совместимы с большинством "
+"программ заплаток. Они включают заголовок, который содержит наиболее важные "
+"метаданные набора изменений."
+
+#: hggtk\hgemail.py:129
+msgid "Use extended (git) patch format"
+msgstr "Использовать расшиненный (git) формат заплатки"
+
+#: hggtk\hgemail.py:132
+msgid ""
+"Git patches can describe binary files, copies, and permission changes, but "
+"recipients may not be able to use them if they are not using git or "
+"Mercurial."
+msgstr ""
+"Git заплатки могут описывать двоичные файлы, копии, и изменения прав, но "
+"получатели не смогут использовать их не иначе чем с git или Mercurial."
+
+#: hggtk\hgemail.py:137
+msgid "Plain, do not prepend HG header"
+msgstr "Простой формат, не добавлять заголовок HG"
+
+#: hggtk\hgemail.py:140
+msgid ""
+"Stripping Mercurial header removes username and parent information.  Only "
+"useful if recipient is not using Mercurial (and does not like to see the "
+"headers)."
+msgstr ""
+"Отсекание заголовка Mercurial убирает имя пользователя и информацию о "
+"родителе. Полезно, только в случае если получатель не использует Mercurial "
+"(и не хочет видеть эти заголовки)."
+
+#: hggtk\hgemail.py:145
+msgid "Send single binary bundle, not patches"
+msgstr "Отправить одной двоичной пачкой, а не заплатками"
+
+#: hggtk\hgemail.py:148
+msgid ""
+"Bundles store complete changesets in binary form. Upstream users can pull "
+"from them. This is the safest way to send changes to recipient Mercurial "
+"users."
+msgstr ""
+"Пачки содержат набор изменений целиком в двоичном виде. Пользователи на той "
+"стороне могут вытягивать из них. Это самый безопасный путь для отправки "
+"изменений получателям использующим Mercurial."
+
+#: hggtk\hgemail.py:155
+msgid "attach"
+msgstr "вложить"
+
+#: hggtk\hgemail.py:157
+msgid "send patches as attachments"
+msgstr "отправить заплатки как вложения"
+
+#: hggtk\hgemail.py:158
+msgid "inline"
+msgstr "в тексте"
+
+#: hggtk\hgemail.py:160
+msgid "send patches as inline attachments"
+msgstr "отправить заплатки как вложения в тексте"
+
+#: hggtk\hgemail.py:161
+msgid "diffstat"
+msgstr "статистика различий"
+
+#: hggtk\hgemail.py:163
+msgid "add diffstat output to messages"
+msgstr "добавить статистику различий к сообщениям"
+
+#: hggtk\hgemail.py:172
+msgid "Subject:"
+msgstr "Тема:"
+
+#: hggtk\hgemail.py:184
+msgid "Patch Series (Bundle) Description"
+msgstr "Описание Ряда Заплаток (Пачки)"
+
+#: hggtk\hgemail.py:236
+msgid "The description field is unused when sending a single patch."
+msgstr "Поле описания не используется при отправке одиночной заплатки."
+
+#: hggtk\hgemail.py:239
+msgid ""
+"Patch series description is sent in initial summary email with [PATCH 0 of "
+"N] subject.  It should describe the effects of the entire patch series.  "
+"When emailing a bundle, these fields make up the message subject and body."
+msgstr ""
+"Описание ряда заплаток отправляется в начальной сводке, в письме с темой "
+"[PATCH 0 of N].  Оно должно описывать воздействие всего ряда заплаток.  При "
+"отправке пачкой, по этим полям составляются тема и и сам текст сообщения."
+
+#: hggtk\hgemail.py:308
+msgid "You must specify a recipient"
+msgstr "Необходимо указать получателя"
+
+#: hggtk\hgemail.py:313
+msgid "You must specify a sender address"
+msgstr "Необходимо указать адрес отправителя"
+
+#: hggtk\hgemail.py:322
+msgid "You must configure SMTP"
+msgstr "Необходимо настроить SMTP"
+
+#: hggtk\hgignore.py:27
+msgid "Ignore filter for "
+msgstr "Фильтр игнорирования для "
+
+#: hggtk\hgignore.py:34
+msgid "Glob:"
+msgstr "Маска:"
+
+#: hggtk\hgignore.py:40 hggtk\hgignore.py:55 hggtk\tagadd.py:47
+msgid "Add"
+msgstr "Добавить"
+
+#: hggtk\hgignore.py:79
+msgid "Filters"
+msgstr "Фильтры"
+
+#: hggtk\hgignore.py:86
+msgid "Patterns"
+msgstr "Шаблоны"
+
+#: hggtk\hgignore.py:97
+msgid "Remove Selected"
+msgstr "Удалить Выбранные"
+
+#: hggtk\hgignore.py:105
+msgid "Unknown Files"
+msgstr "Неизвестные Файлы"
+
+#: hggtk\hgignore.py:122
+msgid "Refresh"
+msgstr "Обновить"
+
+#: hggtk\hginit.py:39
+msgid "Create a new repository"
+msgstr "Создать новое хранилище"
+
+#: hggtk\hginit.py:46
+msgid "Destination:"
+msgstr "Назначение:"
+
+#: hggtk\hginit.py:64
+msgid "Add special files (.hgignore, ...)"
+msgstr "Добавить файлы особого назначения (.hgignore, ...)"
+
+#: hggtk\hginit.py:66
+msgid "Make repo compatible with Mercurial 1.0"
+msgstr "Сделать хранилище совместимым с Mercurial 1.0"
+
+#: hggtk\hginit.py:93
+msgid "Create"
+msgstr "Создать"
+
+#: hggtk\hginit.py:116
+msgid "Destination path is empty"
+msgstr "Путь назначения пустой"
+
+#: hggtk\hginit.py:117
+msgid "Please enter the directory path"
+msgstr "Пожалуйста укажите путь к каталогу"
+
+#: hggtk\hginit.py:131
+msgid "Unable to create new repository"
+msgstr "Невозможно создать новое хранилище"
+
+#: hggtk\hginit.py:135 hggtk\hginit.py:140
+msgid "Error when creating repository"
+msgstr "Ошибка при создании хранилища"
+
+#: hggtk\hginit.py:157
+msgid "New repository created"
+msgstr "Создано новое хранилище"
+
+#: hggtk\hginit.py:158
+msgid "in directory %s"
+msgstr "в каталоге %s"
+
+#: hggtk\hgshelve.py:92
+msgid "unknown patch content: %r"
+msgstr "неизвестное содержимое заплатки: %r"
+
+#: hggtk\hgshelve.py:113 hggtk\hgshelve.py:140
+msgid "this modifies a binary file (all or nothing)\n"
+msgstr "это измение двоичного файла (всё или ничего)\n"
+
+#: hggtk\hgshelve.py:118 hggtk\hgshelve.py:145
+msgid "this is a binary file\n"
+msgstr "это двоичный файл\n"
+
+#: hggtk\hgshelve.py:129
+msgid ""
+"total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
+msgstr ""
+"всего: %d полос (%d изменённых строк); выбрано: %d полос (%d изменённых "
+"строк)"
+
+#: hggtk\hgshelve.py:148
+msgid "%d hunks, %d lines changed\n"
+msgstr "%d полос(а/ки), %d строк(а/и) изменилось(ась)\n"
+
+#: hggtk\hgshelve.py:294
+msgid "unhandled transition: %s -> %s"
+msgstr "необработанный переход: %s -> %s"
+
+#: hggtk\hgshelve.py:320
+msgid " [Ynsfdaq?] "
+msgstr " [Ynsfdaq?] "
+
+#: hggtk\hgshelve.py:336
+msgid "user quit"
+msgstr "пользовательский выход"
+
+#: hggtk\hgshelve.py:350
+msgid "shelve changes to %s?"
+msgstr "отложить изменения в %s?"
+
+#: hggtk\hgshelve.py:351
+msgid " and "
+msgstr " и "
+
+#: hggtk\hgshelve.py:361
+msgid "shelve this change to %r?"
+msgstr "отложить это изменение в %r?"
+
+#: hggtk\hgshelve.py:400
+msgid "backup %r as %r\n"
+msgstr "Сохранить резервную копию %r как %r\n"
+
+#: hggtk\hgshelve.py:433
+msgid "shelve can only be run interactively"
+msgstr "откладывание выполняется только в интерактивном режиме"
+
+#: hggtk\hgshelve.py:437
+msgid "shelve data already exists"
+msgstr "отложенные данные уже существуют"
+
+#: hggtk\hgshelve.py:468
+msgid "no changes to shelve\n"
+msgstr "нет изменений для откладывания\n"
+
+#: hggtk\hgshelve.py:502
+msgid "applying patch\n"
+msgstr "применить заплатку\n"
+
+#: hggtk\hgshelve.py:514
+msgid "saving patch to shelve\n"
+msgstr "заплатка сохраняется в отложенное\n"
+
+#: hggtk\hgshelve.py:525 hggtk\hgshelve.py:576
+msgid "restoring %r to %r\n"
+msgstr "восстанавливается %r в %r\n"
+
+#: hggtk\hgshelve.py:527
+msgid "removing shelve file\n"
+msgstr "удаляется файл отложений\n"
+
+#: hggtk\hgshelve.py:536
+msgid "removing backup for %r : %r\n"
+msgstr "удаляется резервирование для %r : %r\n"
+
+#: hggtk\hgshelve.py:561
+msgid "applying shelved patch\n"
+msgstr "применяется отложенная заплатка\n"
+
+#: hggtk\hgshelve.py:574
+msgid "restoring backup files\n"
+msgstr "восстанавливаются резервные файлы\n"
+
+#: hggtk\hgshelve.py:581
+msgid "removing backup files\n"
+msgstr "удаляются резервные файлы\n"
+
+#: hggtk\hgshelve.py:587
+msgid "removing shelved patches\n"
+msgstr "удаляются отложенные заплатки\n"
+
+#: hggtk\hgshelve.py:589
+msgid "unshelve completed\n"
+msgstr "откладывание завершено\n"
+
+#: hggtk\hgshelve.py:591
+msgid "nothing to unshelve\n"
+msgstr "нечего отложить\n"
+
+#: hggtk\hgshelve.py:597
+msgid "mark new/missing files as added/removed before shelving"
+msgstr ""
+"пометить новые/отсутствующие файлы как добавленные/удалённые до отложения"
+
+#: hggtk\hgshelve.py:599
+msgid "overwrite existing shelve data"
+msgstr "переписать существующие отложенные данные"
+
+#: hggtk\hgshelve.py:601
+msgid "append to existing shelve data"
+msgstr "добавить к существующим отложенным данным"
+
+#: hggtk\hgshelve.py:603
+msgid "hg shelve [OPTION]... [FILE]..."
+msgstr "hg shelve [ПАРАМЕТР]... [ФАЙЛ]..."
+
+#: hggtk\hgshelve.py:606
+msgid "inspect shelved changes only"
+msgstr "рассматривать только отложенные изменения"
+
+#: hggtk\hgshelve.py:608
+msgid "proceed even if patches do not unshelve cleanly"
+msgstr "продолжать даже если не всё гладко с применением заплаток"
+
+#: hggtk\hgshelve.py:610
+msgid "hg unshelve [OPTION]... [FILE]..."
+msgstr "hg unshelve [ПАРАМЕТР]... [ФАЙЛ]..."
+
+#: hggtk\hgthread.py:78
+msgid "unrecognized response\n"
+msgstr "не распознанный ответ\n"
+
+#: hggtk\hgthread.py:80 hggtk\hgthread.py:87
+msgid "response expected"
+msgstr "ожидается ответ"
+
+#: hggtk\hgthread.py:84
+msgid "password: "
+msgstr "пароль: "
+
+#: hggtk\hgthread.py:176
+msgid "[command returned code %d]\n"
+msgstr "[команда вернула код %d]\n"
+
+#: hggtk\hgthread.py:178
+msgid "[command completed successfully]\n"
+msgstr "[команда выполнилась успешно]\n"
+
+#: hggtk\hgtk.py:74
+msgid "can not read file \"%s\". Ignored.\n"
+msgstr "не возможно прочитать файл \"%s\". Игнорирован.\n"
+
+#: hggtk\hgtk.py:146
+msgid "hgtk %s: %s\n"
+msgstr "hgtk %s: %s\n"
+
+#: hggtk\hgtk.py:149
+msgid "hgtk: %s\n"
+msgstr "hgtk: %s\n"
+
+#: hggtk\hgtk.py:152
+msgid ""
+"hgtk: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+"hgtk: команда '%s' неоднозначна:\n"
+"    %s\n"
+
+#: hggtk\hgtk.py:155
+msgid "hgtk: unknown command '%s'\n"
+msgstr "hgtk: неизвестная команда '%s'\n"
+
+#: hggtk\hgtk.py:158
+msgid "abort: %s!\n"
+msgstr "неудача: %s!\n"
+
+#: hggtk\hgtk.py:196 thgutil\hglib.py:305
+msgid "There is no Mercurial repository here (.hg not found)"
+msgstr "Здесь нет хранилища Mercurial (.hg не обнаружен)"
+
+#: hggtk\hgtk.py:206 thgutil\hglib.py:325
+msgid "invalid arguments"
+msgstr "неверные параметры"
+
+#: hggtk\hgtk.py:291
+msgid "rename takes one or two path arguments"
+msgstr "rename требует одного или двух аргументов"
+
+#: hggtk\hgtk.py:383
+msgid "global options:"
+msgstr "глобальные настройки:"
+
+#: hggtk\hgtk.py:385
+msgid "use \"hgtk help\" for the full list of commands"
+msgstr "используйте \"hgtk help\" для получения полного списка команд"
+
+#: hggtk\hgtk.py:389
+msgid ""
+"use \"hgtk help\" for the full list of commands or \"hgtk -v\" for details"
+msgstr ""
+"используйте \"hgtk help\" для получения полного списка команд или \"hgtk -"
+"v\" для подробностей"
+
+#: hggtk\hgtk.py:392
+msgid "use \"hgtk -v help%s\" to show aliases and global options"
+msgstr ""
+"используйте \"hgtk -v help %s\" для просмотра псевдонимов и глобальных "
+"настроек"
+
+#: hggtk\hgtk.py:395
+msgid "use \"hgtk -v help %s\" to show global options"
+msgstr "используйте \"hgtk -v help %s\" для просмотра глобальных настроек"
+
+#: hggtk\hgtk.py:408
+msgid ""
+"\n"
+"aliases: %s\n"
+msgstr ""
+"\n"
+"псевдонимы:\n"
+
+#: hggtk\hgtk.py:413 hggtk\hgtk.py:439 hggtk\hgtk.py:474
+msgid "(No help text available)"
+msgstr "(Нет текстовой справки)"
+
+#: hggtk\hgtk.py:421
+msgid "options:\n"
+msgstr "настройки:\n"
+
+#: hggtk\hgtk.py:444
+msgid "no commands defined\n"
+msgstr "команды не определены\n"
+
+#: hggtk\hgtk.py:500 hggtk\hgtk.py:526
+msgid ""
+"list of commands:\n"
+"\n"
+msgstr ""
+"список команд:\n"
+"\n"
+
+#: hggtk\hgtk.py:519
+msgid "Hgtk - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
+msgstr ""
+"Hgtk - Инструменты с графическим интерфейсом TortoiseHg для Mercurial SCM "
+"(Hg)\n"
+
+#: hggtk\hgtk.py:524
+msgid ""
+"basic commands:\n"
+"\n"
+msgstr ""
+"основные команды:\n"
+"\n"
+
+#: hggtk\hgtk.py:540
+msgid " (default: %s)"
+msgstr " (по-умолчанию: %s)"
+
+#: hggtk\hgtk.py:553
+msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
+msgstr "TortoiseHg Диалоги (версия %s), Mercurial (версия %s)\n"
+
+#: hggtk\hgtk.py:582
+msgid "repository root directory or symbolic path name"
+msgstr "имя каталога в корне хранилища или символического пути"
+
+#: hggtk\hgtk.py:583
+msgid "enable additional output"
+msgstr "включить дополнительный вывод"
+
+#: hggtk\hgtk.py:584
+msgid "display help and exit"
+msgstr "показать справку и выйти"
+
+#: hggtk\hgtk.py:585
+msgid "start debugger"
+msgstr "запустить отладчик"
+
+#: hggtk\hgtk.py:586
+msgid "do not fork GUI process"
+msgstr "не ответвляйте GUI процесс"
+
+#: hggtk\hgtk.py:587
+msgid "read file list from file"
+msgstr "прочитать список файлов из файла"
+
+#: hggtk\hgtk.py:591
+msgid "hgtk about"
+msgstr "hgtk about"
+
+#: hggtk\hgtk.py:592
+msgid "hgtk add [FILE]..."
+msgstr "hgtk add [ФАЙЛ]..."
+
+#: hggtk\hgtk.py:593
+msgid "hgtk clone SOURCE [DEST]"
+msgstr "hgtk clone ИСТОЧНИК [НАЗНАЧЕНИЕ]"
+
+#: hggtk\hgtk.py:595
+msgid "record user as committer"
+msgstr "записать пользователя как фиксирующего"
+
+#: hggtk\hgtk.py:596
+msgid "record datecode as commit date"
+msgstr "записать дату фиксации"
+
+#: hggtk\hgtk.py:597
+msgid "hgtk commit [OPTIONS] [FILE]..."
+msgstr "hgtk commit [ПАРАМЕТРЫ] [ФАЙЛ]..."
+
+#: hggtk\hgtk.py:598
+msgid "hgtk datamine"
+msgstr "hgtk datamine"
+
+#: hggtk\hgtk.py:599
+msgid "hgtk hgignore [FILE]"
+msgstr "hgtk hgignore [ФАЙЛ]"
+
+#: hggtk\hgtk.py:600
+msgid "hgtk init [DEST]"
+msgstr "hgtk init [НАЗНАЧЕНИЕ]"
+
+#: hggtk\hgtk.py:602
+msgid "limit number of changes displayed"
+msgstr "ограничить количество отображаемых изменений"
+
+#: hggtk\hgtk.py:603
+msgid "hgtk log [OPTIONS] [FILE]"
+msgstr "hgtk log [ПАРАМЕТРЫ] [ФАЙЛ]"
+
+#: hggtk\hgtk.py:605 hggtk\hgtk.py:632
+msgid "revision to update"
+msgstr "ревизия для обновления"
+
+#: hggtk\hgtk.py:606
+msgid "hgtk merge"
+msgstr "hgtk merge"
+
+#: hggtk\hgtk.py:607
+msgid "hgtk recovery"
+msgstr "hgtk recovery"
+
+#: hggtk\hgtk.py:608
+msgid "hgtk shelve"
+msgstr "hgtk shelve"
+
+#: hggtk\hgtk.py:609
+msgid "hgtk synch"
+msgstr "hgtk synch"
+
+#: hggtk\hgtk.py:611
+msgid "revisions to compare"
+msgstr "ревизии для сравнения"
+
+#: hggtk\hgtk.py:612
+msgid "hgtk status [FILE]..."
+msgstr "hgtk status [ФАЙЛ]..."
+
+#: hggtk\hgtk.py:613
+msgid "hgtk userconfig"
+msgstr "hgtk userconfig"
+
+#: hggtk\hgtk.py:614
+msgid "hgtk repoconfig"
+msgstr "hgtk repoconfig"
+
+#: hggtk\hgtk.py:615
+msgid "hgtk guess"
+msgstr "hgtk guess"
+
+#: hggtk\hgtk.py:616
+msgid "hgtk remove [FILE]..."
+msgstr "hgtk remove [ФАЙЛ]..."
+
+#: hggtk\hgtk.py:617
+msgid "hgtk rename SOURCE [DEST]"
+msgstr "hgtk rename ИСХОДНОЕ [НАЗНАЧЕНИЕ]"
+
+#: hggtk\hgtk.py:618
+msgid "hgtk revert [FILE]..."
+msgstr "hgtk revert [ФАЙЛ]..."
+
+#: hggtk\hgtk.py:621
+msgid "name of the webdir config file"
+msgstr "имя файла с кофигурацией webdir"
+
+#: hggtk\hgtk.py:622
+msgid "hgtk serve [OPTION]..."
+msgstr "hgtk serve [ПАРАМЕТР]..."
+
+#: hggtk\hgtk.py:624
+msgid "wait until the second ticks over"
+msgstr "подождать секунду"
+
+#: hggtk\hgtk.py:625
+msgid "notify the shell for path(s) given"
+msgstr "уведомлять оболочку для указанного пути(ей)"
+
+#: hggtk\hgtk.py:626
+msgid "remove the status cache"
+msgstr "удалить кэш статуса"
+
+#: hggtk\hgtk.py:627
+msgid "show the contents of the status cache (no update)"
+msgstr "показать содержимое кэша статуса (без обновления)"
+
+#: hggtk\hgtk.py:629
+msgid "udpate all repos in current dir"
+msgstr "обновить все хранилища в текущем каталоге"
+
+#: hggtk\hgtk.py:630
+msgid "hgtk thgstatus [OPTION]"
+msgstr "hgtk thgstatus [ПАРАМЕТР]"
+
+#: hggtk\hgtk.py:635
+msgid "changeset to view in diff tool"
+msgstr "набор изменений для отображения в инструменте различий"
+
+#: hggtk\hgtk.py:636
+msgid "revisions to view in diff tool"
+msgstr "ревизии для отображения в инструменте различий"
+
+#: hggtk\hgtk.py:637
+msgid "launch visual diff tool"
+msgstr "запустить визуализатор различий"
+
+#: hggtk\hgtk.py:639
+msgid "print license"
+msgstr "напечатать лицензию"
+
+#: hggtk\hgtk.py:640
+msgid "hgtk version [OPTION]"
+msgstr "hgtk version [ПАРАМЕТР]"
+
+#: hggtk\hgtk.py:642
+msgid "show the command options"
+msgstr "показать параметры команды"
+
+#: hggtk\hgtk.py:643
+msgid "[-o] CMD"
+msgstr "[-o] КОМАНДА"
+
+#: hggtk\hgtk.py:644
+msgid "hgtk help [COMMAND]"
+msgstr "hgtk help [КОМАНДА]"
+
+#: hggtk\history.py:53 hggtk\status.py:194
+msgid "Re_fresh"
+msgstr "Обновить"
+
+#: hggtk\history.py:55
+msgid "Reload revision history"
+msgstr "Перезагрузить историю ревизий"
+
+#: hggtk\history.py:58
+msgid "_Filter"
+msgstr "Фильтр"
+
+#: hggtk\history.py:61
+msgid "Filter revisions for display"
+msgstr "Фильтровать ревизии для показа"
+
+#: hggtk\history.py:64
+msgid "_DataMine"
+msgstr "Поиск данных"
+
+#: hggtk\history.py:66
+msgid "Search Repository History"
+msgstr "Искать по Истории Хранилища"
+
+#: hggtk\history.py:71 thgutil\menuthg.py:173
+msgid "Synchronize"
+msgstr "Синхронизация"
+
+#: hggtk\history.py:73
+msgid "Launch synchronize tool"
+msgstr "Запустить инструмент синхронизации"
+
+#: hggtk\history.py:166
+msgid "Show Rev"
+msgstr "Отображать Ревизию"
+
+#: hggtk\history.py:172
+msgid "Show ID"
+msgstr "Отображать ID"
+
+#: hggtk\history.py:178
+msgid "Show Local Date"
+msgstr "Отображать Локальное Время"
+
+#: hggtk\history.py:184
+msgid "Show UTC Date"
+msgstr "Отображать UTC Время"
+
+#: hggtk\history.py:190
+msgid "Show Branch"
+msgstr "Отображать Ветку"
+
+#: hggtk\history.py:202
+msgid "Show All Revisions"
+msgstr "Показывать Все Ревизии"
+
+#: hggtk\history.py:207
+msgid "Show New Revisions"
+msgstr "Показывать Новые Ревизии"
+
+#: hggtk\history.py:211
+msgid "Show Tagged Revisions"
+msgstr "Показывать Помеченные Ревизии"
+
+#: hggtk\history.py:215
+msgid "Show Revision Ancestry"
+msgstr "Показывать Происхождение Ревизии"
+
+#: hggtk\history.py:219
+msgid "Show Working Parents"
+msgstr "Показывать Родителей Рабочей"
+
+#: hggtk\history.py:223
+msgid "Show Head Revisions"
+msgstr "Показывать Головные Ревизии"
+
+#: hggtk\history.py:227
+msgid "Show Only Merge Revisions"
+msgstr "Показывать Только Ревизии Слияний"
+
+#: hggtk\history.py:231
+msgid "Show Non-Merge Revisions"
+msgstr "Показывать Ревизии Не Слияний"
+
+#: hggtk\history.py:235
+msgid "Custom Filter"
+msgstr "Настройка Фильтра"
+
+#: hggtk\history.py:390
+msgid "visualize change"
+msgstr "визуализировать изменение"
+
+#: hggtk\history.py:392
+msgid "diff to local"
+msgstr "различия по сравнению с локальным"
+
+#: hggtk\history.py:393
+msgid "_update"
+msgstr "обновить"
+
+#: hggtk\history.py:394 hggtk\history.py:425
+msgid "_merge with"
+msgstr "слияние с"
+
+#: hggtk\history.py:396
+msgid "_copy hash"
+msgstr "скопировать хэш"
+
+#: hggtk\history.py:397
+msgid "_export patch"
+msgstr "экспортировать заплатку"
+
+#: hggtk\history.py:398
+msgid "e_mail patch"
+msgstr "отправить почтой заплатку"
+
+#: hggtk\history.py:399
+msgid "_bundle rev:tip"
+msgstr "сформировать пачку ревизия:tip"
+
+#: hggtk\history.py:400
+msgid "add/remove _tag"
+msgstr "добавить/удалить метку"
+
+#: hggtk\history.py:401
+msgid "backout revision"
+msgstr "восстановить ревизию"
+
+#: hggtk\history.py:402 hggtk\status.py:105 hggtk\status.py:110
+#: hggtk\status.py:129 hggtk\status.py:136 hggtk\status.py:144
+msgid "_revert"
+msgstr "возвратить"
+
+#: hggtk\history.py:407
+msgid "strip revision"
+msgstr "отсечь ревизию"
+
+#: hggtk\history.py:418
+msgid "_diff with selected"
+msgstr "различия с выбраной"
+
+#: hggtk\history.py:419
+msgid "visual diff with selected"
+msgstr "визуальные различия с выбранной"
+
+#: hggtk\history.py:421
+msgid "email from here to selected"
+msgstr "отправить почтой от этой до выбранной"
+
+#: hggtk\history.py:423
+msgid "bundle from here to selected"
+msgstr "сформировать пачку от этой до выбранной"
+
+#: hggtk\history.py:483
+msgid "show next %d revisions"
+msgstr "показать следующие %d ревизий"
+
+#: hggtk\history.py:485
+msgid "show all remaining revisions"
+msgstr "показать все оставшиеся ревизии"
+
+#: hggtk\history.py:523
+msgid "Confirm Strip Revision(s)"
+msgstr "Подтвердить Отсекание Ревизии(й)"
+
+#: hggtk\history.py:524
+msgid "Remove revision %d and all descendants?"
+msgstr "Удалить ревизию %d и всех потомков?"
+
+#: hggtk\history.py:548
+msgid "Confirm Revert Revision(s)"
+msgstr "Подтвердить Воврат Ревизии(й)"
+
+#: hggtk\history.py:549
+msgid ""
+"Revert all files to revision %d?\n"
+"This will overwrite your local changes"
+msgstr ""
+"Возвратить все файлы ревизии %d?\n"
+"Это затрёт все локальные изменения"
+
+#: hggtk\history.py:611 hggtk\history.py:691
+msgid "Write bundle to"
+msgstr "Записать пачку в"
+
+#: hggtk\history.py:660 hggtk\status.py:1045
+msgid "Save patch to"
+msgstr "Сохранить заплатку в"
+
+#: hggtk\history.py:667 hggtk\history.py:696 hggtk\thgconfig.py:368
+#: hggtk\thgconfig.py:670
+msgid "Confirm Overwrite"
+msgstr "Потвердить Переписывание"
+
+#: hggtk\history.py:668 hggtk\history.py:697
+msgid ""
+"The file \"%s\" already exists!\n"
+"\n"
+"Do you want to overwrite it?"
+msgstr ""
+"Файл \"%d\" уже существует!\n"
+"\n"
+"Записать поверх него?"
+
+#: hggtk\logfilter.py:27 hggtk\taskbarui.py:31 hggtk\thgconfig.py:452
+msgid "Apply"
+msgstr "Применить"
+
+#: hggtk\logfilter.py:31
+msgid "Log Filter - %s"
+msgstr "Фильтр Журнала - %s"
+
+#: hggtk\logfilter.py:46 hggtk\logview\treeview.py:398
+msgid "Branch"
+msgstr "Ветка"
+
+#: hggtk\logfilter.py:53
+msgid "View revision graph of named branch"
+msgstr "Показать граф ревизий именованной ветки"
+
+#: hggtk\logfilter.py:60
+msgid "Rev Range"
+msgstr "Диапазон Ревизий"
+
+#: hggtk\logfilter.py:70
+msgid "View range of revisions"
+msgstr "Показать диапазон ревизий"
+
+#: hggtk\logfilter.py:78
+msgid "Search Filter"
+msgstr "Фильтр Поиска"
+
+#: hggtk\logfilter.py:82
+msgid "Search repository changelog with criteria"
+msgstr "Поиск по журналу изменений хранилища в соответствии с требованиями"
+
+#: hggtk\logfilter.py:94
+msgid "File(s):"
+msgstr "Файл(ы):"
+
+#: hggtk\logfilter.py:101
+msgid "Display only changesets affecting these comma separated file paths"
+msgstr ""
+"Показывать только наборы изменений затрагивающих приведенный список файловых "
+"путей"
+
+#: hggtk\logfilter.py:110
+msgid "Keyword(s):"
+msgstr "Ключевые слова:"
+
+#: hggtk\logfilter.py:117
+msgid ""
+"Display only changesets matching these comma separated case insensitive "
+"keywords"
+msgstr ""
+"Показывать только наборы изменений, которым соответствуют приведённые "
+"регистронезависимые ключевые слова"
+
+#: hggtk\logfilter.py:126
+msgid "Help on date formats"
+msgstr "Справка по форматам даты"
+
+#: hggtk\logfilter.py:128
+msgid "Date:"
+msgstr "Дата:"
+
+#: hggtk\logfilter.py:136
+msgid "Display only changesets matching this date specification"
+msgstr "Показывать только наборы изменений соотвествующих данной дате"
+
+#: hggtk\logfilter.py:193
+msgid "Invalid date specification"
+msgstr "Неверная даты"
+
+#: hggtk\logfilter.py:208
+msgid "Invalid revision range"
+msgstr "Неверный диапазон ревизий"
+
+#: hggtk\logview\treeview.py:357
+msgid "Graph"
+msgstr "Граф"
+
+#: hggtk\logview\treeview.py:385
+msgid "ID"
+msgstr "ID"
+
+#: hggtk\logview\treeview.py:411
+msgid "Summary"
+msgstr "Сводка"
+
+#: hggtk\logview\treeview.py:436
+msgid "Local Date"
+msgstr "Локальное Время"
+
+#: hggtk\logview\treeview.py:449
+msgid "Universal Date"
+msgstr "Всеобщее Время"
+
+#: hggtk\merge.py:28
+msgid "Unable to merge"
+msgstr "Слияние невозможно"
+
+#: hggtk\merge.py:29
+msgid "Must supply a target revision"
+msgstr "Необходимо указать целевую ревизию"
+
+#: hggtk\merge.py:39
+msgid "Merging in "
+msgstr "Слияние в "
+
+#: hggtk\merge.py:46
+msgid "Merge target (other)"
+msgstr "Цель слияния (другая)"
+
+#: hggtk\merge.py:55
+msgid "Current revision (local)"
+msgstr "Текущая ревизия (локальная)"
+
+#: hggtk\merge.py:79
+msgid "Undo"
+msgstr "Отменить"
+
+#: hggtk\merge.py:87
+msgid "Merge"
+msgstr "Слить"
+
+#: hggtk\merge.py:116
+msgid "Not a head revision!"
+msgstr "Это не головная ревизия!"
+
+#: hggtk\merge.py:154
+msgid "Confirm undo merge"
+msgstr "Подтвердить отмену слияния"
+
+#: hggtk\merge.py:155
+msgid "Clean checkout of original revision?"
+msgstr "Очистить от изменений выгрузку первоначальной ревизии?"
+
+#: hggtk\recovery.py:37
+msgid "TortoiseHg Recovery - "
+msgstr "TortoiseHg Восстановление - "
+
+#: hggtk\recovery.py:43 hggtk\synch.py:60
+msgid "Stop the hg operation"
+msgstr "Остановить действие hg"
+
+#: hggtk\recovery.py:47
+msgid "Clean"
+msgstr "Очистить"
+
+#: hggtk\recovery.py:49
+msgid "Clean checkout, undo all changes"
+msgstr "Очистить выгрузку, отменить все изменения"
+
+#: hggtk\recovery.py:52
+msgid "Rollback"
+msgstr "Откатить"
+
+#: hggtk\recovery.py:54
+msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
+msgstr ""
+"Откатить (отменить) последнюю транзакцию на хранилище (затягивание, фиксация "
+"и т.д.)"
+
+#: hggtk\recovery.py:58
+msgid "Recover"
+msgstr "Восстановление"
+
+#: hggtk\recovery.py:60
+msgid "Recover from interrupted operation"
+msgstr "Восстановление после прерваного действия"
+
+#: hggtk\recovery.py:63
+msgid "Verify"
+msgstr "Проверить"
+
+#: hggtk\recovery.py:65
+msgid "Validate repository consistency"
+msgstr "Проверить хранилище на целостность"
+
+#: hggtk\recovery.py:99 hggtk\synch.py:367
+msgid "Cannot close now"
+msgstr "Нельзя закрыть сейчас"
+
+#: hggtk\recovery.py:100 hggtk\synch.py:368
+msgid "command is running"
+msgstr "команда выполняется"
+
+#: hggtk\recovery.py:119
+msgid "Confirm clean repository"
+msgstr "Подтвердить очистку хранилища"
+
+#: hggtk\recovery.py:120
+msgid "Clean repository '%s' ?"
+msgstr "Очистить хранилище от изменений'%s' ?"
+
+#: hggtk\recovery.py:126
+msgid "Unable to find repo at %s\n"
+msgstr "Не найдено хранилище в %s\n"
+
+#: hggtk\recovery.py:137
+msgid "Confirm rollback repository"
+msgstr "Подтвердить откат хранилища"
+
+#: hggtk\recovery.py:138
+msgid "Rollback repository '%s' ?"
+msgstr "Откатить хранилище '%s' ?"
+
+#: hggtk\recovery.py:159 hggtk\synch.py:507
+msgid "Cannot run now"
+msgstr "Нельзя сейчас выполнить"
+
+#: hggtk\recovery.py:160 hggtk\synch.py:508
+msgid "Please try again after the previous command is completed"
+msgstr "Пожалуйста попробуйте снова после завершения предыдушей команды"
+
+#: hggtk\recovery.py:222 hggtk\synch.py:601
+msgid "[command interrupted]"
+msgstr "[команда прервана]"
+
+#: hggtk\rename.py:63 hggtk\rename.py:70
+msgid "rename error"
+msgstr "ошибка переименования"
+
+#: hggtk\serve.py:57
+msgid "Start"
+msgstr "Запуск"
+
+#: hggtk\serve.py:59
+msgid "Start server"
+msgstr "Запуск сервера"
+
+#: hggtk\serve.py:63
+msgid "Stop server"
+msgstr "Остановить сервер"
+
+#: hggtk\serve.py:65
+msgid "Browse"
+msgstr "Обзор"
+
+#: hggtk\serve.py:67
+msgid "Launch browser to view repository"
+msgstr "Запустить обозреватель для просмотра хранилища"
+
+#: hggtk\serve.py:69 hggtk\synch.py:93
+msgid "Configure"
+msgstr "Настроить"
+
+#: hggtk\serve.py:71
+msgid "Configure web settings"
+msgstr "Настроить параметры сети"
+
+#: hggtk\serve.py:90
+msgid "HTTP Port:"
+msgstr "HTTP Порт:"
+
+#: hggtk\serve.py:119
+msgid "Serve %s - %s"
+msgstr "Вед доступ к хранилищу %s - %s"
+
+#: hggtk\serve.py:122
+msgid "Serve - "
+msgstr "Веб доступ к хранилищу - "
+
+#: hggtk\serve.py:153
+msgid "Confirm Really Exit?"
+msgstr "Подтвердить Выход?"
+
+#: hggtk\serve.py:154
+msgid ""
+"Server process is still running\n"
+"Exiting will stop the server."
+msgstr ""
+"Процесс сервера еще выполняется\n"
+"Выход остановит сервер."
+
+#: hggtk\serve.py:217
+msgid "Abort: %s\n"
+msgstr "Прервать: %s\n"
+
+#: hggtk\serve.py:225
+msgid "Invalid port 2048..65535"
+msgstr "Невернный порт 2048..65535"
+
+#: hggtk\serve.py:226
+msgid "Defaulting to "
+msgstr "По-умолчанию "
+
+#: hggtk\serve.py:306
+msgid "cannot start server: "
+msgstr "невозможно запустить сервер: "
+
+#: hggtk\serve.py:317
+msgid "listening at http://%s%s/%s (%s:%d)\n"
+msgstr "слушается http://%s%s/%s (%s:%d)\n"
+
+#: hggtk\serve.py:342
+msgid "name of access log file to write to"
+msgstr "имя файла для записи журнала доступа"
+
+#: hggtk\serve.py:343
+msgid "run server in background"
+msgstr "запустить сервер в фоновом режиме"
+
+#: hggtk\serve.py:344
+msgid "used internally by daemon mode"
+msgstr "внутренне используется в режиме сервиса"
+
+#: hggtk\serve.py:345
+msgid "name of error log file to write to"
+msgstr "имя файла для записи журнала ошибок"
+
+#: hggtk\serve.py:346
+msgid "port to use (default: 8000)"
+msgstr "используемый порт (по-умолчанию: 8000)"
+
+#: hggtk\serve.py:347
+msgid "address to use"
+msgstr "используемый адрес"
+
+#: hggtk\serve.py:348
+msgid "prefix path to serve from (default: server root)"
+msgstr ""
+"префикс пути для предоставления доступа (по-умолчанию: в корене сервера)"
+
+#: hggtk\serve.py:350
+msgid "name to show in web pages (default: working dir)"
+msgstr "имя отображаемое на веб-страницах (по-умолчанию: рабочий каталог)"
+
+#: hggtk\serve.py:351
+msgid "name of the webdir config file (serve more than one repo)"
+msgstr ""
+"имя файла конфигурации webdir (для придоставления доступа к нескольким "
+"хранилищам)"
+
+#: hggtk\serve.py:353
+msgid "name of file to write process ID to"
+msgstr "имя файла для записи ID процесса"
+
+#: hggtk\serve.py:354
+msgid "for remote clients"
+msgstr "для удалённых клиентов"
+
+#: hggtk\serve.py:355
+msgid "web templates to use"
+msgstr "используемые веб-шаблоны"
+
+#: hggtk\serve.py:356
+msgid "template style to use"
+msgstr "используемый стиль шаблона"
+
+#: hggtk\serve.py:357
+msgid "use IPv6 in addition to IPv4"
+msgstr "использовать IPv6 вместе с IPv4"
+
+#: hggtk\serve.py:358
+msgid "SSL certificate file"
+msgstr "Файл сертификата SSL"
+
+#: hggtk\serve.py:359
+msgid "hg serve [OPTION]..."
+msgstr "hg serve [ПАРАМЕТР]..."
+
+#: hggtk\status.py:102 hggtk\status.py:108 hggtk\status.py:133
+#: hggtk\status.py:141
+msgid "_difference"
+msgstr "различия"
+
+#: hggtk\status.py:103 hggtk\status.py:134 hggtk\status.py:142
+msgid "edit"
+msgstr "редактировать"
+
+#: hggtk\status.py:104 hggtk\status.py:135 hggtk\status.py:143
+msgid "view other"
+msgstr "показать другой"
+
+#: hggtk\status.py:106 hggtk\status.py:111 hggtk\status.py:123
+#: hggtk\status.py:131 hggtk\status.py:137 hggtk\status.py:145
+msgid "l_og"
+msgstr "журнал"
+
+#: hggtk\status.py:109 hggtk\status.py:113 hggtk\status.py:119
+#: hggtk\status.py:125 hggtk\status.py:128
+msgid "_view"
+msgstr "показать"
+
+#: hggtk\status.py:114 hggtk\status.py:126
+msgid "_delete"
+msgstr "удалить"
+
+#: hggtk\status.py:115
+msgid "_add"
+msgstr "добавить"
+
+#: hggtk\status.py:116
+msgid "_guess rename"
+msgstr "угадать переименование"
+
+#: hggtk\status.py:117
+msgid "_ignore"
+msgstr "игнорировать"
+
+#: hggtk\status.py:120 hggtk\status.py:130
+msgid "re_move"
+msgstr "удалить"
+
+#: hggtk\status.py:121
+msgid "re_name"
+msgstr "переименовать"
+
+#: hggtk\status.py:122
+msgid "_copy"
+msgstr "скопировать"
+
+#: hggtk\status.py:138
+msgid "resolve"
+msgstr "решить"
+
+#: hggtk\status.py:139
+msgid "mark resolved"
+msgstr "отметить как решённое"
+
+#: hggtk\status.py:146
+msgid "mark unresolved"
+msgstr "отметить как нерешённое"
+
+#: hggtk\status.py:182
+msgid "filtered status"
+msgstr "отфильтрованный статус"
+
+#: hggtk\status.py:182
+msgid "status"
+msgstr "статус"
+
+#: hggtk\status.py:195
+msgid "refresh"
+msgstr "обновить"
+
+#: hggtk\status.py:200
+msgid "Save As"
+msgstr "Сохранить Как"
+
+#: hggtk\status.py:201
+msgid "Save selected changes"
+msgstr "Сохранить выбранные изменения"
+
+#: hggtk\status.py:205
+msgid "revert"
+msgstr "возвратить"
+
+#: hggtk\status.py:207
+msgid "add"
+msgstr "добавить"
+
+#: hggtk\status.py:210
+msgid "move selected files to other directory"
+msgstr "переместить выбранные файлы в другой каталог"
+
+#: hggtk\status.py:212
+msgid "remove"
+msgstr "удалить"
+
+#: hggtk\status.py:313
+msgid "st"
+msgstr "ст."
+
+#: hggtk\status.py:321
+msgid "ms"
+msgstr "сс"
+
+#: hggtk\status.py:327
+msgid "path"
+msgstr "путь"
+
+#: hggtk\status.py:434
+msgid "M: modified"
+msgstr "M: изменёные"
+
+#: hggtk\status.py:435
+msgid "A: added"
+msgstr "A: добавленные"
+
+#: hggtk\status.py:436
+msgid "R: removed"
+msgstr "R: удалённые"
+
+#: hggtk\status.py:438
+msgid "!: deleted"
+msgstr "!: отсутствующие"
+
+#: hggtk\status.py:439
+msgid "?: unknown"
+msgstr "?: неизвестные"
+
+#: hggtk\status.py:440
+msgid "C: clean"
+msgstr "C: неизменённые"
+
+#: hggtk\status.py:441
+msgid "I: ignored"
+msgstr "I: игнорированные"
+
+#: hggtk\status.py:488
+msgid "%d selected, %d total"
+msgstr "%d выбрано, %d всего"
+
+#: hggtk\status.py:767
+msgid "Rename file to:"
+msgstr "Переименовать файл в:"
+
+#: hggtk\status.py:777
+msgid "Copy file to"
+msgstr "Скопировать файл в"
+
+#: hggtk\status.py:790 hggtk\status.py:1178
+msgid "Nothing Removed"
+msgstr "Ничего Не Удалено"
+
+#: hggtk\status.py:791
+msgid "Remove is not enabled when multiple revisions are specified."
+msgstr "Удаление отключено, когда указаны несколько ревизий."
+
+#: hggtk\status.py:808
+msgid "Move is not enabled when multiple revisions are specified."
+msgstr "Перемещение отключено, когда указаны несколько ревизий."
+
+#: hggtk\status.py:808 hggtk\status.py:1196 hggtk\status.py:1204
+msgid "Nothing Moved"
+msgstr "Ничего Не Перемещено"
+
+#: hggtk\status.py:826
+msgid "Copy is not enabled when multiple revisions are specified."
+msgstr "Копирование отключено, когда указаны несколько ревизий."
+
+#: hggtk\status.py:826
+msgid "Nothing Copied"
+msgstr "Ничего Не Скопировано"
+
+#: hggtk\status.py:846
+msgid "===== Diff to first parent =====\n"
+msgstr "===== Различия с первым родителем =====\n"
+
+#: hggtk\status.py:855
+msgid ""
+"\n"
+"===== Diff to second parent =====\n"
+msgstr ""
+"\n"
+"===== Различия со вторым родителем =====\n"
+
+#: hggtk\status.py:910
+msgid "File is larger than the specified max size.\n"
+msgstr "Файл больше указанного максимального размера.\n"
+
+#: hggtk\status.py:911
+msgid "Hunk selection is disabled for this file.\n"
+msgstr "Выбор полосы отключён для этого файла.\n"
+
+#: hggtk\status.py:1081 hggtk\status.py:1102
+msgid "Nothing Reverted"
+msgstr "Ничего Не Возвращено"
+
+#: hggtk\status.py:1082
+msgid "No revertable files selected"
+msgstr "Нет выбранных файлов для возврата"
+
+#: hggtk\status.py:1103
+msgid "Revert not allowed when viewing revision range."
+msgstr "Возврат не разрешен при просмотре диапазона ревизий."
+
+#: hggtk\status.py:1118 hggtk\status.py:1135
+msgid "Confirm Revert"
+msgstr "Подтвердить Возврат"
+
+#: hggtk\status.py:1119
+msgid "Revert files to revision %s?"
+msgstr "Возвратить файлы к ревизии %s?"
+
+#: hggtk\status.py:1121
+msgid "Which parent to revert to?"
+msgstr "К какому родителю возвращаться?"
+
+#: hggtk\status.py:1122
+msgid "Revert file(s) to local or other parent?"
+msgstr "Возвратить файл(ы) к локальному или другому родителю?"
+
+#: hggtk\status.py:1123
+msgid "&local"
+msgstr "&локальный"
+
+#: hggtk\status.py:1123
+msgid "&other"
+msgstr "&другой"
+
+#: hggtk\status.py:1123 hggtk\status.py:1124
+msgid "l"
+msgstr "л"
+
+#: hggtk\status.py:1126
+msgid "o"
+msgstr "д"
+
+#: hggtk\status.py:1136
+msgid "Revert the following files?"
+msgstr "Возвратить следующие файлы?"
+
+#: hggtk\status.py:1148
+msgid "Nothing Added"
+msgstr "Ничего Не Добавлено"
+
+#: hggtk\status.py:1149
+msgid "No addable files selected"
+msgstr "Нет выбранных файлов для добавления"
+
+#: hggtk\status.py:1179
+msgid "No removable files selected"
+msgstr "Нет выбранных файлов для удаления"
+
+#: hggtk\status.py:1187
+msgid "Move files to directory..."
+msgstr "Файлы перемещаются в каталог..."
+
+#: hggtk\status.py:1197
+msgid "Cannot move outside repo!"
+msgstr "Перемещение за пределы хранилища невозможно!"
+
+#: hggtk\status.py:1204
+msgid ""
+"No movable files selected\n"
+"\n"
+"Note: only clean files can be moved."
+msgstr ""
+"Нет выбранных файлов для перемещения\n"
+"\n"
+"Примечание: только чистые(неизменённые) файлы могут быть перемещены."
+
+#: hggtk\status.py:1212
+msgid "Confirm Delete Unrevisioned"
+msgstr "Подтвердить Удаление Не Входящих В Ревизии"
+
+#: hggtk\status.py:1213
+msgid "Delete the following unrevisioned files?"
+msgstr "Удалить следующие файлы не входящие в ревизии?"
+
+#: hggtk\status.py:1226
+msgid "Delete Errors"
+msgstr "Ошибки Удаления"
+
+#: hggtk\synch.py:52
+msgid "TortoiseHg Synchronize - "
+msgstr "TortoiseHg Синхронизация - "
+
+#: hggtk\synch.py:64
+msgid "Incoming"
+msgstr "Входящие"
+
+#: hggtk\synch.py:66
+msgid "Display changes that can be pulled from selected repository"
+msgstr ""
+"Отобразить изменения, которые могут быть затянуты из выбранного хранилища"
+
+#: hggtk\synch.py:69
+msgid "   Pull   "
+msgstr "   Затягивание   "
+
+#: hggtk\synch.py:71
+msgid "Pull changes from selected repository"
+msgstr "Затянуть изменения из выбранного хранилища"
+
+#: hggtk\synch.py:75
+msgid "Outgoing"
+msgstr "Исходящие"
+
+#: hggtk\synch.py:77
+msgid "Display local changes that will be  pushed to selected repository"
+msgstr ""
+"Отобразить локальные изменения, которые будут протолкнуты в указанное "
+"хранилище"
+
+#: hggtk\synch.py:80
+msgid "Push"
+msgstr "Проталкивание"
+
+#: hggtk\synch.py:82
+msgid "Push local changes to selected repository"
+msgstr "Протолкнуть локальные изменения в указанное хранилище"
+
+#: hggtk\synch.py:85 hggtk\thgconfig.py:481
+msgid "Email"
+msgstr "Отправить почтой"
+
+#: hggtk\synch.py:87
+msgid "Email local outgoing changes to one or more recipients"
+msgstr ""
+"Отправить почтой локальные исходящие изменения одному и болле получателям"
+
+#: hggtk\synch.py:95
+msgid "Configure peer repository paths"
+msgstr "Настроить пути к хранилищам"
+
+#: hggtk\synch.py:106
+msgid "Repo:"
+msgstr "Хранилище:"
+
+#: hggtk\synch.py:111
+msgid "Bundle:"
+msgstr "Пачка:"
+
+#: hggtk\synch.py:155
+msgid "Post pull operation"
+msgstr "Действие после затягивания"
+
+#: hggtk\synch.py:157
+msgid "Nothing"
+msgstr "Ничего"
+
+#: hggtk\synch.py:158 hggtk\update.py:80
+msgid "Update"
+msgstr "Обновить"
+
+#: hggtk\synch.py:159
+msgid "Fetch"
+msgstr "Получить"
+
+#: hggtk\synch.py:160
+msgid "Rebase"
+msgstr "Перебазировать"
+
+#: hggtk\synch.py:168
+msgid "Advanced Options"
+msgstr "Продвинутые Настройки"
+
+#: hggtk\synch.py:190
+msgid "Force pull or push"
+msgstr "Принудительное затягивание или проталкивание"
+
+#: hggtk\synch.py:191
+msgid "Run even when remote repository is unrelated."
+msgstr "Выполнять даже на не связанном удалённом хранилище"
+
+#: hggtk\synch.py:195
+msgid "Target Revision:"
+msgstr "Целевая Ревизия:"
+
+#: hggtk\synch.py:199
+msgid "A specific revision up to which you would like to push or pull."
+msgstr "Определённая ревизия до которой вы хотите протолкнуть или затянуть."
+
+#: hggtk\synch.py:203
+msgid "Remote Command:"
+msgstr "Удалённая команда:"
+
+#: hggtk\synch.py:207
+msgid "Name of hg executable on remote machine."
+msgstr "Наименование команды hg на удалённой машине."
+
+#: hggtk\synch.py:215
+msgid "Incoming/Outgoing"
+msgstr "Входящие/Исходящие"
+
+#: hggtk\synch.py:218
+msgid "Show Patches"
+msgstr "Показывать Заплатки"
+
+#: hggtk\synch.py:219
+msgid "Show Newest First"
+msgstr "Отображать Новые Первыми"
+
+#: hggtk\synch.py:220
+msgid "Show No Merges"
+msgstr "Не Показывать Слияния"
+
+#: hggtk\synch.py:243
+msgid "View pulled revisions"
+msgstr "Показать затянутые ревизии"
+
+#: hggtk\synch.py:245
+msgid "Update to branch tip"
+msgstr "Обновить до конца ветки"
+
+#: hggtk\synch.py:340
+msgid "unknown sort key '%s'"
+msgstr "неизвестный ключ сортировки '%s'"
+
+#: hggtk\synch.py:350
+msgid "Select Repository"
+msgstr "Выберите Хранилище"
+
+#: hggtk\synch.py:358
+msgid "Select Bundle"
+msgstr "Выберите Пачку"
+
+#: hggtk\synch.py:359
+msgid "Bundle (*.hg)"
+msgstr "Пачка (*.hg)"
+
+#: hggtk\synch.py:360
+msgid "Bundle (*)"
+msgstr "Пачка (*)"
+
+#: hggtk\synch.py:466
+msgid "No repository selected"
+msgstr "Хранилище не выбрано"
+
+#: hggtk\synch.py:467
+msgid "Select a peer repository to compare with"
+msgstr "Выберите хранилище, с которым сравнивать"
+
+#: hggtk\tagadd.py:25
+msgid "TortoiseHg Tag - %s"
+msgstr "TortoiseHg Метка - %s"
+
+#: hggtk\tagadd.py:49
+msgid "Add tag to selected version"
+msgstr "Добавить метку к указанной ревизии"
+
+#: hggtk\tagadd.py:51
+msgid "Remove"
+msgstr "Удалить"
+
+#: hggtk\tagadd.py:53
+msgid "Remove tag from repository"
+msgstr "Удалить метку из хранилища"
+
+#: hggtk\tagadd.py:66
+msgid "Tag:"
+msgstr "Метка:"
+
+#: hggtk\tagadd.py:80
+msgid "Revision:"
+msgstr "Ревизия:"
+
+#: hggtk\tagadd.py:91
+msgid "Tag is local"
+msgstr "Локальную метку"
+
+#: hggtk\tagadd.py:92
+msgid "Replace existing tag"
+msgstr "Заместить существующую метку"
+
+#: hggtk\tagadd.py:93
+msgid "Use custom commit message"
+msgstr "Указать свою заметку фиксации"
+
+#: hggtk\tagadd.py:100
+msgid "Commit message:"
+msgstr "Заметка фиксации:"
+
+#: hggtk\tagadd.py:168
+msgid "Tag input is empty"
+msgstr "Имя метки не указано"
+
+#: hggtk\tagadd.py:169
+msgid "Please enter tag name"
+msgstr "Пожалуйста введите имя метки"
+
+#: hggtk\tagadd.py:173
+msgid "Custom commit message is empty"
+msgstr "Не указана заметка фиксации"
+
+#: hggtk\tagadd.py:181 hggtk\tagadd.py:212
+msgid "Tagging completed"
+msgstr "Установка метки завершена"
+
+#: hggtk\tagadd.py:182
+msgid "Tag \"%s\" has been added"
+msgstr "Метка \"%s\" была добавлена"
+
+#: hggtk\tagadd.py:185 hggtk\tagadd.py:188 hggtk\tagadd.py:216
+#: hggtk\tagadd.py:219
+msgid "Error in tagging"
+msgstr "Ошибка при установке метки"
+
+#: hggtk\tagadd.py:200
+msgid "Tag name is empty"
+msgstr "Имя метки не указано"
+
+#: hggtk\tagadd.py:201
+msgid "Please select tag name to remove"
+msgstr "Пожалуйста укажите имя метки для удаления"
+
+#: hggtk\tagadd.py:213
+msgid "Tag \"%s\" has been removed"
+msgstr "Метка \"%s\" была удалена"
+
+#: hggtk\tagadd.py:227
+msgid "a tag named \"%s\" already exists"
+msgstr "Метка с именем \"%s\" уже существует"
+
+#: hggtk\tagadd.py:233
+msgid "Added tag %s for changeset %s"
+msgstr "Добавлена метка %s для набора изменений %s"
+
+#: hggtk\tagadd.py:235
+msgid "Tag '%s' already exist"
+msgstr "Метка '%s' уже существует"
+
+#: hggtk\tagadd.py:241
+msgid "Tag '%s' does not exist"
+msgstr "Метка '%s' не существует"
+
+#: hggtk\tagadd.py:244
+msgid "Removed tag %s"
+msgstr "Метка %s удалена"
+
+#: hggtk\taskbarui.py:28
+msgid "TortoiseHg Taskbar"
+msgstr "TortoiseHg Панель задач"
+
+#: hggtk\taskbarui.py:30 thgutil\menuthg.py:190 thgutil\menuthg.py:322
+msgid "About"
+msgstr "О программе"
+
+#: hggtk\taskbarui.py:49
+msgid "Overlays"
+msgstr "Оверлеи"
+
+#: hggtk\taskbarui.py:56
+msgid "Enable overlays"
+msgstr "Включить оверлеи"
+
+#: hggtk\taskbarui.py:58
+msgid "Local disks only"
+msgstr "Только для локальных дисков"
+
+#: hggtk\taskbarui.py:61
+msgid "Context Menu"
+msgstr "Контекстное Меню"
+
+#: hggtk\taskbarui.py:67
+msgid "Promote menu items to the top menu"
+msgstr "Отправить пункты на самый верх меню"
+
+#: hggtk\taskbarui.py:81
+msgid "Promote menu item \"%s\" to top menu"
+msgstr "Отправить пунк \"%s\" на самый верх меню"
+
+#: hggtk\taskbarui.py:85
+msgid "Taskbar"
+msgstr "Панель задач"
+
+#: hggtk\taskbarui.py:92
+msgid "Highlight Icon"
+msgstr "Подсветка Значка"
+
+#: hggtk\taskbarui.py:95
+msgid "Enable/Disable the overlay icons globally"
+msgstr "Включить/Выключить оверлейные значки глобально"
+
+#: hggtk\taskbarui.py:98
+msgid "Only enable overlays on local disks"
+msgstr "Включить оверлеи только на локальных дисках"
+
+#: hggtk\taskbarui.py:102
+msgid "Highlight the taskbar icon during activity"
+msgstr "Подсвечивать значок на панели задач вовремя активности"
+
+#: hggtk\taskbarui.py:108
+msgid "Event Log"
+msgstr "Журнал событий"
+
+#: hggtk\thgconfig.py:21
+msgid "<unspecified>"
+msgstr "<неуказано>"
+
+#: hggtk\thgconfig.py:27
+msgid "3-way Merge Tool"
+msgstr "3-х поточный Инструмент Слияния"
+
+#: hggtk\thgconfig.py:28
+msgid ""
+"Graphical merge program for resolving merge conflicts.  If left unspecified, "
+"Mercurial will use the first applicable tool it finds on your system or use "
+"its internal merge tool that leaves conflict markers in place.  Chose "
+"internal:merge to force conflict markers, internal:prompt to always select "
+"local or other, or internal:dump to leave files in the working directory for "
+"manual merging"
+msgstr ""
+"Графическая программа слияний для разрешения конфликтов слияний. Если не "
+"указана, то Mercurial будет использовать первый же подходящий инструмент, "
+"который найдёт на вашей системе, или будет использовать внутренний "
+"инструмент слияний, который оставляет маркеры конфликтов в тексте. Укажите "
+"internal:merge для принудительного использования маркеров конфликтов, "
+"internal:prompt - чтобы всегда выбирать локальное или другое, либо "
+"internal:dump - чтобы оставить файлы в рабочем каталоге для ручного слияния."
+
+#: hggtk\thgconfig.py:34
+msgid "Visual Diff Command"
+msgstr "Команда для Визуализации Различий"
+
+#: hggtk\thgconfig.py:35
+msgid "Specify visual diff tool; must be an extdiff command"
+msgstr ""
+"Укажите инструмент визуализации различий; должен быть командой extdiff"
+
+#: hggtk\thgconfig.py:36
+msgid "Skip Diff Window"
+msgstr "Пропустить Окно Различий"
+
+#: hggtk\thgconfig.py:37
+msgid ""
+"Bypass the builtin visual diff dialog and directly use your visual diff "
+"tool's directory diff feature.  Only enable this feature if you know your "
+"diff tool has a valid extdiff configuration.  Default: False"
+msgstr ""
+"Пропустить встроенный визуализатор различий и сразу использовать "
+"визуализировать различия каталогов возможностями своего инструмента.  "
+"Включайте данную возможность только если вы уверены в правильности настройки "
+"extdiff вашего инструмента.  По-умолчанию: False"
+
+#: hggtk\thgconfig.py:41
+msgid "Visual Editor"
+msgstr "Визуальный Редактор"
+
+#: hggtk\thgconfig.py:42
+msgid "Specify the visual editor used to view files, etc"
+msgstr "Укажите визуальный редактор используемый для просмотра файлов и т.д."
+
+#: hggtk\thgconfig.py:43
+msgid "CLI Editor"
+msgstr "Редактор Командной Строки"
+
+#: hggtk\thgconfig.py:44
+msgid ""
+"The editor to use during a commit and other instances where Mercurial needs "
+"multiline input from the user.  Only used by command line interface commands."
+msgstr ""
+"Редактор используемый вовремя фиксации, а также в других случаях, когда "
+"пользователю необходимо ввести многострочный текст в Mercurial. Используется "
+"только в командах с интерфейсом командной строки."
+
+#: hggtk\thgconfig.py:47
+msgid "Tab Width"
+msgstr "Ширина Табуляции"
+
+#: hggtk\thgconfig.py:48
+msgid ""
+"Specify the number of spaces that tabs expand to in various TortoiseHG "
+"windows. Default: Not expanded"
+msgstr ""
+"Укажите количество пробелов, на которые будут заменятся табулации в "
+"различных окнах TortoiseHg. По-умолчанию: Не заменать"
+
+#: hggtk\thgconfig.py:51
+msgid "Max Diff Size"
+msgstr "Максимальный Размер Различий"
+
+#: hggtk\thgconfig.py:52
+msgid ""
+"The maximum size file (in KB) that TortoiseHg will show changes for in the "
+"changelog, status, and commit windows. A value of zero implies no limit.  "
+"Default: 1024 (1MB)"
+msgstr ""
+"Максимальный размер файла (в КБ), для которого TortoiseHg будет показывать "
+"различия в окнах журнала изменений, статуса и фиксации. Нулевое значение "
+"означает - без ограничения.  По-умолчанию: 1024 (1МБ)"
+
+#: hggtk\thgconfig.py:55
+msgid "Bottom Diffs"
+msgstr "Различия Внизу"
+
+#: hggtk\thgconfig.py:56
+msgid ""
+"Show the diff panel below the file list in status, shelve, and commit "
+"dialogs. Default: False (show diffs to right of file list)"
+msgstr ""
+"Показывать панель различий снизу списка файлов для диалогов статуса, "
+"откладывания, и фиксации. По-умолчанию: False (различия показываются справа "
+"от списка файлов)"
+
+#: hggtk\thgconfig.py:61
+msgid "Username"
+msgstr "Пользователь:"
+
+#: hggtk\thgconfig.py:62
+msgid "Name associated with commits"
+msgstr "Имя используемое при фиксации"
+
+#: hggtk\thgconfig.py:63
+msgid "External Commit Tool"
+msgstr "Внешний Инструмент Фиксации"
+
+#: hggtk\thgconfig.py:64
+msgid ""
+"Select commit tool launched by TortoiseHg. (Qct is no longer distributed as "
+"part of TortoiseHG.) Default: None (use the builtin tool)"
+msgstr ""
+"Укажите инструмент фиксации запускаемый TortoiseHg. (Qct больше не входит в "
+"дистрибутив TortoiseHG.) По-умолчанию: None (используется встроенный "
+"инструмент фиксации)"
+
+#: hggtk\thgconfig.py:67
+msgid "Summary Line Length"
+msgstr "Длина Строки Сводки"
+
+#: hggtk\thgconfig.py:68
+msgid ""
+"Maximum length of the commit message summary line. If set, TortoiseHG will "
+"issue a warning if the summary line is too long or not separated by a blank "
+"line. Default: 0 (unenforced)"
+msgstr ""
+"Максимальная длина строки заметки фиксации. При установленном значении, "
+"TortoiseHG будет предупреждать если строка сводки слишком длинная и не "
+"разделена пустой строкой. По-умолчанию: 0 (без проверок)"
+
+#: hggtk\thgconfig.py:72
+msgid "Message Line Length"
+msgstr "Длина Строки Заметки"
+
+#: hggtk\thgconfig.py:73
+msgid ""
+"Word wrap length of the commit message.  If set, the popup menu can be used "
+"to format the message and a warning will be issued if any lines are too long "
+"at commit.  Default: 0 (unenforced)"
+msgstr ""
+"Размер для переноса по слова заметки фиксации.  Если установлено, тогда "
+"можно использовать всплывающее меню для форматирования сообщения, а также "
+"будет предупреждение при фиксации если строки слишком длинные.  По-"
+"умолчанию: 0 (без проверок)"
+
+#: hggtk\thgconfig.py:80
+msgid "Author Coloring"
+msgstr "Расцвечивание авторов"
+
+#: hggtk\thgconfig.py:81
+msgid ""
+"Color changesets by author name.  If not enabled, the changes are colored "
+"green for merge, red for non-trivial parents, black for normal. Default: "
+"False"
+msgstr ""
+"Расцвечивать наборы изменений по авторам.  Если не включено, то изменения "
+"подсвечиваются зелёным для слияний, красным для не обычных родителей, чёрным "
+"для нормальных. По-умолчанию: False"
+
+#: hggtk\thgconfig.py:85
+msgid "Long Summary"
+msgstr "Длиная Сводка"
+
+#: hggtk\thgconfig.py:86
+msgid ""
+"If true, concatenate multiple lines of changeset summary until they reach 80 "
+"characters. Default: False"
+msgstr ""
+"Если True, то многострочные сводки наборов изменений будут обединятся в одну "
+"до 80 символов. По-умолчанию: False"
+
+#: hggtk\thgconfig.py:89
+msgid "Log Batch Size"
+msgstr "Размер Партии Журнала"
+
+#: hggtk\thgconfig.py:90
+msgid ""
+"The number of revisions to read and display in the changelog viewer in a "
+"single batch. Default: 500"
+msgstr ""
+"Количество ревизий прочивываемых и отображаемых в журнале изменений за один "
+"раз. По-умолчанию: 500"
+
+#: hggtk\thgconfig.py:93
+msgid "Copy Hash"
+msgstr "Копирование Хэша"
+
+#: hggtk\thgconfig.py:94
+msgid ""
+"Allow the changelog viewer to copy the changeset hash of the currently "
+"selected changeset into the clipboard. Default: False"
+msgstr ""
+"Разрешить тому, кто просматривает журнал изменений копировать хэш выбранного "
+"набора изменений в буфер обмена. По-умолчанию: False"
+
+#: hggtk\thgconfig.py:99
+msgid "After pull operation"
+msgstr "После затягивания"
+
+#: hggtk\thgconfig.py:101
+msgid ""
+"Operation which is performed directly after a successful pull. update "
+"equates to pull --update, fetch equates to the fetch extension, rebase "
+"equates to pull --rebase.  Default: none"
+msgstr ""
+"Действие выполняемое сразу после успешного затягивания. update равносильно "
+"pull --update, fetch равносильно использованию расширения fetch, rebase "
+"равносильно pull --rebase. По-умолчанию: none"
+
+#: hggtk\thgconfig.py:106
+msgid "Name"
+msgstr "Наименование"
+
+#: hggtk\thgconfig.py:107
+msgid ""
+"Repository name to use in the web interface. Default is the working "
+"directory."
+msgstr ""
+"Имя хранилища используемое в веб интерфейсе. По-молчанию совпадает с рабочим "
+"каталогом."
+
+#: hggtk\thgconfig.py:109 hggtk\thgconfig.py:778
+msgid "Description"
+msgstr "Описание"
+
+#: hggtk\thgconfig.py:110
+msgid "Textual description of the repository's purpose or contents."
+msgstr "Текстовое описание назначения или содержимого хранилища"
+
+#: hggtk\thgconfig.py:112
+msgid "Contact"
+msgstr "Контакт"
+
+#: hggtk\thgconfig.py:113
+msgid "Name or email address of the person in charge of the repository."
+msgstr "Имя или почтовый адрес отвечающего за хранилище."
+
+#: hggtk\thgconfig.py:115
+msgid "Style"
+msgstr "Оформление"
+
+#: hggtk\thgconfig.py:117
+msgid "Which template map style to use"
+msgstr "Какой шаблон оформления использовать"
+
+#: hggtk\thgconfig.py:118
+msgid "Archive Formats"
+msgstr "Форматы Архивов"
+
+#: hggtk\thgconfig.py:119
+msgid "Comma separated list of archive formats allowed for downloading"
+msgstr ""
+"Список форматов архивов разрешенных для скачивания разделённый запятыми"
+
+#: hggtk\thgconfig.py:121
+msgid "Port to listen on"
+msgstr "Порт который слушать"
+
+#: hggtk\thgconfig.py:121 hggtk\thgconfig.py:231
+msgid "Port"
+msgstr "Порт"
+
+#: hggtk\thgconfig.py:122
+msgid "Push Requires SSL"
+msgstr "Проталкивание Требует SSL"
+
+#: hggtk\thgconfig.py:123
+msgid ""
+"Whether to require that inbound pushes be transported over SSL to prevent "
+"password sniffing."
+msgstr ""
+"Требуется ли для входящих проталкиваний использовать SSL для предотвращения "
+"перехвата пароля."
+
+#: hggtk\thgconfig.py:125
+msgid "Stripes"
+msgstr "Полоски"
+
+#: hggtk\thgconfig.py:126
+msgid ""
+"How many lines a \"zebra stripe\" should span in multiline output. Default "
+"is 1; set to 0 to disable."
+msgstr ""
+"Через сколько строк должны появляться \"полоски зебры\" при многострочном "
+"выводе. По-умолчанию 1; установите в 0 для отключения."
+
+#: hggtk\thgconfig.py:128
+msgid "Max Files"
+msgstr "Максимум Файлов"
+
+#: hggtk\thgconfig.py:129
+msgid "Maximum number of files to list per changeset."
+msgstr "Максимальное количество файлов в списке на каждое изменение."
+
+#: hggtk\thgconfig.py:130
+msgid "Max Changes"
+msgstr "Максимум Изменений"
+
+#: hggtk\thgconfig.py:131
+msgid "Maximum number of changes to list on the changelog."
+msgstr "Максимальное количество изменений в списке журнала изменений."
+
+#: hggtk\thgconfig.py:132
+msgid "Allow Push"
+msgstr "Разрешать Проталкивание"
+
+#: hggtk\thgconfig.py:133
+msgid ""
+"Whether to allow pushing to the repository. If empty or not set, push is not "
+"allowed. If the special value \"*\", any remote user can push, including "
+"unauthenticated users. Otherwise, the remote user must have been "
+"authenticated, and the authenticated user name must be present in this list "
+"(separated by whitespace or \",\"). The contents of the allow_push list are "
+"examined after the deny_push list."
+msgstr ""
+"Кому разрешено проталкивание в хранилище. Если пустое либо не указано, то "
+"проталкивание не разрешено. При специальном значении \"*\" - любой удалённый "
+"пользователь может проталкивать, включая не прошедших аутентификацию. Иначе, "
+"удалённый пользователь должен пройти аутентификацию и его имя должно "
+"присутствовать в этом списке (разделённого пробелами или \",\"). Содержимое "
+"списка разрешения проталкивания рассматривается после списка запрещения "
+"проталкивания."
+
+#: hggtk\thgconfig.py:140
+msgid "Deny Push"
+msgstr "Запрещать Проталкивание"
+
+#: hggtk\thgconfig.py:141
+msgid ""
+"Whether to deny pushing to the repository. If empty or not set, push is not "
+"denied. If the special value \"*\", all remote users are denied push. "
+"Otherwise, unauthenticated users are all denied, and any authenticated user "
+"name present in this list (separated by whitespace or \",\") is also denied. "
+"The contents of the deny_push list are examined before the allow_push list."
+msgstr ""
+"Кому запрещено проталкивать в хранилище. Если пустое либо не указано, то "
+"проталкивание не запрещено. При специальном значении \"*\" - всем удалённым "
+"пользователям запрещено проталкивать. Иначе, проталкивание запрещено "
+"пользователям не прошедшим аутентификацию, а также тем кто прошел "
+"аутентификацию и присутствует в данном списке (разделённого пробелами или "
+"\",\"). Содержимое списка запрещения проталкивания рассматривается до списка "
+"разрешения проталкивания."
+
+#: hggtk\thgconfig.py:147
+msgid "Encoding"
+msgstr "Кодировка"
+
+#: hggtk\thgconfig.py:148
+msgid "Character encoding name"
+msgstr "Наименование кодировки"
+
+#: hggtk\thgconfig.py:151 hggtk\thgconfig.py:232
+msgid "Host"
+msgstr "Хост"
+
+#: hggtk\thgconfig.py:152
+msgid ""
+"Host name and (optional) port of proxy server, for example \"myproxy:8000\""
+msgstr ""
+"Имя хоста и (необязательно) порт прокси сервера, например \"myproxy:8000\""
+
+#: hggtk\thgconfig.py:154
+msgid "Bypass List"
+msgstr "Список исключений"
+
+#: hggtk\thgconfig.py:155
+msgid ""
+"Optional. Comma-separated list of host names that should bypass the proxy"
+msgstr "Необязателен. Список имён хостов, для которых не нужен прокси"
+
+#: hggtk\thgconfig.py:157 hggtk\thgconfig.py:233
+msgid "Password"
+msgstr "Пароль"
+
+#: hggtk\thgconfig.py:158
+msgid "Optional. Password to authenticate with at the proxy server"
+msgstr "Необязателен. Пароль для аутентификации на прокси сервере"
+
+#: hggtk\thgconfig.py:161
+msgid "Optional. User name to authenticate with at the proxy server"
+msgstr "Необязательно. Имя пользователя для аутентификации на прокси сервере"
+
+#: hggtk\thgconfig.py:165
+msgid "From"
+msgstr "Отправитель"
+
+#: hggtk\thgconfig.py:166
+msgid "Email address to use in the \"From\" header and for the SMTP envelope"
+msgstr ""
+"Почтовый адрес, который будет использоваться в заголовке \"From\" SMTP "
+"конверта"
+
+#: hggtk\thgconfig.py:167
+msgid "To"
+msgstr "Получатель"
+
+#: hggtk\thgconfig.py:168
+msgid "Comma-separated list of recipient email addresses"
+msgstr "Список почтовых адресов получателей разделённых запятыми"
+
+#: hggtk\thgconfig.py:169
+msgid "Cc"
+msgstr "Копии"
+
+#: hggtk\thgconfig.py:170
+msgid "Comma-separated list of carbon copy recipient email addresses"
+msgstr "Список почтовых адресов получателей копий разделённых запятыми"
+
+#: hggtk\thgconfig.py:172
+msgid "Bcc"
+msgstr "Скрытые копии"
+
+#: hggtk\thgconfig.py:173
+msgid "Comma-separated list of blind carbon copy recipient email addresses"
+msgstr ""
+"Список почтовых адресов получателей скрытых копий разделённых запятыми"
+
+#: hggtk\thgconfig.py:175
+msgid "method"
+msgstr "метод"
+
+#: hggtk\thgconfig.py:176
+msgid ""
+"Optional. Method to use to send email messages. If value is \"smtp\" "
+"(default), use SMTP (configured below).  Otherwise, use as name of program "
+"to run that acts like sendmail (takes \"-f\" option for sender, list of "
+"recipients on command line, message on stdin). Normally, setting this to "
+"\"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send "
+"messages."
+msgstr ""
+"Необязателен. Метод используемый для отправки почтового сообщения. Если "
+"значение равно \"smtp\", то используется SMTP (настроенный ниже). Иначе, "
+"используйте имя запускаемой программы, которая действует как sendmail "
+"(принимает параметр \"-f\" для отправителя, список получателей в командной "
+"строке, сообщение в stdin). Обычно, достаточно установить это в \"sendmail\" "
+"или \"/usr/sbin/sendmail\" для использования sendmail для отправки сообщений."
+
+#: hggtk\thgconfig.py:181
+msgid "Host name of mail server"
+msgstr "Имя хоста или почтового сервера"
+
+#: hggtk\thgconfig.py:181
+msgid "SMTP Host"
+msgstr "SMTP Хост"
+
+#: hggtk\thgconfig.py:182
+msgid "SMTP Port"
+msgstr "SMTP Порт"
+
+#: hggtk\thgconfig.py:183
+msgid "Port to connect to on mail server. Default: 25"
+msgstr "Порт для соединения с почтовым сервером. По-умолчанию: 25"
+
+#: hggtk\thgconfig.py:185
+msgid "SMTP TLS"
+msgstr "SMTP TLS"
+
+#: hggtk\thgconfig.py:186
+msgid "Connect to mail server using TLS. Default: False"
+msgstr ""
+"Использовать TLS при соединении с почтовым сервером. По-умолчанию: False"
+
+#: hggtk\thgconfig.py:188
+msgid "SMTP Username"
+msgstr "SMTP Имя Пользователя"
+
+#: hggtk\thgconfig.py:189
+msgid "Username to authenticate to mail server with"
+msgstr "Имя пользователя для аутентификации на почтовом сервере"
+
+#: hggtk\thgconfig.py:190
+msgid "SMTP Password"
+msgstr "SMTP Пароль"
+
+#: hggtk\thgconfig.py:191
+msgid "Password to authenticate to mail server with"
+msgstr "Пароль для аутентификации на почтовом сервере"
+
+#: hggtk\thgconfig.py:192
+msgid "Local Hostname"
+msgstr "Имя Локального Хоста"
+
+#: hggtk\thgconfig.py:193
+msgid "Hostname the sender can use to identify itself to the mail server."
+msgstr ""
+"Имя хоста, используемого отправителем для идентификации себя на постовом "
+"сервере"
+
+#: hggtk\thgconfig.py:196
+msgid "Git Format"
+msgstr "Формат Git"
+
+#: hggtk\thgconfig.py:197
+msgid "Use git extended diff header format. Default: False"
+msgstr ""
+"Использовать расширенный git формат для заголовков различий. По-умолчанию: "
+"False"
+
+#: hggtk\thgconfig.py:199
+msgid "No Dates"
+msgstr "Без Дат"
+
+#: hggtk\thgconfig.py:200
+msgid "Do not include modification dates in diff headers. Default: False"
+msgstr "Не включать дату изменения в заголовок различий. По-умолчанию: False"
+
+#: hggtk\thgconfig.py:202
+msgid "Show Function"
+msgstr "Отображать Функцию"
+
+#: hggtk\thgconfig.py:203
+msgid "Show which function each change is in. Default: False"
+msgstr ""
+"Оображать в какой функции находится каждое изменение. По-умолчанию: False"
+
+#: hggtk\thgconfig.py:205
+msgid "Ignore White Space"
+msgstr "Игнорировать Пробельные Разделители"
+
+#: hggtk\thgconfig.py:206
+msgid "Ignore white space when comparing lines. Default: False"
+msgstr ""
+"Игнорировать пробельные разделители при сравнении файлов. По-умолчанию: False"
+
+#: hggtk\thgconfig.py:208
+msgid "Ignore WS Amount"
+msgstr "Игнорировать Количество Пробельных Разделителей"
+
+#: hggtk\thgconfig.py:209
+msgid "Ignore changes in the amount of white space. Default: False"
+msgstr ""
+"Игнорировать изменения в количестве пробельных разделителей. По-умолчанию: "
+"False"
+
+#: hggtk\thgconfig.py:211
+msgid "Ignore Blank Lines"
+msgstr "Не Учитывать Пустые Строки"
+
+#: hggtk\thgconfig.py:212
+msgid "Ignore changes whose lines are all blank. Default: False"
+msgstr ""
+"Игнорировать изменения чьи строки являются пустыми. По-умолчанию: False"
+
+#: hggtk\thgconfig.py:225
+msgid "Edit remote repository path"
+msgstr "Редактирование пути удалённого хранилища"
+
+#: hggtk\thgconfig.py:231
+msgid "URL"
+msgstr "URL адрес"
+
+#: hggtk\thgconfig.py:232
+msgid "Folder"
+msgstr "Папка"
+
+#: hggtk\thgconfig.py:234 hggtk\thgconfig.py:731
+msgid "Alias"
+msgstr "Псевдоним"
+
+#: hggtk\thgconfig.py:369 hggtk\thgconfig.py:671
+msgid "Overwrite existing '%s' path?"
+msgstr "Переписать существующий путь '%s'?"
+
+#: hggtk\thgconfig.py:423
+msgid "No repository found"
+msgstr "Хранилище не найдено"
+
+#: hggtk\thgconfig.py:424
+msgid "no repo at "
+msgstr "хранилища нет в "
+
+#: hggtk\thgconfig.py:432
+msgid "User global settings"
+msgstr "Пользовательские глобальные настройки"
+
+#: hggtk\thgconfig.py:434
+msgid "%s repository settings"
+msgstr "Настройки хранилища %s"
+
+#: hggtk\thgconfig.py:439
+msgid "Edit File"
+msgstr "Редактировать файл"
+
+#: hggtk\thgconfig.py:468
+msgid "Changelog"
+msgstr "Журнал изменений"
+
+#: hggtk\thgconfig.py:471
+msgid "Sync"
+msgstr "Синхронизация"
+
+#: hggtk\thgconfig.py:475
+msgid "Web"
+msgstr "Сеть"
+
+#: hggtk\thgconfig.py:478
+msgid "Proxy"
+msgstr "Прокси"
+
+#: hggtk\thgconfig.py:484
+msgid "Diff"
+msgstr "Различия"
+
+#: hggtk\thgconfig.py:497
+msgid "Unapplied changes"
+msgstr "Не применённые изменения"
+
+#: hggtk\thgconfig.py:498
+msgid "Lose changes and switch files?."
+msgstr "Потерять измения и переключить файлы?."
+
+#: hggtk\thgconfig.py:509
+msgid "TortoiseHg Configure Repository - "
+msgstr "TortoiseHg Настройка Хранилища - "
+
+#: hggtk\thgconfig.py:513
+msgid "TortoiseHg Configure User-Global Settings"
+msgstr "TortoiseHg Настройка Пользовательских-Глобальных Параметров"
+
+#: hggtk\thgconfig.py:557
+msgid "Confirm quit without saving?"
+msgstr "Подтвердить выход без сохранения?"
+
+#: hggtk\thgconfig.py:558
+msgid "Yes to abandon changes, No to continue"
+msgstr "Да для не сохранения изменений, Нет для продолжения"
+
+#: hggtk\thgconfig.py:646
+msgid "No Repository Found"
+msgstr "Хранилище Не Найдено"
+
+#: hggtk\thgconfig.py:647
+msgid "Path testing cannot work without a repository"
+msgstr "Проверка пути невозможна без указания хранилища"
+
+#: hggtk\thgconfig.py:713
+msgid "Remote repository paths"
+msgstr "Пути к удалённым хранилищам"
+
+#: hggtk\thgconfig.py:735
+msgid "Repository Path"
+msgstr "Путь К Хранилищу"
+
+#: hggtk\thgconfig.py:749
+msgid "_Edit"
+msgstr "Редактировать"
+
+#: hggtk\thgconfig.py:759
+msgid "_Test"
+msgstr "Проверить"
+
+#: hggtk\thgconfig.py:764
+msgid "Set as _default"
+msgstr "Использовать по-умолчанию"
+
+#: hggtk\thgconfig.py:863
+msgid "Suggested"
+msgstr "Предлагается"
+
+#: hggtk\thgconfig.py:873
+msgid "History"
+msgstr "История"
+
+#: hggtk\thgconfig.py:911
+msgid "# Generated by tortoisehg-config\n"
+msgstr "# Создано tortoisehg-config\n"
+
+#: hggtk\thgconfig.py:948
+msgid "Skipped saving path with no alias"
+msgstr "Пути без псевдонимов были пропушены при сохранении"
+
+#: hggtk\thgconfig.py:976
+msgid "Unable to write configuration file"
+msgstr "Запись в файл конфигурации невозможна"
+
+#: hggtk\thgshelve.py:71 hggtk\thgshelve.py:133 hggtk\thgshelve.py:139
+#: hggtk\thgshelve.py:147
+msgid "Shelve"
+msgstr "Отложить"
+
+#: hggtk\thgshelve.py:72
+msgid "set aside selected changes"
+msgstr "убрать в сторону выбранные изменения"
+
+#: hggtk\thgshelve.py:73
+msgid "Unshelve"
+msgstr "Восстановить Отложенное"
+
+#: hggtk\thgshelve.py:74
+msgid "restore shelved changes"
+msgstr "восстановить отложенные изменения"
+
+#: hggtk\thgshelve.py:97 hggtk\thgshelve.py:98 hggtk\thgshelve.py:99
+#: hggtk\thgshelve.py:102
+msgid "_shelve"
+msgstr "отложить"
+
+#: hggtk\thgshelve.py:134
+msgid "No changes to shelve"
+msgstr "Нет изменений для откладывания"
+
+#: hggtk\thgshelve.py:140
+msgid "Please select diff chunks to shelve"
+msgstr "Пожалуйста выберите кусочки различий для откладывания"
+
+#: hggtk\thgshelve.py:148
+msgid "<b>Shelve file exists!</b>"
+msgstr "<b>Файл отложений существует!</b>"
+
+#: hggtk\thgshelve.py:149
+msgid "Overwrite"
+msgstr "Переписать"
+
+#: hggtk\thgshelve.py:150
+msgid "Append"
+msgstr "Добавить"
+
+#: hggtk\update.py:18
+msgid "= Current Branch Tip ="
+msgstr "= Конец Текущей Ветки ="
+
+#: hggtk\update.py:37
+msgid "Update - %s"
+msgstr "Обновление - %s"
+
+#: hggtk\update.py:44
+msgid "Update to:"
+msgstr "Обновить до:"
+
+#: hggtk\update.py:64
+msgid "Overwrite local changes (--clean)"
+msgstr "Переписать локальные различия (--clean)"
+
+#: hggtk\visdiff.py:61
+msgid "Visual Diffs"
+msgstr "Визуальные Различия"
+
+#: hggtk\visdiff.py:64
+msgid "Temporary files are removed when this dialog is closed"
+msgstr "Временные файлы будут удалены после закрытия этого окна"
+
+#: hggtk\visdiff.py:82
+msgid "Always launch single files"
+msgstr "Всегда запускать для отдельных файлов"
+
+#: hggtk\visdiff.py:108
+msgid "No repository"
+msgstr "Нет хранилища"
+
+#: hggtk\visdiff.py:109
+msgid "No repository found here"
+msgstr "Хранилище здесь не найдено"
+
+#: hggtk\visdiff.py:116
+msgid "Select diff tool"
+msgstr "Выберите инструмент различий"
+
+#: hggtk\visdiff.py:135
+msgid "No visual diff tool"
+msgstr "Нет инструмента визуализации различий"
+
+#: hggtk\visdiff.py:136
+msgid "No visual diff tool has been configured"
+msgstr "Инструмент визуализации различий не был укзан"
+
+#: hggtk\visdiff.py:155
+msgid "changeset "
+msgstr "набор изменений "
+
+#: hggtk\visdiff.py:160
+msgid "revision(s) "
+msgstr "ревизия(и) "
+
+#: hggtk\visdiff.py:162
+msgid "working changes"
+msgstr "рабочие изменения"
+
+#: hggtk\visdiff.py:165
+msgid "Visual Diffs - "
+msgstr "Визуальные Резличия - "
+
+#: hggtk\visdiff.py:173
+msgid "No file changes"
+msgstr "Файлы не изменились"
+
+#: hggtk\visdiff.py:174
+msgid "There are no file changes to view"
+msgstr "Нет изменений файлов для отображения"
+
+#: hggtk\visdiff.py:242
+msgid "Tool launch failure"
+msgstr "Неудача при запуске инструмента"
+
+#: hggtk\visdiff.py:243
+msgid "%s : %s"
+msgstr "%s : %s"
+
+#: thgutil\hglib.py:261
+msgid "extension '%s' overrides commands: %s\n"
+msgstr "расширение '%s' переопределяет команды: %s\n"
+
+#: thgutil\hglib.py:301
+msgid "repository '%s' is not local"
+msgstr "хранилище '%s' не локальное"
+
+#: thgutil\menuthg.py:168 thgutil\menuthg.py:303
+msgid "Create Clone"
+msgstr "Создать Клон"
+
+#: thgutil\menuthg.py:169
+msgid "Create clone here from source"
+msgstr "Создать здесь клон из источника"
+
+#: thgutil\menuthg.py:174
+msgid "Synchronize with dragged repository"
+msgstr "Синхронизировать с отстающим хранилищем"
+
+#: thgutil\menuthg.py:180
+msgid "Clone a Repository"
+msgstr "Клонировать Хранилище"
+
+#: thgutil\menuthg.py:181
+msgid "clone a repository"
+msgstr "клонировать хранилище"
+
+#: thgutil\menuthg.py:183 thgutil\menuthg.py:307
+msgid "Create Repository Here"
+msgstr "Создать Здесь Хранилище"
+
+#: thgutil\menuthg.py:184 thgutil\menuthg.py:308
+msgid "create a new repository in this directory"
+msgstr "создать новое хранилище в этом каталоге"
+
+#: thgutil\menuthg.py:186 thgutil\menuthg.py:313
+msgid "Global Settings"
+msgstr "Глобальные Параметры"
+
+#: thgutil\menuthg.py:187 thgutil\menuthg.py:314
+msgid "Configure user wide settings"
+msgstr "Настроить пользовательские параметры"
+
+#: thgutil\menuthg.py:190 thgutil\menuthg.py:322
+msgid "About TortoiseHg"
+msgstr "О TortoiseHg"
+
+#: thgutil\menuthg.py:223
+msgid "HG Commit..."
+msgstr "HG Фиксировать..."
+
+#: thgutil\menuthg.py:224
+msgid "Commit changes in repository"
+msgstr "Фиксировать изменения в хранилище"
+
+#: thgutil\menuthg.py:228
+msgid "Edit Ignore Filter"
+msgstr "Редактировать Фильтр Игнорирования"
+
+#: thgutil\menuthg.py:229
+msgid "Edit repository ignore filter"
+msgstr "Редактировать фильтр игнорирования хранилища"
+
+#: thgutil\menuthg.py:233
+msgid "View File Status"
+msgstr "Статус Файлов"
+
+#: thgutil\menuthg.py:234
+msgid "Repository status"
+msgstr "Статус хранилища"
+
+#: thgutil\menuthg.py:238
+msgid "Shelve Changes"
+msgstr "Отложить Изменения"
+
+#: thgutil\menuthg.py:239
+msgid "Shelve or unshelve repository changes"
+msgstr "Откладываение и возвращение изменений хранилища"
+
+#: thgutil\menuthg.py:245
+msgid "Visual Diff"
+msgstr "Визуальные Различия"
+
+#: thgutil\menuthg.py:246
+msgid "View changes using GUI diff tool"
+msgstr "Отобразить изменения в графическом инструменте различий"
+
+#: thgutil\menuthg.py:250
+msgid "Guess Renames"
+msgstr "Угадать Переименования"
+
+#: thgutil\menuthg.py:251
+msgid "Detect renames and copies"
+msgstr "Выявить переименования и копии"
+
+#: thgutil\menuthg.py:254
+msgid "Rename File"
+msgstr "Переименовать Файл"
+
+#: thgutil\menuthg.py:255
+msgid "Rename file or directory"
+msgstr "Переименовать файл или каталог"
+
+#: thgutil\menuthg.py:259
+msgid "Add Files"
+msgstr "Добавить Файлы"
+
+#: thgutil\menuthg.py:260
+msgid "Add files to Hg repository"
+msgstr "Добавить файлы в Hg хранилище"
+
+#: thgutil\menuthg.py:263
+msgid "Remove Files"
+msgstr "Удалить Файлы"
+
+#: thgutil\menuthg.py:264
+msgid "Remove selected files on the next commit"
+msgstr "Удалить выбранные файлы при следующей фиксации"
+
+#: thgutil\menuthg.py:267
+msgid "Revert Changes"
+msgstr "Возвратить Изменения"
+
+#: thgutil\menuthg.py:268
+msgid "Revert selected files"
+msgstr "Возвратить выбранные файлы"
+
+#: thgutil\menuthg.py:273
+msgid "Annotate Files"
+msgstr "Аннотировать Файлы"
+
+#: thgutil\menuthg.py:274
+msgid "show changeset information per file line"
+msgstr "показывать информацию по изменениям для каждой строки файла"
+
+#: thgutil\menuthg.py:280
+msgid "View Changelog"
+msgstr "Показать Журнал Изменений"
+
+#: thgutil\menuthg.py:281
+msgid "View revision history"
+msgstr "Показать историю ревизии"
+
+#: thgutil\menuthg.py:286
+msgid "Search History"
+msgstr "Поиск По Истории"
+
+#: thgutil\menuthg.py:287
+msgid "Search revisions of files for a text pattern"
+msgstr "Поиск ревизий файлов по текстовому шаблону"
+
+#: thgutil\menuthg.py:292
+msgid "Synchronize..."
+msgstr "Синхронизировать..."
+
+#: thgutil\menuthg.py:293
+msgid "Synchronize with remote repository"
+msgstr "Синхронизировать с удалённым хранилищем"
+
+#: thgutil\menuthg.py:295
+msgid "Recovery..."
+msgstr "Востановление..."
+
+#: thgutil\menuthg.py:296
+msgid "General repair and recovery of repository"
+msgstr "Общий ремонт и восстановление хранилища"
+
+#: thgutil\menuthg.py:298
+msgid "Web Server"
+msgstr "Веб сервер"
+
+#: thgutil\menuthg.py:299
+msgid "start web server for this repository"
+msgstr "Запустить веб сервер для данного хранилища"
+
+#: thgutil\menuthg.py:304
+msgid "Clone a repository here"
+msgstr "Клонировать сюда хранилище"
+
+#: thgutil\menuthg.py:316
+msgid "Repository Settings"
+msgstr "Настройки Хранилища"
+
+#: thgutil\menuthg.py:317
+msgid "Configure settings local to this repository"
+msgstr "Изменить локальные настройки хранилища"
+
+#: thgutil\shlib.py:26 thgutil\version.py:16
+msgid "unknown"
+msgstr "неизвесно"
