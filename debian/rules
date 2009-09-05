@@ -23,6 +23,7 @@ build/tortoisehg::
 clean::
 	rm -f debian/pycompat
 	rm -f debian/hgtk.1
+	rm -fr locale
 
 DEBVERSION:=$(shell head -n 1 debian/changelog | sed -e 's/^[^(]*(\([^)]*\)).*/\1/')
 SRCVERSION:=$(shell echo $(DEBVERSION) | sed -e 's/^.*://' -e 's/-[.0-9]*$$//')
