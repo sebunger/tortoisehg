@@ -39,12 +39,12 @@ get-orig-source:
 	uscan --force-download --download-version $(UPVERSION)
 	mkdir ../tempdir
 	cd ../tempdir && tar zxf ../$(UPVERSION).gz
-	# Remove all files which are also not present in the upstream release tarball
+	# Encode proper version number in build script
 	sed -i -e "s/version = \"unknown\"/version = \"$(UPVERSION)\"/" ../tempdir/stable/setup.py
 	sed -i -e "s/or 'unknown'/or '$(UPVERSION)'/" ../tempdir/stable/setup.py
 	echo 'include i18n/*' >> ../tempdir/stable/MANIFEST.in
 	cd ../tempdir/stable && python setup.py sdist
-	mv ../tempdir/stable/dist/tortoisehg-$(UPVERSION).tar.gz ..
+	mv ../tempdir/stable/dist/tortoisehg-$(UPVERSION).tar.gz ../tortoisehg_$(UPVERSION).orig.tar.gz
 	rm -r ../tempdir
 	rm ../$(UPVERSION).gz
 
