@@ -5,4 +5,4 @@ tortoisehg (0.8+dfsg1-1) unstable; urgency=low
     - update copyright statement
     - fix-license-path.patch
 
- -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Sat, 05 Sep 2009 13:06:42 -0700
+ -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Sun, 06 Sep 2009 11:18:46 -0700
