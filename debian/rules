@@ -6,7 +6,6 @@ include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 include /usr/share/cdbs/1/class/python-distutils.mk
 
-
 build/tortoisehg::
 	xsltproc --nonet \
 		--param make.year.ranges 1 \
@@ -16,6 +15,16 @@ build/tortoisehg::
 		/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
 		debian/hgtk.1.xml
 
+
+install/tortoisehg::
+	mkdir -p $(CURDIR)/debian/tortoisehg/usr/lib
+	mv $(CURDIR)/debian/tmp/usr/bin $(CURDIR)/debian/tortoisehg/usr
+	mv $(CURDIR)/debian/tmp/usr/share $(CURDIR)/debian/tortoisehg/usr
+	mv $(CURDIR)/debian/tmp/usr/lib/python* $(CURDIR)/debian/tortoisehg/usr/lib
+
+install/tortoisehg-nautilus::
+	mkdir -p $(CURDIR)/debian/tortoisehg-nautilus/usr
+	mv $(CURDIR)/debian/tmp/usr/lib $(CURDIR)/debian/tortoisehg-nautilus/usr/
 
 # drop automatically created file; see #424898
 clean::
@@ -46,6 +55,4 @@ get-orig-source:
 	mv ../tempdir/stable/dist/tortoisehg-$(UPVERSION).tar.gz ../tortoisehg_$(SRCVERSION).orig.tar.gz
 	rm -r ../tempdir
 	rm ../$(UPVERSION).gz
-
-
 
