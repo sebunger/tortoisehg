@@ -1,68 +1,71 @@
-Upstream-Name: tortoisehg
-Upstream-Maintainer: Steve Borho <steve@borho.org>
-Upstream-Source: http://bitbucket.org/tortoisehg/stable/downloads/
+Name: tortoisehg
+Maintainer: Steve Borho <steve@borho.org>, TK Soh <teekaysoh@gmail.com>
+Source: http://bitbucket.org/tortoisehg/stable/downloads/
+Disclaimer: Some of these files are missing a license statement, which has been
+ however clarified by upstream in the next release (0.8.1).
 
 Files: *
-Copyright: Copyright 2008-2009, Steve Borho <steve@borho.org>
-Copyright: Copyright 2008, TK Soh <teekaysoh@gmail.com>
+Copyright: 2008-2009, Steve Borho <steve@borho.org>
+           2008, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
 Files: hggtk/*
-Copyright: Copyright 2008-2009, Steve Borho <steve@borho.org>
-Copyright: Copyright 2007-2008, TK Soh <teekaysoh@gmail.com>
-Copyright: Copyright 2007, Brad Schick <brad at gmail dot com>
+Copyright: 2008-2009, Steve Borho <steve@borho.org>
+           2007-2008, TK Soh <teekaysoh@gmail.com>
+           2007, Brad Schick <brad at gmail dot com>
 License: GPL-2
 
 Files: hggtk/dialog.py
-Copyright: Copyright 2006, Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
+Copyright: 2006, Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
 License: GPL-2+
 
 Files: hggtk/thgstatus.py
-Copyright: Copyright 2008-2009, Adrian Buehlmann
+Copyright: 2008-2009, Adrian Buehlmann
 License: GPL-2
 
 Files: hggtk/hgshelve.py
-Copyright: Copyright 2007, Bryan O'Sullivan <bos@serpentine.com>
-Copyright: Copyright 2007, TK Soh <teekaysoh@gmail.com>
+Copyright: 2007, Bryan O'Sullivan <bos@serpentine.com>
+           2007, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
 Files: hggtk/logview/*
-Copyright: Copyright 2008, Steve Borho <steve@borho.org>
-Copyright: Copyright 2007, Joel Rosdahl <joel@rosdahl.net>
+Copyright: 2008, Steve Borho <steve@borho.org>
+           2007, Joel Rosdahl <joel@rosdahl.net>
 License: GPL-2
 
 Files: hggtk/logview/colormap.py
-Copyright: Copyright 2005, Dan Loda <danloda@gmail.com>
+Copyright: 2005, Dan Loda <danloda@gmail.com>
 License: GPL-2+
 
 Files: hggtk/logview/graphcell.py
-Copyright: Copyright 2005, Canonical Ltd.
-Copyright: Copyright 2005, Scott James Remnant <scott@ubuntu.com>
+Copyright: 2005, Canonical Ltd.
+           2005, Scott James Remnant <scott@ubuntu.com>
 License: GPL-2+
 
 Files: contrib/_hgtk
-Copyright: Copyright 2009, Steve Borho <steve@borho.org>
+Copyright: 2009, Steve Borho <steve@borho.org>
 License: GPL-2+
 
 Files: contrib/nautilus-thg.py
-Copyright: Copyright 2007-2009, Steve Borho <steve@borho.org>
-Copyright: Copyright 2006, Jeff Bailey
-Copyright: Copyright 2006, Wouter van Heyst
-Copyright: Copyright 2006, Jelmer Vernooij <jelmer@samba.org>
+Copyright: 2007-2009, Steve Borho <steve@borho.org>
+           2006, Jeff Bailey
+           2006, Wouter van Heyst
+           2006, Jelmer Vernooij <jelmer@samba.org>
 License: GPL-2
 
 Files: thgutil/menuthg.py
-Copyright: Copyright 2007, Jelmer Vernooij <jelmer@samba.org>
-Copyright: Copyright 2007, Henry Ludemann <misc@hl.id.au>
-Copyright: Copyright 2007, TK Soh <teekaysoh@gmail.com>
+Copyright: 2007, Jelmer Vernooij <jelmer@samba.org>
+           2007, Henry Ludemann <misc@hl.id.au>
+           2007, TK Soh <teekaysoh@gmail.com>
 License: GPL-2+
 
 Files: thgutil/thread2.py
-Copyright: PD
+Copyright: 2009, Steve Borho <steve@borho.org>
+License: GPL-2
 
 Files: thgutil/iniparse/*
-Copyright: Copyright 2004, Paramjit Oberoi <param.cs.wisc.edu
-Copyright: Copyright 2001-2003, Python Software Foundation
+Copyright: 2004, Paramjit Oberoi <param.cs.wisc.edu
+           2001-2003, Python Software Foundation
 License: MIT
  iniparse/compat.py and tests/test_compat.py contain code derived from
  lib/python-2.3/ConfigParser.py and lib/python-2.3/test/test_cfgparse.py
@@ -355,15 +358,23 @@ License: PSF-2
  OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 Files: icons/*
-Copyright: Copyright 2009, Steve Borho <steve@borho.org>
-Copyright: Copyright 2006-2009, The TortoiseSVN Project
+Copyright: 2009, Steve Borho <steve@borho.org>
+           2006-2009, The TortoiseSVN Project
+License: GPL-2
+
+Files: i18n/*
+Copyright: 2009, Rosetta Contributors and Canonical Ltd
 License: GPL-2
 
 Files: debian/*
-Copyright: Copyright 2009, Ludovico Cavedon <ludovico.cavedon@gmail.com>
+Copyright: 2009, Ludovico Cavedon <ludovico.cavedon@gmail.com>
 License: GPL-2+
 
-License: GPL-2 | GPL-2+
+Files: debian/pacthes/fix-license-path.patch
+Copyright: 2009, Max Bowsher <maxb@f2s.com>
+License: GPL-2+
+
+License: GPL-2 and GPL-2+
  On Debian systems the full text of the GNU General Public License version 2
  can be found in the `/usr/share/common-licenses/GPL-2' file.
 
