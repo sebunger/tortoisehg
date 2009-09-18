@@ -18,16 +18,6 @@ debian/hgtk.1: debian/hgtk.1.xml
 		debian/hgtk.1.xml
 
 
-install/tortoisehg::
-	mkdir -p $(CURDIR)/debian/tortoisehg/usr/lib
-	mv $(CURDIR)/debian/tmp/usr/bin $(CURDIR)/debian/tortoisehg/usr
-	mv $(CURDIR)/debian/tmp/usr/share $(CURDIR)/debian/tortoisehg/usr
-	mv $(CURDIR)/debian/tmp/usr/lib/python* $(CURDIR)/debian/tortoisehg/usr/lib
-
-install/tortoisehg-nautilus::
-	mkdir -p $(CURDIR)/debian/tortoisehg-nautilus/usr
-	mv $(CURDIR)/debian/tmp/usr/lib $(CURDIR)/debian/tortoisehg-nautilus/usr/
-
 # drop automatically created file; see #424898
 clean::
 	rm -f debian/pycompat
