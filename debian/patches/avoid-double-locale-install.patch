@@ -1,5 +1,6 @@
 Description: avoid double installation of .mo files
 Author: Ludovico Cavedon <ludovico.cavedon@gmail.com>
+Forwarded: http://sourceforge.net/mailarchive/message.php?msg_id=4AA2FEE0.9080302%40gmail.com
 
 Index: tortoisehg/setup.py
 ===================================================================
