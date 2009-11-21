@@ -1,0 +1,350 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. A quick tour for the impatient &mdash; TortoiseHg v0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v0.9.0 documentation" href="index.html" />
+    <link rel="next" title="4. TortoiseHg in daily use" href="daily.html" />
+    <link rel="prev" title="2. Introduction" href="intro.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="daily.html" title="4. TortoiseHg in daily use"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="2. Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-tour">
+<h1>3. A quick tour for the impatient<a class="headerlink" href="#module-tour" title="Permalink to this headline">¶</a></h1>
+<p>Mercurial supports many different
+<a class="reference external" href="http://hgbook.red-bean.com/read/collaborating-with-other-people.html">collaboration models</a>.
+This chapter describes just one of those models: a single central repository.
+The central repository model does not scale as well as other models, but
+it is the most familiar to those coming from other revision tools and
+thus is the most common approach people start with.</p>
+<p>To get started, suppose you volunteer to create the central repository.
+There are ways to <a class="reference external" href="http://mercurial.selenic.com/wiki/RepositoryConversion">convert</a>
+non-Mercurial repositories into Mercurial repositories, but this example
+assumes you are starting from scratch.</p>
+<p>This tutorial assumes you already have TortoiseHg properly installed,
+and you have your project folder open in your file browser.</p>
+<div class="section" id="configuring-tortoisehg">
+<h2>3.1. Configuring TortoiseHg<a class="headerlink" href="#configuring-tortoisehg" title="Permalink to this headline">¶</a></h2>
+<p>First you need to make sure that you are correctly identified in
+TortoiseHg.  You do this by adjusting the global settings of TortoiseHg.
+Right click in your source folder and select
+<em>TortoiseHg ‣ Global Settings</em></p>
+<div class="figure">
+<img alt="Context Menu" src="_images/cmenu-nofiles.jpg" />
+<p class="caption">Context menu with no files selected</p>
+</div>
+<p>You must then select the <strong>Commit</strong> tab and enter a name in the
+<strong>Username</strong> field.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you forget to configure your username TortoiseHg will ask you to
+enter one when you <em>commit</em>, the only time the name is actually
+required.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>There are no hard rules on how to format your user name, the field
+is free form, but the following convention is commonly used:</p>
+<div class="highlight-python"><pre>FullName &lt;email&gt;</pre>
+</div>
+<p>for example</p>
+<div class="highlight-python"><pre>Donald Duck &lt;donaldduck@example.net&gt;</pre>
+</div>
+<p class="last">The email address is stripped when viewing history in the changelog
+viewer, and the built-in web server obfuscates email addresses to
+prevent SPAM.</p>
+</div>
+<p>If you are not using one of our Windows installers, you will also have
+to configure a visual diff tool.  Type <strong>hgtk userconfig</strong> and on
+the TortoiseHg tab you will find <strong>Visual Diff Command</strong>.  If
+there are no options in the drop-down list, you must enable and
+configure Mercurial&#8217;s ExtDiff extension and then restart the userconfig
+application.</p>
+</div>
+<div class="section" id="initialize-the-repository">
+<h2>3.2. Initialize the repository<a class="headerlink" href="#initialize-the-repository" title="Permalink to this headline">¶</a></h2>
+<p>Create the initial repository on your local machine by using the
+<strong>Create Repository Here</strong> shell menu option, or in a command
+shell within the folder, type <strong>hgtk init</strong>.  You only need to do
+this in once in the root folder of your project.</p>
+<div class="figure">
+<img alt="Init dialog" src="_images/init.png" />
+<p class="caption">Repository Init Dialog</p>
+</div>
+<p>We suggest you keep <strong>Add special files (.hgignore, ...)</strong>
+checked, and do not check
+<strong>Make repo compatible with Mercurial 1.0</strong>
+unless you have a strong reason to do so.</p>
+<p>After pressing <strong>Create</strong>, Mercurial creates a subdirectory in
+your project folder named <tt class="docutils literal"><span class="pre">.hg</span></tt>. This is where Mercurial keeps all
+its version data.  It is called the <em>repository</em> or <em>store</em>, while the
+directory containing the source files is called the <em>working directory</em>.
+You never need to specify the <tt class="docutils literal"><span class="pre">.hg</span></tt> directory when running
+commands, you only need to specify the working directory root.  It is
+mentioned here just so you better understand how Mercurial works.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">It is dangerous to manually edit the files in <tt class="docutils literal"><span class="pre">.hg</span></tt> directory,
+repository corruption can occur.  <tt class="docutils literal"><span class="pre">.hg/hgrc</span></tt> is perhaps the
+only exception to this rule.</p>
+</div>
+</div>
+<div class="section" id="add-files">
+<h2>3.3. Add files<a class="headerlink" href="#add-files" title="Permalink to this headline">¶</a></h2>
+<p>Now it&#8217;s time to tell Mercurial which files must be tracked and which
+files must be ignored. There are a lot of way to do this:</p>
+<ol class="arabic simple">
+<li>To add files, select them in explorer and then right click and select
+<em>TortoiseHg ‣ Add Files...</em> in the context menu. A
+dialog will open for you to double check the selected files and
+accept the add operation.</li>
+<li>Or open the status tool (<em>TortoiseHg ‣ View File Status</em>
+or <strong>hgtk status</strong> from the command line). Check the files you
+want to add and then press the <strong>Add</strong> button. From the
+status tool you can launch the ignore filter tool from the context
+menu of a unknown file (the menu option is named <strong>ignore</strong>)</li>
+<li>Or skip adding new files as a separate step and have the commit tool
+add them implicitly.  The commit tool is very similar to the status
+tool and allows you to do all of the same tasks. In this tool you
+can add and commit an untracked file by just checking the file and
+pressing <strong>Commit</strong>.</li>
+<li>To ignore files, open the ignore filter dialog:
+<em>TortoiseHg ‣ Edit Ignore Filter</em> or from command
+line <strong>hgtk hgignore</strong>. Choose a file from the list or
+manually type in a <em>Glob</em> or <em>Regular expression</em> filter and then
+press <strong>Add</strong>. Changes to the ignore filter take effect
+immediately.</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <tt class="docutils literal"><span class="pre">.hgignore</span></tt> file, contained in the working directory root,
+is typically tracked (checked in).</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is good practice to not have many <em>unknown</em> files in your working
+directory, as it makes it too easy to forget to add vital new files.
+It is recommended that you keep your <tt class="docutils literal"><span class="pre">.hgignore</span></tt> file up to
+date.</p>
+</div>
+</div>
+<div class="section" id="commit">
+<h2>3.4. Commit<a class="headerlink" href="#commit" title="Permalink to this headline">¶</a></h2>
+<p>Commit your local repository by right-clicking anywhere in the folder,
+or on the folder itself, and then selecting <strong>HG Commit ...</strong>,
+or from command line type <strong>hgtk commit</strong>.  Write a commit
+message, select the files you wish to commit, then press
+<strong>Commit</strong>. If, after the commit, you realize that something was
+wrong with the message or the selected files, you can cancel the last
+commit using the <strong>Undo</strong> button.  Your previous commit message
+will be in the message history drop-down, so you do not have to type it
+in again from scratch.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You lose the ability to easily undo the last commit when you close
+the commit tool.</p>
+</div>
+<div class="figure">
+<img alt="Commit dialog" src="_images/commit.png" />
+<p class="caption">Commit Tool</p>
+</div>
+</div>
+<div class="section" id="share-the-repository">
+<h2>3.5. Share the repository<a class="headerlink" href="#share-the-repository" title="Permalink to this headline">¶</a></h2>
+<p>Now you are ready to share your work. You do this by making a copy of
+your repository in a public location that everyone in your group can
+read. Mercurial calls this copy operation <em>cloning your repository</em>. To
+clone your repository to a shared drive, open the clone tool
+<em>TortoiseHg ‣ Clone a Repository</em>, or
+<strong>hgtk clone</strong> from command line.  Then enter the destination
+path.</p>
+<div class="figure">
+<img alt="Clone dialog" src="_images/share.png" />
+<p class="caption">Clone Dialog</p>
+</div>
+<p>When you create a clone for the purposes of generating a <em>central
+repository</em> there is no reason for that clone to have a working
+directory. Checking
+<strong>do not update the new working directory</strong> will prevent
+Mercurial from checking out a working copy of the repository in the
+central repository clone.  It will only have the <tt class="docutils literal"><span class="pre">.hg</span></tt> directory,
+which stores the entire revision history of the project.</p>
+<p>Other team members can clone from this clone with or without a checked
+out working directory.</p>
+</div>
+<div class="section" id="fetching-from-the-group-repository">
+<h2>3.6. Fetching from the group repository<a class="headerlink" href="#fetching-from-the-group-repository" title="Permalink to this headline">¶</a></h2>
+<p>You want to start collaborating with your team.  They tell you something
+like <em>fetch the repository from x</em>.  What does that mean? It means that
+you want to make a copy of the repository located at x on your local
+machine.  Mercurial calls this cloning and TortiseHg has a dialog
+for it. Right click in the directory where you want your copy and select
+<em>TortoiseHg ‣ Clone a Repository</em>, or
+<strong>hgtk clone</strong> from command line.</p>
+<div class="figure">
+<img alt="Clone dialog" src="_images/clone.png" />
+<p class="caption">Clone Dialog</p>
+</div>
+<p>This time you do want to update the working directory because you want
+to work on the project, uncheck
+<strong>do not update the new working directory</strong> so Mercurial updates
+the working directory with the <em>tip</em> revision in your new clone.</p>
+</div>
+<div class="section" id="working-with-your-repository">
+<h2>3.7. Working with your repository<a class="headerlink" href="#working-with-your-repository" title="Permalink to this headline">¶</a></h2>
+<p>Suppose you&#8217;ve introduced some changes. It is easy to see that there are
+a couple of directories with changes pending.  You can traverse the
+directories to find specific changes and commit them from Explorer. A
+quicker way is to use the commit tool:</p>
+<div class="figure">
+<img alt="Overlay Icons" src="_images/overlayicons.png" />
+<p class="caption">Overlay Icons on Vista</p>
+</div>
+<p>The commit tool gives you a way to see differences or you can use your
+visual difference tool (kdiff). Mercurial allows you to commit many
+changes before you decide to synchronize (share changes) with the group
+repository.</p>
+<p>When you&#8217;re ready to publish your changes, you</p>
+<ol class="arabic simple">
+<li>Commit your changes to your local repository (see above).</li>
+<li>Pull changes from the group repository into your repository,
+<em>TortoiseHg ‣ Repository Browser</em> or
+<strong>hgtk log</strong>, choose the path to the group repository
+in the syncbar and then <strong>Pull</strong>.</li>
+<li>If some changesets were pulled, merge those changes with your local
+changes and then commit the merge into your local repository. From
+the changelog viewer (<em>TortoiseHg ‣ Repository Browser</em>
+or <strong>hgtk log</strong>) open the context menu over the changeset
+which you want to merge and select <strong>merge with</strong>.
+Finally, in the merge dialog, press <strong>Merge</strong> and then
+<strong>Commit</strong>.</li>
+<li>Ensure your merged work still builds and passes your extensive test suite.</li>
+<li>Push your changes to the group repository,
+<em>TortoiseHg ‣ Repository Browser</em> or <strong>hgtk log</strong>,
+choose the path to group repository and then <strong>Push</strong>.</li>
+</ol>
+<p>Which may sound complicated, but most of the time it is just pushing the
+buttons in the commit and changelog tools.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Merges can be safely restarted if necessary.</p>
+</div>
+<p>Mercurial makes collaboration easy, fast, and productive.
+Learn more at Mercurial&#8217;s <a class="reference external" href="http://mercurial.selenic.com/wiki/">wiki</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">3. A quick tour for the impatient</a><ul>
+<li><a class="reference external" href="#configuring-tortoisehg">3.1. Configuring TortoiseHg</a></li>
+<li><a class="reference external" href="#initialize-the-repository">3.2. Initialize the repository</a></li>
+<li><a class="reference external" href="#add-files">3.3. Add files</a></li>
+<li><a class="reference external" href="#commit">3.4. Commit</a></li>
+<li><a class="reference external" href="#share-the-repository">3.5. Share the repository</a></li>
+<li><a class="reference external" href="#fetching-from-the-group-repository">3.6. Fetching from the group repository</a></li>
+<li><a class="reference external" href="#working-with-your-repository">3.7. Working with your repository</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="intro.html"
+                                  title="previous chapter">2. Introduction</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="daily.html"
+                                  title="next chapter">4. TortoiseHg in daily use</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/quick.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="daily.html" title="4. TortoiseHg in daily use"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="intro.html" title="2. Introduction"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>

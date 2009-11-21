@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.1. Common Features &mdash; TortoiseHg v0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v0.9.0 documentation" href="index.html" />
+    <link rel="up" title="4. TortoiseHg in daily use" href="daily.html" />
+    <link rel="next" title="4.2. Windows Explorer Integration" href="explorer.html" />
+    <link rel="prev" title="4. TortoiseHg in daily use" href="daily.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="explorer.html" title="4.2. Windows Explorer Integration"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="daily.html" title="4. TortoiseHg in daily use"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" accesskey="U">4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-common.dialog">
+<h1>4.1. Common Features<a class="headerlink" href="#module-common.dialog" title="Permalink to this headline">¶</a></h1>
+<p>These features are common to many TortoiseHg tools, so we document them
+here just once.</p>
+<div class="section" id="keyboard-accelerators">
+<h2>4.1.1. Keyboard Accelerators<a class="headerlink" href="#keyboard-accelerators" title="Permalink to this headline">¶</a></h2>
+<p>We define a few keyboard accelerators that all of the TortoiseHg tools support.</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Ctrl-Q</span></tt></dt>
+<dd>quit the application, including all open windows</dd>
+<dt><tt class="docutils literal"><span class="pre">Ctrl-W</span></tt></dt>
+<dd>close the current window (same as <tt class="docutils literal"><span class="pre">Ctrl-Q</span></tt> if only one window is open)</dd>
+<dt><tt class="docutils literal"><span class="pre">Ctrl-D</span></tt></dt>
+<dd>visual diff of currently selected file or changeset</dd>
+<dt><tt class="docutils literal"><span class="pre">Ctrl-Enter</span></tt></dt>
+<dd>activation</dd>
+<dt><tt class="docutils literal"><span class="pre">F5</span></tt>, <tt class="docutils literal"><span class="pre">Ctrl-R</span></tt></dt>
+<dd>refresh</dd>
+</dl>
+<p>On <a class="reference external" href="http://bitbucket.org/tortoisehg/stable/wiki/MacOSX">Mac OS X</a>, the
+apple (command) key is used as the modifier instead of <tt class="docutils literal"><span class="pre">Ctrl</span></tt>.
+However some keyboard accelerators are internal to GTK+ so you must use
+the control key to access cut-paste functionality, for instance.</p>
+</div>
+<div class="section" id="visual-diffs">
+<h2>4.1.2. Visual Diffs<a class="headerlink" href="#visual-diffs" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="Visual Diff Window" src="_images/visual-diff.jpg" />
+<p class="caption">Visual Diff Window</p>
+</div>
+<p>TortoiseHg 0.8 introduced a visual diff dialog that solves four
+usability issues:</p>
+<ol class="arabic simple">
+<li>Allows you to select a visual diff tool for each individual file</li>
+<li>Allows you to use visual diff tools that fork background processes</li>
+<li>Allows you to use visual diff tools that do not support directory diffs</li>
+<li>Provides feedback when no files were modified</li>
+</ol>
+<p>Providing visual diffs requires TortoiseHg to generate temporary files
+which contain older versions of data.  Those temporary files are deleted
+when the visual diff dialog is closed.</p>
+<p>If you would like to bypass this visual diff window and directly launch
+your visual diff tool open the global settings dialog and set
+<em>TortoiseHg ‣ Skip Diff Window</em> to true.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The <cite>Skip Diff Window</cite> configurable does not change the behavior of
+visual diffs launched by the shell context menu.  The visual diff
+window is always shown.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">When you bypass the visual diff window, your visual diff tool must
+be able to handle directory diffs and it must not fork a background
+process.  Caveat emptor.</p>
+</div>
+<p>Configuring a visual diff application for use in TortoiseHg is a two
+step process.  First you must configure your application as an
+<a class="reference external" href="http://mercurial.selenic.com/wiki/ExtdiffExtension">Extdiff</a>
+command in your user <tt class="docutils literal"><span class="pre">Mercurial.ini</span></tt>:</p>
+<div class="highlight-python"><pre>[extdiff]
+myapp = C:\Path\to\tool.exe</pre>
+</div>
+<p>Then you can select <cite>myapp</cite> from the list of available extdiff
+commands in <em>TortoiseHg ‣ Visual Diff Command</em>.
+See the <a class="reference external" href="faq.html"><em>Frequently Asked Questions</em></a> for some configuration examples.</p>
+<p>When more than one <cite>Extdiff</cite> command is configured, the visual diff
+window will allow you to select the command to use as you open each
+file.</p>
+</div>
+<div class="section" id="treeview-searches">
+<h2>4.1.3. Treeview searches<a class="headerlink" href="#treeview-searches" title="Permalink to this headline">¶</a></h2>
+<p>Many TortoiseHg dialogs use treeviews to present lists of data to the
+user. The file lists in the status, commit, shelve, and changelog tools
+are treeviews. The changelog graph pane is a treeview. And even the
+annotate pane in the datamine tool is a treeview.</p>
+<p>Most of the TortoiseHg treeviews are configured for live searches.
+Ensure that the treeview has focus (by clicking on a row), and begin
+typing a search phrase. A small entry window will appear containing the
+text you have typed, and the treeview will immediately jump to the first
+row that matches the text you have entered thus far.  As you enter more
+characters, the search is refined.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">Ctrl-F</span></tt> opens the search window explicitly</li>
+<li><tt class="docutils literal"><span class="pre">Ctrl-G</span></tt> advances the search to the next match</li>
+<li><tt class="docutils literal"><span class="pre">Shift-Ctrl-G</span></tt> searches backwards</li>
+<li>The mouse scroll wheel will advance forwards and backwards through
+matching lines</li>
+</ul>
+</div>
+<div class="section" id="hg-command-dialog">
+<h2>4.1.4. HG command dialog<a class="headerlink" href="#hg-command-dialog" title="Permalink to this headline">¶</a></h2>
+<p>Many TortoiseHg tools use the <em>hgcmd</em> dialog to execute Mercurial
+commands that could potentially be interactive.</p>
+<div class="figure">
+<img alt="Mercurial command dialog" src="_images/hgcmd.jpg" />
+<p class="caption">Interactive Mercurial Command Dialog</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Error messages are given a dark red color for contrast</p>
+</div>
+<p>When the Mercurial command has completed, the dialog gives focus to its
+<strong>Close</strong> button.  So pressing <tt class="docutils literal"><span class="pre">Enter</span></tt> is all that is
+required to close the window.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">4.1. Common Features</a><ul>
+<li><a class="reference external" href="#keyboard-accelerators">4.1.1. Keyboard Accelerators</a></li>
+<li><a class="reference external" href="#visual-diffs">4.1.2. Visual Diffs</a></li>
+<li><a class="reference external" href="#treeview-searches">4.1.3. Treeview searches</a></li>
+<li><a class="reference external" href="#hg-command-dialog">4.1.4. HG command dialog</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="daily.html"
+                                  title="previous chapter">4. TortoiseHg in daily use</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="explorer.html"
+                                  title="next chapter">4.2. Windows Explorer Integration</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/common.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="explorer.html" title="4.2. Windows Explorer Integration"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="daily.html" title="4. TortoiseHg in daily use"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" >4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>
