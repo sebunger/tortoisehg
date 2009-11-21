@@ -1,19 +1,16 @@
 # TortoiseHg plugin for Nautilus
 #
-# Copyright (C) 2007-9 Steve Borho
+# Copyright 2007 Steve Borho
 #
-# Stolen mercilessly from nautilus-bzr, thanks guys
-# Copyright (C) 2006 Jeff Bailey
-# Copyright (C) 2006 Wouter van Heyst
-# Copyright (C) 2006 Jelmer Vernooij
-#
-# Published under the GNU GPL
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2, incorporated herein by reference.
 
 import gtk
 import gobject
 import nautilus
 import gnomevfs
 import os
+import sys
 
 try:
     from mercurial import demandimport
@@ -26,7 +23,6 @@ except ImportError:
 demandimport.enable()
 
 import subprocess
-import sys
 import urllib
 
 from mercurial import hg, ui, match, util
@@ -39,13 +35,13 @@ def _thg_path():
         pfile = pfile[:-1]
     path = os.path.dirname(os.path.dirname(os.path.realpath(pfile)))
     thgpath = os.path.normpath(path)
-    testpath = os.path.join(thgpath, 'thgutil')
+    testpath = os.path.join(thgpath, 'tortoisehg')
     if os.path.isdir(testpath) and thgpath not in sys.path:
         sys.path.insert(0, thgpath)
 _thg_path()
 
-from thgutil import paths, debugthg, hglib, cachethg
-from hggtk import gtklib
+from tortoisehg.util import paths, debugthg, hglib, cachethg
+from tortoisehg.hgtk import gtklib
 
 if debugthg.debug('N'):
     debugf = debugthg.debugf
@@ -66,7 +62,7 @@ class HgExtension(nautilus.MenuProvider,
         self.allvfs = {}
         self.inv_dirs = set()
 
-        from thgutil import menuthg
+        from tortoisehg.util import menuthg
         self.hgtk = paths.find_in_path('hgtk')
         self.menu = menuthg.menuThg()
         self.notify = os.path.expanduser('~/.tortoisehg/notify')
@@ -107,7 +103,8 @@ class HgExtension(nautilus.MenuProvider,
         Returns hg.repo
         '''
         p = paths.find_root(path)
-
+        if not p:
+            return None
         try:
             return hg.repository(ui.ui(), path=p)
         except hglib.RepoError:
@@ -273,7 +270,8 @@ class HgExtension(nautilus.MenuProvider,
             return
         root = os.path.commonprefix(files)
         root = paths.find_root(root)
-        self.invalidate(files, root)
+        if root:
+            self.invalidate(files, root)
 
     def invalidate(self, paths, root = ''):
         started = bool(self.inv_dirs)

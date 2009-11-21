@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.9. Synchronize &mdash; TortoiseHg v0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v0.9.0 documentation" href="index.html" />
+    <link rel="up" title="4. TortoiseHg in daily use" href="daily.html" />
+    <link rel="next" title="4.10. Serve" href="serve.html" />
+    <link rel="prev" title="4.8. Datamine" href="datamine.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="serve.html" title="4.10. Serve"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="datamine.html" title="4.8. Datamine"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" accesskey="U">4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-synchronize.dialog">
+<h1>4.9. Synchronize<a class="headerlink" href="#module-synchronize.dialog" title="Permalink to this headline">¶</a></h1>
+<div class="figure">
+<img alt="Synchronize dialog" src="_images/synchronize.png" />
+<p class="caption">Synchronize dialog</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The synchronize tool has been deprecated in the 0.9 release, and may
+be removed in a future release.  We suggest you use the changelog
+tool for performing synchronization duties.</p>
+</div>
+<p>The synchronize tool is used to transmit changesets between repositories
+or to email recipients.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Incoming</strong></dt>
+<dd>show changesets that would be pulled from target repository, the
+changes in the target repository that are not in local repository</dd>
+<dt><strong>Pull</strong></dt>
+<dd>pull incoming changesets from target repository</dd>
+<dt><strong>Outgoing</strong></dt>
+<dd>show changesets that would be pushed to target repository, the
+changes in the local repository that are not in target
+repository</dd>
+<dt><strong>Push</strong></dt>
+<dd>push outgoing changesets to target repository, make the local
+<em>tip</em> the new <em>tip</em> in the target repository</dd>
+<dt><strong>Email</strong></dt>
+<dd>send outgoing changesets (to target repository) as email</dd>
+<dt><strong>Shelve</strong></dt>
+<dd>launch the shelve tool to allow working changes to be
+temporarily moved into the shelf, since some operations require
+the working directory to be clean.</dd>
+<dt><strong>Stop</strong></dt>
+<dd>stop current operation</dd>
+<dt><strong>Configure</strong></dt>
+<dd>configure repository paths (aliases)</dd>
+</dl>
+</blockquote>
+<p>Below the toolbar are two buttons and a text entry:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Repo:</strong></dt>
+<dd>browse for a local repository to synchronize with</dd>
+<dt><strong>Bundle:</strong></dt>
+<dd>browse for a local bundle file to pull from</dd>
+</dl>
+</blockquote>
+<p>The text entry/combo box is where you enter or select paths of target
+repositories. The synchronize tool will seed the drop-down list with
+path aliases configured for this repository.</p>
+<p>The <strong>Post Pull Operation</strong> frame contains radio buttons for
+selecting the operation which is performed after a pull.  This behavior
+is configurable via the <strong>Configure</strong> button.  You can select a
+default behavior for your user account and override that selection on a
+per-repository basis.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Nothing</strong></dt>
+<dd>No operations are performed after a pull.  You will be allowed to
+view the pulled changesets in the log viewer, and you will have the
+option to update to the new tip if applicable.</dd>
+<dt><strong>Update</strong></dt>
+<dd>Automatically update to the new branch tip if, and only if, new
+revisions were pulled into the local repository.  This could trigger
+a merge if the pulled changes conflict with local uncommitted
+changes.</dd>
+<dt><strong>Fetch</strong></dt>
+<dd>Equivalent to hg fetch.  See the fetch extension documentation for
+it&#8217;s behavior.  This feature is only available if the fetch
+extension has been enabled by the user.</dd>
+<dt><strong>Rebase</strong></dt>
+<dd>Equivalent to pull &#8211;rebase.  See the rebase extension
+documentation for it&#8217;s behavior.  This feature is only available
+if the rebase extension has been enabled by the user.</dd>
+</dl>
+</blockquote>
+<p>The <strong>use proxy</strong> button is a quick way to disable your proxy
+configuration for individual operations. The button is only sensitive
+when an http proxy is configured.</p>
+<p>All operations which require authentication will pop up dialog boxes to
+get the required information from the user.  TortoiseHg uses the
+TortoisePlink tool (borrowed from the TortoiseSVN distribution) to
+handle <em>ssh:</em> connections and authentication.  See the <a class="reference external" href="http://bitbucket.org/tortoisehg/stable/wiki/FAQ#tortoisehg-faq">FAQ</a> for help if
+you have trouble connecting to ssh servers.</p>
+<p>Under the <strong>Advanced Options</strong> fold-up panel are a number of
+configurables that are valid for most push/pull operations.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Force pull or push</strong></dt>
+<dd>override warnings about multiple heads or unrelated repositories</dd>
+<dt><strong>Target Revision</strong></dt>
+<dd>to avoid sending all revisions</dd>
+<dt><strong>Remote Command</strong></dt>
+<dd>provides -e argument</dd>
+<dt><strong>Show patches</strong></dt>
+<dd>show diffs in incoming and outging changes</dd>
+<dt><strong>Show Newest First</strong></dt>
+<dd>reverse order that changesets are listed</dd>
+<dt><strong>Show No Merges</strong></dt>
+<dd>filter out merge changesets from output (does not affect push/pull)</dd>
+</dl>
+</blockquote>
+<div class="section" id="after-pull">
+<h2>4.9.1. After Pull<a class="headerlink" href="#after-pull" title="Permalink to this headline">¶</a></h2>
+<p>After changesets are pulled into your repository, a buttons may appear
+at the bottom of the dialog:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Update to branch tip</strong></dt>
+<dd>Update your working directory to the new tip of the current branch</dd>
+</dl>
+</blockquote>
+<p>The button will be hidden when it is not applicable.</p>
+</div>
+<div class="section" id="email">
+<h2>4.9.2. Email<a class="headerlink" href="#email" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="Email dialog" src="_images/email.png" />
+<p class="caption">Email dialog</p>
+</div>
+<p>The email dialog can be launched from two TortoiseHg tools.</p>
+<ol class="arabic simple">
+<li>The changelog tool, in which case the user intends to email a single
+revision or a range of revisions.</li>
+<li>The synchronize tool, in which case the user intends to email all
+outgoing changes to the current target repository (it&#8217;s good practice to
+check the outgoing changes before launching the email dialog).</li>
+</ol>
+<p>The <strong>Send</strong> button is obvious, and the <strong>Configure</strong>
+dialog predictably opens the TortoiseHg Settings dialog to the email tab
+where you can configure your SMTP settings and set default
+<strong>To:</strong> and <strong>From:</strong> addresses.</p>
+<p><strong>In-Reply-To:</strong> is used to make your patches properly threaded
+in mailing lists.</p>
+<p>Please consult the Mercurial documentation for the differences between
+plain patches, HG patches, Git patches, and bundles.</p>
+</div>
+<div class="section" id="from-command-line">
+<h2>4.9.3. From command line<a class="headerlink" href="#from-command-line" title="Permalink to this headline">¶</a></h2>
+<p>The synchronize tool can be started from command line</p>
+<div class="highlight-python"><pre>hgtk synch
+
+aliases: pull, push, incoming, outgoing, email
+
+repository synchronization tool
+
+use "hgtk -v help synch" to show global options</pre>
+</div>
+<p>The syntax is simple, no options or parameters are needed, except the
+global options.  If the synchronize tool is started via push, outgoing,
+or email command aliases, it will automatically select the
+<em>default-push</em> URL if.  For all other aliases the tool selects the
+<em>default</em> URL.  If the selected URL is not found, it will use the first
+path it finds.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">4.9. Synchronize</a><ul>
+<li><a class="reference external" href="#after-pull">4.9.1. After Pull</a></li>
+<li><a class="reference external" href="#email">4.9.2. Email</a></li>
+<li><a class="reference external" href="#from-command-line">4.9.3. From command line</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="datamine.html"
+                                  title="previous chapter">4.8. Datamine</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="serve.html"
+                                  title="next chapter">4.10. Serve</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/synchronize.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="serve.html" title="4.10. Serve"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="datamine.html" title="4.8. Datamine"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" >4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>

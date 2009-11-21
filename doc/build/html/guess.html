@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.11. Rename Guessing &mdash; TortoiseHg v0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v0.9.0 documentation" href="index.html" />
+    <link rel="up" title="4. TortoiseHg in daily use" href="daily.html" />
+    <link rel="next" title="4.12. Ignore Filter" href="ignore.html" />
+    <link rel="prev" title="4.10. Serve" href="serve.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="ignore.html" title="4.12. Ignore Filter"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="serve.html" title="4.10. Serve"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" accesskey="U">4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-guess.dialog">
+<h1>4.11. Rename Guessing<a class="headerlink" href="#module-guess.dialog" title="Permalink to this headline">¶</a></h1>
+<div class="figure">
+<img alt="Rename guessing dialog" src="_images/guess.jpg" />
+<p class="caption">Rename Guessing Dialog</p>
+</div>
+<p>This dialog is used to find renames, moves, and/or copies that were done
+without Mercurial&#8217;s knowledge.  The dialog can be launched from the
+shell context menu, or from the status or commit tools via the context
+menu of an unknown file.</p>
+<p>Follow these steps:</p>
+<ol class="arabic simple">
+<li>select one or more of the <strong>Unrevisioned Files</strong></li>
+<li>slide the simularity bar to the percentage match you desire</li>
+<li>press either <strong>Find Renames</strong> or <strong>Find Copies</strong>.</li>
+<li>select candidate matches and accept good matches</li>
+<li>repeat until all unrevisioned files are matched</li>
+</ol>
+<div class="section" id="find-renames">
+<h2>4.11.1. Find Renames<a class="headerlink" href="#find-renames" title="Permalink to this headline">¶</a></h2>
+<p>This feature will search the repository for missing files (files which
+were revisioned but are now gone).  For each missing file, it compares
+the last revisioned data against the unrevisioned file and if the
+percentage of matching lines is above the
+<strong>Minimum Simularity Percentage</strong>, it adds the pair to the
+<strong>Candidate Matches</strong>.</p>
+</div>
+<div class="section" id="find-copies">
+<h2>4.11.2. Find Copies<a class="headerlink" href="#find-copies" title="Permalink to this headline">¶</a></h2>
+<p>This feature will check every revisioned file in the repository to see
+if it exactly matches the unrevisioned file.</p>
+</div>
+<div class="section" id="candidate-matches">
+<h2>4.11.3. Candidate Matches<a class="headerlink" href="#candidate-matches" title="Permalink to this headline">¶</a></h2>
+<p>When you select a match in this list, the differences between the two
+files are shown in the bottom pane.  Pressing <strong>Accept Match</strong>
+will record the rename or copy event with Mercurial.</p>
+</div>
+<div class="section" id="from-command-line">
+<h2>4.11.4. From command line<a class="headerlink" href="#from-command-line" title="Permalink to this headline">¶</a></h2>
+<p>The guess tool can be started from command line:</p>
+<div class="highlight-python"><pre>hgtk guess
+
+guess previous renames or copies
+
+use "hgtk -v help guess" to show global options</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">4.11. Rename Guessing</a><ul>
+<li><a class="reference external" href="#find-renames">4.11.1. Find Renames</a></li>
+<li><a class="reference external" href="#find-copies">4.11.2. Find Copies</a></li>
+<li><a class="reference external" href="#candidate-matches">4.11.3. Candidate Matches</a></li>
+<li><a class="reference external" href="#from-command-line">4.11.4. From command line</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="serve.html"
+                                  title="previous chapter">4.10. Serve</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="ignore.html"
+                                  title="next chapter">4.12. Ignore Filter</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/guess.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ignore.html" title="4.12. Ignore Filter"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="serve.html" title="4.10. Serve"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" >4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>

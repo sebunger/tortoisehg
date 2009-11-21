@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>2. Introduction &mdash; TortoiseHg v0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v0.9.0 documentation" href="index.html" />
+    <link rel="next" title="3. A quick tour for the impatient" href="quick.html" />
+    <link rel="prev" title="1. Preface" href="preface.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="quick.html" title="3. A quick tour for the impatient"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="preface.html" title="1. Preface"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-introduction">
+<h1>2. Introduction<a class="headerlink" href="#module-introduction" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-tortoisehg">
+<h2>2.1. What is TortoiseHg?<a class="headerlink" href="#what-is-tortoisehg" title="Permalink to this headline">¶</a></h2>
+<p>TortoiseHg is a set of graphical tools and a shell extension for the
+<a class="reference external" href="http://mercurial.selenic.com/wiki/">Mercurial</a> distributed revision control
+system.</p>
+<dl class="docutils">
+<dt>On Windows,</dt>
+<dd>TortoiseHg consists of a shell extension, which provides overlay
+icons and context menus in your file explorer, and a command line
+program named <tt class="docutils literal"><span class="pre">hgtk.exe</span></tt> which can launch the TortoiseHg tools.
+Binary packages of TortoiseHg for Windows come with Mercurial and a
+merge tool and are thus completely ready for use &#8220;Out of the Box&#8221;.</dd>
+<dt>On Linux,</dt>
+<dd>TortoiseHg consists of a command line hgtk script and a Nautilus
+extension which provides overlays and context menus in your file
+explorer.  You must have Mercurial installed separately in order to
+run TortoiseHg on Linux.  TortoiseHg binary packages list Mercurial
+as a dependency, so it is usually installed for you automatically.</dd>
+</dl>
+<p>TortoiseHg is primarily written in Python and PyGtk (the Windows shell
+extension being the notable exception).  The hgtk script and TortoiseHg
+dialogs can be used on any platform that supports PyGtk, including Mac
+OS X.</p>
+</div>
+<div class="section" id="installing-tortoisehg">
+<h2>2.2. Installing TortoiseHg<a class="headerlink" href="#installing-tortoisehg" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="on-windows">
+<h3>2.2.1. On Windows<a class="headerlink" href="#on-windows" title="Permalink to this headline">¶</a></h3>
+<p>TortoiseHg comes with an easy to use installer. Double click on the installer
+file and follow the instructions. The installer will take care of the rest.</p>
+<p>After installation a reboot is necessary.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you have an older (&lt;0.8) version already installed, the installer
+will ask that you to remove the previous version of TortoiseHg.  The
+uninstall can be initiated from the control panel or the start menu.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If you have 0.8 or later already installed, the installer will close
+the ThgTaskbar application when it begins copying files.</p>
+</div>
+<div class="section" id="language-settings">
+<h4>2.2.1.1. Language settings<a class="headerlink" href="#language-settings" title="Permalink to this headline">¶</a></h4>
+<p>The TortoiseHg user interface has been translated into many languages.
+Language packs are not required since all available languages are
+installed. Look in <tt class="docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files\TortoiseHg\locale</span></tt> for the
+available languages. To enable a language just set the environment
+variable <tt class="docutils literal"><span class="pre">LANGUAGE</span></tt> to the desidered language, e.g. for italian
+<tt class="docutils literal"><span class="pre">set</span> <span class="pre">LANGUAGE=it</span></tt>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">After setting LANGUAGE, if standard GUI elements like <strong>OK</strong>
+and <strong>Apply</strong> still appear in English, it means the
+TortoiseHg installer did not include translations of GTK+ for your
+locale.  This usually means the translation of TortoiseHg for your
+locale was incomplete at release time.</p>
+</div>
+<p>The Windows shell extension context menus get their translations from
+the Windows registry.  Translations for many locales were installed
+under <tt class="docutils literal"><span class="pre">C:\Program</span> <span class="pre">Files\TortoiseHg\cmenu_i18n</span></tt>.  Select the
+locale you would like to use, double-click on it, and confirm all
+requests.</p>
+</div>
+</div>
+<div class="section" id="on-linux-and-mac">
+<h3>2.2.2. On Linux and Mac<a class="headerlink" href="#on-linux-and-mac" title="Permalink to this headline">¶</a></h3>
+<p>Debian DEB and RPM packages for Fedora are available on the
+<a class="reference external" href="http://bitbucket.org/tortoisehg/stable/wiki/download/">download</a>
+page of the wiki.</p>
+<p>Deb packages for Ubuntu can be found at
+<a class="reference external" href="https://launchpad.net/~tortoisehg-ppa">that</a>.</p>
+<p>For MacOSX, no packages are available but you can run hgtk and all the
+dialogs via the source install method. For details, see
+<a class="reference external" href="http://bitbucket.org/tortoisehg/stable/wiki/MacOSX">MacOSX</a>.</p>
+<div class="section" id="id1">
+<h4>2.2.2.1. Language settings<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>The TortoiseHg tools use Python&#8217;s
+<a class="reference external" href="http://docs.python.org/library/gettext.html">gettext</a> library to
+localize their text.  To get localized dialogs, it is recommended that
+you set the LANGUAGE environment variable to your locale of choice.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">2. Introduction</a><ul>
+<li><a class="reference external" href="#what-is-tortoisehg">2.1. What is TortoiseHg?</a></li>
+<li><a class="reference external" href="#installing-tortoisehg">2.2. Installing TortoiseHg</a><ul>
+<li><a class="reference external" href="#on-windows">2.2.1. On Windows</a><ul>
+<li><a class="reference external" href="#language-settings">2.2.1.1. Language settings</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#on-linux-and-mac">2.2.2. On Linux and Mac</a><ul>
+<li><a class="reference external" href="#id1">2.2.2.1. Language settings</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="preface.html"
+                                  title="previous chapter">1. Preface</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="quick.html"
+                                  title="next chapter">3. A quick tour for the impatient</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/intro.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="quick.html" title="3. A quick tour for the impatient"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="preface.html" title="1. Preface"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>

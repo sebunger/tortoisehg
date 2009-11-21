@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.8. Datamine &mdash; TortoiseHg v0.9.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.9.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v0.9.0 documentation" href="index.html" />
+    <link rel="up" title="4. TortoiseHg in daily use" href="daily.html" />
+    <link rel="next" title="4.9. Synchronize" href="synchronize.html" />
+    <link rel="prev" title="4.7. Changelog" href="changelog.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="synchronize.html" title="4.9. Synchronize"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="changelog.html" title="4.7. Changelog"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" accesskey="U">4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-datamine.dialog">
+<h1>4.8. Datamine<a class="headerlink" href="#module-datamine.dialog" title="Permalink to this headline">¶</a></h1>
+<p>The datamine application is used to inspect the revision history of your
+repository.  It is a tabbed application that supports two tab types,
+<em>Search</em> and <em>Annotate</em>.</p>
+<div class="section" id="search-tabs">
+<h2>4.8.1. Search Tabs<a class="headerlink" href="#search-tabs" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="Search dialog" src="_images/search.png" />
+<p class="caption">Search tabs</p>
+</div>
+<p>The search tab is used to search (<em>grep</em>) through your entire revision
+history for keywords, variable names, functions, etc...</p>
+<p>The text entry fields have these purposes:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>regexp</strong></dt>
+<dd>Regular expression search criteria.</dd>
+<dt><strong>includes</strong></dt>
+<dd>Comma separated list of paths to include in your search. If no
+paths are given, the search is assumed to be repository wide. In
+other words, specifying an include path actually narrows the
+search criteria.</dd>
+<dt><strong>excludes</strong></dt>
+<dd>Comma separated list of paths to exclude from your search.
+Exclusion patterns are applied after inclusion patterns.</dd>
+</dl>
+</blockquote>
+<p>The toggle buttons below the entry fields are for:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Follow copies and renames</strong></dt>
+<dd>follow searches through copies and renames out of inclusion filters</dd>
+<dt><strong>Ignore case</strong></dt>
+<dd>Perform the search without case considerations</dd>
+<dt><strong>Show line numbers</strong></dt>
+<dd>Show line numbers at the front of the matching lines</dd>
+<dt><strong>Show all matching revisions</strong></dt>
+<dd>Show every instance where the search criteria matches in a file,
+not just the most recent revision.  It shows +/- to indicate
+whether the change adds or removes your search text.</dd>
+</dl>
+</blockquote>
+<p>Search tabs are named after the search string most recently used to
+start a search.  The <strong>New Search</strong> toolbar button will
+obviously open a new search tab while the <strong>Stop</strong> button will
+terminate an ongoing search (the <strong>Stop</strong> button is only
+sensitive when a search is in progress).</p>
+<div class="section" id="matches">
+<h3>4.8.1.1. Matches<a class="headerlink" href="#matches" title="Permalink to this headline">¶</a></h3>
+<p>Each match will be a link to a changeset and will have a descriptive
+tooltip (author, date/time, summary).  Right clicking on a matched line
+will bring up a context menu with these features:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>display change</strong></dt>
+<dd>open a changeset window with this changeset, to see the full context</dd>
+<dt><strong>annotate file</strong></dt>
+<dd>open an annotation tab for this file at this revision</dd>
+<dt><strong>file history</strong></dt>
+<dd>open a changelog window with this file&#8217;s revision history</dd>
+<dt><strong>view file at revision</strong></dt>
+<dd>open the current file at the specified revision in your favorite
+text editor.</dd>
+</dl>
+</blockquote>
+</div>
+</div>
+<div class="section" id="annotate-tabs">
+<h2>4.8.2. Annotate Tabs<a class="headerlink" href="#annotate-tabs" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="Annotate tabs" src="_images/annotate.png" />
+<p class="caption">Annotate tabs</p>
+</div>
+<p>The revision graph has a simple context menu for opening the entire
+changeset in the changeset browser. Activating a row in the revision
+graph updates the file annotation to that revision.</p>
+<p>In the bottom pane is the actual annotation. Each line in the annotation
+is also a link to the changeset which provided that line. Activating a
+row will zoom the changelog (top pane) to the changeset that introduced
+that line and change focus to the top pane.</p>
+<p>The color scheme in the annotation pane is two dimensional. Authors
+determine hue, and age determines saturation. The older a change, the
+lighter the color.</p>
+<p>By right-clicking on the annotate pane&#8217;s column headers (Line, Rev,
+Source) you can bring up a menu for showing two optional columns:
+<strong>filename</strong> and <strong>user</strong>.</p>
+<div class="section" id="following-renames">
+<h3>4.8.2.1. Following Renames<a class="headerlink" href="#following-renames" title="Permalink to this headline">¶</a></h3>
+<p>The annotation data will automatically follow lines of code back through
+copies and renames to find the initial changeset that introduced the
+line.  The graph log pane will also attempt to follow renames and
+copies, so some lines in the graph may correlate to different filenames
+than the original annotated file path.  Renames are indicated in the
+graph by color changes within a column.</p>
+</div>
+<div class="section" id="configurables">
+<h3>4.8.2.2. Configurables<a class="headerlink" href="#configurables" title="Permalink to this headline">¶</a></h3>
+<p>The annotate tabs support the following configurations defined primarily
+for other tools:</p>
+<dl class="docutils">
+<dt><em>Changelog ‣ Author Coloring</em></dt>
+<dd>Give each author a separate color in the changelog graph</dd>
+<dt><em>Changelog ‣ Long Summary</em></dt>
+<dd>Concatenates lines of commit message together to reach an 80
+character summary.</dd>
+<dt><em>TortoiseHg ‣ Tab width</em></dt>
+<dd>Number of spaces to expand tabs in diffs and annotate output</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="from-command-line">
+<h2>4.8.3. From command line<a class="headerlink" href="#from-command-line" title="Permalink to this headline">¶</a></h2>
+<p>The datamine tool can be started from command line</p>
+<div class="highlight-python"><pre>hgtk datamine
+
+aliases: annotate, blame
+
+repository search and annotate tool
+
+use "hgtk -v help datamine" to show global options</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">4.8. Datamine</a><ul>
+<li><a class="reference external" href="#search-tabs">4.8.1. Search Tabs</a><ul>
+<li><a class="reference external" href="#matches">4.8.1.1. Matches</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#annotate-tabs">4.8.2. Annotate Tabs</a><ul>
+<li><a class="reference external" href="#following-renames">4.8.2.1. Following Renames</a></li>
+<li><a class="reference external" href="#configurables">4.8.2.2. Configurables</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#from-command-line">4.8.3. From command line</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="changelog.html"
+                                  title="previous chapter">4.7. Changelog</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="synchronize.html"
+                                  title="next chapter">4.9. Synchronize</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/datamine.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="synchronize.html" title="4.9. Synchronize"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="changelog.html" title="4.7. Changelog"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v0.9.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" >4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2009, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.0.
+    </div>
+  </body>
+</html>
