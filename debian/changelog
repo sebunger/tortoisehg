@@ -1,4 +1,4 @@
-tortoisehg (0.9) unstable; urgency=low
+tortoisehg (0.9-1) unstable; urgency=low
 
   * New upstream release (Closes: #557263).
   * Update copyright file.
@@ -9,7 +9,8 @@ tortoisehg (0.9) unstable; urgency=low
     config file needs to be provided.
   * Remove avoid-double-locale-install.patch (merged upstream).
   * Add preserve-version.patch to prevent setup.py from overriding the package
-    version.
+    version (but sitll fix it by hand after clean, as patches are unapplied
+    before calling setup.py).
 
  -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Sat, 21 Nov 2009 02:06:50 -0800
 

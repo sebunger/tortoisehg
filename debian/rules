@@ -25,6 +25,9 @@ clean::
 	rm -f debian/pycompat
 	rm -f debian/hgtk.1
 	rm -fr locale
+	# patches are removed before calling clean, so we need to fix what setup.py did wrong
+	rm tortoisehg/util/config.py
+	sed -i -e 's/""/"0.9"/' tortoisehg/util/__version__.py
 
 DEBVERSION:=$(shell head -n 1 debian/changelog | sed -e 's/^[^(]*(\([^)]*\)).*/\1/')
 SRCVERSION:=$(shell echo $(DEBVERSION) | sed -e 's/^.*://' -e 's/-[.0-9]*$$//')
