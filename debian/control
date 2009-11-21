@@ -14,8 +14,9 @@ XS-Python-Version: current
 
 Package: tortoisehg
 Architecture: all
-Depends: python, mercurial-common (>= 1.4), python-gobject, python-gtk2,
- python-cairo, ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Depends: python, mercurial-common (>= 1.4), python-gobject (>= 2.12.1),
+ python-gtk2 (>= 2.10), python-cairo, ${shlibs:Depends}, ${misc:Depends},
+ ${python:Depends}
 Suggests: tortoisehg-nautilus
 XB-Python-Version: ${python:Versions}
 Description: Graphical tool for working with Mercurial
@@ -30,8 +31,9 @@ Description: Graphical tool for working with Mercurial
 
 Package: tortoisehg-nautilus
 Architecture: all
-Depends: tortoisehg (>= ${source:Version}), python-nautilus, python-gobject,
- python-gtk2, ${misc:Depends}, ${python:Depends}
+Depends: tortoisehg (>= ${source:Version}), python-nautilus,
+ python-gobject (>= 2.12.1), python-gtk2 (>= 2.10), ${misc:Depends},
+ ${python:Depends}
 XB-Python-Version: ${python:Versions}
 Description: Graphical tool for working with Mercurial (Nautilus extension)
  TortoiseHg provides a graphical tool for interacting with the distributed

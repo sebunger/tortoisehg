@@ -3,6 +3,7 @@ tortoisehg (0.9) unstable; urgency=low
   * New upstream release (Closes: #557263).
   * Update copyright file.
   * Bump mercurial dependency to 1.4.
+  * Specify minimum version for pyobject and pygtk dependencies.
   * Set Python-Version to current.
   * Replace fix-license-path.patch with add-config-file.patch: the whole
     config file needs to be provided.
