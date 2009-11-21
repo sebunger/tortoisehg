@@ -14,7 +14,7 @@ XS-Python-Version: >= 2.5
 
 Package: tortoisehg
 Architecture: all
-Depends: python, mercurial-common (>= 1.3), python-gobject, python-gtk2,
+Depends: python, mercurial-common (>= 1.4), python-gobject, python-gtk2,
  python-cairo, ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
 Suggests: tortoisehg-nautilus
 XB-Python-Version: ${python:Versions}
