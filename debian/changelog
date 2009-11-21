@@ -3,8 +3,14 @@ tortoisehg (0.9) unstable; urgency=low
   * New upstream release (Closes: #557263).
   * Update copyright file.
   * Bump mercurial dependency to 1.4.
+  * Set Python-Version to current.
+  * Replace fix-license-path.patch with add-config-file.patch: the whole
+    config file needs to be provided.
+  * Remove avoid-double-locale-install.patch (merged upstream).
+  * Add preserve-version.patch to prevent setup.py from overriding the package
+    version.
 
- -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Sat, 21 Nov 2009 01:31:45 -0800
+ -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Sat, 21 Nov 2009 02:06:50 -0800
 
 tortoisehg (0.8+dfsg1-1) unstable; urgency=low
 

@@ -1,5 +1,5 @@
-Description: fix patch of copyright text
-Author: Max Bowsher <maxb@f2s.com>
+Description: provide config file with installation paths
+Author: Ludovico Cavedon <ludovico.cavedon@gmail.com>, Max Bowsher <maxb@f2s.com>
 Forwarded: not-needed
 
 Index: tortoisehg/thgutil/config.py

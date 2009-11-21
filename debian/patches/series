@@ -1,2 +1,2 @@
-fix-license-path.patch
-avoid-double-locale-install.patch
+add-config-file.patch
+preserve-version.patch

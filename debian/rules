@@ -35,18 +35,18 @@ print-version:
 	@@echo "Source version:          $(SRCVERSION)"
 	@@echo "Upstream version:        $(UPVERSION)"
 
-# Need to get from RCS and repackage because tarball for versions <= 0.8 do not include .po files
-get-orig-source:
-	@@dh_testdir
-	uscan --force-download --download-version $(UPVERSION)
-	mkdir ../tempdir
-	cd ../tempdir && tar zxf ../$(UPVERSION).gz
-	# Encode proper version number in build script
-	sed -i -e "s/version = \"unknown\"/version = \"$(UPVERSION)\"/" ../tempdir/stable/setup.py
-	sed -i -e "s/or 'unknown'/or '$(UPVERSION)'/" ../tempdir/stable/setup.py
-	echo 'include i18n/*' >> ../tempdir/stable/MANIFEST.in
-	cd ../tempdir/stable && python setup.py sdist
-	mv ../tempdir/stable/dist/tortoisehg-$(UPVERSION).tar.gz ../tortoisehg_$(SRCVERSION).orig.tar.gz
-	rm -r ../tempdir
-	rm ../$(UPVERSION).gz
+## Need to get from RCS and repackage because tarball for versions <= 0.8 do not include .po files
+#get-orig-source:
+#	@@dh_testdir
+#	uscan --force-download --download-version $(UPVERSION)
+#	mkdir ../tempdir
+#	cd ../tempdir && tar zxf ../$(UPVERSION).gz
+#	# Encode proper version number in build script
+#	sed -i -e "s/version = \"unknown\"/version = \"$(UPVERSION)\"/" ../tempdir/stable/setup.py
+#	sed -i -e "s/or 'unknown'/or '$(UPVERSION)'/" ../tempdir/stable/setup.py
+#	echo 'include i18n/*' >> ../tempdir/stable/MANIFEST.in
+#	cd ../tempdir/stable && python setup.py sdist
+#	mv ../tempdir/stable/dist/tortoisehg-$(UPVERSION).tar.gz ../tortoisehg_$(SRCVERSION).orig.tar.gz
+#	rm -r ../tempdir
+#	rm ../$(UPVERSION).gz
 
