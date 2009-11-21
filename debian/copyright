@@ -22,7 +22,8 @@ Copyright: 2008-2009, Adrian Buehlmann <adrian@cadifra.com>
 License: GPL-2
 
 Files: tortoisehg/util/hgshelve.py
-Copyright: 2007, Bryan O'Sullivan <bos@serpentine.com>
+Copyright: 2009, Steve Borho <steve@borho.org>
+           2007, Bryan O'Sullivan <bos@serpentine.com>
            2007, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
