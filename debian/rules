@@ -7,6 +7,7 @@ include /usr/share/cdbs/1/rules/patchsys-quilt.mk
 include /usr/share/cdbs/1/class/python-distutils.mk
 
 DEB_INSTALL_DOCS_tortoisehg="--exclude=nautilus-thg.py"
+DEB_COMPRESS_tortoisehg="-X.js -X_static/* -X _sources/*"
 
 build/tortoisehg:: debian/hgtk.1
 
@@ -18,6 +19,11 @@ debian/hgtk.1: debian/hgtk.1.xml
 		-o debian/ \
 		/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
 		debian/hgtk.1.xml
+
+binary-post-install/tortoisehg::
+	ln -sf ../../../../javascript/jquery/jquery.js \
+	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
+
 
 
 # drop automatically created file; see #424898

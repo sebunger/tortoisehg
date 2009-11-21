@@ -1,0 +1,9 @@
+Document: tortoisehg-user-manual
+Title: TortoiseHg documentation
+Abstract: User Manual for TortoiseHg
+Section: Project Management
+
+Format: HTML
+Index: /usr/share/doc/tortoisehg/html/index.html
+Files: /usr/share/doc/tortoisehg/html/*
+

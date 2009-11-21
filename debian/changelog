@@ -11,8 +11,10 @@ tortoisehg (0.9-1) unstable; urgency=low
   * Add preserve-version.patch to prevent setup.py from overriding the package
     version (but sitll fix it by hand after clean, as patches are unapplied
     before calling setup.py).
+  * Include html documentation registered with doc-base (and recommend
+    libjs-jquery).
 
- -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Sat, 21 Nov 2009 02:06:50 -0800
+ -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Sat, 21 Nov 2009 12:19:19 -0800
 
 tortoisehg (0.8+dfsg1-1) unstable; urgency=low
 
