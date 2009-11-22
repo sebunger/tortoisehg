@@ -1,5 +1,7 @@
-Name: tortoisehg
-Maintainer: Steve Borho <steve@borho.org>, TK Soh <teekaysoh@gmail.com>
+Format-Specification: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=59
+Name: TortoiseHg
+Maintainer: Steve Borho <steve@borho.org>
+            TK Soh <teekaysoh@gmail.com>
 Source: http://bitbucket.org/tortoisehg/stable/downloads/
 
 Files: *
