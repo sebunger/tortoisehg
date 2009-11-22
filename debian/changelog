@@ -9,7 +9,7 @@ tortoisehg (0.9-1) unstable; urgency=low
     config file needs to be provided.
   * Remove avoid-double-locale-install.patch (merged upstream).
   * Add preserve-version.patch to prevent setup.py from overriding the package
-    version (but sitll fix it by hand after clean, as patches are unapplied
+    version (but still fix it by hand after clean, as patches are unapplied
     before calling setup.py).
   * Include html documentation registered with doc-base (and recommend
     libjs-jquery).
