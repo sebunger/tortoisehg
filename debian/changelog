@@ -20,6 +20,7 @@ tortoisehg (0.9-1) unstable; urgency=low
   * Drop python from Depends, ${python:Depends} will add it automatically.
   * Depend on mercurial, not mercurial-common.
   * Add Format-Specification line to debian/copyright, and tidy.
+  * Change section to 'vcs'.
 
  -- Max Bowsher <maxb@f2s.com>  Wed, 25 Nov 2009 04:17:24 +0000
 

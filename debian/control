@@ -1,5 +1,5 @@
 Source: tortoisehg
-Section: devel
+Section: vcs
 Priority: optional
 Maintainer: Ludovico Cavedon <ludovico.cavedon@gmail.com>
 DM-Upload-Allowed: yes
