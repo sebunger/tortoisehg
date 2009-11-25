@@ -22,8 +22,9 @@ tortoisehg (0.9-1) unstable; urgency=low
   * Add Format-Specification line to debian/copyright, and tidy.
   * Change section to 'vcs'.
   * Narrow builddep from python-dev to python.
+  * With agreement of maintainer, add myself to Uploaders.
 
- -- Max Bowsher <maxb@f2s.com>  Wed, 25 Nov 2009 04:29:02 +0000
+ -- Max Bowsher <maxb@f2s.com>  Wed, 25 Nov 2009 04:31:42 +0000
 
 tortoisehg (0.8+dfsg1-1) unstable; urgency=low
 
