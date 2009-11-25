@@ -68,10 +68,6 @@ License: GPL-2
 
 Files: debian/*
 Copyright: 2009, Ludovico Cavedon <ludovico.cavedon@gmail.com>
-License: GPL-2+
-
-Files: debian/patches/add-config-file.patch
-Copyright: 2009, Ludovico Cavedon <ludovico.cavedon@gmail.com>
            2009, Max Bowsher <maxb@f2s.com>
 License: GPL-2+
 
