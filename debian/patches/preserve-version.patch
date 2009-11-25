@@ -1,3 +1,6 @@
+Description: do not overwrite version if we are not running setup.py not in a hg checkout
+Author: Ludovico Cavedon <ludovico.cavedon@gmail.com>
+
 Index: tortoisehg/setup.py
 ===================================================================
 --- tortoisehg.orig/setup.py	2009-11-21 02:01:12.000000000 -0800
