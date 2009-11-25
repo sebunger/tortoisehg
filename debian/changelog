@@ -25,7 +25,7 @@ tortoisehg (0.9-1) unstable; urgency=low
   * Narrow builddep from python-dev to python.
   * With agreement of maintainer, add myself to Uploaders.
 
- -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Tue, 24 Nov 2009 21:43:34 -0800
+ -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Tue, 24 Nov 2009 21:47:15 -0800
 
 tortoisehg (0.8+dfsg1-1) unstable; urgency=low
 
