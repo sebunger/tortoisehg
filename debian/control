@@ -18,7 +18,7 @@ Architecture: all
 Depends: mercurial (>= 1.4), python-gobject (>= 2.12.1),
  python-gtk2 (>= 2.10), python-cairo, ${shlibs:Depends}, ${misc:Depends},
  ${python:Depends}
-Recommends: libjs-jquery
+Recommends: libjs-jquery, python-iniparse
 Suggests: tortoisehg-nautilus
 XB-Python-Version: ${python:Versions}
 Description: Graphical tool for working with Mercurial

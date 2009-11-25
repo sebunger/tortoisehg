@@ -14,6 +14,7 @@ tortoisehg (0.9-1) unstable; urgency=low
     before calling setup.py).
   * Include html documentation registered with doc-base (and recommend
     libjs-jquery).
+  * Recommend python-iniparse.
 
   [ Max Bowsher ]
   * Remove obsolete note about repacking from README.source.
@@ -24,7 +25,7 @@ tortoisehg (0.9-1) unstable; urgency=low
   * Narrow builddep from python-dev to python.
   * With agreement of maintainer, add myself to Uploaders.
 
- -- Max Bowsher <maxb@f2s.com>  Wed, 25 Nov 2009 04:31:42 +0000
+ -- Ludovico Cavedon <ludovico.cavedon@gmail.com>  Tue, 24 Nov 2009 21:43:34 -0800
 
 tortoisehg (0.8+dfsg1-1) unstable; urgency=low
 
