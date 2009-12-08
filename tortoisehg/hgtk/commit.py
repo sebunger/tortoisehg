@@ -28,10 +28,15 @@ from tortoisehg.hgtk import csinfo, gtklib, thgconfig, gdialog, hgcmd
 class BranchOperationDialog(gtk.Dialog):
     def __init__(self, branch, close, mergebranches):
         gtk.Dialog.__init__(self, parent=None, flags=gtk.DIALOG_MODAL,
-                          buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL,
-                              gtk.STOCK_OK, gtk.RESPONSE_OK))
+                            buttons=(gtk.STOCK_OK, gtk.RESPONSE_OK,
+                                     gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL),
+                            title=_('Branch Operations'))
+        gtklib.set_tortoise_icon(self, 'branch.ico')
         gtklib.set_tortoise_keys(self)
-        self.set_title(_('Branch Operations'))
+        self.set_resizable(False)
+        self.set_has_separator(False)
+        self.connect('response', self.response)
+
         self.newbranch = None
         self.closebranch = False
 
@@ -47,30 +52,30 @@ class BranchOperationDialog(gtk.Dialog):
             self.show_all()
             return
 
-        self.connect('response', self.response)
-        lbl = gtk.Label(_('Changes take effect on next commit'))
+        # create widgets
         nochanges = gtk.RadioButton(None, _('No branch changes'))
         self.newbranchradio = gtk.RadioButton(nochanges,
                 _('Open a new named branch'))
-        self.closebranchradio = gtk.RadioButton(nochanges,
-                _('Close current named branch'))
+        self.newbranchradio.set_active(True)
+        self.newbranchradio.connect('toggled', self.nbtoggle)
         self.branchentry = gtk.Entry()
         self.branchentry.connect('activate', self.activated)
+        self.closebranchradio = gtk.RadioButton(nochanges,
+                _('Close current named branch'))
 
-        hbox = gtk.HBox()
-        hbox.pack_start(self.newbranchradio, False, False, 2)
-        hbox.pack_start(self.branchentry, True, True, 2)
-        self.vbox.pack_start(hbox, True, True, 2)
-        hbox = gtk.HBox()
-        hbox.pack_start(self.closebranchradio, True, True, 2)
-        self.vbox.pack_start(hbox, True, True, 2)
-        hbox = gtk.HBox()
-        hbox.pack_start(nochanges, True, True, 2)
-        self.vbox.pack_start(hbox, True, True, 2)
-        self.vbox.pack_start(lbl, True, True, 10)
-        self.newbranchradio.connect('toggled', self.nbtoggle)
+        # layout table
+        table = gtklib.LayoutTable()
+        self.vbox.pack_start(table, True, True, 2)
 
-        self.newbranchradio.set_active(True)
+        lbl = gtk.Label()
+        lbl.set_markup(gtklib.markup(_('Changes take effect on next commit'),
+                                     weight='bold'))
+        table.add_row(lbl, padding=False, ypad=6)
+        table.add_row(self.newbranchradio, self.branchentry)
+        table.add_row(self.closebranchradio)
+        table.add_row(nochanges)
+
+        # prepare to show
         if branch:
             self.newbranch = branch
             self.branchentry.set_text(branch)
@@ -80,6 +85,7 @@ class BranchOperationDialog(gtk.Dialog):
             self.closebranchradio.set_active(True)
         else:
             nochanges.set_active(True)
+
         self.show_all()
 
     def nbtoggle(self, radio):
@@ -140,6 +146,8 @@ class GCommit(GStatus):
 
     def get_title(self):
         root = self.get_reponame()
+        if self.is_merge():
+            root = _('merging ') + root
         user = self.opts.get('user') or ''
         if user: user = 'as ' + user
         date = self.opts.get('date') or ''
@@ -272,7 +280,7 @@ class GCommit(GStatus):
             user = self.opts['user'] or os.environ.get('HGUSER') or \
                    self.repo.ui.config('ui', 'username')
             if user:
-                update_recent_committers(hglib.toutf(user))
+                self.update_recent_committers(hglib.toutf(user))
         if not self.autoinc_entry.get_text():
             autoinc = self.repo.ui.config('tortoisehg', 'autoinc', '')
             self.autoinc_entry.set_text(hglib.toutf(autoinc))
@@ -303,7 +311,7 @@ class GCommit(GStatus):
         self.update_recent_committers()
         committer = os.environ.get('HGUSER') or self.repo.ui.config('ui', 'username')
         if committer:
-            self.update_recent_committers(committer)
+            self.update_recent_committers(hglib.toutf(committer))
         self.committer_cbbox.set_active(0)
 
         adv_hbox.pack_start(gtk.Label(_('Auto-includes:')), False, False, 2)
@@ -400,8 +408,10 @@ class GCommit(GStatus):
             return label
         self.parent1_label = add_parent()
         self.parent2_label = add_parent()
-        parents_vbox.pack_start(gtk.HSeparator())
-        vbox2.pack_start(parents_vbox, False, False)
+        parents_hbox = gtk.HBox()
+        parents_hbox.pack_start(parents_vbox, False, False, 5)
+        vbox2.pack_start(parents_hbox, False, False, 2)
+        vbox2.pack_start(gtk.HSeparator(), False, False)
 
         self.vpaned = gtk.VPaned()
         self.vpaned.pack1(vbox, shrink=False)
@@ -420,6 +430,7 @@ class GCommit(GStatus):
 
 
     def update_recent_committers(self, name=None):
+        """ 'name' argument must be in UTF-8. """
         if name is not None:
             self._mru_committers.add(name)
             self._mru_committers.compact()
@@ -945,7 +956,7 @@ class GCommit(GStatus):
             self.refresh_complete()
             return
 
-        self.update_recent_committers(user)
+        self.update_recent_committers(hglib.toutf(user))
         incs = hglib.fromutf(self.autoinc_entry.get_text())
         self.opts['include'] = [i.strip() for i in incs.split(',') if i.strip()]
         autopush = self.autopush.get_active()
