@@ -261,7 +261,7 @@ class ChangeSet(gdialog.GDialog):
         buf = self._buffer
         buf.set_text('')
         eob = buf.get_end_iter()
-        buf.insert(eob, desc + '\n\n')
+        buf.insert(eob, desc.rstrip('\n\r') + '\n\n')
 
     def append_diff(self, wfile):
         if not wfile:
@@ -276,7 +276,7 @@ class ChangeSet(gdialog.GDialog):
             fctx = self.repo[rev].filectx(wfile)
         except hglib.LookupError:
             fctx = None
-        if fctx and fctx.size() > hglib.getmaxdiffsize(self.ui):
+        if fctx and fctx.size() > hglib.getmaxdiffsize(self.repo.ui):
             lines = ['diff',
                     _(' %s is larger than the specified max diff size') % wfile]
         else:
@@ -301,7 +301,7 @@ class ChangeSet(gdialog.GDialog):
 
         sob, eob = buf.get_bounds()
         pos = buf.get_iter_at_offset(offset)
-        buf.apply_tag_by_name('mono', pos, eob)
+        buf.apply_tag_by_name('diff', pos, eob)
         return True
 
     def append_patch_diff(self, patchfile):
@@ -325,7 +325,7 @@ class ChangeSet(gdialog.GDialog):
 
         sob, eob = buf.get_bounds()
         pos = buf.get_iter_at_offset(offset)
-        buf.apply_tag_by_name('mono', pos, eob)
+        buf.apply_tag_by_name('diff', pos, eob)
 
     def append_all_patch_diffs(self):
         model = self._filelist
@@ -700,23 +700,7 @@ class ChangeSet(gdialog.GDialog):
 
         tag_table = self._buffer.get_tag_table()
 
-        tag_table.add(make_texttag('changeset', foreground='#000090',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('changeset-summary', foreground='black',
-                paragraph_background='#F0F0F0', family='Sans'))
-        tag_table.add(make_texttag('date', foreground='#000090',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('tag', foreground='#000090',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('files', foreground='#5C5C5C',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('parent', foreground='#000090',
-                paragraph_background='#F0F0F0'))
-        tag_table.add(make_texttag('parenthl', foreground='#000090',
-                paragraph_background='#F0F0F0',
-                weight=pango.WEIGHT_BOLD ))
-
-        tag_table.add(make_texttag('mono', family='Monospace'))
+        tag_table.add(make_texttag('diff', font=self.fontdiff))
         tag_table.add(make_texttag('blue', foreground='blue'))
         tag_table.add(make_texttag('red', foreground='red'))
         tag_table.add(make_texttag('green', foreground='darkgreen'))

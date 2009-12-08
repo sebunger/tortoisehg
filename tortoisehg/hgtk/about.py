@@ -61,12 +61,12 @@ class AboutDialog(gtk.AboutDialog):
 
         comment = _("Several icons are courtesy of the TortoiseSVN project")
 
-        self.set_website("http://bitbucket.org/tortoisehg/stable/")
+        self.set_website("http://tortoisehg.org")
         self.set_name("TortoiseHg")
         self.set_version(_("(version %s)") % version.version())
         if hasattr(self, 'set_wrap_license'):
             self.set_wrap_license(True)
-        self.set_copyright(_("Copyright 2009 TK Soh and others"))
+        self.set_copyright(_("Copyright 2009 Steve Borho and others"))
 
         thg_logo = paths.get_tortoise_icon('thg_logo_92x50.png')
         thg_icon = paths.get_tortoise_icon('thg_logo.ico')

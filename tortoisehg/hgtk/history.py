@@ -10,7 +10,6 @@ import os
 import sys
 import gtk
 import gobject
-import Queue
 import shutil
 import tempfile
 import atexit
@@ -18,7 +17,7 @@ import atexit
 from mercurial import ui, hg, cmdutil, commands, extensions, util, match, url
 
 from tortoisehg.util.i18n import _
-from tortoisehg.util import hglib, thread2
+from tortoisehg.util import hglib
 
 from tortoisehg.hgtk.logview.treeview import TreeView as LogTreeView
 
@@ -88,7 +87,7 @@ class GLog(gdialog.GDialog):
         return live
 
     def get_title(self):
-        str = _('%s - changelog') % self.get_reponame()
+        str = self.get_reponame() + ' - ' + _('Repository Explorer')
         if self.bfile:
             str += _(' (Bundle Preview)')
         return str
@@ -354,13 +353,32 @@ class GLog(gdialog.GDialog):
             if reload:
                 self.reload_log()
 
+    def filter_entry_changed(self, entrycombo, filtercombo):
+        row = entrycombo.get_active()
+        if row < 0:
+            return
+        mode, text, display = entrycombo.get_model()[row]
+        filtercombo.set_active(mode)
+        entrycombo.child.set_text(text)
+        self.activate_filter(text, mode)
+
     def filter_entry_activated(self, entry, combo):
         'User pressed enter in the filter entry'
-        opts = {}
         mode = combo.get_active()
         text = entry.get_text()
         if not text:
             return
+        row = [mode, text, combo.get_active_text()] 
+        model = self.entrycombo.get_model()
+        for r in model:
+            if r[0] == row[0] and r[1] == row[1]:
+                break
+        else:
+            self.entrycombo.get_model().append( row )
+        self.activate_filter(text, mode)
+
+    def activate_filter(self, text, mode):
+        opts = {}
         if mode == 0: # Rev Range
             try:
                 opts['revlist'] = cmdutil.revrange(self.repo, [text])
@@ -428,7 +446,6 @@ class GLog(gdialog.GDialog):
                 self.changeview.load_details(self.currevid)
 
     def repo_invalidated(self, mqwidget):
-        self.changeview.clear_cache()
         self.reload_log()
 
     def prepare_display(self):
@@ -445,21 +462,24 @@ class GLog(gdialog.GDialog):
             self.pats = []
 
         opts = self.opts
+        if 'bundle' in opts:
+            self.set_bundlefile(opts['bundle'])
+            self.bundle_autoreject = True
         if opts['filehist']:
+            file = opts['filehist']
+            opts['pats'] = [file]
             self.custombutton.set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
-            self.filterentry.set_text(opts['filehist'])
-            opts['pats'] = [opts['filehist']]
+            self.filterentry.set_text(file)
+            self.filter_entry_activated(self.filterentry, self.filtercombo)
         elif self.pats:
             self.custombutton.set_active(True)
             self.filter = 'custom'
             self.filtercombo.set_active(1)
             self.filterentry.set_text(', '.join(self.pats))
             opts['pats'] = self.pats
-        if 'bundle' in opts:
-            self.set_bundlefile(opts['bundle'])
-            self.bundle_autoreject = True
+            self.filter_entry_activated(self.filterentry, self.filtercombo)
         else:
             self.reload_log(**opts)
 
@@ -578,6 +598,7 @@ class GLog(gdialog.GDialog):
     def reload_log(self, **kwopts):
         'Send refresh event to treeview object'
         self.update_hide_merges_button()
+        self.changeview.clear_cache()
 
         opts = {'date': None, 'no_merges':False, 'only_merges':False,
                 'keyword':[], 'branch':None, 'pats':[], 'filehist':None,
@@ -745,7 +766,7 @@ class GLog(gdialog.GDialog):
 
         # need mq extension for strip command
         if 'mq' in self.exs:
-            cmenu_qimport = create_menu(_('qimport'), self.qimport_rev)
+            cmenu_qimport = create_menu(_('QImport Revision'), self.qimport_rev)
             cmenu_strip = create_menu(_('Strip Revision...'), self.strip_rev)
 
             try:
@@ -822,7 +843,7 @@ class GLog(gdialog.GDialog):
         
         # need MQ extension for qimport command
         if 'mq' in self.exs:
-            m.append(create_menu(_('qimport from here to selected'),
+            m.append(create_menu(_('QImport from here to selected'),
                      self.qimport_revs))
 
         m.append_sep()
@@ -916,14 +937,9 @@ class GLog(gdialog.GDialog):
                         _('Push outgoing changesets'))
         email = syncbox.append_stock(gtk.STOCK_GOTO_LAST,
                         _('Email outgoing changesets'))
-        syncbox.append_widget(gtk.VSeparator())
-        stop = syncbox.append_stock(gtk.STOCK_STOP,
-                        _('Stop current transaction'))
 
-        stop.set_sensitive(False)
         apply.set_sensitive(False)
         reject.set_sensitive(False)
-        self.stop_button = stop
         self.syncbar_apply = apply
         self.syncbar_reject = reject
 
@@ -1049,10 +1065,19 @@ class GLog(gdialog.GDialog):
         self.filtercombo = filtercombo
         filterbox.append_widget(filtercombo, padding=0)
 
-        entry = gtk.Entry()
+        searchlist = gtk.ListStore(int, # filtercombo value
+                                   str, # search string (utf-8)
+                                   str) # mode string (utf-8)
+        entrycombo = gtk.ComboBoxEntry(searchlist, 1)
+        cell = gtk.CellRendererText()
+        entrycombo.pack_end(cell, False)
+        entrycombo.add_attribute(cell, 'text', 2)
+        entry = entrycombo.child
         entry.connect('activate', self.filter_entry_activated, filtercombo)
+        entrycombo.connect('changed', self.filter_entry_changed, filtercombo)
+        self.entrycombo = entrycombo
         self.filterentry = entry
-        filterbox.append_widget(entry, expand=True, padding=0)
+        filterbox.append_widget(entrycombo, expand=True, padding=0)
 
         midpane = gtk.VBox()
         midpane.pack_start(syncbox, False)
@@ -1136,7 +1161,10 @@ class GLog(gdialog.GDialog):
     def remove_overlay(self, resettip):
         self.bfile = None
         self.npreviews = 0
-        self.urlcombo.set_active(self.origurl)
+        if isinstance(self.origurl, int):
+            self.urlcombo.set_active(self.origurl)
+        else:
+            self.pathentry.set_text(self.origurl)
         self.repo = hg.repository(self.ui, path=self.repo.root)
         self.graphview.set_repo(self.repo, self.stbar)
         self.changeview.set_repo(self.repo)
@@ -1200,6 +1228,8 @@ class GLog(gdialog.GDialog):
 
     def set_bundlefile(self, bfile, **kwopts):
         self.origurl = self.urlcombo.get_active()
+        if self.origurl == -1:
+            self.origurl = self.pathentry.get_text()
         self.pathentry.set_text(bfile)
 
         # create apply/reject toolbar buttons
@@ -1280,13 +1310,14 @@ class GLog(gdialog.GDialog):
                 extensions.load(self.ui, 'rebase', None)
 
         path = hglib.fromutf(self.pathentry.get_text()).strip()
+        remote_path = hglib.validate_synch_path(path, self.repo)
         if not path:
             gdialog.Prompt(_('No remote path specified'),
                            _('Please enter or select a remote path'),
                            self).run()
             self.pathentry.grab_focus()
             return
-        cmdline = ['hg'] + cmd + self.get_proxy_args() + [path]
+        cmdline = ['hg'] + cmd + self.get_proxy_args() + [remote_path]
         dlg = hgcmd.CmdDialog(cmdline, text=' '.join(['hg'] + cmd))
         dlg.show_all()
         dlg.run()
@@ -1308,46 +1339,28 @@ class GLog(gdialog.GDialog):
                            self).run()
             self.pathentry.grab_focus()
             return
-        q = Queue.Queue()
-        cmd = [q, 'outgoing', '--quiet', '--template', '{node}\n']
+        cmd = ['hg', 'outgoing', '--quiet', '--template', '{node}\n']
         cmd += self.get_proxy_args()
         cmd += [hglib.validate_synch_path(path, self.repo)] 
 
-        def threadfunc(q, *args):
-            try:
-                hglib.hgcmd_toq(q, *args)
-            except (util.Abort, hglib.RepoError), e:
-                self.stbar.set_status_text(_('Abort: %s') % str(e))
-
-        def out_wait():
-            while q.qsize():
-                hash = q.get(0).strip()
+        dlg = hgcmd.CmdDialog(cmd, text='hg outgoing')
+        dlg.show_all()
+        dlg.run()
+        dlg.hide()
+        if dlg.return_code() == 0:
+            outgoing = []
+            buf = dlg.textbuffer
+            begin, end = buf.get_bounds()
+            for line in buf.get_text(begin, end).splitlines()[:-1]:
                 try:
-                    node = self.repo[hash].node()
+                    node = self.repo[line].node()
                     outgoing.append(node)
                 except:
                     pass
-            if thread.isAlive():
-                return True
-            else:
-                self.stbar.end()
-                self.outgoing = outgoing
-                self.reload_log()
-                text = _('%d outgoing changesets') % len(outgoing)
-                self.stbar.set_idle_text(text)
-                self.stop_button.disconnect(stop_handler)
-                self.stop_button.set_sensitive(False)
-
-        def stop_clicked(button):
-            thread.terminate()
-
-        outgoing = []
-        thread = thread2.Thread(target=threadfunc, args=cmd)
-        thread.start()
-        self.stbar.begin()
-        stop_handler = self.stop_button.connect('clicked', stop_clicked)
-        self.stop_button.set_sensitive(True)
-        gobject.timeout_add(50, out_wait)
+            self.outgoing = outgoing
+            self.reload_log()
+            text = _('%d outgoing changesets') % len(outgoing)
+            self.stbar.set_idle_text(text)
 
     def email_clicked(self, toolbutton):
         path = hglib.fromutf(self.pathentry.get_text()).strip()
@@ -1511,7 +1524,6 @@ class GLog(gdialog.GDialog):
     def strip_rev(self, menuitem):
         def strip_completed():
             self.repo.invalidate()
-            self.changeview.clear_cache()
             self.reload_log()
             self.changeview.clear()
         rev = self.currevid
@@ -1662,7 +1674,6 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
-        self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
         self.enable_mqpanel()
@@ -1681,7 +1692,6 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
-        self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
 
@@ -1695,7 +1705,6 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
-        self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
 
@@ -1703,7 +1712,13 @@ class GLog(gdialog.GDialog):
         # save tag info for detecting new tags added
         oldtags = self.repo.tagslist()
         oldlen = len(self.repo)
-        rev = self.currevid
+        rev = str(self.currevid)
+        for t in self.repo.nodetags(self.repo[rev].node()):
+            if t != 'tip':
+                tag = t
+                break;
+        else:
+            tag = ''
 
         def refresh(*args):
             self.repo.invalidate()
@@ -1715,7 +1730,7 @@ class GLog(gdialog.GDialog):
                 if newtags != oldtags:
                     self.refresh_model()
 
-        dialog = tagadd.TagAddDialog(self.repo, rev=str(rev))
+        dialog = tagadd.TagAddDialog(self.repo, tag, rev)
         dialog.connect('destroy', refresh)
         self.show_dialog(dialog)
 
@@ -1875,7 +1890,6 @@ class GLog(gdialog.GDialog):
         dialog.run()
         dialog.hide()
         self.repo.invalidate()
-        self.changeview.clear_cache()
         self.reload_log()
         self.changeview.clear()
 
