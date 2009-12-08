@@ -3,8 +3,10 @@ tortoisehg (0.9.1.1-1) unstable; urgency=low
   * New upstream release.
   * Upstream no longer ships HTML documentation, we must build it - add
     builddep on python-sphinx to allow this.
+  * Loosen overly strict regex on the debian revision
+    (facilitate backports, third-party builds, etc.)
 
- -- Max Bowsher <maxb@f2s.com>  Tue, 08 Dec 2009 08:31:55 +0000
+ -- Max Bowsher <maxb@f2s.com>  Tue, 08 Dec 2009 08:33:31 +0000
 
 tortoisehg (0.9-1) unstable; urgency=low
 

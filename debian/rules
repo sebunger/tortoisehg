@@ -26,7 +26,7 @@ binary-post-install/tortoisehg::
 	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
 
 DEBVERSION:=$(shell head -n 1 debian/changelog | sed -e 's/^[^(]*(\([^)]*\)).*/\1/')
-SRCVERSION:=$(shell echo $(DEBVERSION) | sed -e 's/^.*://' -e 's/-[.0-9]*$$//')
+SRCVERSION:=$(shell echo $(DEBVERSION) | sed -e 's/^.*://' -e 's/-[^-]*$$//')
 UPVERSION:=$(shell echo $(SRCVERSION) | sed -e 's/[\.+~]dfsg.*$$//')
 
 print-version:
