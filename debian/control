@@ -1,10 +1,9 @@
 Source: tortoisehg
 Section: vcs
 Priority: optional
-Maintainer: Ludovico Cavedon <ludovico.cavedon@gmail.com>
+Maintainer: Ludovico Cavedon <cavedon@debian.org>
 Uploaders: Max Bowsher <maxb@f2s.com>
-DM-Upload-Allowed: yes
-Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python (>= 2.5), quilt
+Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python (>= 2.4), quilt
 Build-Depends-Indep: python-support (>= 0.5.3), docbook-xsl, docbook-xml,
  xsltproc, python-sphinx
 Standards-Version: 3.8.3

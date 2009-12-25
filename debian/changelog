@@ -1,12 +1,19 @@
 tortoisehg (0.9.1.1-1) unstable; urgency=low
 
+  [ Max Bowsher ]
   * New upstream release.
   * Upstream no longer ships HTML documentation, we must build it - add
     builddep on python-sphinx to allow this.
   * Loosen overly strict regex on the debian revision
     (facilitate backports, third-party builds, etc.)
 
- -- Max Bowsher <maxb@f2s.com>  Tue, 08 Dec 2009 08:33:31 +0000
+  [ Ludovico Cavedon ]
+  * Lower depends on python to 2.4, according to upstream.
+  * Install _hgtk (zhs completions) into proper location for zsh.
+  * Use newer source format 3.0 (quilt). 
+  * Update Maintainer and remove DM-Upload-Allowed.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Fri, 25 Dec 2009 01:40:03 +0100
 
 tortoisehg (0.9-1) unstable; urgency=low
 

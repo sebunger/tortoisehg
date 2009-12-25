@@ -21,6 +21,9 @@ debian/hgtk.1: debian/hgtk.1.xml
 		/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
 		debian/hgtk.1.xml
 
+install/tortoisehg::
+	dh_install contrib/_hgtk usr/share/zsh/functions/Completion/Unix/
+
 binary-post-install/tortoisehg::
 	ln -sf ../../../../javascript/jquery/jquery.js \
 	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
