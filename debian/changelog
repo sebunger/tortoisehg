@@ -12,8 +12,9 @@ tortoisehg (0.9.1.1-1) unstable; urgency=low
   * Install _hgtk (zhs completions) into proper location for zsh.
   * Use newer source format 3.0 (quilt). 
   * Update Maintainer and remove DM-Upload-Allowed.
+  * Update Upstream Homepage.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Fri, 25 Dec 2009 01:40:03 +0100
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 27 Dec 2009 23:26:09 +0100
 
 tortoisehg (0.9-1) unstable; urgency=low
 
