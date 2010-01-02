@@ -1,3 +1,11 @@
+tortoisehg (0.9.2) unstable; urgency=low
+
+  * New upstream release.
+  * Remove references to quilt from debian/rules in order to allow unpacking
+    with lenny's dpkg.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 03 Jan 2010 00:46:05 +0100
+
 tortoisehg (0.9.1.1-1) unstable; urgency=low
 
   [ Max Bowsher ]
