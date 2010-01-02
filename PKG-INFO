@@ -1,8 +1,8 @@
 Metadata-Version: 1.0
 Name: tortoisehg
-Version: 0.9.1.1
+Version: 0.9.2
 Summary: TortoiseHg dialogs for Mercurial VCS
-Home-page: http://tortoisehg.bitbucket.org
+Home-page: http://tortoisehg.org
 Author: Steve Borho
 Author-email: steve@borho.org
 License: GNU GPL2
