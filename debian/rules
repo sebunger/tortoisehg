@@ -43,7 +43,6 @@ clean::
 	rm -fr locale doc/build
 	# patches are removed before calling clean, so we need to fix what setup.py did wrong
 	rm tortoisehg/util/config.py
-	sed -i -e 's/""/"$(UPVERSION)"/' tortoisehg/util/__version__.py
 
 ## Need to get from RCS and repackage because tarball for versions <= 0.8 do not include .po files
 #get-orig-source:
