@@ -11,7 +11,7 @@ tortoisehg (0.9.2-1) unstable; urgency=low
   * New upstream release.
   * Remove references to quilt from debian/rules in order to allow unpacking
     with lenny's dpkg.
-  * Revert to not installing _hgtk (zhs completions), but leave it in
+  * Revert to not installing _hgtk (zsh completions), but leave it in
     doc/contrib, as upstream say it is not up-to-date.
 
   [ Max Bowsher ]
