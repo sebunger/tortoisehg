@@ -1,8 +1,9 @@
-tortoisehg (0.9.2-2) UNRELEASED; urgency=low
+tortoisehg (0.9.3-1) UNRELEASED; urgency=low
 
   * Update watch file for changed upstream download location.
+  * New upstream release.
 
- -- Max Bowsher <maxb@f2s.com>  Wed, 03 Feb 2010 08:35:10 +0000
+ -- Max Bowsher <maxb@f2s.com>  Wed, 03 Feb 2010 08:39:50 +0000
 
 tortoisehg (0.9.2-1) unstable; urgency=low
 
