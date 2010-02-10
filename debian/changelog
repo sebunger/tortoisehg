@@ -1,4 +1,4 @@
-tortoisehg (0.9.3-1) UNRELEASED; urgency=low
+tortoisehg (0.9.3-1) unstable; urgency=low
 
   * Update watch file for changed upstream download location.
   * New upstream release.
