@@ -6,7 +6,7 @@ Uploaders: Max Bowsher <maxb@f2s.com>
 Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python (>= 2.4), quilt
 Build-Depends-Indep: python-support (>= 0.5.3), docbook-xsl, docbook-xml,
  xsltproc, python-sphinx
-Standards-Version: 3.8.3
+Standards-Version: 3.8.4
 Homepage: http://tortoisehg.bitbucket.org/
 Vcs-Git: git://git.debian.org/git/collab-maint/tortoisehg.git
 Vcs-Browser: http://git.debian.org/?p=collab-maint/tortoisehg.git
