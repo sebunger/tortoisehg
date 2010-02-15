@@ -1,3 +1,11 @@
+tortoisehg (0.9.3-2) lucid; urgency=low
+
+  * Add disable-stdout-redirect.patch: fix dangling process with python 2.6
+    (LP: 519984).
+  * Update Standards-Version to 3.8.4.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 14 Feb 2010 17:15:45 -0800
+
 tortoisehg (0.9.3-1) unstable; urgency=low
 
   * Update watch file for changed upstream download location.
