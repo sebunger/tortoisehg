@@ -1,4 +1,4 @@
-tortoisehg (0.9.3-2) lucid; urgency=low
+tortoisehg (0.9.3-2) unstable; urgency=low
 
   * Add disable-stdout-redirect.patch: fix dangling process with python 2.6
     (LP: 519984).
