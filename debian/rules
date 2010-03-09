@@ -10,7 +10,6 @@ DEB_INSTALL_DOCS_tortoisehg="--exclude=nautilus-thg.py"
 DEB_COMPRESS_tortoisehg="-X.js -X_static/* -X _sources/*"
 
 build/tortoisehg:: debian/hgtk.1
-	$(MAKE) -C doc html
 
 debian/hgtk.1: debian/hgtk.1.xml
 	xsltproc --nonet \
@@ -29,6 +28,6 @@ binary-post-install/tortoisehg::
 clean::
 	rm -f debian/pycompat
 	rm -f debian/hgtk.1
-	rm -fr locale doc/build
+	rm -fr locale
 	# patches are removed before calling clean, so we need to fix what setup.py did wrong
 	rm tortoisehg/util/config.py

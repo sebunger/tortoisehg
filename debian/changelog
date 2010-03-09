@@ -2,11 +2,11 @@ tortoisehg (1.0-1) UNRELEASED; urgency=low
 
   * New upstream release.
   * Drop disable-stdout-redirect.patch, included in this version.
+  * Drop python-sphinx build-dep, use upstream's pre-built docs, which are now
+    present in the tarball again.
   * XXX: Shall we install contrib/mergetools.rc ?
-  * XXX: Upstream are now shipping pre-built HTML docs in the tarball again,
-    what do we want to do about that?
 
- -- Max Bowsher <maxb@f2s.com>  Tue, 09 Mar 2010 01:13:11 +0000
+ -- Max Bowsher <maxb@f2s.com>  Tue, 09 Mar 2010 10:03:03 +0000
 
 tortoisehg (0.9.3-2) unstable; urgency=low
 
