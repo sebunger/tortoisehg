@@ -18,6 +18,9 @@ TortoiseHg マニュアルにようこそ!
 	daily
 	settings
 	recovery
+	patches
+	extensions
+	nonhg
 	faq
 	debugging
    

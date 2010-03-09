@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.10. Serve &mdash; TortoiseHg v1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v1.0.0 documentation" href="index.html" />
+    <link rel="up" title="4. TortoiseHg in daily use" href="daily.html" />
+    <link rel="next" title="4.11. Rename Guessing" href="guess.html" />
+    <link rel="prev" title="4.9. Synchronize" href="synchronize.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="guess.html" title="4.11. Rename Guessing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="synchronize.html" title="4.9. Synchronize"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" accesskey="U">4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-serve.dialog">
+<h1>4.10. Serve<a class="headerlink" href="#module-serve.dialog" title="Permalink to this headline">¶</a></h1>
+<div class="figure">
+<img alt="Web server dialog" src="_images/serve.png" />
+</div>
+<p>The serve tool is a wrapper for Mercurial&#8217;s built-in web server. Once
+launched, any computer can attach to the http port and browse your
+repository(ies) or perform clone, pull, or even push operations (if you
+configure your server to allow it).</p>
+<p>Toolbar buttons:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Start</strong></dt>
+<dd>start the web server</dd>
+<dt><strong>Stop</strong></dt>
+<dd>stop the web server</dd>
+<dt><strong>Browse</strong></dt>
+<dd>open your default browser at the built-in web server</dd>
+<dt><strong>Configure</strong></dt>
+<dd>Configure repository web style, description, and access policies</dd>
+</dl>
+</blockquote>
+<p>When the settings dialog is launched via the <strong>Configure</strong>
+button, it is run in the context of the current repository.  Please
+visit the Mercurial wiki for detailed descriptions of the various
+web configurations.</p>
+<div class="section" id="multiple-repositories">
+<h2>4.10.1. Multiple Repositories<a class="headerlink" href="#multiple-repositories" title="Permalink to this headline">¶</a></h2>
+<p>If you wish to serve a many repositories with a single web server
+instance, you can create an <tt class="docutils literal"><span class="pre">hgwebdir.conf</span></tt> text file with the
+following contents:</p>
+<div class="highlight-python"><pre>[paths]
+/ = /path/to/repositories/*</pre>
+</div>
+<p>The first path &#8216;/&#8217; is where the repositories will appear in the context
+of the web server and the second path describes here the repositories
+can be found on your computer.  Multiple entries are possible.</p>
+<p>To use this file you must launch the TortoiseHg serve dialog from the
+command line via: <strong>hgtk serve &#8211;webdir-conf=hgwebdir.conf</strong>.</p>
+</div>
+<div class="section" id="from-command-line">
+<h2>4.10.2. From command line<a class="headerlink" href="#from-command-line" title="Permalink to this headline">¶</a></h2>
+<p>The server tool can be started from command line</p>
+<div class="highlight-python"><pre>hgtk serve [OPTION]...
+
+web server
+
+options:
+
+        --webdir-conf  name of the webdir config file
+
+use "hgtk -v help serve" to show global options</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">4.10. Serve</a><ul>
+<li><a class="reference external" href="#multiple-repositories">4.10.1. Multiple Repositories</a></li>
+<li><a class="reference external" href="#from-command-line">4.10.2. From command line</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="synchronize.html"
+                                  title="previous chapter">4.9. Synchronize</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="guess.html"
+                                  title="next chapter">4.11. Rename Guessing</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/serve.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="guess.html" title="4.11. Rename Guessing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="synchronize.html" title="4.9. Synchronize"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" >4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

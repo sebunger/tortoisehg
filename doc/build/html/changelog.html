@@ -1,0 +1,711 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.7. Changelog &mdash; TortoiseHg v1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v1.0.0 documentation" href="index.html" />
+    <link rel="up" title="4. TortoiseHg in daily use" href="daily.html" />
+    <link rel="next" title="4.8. Datamine" href="datamine.html" />
+    <link rel="prev" title="4.6. Shelve" href="shelve.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="datamine.html" title="4.8. Datamine"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="shelve.html" title="4.6. Shelve"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" accesskey="U">4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-changelog.dialog">
+<h1>4.7. Changelog<a class="headerlink" href="#module-changelog.dialog" title="Permalink to this headline">¶</a></h1>
+<p>The changelog tool (<em>also known as the repository explorer</em>) is
+used to visualize the revision history of your repository and to perform
+any maintenence tasks that involve changesets. It presents a graph of
+the revision history, showing the parent/child relationship of each
+change. At each revision you can view the files that were modified and
+the contents of those changes.</p>
+<div class="figure">
+<img alt="Changelog" src="_images/log.png" />
+<p class="caption">Changelog viewer dialog with main toolbar hidden</p>
+</div>
+<p>The changelog tool has a menu bar for accessing tool functions and for
+launching other tools.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Tools</strong></dt>
+<dd>Launch other TortoiseHg tools as separate processes</dd>
+<dt><strong>View</strong></dt>
+<dd>Toggle the visibility of various features, or refresh views</dd>
+<dt><strong>Navigate</strong></dt>
+<dd>Select specific changesets in your repository history</dd>
+<dt><strong>Synchronize</strong></dt>
+<dd>Access synchronization functions, more below</dd>
+<dt><strong>Help</strong></dt>
+<dd>Help contents shows this web page.  About shows TortoiseHg
+version info</dd>
+</dl>
+</blockquote>
+<p>The toolbar buttons from left to right:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Refresh</strong></dt>
+<dd>Reload the revision history (if you commit in another window, etc)</dd>
+<dt><strong>Reset Marks</strong></dt>
+<dd>Remove &#8216;new&#8217;, &#8216;incoming&#8217;, and &#8216;outgoing&#8217; revision marks and refresh</dd>
+<dt><strong>Patch Queue</strong></dt>
+<dd>Toggles the display of the MQ pane.  This button is only visible
+when the MQ extension has been enabled by the user.</dd>
+<dt><strong>Commit</strong></dt>
+<dd>Launch the commit tool in a separate process</dd>
+<dt><strong>Datamine</strong></dt>
+<dd>Launch the data mining tool in a separate process</dd>
+<dt><strong>Recovery</strong></dt>
+<dd>Launch the recovery dialog in a separate process</dd>
+<dt><strong>Web Server</strong></dt>
+<dd>Launch the web server dialog in a separate process</dd>
+<dt><strong>Shelve</strong></dt>
+<dd>Launch the shelve tool in a separate process</dd>
+<dt><strong>Load more</strong></dt>
+<dd>Load the next N revisions into the graph</dd>
+<dt><strong>Load all</strong></dt>
+<dd>Load all remaining revisions into the graph</dd>
+</dl>
+</blockquote>
+<div class="section" id="sync-bar">
+<h2>4.7.1. Sync Bar<a class="headerlink" href="#sync-bar" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="Changelog" src="_images/syncbar.png" />
+<p class="caption">Synchronization features in changelog tool</p>
+</div>
+<p>From left to right...</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Incoming</strong></dt>
+<dd>Download incoming changesets from the remote repository, store
+them in a temporary bundle file, then enter bundle preview mode
+with the incoming changes applied.  Incoming changesets will
+have a &#8216;down&#8217; arrow in the revision graph.</dd>
+<dt><strong>Accept</strong></dt>
+<dd>Accept (pull) the changesets from the previewed bundle.  This
+button is only sensitive when previewing a changeset bundle.
+The after-pull effect is respected after pulling from a bundle.</dd>
+<dt><strong>Reject</strong></dt>
+<dd>Reject the changesets from the previewed bundle and exit preview
+mode.  This button is only sensitive when previewing a changeset
+bundle.</dd>
+<dt><strong>Pull</strong></dt>
+<dd>Pull incoming changesets from the remote repository, then apply
+after-pull effect (update, fetch, or rebase).</dd>
+<dt><strong>Import</strong></dt>
+<dd>Open the import dialog to import one or more patches</dd>
+<dt><strong>Outgoing</strong></dt>
+<dd>Determine outgoing changesets that would be pushed to the
+remote repository.  Outgoing changesets are marked with an &#8216;up&#8217;
+arrow.</dd>
+<dt><strong>Push</strong></dt>
+<dd>Push outgoing changesets to the remote repository.</dd>
+<dt><strong>Email</strong></dt>
+<dd>Email outgoing changesets to the remote repository.</dd>
+<dt><strong>Stop</strong></dt>
+<dd>Stop current transaction.  The button is only sensitive during
+outgoing commands.</dd>
+</dl>
+</blockquote>
+<p>To the right of the <strong>Stop</strong> button is a combo box containing
+all of the configured peer repository paths for the current repository.
+The default path is selected at startup, if it has been configured.
+See <a class="reference external" href="http://www.selenic.com/mercurial/hg.1.html#urls">hg.1.html#urls</a>  for
+details on specifying remote repository URLs.</p>
+<p>To the right of the path combo box is the <strong>After Pull</strong> combo
+that selects the operation which is performed after every pull operation
+triggered by the sync bar.  The user must have the rebase extension
+enabled in order for that option to be available in the after pull
+combo.  The same is true of the fetch extension and it&#8217;s post pull
+operation.</p>
+<p>To the right of the <strong>After Pull</strong> combo is the
+<strong>Settings</strong> button.  It opens the repository settings tool on
+the <strong>Sync</strong> tab where the after pull configurable and peer
+repository paths can be configured.</p>
+<p>Changesets which are added to the repository after the changelog tool
+was opened are marked with green stars in the graph.  This includes
+recent commits, pulled changesets, and applied patches.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">To clear the new, incoming, and outgoing marks from the changeset
+graph, use <strong>View -&gt; Reset Marks</strong></p>
+</div>
+</div>
+<div class="section" id="search-bar">
+<h2>4.7.2. Search Bar<a class="headerlink" href="#search-bar" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="Changelog" src="_images/searchbar.png" />
+<p class="caption">Filter features in changelog tool</p>
+</div>
+<p>The search bar allows one to quickly filter the changesets panel.
+Buttons from right to left...</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>All</strong></dt>
+<dd>Show all changesets in the respository.  Essentially removes all
+filters.</dd>
+<dt><strong>Tagged</strong></dt>
+<dd>Show only changesets with tags.</dd>
+<dt><strong>Ancestry</strong></dt>
+<dd>Show only changesets that are ancestors of the currently
+selected changeset.  This option is only sensitive when a
+revision is selected.</dd>
+<dt><strong>Parents</strong></dt>
+<dd>Show only the working directory parent revisions.  Unless a
+merge is in progress, this will be only one revision.</dd>
+<dt><strong>Heads</strong></dt>
+<dd>Show only repository heads (changesets without any child
+revisions).</dd>
+<dt><strong>Merges</strong></dt>
+<dd>Show only merge changesets (changesets with two parents)</dd>
+<dt><strong>Hide Merges</strong></dt>
+<dd>A toggle button, not a radio like the other buttons in the
+search bar, which toggles the display of merge changesets.</dd>
+<dt><strong>Branches</strong></dt>
+<dd>A combo box with the list of named branches in your repository.
+See <strong>Repo Settings -&gt; Changelog -&gt; Dead Branches</strong> for
+a method to prune names from this combo box.</dd>
+<dt><strong>Custom Filter Combo</strong></dt>
+<dd>Finally there is a combo box that selects among the various
+filter types that can be manually specified.</dd>
+</dl>
+</blockquote>
+<p>To specify a custom filter, the user selects the filter type, enters
+the search text of that type, and then hits return in the text entry.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Rev Range</strong></dt>
+<dd>Parse the user text as a revision range.  See
+<a class="reference external" href="http://www.selenic.com/mercurial/hg.1.html#revisions">hg.1.html#revisions</a>
+for details on how to specify revision ranges.</dd>
+<dt><strong>File Patterns</strong></dt>
+<dd>Parse the user text as a file pattern glob, unless the user text
+is prefixed with a pattern type like <em>regexp:</em>.  See
+<a class="reference external" href="http://www.selenic.com/mercurial/hg.1.html#patterns">hg.1.html#patterns</a>
+for details on how to specify file patterns.</dd>
+<dt><strong>Keywords</strong></dt>
+<dd>Parse the user text as a keyword pattern that should be matched
+against changeset meta data like comitter, message, etc.</dd>
+<dt><strong>Date</strong></dt>
+<dd>Parse the user text as a date range.  See
+<a class="reference external" href="http://www.selenic.com/mercurial/hg.1.html#dates">hg.1.html#dates</a>
+for details on how to specify date ranges.</dd>
+<dt><strong>User</strong></dt>
+<dd>Parse the user text as a user / comitter name.</dd>
+</dl>
+</blockquote>
+<p>The filter entry has a combo box which stores the history of searches.
+Selecting an item from the drop down list will apply that filter.</p>
+</div>
+<div class="section" id="revision-graph-details">
+<h2>4.7.3. Revision Graph Details<a class="headerlink" href="#revision-graph-details" title="Permalink to this headline">¶</a></h2>
+<p>The graph column shows the child-parent relationships between revisions
+in your repository history.  This column auto-sizes for as many lines of
+ancestry that are required to visualize the revisions you have loaded.
+The column has an initial hard-limit width to prevent some degenerative
+cases from breaking the viewer, but can be resized after refreshes.</p>
+</div>
+<div class="section" id="performance-implications">
+<h2>4.7.4. Performance Implications<a class="headerlink" href="#performance-implications" title="Permalink to this headline">¶</a></h2>
+<p>There are some Repository Explorer features that should probably be
+avoided in large repositories.</p>
+<ul>
+<li><dl class="first docutils">
+<dt><em>View -&gt; Color By Branch</em></dt>
+<dd><p class="first last">This option requires the log viewer to query the branch name of
+every revision in order to draw the graph.  It can cause refreshes
+to be slow.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><em>View -&gt; Compact Graph</em></dt>
+<dd><p class="first last">This option can cause refresh to be slower than the default setting.
+Also be aware that enabling this feature makes the graph lines less
+accurate.  The feature trades merge parent accuracy for horizontal
+screen space.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Column <strong>Changes</strong></dt>
+<dd><p class="first last">This column can be expensive to calculate on repositories with large
+working copies, causing both refreshes and scrolling to be slow.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="revision-context-menus">
+<h2>4.7.5. Revision Context Menus<a class="headerlink" href="#revision-context-menus" title="Permalink to this headline">¶</a></h2>
+<p>Right-clicking on a revision in the (top) graph pane will bring up the
+revision context menu.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Visualize Change</strong></dt>
+<dd>open this change in your visual diff tool</dd>
+<dt><strong>Display Change</strong></dt>
+<dd>open this changeset in the changeset browser (more below)</dd>
+<dt><strong>Diff to Local</strong></dt>
+<dd>display changes (visual diff) between this revision and your
+current working directory</dd>
+<dt><strong>Copy Hash</strong></dt>
+<dd>copy current revision&#8217;s full hash to the clipboard</dd>
+<dt><strong>Update...</strong></dt>
+<dd>update your working directory to this revision <a class="footnote-reference" href="#rcm1" id="id1">[1]</a></dd>
+<dt><strong>Merge With...</strong></dt>
+<dd>merge with this revision <a class="footnote-reference" href="#rcm2" id="id2">[2]</a></dd>
+<dt><strong>Backout...</strong></dt>
+<dd>create a backout changeset for selected revision</dd>
+<dt><strong>Revert</strong></dt>
+<dd>revert working copy to this revision&#8217;s contents, without
+updating working directory parent revision. Use with care.</dd>
+<dt><strong>Export</strong></dt>
+<dd><dl class="first last docutils">
+<dt><strong>Export Patch</strong></dt>
+<dd>generate a patch file containing this revision&#8217;s changes</dd>
+<dt><strong>Email Patch</strong></dt>
+<dd>send this revision&#8217;s changes to email recipient <a class="footnote-reference" href="#rcm3" id="id3">[3]</a></dd>
+<dt><strong>Bundle rev:tip</strong></dt>
+<dd>create a bundle with all revs from selected to tip</dd>
+<dt><strong>Archive...</strong></dt>
+<dd>open the archive dialog for this revision, allowing user to
+generate a backup copy of the repository at that revision.</dd>
+</dl>
+</dd>
+<dt><strong>Tag</strong></dt>
+<dd><dl class="first last docutils">
+<dt><strong>Add/Remove Tag</strong></dt>
+<dd>opens the TortoiseHg tag dialog with this revision selected</dd>
+<dt><strong>Add/Move/Remove Bookmark</strong></dt>
+<dd>opens the TortoiseHg bookmark dialog with this revision selected
+<em>This option requires the boomarks extension to be enabled</em></dd>
+<dt><strong>Rename Bookmark</strong></dt>
+<dd>opens the TortoiseHg bookmark rename dialog
+<em>This option requires the boomarks extension to be enabled</em></dd>
+</dl>
+</dd>
+<dt><strong>Mercurial Queues</strong></dt>
+<dd><dl class="first last docutils">
+<dt><strong>Import revision to MQ</strong></dt>
+<dd>Import selected revision into the current patch queue.  Only
+valid for qbase or checked out head revision.  <em>Only visible
+when MQ is enabled</em></dd>
+<dt><strong>Strip Revision...</strong></dt>
+<dd>Remove the selected revision and all of it&#8217;s descendants from the
+repository <a class="footnote-reference" href="#rcm4" id="id4">[4]</a> <em>Only visible when MQ is enabled</em></dd>
+</dl>
+</dd>
+<dt><strong>Transplant to local</strong></dt>
+<dd>Transplant selected revision onto the current working parent.
+<em>Only visible when the transplant extension is enabled</em></dd>
+<dt><strong>Bisect</strong></dt>
+<dd><dl class="first last docutils">
+<dt><strong>Reset</strong></dt>
+<dd>Reset bisect state. See <a class="reference external" href="#id10">bisect</a> section below.</dd>
+<dt><strong>Mark as Good</strong></dt>
+<dd>Mark changeset as good</dd>
+<dt><strong>Mark as Bad</strong></dt>
+<dd>Mark changeset as bad</dd>
+<dt><strong>Skip Testing</strong></dt>
+<dd>Skip testing this changeset</dd>
+</dl>
+</dd>
+</dl>
+</blockquote>
+<p>If you right-click on a row other than the one that was currently
+selected, you get a secondary context menu which defines commands that
+operation on revision ranges.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Diff with selected</strong></dt>
+<dd>Opens status viewer with cumulative changes of the range of
+changesets.  The status viewer allows cherry picked changes to
+be saved to a file.</dd>
+<dt><strong>Visual Diff with selected</strong> <a class="footnote-reference" href="#rcm5" id="id5">[5]</a></dt>
+<dd>Opens visual diff window with cumulative changes of the range
+of changesets.</dd>
+<dt><strong>Email from here to selected</strong></dt>
+<dd>Opens email dialog with range of changesets.</dd>
+<dt><strong>Bundle from here to selected</strong></dt>
+<dd>Creates a bundle file with range of changesets.</dd>
+<dt><strong>Export patches from here to selected</strong></dt>
+<dd>Creates a patch file for each changeset in selected range.</dd>
+<dt><strong>Merge with selected</strong> <a class="footnote-reference" href="#rcm6" id="id6">[6]</a></dt>
+<dd>Merges this revision with the other selected revision.  If
+neither revision is currently checked out, the merge dialog will
+be forced to update to the first selected revision before
+starting the merge.  This will fail if the working directory is
+not clean.</dd>
+<dt><strong>Transplant revision range to local</strong></dt>
+<dd>Transplant selected range of changesets on to current working
+parent revision. <em>Only visible when the transplant extension is
+enabled</em></dd>
+<dt><strong>Rebase on top of selected</strong></dt>
+<dd>Rebase selected changeset and ancestors on top of original
+selected revision.  <em>Only visible when the rebase extension is
+enabled</em></dd>
+<dt><strong>qimport from here to selected</strong></dt>
+<dd>Import selected revision range into the current patch queue.
+<em>Only visible when MQ is enabled</em></dd>
+</dl>
+</blockquote>
+<table class="docutils footnote" frame="void" id="rcm1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Opens the TortoiseHg update dialog with this revision selected.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="rcm2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Opens the TortoiseHg merge dialog with this revision selected.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="rcm3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Opens the TortoiseHg email dialog with this revision selected.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="rcm4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>The strip command will store the stripped revisions in a bundle file
+that can later be reapplied.
+See <a class="reference external" href="http://mercurial.selenic.com/wiki/EditingHistory">also</a>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="rcm5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td><em>Global Settings ‣ TortoiseHg ‣ Visual Diff Tool</em></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="rcm6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id6">[6]</a></td><td>Only sensitive if the selected revision is your current working
+directory parent</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="file-context-menus">
+<h2>4.7.6. File Context Menus<a class="headerlink" href="#file-context-menus" title="Permalink to this headline">¶</a></h2>
+<p>Right-clicking on filenames in the file list (bottom left) pane will
+bring up a context menu for the selected file:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Visual Diff</strong></dt>
+<dd>Open this revision of the file in your visual diff tool</dd>
+<dt><strong>Diff to Local</strong></dt>
+<dd>Visualize differences between this revision and your checked
+out version</dd>
+<dt><strong>View at Revision</strong></dt>
+<dd>Open this revision of the file in your visual editor <a class="footnote-reference" href="#flcm1" id="id7">[7]</a></dd>
+<dt><strong>Save at Revision</strong></dt>
+<dd>Write this revision of the file to specified location</dd>
+<dt><strong>File History</strong></dt>
+<dd>Show revisions that modified this file <a class="footnote-reference" href="#flcm2" id="id8">[8]</a></dd>
+<dt><strong>Annotate File</strong></dt>
+<dd>Open this file in the datamine app, annotated at this revision</dd>
+<dt><strong>Revert File Contents</strong></dt>
+<dd>Checkout this specific revision of this file <a class="footnote-reference" href="#flcm3" id="id9">[9]</a></dd>
+</dl>
+</blockquote>
+<table class="docutils footnote" frame="void" id="flcm1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[7]</a></td><td><em>Global Settings ‣ TortoiseHg ‣ Visual Editor</em></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="flcm2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[8]</a></td><td>Does not show revisions where a file was deleted, as this is only a
+manifest change, it does not modify the file&#8217;s history.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="flcm3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id9">[9]</a></td><td>The new contents will appear as local changes and must be committed.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="changeset-browser">
+<h2>4.7.7. Changeset browser<a class="headerlink" href="#changeset-browser" title="Permalink to this headline">¶</a></h2>
+<p>The changeset browser will only show a single file&#8217;s diffs at a time, as
+a performance optimization.  If you would like to see all of the file
+diffs at once, click on the <strong>[All Files]</strong> row.  The changeset
+browser will also skip displaying diffs for files which are above a
+maximum limit. See
+<em>Global Settings ‣ TortoiseHg ‣ Max Diff Size</em>.  The
+size limit can be temporarily disabled by toggling <em>View
+-&gt; Ignore Max Diff Size</em>.</p>
+<p>The changelog and datamine tools can open the changeset browser to view
+a single revision or the combined effect of a range of revisions. The
+changeset browser is very similar to the commit and shelve tools. It has
+a file list on the left of all files that have been changed, and a diff
+pane on the right with the changes to each file.</p>
+<p>The diff pane is tabbed and allows one to select files and hunks that
+you wish to extract from the changeset(s) you are browsing and write
+them to a patch file using the <strong>Save as</strong> toolbar button.  This
+is a very efficient way to cherry pick changes from a repository.  This
+changeset browser also supports the <tt class="docutils literal"><span class="pre">Ctrl-C</span></tt> keyboard accelerator
+to copy hightlighted diff hunks to the clipboard.</p>
+<p>Unfortunately, TortoiseHg still does not have a dialog for importing
+patches into a repository, so this must be done on the command line with
+the <strong>hg import</strong> command.</p>
+</div>
+<div class="section" id="message-parsing">
+<h2>4.7.8. Message Parsing<a class="headerlink" href="#message-parsing" title="Permalink to this headline">¶</a></h2>
+<p>New in TortoiseHg 1.0, the repository browser will detect and underline
+changeset hashes, HTTP(s) URLs, and bug report identifiers inside
+changeset messages.  These underlined phrases are clickable links.</p>
+<p>Every word-boundary delimited string of 12 or 40 characters from the
+range [0-9a-f] is considered a changeset link. Clicking on it in the
+repository explorer will jump to the given changeset if possible.</p>
+<p>HTTP and HTTPS URLs are similarly turned into clickable links which are
+opened in your default web browser.</p>
+<p>Issue tracker links are enabled when configured in the tortoisehg
+section of your configuration files.  Since only a single issue tracker
+can be configured at a time, it is typically configured in the
+repository&#8217;s <tt class="docutils literal"><span class="pre">.hg/hgrc</span></tt> file.  There are two keys: issue.regex and
+issue.link. The first defines the regex to match when picking up issue
+numbers, while the second defines the command to run when an issue
+number is recognized.</p>
+<p>You may include groups in issue.regex, and corresponding {n} tokens in
+issue.link (where n is a non-negative integer). {0} refers to the entire
+string matched by issue.regex, while {1} refers to the first group and
+so on. If no {n} tokens are found in issue.link, the entire matched
+string is appended instead.</p>
+<p>Examples:</p>
+<div class="highlight-python"><pre>BitBucket:
+issue.regex = #(\d+)\b
+issue.link = http://bitbucket.org/&lt;your project and repo&gt;/issue/{1}/
+
+Mercurial:
+issue.regex = \bissue\d+\b
+issue.link = http://mercurial.selenic.com/bts/</pre>
+</div>
+</div>
+<div class="section" id="id10">
+<h2>4.7.9. Bisect<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<p>TortoiseHg 1.0 introduced support for bisect bug searching to help find
+changesets which introduce problems. To use, mark the earliest changeset
+you know exhibits the problem as bad, then mark the latest changeset
+which is free from the problem as good.  Once you have performed tests,
+mark the working directory parent as good or bad, and bisect will either
+update to another candidate changeset or announce that it has found the
+bad revision.</p>
+<p>As a shortcut, you can also mark a revision as good or bad without
+checking it out first.</p>
+<p>For more automated bisecting, you must use the Mercurial command line
+and provide an automated test that can build and run a changeset and
+return 0-good, 125-skip, or 127-abort, or anythin else to mean bad.  See
+the <strong>hg bisect</strong> command help for more information.</p>
+</div>
+<div class="section" id="keyboard-navigation">
+<h2>4.7.10. Keyboard navigation<a class="headerlink" href="#keyboard-navigation" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Ctrl-P</span></tt></dt>
+<dd>Zoom to the working directory parent revision</dd>
+<dt><tt class="docutils literal"><span class="pre">Ctrl-D</span></tt></dt>
+<dd>Display visual diffs for selected changeset or file</dd>
+<dt><tt class="docutils literal"><span class="pre">Ctrl-R</span></tt></dt>
+<dd>Refresh repository contents</dd>
+<dt><tt class="docutils literal"><span class="pre">Ctrl-G</span></tt></dt>
+<dd>Go to a specific revision</dd>
+</dl>
+</div>
+<div class="section" id="configurables">
+<h2>4.7.11. Configurables<a class="headerlink" href="#configurables" title="Permalink to this headline">¶</a></h2>
+<p>The changelog browser has a few configurable options that can be set in
+the TortoiseHg Settings dialog on the Changelog tab.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Author coloring</strong></dt>
+<dd>If true, each author&#8217;s changeset will be given a unique color</dd>
+<dt><strong>Long Summary</strong></dt>
+<dd>Concatenate commit message lines until 80 chars are reached</dd>
+<dt><strong>Graph batch limit</strong></dt>
+<dd>Number of revisions to read in each batch load</dd>
+<dt><strong>Copy Hash</strong></dt>
+<dd>Copy a revision&#8217;s changeset id hash to the clipboard when selected
+[DEPRECATED]</dd>
+<dt><strong>Dead Branches</strong></dt>
+<dd>Comma separated list of branch names that should be ignored
+when building a list of branch names for a repository.</dd>
+<dt><strong>Branch Colors</strong></dt>
+<dd>Space separated list of branch names and colors on the
+form branch:#XXXXXX. Spaces and colons in the branch name must be
+escaped using a backslash (\). Likewise some other characters
+can be escaped in this way, e.g. \u0040 will be decoded to the
+&#64; character, and \n to a linefeed.</dd>
+<dt><strong>Hide Tags</strong></dt>
+<dd>Space separated list of tags that will not be shown.  Useful
+example: Specify &#8220;qbase qparent qtip&#8221; to hide the standard tags
+inserted by the Mercurial Queues Extension.</dd>
+<dt><strong>Use Expander</strong></dt>
+<dd>Show changeset details within an expander.  When contained
+within the expander, the details do not scroll with the
+changeset contents.</dd>
+</dl>
+</blockquote>
+<p>The exact colors given to particular users can be configured by adding
+lines like these to your <tt class="docutils literal"><span class="pre">Mercurial.ini</span></tt> file:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">tortoisehg</span><span class="p">]</span>
+<span class="n">authorcolor</span><span class="o">.</span><span class="n">USERNAME</span> <span class="o">=</span> <span class="n">color</span>
+</pre></div>
+</div>
+<p>The changelog browser also respects the following settings on the
+TortoiseHg tab:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Tab Width</strong></dt>
+<dd>Number of spaces to expand tabs in diffs</dd>
+<dt><strong>Max Diff Size</strong></dt>
+<dd>Maximum size of file to be diffed</dd>
+<dt><strong>Bottom Diffs</strong></dt>
+<dd>Show diffs below file list</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="from-command-line">
+<h2>4.7.12. From command line<a class="headerlink" href="#from-command-line" title="Permalink to this headline">¶</a></h2>
+<p>The changelog viewer can be started from command line</p>
+<div class="highlight-python"><pre>hgtk log [OPTIONS] [FILE]
+
+aliases: history
+
+changelog viewer
+
+options:
+
+ -l --limit  limit number of changes displayed
+
+use "hgtk -v help log" to show global options</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">4.7. Changelog</a><ul>
+<li><a class="reference external" href="#sync-bar">4.7.1. Sync Bar</a></li>
+<li><a class="reference external" href="#search-bar">4.7.2. Search Bar</a></li>
+<li><a class="reference external" href="#revision-graph-details">4.7.3. Revision Graph Details</a></li>
+<li><a class="reference external" href="#performance-implications">4.7.4. Performance Implications</a></li>
+<li><a class="reference external" href="#revision-context-menus">4.7.5. Revision Context Menus</a></li>
+<li><a class="reference external" href="#file-context-menus">4.7.6. File Context Menus</a></li>
+<li><a class="reference external" href="#changeset-browser">4.7.7. Changeset browser</a></li>
+<li><a class="reference external" href="#message-parsing">4.7.8. Message Parsing</a></li>
+<li><a class="reference external" href="#id10">4.7.9. Bisect</a></li>
+<li><a class="reference external" href="#keyboard-navigation">4.7.10. Keyboard navigation</a></li>
+<li><a class="reference external" href="#configurables">4.7.11. Configurables</a></li>
+<li><a class="reference external" href="#from-command-line">4.7.12. From command line</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="shelve.html"
+                                  title="previous chapter">4.6. Shelve</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="datamine.html"
+                                  title="next chapter">4.8. Datamine</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/changelog.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="datamine.html" title="4.8. Datamine"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="shelve.html" title="4.6. Shelve"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" >4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

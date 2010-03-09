@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>7. Patches &mdash; TortoiseHg v1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v1.0.0 documentation" href="index.html" />
+    <link rel="next" title="8. Extensions" href="extensions.html" />
+    <link rel="prev" title="6. Recovery" href="recovery.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="extensions.html" title="8. Extensions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="recovery.html" title="6. Recovery"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-patches">
+<h1>7. Patches<a class="headerlink" href="#module-patches" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="defining-a-patch">
+<h2>7.1. Defining a patch<a class="headerlink" href="#defining-a-patch" title="Permalink to this headline">¶</a></h2>
+<p>These links are recommended reading for understanding the history and nature
+of patches and how they can be used with Mercurial.</p>
+<ul class="simple">
+<li><a class="reference external" href="http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt">The patch management problem</a></li>
+<li><a class="reference external" href="http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch">Understanding patches</a></li>
+<li><a class="reference external" href="http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch">More about patches</a></li>
+</ul>
+</div>
+<div class="section" id="pitfalls">
+<h2>7.2. Pitfalls<a class="headerlink" href="#pitfalls" title="Permalink to this headline">¶</a></h2>
+<p>The standard patch format cannot describe binary files, renames, copies,
+or permission changes.  If your patch needs to record any of those
+things, you will need to enable <strong>git</strong> patches via:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">diff</span><span class="p">]</span>
+<span class="n">git</span><span class="o">=</span><span class="bp">True</span>
+</pre></div>
+</div>
+<p>Mercurial 1.5 improves it&#8217;s behavior in this regard.  It will warn you
+when git diffs are required, or sometimes upgrade to the git format
+automatically.  See also the
+<a class="reference external" href="http://www.selenic.com/mercurial/hgrc.5.html#diff">diff section</a> of
+the hgrc documentation.</p>
+<p>Mercurial&#8217;s patch routines do not deal well with mixed EOLN between
+source files and patches.  The <strong>patch.eol</strong> setting was introduced in
+1.3 to improve this situation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">patch</span><span class="p">]</span>
+<span class="n">eol</span> <span class="o">=</span> <span class="n">auto</span> <span class="c">#strict, lf, or crlf</span>
+</pre></div>
+</div>
+<p>The work on the hgeol extension is also improving this area.  Perhaps it
+will be resolved by hg-1.5.  See also the
+<a class="reference external" href="http://www.selenic.com/mercurial/hgrc.5.html#patch">patch section</a>
+of the hgrc documentation.</p>
+<p>Applying a patch is not a foolproof operation.  If the source file has
+diverged from the file that was used to create the patch, there may be
+conflicts during the patch application.  These are written to a file
+with an .rej extension.  TortoiseHg 1.0 includes an experimental
+<strong>hgtk mpatch</strong> command that can try <em>harder</em> to apply the
+rejected patch hunks.  This command is based on Chris Mason&#8217;s <a class="reference external" href="http://oss.oracle.com/~mason/mpatch/">mpatch</a> utility.  If mpatch cannot
+apply the rejected hunks, your only remaining choice is to apply them by
+hand.</p>
+</div>
+<div class="section" id="export-patches">
+<h2>7.3. Export Patches<a class="headerlink" href="#export-patches" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="changeset">
+<h3>7.3.1. Changeset<a class="headerlink" href="#changeset" title="Permalink to this headline">¶</a></h3>
+<p>To export a changeset as a patch file, use the changeset context menu of
+the Repository Explorer to select <em>Export ‣ Export Patch</em>.
+You will be asked to provide a filename.</p>
+</div>
+<div class="section" id="changeset-ranges">
+<h3>7.3.2. Changeset Ranges<a class="headerlink" href="#changeset-ranges" title="Permalink to this headline">¶</a></h3>
+<p>Select a range of changesets in the Repository Explorer.  Left click on
+the first (base) changeset, then right click on the last (target)
+changeset.  This opens a special revision range context menu.  From this
+menu you can generate patches, generate a bundle, send emails, or view
+the accumulated changes.</p>
+<p>This is a very powerful feature and there is no restriction on the base
+and target changesets you can select.</p>
+</div>
+<div class="section" id="email">
+<h3>7.3.3. Email<a class="headerlink" href="#email" title="Permalink to this headline">¶</a></h3>
+<div class="figure">
+<img alt="Email dialog" src="_images/email.png" />
+<p class="caption">Email dialog of Repository Explorer</p>
+</div>
+<p>To send a changeset as an email, use the changeset context menu of the
+Repository Explorer. <em>Export ‣ Email Patch</em>.  This
+opens the e-mail dialog for this single changeset.</p>
+<p>To send a changeset range, use the changeset range selection feature of
+the Repository Explorer and select
+<em>Email from here to selected...</em></p>
+<p>Lastly, you can use the <strong>Email</strong> button on the syncbar of the
+Repository Explorer to email all outgoing changes to the selected remote
+repository.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You must configure
+<a class="reference external" href="http://www.selenic.com/mercurial/hgrc.5.html#smtp">SMTP</a>
+to send patches via email</p>
+</div>
+</div>
+<div class="section" id="cherry-picking">
+<h3>7.3.4. Cherry Picking<a class="headerlink" href="#cherry-picking" title="Permalink to this headline">¶</a></h3>
+<p>Use the changeset range selection feature of the Repository Explorer and
+select <em>Diff with selected</em>.  This opens up a status
+viewer showing you the accumulated changes between your base and target
+changesets.</p>
+<p>From the status viewer, you can select files and diff hunks just as you
+can in the commit tool, and preview the final result in the
+<strong>Save Preview</strong> tab.  Pressing <strong>Save As</strong> will save
+the selected changes to a patch file.</p>
+<p>For even finer cherry-picking, you can highlight a number of diff-hunks
+in the hunk selection pane and hit CTRL-C.  This will copy the
+highlighted (mouse selected, not toggled) hunks to the clipboard.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Reversing the order of your changeset selection reverses the effect
+of the patch.</p>
+</div>
+</div>
+</div>
+<div class="section" id="import-patches">
+<h2>7.4. Import Patches<a class="headerlink" href="#import-patches" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="Import tool" src="_images/import.png" />
+<p class="caption">Import dialog of Repository Explorer</p>
+</div>
+<p>The import dialog can be opened from the sync bar or menu of the
+Repository Explorer, or via <strong>hgtk import</strong>.  The dialog supports
+file and directory drag and drop.  The drop down menu in the upper right
+corner next to the <strong>Browse</strong> button has the options:
+<strong>Browse Directory..</strong> and <strong>Import from Clipboard</strong>.</p>
+<p>You have the choice of importing directly into the repository, or
+importing into your patch queue.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Importing a patch requires a clean working directory state.  You
+must commit, revert, or shelve changes before importing a patch.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If the patch you are importing does not have a commit
+message, Mercurial will try to launch your editor, just as if you
+had tried to import the patch from the command line.  Your ui.editor
+needs to be a GUI app to make this work correctly.</p>
+</div>
+</div>
+<div class="section" id="patch-queues">
+<h2>7.5. Patch Queues<a class="headerlink" href="#patch-queues" title="Permalink to this headline">¶</a></h2>
+<div class="figure">
+<img alt="Patch Queue" src="_images/patchqueue.png" />
+<p class="caption">Patch Queue panel in the Repository Explorer</p>
+</div>
+<p>Both the Repository Explorer and Commit Tool have an optional Patch
+Queue panel that is only available when the user has enabled the MQ
+extension.  It allows the user to perform most patch queue operations
+including push, pop, rename, and finish.  It&#8217;s recommended to learn the
+MQ extension before using the Patch Queue panel.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">7. Patches</a><ul>
+<li><a class="reference external" href="#defining-a-patch">7.1. Defining a patch</a></li>
+<li><a class="reference external" href="#pitfalls">7.2. Pitfalls</a></li>
+<li><a class="reference external" href="#export-patches">7.3. Export Patches</a><ul>
+<li><a class="reference external" href="#changeset">7.3.1. Changeset</a></li>
+<li><a class="reference external" href="#changeset-ranges">7.3.2. Changeset Ranges</a></li>
+<li><a class="reference external" href="#email">7.3.3. Email</a></li>
+<li><a class="reference external" href="#cherry-picking">7.3.4. Cherry Picking</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#import-patches">7.4. Import Patches</a></li>
+<li><a class="reference external" href="#patch-queues">7.5. Patch Queues</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="recovery.html"
+                                  title="previous chapter">6. Recovery</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="extensions.html"
+                                  title="next chapter">8. Extensions</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/patches.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="extensions.html" title="8. Extensions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="recovery.html" title="6. Recovery"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
