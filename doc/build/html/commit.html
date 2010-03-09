@@ -1,0 +1,581 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.5. Commit &mdash; TortoiseHg v1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v1.0.0 documentation" href="index.html" />
+    <link rel="up" title="4. TortoiseHg in daily use" href="daily.html" />
+    <link rel="next" title="4.6. Shelve" href="shelve.html" />
+    <link rel="prev" title="4.4. Clone a repository" href="clone.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="shelve.html" title="4.6. Shelve"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="clone.html" title="4.4. Clone a repository"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" accesskey="U">4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-commit.dialog">
+<h1>4.5. Commit<a class="headerlink" href="#module-commit.dialog" title="Permalink to this headline">¶</a></h1>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">The win32text extension can cause trouble with hunk selection.  This
+has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
+proper configuration. See
+<a class="reference external" href="http://bitbucket.org/tortoisehg/stable/issue/82/">issue #82</a>.</p>
+</div>
+<p>The commit tool is one of the two main applications of TortoiseHg.
+Together with the Repository Explorer (aka, the changelog tool) these
+two tools can perform or access nearly every function that TortoiseHg
+supports.</p>
+<p>Not only can the commit tool commit your changes, but it can also
+examine the state of your working directory and perform most routine
+maintenance tasks (add new files, record renames, manage the ignore
+filter, etc).</p>
+<div class="figure">
+<img alt="Commit dialog" src="_images/commit.png" />
+<p class="caption">Commit dialog</p>
+</div>
+<div class="section" id="features">
+<h2>4.5.1. Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<p>At the top of the commit tool is a menu bar, newly introduced in version 0.9.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Tools</strong></dt>
+<dd>Launch common TortoiseHg tools in separate processes</dd>
+<dt><strong>View</strong></dt>
+<dd>Toggle the display of optional features, or refresh the working
+directory contents.</dd>
+<dt><strong>Operations</strong></dt>
+<dd>These menu items correspond to the toolbar buttons.</dd>
+<dt><strong>Help</strong></dt>
+<dd>Open a web browser to this web page, or launch TortoiseHg About
+dialog.</dd>
+</dl>
+</blockquote>
+<p>Enumerating the toolbar buttons:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Commit</strong></dt>
+<dd>Commit selected diffs in checked files.</dd>
+<dt><strong>Undo</strong></dt>
+<dd>Undo (rollback) last immediate commit. Your commit message will be
+available in the message history, so you can easily repeat the
+commit if necessary.</dd>
+<dt><strong>Diff</strong></dt>
+<dd>Visual diff checked files.</dd>
+<dt><strong>Revert</strong></dt>
+<dd>Revert checked files to last revisioned state.  If merging, it
+allows you to select the revert parent.</dd>
+<dt><strong>Add</strong></dt>
+<dd>Add checked files that were in unknown &#8216;?&#8217; or ignored &#8216;I&#8217; state.</dd>
+<dt><strong>Move</strong></dt>
+<dd>Move checked files to specified target directory in versioned
+manner.</dd>
+<dt><strong>Remove</strong></dt>
+<dd>Delete checked unversioned files and/or remove (mark as deleted) any
+versioned files.</dd>
+<dt><strong>Forget</strong></dt>
+<dd>Forget checked versioned files.</dd>
+<dt><strong>Refresh</strong></dt>
+<dd>Reload the state of the working directory. It tries to retain
+check and selection state across refresh.</dd>
+<dt><strong>Patch Queue</strong></dt>
+<dd>If the MQ extension is enabled, this toggle button for the patch
+queue pane will be visible.</dd>
+</dl>
+</blockquote>
+<p>Below the toolbar are useful widgets:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Branch dialog</strong></dt>
+<dd>Shows the current branch name of the working directory. Normally
+this is informational only, but pressing this button opens up a
+branch maintenance dialog.  Do not use this feature unless you
+understand Mercurial&#8217;s
+<a class="reference external" href="http://mercurial.selenic.com/wiki/NamedBranches">named branches</a>.</dd>
+<dt><strong>Recent Commit Messages</strong></dt>
+<dd>A drop-down list of the 10 most recent commit messages. The
+the drop-down list is filled the first time it is opened.</dd>
+<dt><strong>QNew</strong></dt>
+<dd>If you have enabled the MQ extension, there will also be a text
+entry for a new patch name.  Entering a patch name switches the
+commit tool into &#8216;QNew&#8217; mode.</dd>
+</dl>
+</blockquote>
+<p>The file list has four columns:</p>
+<blockquote>
+<ol class="arabic simple">
+<li>A checkbox that indicates whether the file is selected for an
+operation.  The toolbar buttons only operate on checked files.
+&#8220;Partially&#8221; selected files have a special check state.  This
+column header is checkable, it will toggle the file selection
+states.</li>
+<li>The <strong>st</strong> column holds the status of the file, defined
+by Mercurial&#8217;s status command, one of &#8216;MARD?IC&#8217;.  A status of &#8216;S&#8217;
+indicates a dirty subrepository that needs to be committed.</li>
+<li>The <strong>ms</strong> column holds the merge state of the file,
+defined by Mercurial&#8217;s resolve command, one of &#8216; RU&#8217;.  See the
+merge section below.</li>
+<li>The canonical path of the file relative to the repository root</li>
+</ol>
+</blockquote>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If the commit tool was started with a file pattern or selection, a
+button will appear at the bottom of the file list that can clear the
+file pattern and give you an unfiltered view of the entire working
+directory.</p>
+</div>
+<p>Below the file list, inside an expander, are checkboxes that toggle the
+display of the various classes of files {modified, added, removed,
+deleted, unknown, clean, ignored}.  These check boxes will be disabled
+if the commit tool was started with a file pattern or selection.</p>
+<p><em>Removed</em> means a revisioned file has been marked as removed. <em>Deleted</em>
+means a revisioned file is missing but Mercurial has not been told to
+quit tracking that file. For instance, if you rename a revisioned file
+in the explorer, the original filename will show up as deleted and the
+new filename will show up as unknown. By right-clicking on the new
+filename you can bring up the rename guessing dialog which can discover
+the rename by comparing file contents and mark the old file as removed
+and the new file as added while recording the whole operation as a
+rename.</p>
+<p><em>Unknown</em> files are not tracked by Mercurial, but they also do not match
+any ignore filters you have configured.  Unknown files are shown by
+default because they are usually files that need to be added to revision
+control.  It is recommended that you keep your ignore filters up to date
+to ensure that is the case.  The context menu of unknown files has an
+option open the ignore pattern tool.</p>
+<p><em>Clean</em> files are tracked files that have not been modified, while
+<em>Ignored</em> files are untracked files that match a configured ignore
+pattern.  Neither of those file types are shown by default, unless a the
+user includes such a file in a selection (explorer) or provides the file
+name on the command line.</p>
+<div class="figure">
+<img alt="Parent bar" src="_images/parentbar.png" />
+<p class="caption">Parent bar in commit dialog</p>
+</div>
+<p>Below both the file list and diff pane is a narrow
+<strong>Parents Bar</strong>.  This bar shows you the current working
+directory parent(s), and gives you some warnings if a commit would
+introduce a new head.  The parents bar can be hidden by an option in the
+<strong>View</strong> menu.</p>
+<p>To the right of the file list is the diff pane.  The diff pane is newly
+tabbed in the 0.9 release.</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Text Diff</strong></dt>
+<dd>Shows the textual diffs in the currently selected file.</dd>
+<dt><strong>Hunk Selection</strong></dt>
+<dd>In releases 0.7 through 0.8, this tab was the only content shown
+to the user.  The diffs in this tab can be toggled per &#8220;hunk&#8221;,
+allowing the user to cherry pick changes to be included in the
+commit.  As in 0.8, this tab only shows diff hunks for the
+currently selected file.  This tab cannot show binary diffs or
+renames.  That data can only be seen in the Text Diff tab.</dd>
+<dt><strong>Commit Preview</strong></dt>
+<dd>This tab previews all of the selected hunks in every checked
+file, essentially a preview of what will be committed when you
+press the commit button.</dd>
+<dt><strong>Patch Contents</strong></dt>
+<dd>Only visible when the commit tool is in QRefresh mode.  It
+displays the current contents of the patch being refreshed.</dd>
+</dl>
+</blockquote>
+<div class="figure">
+<img alt="Advanced bar" src="_images/advancedbar.png" />
+<p class="caption">Advanced bar in commit dialog</p>
+</div>
+<p>If the <strong>Advanced Bar</strong> is enabled in the <strong>View</strong> menu,
+a bar is inserted between the toolbar and the message history bar.  The
+advanced bar contains:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Committer</strong></dt>
+<dd>The username to use for this commit.  This value is usually read
+from your Mercurial.ini file, but it can be specified on the
+hgtk command line or read from a patch file.  Lastly, the user
+could manually specify a different username here.</dd>
+<dt><strong>Auto-includes</strong></dt>
+<dd>A text entry that allows the user to modify the comma separated
+list of files that are always included in the commit list,
+regardless of whether they have been checked.  This is intended
+for use in repositories that have pre-commit hooks that modify
+certain files (say a changelog).</dd>
+<dt><strong>Push after commit</strong></dt>
+<dd>A toggle button that determines whether TortoiseHg will attempt
+to push outgoing changes to your default push target after each
+successful commit.</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="change-selection">
+<h2>4.5.2. Change Selection<a class="headerlink" href="#change-selection" title="Permalink to this headline">¶</a></h2>
+<p>So what does the phrase &#8216;commit the selected diffs in checked files&#8217;
+mean?  Simple, the TortoiseHg commit tool supports change selection
+intrinsically in the diff browser. This means that all of the changes
+you make to versioned files can be individually selected to be included
+in the commit or left out of the commit (but left in the working
+directory).  Fans of darcs or Mercurial&#8217;s record extension will
+recognize this feature immediately.</p>
+<div class="section" id="when-is-this-necessary">
+<h3>4.5.2.1. When is this necessary?<a class="headerlink" href="#when-is-this-necessary" title="Permalink to this headline">¶</a></h3>
+<p>When you have more than a single coherent change in your source code and
+you would like to commit your changes piecemeal.  This can often be
+accomplished by filtering the list of files in each commit, but there
+will be times when your changes intermingle in the same set of files and
+that is when this change selection feature becomes indispensable.</p>
+</div>
+<div class="section" id="how-does-it-work">
+<h3>4.5.2.2. How does it work?<a class="headerlink" href="#how-does-it-work" title="Permalink to this headline">¶</a></h3>
+<p>By double-clicking on individual change hunks in the
+<strong>Hunk Selection</strong> tab of the diff panel.  <em>Technically, any
+action which activates a change hunk row will toggle it&#8217;s selection
+status. The spacebar will also work.</em> When a hunk is unselected, the
+syntax highlighting of the diff is disabled and the background is turned
+gray.  At the same time, the file&#8217;s diff header is updated to show the
+current selection state, the selected hunk count and changed lines will
+be updated. Toggle the hunk a second time to reselect it for inclusion
+in your commit.</p>
+<p>When a file is partially selected for commit, it&#8217;s icon is changed from
+a checkbox to a radio button. At a glance at the file list, you should
+be able to find which files are entirely included in the commit,
+partially included, or entirely excluded.</p>
+</div>
+<div class="section" id="what-happens-at-commit-time">
+<h3>4.5.2.3. What happens at commit time?<a class="headerlink" href="#what-happens-at-commit-time" title="Permalink to this headline">¶</a></h3>
+<p>The short answer is that the selected hunks in checked files are
+committed to the repository and the unselected changes are left in your
+working directory for the next commit.</p>
+<p>The long answer is a little more complicated.  What happens behind the
+scenes is that the files which are partially selected are backed up in a
+safe location, reverted to their last revisioned state, have their
+selected change hunks applied back to them, committed, and then finally
+recovered from backup (thus placing the rejected change hunks back into
+the working copy).  Files which are not partially selected avoid the
+entire <em>backup, revert, patch, commit, recover</em> round trip and instead
+are committed in place.</p>
+<p>This longer answer is only interesting when something goes wrong, which
+on Windows unfortunately has a probability greater than 0. If some
+program (virus checker, compiler) locks your file in the middle of this
+process you may see an error about a failed patch.  These errors are
+recoverable.  Delete any new <tt class="docutils literal"><span class="pre">.rej</span></tt> files left in your repository
+and retry the commit.</p>
+</div>
+</div>
+<div class="section" id="keyboard-navigation">
+<h2>4.5.3. Keyboard navigation<a class="headerlink" href="#keyboard-navigation" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">Ctrl-Enter</span></tt></dt>
+<dd>Trigger the commit</dd>
+<dt><tt class="docutils literal"><span class="pre">Ctrl-C</span></tt></dt>
+<dd>When pressed in the diff panel, ctrl-c will copy the currently
+highlighted (repeat highlighted, not selected) diff hunks to the
+clipboard. These can be pasted into a text buffer to generate any
+arbitrary patch based from the changes in your working directory.</dd>
+<dt><tt class="docutils literal"><span class="pre">Alt-Q</span></tt></dt>
+<dd>Reflow the paragraph currently under the cursor.  You must configure
+a message format policy for this key combination to work.</dd>
+</dl>
+<p>The code which copies the hunks to the clipboard is intelligent about
+diff headers.  The clipboard contents will always be a valid patch.</p>
+</div>
+<div class="section" id="file-context-menus">
+<h2>4.5.4. File Context Menus<a class="headerlink" href="#file-context-menus" title="Permalink to this headline">¶</a></h2>
+<p>When right clicking on files in the file list, you will get a context
+menu of commands that are applicable to the selected files.</p>
+<p>For unknown <strong>?</strong> files, the context menu will allow you to detect
+renames (if you think the unknown file is a copy or rename of a
+revisioned file) or to configure the repository&#8217;s ignore filter (if the
+unknown file should never be revisioned and you want Mercurial to ignore
+it).</p>
+</div>
+<div class="section" id="merging">
+<h2>4.5.5. Merging<a class="headerlink" href="#merging" title="Permalink to this headline">¶</a></h2>
+<p>The commit tool has a special mode when it is opened in a repository
+that is in a merged state (technically, this means the current working
+directory has two parent revisions). The file list has no checkboxes and
+the hunk selection tabs are hidden. The commit &#8216;manifest&#8217; is essentially
+immutable, since you must commit the entire working directory after a
+merge.</p>
+<p>The merge state <em>ms</em> column is especially useful in this mode.  Files
+that are marked with <em>R</em> are files where Mercurial and/or the user have
+successfully merged (resolved) changes from both parents. Files that
+are marked with <em>U</em> have unresolved changes. You can use the <em>Restart
+Merge</em> context menu option to restart the merge for those files, or you
+can use the <em>edit</em> context menu option to resolve the conflict by hand.
+The <em>Restart Merge</em> menu option allows you to select the merge tool to
+use to perform the merge, or even to pick one version or the other
+unconditionally (internal:local, internal:other).  After the conflicts
+have been manually resolved, you must use the <em>mark resolved</em> context
+menu option to change the file&#8217;s merge state to <em>R</em>.</p>
+<p>Mercurial will not allow you to commit a merge if any files have
+unresolved <em>U</em> merge states.</p>
+<p>For your reference, <em>local</em> is the revision you had checked out when you
+started the merge and <em>other</em> is the revision you merged with.</p>
+<p>To undo a failed merge attempt, you must tell Mercurial to remove the
+second parent from your working directory.  This usually means
+performing a clean update of the first parent.  The merge tool has an
+<strong>Undo</strong> button which does exactly that.  The recovery tool also
+has a <strong>Clean</strong> button that does the same thing.</p>
+<p>Once you have your working directory back at one parent revision, you
+may restart the merge process.</p>
+</div>
+<div class="section" id="commit-message-pane">
+<h2>4.5.6. Commit Message Pane<a class="headerlink" href="#commit-message-pane" title="Permalink to this headline">¶</a></h2>
+<p>The commit message pane has these special context menu options:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Paste Filenames</strong>:</dt>
+<dd>Paste checked filenames into the commit message at the cursor.</dd>
+<dt><strong>Apply Format</strong>:</dt>
+<dd>Apply configured message wrap policy to current message.</dd>
+<dt><strong>Configure Format</strong>:</dt>
+<dd>Opens the settings dialog to the <strong>Commit</strong> tab.</dd>
+</dl>
+</blockquote>
+<p>If your project has guidelines for the format of commit messages, you
+can configure them in the settings tool.  The commit tool will enforce
+your policy at commit time, and you can ask the tool to apply the format
+to the current message.  The <strong>Commit</strong> tab of the settings tool
+has these two configurables for commit message policy:</p>
+<blockquote>
+<dl class="docutils">
+<dt><strong>Summary Line Length</strong>:</dt>
+<dd>Maximum length of the commit message summary line.  If set,
+TortoiseHg will issue a warning if the summary line is too long
+or not separated by a blank line. Default: 0 (unenforced)</dd>
+<dt><strong>Message Line Length</strong>:</dt>
+<dd>Word wrap length of the commit message.  If set, the popup menu
+can be used to format the message and a warning will be issued
+if any lines are too long at commit.  Default: 0 (unenforced)</dd>
+</dl>
+</blockquote>
+</div>
+<div class="section" id="subrepositories">
+<h2>4.5.7. Subrepositories<a class="headerlink" href="#subrepositories" title="Permalink to this headline">¶</a></h2>
+<p>A <a class="reference external" href="http://mercurial.selenic.com/wiki/subrepos">subrepository</a>
+is a feature introduced in Mercurial 1.3.  It allows one Mercurial
+repository to store references to external Mercurial (or potentially
+other VCS) repositories, and to include the state of those external
+repositories in the main repository&#8217;s history.</p>
+<p>TortoiseHg 1.0 introduced rudimentary support for subrepositories, and
+only in the commit / status tool.  When Mercurial considers a subrepo as
+dirty, it will appear in the commit tool as a special entry in the file
+list with a status of <em>S</em>.  If a subrepo is included in the file list of
+a commit, the subrepo is committed along with the other changes,
+updating the .hgsubstate file in the main repository root.</p>
+<p>Prior to TortoiseHg 1.0, dirty subrepos were not shown in the commit
+tool and .hgsubstate was not updated during commits.</p>
+</div>
+<div class="section" id="mq-patches">
+<h2>4.5.8. MQ patches<a class="headerlink" href="#mq-patches" title="Permalink to this headline">¶</a></h2>
+<p>Many advanced Mercurial users use the MQ extension to manage a patch
+queue.  The commit tool will recognize when a patch is applied and enter
+<em>patch refresh</em> mode. The title bar will say &#8220;refreshing patch
+<em>patchname</em>&#8221; and the patch comment will appear in the commit message
+pane.</p>
+<p>A new &#8216;Patch Contents&#8217; tab will appear in the diff pane with the full
+contents of the top patch.  The Text Diff and Hunk Selection tabs will
+show the combined diff of the patch and working directory changes so
+that you can move changes into or out of the patch during the qrefresh.</p>
+<p>This is essentially what the qdiff command would show you.  There is, in
+fact, no way to get just the working copy diffs beyond running
+<strong>hg diff</strong> on the command line or typing a name into the QNew
+entry which toggles the dialog into QNew mode (more below).</p>
+<p>The <strong>Commit</strong> button, which has been renamed <strong>QRefresh</strong>
+in this context, will refresh the top patch with the changes you
+have selected, including the patch description. This may be a bit
+confusing at first because the changes you leave out of the patch are
+still going to be in the working directory after the refresh, so unless
+you look at the patch contents it will not seem as if anything changed.</p>
+</div>
+<div class="section" id="qnew-mode">
+<h2>4.5.9. QNew Mode<a class="headerlink" href="#qnew-mode" title="Permalink to this headline">¶</a></h2>
+<p>The commit tool can be used to create a new patch for your patch queue.
+If you have the MQ extension enabled, a text entry will be inserted
+between the branch maintenance button and the message history drop-down
+box.  If you enter a filename in this entry the commit tool will switch
+out of <em>commit</em> or <em>qrefresh</em> mode into <em>qnew</em> mode.  In <em>qnew</em> mode,
+the commit tool shows only working directory modifications (the changes
+that would typically get added to a new patch by <strong>hg qnew -f</strong>).
+The <strong>Commit</strong> button will change into a <strong>QNew</strong> button
+as well, to make the mode switch more obvious.</p>
+<p>When the <strong>QNew</strong> button is pressed, the selected change hunks
+are written into a new patch (given the filename you specified), and the
+dialog is refreshed.  After this refresh, the commit tool will obviously
+switch to <em>qrefresh</em> mode since there will now be at least one applied
+patch.</p>
+<p>You may give the new patch a commit message at the initial <em>qnew</em> event,
+or you can do it afterwords while in <em>qrefresh</em> mode.</p>
+</div>
+<div class="section" id="configurables">
+<h2>4.5.10. Configurables<a class="headerlink" href="#configurables" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><em>Commit ‣ Username</em></dt>
+<dd>Sets username associated with your commits (see <a class="reference external" href="quick.html"><em>A Quick Start Guide to TortoiseHg</em></a>)</dd>
+<dt><em>Commit ‣ Summary Line Length</em></dt>
+<dd>Configures a &#8216;policy&#8217; limit for summary lines</dd>
+<dt><em>Commit ‣ Message Line Length</em></dt>
+<dd>Configures a &#8216;policy&#8217; limit for message lines</dd>
+</dl>
+<p>And three other features for <em>advanced</em> users.</p>
+<dl class="docutils">
+<dt><em>Commit ‣ Push After Commit</em>:</dt>
+<dd>When set to True, the commit tool will check the <em>push after
+commit</em> toggle button on startup.</dd>
+<dt><em>Commit ‣ Auto Commit List</em>:</dt>
+<dd>Comma separated list of files that are automatically included in
+every commit.  Intended for use only as a repository setting.</dd>
+<dt><em>Commit ‣ Auto Exclude List</em>:</dt>
+<dd>Comma separated list of files that are automatically unchecked
+when the status, commit, and shelve tools are opened.</dd>
+<dt><em>TortoiseHg ‣ Bottom Diffs</em></dt>
+<dd>Toggles diff pane from left to below file list</dd>
+<dt><em>TortoiseHg ‣ Max Diff Size</em></dt>
+<dd>Configures the diff size limit</dd>
+</dl>
+<p>External tool configuration has been removed in 0.9</p>
+</div>
+<div class="section" id="from-command-line">
+<h2>4.5.11. From command line<a class="headerlink" href="#from-command-line" title="Permalink to this headline">¶</a></h2>
+<p>The commit tool can be started from command line:</p>
+<div class="highlight-python"><pre>hgtk commit [OPTIONS] [FILE]...
+
+aliases: ci
+
+commit tool
+
+options:
+
+ -u --user  record user as committer
+ -d --date  record datecode as commit date
+
+use "hgtk -v help commit" to show global options</pre>
+</div>
+<p>For a quick help on the format of date type:</p>
+<div class="highlight-python"><pre>hg help dates</pre>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">4.5. Commit</a><ul>
+<li><a class="reference external" href="#features">4.5.1. Features</a></li>
+<li><a class="reference external" href="#change-selection">4.5.2. Change Selection</a><ul>
+<li><a class="reference external" href="#when-is-this-necessary">4.5.2.1. When is this necessary?</a></li>
+<li><a class="reference external" href="#how-does-it-work">4.5.2.2. How does it work?</a></li>
+<li><a class="reference external" href="#what-happens-at-commit-time">4.5.2.3. What happens at commit time?</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#keyboard-navigation">4.5.3. Keyboard navigation</a></li>
+<li><a class="reference external" href="#file-context-menus">4.5.4. File Context Menus</a></li>
+<li><a class="reference external" href="#merging">4.5.5. Merging</a></li>
+<li><a class="reference external" href="#commit-message-pane">4.5.6. Commit Message Pane</a></li>
+<li><a class="reference external" href="#subrepositories">4.5.7. Subrepositories</a></li>
+<li><a class="reference external" href="#mq-patches">4.5.8. MQ patches</a></li>
+<li><a class="reference external" href="#qnew-mode">4.5.9. QNew Mode</a></li>
+<li><a class="reference external" href="#configurables">4.5.10. Configurables</a></li>
+<li><a class="reference external" href="#from-command-line">4.5.11. From command line</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="clone.html"
+                                  title="previous chapter">4.4. Clone a repository</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="shelve.html"
+                                  title="next chapter">4.6. Shelve</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/commit.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="shelve.html" title="4.6. Shelve"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="clone.html" title="4.4. Clone a repository"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li>
+          <li><a href="daily.html" >4. TortoiseHg in daily use</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>

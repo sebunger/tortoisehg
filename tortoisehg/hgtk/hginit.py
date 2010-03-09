@@ -8,7 +8,7 @@
 import os
 import gtk
 
-from mercurial import hg, ui, util
+from mercurial import hg, ui, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib
@@ -33,7 +33,10 @@ class InitDialog(gtk.Dialog):
         self.cwd = os.getcwd()
 
         # preconditioning info
-        self.dest_path = os.path.abspath(repos and repos[0] or self.cwd)
+        path = os.path.abspath(repos and repos[0] or self.cwd)
+        if not os.path.isdir(path):
+            path = os.path.dirname(path)
+        self.dest_path = path
 
         # layout table
         table = gtklib.LayoutTable()
@@ -46,7 +49,8 @@ class InitDialog(gtk.Dialog):
         self.destentry.set_text(hglib.toutf(self.dest_path))
         self.destentry.grab_focus()
         self.destentry.set_position(-1)
-        self.destentry.connect('activate', lambda b: self.init())
+        self.destentry.connect('activate',
+                               lambda b: self.response(gtk.RESPONSE_OK))
 
         destbrowse = gtk.Button(_('Browse...'))
         destbrowse.connect('clicked', self.dest_clicked)
@@ -72,7 +76,7 @@ class InitDialog(gtk.Dialog):
     def dialog_response(self, dialog, response_id):
         # Create button
         if response_id == gtk.RESPONSE_OK:
-            self.init()
+            gtklib.idle_add_single_call(self.init)
         # Cancel button or dialog closing by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
             return # close dialog
@@ -110,7 +114,7 @@ class InitDialog(gtk.Dialog):
 
         try:
             hg.repository(u, dest, create=1)
-        except hglib.RepoError, inst:
+        except error.RepoError, inst:
             dialog.error_dialog(self, _('Unable to create new repository'),
                     hglib.toutf(str(inst)))
             return False
@@ -136,10 +140,6 @@ class InitDialog(gtk.Dialog):
                     pass
 
         shlib.shell_notify([dest])
-
-        dialog.info_dialog(self, _('New repository created'),
-                _('in directory %s') % hglib.toutf(os.path.abspath(dest)))
-
         self.response(gtk.RESPONSE_CLOSE)
 
 def run(ui, *pats, **opts):

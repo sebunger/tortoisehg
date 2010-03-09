@@ -10,7 +10,7 @@ import os
 import gtk
 import traceback
 
-from mercurial import hg, ui, util
+from mercurial import hg, ui, util, error
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, settings, i18n
@@ -36,8 +36,8 @@ class TagAddDialog(gtk.Dialog):
         self.repo = repo
 
         # add buttons
-        self.add_button(_('Add'), RESPONSE_ADD)
-        self.add_button(_('Remove'), RESPONSE_REMOVE)
+        self.addbtn = self.add_button(_('Add'), RESPONSE_ADD)
+        self.removebtn = self.add_button(_('Remove'), RESPONSE_REMOVE)
         self.add_button(gtk.STOCK_CLOSE, gtk.RESPONSE_CLOSE)
 
         # persistent settings
@@ -48,19 +48,21 @@ class TagAddDialog(gtk.Dialog):
         self.vbox.pack_start(table, True, True, 2)
 
         ## tag name input
-        self._tagslist = gtk.ListStore(str)
-        self._taglistbox = gtk.ComboBoxEntry(self._tagslist, 0)
-        self._tag_input = self._taglistbox.get_child()
-        self._tag_input.connect('activate',
-                                lambda *a: self.response(RESPONSE_ADD))
-        self._tag_input.set_text(tag)
-        table.add_row(_('Tag:'), self._taglistbox, padding=False)
+        self.tagcombo = gtk.combo_box_entry_new_text()
+        self.tagentry = self.tagcombo.get_child()
+        self.tagentry.set_text(hglib.toutf(tag))
+        self.tagcombo.connect('changed', self.combo_changed)
+        self.tagentry.connect('activate',
+                              lambda *a: self.response(RESPONSE_ADD))
+        table.add_row(_('Tag:'), self.tagcombo, padding=False)
 
         ## revision input
-        self._rev_input = gtk.Entry()
-        self._rev_input.set_width_chars(12)
-        self._rev_input.set_text(rev)
-        table.add_row(_('Revision:'), self._rev_input)
+        self.reventry = gtk.Entry()
+        self.reventry.set_width_chars(12)
+        self.reventry.set_text(rev)
+        self.reventry.connect('notify::text',
+                                lambda *a: self.update_sensitives())
+        table.add_row(_('Revision:'), self.reventry)
         
         # advanced options expander
         self.expander = gtk.Expander(_('Advanced options'))
@@ -71,80 +73,126 @@ class TagAddDialog(gtk.Dialog):
         self.expander.add(table)
 
         ## tagging options
-        self._local_tag = gtk.CheckButton(_('Tag is local'))
-        self._local_tag.connect('toggled', self.local_tag_toggled)
-        self._replace_tag = gtk.CheckButton(_('Replace existing tag'))
-        self._eng_msg = gtk.CheckButton(_('Use English commit message'))
-        table.add_row(self._local_tag)
-        table.add_row(self._replace_tag)
-        table.add_row(self._eng_msg)
+        self.localchk = gtk.CheckButton(_('Tag is local'))
+        self.localchk.connect('toggled', self.local_tag_toggled)
+        self.replacechk = gtk.CheckButton(_('Replace existing tag'))
+        self.replacechk.connect('toggled',
+                                  lambda *a: self.update_sensitives())
+        self.engchk = gtk.CheckButton(_('Use English commit message'))
+        table.add_row(self.localchk)
+        table.add_row(self.replacechk)
+        table.add_row(self.engchk)
 
         ## custom commit message
-        self._use_msg = gtk.CheckButton(_('Use custom commit message:'))
-        self._use_msg.connect('toggled', self.msg_toggled)
-        self._commit_message = gtk.Entry()
-        self._commit_message.set_sensitive(False)
-        table.add_row(self._use_msg)
-        table.add_row(self._commit_message, padding=False)
+        self.customchk = gtk.CheckButton(_('Use custom commit message:'))
+        self.customchk.connect('toggled', self.msg_toggled)
+        self.msgentry = gtk.Entry()
+        self.msgentry.set_sensitive(False)
+        table.add_row(self.customchk)
+        table.add_row(self.msgentry, padding=False)
 
         # prepare to show
         self.load_settings()
-        self._refresh(clear=False)
-        self._taglistbox.grab_focus()
+        self.update_tagcombo(clear=False)
+        self.update_sensitives(True)
+        self.tagentry.grab_focus()
 
-    def _refresh(self, clear=True):
+    def update_tagcombo(self, clear=True):
         """ update display on dialog with recent repo data """
         self.repo.invalidate()
-        self._tagslist.clear()
+        self.tagcombo.get_model().clear()
 
         # add tags to drop-down list
-        tags = [x[0] for x in self.repo.tagslist()]
+        tags = list(self.repo.tags())
         tags.sort()
-        for tagname in tags:
-            if tagname == 'tip':
+        tags.reverse()
+        for tag in tags:
+            if tag == 'tip':
                 continue
-            self._tagslist.append([tagname])
+            self.tagcombo.append_text(hglib.toutf(tag))
 
         # clear tag input
         if clear:
-            self._tag_input.set_text('')
+            self.tagentry.set_text('')
+
+    def update_revision(self):
+        """ update revision entry based on tag """
+        tagmap = self.repo.tags()
+        tag = self.tagentry.get_text()
+        if not tag or hglib.fromutf(tag) not in tagmap:
+            return
+
+        node = tagmap[hglib.fromutf(tag)]
+        ctx = self.repo[node]
+        self.reventry.set_text(str(ctx.rev()))
+
+    def update_sensitives(self, affectlocal=False):
+        """ update bottom button sensitives based on rev and tag """
+        rev = self.reventry.get_text()
+        tag = self.tagentry.get_text()
+        if not rev or not tag:
+            self.addbtn.set_sensitive(False)
+            self.removebtn.set_sensitive(False)
+            return
+
+        # check if valid revision
+        try:
+            self.repo[hglib.fromutf(rev)]
+        except (error.LookupError, error.RepoLookupError, error.RepoError):
+            self.addbtn.set_sensitive(False)
+            self.removebtn.set_sensitive(False)
+            return
+        # check tag existence
+        force = self.replacechk.get_active()
+        is_exist = hglib.fromutf(tag) in self.repo.tags()
+        self.addbtn.set_sensitive(not is_exist or force)
+        self.removebtn.set_sensitive(is_exist)
+
+        # check if local
+        is_local = self.repo.tagtype(hglib.fromutf(tag))
+        if affectlocal and is_local is not None:
+            self.localchk.set_active(is_local == 'local')
 
     def load_settings(self):
         expanded = self.settings.get_value('expanded', False, True)
         self.expander.set_property('expanded', expanded)
 
         checked = self.settings.get_value('english', False, True)
-        self._eng_msg.set_active(checked)
+        self.engchk.set_active(checked)
 
     def store_settings(self):
         expanded = self.expander.get_property('expanded')
         self.settings.set_value('expanded', expanded)
 
-        checked = self._eng_msg.get_active()
+        checked = self.engchk.get_active()
         self.settings.set_value('english', checked)
 
         self.settings.write()
 
     def local_tag_toggled(self, checkbutton):
         local_tag_st = checkbutton.get_active()
-        self._eng_msg.set_sensitive(not local_tag_st)
-        self._use_msg.set_sensitive(not local_tag_st)
-        use_msg_st = self._use_msg.get_active()
-        self._commit_message.set_sensitive(not local_tag_st and use_msg_st)
+        self.engchk.set_sensitive(not local_tag_st)
+        self.customchk.set_sensitive(not local_tag_st)
+        use_msg_st = self.customchk.get_active()
+        self.msgentry.set_sensitive(not local_tag_st and use_msg_st)
 
     def msg_toggled(self, checkbutton):
         state = checkbutton.get_active()
-        self._commit_message.set_sensitive(state)
+        self.msgentry.set_sensitive(state)
         if state:
-            self._commit_message.grab_focus()
+            self.msgentry.grab_focus()
+
+    def combo_changed(self, combo):
+        self.update_revision()
+        self.update_sensitives(True)
 
     def dialog_response(self, dialog, response_id):
         # Add button
         if response_id == RESPONSE_ADD:
-            self._do_add_tag()
+            self.add_tag()
         # Remove button
         elif response_id == RESPONSE_REMOVE:
-            self._do_remove_tag()
+            self.remove_tag()
         # Close button or closed by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
             self.store_settings()
@@ -155,35 +203,35 @@ class TagAddDialog(gtk.Dialog):
 
         self.run() # don't close dialog
 
-    def _do_add_tag(self):
+    def add_tag(self):
         # gather input data
-        is_local = self._local_tag.get_active()
-        name = self._tag_input.get_text()
-        rev = self._rev_input.get_text()
-        force = self._replace_tag.get_active()
-        eng_msg = self._eng_msg.get_active()
-        use_msg = self._use_msg.get_active()
-        message = self._commit_message.get_text()
+        is_local = self.localchk.get_active()
+        name = self.tagentry.get_text()
+        rev = self.reventry.get_text()
+        force = self.replacechk.get_active()
+        eng_msg = self.engchk.get_active()
+        use_msg = self.customchk.get_active()
+        message = self.msgentry.get_text()
 
         # verify input
         if name == '':
             dialog.error_dialog(self, _('Tag input is empty'),
                          _('Please enter tag name'))
-            self._tag_input.grab_focus()
+            self.tagentry.grab_focus()
             return False
         if use_msg and not message:
             dialog.error_dialog(self, _('Custom commit message is empty'),
                          _('Please enter commit message'))
-            self._commit_message.grab_focus()
+            self.msgentry.grab_focus()
             return False
 
         # add tag to repo
         try:
-            self._add_hg_tag(name, rev, message, is_local, force=force,
+            self.add_hg_tag(name, rev, message, is_local, force=force,
                             english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been added') % name)
-            self._refresh()
+            self.update_tagcombo()
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error in tagging'), str(inst))
             return False
@@ -192,30 +240,30 @@ class TagAddDialog(gtk.Dialog):
                     traceback.format_exc())
             return False
 
-    def _do_remove_tag(self):
+    def remove_tag(self):
         # gather input data
-        is_local = self._local_tag.get_active()
-        name = self._tag_input.get_text()
-        eng_msg = self._eng_msg.get_active()
-        use_msg = self._use_msg.get_active()
+        is_local = self.localchk.get_active()
+        name = self.tagentry.get_text()
+        eng_msg = self.engchk.get_active()
+        use_msg = self.customchk.get_active()
 
         # verify input
         if name == '':
             dialog.error_dialog(self, _('Tag name is empty'),
                          _('Please select tag name to remove'))
-            self._tag_input.grab_focus()
+            self.tagentry.grab_focus()
             return False
 
         if use_msg:
-            message = self._commit_message.get_text()
+            message = self.msgentry.get_text()
         else:
             message = ''
 
         try:
-            self._remove_hg_tag(name, message, is_local, english=eng_msg)
+            self.remove_hg_tag(name, message, is_local, english=eng_msg)
             dialog.info_dialog(self, _('Tagging completed'),
                               _('Tag "%s" has been removed') % name)
-            self._refresh()
+            self.update_tagcombo()
         except util.Abort, inst:
             dialog.error_dialog(self, _('Error in tagging'), str(inst))
             return False
@@ -224,10 +272,9 @@ class TagAddDialog(gtk.Dialog):
                     traceback.format_exc())
             return False
 
-
-    def _add_hg_tag(self, name, revision, message, local, user=None,
+    def add_hg_tag(self, name, revision, message, local, user=None,
                     date=None, force=False, english=False):
-        if name in self.repo.tags() and not force:
+        if hglib.fromutf(name) in self.repo.tags() and not force:
             raise util.Abort(_('a tag named "%s" already exists') % name)
 
         ctx = self.repo[revision]
@@ -240,15 +287,25 @@ class TagAddDialog(gtk.Dialog):
         if name in self.repo.tags() and not force:
             raise util.Abort(_("Tag '%s' already exist") % name)
 
-        self.repo.tag(name, r, hglib.fromutf(message), local, user, date)
+        lname = hglib.fromutf(name)
+        self.repo.tag(lname, r, hglib.fromutf(message), local, user, date)
 
-    def _remove_hg_tag(self, name, message, local, user=None, date=None,
+    def remove_hg_tag(self, name, message, local, user=None, date=None,
                     english=False):
-        if not name in self.repo.tags():
-            raise util.Abort(_("Tag '%s' does not exist") % name)
+        lname = hglib.fromutf(name)
+
+        tagtype = self.repo.tagtype(lname)
+        if not tagtype:
+            raise util.Abort(_('tag \'%s\' does not exist') % lname)
+        if local:
+            if tagtype != 'local':
+                raise util.Abort(_('tag \'%s\' is not a local tag') % lname)
+        else:
+            if tagtype != 'global':
+                raise util.Abort(_('tag \'%s\' is not a global tag') % lname)
 
         if not message:
             msgset = keep._('Removed tag %s')
             message = (english and msgset['id'] or msgset['str']) % name
         r = self.repo[-1].node()
-        self.repo.tag(name, r, message, local, user, date)
+        self.repo.tag(lname, r, hglib.fromutf(message), local, user, date)

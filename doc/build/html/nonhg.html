@@ -1,0 +1,261 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>9. Use with other VCS systems &mdash; TortoiseHg v1.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0.0',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="TortoiseHg v1.0.0 documentation" href="index.html" />
+    <link rel="next" title="10. Frequently Asked Questions" href="faq.html" />
+    <link rel="prev" title="8. Extensions" href="extensions.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="10. Frequently Asked Questions"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="extensions.html" title="8. Extensions"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-nonhg">
+<h1>9. Use with other VCS systems<a class="headerlink" href="#module-nonhg" title="Permalink to this headline">¶</a></h1>
+<p>This chapter describes the three most popular Mercurial extensions for
+interoperating with <em>foreign</em> VCS systems.  See also <a class="reference external" href="http://mercurial.selenic.com/wiki/RepositoryConversion">Repository
+Conversion</a></p>
+<div class="section" id="perfarce-perforce">
+<h2>9.1. Perfarce (Perforce)<a class="headerlink" href="#perfarce-perforce" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://www.kingswood-consulting.co.uk/hg/perfarce/">Perfarce</a> home page.</li>
+<li><a class="reference external" href="http://mercurial.selenic.com/wiki/PerforceConcepts">Mercurial for Perforce users</a></li>
+</ul>
+<p>This extension modifies the remote repository handling so that repository
+paths that resemble:</p>
+<div class="highlight-python"><pre>p4://p4server[:port]/clientname</pre>
+</div>
+<p>cause operations on the named p4 client specification on the p4 server.
+The client specification must already exist on the server before using
+this extension. Making changes to the client specification Views causes
+problems when synchronizing the repositories, and should be avoided.</p>
+<p>Five built-in Mercurial commands are overridden.</p>
+<p>outgoing:</p>
+<div class="highlight-python"><pre>If the destination repository name starts with p4:// then this
+reports files affected by the revision(s) that are in the local
+repository but not in the p4 depot.</pre>
+</div>
+<p>push:</p>
+<div class="highlight-python"><pre>If the destination repository name starts with p4:// then this
+exports changes from the local repository to the p4 depot. If no
+revision is specified then all changes since the last p4 changelist
+are pushed. In either case, all revisions to be pushed are foled
+into a single p4 changelist.  Optionally the resulting changelist is
+submitted to the p4 server, controlled by the --submit option to
+push, or by setting **perfarce.submit** to True.  If the option
+**perfarce.keep** is False then after a successful submit the files
+in the p4 workarea will be deleted.</pre>
+</div>
+<p>pull:</p>
+<div class="highlight-python"><pre>If the source repository name starts with p4:// then this imports
+changes from the p4 depot, automatically creating merges of
+changelists submitted by hg push.  If the config option
+**perfarce.keep** is False then the import does not leave files in
+the p4 workarea, otherwise the p4 workarea will be updated with the
+new files.</pre>
+</div>
+<p>incoming:</p>
+<div class="highlight-python"><pre>If the source repository name starts with p4:// then this
+reports changes in the p4 depot that are not yet in the local
+repository.</pre>
+</div>
+<p>clone:</p>
+<div class="highlight-python"><pre>If the source repository name starts with p4:// then this
+creates the destination repository and pulls all changes from
+the p4 depot into it.</pre>
+</div>
+<p><em>TortoiseHg Integration</em></p>
+<p>When the perfarce extension is enabled, it adds a <strong>start revision</strong>
+configurable option to the clone tool, and a <strong>Perforce</strong> menu
+to the Repository Explorer.  The menu has two items:</p>
+<p>identity:</p>
+<div class="highlight-python"><pre>Finds the tip Perforce changelist in your local repository and
+selects it in the changelog window.</pre>
+</div>
+<p>pending:</p>
+<div class="highlight-python"><pre>Detects pending Perforce changelists that have been "push"ed to your
+Perforce client but have not been submitted, or have not been pulled
+back.  This opens the pending changelist dialog so that you can view
+these pending changelists and either submit or revert them.</pre>
+</div>
+<p><em>Installation</em></p>
+<p>Perfarce comes bundled with TortoiseHg 1.0 Windows installers, so you
+enable perfarce by simply adding it to your Mercurial.ini or a
+repository&#8217;s hgrc like this:</p>
+<div class="highlight-python"><pre>[extensions]
+perfarce=</pre>
+</div>
+</div>
+<div class="section" id="hgsubversion-svn">
+<h2>9.2. hgsubversion (SVN)<a class="headerlink" href="#hgsubversion-svn" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://bitbucket.org/durin42/hgsubversion/wiki/Home">hgsubversion</a> home page</li>
+<li><a class="reference external" href="http://mercurial.selenic.com/wiki/HgSubversion">hgsubversion Extension</a> wiki page</li>
+<li><a class="reference external" href="http://mercurial.selenic.com/wiki/WorkingWithSubversion">Working with Subversion Repositories</a></li>
+</ul>
+<p>hgsubversion, as it&#8217;s name implies, allows you to use Mercurial as a
+client to a Subversion server.  It can also be used to do straight
+conversions of Subversion repositories into Mercurial.</p>
+<p><em>Installation</em></p>
+<p>TortoiseHg Windows installers come with the python-svn bindings that
+hgsubversion requires, so one only needs to clone the hgsubversion
+repository to your local computer:</p>
+<div class="highlight-python"><pre>hg clone http://bitbucket.org/durin42/hgsubversion/ C:\hgsvn</pre>
+</div>
+<p>Then enable the extension in your Mercurial.ini file, specifying the
+hgsubversion folder inside the cloned repository:</p>
+<div class="highlight-python"><pre>[extensions]
+hgsubversion = C:\hgsvn\hgsubversion</pre>
+</div>
+<p>You can verify that worked by typing <strong>hg help hgsubversion</strong></p>
+<p>See the hgsubversion wiki for details of use.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">When doing a clone of a Subversion server, it is highly recommended
+to clone only the first few revisions, then pull the rest.  Clone&#8217;s
+failure behavior is to delete the entire incomplete cloned
+repository.  Pull is much more forgiving.</p>
+</div>
+<p><em>TortoiseHg Integration</em></p>
+<p>Imported Subversion changesets will display the original Subversion
+checkin number in the Repository Explorer browser.</p>
+</div>
+<div class="section" id="hg-git-git">
+<h2>9.3. hg-git (git)<a class="headerlink" href="#hg-git-git" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><a class="reference external" href="http://hg-git.github.com/">hg-git</a> home page</li>
+<li><a class="reference external" href="http://mercurial.selenic.com/wiki/HgGit">hg-git Extension</a> wiki page</li>
+<li><a class="reference external" href="http://mercurial.selenic.com/wiki/GitConcepts">Mercurial for Git users</a></li>
+</ul>
+<p>hg-git, as it&#8217;s name implies, allows you to use Mercurial as a
+client to a git server.  It can also be used to do straight conversions
+of Git repositories into Mercurial.</p>
+<p><em>Installation</em></p>
+<p>TortoiseHg Windows installers come with the python-git bindings (named
+dulwich) that hg-git requires, so one only needs to clone the
+hg-git repository to your local computer:</p>
+<div class="highlight-python"><pre>hg clone http://bitbucket.org/durin42/hg-git/ C:\hg-git</pre>
+</div>
+<p>Then enable hggit and bookmarks in your Mercurial.ini file:</p>
+<div class="highlight-python"><pre>[extensions]
+bookmarks =
+hggit = C:\hg-git\hggit</pre>
+</div>
+<p>You can verify that worked by typing <strong>hg help hggit</strong></p>
+<p>See the hggit documentation for details of use.</p>
+<p>Beware the &#8216;incoming&#8217; command appears broken when speaking with git
+repositories, and &#8216;outgoing&#8217; does not show much useful info. So you are
+restricted to simple push and pull commands (not uncommon for extensions
+that speak with external revision control tools).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/thg_logo_92x50.png" alt="Logo"/>
+            </a></p>
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="">9. Use with other VCS systems</a><ul>
+<li><a class="reference external" href="#perfarce-perforce">9.1. Perfarce (Perforce)</a></li>
+<li><a class="reference external" href="#hgsubversion-svn">9.2. hgsubversion (SVN)</a></li>
+<li><a class="reference external" href="#hg-git-git">9.3. hg-git (git)</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="extensions.html"
+                                  title="previous chapter">8. Extensions</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="faq.html"
+                                  title="next chapter">10. Frequently Asked Questions</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/nonhg.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="faq.html" title="10. Frequently Asked Questions"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="extensions.html" title="8. Extensions"
+             >previous</a> |</li>
+        <li><a href="index.html">TortoiseHg v1.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Steve Borho and others.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.2.
+    </div>
+  </body>
+</html>
