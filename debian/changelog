@@ -1,12 +1,15 @@
 tortoisehg (1.0-1) UNRELEASED; urgency=low
 
+  [ Max Bowsher ]
   * New upstream release.
   * Drop disable-stdout-redirect.patch, included in this version.
   * Drop python-sphinx build-dep, use upstream's pre-built docs, which are now
     present in the tarball again.
-  * XXX: Shall we install contrib/mergetools.rc ?
 
- -- Max Bowsher <maxb@f2s.com>  Tue, 09 Mar 2010 10:03:03 +0000
+  [ Ludovico Cavedon ]
+  * Install contrib/mergetools.rc as /etc/mercurial/hgrc.d/thg-mergetools.rc.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Tue, 09 Mar 2010 11:42:12 +0100
 
 tortoisehg (0.9.3-2) unstable; urgency=low
 
