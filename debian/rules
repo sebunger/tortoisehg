@@ -22,7 +22,7 @@ debian/hgtk.1: debian/hgtk.1.xml
 
 install/tortoisehg::
 	mkdir -p debian/tmp/etc/mercurial/hgrc.d/
-	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thg-mergetools.rc
+	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thgmergetools.rc
 
 binary-post-install/tortoisehg::
 	ln -sf ../../../../javascript/jquery/jquery.js \
