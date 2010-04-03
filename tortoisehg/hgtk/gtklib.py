@@ -168,6 +168,7 @@ def open_with_editor(ui, file, parent=None):
             ui.config('ui', 'editor') or
             os.environ.get('EDITOR', 'vi'))
     if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
+        from tortoisehg.hgtk import gdialog
         gdialog.Prompt(_('No visual editor configured'),
                _('Please configure a visual editor.'), parent).run()
         return False
@@ -766,20 +767,26 @@ def create_menuitem(label, handler=None, icon=None, *args, **kargs):
     check: toggle or selection state for check/radio menu item.
            Default: False.
     sensitive: sensitive state on init. Default: True.
+    use_underline: handle underline as accelerator key prefix.
+                   Default: True.
     args: an argument list for 'handler' parameter.
           Default: [] (an empty list).
     """
+    use_underline = kargs.get('use_underline', True)
+    if gtk.gtk_version < (2, 14, 0) and not use_underline:
+       # workaround (set_use_underline not available on gtk < 2.14)
+       label = label.replace('_', '__')
     if kargs.get('asradio') or kargs.get('ascheck'):
         if kargs.get('asradio'):
-            menu = gtk.RadioMenuItem(kargs.get('group'), label)
+            menu = gtk.RadioMenuItem(kargs.get('group'), label, use_underline=use_underline)
         else:
-            menu = gtk.CheckMenuItem(label)
+            menu = gtk.CheckMenuItem(label, use_underline=use_underline)
         menu.set_active(kargs.get('check', False))
     elif icon:
         menu = gtk.ImageMenuItem(label)
         menu.set_image(get_icon_image(icon))
     else:
-        menu = gtk.MenuItem(label, True)
+        menu = gtk.MenuItem(label, use_underline=use_underline)
     if handler:
         args = kargs.get('args', [])
         menu.connect('activate', handler, *args)

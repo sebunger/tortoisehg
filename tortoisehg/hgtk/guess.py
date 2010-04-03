@@ -271,7 +271,10 @@ class DetectRenameDialog(gtk.Window):
         thread = thread2.Thread(target=self.search_thread, args=(q, tgts))
         thread.start()
         self.stbar.begin()
-        self.stbar.set_text(_('finding source of ') + ', '.join(tgts))
+        text = _('finding source of ') + ', '.join(tgts)
+        if len(text) > 60:
+            text = text[:60]+'...'
+        self.stbar.set_text(text)
         gobject.timeout_add(50, self.search_wait, thread, q)
 
     def search_thread(self, q, tgts):
@@ -307,9 +310,10 @@ class DetectRenameDialog(gtk.Window):
 
     def search_wait(self, thread, q):
         canmodel = self.cantree.get_model()
-        while q.qsize():
+        while canmodel and q.qsize():
             source, dest, sim = q.get(0)
-            canmodel.append( [source, hglib.toutf(source), dest, hglib.toutf(dest), sim, True] )
+            canmodel.append( [source, hglib.toutf(source), dest,
+                              hglib.toutf(dest), sim, True] )
         if thread.isAlive():
             return True
         else:

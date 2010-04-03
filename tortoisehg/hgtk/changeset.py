@@ -145,10 +145,10 @@ class ChangeSet(gdialog.GWindow):
             gview = self.graphview
             if oldother:
                 gview.model.clear_parents()
+                gview.queue_draw()
             elif self.otherparent:
                 gview.model.set_parent(ctx.rev(), parent)
-            gview.hide()
-            gview.show()
+                gview.queue_draw()
 
         # update dialog title
         self.set_title(title)
@@ -295,7 +295,7 @@ class ChangeSet(gdialog.GWindow):
         self.issuedict.clear()
         for m in self.bodyre.finditer(desc):
             a, b = m.span()
-            if a > pos:
+            if a >= pos:
                 buf.insert(eob, desc[pos:a])
                 pos = b
             groups = m.groups()
@@ -1007,7 +1007,7 @@ class ChangeSet(gdialog.GWindow):
                  (self.curfile, rev))
         if dialog.run() == gtk.RESPONSE_NO:
             return
-        cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), self.curfile]
+        cmdline = ['hg', 'revert', '--verbose', '--rev', str(rev), '--', self.curfile]
         dlg = hgcmd.CmdDialog(cmdline)
         dlg.run()
         dlg.hide()

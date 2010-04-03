@@ -11,7 +11,7 @@ import shlex
 import time
 import inspect
 
-from mercurial import ui, util, extensions, match, bundlerepo, url
+from mercurial import ui, util, extensions, match, bundlerepo, url, cmdutil
 from mercurial import dispatch, encoding, templatefilters, filemerge
 
 _encoding = encoding.encoding
@@ -107,9 +107,17 @@ def getlivebranch(repo):
     '''return a list of live branch names in UTF-8'''
     lives = []
     deads = getdeadbranch(repo.ui)
-    for branch in repo.branchtags().keys(): # encoded in UTF-8
-        if branch not in deads:
-            lives.append(branch.replace('\0', ''))
+    cl = repo.changelog
+    for branch, heads in repo.branchmap().iteritems():
+        # branch encoded in UTF-8
+        if branch in deads:
+            # ignore branch names in tortoisehg.deadbranch
+            continue
+        bheads = [h for h in heads if ('close' not in cl.read(h)[5])]
+        if not bheads:
+            # ignore branches with all heads closed
+            continue
+        lives.append(branch.replace('\0', ''))
     return lives
 
 _hidetags = None
@@ -452,3 +460,17 @@ def is_descriptor(obj, attr):
             return hasattr(cls.__dict__[attr], '__get__')
     return None
     
+def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
+           opts=None):
+    '''
+    export changesets as hg patches.
+    
+    Mercurial moved patch.export to cmdutil.export after version 1.5
+    (change e764f24a45ee in mercurial).
+    '''   
+
+    try:
+        return cmdutil.export(repo, revs, template, fp, switch_parent, opts)
+    except AttributeError:
+        from mercurial import patch
+        return patch.export(repo, revs, template, fp, switch_parent, opts)

@@ -1,150 +1,150 @@
-# Polish translation for tortoisehg
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Hungarian translation for tortoisehg
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
 # This file is distributed under the same license as the tortoisehg package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2010-02-22 23:55+0000\n"
-"PO-Revision-Date: 2010-03-05 16:13+0000\n"
-"Last-Translator: Amfidiusz <Unknown>\n"
-"Language-Team: Polish <pl@li.org>\n"
+"PO-Revision-Date: 2010-03-07 18:25+0000\n"
+"Last-Translator: Blackman21 <Unknown>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-03-06 05:13+0000\n"
+"X-Launchpad-Export-Date: 2010-03-08 05:40+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: thgtaskbar.py:36
 msgid "TortoiseHg Overlay Icon Server"
-msgstr ""
+msgstr "TortoiseHg Overlay Icon Server"
 
 #: thgtaskbar.py:117
 msgid "Exit"
-msgstr "Zakończ"
+msgstr "Kilépés"
 
 #: tortoisehg\hgtk\about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr ""
+msgstr "Néhány ikon a TortoiseSVN projekt jóvoltából"
 
 #: tortoisehg\hgtk\about.py:70
 msgid "A new version of TortoiseHg is ready for download!"
-msgstr "Nowa wersja TortoiseHG jest dostępna do pobrania!"
+msgstr "A TortoiseHG új verziója letölthető!"
 
 #: tortoisehg\hgtk\about.py:76
 msgid "(version %s)"
-msgstr "(wersja %s)"
+msgstr "verzió %s"
 
 #: tortoisehg\hgtk\about.py:79
 msgid "Copyright 2008-2010 Steve Borho and others"
-msgstr ""
+msgstr "Szerzői jog 2008-2010 Steve Borho és mások"
 
 #: tortoisehg\hgtk\about.py:95
 msgid "with %s"
-msgstr "z %s"
+msgstr "%s -al"
 
 #: tortoisehg\hgtk\archive.py:18
 msgid "= Working Directory Parent ="
-msgstr ""
+msgstr "Munkakönyvtár szülője"
 
 #: tortoisehg\hgtk\archive.py:29
 msgid "Archive - %s"
-msgstr "Archiwum - %s"
+msgstr "Archív %s"
 
 #: tortoisehg\hgtk\archive.py:59
 msgid "Archive revision:"
-msgstr "Wersje archiwalne:"
+msgstr "Archív revízió:"
 
 #: tortoisehg\hgtk\archive.py:65 tortoisehg\hgtk\clone.py:70
 #: tortoisehg\hgtk\hginit.py:54 tortoisehg\hgtk\thgconfig.py:323
 #: tortoisehg\hgtk\thgimport.py:63
 msgid "Browse..."
-msgstr "Przeglądaj..."
+msgstr "Tallózás…"
 
 #: tortoisehg\hgtk\archive.py:68 tortoisehg\hgtk\clone.py:106
 msgid "Destination path:"
-msgstr ""
+msgstr "Cél útvonal:"
 
 #: tortoisehg\hgtk\archive.py:71
 msgid "Directory of files"
-msgstr ""
+msgstr "Könyvtár fájljai"
 
 #: tortoisehg\hgtk\archive.py:73
 msgid "Archive types:"
-msgstr ""
+msgstr "Archívum típusok:"
 
 #: tortoisehg\hgtk\archive.py:79
 msgid "Uncompressed tar archive"
-msgstr ""
+msgstr "Tömörítettlen tar archívum"
 
 #: tortoisehg\hgtk\archive.py:80
 msgid "Tar archive compressed using bzip2"
-msgstr ""
+msgstr "Tar acrhívum bzip2-vel tömörítve"
 
 #: tortoisehg\hgtk\archive.py:81
 msgid "Tar archive compressed using gzip"
-msgstr ""
+msgstr "Tar archívum gzip-el tömörítve"
 
 #: tortoisehg\hgtk\archive.py:82
 msgid "Uncompressed zip archive"
-msgstr "Rozpakuj archiwum zip"
+msgstr "Tömörítettlen zip fájl"
 
 #: tortoisehg\hgtk\archive.py:83
 msgid "Zip archive compressed using deflate"
-msgstr ""
+msgstr "Zip archívum deflate-el"
 
 #: tortoisehg\hgtk\archive.py:92
 msgid "Archive"
-msgstr ""
+msgstr "Archívum"
 
 #: tortoisehg\hgtk\archive.py:107
 msgid "Archived successfully"
-msgstr ""
+msgstr "Archíválás kész"
 
 #: tortoisehg\hgtk\archive.py:109
 msgid "Canceled archiving"
-msgstr ""
+msgstr "Archíválás megszakítva"
 
 #: tortoisehg\hgtk\archive.py:111
 msgid "Failed to archive"
-msgstr ""
+msgstr "Archíválás sikertelen"
 
 #: tortoisehg\hgtk\archive.py:167
 msgid "Tar archives"
-msgstr "Archiwa tar"
+msgstr "Tar archívum"
 
 #: tortoisehg\hgtk\archive.py:170
 msgid "Bzip2 tar archives"
-msgstr ""
+msgstr "Bzip2 tar archívum"
 
 #: tortoisehg\hgtk\archive.py:173
 msgid "Gzip tar archives"
-msgstr ""
+msgstr "Gzip tar archívum"
 
 #: tortoisehg\hgtk\archive.py:179
 msgid "Compressed zip archives"
-msgstr ""
+msgstr "Tömörített zip arhívum"
 
 #: tortoisehg\hgtk\archive.py:191 tortoisehg\hgtk\clone.py:107
 #: tortoisehg\hgtk\hginit.py:91
 msgid "Select Destination Folder"
-msgstr "Wybierz katalog docelowy"
+msgstr "Célkönyvtár kiválasztása"
 
 #: tortoisehg\hgtk\archive.py:197
 msgid "Select Destination File"
-msgstr ""
+msgstr "Célgájl kiválasztása"
 
 #: tortoisehg\hgtk\archive.py:199
 msgid "All Files (*.*)"
-msgstr ""
+msgstr "Az összes fájl (*.*)"
 
 #: tortoisehg\hgtk\archive.py:209 tortoisehg\hgtk\archive.py:215
 #: tortoisehg\hgtk\gtklib.py:359 tortoisehg\hgtk\thgconfig.py:503
 #: tortoisehg\hgtk\thgconfig.py:931
 msgid "Confirm Overwrite"
-msgstr ""
+msgstr "Felülírás megerősítése"
 
 #: tortoisehg\hgtk\archive.py:210
 msgid ""
@@ -152,6 +152,9 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"A cél \"%s\" létezik!\n"
+"\n"
+"Felül írja?"
 
 #: tortoisehg\hgtk\archive.py:216
 msgid ""
@@ -159,10 +162,13 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"A könyvtár \"%s\" nem üres!\n"
+"\n"
+"Felül írja?"
 
 #: tortoisehg\hgtk\backout.py:28
 msgid "Backout changeset - %s"
-msgstr ""
+msgstr "Megszegett változás halmaz - %s"
 
 #: tortoisehg\hgtk\backout.py:41
 msgid "Backed out changeset: "
@@ -170,11 +176,11 @@ msgstr ""
 
 #: tortoisehg\hgtk\backout.py:46
 msgid "Changeset Description"
-msgstr ""
+msgstr "Változás Ismertető"
 
 #: tortoisehg\hgtk\backout.py:52
 msgid "Backout commit message"
-msgstr ""
+msgstr "Megszegett jóváhagyási üzenet"
 
 #: tortoisehg\hgtk\backout.py:76
 msgid ""
@@ -184,7 +190,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\backout.py:82
 msgid "Use English backout message"
-msgstr ""
+msgstr "Angol megszegési üzenet használata"
 
 #: tortoisehg\hgtk\backout.py:88
 msgid "Merge with old dirstate parent after backout"
@@ -208,7 +214,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\backout.py:139 tortoisehg\hgtk\commit.py:564
 msgid "Confirm Discard Message"
-msgstr ""
+msgstr "Megszakítási üzenet jóváhagyása"
 
 #: tortoisehg\hgtk\backout.py:140
 msgid "Discard current backout message?"
@@ -216,83 +222,83 @@ msgstr ""
 
 #: tortoisehg\hgtk\bookmark.py:37
 msgid "Bookmark - %s"
-msgstr ""
+msgstr "Könyvjelző - %s"
 
 #: tortoisehg\hgtk\bookmark.py:48 tortoisehg\hgtk\hgignore.py:50
 #: tortoisehg\hgtk\hgignore.py:58 tortoisehg\hgtk\quickop.py:19
 #: tortoisehg\hgtk\tagadd.py:39
 msgid "Add"
-msgstr ""
+msgstr "Hozzáadás"
 
 #: tortoisehg\hgtk\bookmark.py:49 tortoisehg\hgtk\commit.py:252
 #: tortoisehg\hgtk\status.py:163
 msgid "Move"
-msgstr ""
+msgstr "Mozgatás"
 
 #: tortoisehg\hgtk\bookmark.py:50 tortoisehg\hgtk\quickop.py:22
 #: tortoisehg\hgtk\tagadd.py:40
 msgid "Remove"
-msgstr ""
+msgstr "Eltávolítás"
 
 #: tortoisehg\hgtk\bookmark.py:52
 msgid "Rename"
-msgstr ""
+msgstr "Átnevezés"
 
 #: tortoisehg\hgtk\bookmark.py:54
 msgid "Set Current"
-msgstr ""
+msgstr "Aktuális"
 
 #: tortoisehg\hgtk\bookmark.py:56 tortoisehg\hgtk\bookmark.py:182
 #: tortoisehg\hgtk\merge.py:178
 msgid "unexpected type: %s"
-msgstr ""
+msgstr "Váratlan típus: %s"
 
 #: tortoisehg\hgtk\bookmark.py:69
 msgid "Old name:"
-msgstr ""
+msgstr "Régi név:"
 
 #: tortoisehg\hgtk\bookmark.py:71
 msgid "Bookmark:"
-msgstr ""
+msgstr "Könyvjelző:"
 
 #: tortoisehg\hgtk\bookmark.py:83 tortoisehg\hgtk\csinfo.py:198
 #: tortoisehg\hgtk\csinfo.py:199 tortoisehg\hgtk\cslist.py:142
 #: tortoisehg\hgtk\tagadd.py:65
 msgid "Revision:"
-msgstr ""
+msgstr "Változat:"
 
 #: tortoisehg\hgtk\bookmark.py:86
 msgid "New Name:"
-msgstr ""
+msgstr "Új név:"
 
 #: tortoisehg\hgtk\bookmark.py:92
 msgid "Make new/moved bookmark current"
-msgstr ""
+msgstr "Könyvjelző létrehozás/mozgatása az aktuális elemhez"
 
 #: tortoisehg\hgtk\bookmark.py:167 tortoisehg\hgtk\gdialog.py:902
 #: tortoisehg\hgtk\hginit.py:83 tortoisehg\hgtk\tagadd.py:202
 msgid "unexpected response id: %s"
-msgstr ""
+msgstr "nem várt válasz azonosító: %s"
 
 #: tortoisehg\hgtk\bookmark.py:208 tortoisehg\hgtk\bookmark.py:238
 #: tortoisehg\hgtk\bookmark.py:292 tortoisehg\hgtk\bookmark.py:324
 msgid "Bookmark input is empty"
-msgstr ""
+msgstr "Könyvjelző bemenet üres"
 
 #: tortoisehg\hgtk\bookmark.py:209 tortoisehg\hgtk\bookmark.py:239
 #: tortoisehg\hgtk\bookmark.py:293 tortoisehg\hgtk\bookmark.py:325
 msgid "Please enter bookmark name"
-msgstr ""
+msgstr "Kérjük adja meg a könyvjelző nevét"
 
 #: tortoisehg\hgtk\bookmark.py:216 tortoisehg\hgtk\bookmark.py:246
 #: tortoisehg\hgtk\bookmark.py:274 tortoisehg\hgtk\bookmark.py:306
 #: tortoisehg\hgtk\bookmark.py:332
 msgid "Bookmarking completed"
-msgstr ""
+msgstr "Könyvjelzés sikeres"
 
 #: tortoisehg\hgtk\bookmark.py:217
 msgid "Bookmark \"%s\" has been added"
-msgstr ""
+msgstr "\"%s\" Könyvjelző hozzáadva"
 
 #: tortoisehg\hgtk\bookmark.py:224 tortoisehg\hgtk\bookmark.py:227
 #: tortoisehg\hgtk\bookmark.py:254 tortoisehg\hgtk\bookmark.py:257
@@ -300,301 +306,304 @@ msgstr ""
 #: tortoisehg\hgtk\bookmark.py:311 tortoisehg\hgtk\bookmark.py:314
 #: tortoisehg\hgtk\bookmark.py:337 tortoisehg\hgtk\bookmark.py:340
 msgid "Error in bookmarking"
-msgstr ""
+msgstr "Hiba a könyvjelzés közben"
 
 #: tortoisehg\hgtk\bookmark.py:247
 msgid "Bookmark \"%s\" has been moved"
-msgstr ""
+msgstr "\"%s\" könyvjelző mozgatva"
 
 #: tortoisehg\hgtk\bookmark.py:267
 msgid "Bookmark name is empty"
-msgstr ""
+msgstr "Könyvjelző név üres"
 
 #: tortoisehg\hgtk\bookmark.py:268
 msgid "Please select bookmark name to remove"
-msgstr ""
+msgstr "Kérem válassza ki az eltávolítani kívánt könyvjelzőt"
 
 #: tortoisehg\hgtk\bookmark.py:275
 msgid "Bookmark \"%s\" has been removed"
-msgstr ""
+msgstr "\"%s\" könyvjelző eltávolítva"
 
 #: tortoisehg\hgtk\bookmark.py:298
 msgid "Bookmark new name input is empty"
-msgstr ""
+msgstr "Új könyvjelző név üres"
 
 #: tortoisehg\hgtk\bookmark.py:299
 msgid "Please enter new bookmark name"
-msgstr ""
+msgstr "Kérjük adja meg az új könyvjelző nevét"
 
 #: tortoisehg\hgtk\bookmark.py:307
 msgid "Bookmark \"%s\" has been renamed to \"%s\""
-msgstr ""
+msgstr "Könyvjelző \"%s\" átnevezve \"%s\"-re"
 
 #: tortoisehg\hgtk\bookmark.py:333
 msgid "Bookmark \"%s\" has been made current"
-msgstr ""
+msgstr "Aktuális könyvjelző \"%s\""
 
 #: tortoisehg\hgtk\bookmark.py:346 tortoisehg\hgtk\bookmark.py:373
 msgid "a bookmark named \"%s\" already exists"
-msgstr ""
+msgstr "\"%s\" könyvjelző már létezik"
 
 #: tortoisehg\hgtk\bookmark.py:355 tortoisehg\hgtk\bookmark.py:382
 msgid "No bookmark named \"%s\" exists"
-msgstr ""
+msgstr "\"%s\" nevű könyvjelző nem létezik"
 
 #: tortoisehg\hgtk\bookmark.py:364
 msgid "Bookmark '%s' does not exist"
-msgstr ""
+msgstr "Könyvjelző '%s' nem létezik"
 
 #: tortoisehg\hgtk\browse.py:112 tortoisehg\hgtk\quickop.py:100
 #: tortoisehg\hgtk\status.py:134
 msgid "status"
-msgstr ""
+msgstr "státusz"
 
 #: tortoisehg\hgtk\browse.py:136
 msgid "type"
-msgstr ""
+msgstr "típus"
 
 #: tortoisehg\hgtk\browse.py:142 tortoisehg\hgtk\quickop.py:103
 #: tortoisehg\hgtk\status.py:322
 msgid "path"
-msgstr ""
+msgstr "útvonal"
 
 #: tortoisehg\hgtk\browse.py:344 tortoisehg\hgtk\browse.py:346
 msgid "browser"
-msgstr ""
+msgstr "böngésző"
 
 #: tortoisehg\hgtk\bugreport.py:25
 msgid "TortoiseHg Bug Report"
-msgstr ""
+msgstr "TortoiseHG Hiba Jelentés"
 
 #: tortoisehg\hgtk\bugreport.py:45
 msgid "Save as.."
-msgstr ""
+msgstr "Mentés másként..."
 
 #: tortoisehg\hgtk\bugreport.py:48 tortoisehg\hgtk\hgcmd.py:48
 msgid "Close"
-msgstr ""
+msgstr "Bezárás"
 
 #: tortoisehg\hgtk\bugreport.py:57
 msgid ""
 "** Please report this bug to http://bitbucket.org/tortoisehg/stable/issues "
 "or tortoisehg-discuss@lists.sourceforge.net\n"
 msgstr ""
+"** Kérjük jelentse az alábbi hibát az alábbi címek valamelyikére: "
+"http://bitbucket.org/tortoisehg/stable/issues, tortoisehg-"
+"discuss@lists.sourceforge.net\n"
 
 #: tortoisehg\hgtk\bugreport.py:73
 msgid "Save error report to"
-msgstr ""
+msgstr "Hiba mentése"
 
 #: tortoisehg\hgtk\changeset.py:43
 msgid "%s changeset "
-msgstr ""
+msgstr "%s változás halmaz "
 
 #: tortoisehg\hgtk\changeset.py:165 tortoisehg\hgtk\changeset.py:195
 msgid "[All Files]"
-msgstr ""
+msgstr "[Minden Fájl]"
 
 #: tortoisehg\hgtk\changeset.py:230
 msgid "unknown hunk type: %s"
-msgstr ""
+msgstr "ismeretlen púp: %s"
 
 #: tortoisehg\hgtk\changeset.py:329
 msgid " %s is larger than the specified max diff size"
-msgstr ""
+msgstr " %s nagyobb, mint a megengedett maximális különbség méret"
 
 #: tortoisehg\hgtk\changeset.py:338
 msgid "Repository Error:  %s, refresh suggested"
-msgstr ""
+msgstr "Adattár hiba: %s, frissítés javasolt"
 
 #: tortoisehg\hgtk\changeset.py:385
 msgid "[no hunks to display]"
-msgstr ""
+msgstr "[nincsenek megjeleníthető púpok]"
 
 #: tortoisehg\hgtk\changeset.py:440 tortoisehg\hgtk\status.py:1655
 msgid "_Visual Diff"
-msgstr ""
+msgstr "_Vizuális különbség"
 
 #: tortoisehg\hgtk\changeset.py:442
 msgid "Diff to _local"
-msgstr ""
+msgstr "Különbség a _helyihez képest"
 
 #: tortoisehg\hgtk\changeset.py:444
 msgid "_View at Revision"
-msgstr ""
+msgstr "Revízió Nézése"
 
 #: tortoisehg\hgtk\changeset.py:445
 msgid "_Save at Revision..."
-msgstr ""
+msgstr "Revízióhoz Menté_s"
 
 #: tortoisehg\hgtk\changeset.py:448 tortoisehg\hgtk\datamine.py:147
 #: tortoisehg\hgtk\datamine.py:162
 msgid "_File History"
-msgstr ""
+msgstr "_Fájl története"
 
 #: tortoisehg\hgtk\changeset.py:449 tortoisehg\hgtk\datamine.py:146
 msgid "_Annotate File"
-msgstr ""
+msgstr "File _Címkézése"
 
 #: tortoisehg\hgtk\changeset.py:452
 msgid "_Revert File Contents"
-msgstr ""
+msgstr "File _Visszaállítása"
 
 #: tortoisehg\hgtk\changeset.py:536
 msgid "Changeset:"
-msgstr ""
+msgstr "Változás:"
 
 #: tortoisehg\hgtk\changeset.py:538 tortoisehg\hgtk\update.py:90
 msgid "Parent:"
-msgstr ""
+msgstr "Szülő:"
 
 #: tortoisehg\hgtk\changeset.py:540
 msgid "Child:"
-msgstr ""
+msgstr "Gyerek:"
 
 #: tortoisehg\hgtk\changeset.py:542 tortoisehg\hgtk\cslist.py:143
 msgid "Patch:"
-msgstr ""
+msgstr "Javítás:"
 
 #: tortoisehg\hgtk\changeset.py:739
 msgid "Diff to second Parent"
-msgstr ""
+msgstr "Különbség a második szülőhöz képest"
 
 #: tortoisehg\hgtk\changeset.py:915
 msgid "Save file to"
-msgstr ""
+msgstr "Fájlba mentés"
 
 #: tortoisehg\hgtk\changeset.py:925
 msgid "Unable to save file"
-msgstr ""
+msgstr "A file nem menthető"
 
 #: tortoisehg\hgtk\changeset.py:997
 msgid "Confirm revert file to old revision"
-msgstr ""
+msgstr "Visszaállított fájl jóváhagyása a régi verzióhoz"
 
 #: tortoisehg\hgtk\changeset.py:998
 msgid "Revert %s to contents at revision %d?"
-msgstr ""
+msgstr "Visszaállított %s tartalom a %d verzióban"
 
 #: tortoisehg\hgtk\changeset.py:1011
 msgid "Enable _Wordwrap"
-msgstr ""
+msgstr "_Sortörés engedélyezése"
 
 #: tortoisehg\hgtk\clone.py:37
 msgid "TortoiseHg Clone"
-msgstr ""
+msgstr "TortoiseHg Klón"
 
 #: tortoisehg\hgtk\clone.py:75
 msgid "Bundle..."
-msgstr ""
+msgstr "Csomag..."
 
 #: tortoisehg\hgtk\clone.py:77
 msgid "Select a Mercurial Bundle"
-msgstr ""
+msgstr "Válasszon Mercurial csomagot"
 
 #: tortoisehg\hgtk\clone.py:90
 msgid "Source path:"
-msgstr ""
+msgstr "Forrás elérési útvonala:"
 
 #: tortoisehg\hgtk\clone.py:91
 msgid "Select Source Folder"
-msgstr ""
+msgstr "Válasszon forrás könyvtárt"
 
 #: tortoisehg\hgtk\clone.py:117 tortoisehg\hgtk\tagadd.py:68
 msgid "Advanced options"
-msgstr ""
+msgstr "Speciális beállítások"
 
 #: tortoisehg\hgtk\clone.py:127
 msgid "Clone to revision:"
-msgstr ""
+msgstr "Klón a verzióhoz:"
 
 #: tortoisehg\hgtk\clone.py:135
 msgid "Starting P4 Changelist:"
-msgstr ""
+msgstr "P4 Változáslista indítása"
 
 #: tortoisehg\hgtk\clone.py:141
 msgid "Do not update the new working directory"
-msgstr ""
+msgstr "Ne updatelje meg az új munkakönyvtárat"
 
 #: tortoisehg\hgtk\clone.py:142
 msgid "Use pull protocol to copy metadata"
-msgstr ""
+msgstr "Pull protokol alkalmazása a metaadatok másolásához"
 
 #: tortoisehg\hgtk\clone.py:143
 msgid "Use uncompressed transfer"
-msgstr ""
+msgstr "Tömörítettlen adatátvitel használata"
 
 #: tortoisehg\hgtk\clone.py:149 tortoisehg\hgtk\history.py:402
 #: tortoisehg\hgtk\synch.py:183
 msgid "Use proxy server"
-msgstr ""
+msgstr "Proxy kiszolgáló használata"
 
 #: tortoisehg\hgtk\clone.py:159 tortoisehg\hgtk\synch.py:204
 msgid "Remote command:"
-msgstr ""
+msgstr "Távoli parancs:"
 
 #: tortoisehg\hgtk\clone.py:165
 msgid "Clone"
-msgstr ""
+msgstr "Klón"
 
 #: tortoisehg\hgtk\clone.py:187
 msgid "Cloned successfully"
-msgstr ""
+msgstr "Klónozás sikeres"
 
 #: tortoisehg\hgtk\clone.py:189 tortoisehg\hgtk\update.py:151
 msgid "Canceled updating"
-msgstr ""
+msgstr "Frissítés megszakítva"
 
 #: tortoisehg\hgtk\clone.py:191
 msgid "Failed to clone"
-msgstr ""
+msgstr "Klónozás sikertelen"
 
 #: tortoisehg\hgtk\clone.py:220
 msgid "Mercurial bundles"
-msgstr ""
+msgstr "Mercurial csomagok"
 
 #: tortoisehg\hgtk\clone.py:282
 msgid "Source path is empty"
-msgstr ""
+msgstr "Forrás útvonal üres"
 
 #: tortoisehg\hgtk\clone.py:283
 msgid "Please enter a valid source path"
-msgstr ""
+msgstr "Kérjük adjon meg valós elérési útvonalat"
 
 #: tortoisehg\hgtk\clone.py:288
 msgid "Source and destination are the same"
-msgstr ""
+msgstr "Forrás és cél azonos"
 
 #: tortoisehg\hgtk\clone.py:289
 msgid "Please specify different paths"
-msgstr ""
+msgstr "Kérjük adjon meg különböző útvonalakat"
 
 #: tortoisehg\hgtk\commit.py:33
 msgid "Branch Operations"
-msgstr ""
+msgstr "Branch műveletek"
 
 #: tortoisehg\hgtk\commit.py:43
 msgid "Select branch of merge commit"
-msgstr ""
+msgstr "Ősszemásolási ág választása"
 
 #: tortoisehg\hgtk\commit.py:55
 msgid "No branch changes"
-msgstr ""
+msgstr "Ágnak nincsenek változásai"
 
 #: tortoisehg\hgtk\commit.py:57
 msgid "Open a new named branch"
-msgstr ""
+msgstr "Nyisson meg egy új elnevezett ágat"
 
 #: tortoisehg\hgtk\commit.py:65
 msgid "Close current named branch"
-msgstr ""
+msgstr "Aktális elnevezésű ág zárása"
 
 #: tortoisehg\hgtk\commit.py:72
 msgid "Changes take effect on next commit"
-msgstr ""
+msgstr "Változások hatása a következő kommitkor"
 
 #: tortoisehg\hgtk\commit.py:164
 msgid "merging "
-msgstr ""
+msgstr "összemásolás "
 
 #: tortoisehg\hgtk\commit.py:170
 msgid " - qnew"
@@ -612,94 +621,94 @@ msgstr ""
 #: tortoisehg\hgtk\history.py:213 tortoisehg\hgtk\history.py:309
 #: tortoisehg\hgtk\thgimport.py:107
 msgid "Patch Queue"
-msgstr ""
+msgstr "Javítási sor"
 
 #: tortoisehg\hgtk\commit.py:222 tortoisehg\hgtk\history.py:326
 msgid "_View"
-msgstr ""
+msgstr "_Nézet"
 
 #: tortoisehg\hgtk\commit.py:223 tortoisehg\hgtk\history.py:332
 msgid "Toolbar"
-msgstr ""
+msgstr "Eszköztár"
 
 #: tortoisehg\hgtk\commit.py:225
 msgid "Advanced"
-msgstr ""
+msgstr "Haladó"
 
 #: tortoisehg\hgtk\commit.py:227 tortoisehg\hgtk\history.py:64
 #: tortoisehg\hgtk\history.py:414 tortoisehg\hgtk\history.py:1088
 msgid "Parents"
-msgstr ""
+msgstr "Szülők"
 
 #: tortoisehg\hgtk\commit.py:231 tortoisehg\hgtk\hgignore.py:142
 #: tortoisehg\hgtk\history.py:339
 msgid "Refresh"
-msgstr ""
+msgstr "Frissítés"
 
 #: tortoisehg\hgtk\commit.py:233 tortoisehg\hgtk\history.py:353
 msgid "Ignore Max Diff Size"
-msgstr ""
+msgstr "Maxximális különbözet méret figyelmenkívül hagyása"
 
 #: tortoisehg\hgtk\commit.py:235 tortoisehg\hgtk\history.py:355
 msgid "Always Show Output"
-msgstr ""
+msgstr "Mindíg mutassa a kimenetet"
 
 #: tortoisehg\hgtk\commit.py:238
 msgid "_Operations"
-msgstr ""
+msgstr "_Műveletek"
 
 #: tortoisehg\hgtk\commit.py:239 tortoisehg\hgtk\commit.py:293
 #: tortoisehg\hgtk\commit.py:753
 msgid "_Commit"
-msgstr ""
+msgstr "_Kommit"
 
 #: tortoisehg\hgtk\commit.py:241 tortoisehg\hgtk\commit.py:291
 msgid "_Undo"
-msgstr ""
+msgstr "_Visszavonás"
 
 #: tortoisehg\hgtk\commit.py:244 tortoisehg\hgtk\status.py:154
 msgid "_Diff"
-msgstr ""
+msgstr "_Különbség"
 
 #: tortoisehg\hgtk\commit.py:246 tortoisehg\hgtk\status.py:157
 msgid "Re_vert"
-msgstr ""
+msgstr "Visszaállítás"
 
 #: tortoisehg\hgtk\commit.py:248 tortoisehg\hgtk\status.py:160
 #: tortoisehg\hgtk\status.py:1665 tortoisehg\hgtk\thgconfig.py:1019
 msgid "_Add"
-msgstr ""
+msgstr "_Hozzáadás"
 
 #: tortoisehg\hgtk\commit.py:250 tortoisehg\hgtk\status.py:166
 #: tortoisehg\hgtk\thgconfig.py:1029
 msgid "_Remove"
-msgstr ""
+msgstr "_Eltávolítás"
 
 #: tortoisehg\hgtk\commit.py:254 tortoisehg\hgtk\status.py:169
 #: tortoisehg\hgtk\status.py:1664
 msgid "_Forget"
-msgstr ""
+msgstr "_Felejtse el"
 
 #: tortoisehg\hgtk\commit.py:292
 msgid "undo recent commit"
-msgstr ""
+msgstr "Aktuális commit visszavonása"
 
 #: tortoisehg\hgtk\commit.py:294 tortoisehg\hgtk\commit.py:630
 msgid "commit"
-msgstr ""
+msgstr "kommit"
 
 #: tortoisehg\hgtk\commit.py:300 tortoisehg\hgtk\history.py:215
 msgid "Show/Hide Patch Queue"
-msgstr ""
+msgstr "Mutatása/Elrejtése a Javító Sornak"
 
 #: tortoisehg\hgtk\commit.py:313 tortoisehg\hgtk\merge.py:190
 #: tortoisehg\hgtk\thgconfig.py:798
 msgid "Confirm Exit"
-msgstr ""
+msgstr "Kilépés Jóváhagyása"
 
 #: tortoisehg\hgtk\commit.py:314
 msgid "Save commit message at exit?"
-msgstr ""
+msgstr "Mentse a kommit üzenetet kilépéskor?"
 
 #: tortoisehg\hgtk\commit.py:315 tortoisehg\hgtk\commit.py:1116
 #: tortoisehg\hgtk\commit.py:1120 tortoisehg\hgtk\history.py:175
@@ -708,61 +717,61 @@ msgstr ""
 #: tortoisehg\hgtk\thgconfig.py:801 tortoisehg\hgtk\thgmq.py:345
 #: tortoisehg\hgtk\update.py:236
 msgid "&Cancel"
-msgstr ""
+msgstr "&Mégsem"
 
 #: tortoisehg\hgtk\commit.py:315 tortoisehg\hgtk\commit.py:1116
 #: tortoisehg\hgtk\commit.py:1120 tortoisehg\hgtk\status.py:1731
 #: tortoisehg\hgtk\thgconfig.py:800 tortoisehg\hgtk\thgmq.py:345
 msgid "&Yes"
-msgstr ""
+msgstr "&Igen"
 
 #: tortoisehg\hgtk\commit.py:315 tortoisehg\hgtk\commit.py:1116
 #: tortoisehg\hgtk\commit.py:1120 tortoisehg\hgtk\thgstrip.py:217
 msgid "&No"
-msgstr ""
+msgstr "&Nem"
 
 #: tortoisehg\hgtk\commit.py:361
 msgid "Committer:"
-msgstr ""
+msgstr "Kommitáló:"
 
 #: tortoisehg\hgtk\commit.py:375
 msgid "Auto-includes:"
-msgstr ""
+msgstr "Automatikusa-magába foglaltak:"
 
 #: tortoisehg\hgtk\commit.py:378
 msgid "Push after commit"
-msgstr ""
+msgstr "Push a kommit után"
 
 #: tortoisehg\hgtk\commit.py:413
 msgid "Recent commit messages..."
-msgstr ""
+msgstr "Aktuális kommit üzenet"
 
 #: tortoisehg\hgtk\commit.py:486
 msgid "Parent: %(rev)s"
-msgstr ""
+msgstr "Szülő: %(res)-k"
 
 #: tortoisehg\hgtk\commit.py:494
 msgid "Not at head"
-msgstr ""
+msgstr "Nem a fej"
 
 #: tortoisehg\hgtk\commit.py:519 tortoisehg\hgtk\status.py:534
 msgid "Patch Preview"
-msgstr ""
+msgstr "Javítás Előnézet"
 
 #: tortoisehg\hgtk\commit.py:521 tortoisehg\hgtk\status.py:538
 msgid "Commit Preview"
-msgstr ""
+msgstr "Kommit Előnézet"
 
 #: tortoisehg\hgtk\commit.py:565
 msgid "Discard current commit message?"
-msgstr ""
+msgstr "Elveti az aktuális kommit üzenetet?"
 
 #: tortoisehg\hgtk\commit.py:629 tortoisehg\hgtk\commit.py:902
 #: tortoisehg\hgtk\commit.py:953 tortoisehg\hgtk\commit.py:1182
 #: tortoisehg\hgtk\gdialog.py:485 tortoisehg\hgtk\history.py:224
 #: tortoisehg\hgtk\merge.py:130 tortoisehg\hgtk\thgconfig.py:664
 msgid "Commit"
-msgstr ""
+msgstr "Eltárolás (commit)"
 
 #: tortoisehg\hgtk\commit.py:633
 msgid "QNew"
@@ -770,7 +779,7 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:634
 msgid "create new MQ patch"
-msgstr ""
+msgstr "új MQ patch létrehozása"
 
 #: tortoisehg\hgtk\commit.py:636
 msgid "QRefresh"
@@ -778,75 +787,75 @@ msgstr ""
 
 #: tortoisehg\hgtk\commit.py:637
 msgid "refresh top MQ patch"
-msgstr ""
+msgstr "felső MR javítás frissítése"
 
 #: tortoisehg\hgtk\commit.py:639
 msgid "_Commit (+1 head)"
-msgstr ""
+msgstr "_Jóváhagy (+1 fej)"
 
 #: tortoisehg\hgtk\commit.py:639
 msgid "_Commit (-1 head)"
-msgstr ""
+msgstr "_Jóváhagy (-1 fej)"
 
 #: tortoisehg\hgtk\commit.py:645
 msgid "commit to merge one head"
-msgstr ""
+msgstr "jóváhagyás egy fej összeölvaszáthoz"
 
 #: tortoisehg\hgtk\commit.py:648
 msgid "neither parent is a head, commit to add a new head"
-msgstr ""
+msgstr "egyik szülős sem a fej, kommital új fej létrehozása"
 
 #: tortoisehg\hgtk\commit.py:653
 msgid "parent is not a head, commit to add a new head"
-msgstr ""
+msgstr "szülő nem a fej, kommital új fej létrehozása"
 
 #: tortoisehg\hgtk\commit.py:763
 msgid "new branch: "
-msgstr ""
+msgstr "Új ág: "
 
 #: tortoisehg\hgtk\commit.py:765
 msgid "close branch: "
-msgstr ""
+msgstr "ág zárása: "
 
 #: tortoisehg\hgtk\commit.py:767
 msgid "branch: "
-msgstr ""
+msgstr "ág: "
 
 #: tortoisehg\hgtk\commit.py:786
 msgid "Merge "
-msgstr ""
+msgstr "Egyesítés "
 
 #: tortoisehg\hgtk\commit.py:822
 msgid "Patch Contents"
-msgstr ""
+msgstr "Javítás Tartalma"
 
 #: tortoisehg\hgtk\commit.py:886 tortoisehg\hgtk\commit.py:1028
 msgid "Nothing Commited"
-msgstr ""
+msgstr "Semmi jóváhagyott"
 
 #: tortoisehg\hgtk\commit.py:887
 msgid "No committable files selected"
-msgstr ""
+msgstr "Nincs kommitálható fájl kiválasztva"
 
 #: tortoisehg\hgtk\commit.py:903
 msgid "Unable to create "
-msgstr ""
+msgstr "Nem lehet létrehozni "
 
 #: tortoisehg\hgtk\commit.py:954
 msgid "Unable to apply patch"
-msgstr ""
+msgstr "Nem lehet a javítást alkalamzni"
 
 #: tortoisehg\hgtk\commit.py:983
 msgid "Confirm Undo Commit"
-msgstr ""
+msgstr "Visszavonási commit jóváhagyása"
 
 #: tortoisehg\hgtk\commit.py:984
 msgid "Undo last commit"
-msgstr ""
+msgstr "Utolsó jóváhagyás visszavonása"
 
 #: tortoisehg\hgtk\commit.py:990 tortoisehg\hgtk\commit.py:1005
 msgid "Undo Commit"
-msgstr ""
+msgstr "Jóváhagyás visszavonása"
 
 #: tortoisehg\hgtk\commit.py:991
 msgid ""
@@ -854,35 +863,38 @@ msgid ""
 "\n"
 "Tip revision differs from last commit."
 msgstr ""
+"Nem lehet visszavonni!\n"
+"\n"
+"Tipp: Verzió különbség az utolsó érvényesítéskor"
 
 #: tortoisehg\hgtk\commit.py:1006
 msgid "Errors during rollback!"
-msgstr ""
+msgstr "Hiba a visszagörgetés alatt!"
 
 #: tortoisehg\hgtk\commit.py:1012
 msgid "Confirm Add/Remove"
-msgstr ""
+msgstr "Hozzáadás/Eltávolítás jóváhagyása"
 
 #: tortoisehg\hgtk\commit.py:1013
 msgid "Add/Remove the following files?"
-msgstr ""
+msgstr "Hozzáadja/Eltávolítja a következő fájlokat?"
 
 #: tortoisehg\hgtk\commit.py:1029 tortoisehg\hgtk\tagadd.py:224
 msgid "Please enter commit message"
-msgstr ""
+msgstr "Kérjük adjun meg kommit üzenetet."
 
 #: tortoisehg\hgtk\commit.py:1036
 msgid "Error"
-msgstr ""
+msgstr "Hiba"
 
 #: tortoisehg\hgtk\commit.py:1037
 msgid "Message format configuration error"
-msgstr ""
+msgstr "Üzenet formátum konfigurálási hiba"
 
 #: tortoisehg\hgtk\commit.py:1046 tortoisehg\hgtk\commit.py:1054
 #: tortoisehg\hgtk\commit.py:1066
 msgid "Confirm Commit"
-msgstr ""
+msgstr "Érvényesítés jóváhagyása"
 
 #: tortoisehg\hgtk\commit.py:1047
 msgid ""
@@ -890,6 +902,9 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"Az összegfoglaló sor hossza %i nagyobb mint %i\n"
+"\n"
+"Hagyja figyelmenkívül a formázási előírást és folytassa a kommitot?"
 
 #: tortoisehg\hgtk\commit.py:1055
 msgid ""
@@ -897,6 +912,9 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"Az összefoglaló sort nem üres sor követi.\n"
+"\n"
+"Hagyja figyelmenkívül a formázási előírást és folytassa a kommitot?"
 
 #: tortoisehg\hgtk\commit.py:1067
 msgid ""
@@ -904,10 +922,13 @@ msgid ""
 "\n"
 "Ignore format policy and continue commit?"
 msgstr ""
+"A %i sorban a karakterek száma nagyobb mint %s.\n"
+"\n"
+"Hagyja figyelmenkívül a formázási előírást és folytassa a kommitot?"
 
 #: tortoisehg\hgtk\commit.py:1079
 msgid "Commit: Invalid username"
-msgstr ""
+msgstr "Jóváhagyás: Hibás felhasználóinév"
 
 #: tortoisehg\hgtk\commit.py:1080
 msgid ""
@@ -915,40 +936,43 @@ msgid ""
 "\n"
 "Please configure your username and try again"
 msgstr ""
+"Felhasználóinév nincs konfigurálva\n"
+"\n"
+"Kérjük konfigurálja és próbálja újra."
 
 #: tortoisehg\hgtk\commit.py:1113
 msgid "Confirm Override Branch"
-msgstr ""
+msgstr "Ág felülrísának jóváhagyása"
 
 #: tortoisehg\hgtk\commit.py:1114
 msgid ""
 "A branch named \"%s\" already exists,\n"
 "override?"
-msgstr ""
+msgstr "Az ág \"%s\" létezi felülírja?"
 
 #: tortoisehg\hgtk\commit.py:1118
 msgid "Confirm New Branch"
-msgstr ""
+msgstr "Új Ág Jóváhagyása"
 
 #: tortoisehg\hgtk\commit.py:1119
 msgid "Create new named branch \"%s\"?"
-msgstr ""
+msgstr "Hozzon létre új ágat az alábbi néven \"%s\"?"
 
 #: tortoisehg\hgtk\commit.py:1173
 msgid "Finish committing"
-msgstr ""
+msgstr "Érvényesítés befejezése"
 
 #: tortoisehg\hgtk\commit.py:1175
 msgid "Aborted committing"
-msgstr ""
+msgstr "Megszakított érvényesítés"
 
 #: tortoisehg\hgtk\commit.py:1177
 msgid "Failed to commit"
-msgstr ""
+msgstr "Hibás érvényesítés"
 
 #: tortoisehg\hgtk\commit.py:1181
 msgid "Committing changes..."
-msgstr ""
+msgstr "Változások véglegesítése…"
 
 #: tortoisehg\hgtk\commit.py:1183 tortoisehg\hgtk\history.py:537
 #: tortoisehg\hgtk\history.py:562 tortoisehg\hgtk\history.py:1620
@@ -958,7 +982,7 @@ msgstr ""
 #: tortoisehg\hgtk\history.py:2499 tortoisehg\hgtk\history.py:2527
 #: tortoisehg\hgtk\recovery.py:161 tortoisehg\hgtk\synch.py:540
 msgid "Cannot run now"
-msgstr ""
+msgstr "Jelenleg nem futtatható"
 
 #: tortoisehg\hgtk\commit.py:1184 tortoisehg\hgtk\history.py:538
 #: tortoisehg\hgtk\history.py:563 tortoisehg\hgtk\history.py:1621
@@ -967,420 +991,424 @@ msgstr ""
 #: tortoisehg\hgtk\history.py:2278 tortoisehg\hgtk\history.py:2308
 #: tortoisehg\hgtk\history.py:2500 tortoisehg\hgtk\history.py:2528
 msgid "Please try again after running operation is completed"
-msgstr ""
+msgstr "Kérjük próbálja újra az miután az aktuális művelet befejeződött"
 
 #: tortoisehg\hgtk\commit.py:1210
 msgid "Paste _Filenames"
-msgstr ""
+msgstr "_Fájlnevek beillesztése"
 
 #: tortoisehg\hgtk\commit.py:1211
 msgid "App_ly Format"
-msgstr ""
+msgstr "Formátú Érvényesítése"
 
 #: tortoisehg\hgtk\commit.py:1212
 msgid "C_onfigure Format..."
-msgstr ""
+msgstr "Formátúm beállítás"
 
 #: tortoisehg\hgtk\commit.py:1257
 msgid "Info Required"
-msgstr ""
+msgstr "Információ Szükséges"
 
 #: tortoisehg\hgtk\commit.py:1258
 msgid "Message format needs to be configured"
-msgstr ""
+msgstr "Üzenet formátúm konfigurálása szükséges"
 
 #: tortoisehg\hgtk\commit.py:1270 tortoisehg\hgtk\commit.py:1275
 msgid "Warning"
-msgstr ""
+msgstr "Figyelem"
 
 #: tortoisehg\hgtk\commit.py:1271
 msgid "The summary line length of %i is greater than %i"
-msgstr ""
+msgstr "Az összefoglaló sor hossza %i nagyobb mint %i"
 
 #: tortoisehg\hgtk\commit.py:1276
 msgid "The summary line is not followed by a blank line"
-msgstr ""
+msgstr "Az összefoglaló sort nem követi üres sor"
 
 #: tortoisehg\hgtk\csinfo.py:49
 msgid "must be specified repository"
-msgstr ""
+msgstr "repository megadása kötelező"
 
 #: tortoisehg\hgtk\csinfo.py:86
 msgid "must be specified 'type' in style"
-msgstr ""
+msgstr "'típus' megadása kötelező a stílusban"
 
 #: tortoisehg\hgtk\csinfo.py:199
 msgid "Summary:"
-msgstr ""
+msgstr "Összegzés:"
 
 #: tortoisehg\hgtk\csinfo.py:200
 msgid "Age:"
-msgstr ""
+msgstr "Kor:"
 
 #: tortoisehg\hgtk\csinfo.py:200 tortoisehg\hgtk\csinfo.py:201
 msgid "Date:"
-msgstr ""
+msgstr "Dátum:"
 
 #: tortoisehg\hgtk\csinfo.py:200 tortoisehg\hgtk\csinfo.py:205
 msgid "User:"
-msgstr ""
+msgstr "Felhasználó:"
 
 #: tortoisehg\hgtk\csinfo.py:201 tortoisehg\hgtk\csinfo.py:202
 msgid "Branch:"
-msgstr ""
+msgstr "Ág:"
 
 #: tortoisehg\hgtk\csinfo.py:202 tortoisehg\hgtk\csinfo.py:203
 msgid "Tags:"
-msgstr ""
+msgstr "Címkék:"
 
 #: tortoisehg\hgtk\csinfo.py:203
 msgid "Transplant:"
-msgstr ""
+msgstr "Átültet:"
 
 #: tortoisehg\hgtk\csinfo.py:204
 msgid "Perforce:"
-msgstr ""
+msgstr "Szükségképpen:"
 
 #: tortoisehg\hgtk\csinfo.py:204
 msgid "Subversion:"
-msgstr ""
+msgstr "Subversion:"
 
 #: tortoisehg\hgtk\cslist.py:88
 msgid "Show all"
-msgstr ""
+msgstr "Összes megjelenítése"
 
 #: tortoisehg\hgtk\cslist.py:91
 msgid "Use compact view"
-msgstr ""
+msgstr "Kompakt nézet használata"
 
 #: tortoisehg\hgtk\cslist.py:384
 msgid "No items to display"
-msgstr ""
+msgstr "Nincs megjeleníthető elem"
 
 #: tortoisehg\hgtk\cslist.py:397
 msgid "Updating..."
-msgstr ""
+msgstr "Frissítés..."
 
 #: tortoisehg\hgtk\cslist.py:400
 msgid "Selecting %(sel)d of %(total)d, displaying all items"
-msgstr ""
+msgstr "Kiválaszt %(sel)d a %(total)dból, összes elem megjelenítése"
 
 #: tortoisehg\hgtk\cslist.py:403
 msgid "Selecting %(sel)d, displaying %(count)d of %(total)d items"
-msgstr ""
+msgstr "Kiválaszt %(sel)d, megjelenít %(count)d a %(total)d elemből"
 
 #: tortoisehg\hgtk\cslist.py:407
 msgid "Displaying all items"
-msgstr ""
+msgstr "Összes elem megjelenítése"
 
 #: tortoisehg\hgtk\cslist.py:409
 msgid "Displaying %(count)d of %(total)d items"
-msgstr ""
+msgstr "Megjelenítve %(count)d a %(total)d-ból"
 
 #: tortoisehg\hgtk\datamine.py:45
 msgid "%s - datamine"
-msgstr ""
+msgstr "%s - adattípus"
 
 #: tortoisehg\hgtk\datamine.py:54 tortoisehg\hgtk\hgcmd.py:44
 #: tortoisehg\hgtk\history.py:383 tortoisehg\hgtk\recovery.py:46
 #: tortoisehg\hgtk\serve.py:65 tortoisehg\hgtk\synch.py:59
 msgid "Stop"
-msgstr ""
+msgstr "Leállítás"
 
 #: tortoisehg\hgtk\datamine.py:56
 msgid "Stop operation on current tab"
-msgstr ""
+msgstr "Művelet leállítása az aktuális tabon"
 
 #: tortoisehg\hgtk\datamine.py:58
 msgid "New Search"
-msgstr ""
+msgstr "Új keresés"
 
 #: tortoisehg\hgtk\datamine.py:60
 msgid "Open new search tab"
-msgstr ""
+msgstr "Új kereső fül megnyitása"
 
 #: tortoisehg\hgtk\datamine.py:71 tortoisehg\hgtk\rename.py:29
 #: tortoisehg\hgtk\thgconfig.py:1307
 msgid "Invalid path"
-msgstr ""
+msgstr "Érvénytelen útvonal"
 
 #: tortoisehg\hgtk\datamine.py:72
 msgid "Cannot annotate directory: %s"
-msgstr ""
+msgstr "Könyvtár nem cimkézhető: %s"
 
 #: tortoisehg\hgtk\datamine.py:134
 msgid "Filename"
-msgstr ""
+msgstr "Fájlnév"
 
 #: tortoisehg\hgtk\datamine.py:136 tortoisehg\hgtk\datamine.py:650
 #: tortoisehg\hgtk\history.py:101 tortoisehg\hgtk\history.py:435
 #: tortoisehg\hgtk\history.py:619 tortoisehg\hgtk\logview\treeview.py:486
 #: tortoisehg\hgtk\thgconfig.py:191 tortoisehg\hgtk\thgconfig.py:299
 msgid "User"
-msgstr ""
+msgstr "Felhasználó"
 
 #: tortoisehg\hgtk\datamine.py:144 tortoisehg\hgtk\datamine.py:157
 #: tortoisehg\hgtk\history.py:1128
 msgid "Di_splay Change"
-msgstr ""
+msgstr "Változások Megjelenítése"
 
 #: tortoisehg\hgtk\datamine.py:148 tortoisehg\hgtk\datamine.py:161
 msgid "_View File at Revision"
-msgstr ""
+msgstr "Fájl Megtekintése a Verzióban"
 
 #: tortoisehg\hgtk\datamine.py:155
 msgid "_Zoom to Change"
-msgstr ""
+msgstr "_Nagyitás a változásra"
 
 #: tortoisehg\hgtk\datamine.py:159
 msgid "_Annotate Parent"
-msgstr ""
+msgstr "Szülő Megjelölése"
 
 #: tortoisehg\hgtk\datamine.py:186
 msgid "No parent file"
-msgstr ""
+msgstr "Nincs szülő fájl"
 
 #: tortoisehg\hgtk\datamine.py:187
 msgid "Unable to annotate"
-msgstr ""
+msgstr "Nem megjelölhető"
 
 #: tortoisehg\hgtk\datamine.py:316
 msgid "Search"
-msgstr ""
+msgstr "Keresés"
 
 #: tortoisehg\hgtk\datamine.py:317 tortoisehg\hgtk\hgignore.py:60
 msgid "Regexp:"
-msgstr ""
+msgstr "REg. kif.:"
 
 #: tortoisehg\hgtk\datamine.py:319
 msgid "Includes:"
-msgstr ""
+msgstr "Tartalma:"
 
 #: tortoisehg\hgtk\datamine.py:321
 msgid "Excludes:"
-msgstr ""
+msgstr "Kizártak:"
 
 #: tortoisehg\hgtk\datamine.py:324
 msgid "Start this search"
-msgstr ""
+msgstr "Keresés indítása"
 
 #: tortoisehg\hgtk\datamine.py:325
 msgid "Regular expression search pattern"
-msgstr ""
+msgstr "Reguláris kif. kereső mintája"
 
 #: tortoisehg\hgtk\datamine.py:326
 msgid ""
 "Comma separated list of inclusion patterns.  By default, the entire "
 "repository is searched."
 msgstr ""
+"Vesszővel elválasztva a keresési minták. Alapértelmezésként a teljes "
+"repository-ban keres"
 
 #: tortoisehg\hgtk\datamine.py:329
 msgid ""
 "Comma separated list of exclusion patterns.  Exclusion patterns are applied "
 "after inclusion patterns."
 msgstr ""
+"Vesszővel elválasztva a kivételi minták. A kivételi minta az alkalmazott "
+"minták után kerül kiértékelésre."
 
 #: tortoisehg\hgtk\datamine.py:335
 msgid "Follow copies and renames"
-msgstr ""
+msgstr "Alábbiak másolása és átnevezése"
 
 #: tortoisehg\hgtk\datamine.py:336
 msgid "Ignore case"
-msgstr ""
+msgstr "Nem nagybetűérzékeny"
 
 #: tortoisehg\hgtk\datamine.py:337
 msgid "Show line numbers"
-msgstr ""
+msgstr "Sorok számának mutatása"
 
 #: tortoisehg\hgtk\datamine.py:338
 msgid "Show all matching revisions"
-msgstr ""
+msgstr "Összes egyező verzió megjelenítése"
 
 #: tortoisehg\hgtk\datamine.py:369 tortoisehg\hgtk\datamine.py:648
 #: tortoisehg\hgtk\logview\treeview.py:415
 msgid "Rev"
-msgstr ""
+msgstr "Rev"
 
 #: tortoisehg\hgtk\datamine.py:370 tortoisehg\hgtk\datamine.py:649
 msgid "File"
-msgstr ""
+msgstr "Fájl"
 
 #: tortoisehg\hgtk\datamine.py:371
 msgid "Matches"
-msgstr ""
+msgstr "Találatok"
 
 #: tortoisehg\hgtk\datamine.py:393
 msgid "Search %d"
-msgstr ""
+msgstr "Keresés %s"
 
 #: tortoisehg\hgtk\datamine.py:436
 msgid "No regular expression given"
-msgstr ""
+msgstr "Nincs megadva reguláris kifejezés"
 
 #: tortoisehg\hgtk\datamine.py:437
 msgid "You must provide a search expression"
-msgstr ""
+msgstr "Keresési kifejezés megadása kötelező"
 
 #: tortoisehg\hgtk\datamine.py:443
 msgid "Invalid regular expression"
-msgstr ""
+msgstr "Érvénytelen reguláris kifejezés"
 
 #: tortoisehg\hgtk\datamine.py:444 tortoisehg\hgtk\thgshelve.py:210
 msgid "Error: %s"
-msgstr ""
+msgstr "Hiba: %s"
 
 #: tortoisehg\hgtk\datamine.py:466 tortoisehg\hgtk\datamine.py:767
 msgid "Abort: %s"
-msgstr ""
+msgstr "Megszakítás: %s"
 
 #: tortoisehg\hgtk\datamine.py:478
 msgid "Search \"%s\""
-msgstr ""
+msgstr "Keresés \"%s\""
 
 #: tortoisehg\hgtk\datamine.py:593
 msgid "File is unrevisioned"
-msgstr ""
+msgstr "Fájl nem verziózott"
 
 #: tortoisehg\hgtk\datamine.py:594
 msgid "Unable to annotate "
-msgstr ""
+msgstr "Nem cimkézhető "
 
 #: tortoisehg\hgtk\datamine.py:647
 msgid "Line"
-msgstr ""
+msgstr "Sor"
 
 #: tortoisehg\hgtk\datamine.py:651 tortoisehg\hgtk\guess.py:158
 msgid "Source"
-msgstr ""
+msgstr "Forrás"
 
 #: tortoisehg\hgtk\datamine.py:709
 msgid "Loading history..."
-msgstr ""
+msgstr "Változások betöltése..."
 
 #: tortoisehg\hgtk\dialog.py:34
 msgid "TortoiseHg Prompt"
-msgstr ""
+msgstr "TortoiseHG parancssor"
 
 #: tortoisehg\hgtk\gdialog.py:482
 msgid "_Tools"
-msgstr ""
+msgstr "_Eszközök"
 
 #: tortoisehg\hgtk\gdialog.py:483 tortoisehg\hgtk\history.py:185
 #: tortoisehg\hgtk\thgconfig.py:665 tortoisehg\util\menuthg.py:49
 msgid "Repository Explorer"
-msgstr ""
+msgstr "Repository Explorer"
 
 #: tortoisehg\hgtk\gdialog.py:487 tortoisehg\hgtk\history.py:227
 msgid "Datamine"
-msgstr ""
+msgstr "Adattípus"
 
 #: tortoisehg\hgtk\gdialog.py:489 tortoisehg\hgtk\history.py:230
 msgid "Recovery"
-msgstr ""
+msgstr "Visszaállítás"
 
 #: tortoisehg\hgtk\gdialog.py:491 tortoisehg\hgtk\history.py:233
 msgid "Serve"
-msgstr ""
+msgstr "Szolgáltat"
 
 #: tortoisehg\hgtk\gdialog.py:493 tortoisehg\hgtk\history.py:236
 #: tortoisehg\hgtk\synch.py:89 tortoisehg\hgtk\thgshelve.py:71
 #: tortoisehg\hgtk\thgshelve.py:139 tortoisehg\hgtk\thgshelve.py:145
 #: tortoisehg\hgtk\thgshelve.py:153
 msgid "Shelve"
-msgstr ""
+msgstr "Mellőz"
 
 #: tortoisehg\hgtk\gdialog.py:495 tortoisehg\hgtk\thgconfig.py:667
 #: tortoisehg\util\menuthg.py:55
 msgid "Synchronize"
-msgstr ""
+msgstr "Szinkronizál"
 
 #: tortoisehg\hgtk\gdialog.py:497
 msgid "Settings"
-msgstr ""
+msgstr "Beállítások"
 
 #: tortoisehg\hgtk\gdialog.py:500
 msgid "_Help"
-msgstr ""
+msgstr "_Súgó"
 
 #: tortoisehg\hgtk\gdialog.py:501
 msgid "Contents"
-msgstr ""
+msgstr "Tartalom"
 
 #: tortoisehg\hgtk\gdialog.py:503 tortoisehg\hgtk\thgmq.py:831
 msgid "Index"
-msgstr ""
+msgstr "Tárgymutató"
 
 #: tortoisehg\hgtk\gdialog.py:505
 msgid "About"
-msgstr ""
+msgstr "Névjegy"
 
 #: tortoisehg\hgtk\gdialog.py:582
 msgid " Aborted"
-msgstr ""
+msgstr " Megszakítva"
 
 #: tortoisehg\hgtk\gdialog.py:593
 msgid " Messages and Errors"
-msgstr ""
+msgstr " Üzenetek és Hibák"
 
 #: tortoisehg\hgtk\gdialog.py:636
 msgid "making snapshot of %d files from rev %s\n"
-msgstr ""
+msgstr "Pillanat felvétel készítése a %d fájlról a%s verzióban\n"
 
 #: tortoisehg\hgtk\gdialog.py:670
 msgid "edit failed"
-msgstr ""
+msgstr "szerkestés sikertelen"
 
 #: tortoisehg\hgtk\gdialog.py:678 tortoisehg\hgtk\gtklib.py:171
 msgid "No visual editor configured"
-msgstr ""
+msgstr "Visuális szerkesztő nincs konfigurálva"
 
 #: tortoisehg\hgtk\gdialog.py:679 tortoisehg\hgtk\gtklib.py:172
 msgid "Please configure a visual editor."
-msgstr ""
+msgstr "Kérjük konfigurálja a vizuális szerkesztőt"
 
 #: tortoisehg\hgtk\gdialog.py:808
 msgid "unknown mode name: %s"
-msgstr ""
+msgstr "ismeretlen mód név: %s"
 
 #: tortoisehg\hgtk\gdialog.py:848
 msgid "Abort"
-msgstr "Przerwij"
+msgstr "Megszakít"
 
 #: tortoisehg\hgtk\gdialog.py:888
 msgid "Confirm Abort"
-msgstr "Potwierdź przerwanie"
+msgstr "Megszakítás Jóváhagyása"
 
 #: tortoisehg\hgtk\gdialog.py:889
 msgid "Do you want to abort?"
-msgstr "Czy chcesz przewać?"
+msgstr "Biztosa megszakítja"
 
 #: tortoisehg\hgtk\gorev.py:27
 msgid "Select"
-msgstr ""
+msgstr "Kiválaszt"
 
 #: tortoisehg\hgtk\gorev.py:31
 msgid "Select Revision"
-msgstr ""
+msgstr "Revízió kiválasztása"
 
 #: tortoisehg\hgtk\gorev.py:44
 msgid "revision number, changeset ID, branch or tag"
-msgstr ""
+msgstr "revízió szám, változás ID, ág vagy cimke"
 
 #: tortoisehg\hgtk\gorev.py:59
 msgid "Ambiguous Revision"
-msgstr ""
+msgstr "Azonos nevű revízió"
 
 #: tortoisehg\hgtk\gorev.py:63
 msgid "Invalid Revision"
-msgstr ""
+msgstr "Érvénytelen Revízió"
 
 #: tortoisehg\hgtk\gtklib.py:246
 msgid "Save File"
-msgstr ""
+msgstr "Fájl mentése"
 
 #: tortoisehg\hgtk\gtklib.py:247
 msgid "All files"
-msgstr ""
+msgstr "Minden fájl"
 
 #: tortoisehg\hgtk\gtklib.py:360
 msgid ""
@@ -1388,10 +1416,13 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"A fájl \"%s\" létezik!\n"
+"\n"
+"Szeretné felülírni?"
 
 #: tortoisehg\hgtk\gtklib.py:371
 msgid "Select Folder"
-msgstr ""
+msgstr "Könyvtárválasztás"
 
 #: tortoisehg\hgtk\gtklib.py:854
 msgid ""
@@ -1403,159 +1434,168 @@ msgid ""
 "\n"
 "examples: en, en_GB, en_US"
 msgstr ""
+"Nyelv választása a helyesírásellenörzéshez.\n"
+"\n"
+"Ha üres akkor az alapértelemzett nyelv lesz használva.\n"
+"Ha az össze szöveg hibásnak van megjelölve, akkor lehet\n"
+"hogy a szótár nincs installálva"
 
 #: tortoisehg\hgtk\gtklib.py:860
 msgid "Lang \"%s\" can not be set.\n"
-msgstr ""
+msgstr "Nyelv \"%s\" nem beállítható.\n"
 
 #: tortoisehg\hgtk\gtklib.py:873 tortoisehg\hgtk\thgconfig.py:657
 msgid "Spell Check Language"
-msgstr ""
+msgstr "Helyesírás Ellenörés Nyelve"
 
 #: tortoisehg\hgtk\guess.py:53
 msgid "Detect Copies/Renames in %s"
-msgstr ""
+msgstr "Másolatok/Átnevezések keresése itt: %s"
 
 #: tortoisehg\hgtk\guess.py:73
 msgid "Minimum Simularity Percentage"
-msgstr ""
+msgstr "Minimális hasonlóság Százalékban"
 
 #: tortoisehg\hgtk\guess.py:90
 msgid "Unrevisioned Files"
-msgstr ""
+msgstr "Nem Revíziózott Fájlok"
 
 #: tortoisehg\hgtk\guess.py:121
 msgid "Find Renames"
-msgstr ""
+msgstr "Átnevezések Keresése"
 
 #: tortoisehg\hgtk\guess.py:124
 msgid "Find Copies"
-msgstr ""
+msgstr "Másolatok keresése"
 
 #: tortoisehg\hgtk\guess.py:129
 msgid "Candidate Matches"
-msgstr ""
+msgstr "Jelölt Egyeződések"
 
 #: tortoisehg\hgtk\guess.py:165
 msgid "Dest"
-msgstr ""
+msgstr "Cél"
 
 #: tortoisehg\hgtk\guess.py:181
 msgid "Accept Match"
-msgstr ""
+msgstr "Egyezés Elfogadása"
 
 #: tortoisehg\hgtk\guess.py:186
 msgid "Differences from Source to Dest"
-msgstr ""
+msgstr "Kölömbség a Forrás és a Cél között"
 
 #: tortoisehg\hgtk\guess.py:274
 msgid "finding source of "
-msgstr ""
+msgstr "forrás keresése "
 
 #: tortoisehg\hgtk\guess.py:373
 msgid ""
 "== %s and %s have identical contents ==\n"
 "\n"
 msgstr ""
+"== %s és %s azonosító tartalomnak kell lennie ==\n"
+"\n"
 
 #: tortoisehg\hgtk\hgcmd.py:186 tortoisehg\hgtk\hgcmd.py:529
 msgid ""
 "\n"
 "[command interrupted]"
 msgstr ""
+"\n"
+"[parancs megszakítva]"
 
 #: tortoisehg\hgtk\hgcmd.py:278
 msgid "unknown CmdWidget style: %s"
-msgstr ""
+msgstr "ismeretlem CmdWidget stílus: %s"
 
 #: tortoisehg\hgtk\hgcmd.py:291
 msgid "Toggle log window"
-msgstr ""
+msgstr "Log ablak kapcsoló"
 
 #: tortoisehg\hgtk\hgcmd.py:324
 msgid "Stop transaction"
-msgstr ""
+msgstr "Tranzakció megállítása"
 
 #: tortoisehg\hgtk\hgcmd.py:326
 msgid "Close this"
-msgstr ""
+msgstr "Elem bezárása"
 
 #: tortoisehg\hgtk\hgcmd.py:464 tortoisehg\hgtk\hgcmd.py:481
 msgid "invalid state"
-msgstr ""
+msgstr "Nem megfelelő állapot"
 
 #: tortoisehg\hgtk\hgcmd.py:613
 msgid "Command Log"
-msgstr ""
+msgstr "Parancs Log"
 
 #: tortoisehg\hgtk\hgemail.py:36
 msgid "Send"
-msgstr ""
+msgstr "Küld"
 
 #: tortoisehg\hgtk\hgemail.py:38
 msgid "Send emails"
-msgstr ""
+msgstr "Email-ek küldése"
 
 #: tortoisehg\hgtk\hgemail.py:39
 msgid "Test"
-msgstr ""
+msgstr "Teszt"
 
 #: tortoisehg\hgtk\hgemail.py:41
 msgid "Show emails which would be sent"
-msgstr ""
+msgstr "Elküldött email-ek megjelenítése"
 
 #: tortoisehg\hgtk\hgemail.py:43 tortoisehg\hgtk\serve.py:73
 #: tortoisehg\hgtk\synch.py:96
 msgid "Configure"
-msgstr ""
+msgstr "Konfigurálás"
 
 #: tortoisehg\hgtk\hgemail.py:45
 msgid "Configure email settings"
-msgstr ""
+msgstr "Email beállítások"
 
 #: tortoisehg\hgtk\hgemail.py:55
 msgid "Email outgoing changes"
-msgstr ""
+msgstr "Email a kimenőváltozásokról"
 
 #: tortoisehg\hgtk\hgemail.py:57
 msgid "Email revisions "
-msgstr ""
+msgstr "Email revízió "
 
 #: tortoisehg\hgtk\hgemail.py:59
 msgid "Email Mercurial Patches"
-msgstr ""
+msgstr "Mercurial Javítások Email"
 
 #: tortoisehg\hgtk\hgemail.py:63
 msgid "Envelope"
-msgstr ""
+msgstr "Boríték"
 
 #: tortoisehg\hgtk\hgemail.py:64
 msgid "Options"
-msgstr ""
+msgstr "Opciók"
 
 #: tortoisehg\hgtk\hgemail.py:76
 msgid "To:"
-msgstr ""
+msgstr "Címzett:"
 
 #: tortoisehg\hgtk\hgemail.py:81
 msgid "Cc:"
-msgstr ""
+msgstr "Másolat:"
 
 #: tortoisehg\hgtk\hgemail.py:86
 msgid "From:"
-msgstr ""
+msgstr "Feladó:"
 
 #: tortoisehg\hgtk\hgemail.py:90
 msgid "In-Reply-To:"
-msgstr ""
+msgstr "Eredeti üzenet a válasz üzenetben"
 
 #: tortoisehg\hgtk\hgemail.py:92
 msgid "Message identifier to reply to, for threading"
-msgstr ""
+msgstr "Üzenet azonosító a válaszban a szálkövetés megtartása miatt"
 
 #: tortoisehg\hgtk\hgemail.py:99
 msgid "Send changesets as Hg patches"
-msgstr ""
+msgstr "Válzotások küldése mint HG javítása"
 
 #: tortoisehg\hgtk\hgemail.py:102
 msgid ""
@@ -1563,10 +1603,13 @@ msgid ""
 "programs.  They include a header which contains the most important changeset "
 "metadata."
 msgstr ""
+"Hg javítások (export parancsal generálva) kompatibilisek a legtöbb javító "
+"programmal. Tartalmaza a fejlécet, ami magábafoglalja a legfontosabb "
+"változások metaadatait."
 
 #: tortoisehg\hgtk\hgemail.py:107
 msgid "Use extended (git) patch format"
-msgstr ""
+msgstr "Kiterjestett (git) javító formátum használata"
 
 #: tortoisehg\hgtk\hgemail.py:110
 msgid ""
@@ -1574,10 +1617,13 @@ msgid ""
 "recipients may not be able to use them if they are not using git or "
 "Mercurial."
 msgstr ""
+"Git javítások bináris fájlokat tartalmazhatnak, teljes másolatokat és "
+"jogosultság változásokat, előfordulhat, hogy a fogadó nem képes feldolgoznia "
+"a fájlokat ha nem git-et vagy Mercurial-t használ"
 
 #: tortoisehg\hgtk\hgemail.py:115
 msgid "Plain, do not prepend Hg header"
-msgstr ""
+msgstr "Hh fejléc nélkül"
 
 #: tortoisehg\hgtk\hgemail.py:118
 msgid ""
@@ -1585,10 +1631,13 @@ msgid ""
 "useful if recipient is not using Mercurial (and does not like to see the "
 "headers)."
 msgstr ""
+"Egyszerűsített Mercurial header nem tartalmazza a felhasználóinevet és a "
+"szülő információka. Csak akkor hasznos, ha a fogadó nem használ Mercurial-t "
+"és nem szereti ha a fejlécinformációk megjelenítődnek."
 
 #: tortoisehg\hgtk\hgemail.py:123
 msgid "Send single binary bundle, not patches"
-msgstr ""
+msgstr "Egy bináris csomag küldése, nem javítás"
 
 #: tortoisehg\hgtk\hgemail.py:127
 msgid ""
@@ -1596,48 +1645,53 @@ msgid ""
 "from them. This is the safest way to send changes to recipient Mercurial "
 "users."
 msgstr ""
+"A csomag tartalmazza a teljes változás listát bináris formátumban. A "
+"csővégén lévő felhasználók letudják tölteni azokat. Ez a legbiztonságosabb "
+"módja a változások küldésének másik Mercurial felhasználónak."
 
 #: tortoisehg\hgtk\hgemail.py:133
 msgid ""
 "This feature is only available when sending outgoing changesets. It is not "
 "applicable with revision ranges."
 msgstr ""
+"Ez csak akkor választható, ha kimenő változást küldünk. Nem alkalmazható "
+"revízió töredékekre."
 
 #: tortoisehg\hgtk\hgemail.py:136
 msgid "attach"
-msgstr ""
+msgstr "csatolás"
 
 #: tortoisehg\hgtk\hgemail.py:138
 msgid "send patches as attachments"
-msgstr ""
+msgstr "javítás küldése mellékletként"
 
 #: tortoisehg\hgtk\hgemail.py:139
 msgid "inline"
-msgstr ""
+msgstr "beágyazott"
 
 #: tortoisehg\hgtk\hgemail.py:141
 msgid "send patches as inline attachments"
-msgstr ""
+msgstr "javítás küldése beágyazott levélelemként"
 
 #: tortoisehg\hgtk\hgemail.py:142
 msgid "diffstat"
-msgstr ""
+msgstr "diffstat"
 
 #: tortoisehg\hgtk\hgemail.py:144
 msgid "add diffstat output to messages"
-msgstr ""
+msgstr "különbözeti statistika hozzáadása az üzenetekhez"
 
 #: tortoisehg\hgtk\hgemail.py:152
 msgid "Subject:"
-msgstr ""
+msgstr "Tárgy:"
 
 #: tortoisehg\hgtk\hgemail.py:166
 msgid "Flags:"
-msgstr ""
+msgstr "Jelölések:"
 
 #: tortoisehg\hgtk\hgemail.py:180
 msgid "Patch Series (Bundle) Description"
-msgstr ""
+msgstr "Javító Csomag Leírás"
 
 #: tortoisehg\hgtk\hgemail.py:221
 msgid ""
@@ -1651,23 +1705,23 @@ msgstr ""
 #: tortoisehg\hgtk\hgemail.py:268 tortoisehg\hgtk\hgemail.py:273
 #: tortoisehg\hgtk\hgemail.py:282
 msgid "Info required"
-msgstr ""
+msgstr "Információ szükséges"
 
 #: tortoisehg\hgtk\hgemail.py:269
 msgid "You must specify a recipient"
-msgstr ""
+msgstr "Fogadó megadása szükséges"
 
 #: tortoisehg\hgtk\hgemail.py:274
 msgid "You must specify a sender address"
-msgstr ""
+msgstr "A küldő címet kötelező megadni"
 
 #: tortoisehg\hgtk\hgemail.py:283
 msgid "You must configure SMTP"
-msgstr ""
+msgstr "Kérjük konfigurálja az SMPT beállításokat"
 
 #: tortoisehg\hgtk\hgignore.py:34
 msgid "Ignore filter - %s"
-msgstr ""
+msgstr "Figyelmen kívülhagyott szűrő - %s"
 
 #: tortoisehg\hgtk\hgignore.py:52
 msgid "Glob:"
@@ -1675,31 +1729,31 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgignore.py:77 tortoisehg\hgtk\thgconfig.py:599
 msgid "Edit File"
-msgstr ""
+msgstr "Fájl szerkesztése"
 
 #: tortoisehg\hgtk\hgignore.py:79
 msgid "Apply to:"
-msgstr ""
+msgstr "Hatáskör:"
 
 #: tortoisehg\hgtk\hgignore.py:88
 msgid "Filters"
-msgstr ""
+msgstr "Szűrők"
 
 #: tortoisehg\hgtk\hgignore.py:104
 msgid "Patterns"
-msgstr ""
+msgstr "Minták"
 
 #: tortoisehg\hgtk\hgignore.py:112
 msgid "Remove Selected"
-msgstr ""
+msgstr "A kijelöltek eltávolítása"
 
 #: tortoisehg\hgtk\hgignore.py:118
 msgid "Unknown Files"
-msgstr ""
+msgstr "Ismeretlen fájlok"
 
 #: tortoisehg\hgtk\hgignore.py:132
 msgid "Files"
-msgstr ""
+msgstr "Fájlok"
 
 #: tortoisehg\hgtk\hgignore.py:197
 msgid "Invalid glob expression"
@@ -1707,155 +1761,164 @@ msgstr ""
 
 #: tortoisehg\hgtk\hgignore.py:213
 msgid "Invalid regexp expression"
-msgstr ""
+msgstr "Hibás reguláris kifejezés"
 
 #: tortoisehg\hgtk\hginit.py:22
 msgid "TortoiseHg Init"
-msgstr ""
+msgstr "TortoiseHg Init"
 
 #: tortoisehg\hgtk\hginit.py:30
 msgid "Create"
-msgstr ""
+msgstr "Létrehozás"
 
 #: tortoisehg\hgtk\hginit.py:57
 msgid "Destination:"
-msgstr ""
+msgstr "Cél:"
 
 #: tortoisehg\hgtk\hginit.py:61
 msgid "Add special files (.hgignore, ...)"
-msgstr ""
+msgstr "Speciális fájlok hozzáadása (.hgignore, ...)"
 
 #: tortoisehg\hgtk\hginit.py:63
 msgid "Make repo compatible with Mercurial 1.0"
-msgstr ""
+msgstr "Repsitory legyen kompatibilis a Mercurial 1.0-val"
 
 #: tortoisehg\hgtk\hginit.py:102
 msgid "Destination path is empty"
-msgstr ""
+msgstr "Cél útvonal üres"
 
 #: tortoisehg\hgtk\hginit.py:103
 msgid "Please enter the directory path"
-msgstr ""
+msgstr "Kérjük adja meg a könytár útvonalát"
 
 #: tortoisehg\hgtk\hginit.py:117
 msgid "Unable to create new repository"
-msgstr ""
+msgstr "Nem lehet új repository-t létrehozni"
 
 #: tortoisehg\hgtk\hginit.py:121 tortoisehg\hgtk\hginit.py:126
 msgid "Error when creating repository"
-msgstr ""
+msgstr "Hiba a repository létrehozása közben"
 
 #: tortoisehg\hgtk\hginit.py:143
 msgid "New repository created"
-msgstr ""
+msgstr "Új repository létrehozva"
 
 #: tortoisehg\hgtk\hginit.py:144
 msgid "in directory %s"
-msgstr ""
+msgstr "könyvtárban %s"
 
 #: tortoisehg\hgtk\hgthread.py:70 tortoisehg\hgtk\hgthread.py:82
 #: tortoisehg\hgtk\hgthread.py:89
 msgid "response expected"
-msgstr ""
+msgstr "vár válasz"
 
 #: tortoisehg\hgtk\hgthread.py:86
 msgid "password: "
-msgstr "hasło: "
+msgstr "jelszó: "
 
 #: tortoisehg\hgtk\hgthread.py:163
 msgid "[command returned code %d "
-msgstr ""
+msgstr "[parancs visszatérési értéke %d "
 
 #: tortoisehg\hgtk\hgthread.py:165
 msgid "[command completed successfully "
-msgstr ""
+msgstr "[parancs sikeresen végrehajtva "
 
 #: tortoisehg\hgtk\hgthread.py:171
 msgid "abort: "
-msgstr ""
+msgstr "megszakadt: "
 
 #: tortoisehg\hgtk\hgtk.py:66
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
+"\n"
+"Billentyűzet bevitel megszakít, leállít.\n"
 
 #: tortoisehg\hgtk\hgtk.py:118
 msgid "can not read file \"%s\". Ignored.\n"
-msgstr ""
+msgstr "fájl nem olvasható \"%s\". Figyelmen kívül hagyva.\n"
 
 #: tortoisehg\hgtk\hgtk.py:197
 msgid "hgtk %s: %s\n"
-msgstr ""
+msgstr "hgtk %s: %s\n"
 
 #: tortoisehg\hgtk\hgtk.py:200
 msgid "hgtk: %s\n"
-msgstr ""
+msgstr "hgtk: %s\n"
 
 #: tortoisehg\hgtk\hgtk.py:203
 msgid ""
 "hgtk: command '%s' is ambiguous:\n"
 "    %s\n"
 msgstr ""
+"hgtk: parancs '%s' nem egyedi: %s\n"
+"    %s\n"
 
 #: tortoisehg\hgtk\hgtk.py:206
 msgid "hgtk: unknown command '%s'\n"
-msgstr ""
+msgstr "hgtk: ismeretlen parancs '%s'\n"
 
 #: tortoisehg\hgtk\hgtk.py:209
 msgid "abort: %s!\n"
-msgstr ""
+msgstr "megszakít: %s!\n"
 
 #: tortoisehg\hgtk\hgtk.py:256 tortoisehg\hgtk\hgtk.py:455
 msgid "There is no Mercurial repository here (.hg not found)"
-msgstr ""
+msgstr "Nem Mercurial repository (.hg nem található)"
 
 #: tortoisehg\hgtk\hgtk.py:268
 msgid "invalid arguments"
-msgstr ""
+msgstr "hibás argomentum"
 
 #: tortoisehg\hgtk\hgtk.py:274
 msgid "unrecognized profiling format '%s' - Ignored\n"
 msgstr ""
+"nem felismerhető nyomkövetési formátúm '%s' - Figyelmen kívül hagyva\n"
 
 #: tortoisehg\hgtk\hgtk.py:289
 msgid ""
 "lsprof not available - install from "
 "http://codespeak.net/svn/user/arigo/hack/misc/lsprof/"
 msgstr ""
+"lsprof nem elérhető - telepíthető a "
+"http://codespeak.net/svn/user/arigo/hack/misc/lsprof/ címről"
 
 #: tortoisehg\hgtk\hgtk.py:395
 msgid "Rename error"
-msgstr ""
+msgstr "Átnevezési hiba"
 
 #: tortoisehg\hgtk\hgtk.py:396
 msgid "rename takes one or two path arguments"
-msgstr ""
+msgstr "az átnevezéshez egy vagy kettő útvonal argumentum szükséges"
 
 #: tortoisehg\hgtk\hgtk.py:503
 msgid "mpatch error"
-msgstr ""
+msgstr "mpatch hiba"
 
 #: tortoisehg\hgtk\hgtk.py:506
 msgid "mpatch expects *.rej file argument\n"
-msgstr ""
+msgstr "mpatch *rej argumentumot vár\n"
 
 #: tortoisehg\hgtk\hgtk.py:508 tortoisehg\hgtk\hgtk.py:515
 msgid "%s does not exist\n"
-msgstr ""
+msgstr "% nem létezik\n"
 
 #: tortoisehg\hgtk\hgtk.py:534
 msgid "global options:"
-msgstr ""
+msgstr "globális beállítás"
 
 #: tortoisehg\hgtk\hgtk.py:536
 msgid "use \"hgtk help\" for the full list of commands"
-msgstr ""
+msgstr "használja a \"hgtk help\" a teljes parancslistához"
 
 #: tortoisehg\hgtk\hgtk.py:540
 msgid ""
 "use \"hgtk help\" for the full list of commands or \"hgtk -v\" for details"
 msgstr ""
+"használja \"hgtk help\" teljes parancslistához vagy \"hgtk -v\" a "
+"részletekért"
 
 #: tortoisehg\hgtk\hgtk.py:543
 msgid "use \"hgtk -v help%s\" to show aliases and global options"
@@ -5754,7 +5817,7 @@ msgstr ""
 
 #: tortoisehg\util\menuthg.py:79
 msgid "About TortoiseHg"
-msgstr "O TortoiseHG"
+msgstr ""
 
 #: tortoisehg\util\menuthg.py:80
 msgid "Show About Dialog"

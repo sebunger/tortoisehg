@@ -161,7 +161,7 @@ def visualdiff(ui, repo, pats, opts):
 
     # Build tool list based on diff-patterns matches
     toollist = set()
-    patterns = ui.configitems('diff-patterns')
+    patterns = repo.ui.configitems('diff-patterns')
     patterns = [(p, t) for p,t in patterns if t in detectedtools]
     for path in MAR:
         for pat, tool in patterns:
@@ -172,7 +172,16 @@ def visualdiff(ui, repo, pats, opts):
         else:
             toollist.add(preferred)
 
-    if len(toollist) > 1 or cpy:
+    cto = cpy.keys()
+    cfrom = cpy.values()
+    for path in MAR:
+        if path in cto or path in cfrom:
+            hascopies = True
+            break
+    else:
+        hascopies = False
+    force = repo.ui.configbool('tortoisehg', 'forcevdiffwin')
+    if len(toollist) > 1 or hascopies or force:
         usewin = True
     else:
         preferred = toollist.pop()
@@ -197,11 +206,11 @@ def visualdiff(ui, repo, pats, opts):
     # Disable 3-way merge if there is only one parent or no tool support
     do3way = bool(mergeopts) and ctx1b is not None
     if do3way:
-        args = ' '.join(mergeopts)
+        args = mergeopts
     else:
-        args = ' '.join(diffopts)
+        args = diffopts
 
-    def dodiff(tmproot, diffcmd, args):
+    def dodiff(tmproot):
         fns_and_mtime = []
 
         # Always make a copy of ctx1a (and ctx1b, if applicable)
@@ -268,7 +277,7 @@ def visualdiff(ui, repo, pats, opts):
                        plabel1=label1a, plabel2=label1b,
                        ancestor=dira, alabel=labela,
                        clabel=label2, child=dir2)
-        launchtool(diffcmd, diffopts, replace, True)
+        launchtool(diffcmd, args, replace, True)
 
         # detect if changes were made to mirrored working files
         for copy_fn, working_fn, mtime in fns_and_mtime:
@@ -279,7 +288,7 @@ def visualdiff(ui, repo, pats, opts):
 
     def dodiffwrapper():
         try:
-            dodiff(tmproot, diffcmd, args)
+            dodiff(tmproot)
         finally:
             ui.note(_('cleaning up temp directory\n'))
             shutil.rmtree(tmproot)
@@ -464,7 +473,7 @@ class FileSelectionDialog(gtk.Dialog):
                 return 'R'
             return ' '
 
-        for f in mod_a | add_a | rem_a:
+        for f in sorted(mod_a | add_a | rem_a):
             model.append([get_status(f, mod_a, add_a, rem_a), hglib.toutf(f)])
 
         self.connect('response', self.response)
