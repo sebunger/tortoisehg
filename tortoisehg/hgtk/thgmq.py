@@ -11,7 +11,7 @@ import gtk.keysyms
 import gobject
 import pango
 
-from mercurial import error
+from mercurial import error, util
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
@@ -298,7 +298,7 @@ class MQWidget(gtk.VBox):
         """
         if not self.is_operable():
             return
-        cmdline = ['hg', 'qgoto', patch]
+        cmdline = ['hg', 'qgoto', '--', patch]
         self.cmd.execute(cmdline, self.cmd_done)
 
     def qpop(self, all=False):
@@ -358,9 +358,11 @@ class MQWidget(gtk.VBox):
                 keep = True
             else:
                 return
-        cmdline = ['hg', 'qdelete'] + unapplied
+        cmdline = ['hg', 'qdelete']
         if keep:
             cmdline.append('--keep')
+        cmdline.append('--')
+        cmdline.extend(unapplied)
         self.cmd.execute(cmdline, self.cmd_done, noemit=True)
 
     def qrename(self, name, patch='qtip'):
@@ -374,7 +376,7 @@ class MQWidget(gtk.VBox):
         """
         if not name or not self.has_patch():
             return
-        cmdline = ['hg', 'qrename', patch, name]
+        cmdline = ['hg', 'qrename', '--', patch, name]
         self.cmd.execute(cmdline, self.cmd_done)
 
     def qrename_ui(self, patch='qtip'):
@@ -448,7 +450,7 @@ class MQWidget(gtk.VBox):
                       " into the current patch '%(qtip)s'?") % data).run()
         if ret != gtk.RESPONSE_YES:
             return
-        cmdline = ['hg', 'qfold'] + unapplied
+        cmdline = ['hg', 'qfold', '--'] + unapplied
         self.cmd.execute(cmdline, self.cmd_done)
 
     def qreorder(self, patch, op):
@@ -476,12 +478,14 @@ class MQWidget(gtk.VBox):
                 if maxidx < idx:
                     maxidx = idx
 
-        # find index of first unapplied patch in TreeView
+        # find index of first unapplied patch after last applied one in TreeView
+        uminidx = None
         for i, row in enumerate(model):
-            if self.is_unapplied(row[MQ_NAME]):
+            if uminidx is None and self.is_unapplied(row[MQ_NAME]):
                 uminidx = i
-                break
-        else:
+            elif self.is_applied(row[MQ_NAME]):
+                uminidx = None
+        if uminidx is None:
             return False
 
         # check whether operation is possible
@@ -546,6 +550,8 @@ class MQWidget(gtk.VBox):
         series = q.full_series[:]
         for pos, qpos in zip(dirty, qdirty):
             q.full_series[qpos] = series[model[pos][MQ_INDEX]]
+        if len(set(q.full_series)) != len(q.full_series):  # found duplicates
+            raise util.Abort(_('series become inconsistent during reorder'))
         q.series_dirty = True
         q.save_dirty()
 

@@ -21,11 +21,14 @@ def get_system_times():
 
 if os.name == 'nt':
     def browse_url(url):
+        try:
+            import win32api
+        except ImportError:
+            return
         def start_browser():
             try:
-                import win32api
                 win32api.ShellExecute(0, 'open', url, None, None, 0)
-            except (ImportError, Exception):
+            except Exception:
                 pass
         threading.Thread(target=start_browser).start()
 
@@ -37,6 +40,8 @@ if os.name == 'nt':
             return
         dirs = set()
         for path in paths:
+            if path is None:
+                continue
             abspath = os.path.abspath(path)
             if not os.path.isdir(abspath):
                 abspath = os.path.dirname(abspath)
@@ -140,7 +145,8 @@ else:
             return
         f_notify = open(notify, 'w')
         try:
-            f_notify.write('\n'.join([os.path.abspath(path) for path in paths]))
+            abspaths = [os.path.abspath(path) for path in paths if path]
+            f_notify.write('\n'.join(abspaths))
         finally:
             f_notify.close()
 

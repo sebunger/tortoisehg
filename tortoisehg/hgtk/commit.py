@@ -384,7 +384,7 @@ class GCommit(GStatus):
 
         mbox = gtk.HBox()
         self.connect('thg-accept', self.thgaccept)
-        self.branchbutton = gtk.Button()
+        self.branchbutton = gtk.Button(use_underline=False)
         self.branchbutton.connect('clicked', self.branch_clicked)
         mbox.pack_start(self.branchbutton, False, False, 2)
         if self.is_merge():
@@ -824,7 +824,7 @@ class GCommit(GStatus):
                 revs = cmdutil.revrange(self.repo, ['tip'])
                 fp = cStringIO.StringIO()
                 opts = patch.diffopts(self.ui, self.opts)
-                patch.export(self.repo, revs, fp=fp, opts=opts)
+                hglib.export(self.repo, revs, fp=fp, opts=opts)
                 text = fp.getvalue().splitlines(True)
                 buf = self.diff_highlight_buffer(text)
                 self.patch_text.set_buffer(buf)
@@ -981,7 +981,7 @@ class GCommit(GStatus):
 
     def undo_clicked(self, toolbutton, data=None):
         response = gdialog.Confirm(_('Confirm Undo Commit'),
-                [], self, _('Undo last commit')).run()
+                [], self, _('Undo last commit?')).run()
         if response != gtk.RESPONSE_YES:
             return
 
@@ -1017,7 +1017,7 @@ class GCommit(GStatus):
         # prompts). Problem?
         self.opts['addremove'] = True
         if self.qnew or self.qheader is not None:
-            cmdline = ['hg', 'addremove', '--verbose']
+            cmdline = ['hg', 'addremove', '--verbose', '--']
             cmdline += [self.repo.wjoin(x) for x in files]
             self.execute_command(cmdline, force=True)
         return True
@@ -1146,6 +1146,7 @@ class GCommit(GStatus):
         cmdline += ['--message', hglib.fromutf(self.opts['message'])]
         if self.qnew:
             cmdline += [hglib.fromutf(self.get_qnew_name())]
+        cmdline.append('--')
         cmdline += files
         if autopush:
             cmdline = (cmdline, ['hg', 'push'])
@@ -1170,7 +1171,10 @@ class GCommit(GStatus):
                     self.last_commit_id = self.get_tip_rev(True)
                 if self.notify_func:
                     self.notify_func(*self.notify_args)
-                text = _('Finish committing')
+                if autopush:
+                    text = _('Finish committing and pushing')
+                else:
+                    text = _('Finish committing')
             elif return_code is None:
                 text = _('Aborted committing')
             else:

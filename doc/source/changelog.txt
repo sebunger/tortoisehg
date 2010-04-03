@@ -223,41 +223,47 @@ Right-clicking on a revision in the (top) graph pane will bring up the
 revision context menu.
 
 	:guilabel:`Visualize Change`
-		open this change in your visual diff tool
+		Open this change in your visual diff tool
 	:guilabel:`Display Change`
-		open this changeset in the changeset browser (more below)
+		Open this changeset in the changeset browser (more below)
 	:guilabel:`Diff to Local`
-		display changes (visual diff) between this revision and your
+		Display changes (visual diff) between this revision and your
 		current working directory
 	:guilabel:`Copy Hash`
-		copy current revision's full hash to the clipboard
+		Copy current revision's full hash to the clipboard
+	:guilabel:`Push to Here`
+		Performs the equivalent of 'push -r <rev>'.  This option is only
+		available on changesets marked as outgoing.
 	:guilabel:`Update...`
-		update your working directory to this revision [#rcm1]_
+		Update your working directory to this revision. Opens the
+		TortoiseHg update dialog with this revision selected.
 	:guilabel:`Merge With...`
-		merge with this revision [#rcm2]_
+		Merge with this revision. Opens the TortoiseHg merge dialog with
+		this revision selected.
 	:guilabel:`Backout...`
-		create a backout changeset for selected revision
+		Create a backout changeset for selected revision
 	:guilabel:`Revert`
-		revert working copy to this revision's contents, without
+		Revert working copy to this revision's contents, without
 		updating working directory parent revision. Use with care.
 	:guilabel:`Export`
 		:guilabel:`Export Patch`
-			generate a patch file containing this revision's changes
+			Generate a patch file containing this revision's changes
 		:guilabel:`Email Patch`
-			send this revision's changes to email recipient [#rcm3]_
+			Send this revision's changes to email recipient.  Opens the
+			TortoiseHg email dialog with this revision selected.
 		:guilabel:`Bundle rev:tip`
-			create a bundle with all revs from selected to tip
+			Create a bundle with all revs from selected to tip
 		:guilabel:`Archive...`
-			open the archive dialog for this revision, allowing user to
+			Open the archive dialog for this revision, allowing user to
 			generate a backup copy of the repository at that revision.
 	:guilabel:`Tag`
 		:guilabel:`Add/Remove Tag`
-			opens the TortoiseHg tag dialog with this revision selected
+			Open the TortoiseHg tag dialog with this revision selected
 		:guilabel:`Add/Move/Remove Bookmark`
-			opens the TortoiseHg bookmark dialog with this revision selected
+			Open the TortoiseHg bookmark dialog with this revision selected
 			*This option requires the boomarks extension to be enabled*
 		:guilabel:`Rename Bookmark`
-			opens the TortoiseHg bookmark rename dialog
+			Open the TortoiseHg bookmark rename dialog
 			*This option requires the boomarks extension to be enabled*
 	:guilabel:`Mercurial Queues`
 		:guilabel:`Import revision to MQ`
@@ -266,7 +272,7 @@ revision context menu.
 			when MQ is enabled*
 		:guilabel:`Strip Revision...`
 			Remove the selected revision and all of it's descendants from the
-			repository [#rcm4]_ *Only visible when MQ is enabled*
+			repository [#rcm1]_ *Only visible when MQ is enabled*
 	:guilabel:`Transplant to local`
 		Transplant selected revision onto the current working parent.
 		*Only visible when the transplant extension is enabled*
@@ -288,16 +294,17 @@ operation on revision ranges.
 		Opens status viewer with cumulative changes of the range of
 		changesets.  The status viewer allows cherry picked changes to
 		be saved to a file.
-	:guilabel:`Visual Diff with selected` [#rcm5]_
+	:guilabel:`Visual Diff with selected`
 		Opens visual diff window with cumulative changes of the range
-		of changesets.
+		of changesets.  See also menuselection:`Global Settings -->
+		TortoiseHg --> Visual Diff Tool`
 	:guilabel:`Email from here to selected`
 		Opens email dialog with range of changesets.
 	:guilabel:`Bundle from here to selected`
 		Creates a bundle file with range of changesets.
 	:guilabel:`Export patches from here to selected`
 		Creates a patch file for each changeset in selected range.
-	:guilabel:`Merge with selected` [#rcm6]_
+	:guilabel:`Merge with selected`
 		Merges this revision with the other selected revision.  If
 		neither revision is currently checked out, the merge dialog will
 		be forced to update to the first selected revision before
@@ -315,15 +322,9 @@ operation on revision ranges.
 		Import selected revision range into the current patch queue.
 		*Only visible when MQ is enabled*
 
-.. [#rcm1] Opens the TortoiseHg update dialog with this revision selected.
-.. [#rcm2] Opens the TortoiseHg merge dialog with this revision selected.
-.. [#rcm3] Opens the TortoiseHg email dialog with this revision selected.
-.. [#rcm4] The strip command will store the stripped revisions in a bundle file
+.. [#rcm1] The strip command will store the stripped revisions in a bundle file
 		that can later be reapplied.
-		See `also <http://mercurial.selenic.com/wiki/EditingHistory>`_.
-.. [#rcm5] :menuselection:`Global Settings --> TortoiseHg --> Visual Diff Tool`
-.. [#rcm6] Only sensitive if the selected revision is your current working
-		directory parent
+		See also `EditingHistory <http://mercurial.selenic.com/wiki/EditingHistory>`_.
 
 File Context Menus
 ------------------
@@ -426,18 +427,18 @@ Bisect
 TortoiseHg 1.0 introduced support for bisect bug searching to help find
 changesets which introduce problems. To use, mark the earliest changeset
 you know exhibits the problem as bad, then mark the latest changeset
-which is free from the problem as good.  Once you have performed tests,
-mark the working directory parent as good or bad, and bisect will either
-update to another candidate changeset or announce that it has found the
-bad revision.
+which is free from the problem as good.  The changelog tool will select
+a changeset for you to test.  Once you have performed tests, mark the
+changeset as good or bad, and bisect will either update to another
+candidate changeset or announce that it has found the bad revision.
 
 As a shortcut, you can also mark a revision as good or bad without
 checking it out first.
 
 For more automated bisecting, you must use the Mercurial command line
 and provide an automated test that can build and run a changeset and
-return 0-good, 125-skip, or 127-abort, or anythin else to mean bad.  See
-the :command:`hg bisect` command help for more information.
+return 0-good, 125-skip, or 127-abort, or anything else to mean bad.
+See the :command:`hg bisect` command help for more information.
 
 
 Keyboard navigation

@@ -227,9 +227,10 @@ _('Optional. Method to use to send email messages. If value is "smtp" (default),
         _('Hostname the sender can use to identify itself to the mail server.')))
 
 _diff_info = (
-    (_('Patch EOL'), 'patch.eol', ['strict', 'crlf', 'lf'],
+    (_('Patch EOL'), 'patch.eol', ['auto', 'strict', 'crlf', 'lf'],
         _('Normalize file line endings during and after patch to lf or'
-        ' crlf.  Strict does no normalization.'
+        ' crlf.  Strict does no normalization.  Auto does per-file'
+        ' detection, and is the recommended setting.'
         ' Default: strict')),
     (_('Git Format'), 'diff.git', ['False', 'True'],
         _('Use git extended diff header format.'
@@ -536,6 +537,9 @@ class PathEditDialog(gtk.Dialog):
             ret += netloc + '/' + folder
         return ret
 
+CONF_GLOBAL = 0
+CONF_REPO   = 1
+
 class ConfigDialog(gtk.Dialog):
     def __init__(self, configrepo=False):
         """ Initialize the Dialog. """
@@ -588,18 +592,24 @@ class ConfigDialog(gtk.Dialog):
         self.vbox.pack_start(wrapbox)
 
         # create combo to select the target
+        hbox = gtk.HBox()
+        wrapbox.pack_start(hbox, False, False, 1)
         combo = gtk.combo_box_new_text()
+        hbox.pack_start(combo, False, False)
         combo.append_text(_('User global settings'))
         if repo:
             combo.append_text(_('%s repository settings') % hglib.toutf(name))
         combo.connect('changed', self.fileselect)
+        self.confcombo = combo
 
-        hbox = gtk.HBox()
-        hbox.pack_start(combo, False, False)
+        # command buttons
         edit = gtk.Button(_('Edit File'))
         hbox.pack_start(edit, False, False, 6)
         edit.connect('clicked', self.edit_clicked)
-        wrapbox.pack_start(hbox, False, False, 1)
+
+        reload = gtk.Button(_('Reload'))
+        hbox.pack_start(reload, False, False)
+        reload.connect('clicked', self.reload_clicked)
 
         # insert padding of between combo and middle pane
         wrapbox.pack_start(gtk.VBox(), False, False, 4)
@@ -690,12 +700,10 @@ class ConfigDialog(gtk.Dialog):
         descframe.add(scrolled)
         self.descbuffer = desctext.get_buffer()
 
-        self.configrepo = configrepo
-
         # Force dialog into clean state in the beginning
         self._btn_apply.set_sensitive(False)
         self.dirty = False
-        combo.set_active(configrepo and 1 or 0)
+        combo.set_active(configrepo and CONF_REPO or CONF_GLOBAL)
 
         # activate first config page
         self.confview.set_cursor(self.confmodel[0].path)
@@ -704,15 +712,22 @@ class ConfigDialog(gtk.Dialog):
     def fileselect(self, combo):
         'select another hgrc file'
         if self.dirty:
-            ret = gdialog.Confirm(_('Unapplied changes'), [], self,
-                   _('Lose changes and switch files?.')).run()
-            if ret != gtk.RESPONSE_YES:
-               return
-        self.configrepo = combo.get_active() and True or False
+            ret = gdialog.CustomPrompt(_('Confirm Switch'),
+                    _('Switch after saving changes?'), self,
+                    (_('&Save'), _('&Discard'), _('&Cancel')),
+                    default=2, esc=2).run()
+            if ret == 2:
+                combo.handler_block_by_func(self.fileselect)
+                repo = combo.get_active() == CONF_GLOBAL
+                combo.set_active(repo and CONF_REPO or CONF_GLOBAL)
+                combo.handler_unblock_by_func(self.fileselect)
+                return
+            elif ret == 0:
+                self.apply_changes()
         self.refresh()
 
     def refresh(self):
-        if self.configrepo:
+        if self.confcombo.get_active() == CONF_REPO:
             repo = hg.repository(ui.ui(), self.root)
             name = hglib.get_reponame(repo)
             self.rcpath = [os.sep.join([repo.root, '.hg', 'hgrc'])]
@@ -769,7 +784,7 @@ class ConfigDialog(gtk.Dialog):
 
     def edit_clicked(self, button):
         # reload configs, in case they have been written since opened
-        if self.configrepo:
+        if self.confcombo.get_active() == CONF_REPO:
             repo = hg.repository(ui.ui(), self.root)
             u = repo.ui
         else:
@@ -777,6 +792,15 @@ class ConfigDialog(gtk.Dialog):
         # open config file with visual editor
         if not gtklib.open_with_editor(u, self.fn, self):
             self.focus_field('tortoisehg.editor')
+
+    def reload_clicked(self, button):
+        if self.dirty:
+            ret = gdialog.Confirm(_('Confirm Reload'), [], self,
+                                  _('Unsaved changes will be lost.\n'
+                                    'Do you want to reload?')).run()
+            if ret != gtk.RESPONSE_YES:
+                return
+        self.refresh()
 
     def delete_event(self, dlg, event):
         return True
@@ -786,7 +810,7 @@ class ConfigDialog(gtk.Dialog):
 
     def should_live(self, dialog=None, resp=None):
         if resp == gtk.RESPONSE_APPLY:
-            self._apply_clicked()
+            self.apply_changes()
             self.emit_stop_by_name('response')
             return True
         elif resp == gtk.RESPONSE_CANCEL:
@@ -804,7 +828,7 @@ class ConfigDialog(gtk.Dialog):
                     self.emit_stop_by_name('response')
                 return True
             elif ret == 0:
-                self._apply_clicked()
+                self.apply_changes()
         return False
 
     def cursor_changed(self, treeview):
@@ -913,7 +937,7 @@ class ConfigDialog(gtk.Dialog):
             return
         if testpath[0] == '~':
             testpath = os.path.expanduser(testpath)
-        cmdline = ['hg', 'incoming', '--verbose', testpath]
+        cmdline = ['hg', 'incoming', '--verbose', '--', testpath]
         dlg = hgcmd.CmdDialog(cmdline, text='hg incoming')
         dlg.run()
         dlg.hide()
@@ -1230,7 +1254,7 @@ class ConfigDialog(gtk.Dialog):
                 # Try to create a file from rcpath
                 try:
                     f = open(fn, 'w')
-                    f.write(_('# Generated by tortoisehg-config\n'))
+                    f.write('# Generated by TortoiseHg setting dialog\n')
                     f.close()
                     break
                 except (IOError, OSError):
@@ -1290,7 +1314,7 @@ class ConfigDialog(gtk.Dialog):
             self.history.get_value(cpath).remove(newvalue)
         self.history.mrul(cpath).add(newvalue)
 
-    def _apply_clicked(self, *args):
+    def apply_changes(self):
         if self.readonly:
             #dialog? Read only access, please install ...
             return

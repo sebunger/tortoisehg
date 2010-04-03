@@ -47,6 +47,7 @@ class FilterBar(gtklib.SlimToolbar):
         gtklib.SlimToolbar.__init__(self, tooltips)
         self.filter_mode = filter_mode
         self.buttons = {}
+        self.handlers = {}
 
         self.all = gtk.RadioButton(None, _('All'))
         self.all.set_active(True)
@@ -84,9 +85,7 @@ class FilterBar(gtklib.SlimToolbar):
         self.buttons['branch'] = self.branches
 
         self.branchcombo = gtk.combo_box_new_text()
-        self.branchcombo.append_text(_('Branches...'))
-        for name in branch_names:
-            self.branchcombo.append_text(name)
+        self.refresh(branch_names)
         self.branchcombo.set_active(0)
         self.append_widget(self.branchcombo, padding=0)
 
@@ -126,8 +125,45 @@ class FilterBar(gtklib.SlimToolbar):
         widget = self.__dict__[widget_name]
         widget.connect(signal, handler, *opts)
 
+        if not self.handlers.has_key(widget_name):
+            self.handlers[widget_name] = []
+        self.handlers[widget_name].append(handler)
+
     def get_button(self, type):
         return self.buttons.get(type)
+
+    def refresh(self, branch_names):
+        ''' refresh branch names in drop-down list '''
+        # block all handlers
+        if self.handlers.has_key('branchcombo'):
+            handlers = self.handlers['branchcombo']
+            for handler in handlers:
+                self.branchcombo.handler_block_by_func(handler)
+        else:
+            handlers = ()
+
+        # save selected item
+        text = self.branchcombo.get_active_text()
+
+        # refresh branch names
+        self.branchcombo.get_model().clear()
+        self.branchcombo.append_text(_('Branches...'))
+        for name in branch_names:
+            self.branchcombo.append_text(name)
+
+        # try to restore previously selected item
+        for row in self.branchcombo.get_model():
+            if row[0] == text:
+                self.branchcombo.set_active_iter(row.iter)
+                break
+        else:
+            # fallback to 'All' filter if no matches
+            self.branchcombo.set_active(0)
+            self.all.set_active(True)
+
+        # unblock all handlers
+        for handler in handlers:
+            self.branchcombo.handler_unblock_by_func(handler)
 
 class GLog(gdialog.GWindow):
     'GTK+ based dialog for displaying repository logs'
@@ -274,10 +310,11 @@ class GLog(gdialog.GWindow):
             navi_b = []
             for name in lb[:10]:
                 lname = hglib.fromutf(name)
-                navi_b.append(dict(text=name, func=navigate, args=[lname]))
+                navi_b.append(dict(text=name, func=navigate, args=[lname],
+                                   use_underline=False))
                 filter_b.append(dict(text=name, name='@' + name,
                          func=self.filter_handler, args=['branch', name],
-                         asradio=True, rg='all'))
+                         asradio=True, rg='all', use_underline=False))
             if len(navi_b) > 0:
                 navi_menu.append(dict(text='----'))
                 navi_menu.append(dict(text=_('Branches'), subitems=navi_b,
@@ -289,7 +326,8 @@ class GLog(gdialog.GWindow):
         navi_t = []
         for tag in ft:
             tname = hglib.toutf(tag)
-            navi_t.append(dict(text=tname, func=navigate, args=[tag]))
+            navi_t.append(dict(text=tname, func=navigate, args=[tag],
+                               use_underline=False))
         if len(navi_t) > 0:
             if len(navi_menu) == 0:
                 navi_menu.append(dict(text='----'))
@@ -511,9 +549,18 @@ class GLog(gdialog.GWindow):
                     try:
                         hashes = line.split(' ')
                         changelist = hashes.pop(0)
-                        if changelist == 'submitted':
-                            changelist = _('Submitted') + str(submitted)
-                            submitted += 1
+                        if len(hashes)>1 and len(hashes[0])==1:
+                           state = hashes.pop(0)
+                           if state == 's':
+                               changelist = _('%s (submitted)') % changelist
+                           elif state == 'p':
+                               changelist = _('%s (pending)') % changelist
+                        else:
+                           if changelist == 'submitted':
+                               changelist = _('Submitted') + str(submitted)
+                               submitted += 1
+                           else:
+                               changelist = _('%s (pending)') % changelist
                         pending[changelist] = hashes
                     except (ValueError, IndexError):
                         text = _('Unable to parse p4pending output')
@@ -1051,7 +1098,8 @@ class GLog(gdialog.GWindow):
                     opts['filehist'] = lname
                     self.graphview.refresh(graphcol, [lname], opts)
             if not opts.get('filehist'):
-                ftitle(self.filtercombo.get_active_text())
+                ftitle('%s: %s' % (self.filtercombo.get_active_text(),
+                                   self.filterentry.get_text()))
                 self.graphview.refresh(False, npats, opts)
             filtertext += self.filtercombo.get_active_text()
         elif self.filter == 'all':
@@ -1117,6 +1165,9 @@ class GLog(gdialog.GWindow):
                 mq_text += _('%(count)d of %(total)d applied patches') % {
                              'count': ncount, 'total': ntotal}
             self.stbar.set_text(mq_text, name='mq')
+
+        # refresh filterbar
+        self.filterbar.refresh(hglib.getlivebranch(self.repo))
 
         # Remember options to next time reload_log is called
         self.filteropts = opts
@@ -1609,7 +1660,7 @@ class GLog(gdialog.GWindow):
                 # load the rebase extension explicitly
                 hglib.loadextension(self.ui, 'rebase')
 
-        cmdline = ['hg'] + cmd + [self.bfile]
+        cmdline = ['hg'] + cmd + ['--', self.bfile]
 
         def callback(return_code, *args):
             self.remove_overlay('--rebase' in cmd)
@@ -1805,7 +1856,7 @@ class GLog(gdialog.GWindow):
                            self).run()
             self.pathentry.grab_focus()
             return
-        cmdline = ['hg'] + cmd + self.get_proxy_args() + [remote_path]
+        cmdline = ['hg'] + cmd + self.get_proxy_args() + ['--', remote_path]
 
         def callback(return_code, *args):
             if return_code == 0:
@@ -1883,43 +1934,14 @@ class GLog(gdialog.GWindow):
         self.show_dialog(dlg)
 
     def push_clicked(self, toolbutton):
-        original_path = hglib.fromutf(self.pathentry.get_text()).strip()
-        remote_path = hglib.validate_synch_path(original_path, self.repo)
+        remote_path = self.validate_path()
         if not remote_path:
-            gdialog.Prompt(_('No remote path specified'),
-                           _('Please enter or select a remote path'),
-                           self).run()
-            self.pathentry.grab_focus()
             return
-
-        confirm_push = False
-        if not hg.islocal(remote_path):
-            if self.forcepush:
-                title = _('Confirm Forced Push to Remote Repository')
-                text = _('Forced push to remote repository\n%s\n'
-                    '(creating new heads in remote if needed)?') % original_path
-                buttontext = _('Forced &Push')
-            else:
-                title = _('Confirm Push to remote Repository')
-                text = _('Push to remote repository\n%s\n?') % original_path
-                buttontext = _('&Push')
-            confirm_push = True
-        elif self.forcepush:
-            title = _('Confirm Forced Push')
-            text = _('Forced push to repository\n%s\n'
-                '(creating new heads if needed)?') % original_path
-            buttontext = _('Forced &Push')
-            confirm_push = True
-        if confirm_push:
-            dlg = gdialog.CustomPrompt(title, text,
-                    None, (buttontext, _('&Cancel')), default=1, esc=1)
-            if dlg.run() != 0:
-                return
 
         cmdline = ['hg', 'push'] + self.get_proxy_args()
         if self.forcepush:
             cmdline += ['--force']
-        cmdline += [remote_path]
+        cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
             if return_code == 0:
@@ -2113,7 +2135,7 @@ class GLog(gdialog.GWindow):
 
     def strip_rev(self, menuitem):
         def strip_completed():
-            self.repo.invalidate()
+            hglib.invalidaterepo(self.repo)
             self.reload_log()
             self.changeview.clear()
         rev = self.currevid
@@ -2263,6 +2285,7 @@ class GLog(gdialog.GWindow):
             status = _('Bundling from %(base)s to %(rev)s...') % data
         else:
             status = _('Bundling from %(base)s to tip...') % data
+        cmdline.append('--')
         cmdline.append(result)
 
         def callback(return_code, *args):
@@ -2458,22 +2481,56 @@ class GLog(gdialog.GWindow):
                          statopts)
         dialog.display()
 
-    def push_to(self, menuitem):
-        remote_path = hglib.fromutf(self.pathentry.get_text()).strip()
-        for alias, path in self.repo.ui.configitems('paths'):
-            if remote_path == alias:
-                remote_path = path
-            elif remote_path == url.hidepassword(path):
-                remote_path = path
+    def validate_path(self):
+        original_path = hglib.fromutf(self.pathentry.get_text()).strip()
+        remote_path = hglib.validate_synch_path(original_path, self.repo)
         if not remote_path:
             gdialog.Prompt(_('No remote path specified'),
                            _('Please enter or select a remote path'),
                            self).run()
             self.pathentry.grab_focus()
+            return None
+        else:
+            confirm_push = False
+            if not hg.islocal(remote_path):
+                if self.forcepush:
+                    title = _('Confirm Forced Push to Remote Repository')
+                    text = _('Forced push to remote repository\n%s\n'
+                             '(creating new heads in remote if needed)?') % original_path
+                    buttontext = _('Forced &Push')
+                else:
+                    title = _('Confirm Push to remote Repository')
+                    text = _('Push to remote repository\n%s\n?') % original_path
+                    buttontext = _('&Push')
+                    confirm_push = True
+            elif self.forcepush:
+                title = _('Confirm Forced Push')
+                text = _('Forced push to repository\n%s\n'
+                         '(creating new heads if needed)?') % original_path
+                buttontext = _('Forced &Push')
+                confirm_push = True
+            
+            if confirm_push:
+                dlg = gdialog.CustomPrompt(title, text,
+                    None, (buttontext, _('&Cancel')), default=1, esc=1)
+                if dlg.run() != 0:
+                    return None
+                else:
+                    return remote_path
+            else:
+                return remote_path    
+
+    def push_to(self, menuitem):
+        remote_path = self.validate_path()
+        if not remote_path:
             return
+        
         node = self.repo[self.currevid].node()
         rev = str(self.currevid)
-        cmdline = ['hg', 'push', '--rev', rev, remote_path]
+        cmdline = ['hg', 'push', '--rev', rev]
+        if self.forcepush:
+            cmdline += ['--force']
+        cmdline += ['--', remote_path]
 
         def callback(return_code, *args):
             if return_code == 0:
@@ -2502,7 +2559,7 @@ class GLog(gdialog.GWindow):
 
     def pull_to(self, menuitem):
         rev = str(self.currevid)
-        cmdline = ['hg', 'pull', '--rev', rev, self.bfile]
+        cmdline = ['hg', 'pull', '--rev', rev, '--', self.bfile]
 
         def callback(return_code, *args):
             if return_code == 0:
