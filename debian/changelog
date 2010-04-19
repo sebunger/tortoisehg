@@ -1,4 +1,4 @@
-tortoisehg (1.0.1-1) UNRELEASED; urgency=low
+tortoisehg (1.0.1-1) unstable; urgency=low
 
   * New upstream release.
   * Upstream have flipflopped again on including the docs in the tarball,
