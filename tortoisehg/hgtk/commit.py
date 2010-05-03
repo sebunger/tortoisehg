@@ -655,7 +655,7 @@ class GCommit(GStatus):
 
         btn = self.get_toolbutton('commit')
         btn.set_label(label)
-        btn.set_tooltip(self.tooltips, tooltip)
+        self.tooltips.set_tip(btn, tooltip)
 
     def get_head_info(self):
         def ishead(ctx):
@@ -902,6 +902,19 @@ class GCommit(GStatus):
                 gdialog.Prompt(_('Commit'),
                         _('Unable to create ') + backupdir, self).run()
                 return
+
+        def finish():
+            os.chdir(cwd)
+            # restore backup files
+            try:
+                for realname, tmpname in backups.iteritems():
+                    util.copyfile(tmpname, repo.wjoin(realname))
+                    os.unlink(tmpname)
+                os.rmdir(backupdir)
+            except OSError:
+                pass
+            callback()
+
         try:
             # backup continues
             allchunks = []
@@ -953,18 +966,6 @@ class GCommit(GStatus):
                         gdialog.Prompt(_('Commit'),
                                 _('Unable to apply patch'), self).run()
                         return
-
-            def finish():
-                os.chdir(cwd)
-                # restore backup files
-                try:
-                    for realname, tmpname in backups.iteritems():
-                        util.copyfile(tmpname, repo.wjoin(realname))
-                        os.unlink(tmpname)
-                    os.rmdir(backupdir)
-                except OSError:
-                    pass
-                callback()
 
             # 4. We prepared working directory according to filtered patch.
             #    Now is the time to delegate the job to commit/qrefresh
@@ -1172,9 +1173,9 @@ class GCommit(GStatus):
                 if self.notify_func:
                     self.notify_func(*self.notify_args)
                 if autopush:
-                    text = _('Finish committing and pushing')
+                    text = _('Finished committing and pushing')
                 else:
-                    text = _('Finish committing')
+                    text = _('Finished committing')
             elif return_code is None:
                 text = _('Aborted committing')
             else:
@@ -1185,7 +1186,7 @@ class GCommit(GStatus):
                     status=_('Committing changes...'),
                     title=_('Commit')):
             gdialog.Prompt(_('Cannot run now'),
-                           _('Please try again after running '
+                           _('Please try again after the running '
                              'operation is completed'), self).run()
 
     def get_tip_rev(self, refresh=False):

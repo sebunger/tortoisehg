@@ -260,7 +260,7 @@ class GWindow(gtk.Window):
             self.show_all()
         else:
             self._parse_opts()
-            self.tooltips = gtk.Tooltips()
+            self.tooltips = gtklib.Tooltips()
 
 
     def test_opt(self, opt):
@@ -326,7 +326,7 @@ class GWindow(gtk.Window):
             tbutton = gtk.ToolButton(stock)
 
         if tip:
-            tbutton.set_tooltip(self.tooltips, tip)
+            self.tooltips.set_tip(tbutton, tip)
         if icon:
             image = gtklib.get_icon_image(icon)
             tbutton.set_icon_widget(image)
@@ -461,7 +461,7 @@ class GWindow(gtk.Window):
         if x >= 0 and x < w and y >= 0 and y < h:
             self.move(x, y)
 
-        self.tooltips = gtk.Tooltips()
+        self.tooltips = gtklib.Tooltips()
         toolbar = gtk.Toolbar()
         tbuttons =  self.get_tbbuttons()
         for tbutton in tbuttons:
@@ -580,6 +580,10 @@ class GWindow(gtk.Window):
                 command()
             except (util.Abort, IOError, OSError), inst:
                 Prompt(title + _(' Aborted'), str(inst), self).run()
+                return False, ''
+            except error.LookupError, inst:
+                Prompt(title + _(' Aborted'), str(inst) + 
+                        _(', please refresh'), self).run()
                 return False, ''
         finally:
             sys.stderr = saved
@@ -723,13 +727,11 @@ class GDialog(gtk.Dialog):
         if name:
             self.settings = settings.Settings(name)
 
-        # dialog size
-        defsize = self.get_defsize()
-        if defsize != (-1, -1):
-            self.set_default_size(*defsize)
-
         # signal handler
         self.connect('realize', self.realized)
+
+        # disable entire dialog
+        self.set_sensitive(False)
 
     ### Overridable Functions ###
 
@@ -766,6 +768,9 @@ class GDialog(gtk.Dialog):
     def command_done(self, returncode, useraborted, *args):
         pass
 
+    def before_show(self):
+        pass
+
     def before_close(self):
         return True
 
@@ -798,6 +803,16 @@ class GDialog(gtk.Dialog):
 
         # add Abort button
         self.action_area.add(self.buttons['abort'])
+
+        # enable entire dialog
+        self.set_sensitive(True)
+
+        # focus on default button if needs
+        name = self.get_default_button()
+        if name:
+            btn = self.buttons.get(name)
+            if btn:
+                btn.grab_focus()
 
     def do_switch_to(self, mode, cmd=True):
         if mode == MODE_NORMAL:
@@ -832,7 +847,7 @@ class GDialog(gtk.Dialog):
         self.do_switch_to(MODE_WORKING)
         self.cmd.execute(cmdline, cmd_done)
 
-    ### Signal Handler ###
+    ### Signal Handlers ###
 
     def realized(self, *args):
         # set title
@@ -856,18 +871,19 @@ class GDialog(gtk.Dialog):
             gtklib.idle_add_single_call(self.destroy)
             return
 
-        # focus on default button if needs
-        name = self.get_default_button()
-        if name:
-            btn = self.buttons.get(name)
-            if btn:
-                btn.grab_focus()
+        # load persistent settings
+        self.load_settings()
+
+        # dialog size
+        defsize = self.get_defsize()
+        if defsize != (-1, -1):
+            self.set_default_size(*defsize)
 
         # signal handler
         self.connect('response', self.dialog_response)
 
         # prepare to show
-        self.load_settings()
+        self.before_show()
         self.vbox.show_all()
         gtklib.idle_add_single_call(self.after_init)
 
@@ -885,7 +901,7 @@ class GDialog(gtk.Dialog):
             return # close dialog
         # Cancel button or dialog closing by the user
         elif response_id in (gtk.RESPONSE_CLOSE, gtk.RESPONSE_DELETE_EVENT):
-            if hasattr(self, 'cmd') and self.cmd.is_alive():
+            if self.cmd.is_alive():
                 ret = Confirm(_('Confirm Abort'), [], self,
                               _('Do you want to abort?')).run()
                 if ret == gtk.RESPONSE_YES:

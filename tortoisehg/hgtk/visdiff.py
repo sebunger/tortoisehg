@@ -134,8 +134,8 @@ def visualdiff(ui, repo, pats, opts):
                        None).run()
         return None
 
-    lpats = [util.localpath(f) for f in pats]
-    m = match.match(repo.root, repo.root, lpats)
+    pats = cmdutil.expandpats(pats)
+    m = match.match(repo.root, '', pats, None, None, 'relpath')
     n2 = ctx2.node()
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
     if ctx1b:
@@ -204,9 +204,15 @@ def visualdiff(ui, repo, pats, opts):
     diffcmd, diffopts, mergeopts = detectedtools[preferred]
 
     # Disable 3-way merge if there is only one parent or no tool support
-    do3way = bool(mergeopts) and ctx1b is not None
-    if do3way:
-        args = mergeopts
+    do3way = False
+    if ctx1b:
+        if mergeopts:
+            do3way = True
+            args = mergeopts
+        else:
+            args = diffopts
+            if str(ctx1b.rev()) in revs:
+                ctx1a = ctx1b
     else:
         args = diffopts
 
@@ -291,7 +297,11 @@ def visualdiff(ui, repo, pats, opts):
             dodiff(tmproot)
         finally:
             ui.note(_('cleaning up temp directory\n'))
-            shutil.rmtree(tmproot)
+            try:
+                shutil.rmtree(tmproot)
+            except (IOError, OSError), e:
+                # Leaking temporary files, fix your diff tool config
+                ui.note(_('unable to clean temp directory: %s\n'), str(e))
 
     tmproot = tempfile.mkdtemp(prefix='visualdiff.')
     if opts.get('mainapp'):
