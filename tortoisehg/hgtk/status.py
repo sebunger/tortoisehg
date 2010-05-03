@@ -86,6 +86,7 @@ class GStatus(gdialog.GWindow):
         self.mode = 'status'
         self.ready = False
         self.filechunks = {}
+        self.diffmodelfile = None
         self.status = (None,) * 7
         self.status_error = None
         self.preview_tab_name_label = None
@@ -197,7 +198,12 @@ class GStatus(gdialog.GWindow):
             self.mqmode = True
 
     def is_merge(self):
-        return self.count_revs() < 2 and len(self.repo.parents()) == 2
+        try:
+            numparents = len(self.repo.parents())
+        except error.Abort, e:
+            self.stbar.set_text(str(e) + _(', please refresh'))
+            numparents = 1
+        return self.count_revs() < 2 and numparents == 2
 
 
     def get_accelgroup(self):
@@ -698,11 +704,17 @@ class GStatus(gdialog.GWindow):
 
         self.auto_check() # may check more files
 
-        # manually refresh partially selected files
         for i, row in enumerate(model):
             if row[FM_PARTIAL_SELECTED]:
+                # force refresh of partially selected files
                 self.update_hunk_model(i, self.filetree)
                 self.diffmodel.clear()
+                self.diffmodelfile = None
+            else:
+                # demand refresh of full or non selection
+                wfile = row[FM_PATH]
+                if wfile in self.filechunks:
+                    del self.filechunks[wfile]
 
         # recover selections
         firstrow = None
@@ -722,6 +734,7 @@ class GStatus(gdialog.GWindow):
             self.preview_text.set_buffer(gtk.TextBuffer())
             if not is_merge:
                 self.diffmodel.clear()
+                self.diffmodelfile = None
 
         self.filetree.show()
         if self.mode == 'commit':
@@ -760,7 +773,7 @@ class GStatus(gdialog.GWindow):
                                      clean=clean,
                                      unknown=unknown)
                 self.status = status
-            except (IOError, util.Abort), e:
+            except (OSError, IOError, util.Abort), e:
                 self.status_error = str(e)
             self.subrepos = []
             wctx = repo[None]
@@ -768,7 +781,7 @@ class GStatus(gdialog.GWindow):
                 for s in wctx.substate:
                     if matcher(s) and wctx.sub(s).dirty():
                         self.subrepos.append(s)
-            except (IOError, error.ConfigError), e:
+            except (OSError, IOError, error.ConfigError), e:
                 self.status_error = str(e)
 
         def status_wait(thread):
@@ -828,6 +841,8 @@ class GStatus(gdialog.GWindow):
         chunks = self.filechunks[wfile]
         for chunk in chunks:
             chunk.active = selected
+        if wfile != self.diffmodelfile:
+            return
         for n, chunk in enumerate(chunks):
             if n == 0:
                 continue
@@ -1049,12 +1064,15 @@ class GStatus(gdialog.GWindow):
             pctx1, pctx2 = wctx.parents()
             difftext = [_('===== Diff to first parent %d:%s =====\n') % (
                         pctx1.rev(), str(pctx1))]
-            for s in patch.diff(self.repo, pctx1.node(), None, opts=opts):
-                difftext.extend(s.splitlines(True))
-            difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
-                            pctx2.rev(), str(pctx2)))
-            for s in patch.diff(self.repo, pctx2.node(), None, opts=opts):
-                difftext.extend(s.splitlines(True))
+            try:
+                for s in patch.diff(self.repo, pctx1.node(), None, opts=opts):
+                    difftext.extend(s.splitlines(True))
+                difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
+                                pctx2.rev(), str(pctx2)))
+                for s in patch.diff(self.repo, pctx2.node(), None, opts=opts):
+                    difftext.extend(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stbar.set_text(str(e))
         else:
             buf = cStringIO.StringIO()
             for row in self.filemodel:
@@ -1123,18 +1141,24 @@ class GStatus(gdialog.GWindow):
             pctx1, pctx2 = wctx.parents()
             difftext = [_('===== Diff to first parent %d:%s =====\n') % (
                         pctx1.rev(), str(pctx1))]
-            for s in patch.diff(self.repo, pctx1.node(), None,
-                                match=matcher, opts=opts):
-                difftext.extend(s.splitlines(True))
-            difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
-                            pctx2.rev(), str(pctx2)))
-            for s in patch.diff(self.repo, pctx2.node(), None,
-                                match=matcher, opts=opts):
-                difftext.extend(s.splitlines(True))
+            try:
+                for s in patch.diff(self.repo, pctx1.node(), None,
+                                    match=matcher, opts=opts):
+                    difftext.extend(s.splitlines(True))
+                difftext.append(_('\n===== Diff to second parent %d:%s =====\n') % (
+                                pctx2.rev(), str(pctx2)))
+                for s in patch.diff(self.repo, pctx2.node(), None,
+                                    match=matcher, opts=opts):
+                    difftext.extend(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stbar.set_text(str(e))
         else:
-            for s in patch.diff(self.repo, self._node1, self._node2,
-                    match=matcher, opts=opts):
-                difftext.extend(s.splitlines(True))
+            try:
+                for s in patch.diff(self.repo, self._node1, self._node2,
+                        match=matcher, opts=opts):
+                    difftext.extend(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stbar.set_text(str(e))
         return self.diff_highlight_buffer(difftext)
 
 
@@ -1142,6 +1166,7 @@ class GStatus(gdialog.GWindow):
         # Read this file's diffs into hunk selection model
         wfile = self.filemodel[path][FM_PATH]
         self.diffmodel.clear()
+        self.diffmodelfile = wfile
         if not self.is_merge():
             self.append_diff_hunks(wfile)
             if len(self.diffmodel):
@@ -1174,9 +1199,12 @@ class GStatus(gdialog.GWindow):
         else:
             matcher = cmdutil.matchfiles(self.repo, [pfile])
             diffopts = mdiff.diffopts(git=True, nodates=True)
-            for s in patch.diff(self.repo, self._node1, self._node2,
-                    match=matcher, opts=diffopts):
-                difftext.writelines(s.splitlines(True))
+            try:
+                for s in patch.diff(self.repo, self._node1, self._node2,
+                        match=matcher, opts=diffopts):
+                    difftext.writelines(s.splitlines(True))
+            except (IOError, error.RepoError, error.LookupError, util.Abort), e:
+                self.stbar.set_text(str(e))
             difftext.seek(0)
         return hgshelve.parsepatch(difftext)
 
@@ -1724,7 +1752,13 @@ class GStatus(gdialog.GWindow):
         return False
 
 def run(ui, *pats, **opts):
-    showclean = util.any(os.path.isfile(e) for e in pats)
+    # When hg-1.4 support is dropped, use util.any
+    #showclean = util.any(os.path.isfile(e) for e in pats)
+    showclean = False
+    for e in pats:
+        if os.path.isfile(e):
+            showclean = True
+            break
     rev = opts.get('rev', [])
     cmdoptions = {
         'all':False, 'clean':showclean, 'ignored':False, 'modified':True,
