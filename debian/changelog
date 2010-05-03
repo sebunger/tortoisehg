@@ -1,3 +1,9 @@
+tortoisehg (1.0.2-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+
+ -- Max Bowsher <maxb@f2s.com>  Mon, 03 May 2010 13:36:53 +0100
+
 tortoisehg (1.0.1-1) unstable; urgency=low
 
   * New upstream release.
