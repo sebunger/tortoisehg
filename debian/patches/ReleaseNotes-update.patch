@@ -1,3 +1,8 @@
+Description: update upstream changelog
+Author: Ludovico Cavedon <cavedon@debian.org>
+Bug-Debian: http://bugs.debian.org/579782
+Forwarded: http://sourceforge.net/mailarchive/forum.php?thread_name=4BE11BB9.2050604%40gmail.com&forum_name=tortoisehg-develop
+
 Index: tortoisehg/ReleaseNotes.txt
 ===================================================================
 --- tortoisehg.orig/ReleaseNotes.txt	2010-05-05 00:19:45.000000000 -0700
