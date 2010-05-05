@@ -1,0 +1,95 @@
+Index: tortoisehg/ReleaseNotes.txt
+===================================================================
+--- tortoisehg.orig/ReleaseNotes.txt	2010-05-05 00:19:45.000000000 -0700
++++ tortoisehg/ReleaseNotes.txt	2010-05-05 00:21:10.000000000 -0700
+@@ -11,6 +11,90 @@
+ The ReleaseNotes page on the TortosieHg Wiki is usually kept up to date.
+ http://bitbucket.org/tortoisehg/stable/wiki/ReleaseNotes
+ 
++= TortoiseHg 1.0.2 =
++
++Released on May 1, 2010
++
++This is a bug fix release.  We recommend all users upgrade to this release.
++
++== Packaged Versions ==
++
++* Mercurial 1.5.2
++
++== Bugs Fixes ==
++
++* #709 - status: do not cache filechunks through a refresh
++* #1023 - visdiff: toggle to second parent when diff tool refuses three-way diff
++* #1062 - status: catch OSError from repo.status()
++* #1065 - visdiff: fix diff-to-local with file filters
++* #1087 - quickop: add functionality to restore dialog geometries
++* #1093 - tagadd: return initial rev selection if 'replace' is checked
++* #1101,#1132 - gdialog: disable entire dialog till it's ready
++* #1102 - status: catch LookupError and friends from patch.diff()
++* #1125 - guess: get back 'Find Copies' feature
++* #1135 - visdiff: catch OSError and IOError when deleting temp files
++* #1137,#1143 - status: keep track of file currently displayed in diffmodel
++* #1200 - catch errors in status/commit when working parent is unknown
++* hgemail: allow to send a single mail without an introduction
++* gtk:  fix warnings about tooltip API deprecation
++* hgtk: remove close_fds parameter to Popen
++* bugreport: get_error_text: catch AttributeError
++
++== Improvements ==
++
++* #1059 - Progress bars are now hooked into progress notifications from Mercurial.
++
++
++
++= TortoiseHg 1.0.1 =
++
++Released on April 1, 2010
++
++This is a bug fix release.  We recommend all users upgrade to this release.
++
++== Packaged Versions ==
++
++* Mercurial 1.5.1
++* GTK has been downgraded from 2.18.7 to 2.16.6
++* dulwich has been upgraded to 0.5.1
++* See extension-versions.txt in the install directory for the complete list of bundled extensions and modules and their versions
++
++== Bugs Fixes ==
++
++* #879 - Remove closed branches from Repository Explorer branch drop-down
++* #973 - Correct behavior when canceling mode change in settings tool
++* #998 - Visual Diff and hgignore edit were missing from shell context menus
++* #1000 - Clicking on null revision link in Repository Explorer caused infinite load loop
++* #1003 - Fix bugtracking link at start of changeset message
++* #1004 - Fix display of underscores in tags and branch names
++* #1005 - Catch race conditions when terminating threads
++* #1007 - Fix docdiff for non-mergable file types
++* #1008 - Catch util.Abort in quickop dialog
++* #1009 - Fix push-after-commit with CmdRunner enabled
++* #1022 - Fix CTRL-F in Repository Explorer
++* #1028 - Show filter criteria in Repository Explorer title bar
++* #1032 - catch OSError from os.makedirs
++* #1039 - installer: do not start thgtaskbar if shell extensions were not installed
++* #1044 - Fix potential errors after clone on Linux
++* #1045 - Fix 'working directory has no parent' after strip
++* #1048 - refresh branch name drop-down on reload
++* #1051 - Correctly parse svn revisions from convert extension
++* #1075 - Make clone, update dialogs resizeable
++* #1076 - Restart TortoiseHgOverlayServer on 'Update Icons', when necessary
++* #1083 - Remove redundant vertical pane from shelve tool
++* #1085 - Fix problems caused by large simultaneous rename batches
++* #1091 - Fix direct diff tool usage when copies are present but not selected
++* #1100 - Fix potential back-traces from quickop
++* #1112 - Fix misbehaviors in tag dialog
++* Fixed direct use of 3-way (merge) directory diffs
++
++== Installer Changes ==
++
++* wincolor extension and its pyreadline prerequisite are now packaged
++* pyopenssl is now included
++
++
++
+ = TortoiseHg 1.0 =
+ 
+ Released on March 5, 2010
