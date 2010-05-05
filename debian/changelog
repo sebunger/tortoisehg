@@ -1,4 +1,4 @@
-tortoisehg (1.0.2-1) UNRELEASED; urgency=low
+tortoisehg (1.0.2-1) unstable; urgency=low
 
   [ Max Bowsher ]
   * New upstream release.
@@ -7,7 +7,7 @@ tortoisehg (1.0.2-1) UNRELEASED; urgency=low
   * Add ReleaseNotes-update.patch: update upstream changelog
     (Closes: #579782).
 
- -- Ludovico Cavedon <cavedon@debian.org>  Wed, 05 May 2010 00:21:50 -0700
+ -- Ludovico Cavedon <cavedon@debian.org>  Wed, 05 May 2010 00:24:08 -0700
 
 tortoisehg (1.0.1-1) unstable; urgency=low
 
