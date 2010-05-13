@@ -1,3 +1,10 @@
+tortoisehg (1.0.3-1) unstable; urgency=low
+
+  * New upstream release:
+    - Which drops ReleaseNotes.txt, update packaging accordingly.
+
+ -- Max Bowsher <maxb@f2s.com>  Thu, 13 May 2010 23:49:52 +0100
+
 tortoisehg (1.0.2-1) unstable; urgency=low
 
   [ Max Bowsher ]
