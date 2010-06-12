@@ -1,3 +1,9 @@
+tortoisehg (1.0.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sat, 12 Jun 2010 02:20:19 -0700
+
 tortoisehg (1.0.3-1) unstable; urgency=low
 
   * New upstream release:
