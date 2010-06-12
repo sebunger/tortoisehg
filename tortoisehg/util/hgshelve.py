@@ -15,7 +15,6 @@ import errno
 import operator
 import os
 import re
-import shutil
 import tempfile
 
 from mercurial import cmdutil, commands, cmdutil, hg, mdiff, patch, revlog
@@ -411,10 +410,37 @@ def makebackup(ui, repo, dir, files):
                                        dir=dir)
         os.close(fd)
         ui.debug(_('backup %r as %r\n') % (f, tmpname))
-        util.copyfile(repo.wjoin(f), tmpname)
+        try:
+            util.copyfile(repo.wjoin(f), tmpname)
+        except:
+            ui.warn(_('file copy of %s failed\n') % f)
+            raise
         backups[f] = tmpname
 
     return backups
+
+
+def delete_backup(ui, repo, backupdir):
+    """remove the shelve backup files and directory"""
+
+    backupdir = os.path.normpath(repo.join(backupdir))
+
+    # Do a sanity check to ensure that unrelated files aren't destroyed.
+    # All shelve file and directory paths must start with "shelve" under
+    # the .hg directory.
+    if backupdir.startswith(repo.join('shelve')):
+        try:
+            backups = os.listdir(backupdir)
+            for filename in backups:
+                ui.debug(_('removing backup file : %r\n') % filename)
+                os.unlink(os.path.join(backupdir, filename))
+            os.rmdir(backupdir)
+        except OSError:
+            ui.warn(_('delete of shelve backup failed'))
+            pass
+    else:
+        ui.warn(_('bad shelve backup directory name'))
+
 
 def get_shelve_filename(repo):
     return repo.join('shelve')
@@ -539,13 +565,8 @@ def shelve(ui, repo, *pats, **opts):
 
             return 0
         finally:
-            try:
-                for realname, tmpname in backups.iteritems():
-                    ui.debug(_('removing backup for %r : %r\n') % (realname, tmpname))
-                    os.unlink(tmpname)
-                os.rmdir(backupdir)
-            except OSError:
-                pass
+            delete_backup(ui, repo, backupdir)
+
     fancyopts.fancyopts([], commands.commitopts, opts)
     return cmdutil.commit(ui, repo, shelvefunc, pats, opts)
 
@@ -556,15 +577,24 @@ def unshelve(ui, repo, *pats, **opts):
     try:
         fp = cStringIO.StringIO()
         fp.write(repo.opener('shelve').read())
+    except:
+        ui.warn(_('nothing to unshelve\n'))
+    else:
         if opts['inspect']:
             ui.status(fp.getvalue())
         else:
             files = []
+            fp.seek(0)
             for chunk in parsepatch(fp):
                 if isinstance(chunk, header):
                     files += chunk.files()
             backupdir = repo.join('shelve-backups')
-            backups = makebackup(ui, repo, backupdir, set(files))
+            try:
+                backups = makebackup(ui, repo, backupdir, set(files))
+            except:
+                ui.warn(_('unshelve backup aborted\n'))
+                delete_backup(ui, repo, backupdir)
+                raise
 
             ui.debug(_('applying shelved patch\n'))
             patchdone = 0
@@ -585,18 +615,14 @@ def unshelve(ui, repo, *pats, **opts):
                                      (tmpname, realname))
                             util.copyfile(tmpname, repo.wjoin(realname))
             finally:
-                try:
-                    ui.debug(_('removing backup files\n'))
-                    shutil.rmtree(backupdir, True)
-                except OSError:
-                    pass
+                delete_backup(ui, repo, backupdir)
 
             if patchdone:
                 ui.debug(_('removing shelved patches\n'))
                 os.unlink(repo.join('shelve'))
                 ui.status(_('unshelve completed\n'))
-    except IOError:
-        ui.warn(_('nothing to unshelve\n'))
+            else:
+                raise patch.PatchError
 
 cmdtable = {
     "shelve":
