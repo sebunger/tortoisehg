@@ -5,7 +5,7 @@ Maintainer: Steve Borho <steve@borho.org>
 Source: http://bitbucket.org/tortoisehg/stable/downloads/
 
 Files: *
-Copyright: 2007-2009, Steve Borho <steve@borho.org>
+Copyright: 2007-2010, Steve Borho <steve@borho.org>
            2007-2008, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
@@ -43,14 +43,30 @@ Copyright: 2005, Canonical Ltd.
            2005, Scott James Remnant <scott@ubuntu.com>
 License: GPL-2+
 
-File: tortoisehg/hgtk/status.py
+File: tortoisehg/hgtk/chunks.py
 Copyright: 2009, Emmanuel Rosa <goaway1000@gmail.com>
+           2008, Steve Borho <steve@borho.org>
+           2007, TK Soh <teekaysoh@gmail.com>
+           2007, Brad Schick <brad at gmail dot com>
+License: GPL-2
+
+File: tortoisehg/hgtk/status.py
+Copyright: 2008, Emmanuel Rosa <goaway1000@gmail.com>
            2008, Steve Borho <steve@borho.org>
            2007, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
 File: tortoisehg/hgtk/archive.py
 Copyright: 2009, Emmanuel Rosa <goaway1000@gmail.com>
+License: GPL-2
+
+File: tortoisehg/hgtk/textview.py
+Copyright: 2010, Yuki KODAMA <endflow.net@gmail.com>
+           2009, Florian Heinle
+License: GPL-2
+
+File: tortoisehg/hgtk/thgpbranch.py
+Copyright: 2009, Peer Sommerlund <peer.sommerlund@gmail.com>
 License: GPL-2
 
 Files: contrib/_hgtk
