@@ -18,7 +18,7 @@ import threading
 import time
 
 from mercurial import hg, ui, commands, cmdutil, util, error
-from mercurial.hgweb import server
+from mercurial.hgweb import server, hgweb_mod, hgwebdir_mod
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths
@@ -214,9 +214,8 @@ class ServeDialog(gtk.Window):
             threading.Thread(target=start_browser).start()
 
     def _on_conf_clicked(self, *args):
-        dlg = thgconfig.ConfigDialog(True)
+        dlg = thgconfig.ConfigDialog(True, focus='web.name')
         dlg.show_all()
-        dlg.focus_field('web.name')
         dlg.run()
         dlg.hide()
         self._get_config()
@@ -224,7 +223,7 @@ class ServeDialog(gtk.Window):
     def _start_server(self):
         def threadfunc(q, *args):
             try:
-                hglib.hgcmd_toq(q, *args)
+                hglib.hgcmd_toq(q, False, args)
             except util.Abort, e:
                 self._write(_('Abort: %s\n') % str(e))
 
@@ -312,7 +311,12 @@ def thg_serve(ui, repo, **opts):
                         baseui.setconfig("web", o, str(opts[o]))
                         if repoui:
                             repoui.setconfig("web", o, str(opts[o]))
-                self.httpd = server.create_server(ui, repo)
+                o = opts.get('web_conf') or opts.get('webdir_conf')
+                if o:
+                    app = hgwebdir_mod.hgwebdir(o, repo.ui)
+                else:
+                    app = hgweb_mod.hgweb(hg.repository(repo.ui, repo.root))
+                self.httpd = server.create_server(ui, app)
             except socket.error, inst:
                 raise util.Abort(_('cannot start server: ') + inst.args[1])
 
@@ -359,8 +363,10 @@ thg_serve_cmd =  {"^serve":
           ('', 'prefix', '', _('prefix path to serve from (default: server root)')),
           ('n', 'name', '',
            _('name to show in web pages (default: working dir)')),
+          ('', 'web-conf', '',
+           _('name of the hgweb config file (serve more than one repository)')),
           ('', 'webdir-conf', '', _('name of the webdir config file'
-                                    ' (serve more than one repo)')),
+                                    ' (DEPRECATED)')),
           ('', 'pid-file', '', _('name of file to write process ID to')),
           ('', 'stdio', None, _('for remote clients')),
           ('t', 'templates', '', _('web templates to use')),
@@ -370,4 +376,4 @@ thg_serve_cmd =  {"^serve":
          _('hg serve [OPTION]...'))}
 
 def run(ui, *pats, **opts):
-    return ServeDialog(opts.get('webdir_conf'))
+    return ServeDialog(opts.get('web_conf') or opts.get('webdir_conf'))

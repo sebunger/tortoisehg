@@ -130,7 +130,8 @@ type_PLAIN = 0
 type_LOOSE_LOW = 1
 type_LOOSE_HIGH = 2
 
-def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, branch_color=False):
+def revision_grapher(repo, start_rev=-1, stop_rev=-1, branch=None, noheads=False,
+    branch_color=False, only_revs=[]):
     """incremental revision grapher
 
     This grapher generates a full graph where every edge is visible.
@@ -142,14 +143,28 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
     to show ancestors of a revision.
     if branch_color is True, the branch colour is determined by a hash
     of the branch tip, and will thus always be the same.
+    if only_revs is not [], only those revisions will be shown.
     """
+
+    shown_revs = None
+    if only_revs:
+        shown_revs = set([repo[repo.lookup(r)].rev() for r in only_revs])
+        start_rev = max(shown_revs)
+        stop_rev = min(shown_revs)
 
     assert start_rev >= stop_rev
     curr_rev = start_rev
     revs = []
     rev_color = {}
     nextcolor = [0]
+    
+    def hidden(rev):
+        return (shown_revs and (rev not in shown_revs)) or False
+    
     while curr_rev >= stop_rev:
+        if hidden(curr_rev):
+            curr_rev -= 1
+            continue
         # Compute revs and next_revs.
         if curr_rev not in revs:
             if noheads and curr_rev != start_rev:
@@ -177,7 +192,7 @@ def revision_grapher(repo, start_rev, stop_rev, branch=None, noheads=False, bran
         next_revs = revs[:]
 
         # Add parents to next_revs.
-        parents = __get_parents(repo, curr_rev)
+        parents = [p for p in __get_parents(repo, curr_rev) if not hidden(p)]
         parents_to_add = []
         preferred_color = [rev_color[curr_rev]]
         for parent in parents:

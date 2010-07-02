@@ -85,6 +85,9 @@ class MQWidget(gtk.VBox):
                           gobject.TYPE_NONE,
                           (object, # list of dropped files/dirs
                            str))   # raw string data
+        ,'close-mq': (gobject.SIGNAL_RUN_FIRST,
+                      gobject.TYPE_NONE,
+                      ())
     }
 
     def __init__(self, repo, accelgroup=None, tooltips=None):
@@ -130,6 +133,10 @@ class MQWidget(gtk.VBox):
             menubtn.child.get_children()[0].hide()
         gtklib.idle_add_single_call(after_init)
         self.pack_start(tbar, False, False)
+
+        closebtn = tbar.append_button(gtk.STOCK_CLOSE, _('Close'))
+        closebtn.connect('clicked', lambda *a: self.emit('close-mq'))
+        self.btn['close'] = closebtn
 
         # center pane
         mainbox = gtk.VBox()
@@ -731,11 +738,11 @@ class MQWidget(gtk.VBox):
 
         stat = row[MQ_STATUS]
         if stat == 'A':
-            cell.set_property('foreground', 'blue')
+            cell.set_property('foreground', gtklib.BLUE)
         elif stat == 'U':
-            cell.set_property('foreground', '#909090')
+            cell.set_property('foreground', gtklib.GREY)
         else:
-            cell.set_property('foreground', 'black')
+            cell.set_property('foreground', gtklib.NORMAL)
 
         patchname = row[MQ_NAME]
         if self.is_qtip(patchname):
@@ -948,10 +955,12 @@ class MQWidget(gtk.VBox):
         if row[MQ_INDEX] < 0:
             return
         patchname = row[MQ_NAME]
-        try:
-            ctx = self.repo[patchname]
-            revid = ctx.rev()
-        except (error.RepoError, error.RepoLookupError, error.LookupError):
+        q = self.repo.mq
+        q.parse_series()
+        applied = q.isapplied(patchname)
+        if applied:
+            revid = self.repo[applied[1]].rev()
+        else:
             revid = -1
         self.emit('patch-selected', revid, patchname)
 

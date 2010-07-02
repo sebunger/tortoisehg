@@ -392,7 +392,7 @@ class GWindow(gtk.Window):
             if not url:
                 return
         if not url.startswith('http'):
-            fullurl = 'http://tortoisehg.org/manual/1.0/' + url
+            fullurl = 'http://tortoisehg.org/manual/1.1/' + url
             # Use local CHM file if it can be found
             if os.name == 'nt' and paths.bin_path:
                 chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
@@ -681,9 +681,8 @@ class GWindow(gtk.Window):
         if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
             Prompt(_('No visual editor configured'),
                    _('Please configure a visual editor.'), self).run()
-            dlg = thgconfig.ConfigDialog(False)
+            dlg = thgconfig.ConfigDialog(False, focus='tortoisehg.editor')
             dlg.show_all()
-            dlg.focus_field('tortoisehg.editor')
             dlg.run()
             dlg.hide()
             self.ui = ui.ui()
