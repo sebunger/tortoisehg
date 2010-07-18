@@ -1,3 +1,10 @@
+tortoisehg (1.1.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Set minimum mercurial dependecy to version 1.6.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 18 Jul 2010 10:51:58 +0200
+
 tortoisehg (1.1-1) unstable; urgency=low
 
   * New upstream release.
