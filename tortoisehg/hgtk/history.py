@@ -790,6 +790,7 @@ class GLog(gdialog.GWindow):
         ret = self.check_filter_text(text, mode)
         if not ret:
             return
+        text = hglib.fromutf(text)
         opts = {}
         if mode == MODE_REVRANGE:
             opts['revlist'] = ret
@@ -896,7 +897,7 @@ class GLog(gdialog.GWindow):
 
     def patch_selected(self, mqwidget, revid, patchname):
         if revid < 0:
-            patchfile = os.path.join(self.repo.root, '.hg', 'patches', patchname)
+            patchfile = os.path.join(self.repo.mq.path, patchname)
             self.currevid = self.lastrevid = None
             self.changeview.load_patch_details(patchfile)
         else:

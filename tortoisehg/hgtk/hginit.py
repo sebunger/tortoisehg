@@ -62,8 +62,10 @@ class InitDialog(gtk.Dialog):
                 _('Add special files (.hgignore, ...)'))
         self.optoldrepo = gtk.CheckButton(
                 _('Make repo compatible with Mercurial 1.0'))
+        self.optrunci = gtk.CheckButton(_('Run Commit after init'))
         table.add_row(self.optspfiles, xpad=2)
         table.add_row(self.optoldrepo, xpad=2)
+        table.add_row(self.optrunci, xpad=2)
 
         # set option states
         self.optspfiles.set_active(True)
@@ -72,6 +74,7 @@ class InitDialog(gtk.Dialog):
             self.optoldrepo.set_active(not usefncache)
         except:
             pass
+        self.optrunci.set_active(False)
 
     def dialog_response(self, dialog, response_id):
         # Create button
@@ -140,7 +143,19 @@ class InitDialog(gtk.Dialog):
                     pass
 
         shlib.shell_notify([dest])
-        self.response(gtk.RESPONSE_CLOSE)
+
+        if self.optrunci.get_active():
+            self.emit_stop_by_name('response')
+            self.emit_stop_by_name('destroy')
+            self.hide()
+            os.chdir(dest)
+            from tortoisehg.hgtk.commit import run as cirun
+            win = cirun(ui.ui())
+            win.display()
+            win.show_all()
+            win.connect('destroy', gtk.main_quit)
+        else:
+            self.response(gtk.RESPONSE_CLOSE)
 
 def run(ui, *pats, **opts):
     return InitDialog(pats)
