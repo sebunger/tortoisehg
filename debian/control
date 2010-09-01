@@ -33,8 +33,8 @@ Description: Graphical tool for working with Mercurial
 Package: tortoisehg-nautilus
 Architecture: all
 Depends: tortoisehg (>= ${source:Version}), python-nautilus,
- python-gobject (>= 2.12.1), python-gtk2 (>= 2.10), ${misc:Depends},
- ${python:Depends}
+ python-gobject (>= 2.12.1), python-gtk2 (>= 2.10), python-gnome2,
+ ${misc:Depends}, ${python:Depends}
 XB-Python-Version: ${python:Versions}
 Description: Graphical tool for working with Mercurial (Nautilus extension)
  TortoiseHg provides a graphical tool for interacting with the distributed
