@@ -14,7 +14,7 @@ XS-Python-Version: >= 2.4
 
 Package: tortoisehg
 Architecture: all
-Depends: mercurial (>= 1.6), python-gobject (>= 2.12.1),
+Depends: mercurial (>= 1.6), mercurial (<< 1.8), python-gobject (>= 2.12.1),
  python-gtk2 (>= 2.10), python-cairo, ${shlibs:Depends}, ${misc:Depends},
  ${python:Depends}
 Recommends: libjs-jquery, python-iniparse
