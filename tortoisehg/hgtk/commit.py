@@ -96,8 +96,6 @@ class BranchOperationDialog(gtk.Dialog):
             self.closebranchradio.set_active(True)
         else:
             nochanges.set_active(True)
-        if repo[None].branch() == 'default':
-            self.closebranchradio.set_sensitive(False)
 
         self.show_all()
 
@@ -1028,7 +1026,7 @@ class GCommit(GStatus):
             os.chdir(repo.root)
             self.hg_commit(files, finish)
         except Exception, e:
-            gdialog.Prompt(_('Commit failed'), hglib.toutf(e), self).run()
+            gdialog.Prompt(_('Commit failed'), hglib.toutf(str(e)), self).run()
             finish(1)
 
 
