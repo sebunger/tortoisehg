@@ -15,7 +15,7 @@ import gobject
 import threading
 
 from mercurial import cmdutil, util, patch, error, hg
-from mercurial import merge as merge_
+from mercurial import merge as merge_, filemerge
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, paths, hgshelve
@@ -1196,23 +1196,27 @@ class GStatus(gdialog.GWindow):
             ms = merge_.mergestate(self.repo)
             for wfile in files:
                 ms.mark(wfile, "u")
+            ms.commit()
             self.reload_status()
         def mark(menuitem, files):
             ms = merge_.mergestate(self.repo)
             for wfile in files:
                 ms.mark(wfile, "r")
+            ms.commit()
             self.reload_status()
         def resolve(stat, files):
             wctx = self.repo[None]
             mctx = wctx.parents()[-1]
+            ms = merge_.mergestate(self.repo)
             for wfile in files:
-                ms = merge_.mergestate(self.repo)
                 ms.resolve(wfile, wctx, mctx)
+            ms.commit()
             self.reload_status()
         def resolve_with(stat, tool, files):
             if tool:
+                exe = filemerge._findtool(self.repo.ui, tool)
                 oldmergeenv = os.environ.get('HGMERGE')
-                os.environ['HGMERGE'] = tool
+                os.environ['HGMERGE'] = exe
             resolve(stat, files)
             if tool:
                 if oldmergeenv:
