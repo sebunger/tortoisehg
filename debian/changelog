@@ -1,8 +1,12 @@
-tortoisehg (1.1.7-1) UNRELEASED; urgency=low
+tortoisehg (1.1.7-1) experimental; urgency=low
 
+  [ Max Bowsher ]
   * New upstream release.
 
- -- Max Bowsher <maxb@f2s.com>  Thu, 02 Dec 2010 22:42:44 +0000
+  [ Ludovico Cavedon ]
+  * Update dependecy on mercurial to 1.7.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Fri, 17 Dec 2010 12:50:22 +0100
 
 tortoisehg (1.1.4-1) experimental; urgency=low
 
