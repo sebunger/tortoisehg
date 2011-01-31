@@ -10,10 +10,15 @@ import os
 import sys
 
 if hasattr(sys, "frozen"):
-    # Prepend C:\Program Files\TortoiseHg\gtk (equiv) to the path
     from tortoisehg.util import paths
     gtkpath = os.path.join(paths.bin_path, 'gtk')
-    os.environ['PATH'] = os.pathsep.join([gtkpath, os.environ['PATH']])
+    try:
+        # may fail on Windows XP without SP1
+        import win32api
+        win32api.SetDllDirectory(gtkpath)
+    except:
+        # fallback to prepending gtk/ folder at start of %PATH%
+        os.environ['PATH'] = os.pathsep.join([gtkpath, os.environ['PATH']])
 else:
     # if hgtk is a symlink, insert symlink target directory in sys.path
     thgpath = os.path.dirname(os.path.realpath(__file__))
@@ -48,7 +53,13 @@ capt = _ui.configbool('tortoisehg', 'stderrcapt', True)
 
 err = checkhgversion(hgversion)
 if err:
-    _ui.warn('abort: %s\n' % err)
+    from tortoisehg.hgtk.bugreport import run
+    from tortoisehg.hgtk.hgtk import gtkrun
+    opts = {}
+    opts['cmd'] = ' '.join(sys.argv[1:])
+    opts['error'] = err
+    opts['nofork'] = True
+    gtkrun(run, _ui, **opts)
     sys.exit(1)
 
 if not capt or 'THGDEBUG' in os.environ or '--profile' in sys.argv:
