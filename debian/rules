@@ -9,17 +9,17 @@ include /usr/share/cdbs/1/class/python-distutils.mk
 DEB_INSTALL_DOCS_tortoisehg=--exclude=nautilus-thg.py --exclude=mergetools.rc
 DEB_COMPRESS_tortoisehg="-X.js -X_static/* -X _sources/*"
 
-build/tortoisehg:: debian/hgtk.1
+build/tortoisehg:: debian/thg.1
 	$(MAKE) -C doc html
 
-debian/hgtk.1: debian/hgtk.1.xml
+debian/thg.1: debian/thg.1.xml
 	xsltproc --nonet \
 		--param make.year.ranges 1 \
 		--param make.single.year.ranges 1 \
 		--param man.charmap.use.subset 0 \
 		-o debian/ \
 		/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
-		debian/hgtk.1.xml
+		debian/thg.1.xml
 
 install/tortoisehg::
 	mkdir -p debian/tmp/etc/mercurial/hgrc.d/
@@ -32,7 +32,7 @@ binary-post-install/tortoisehg::
 # drop automatically created file; see #424898
 clean::
 	rm -f debian/pycompat
-	rm -f debian/hgtk.1
+	rm -f debian/thg.1
 	rm -fr locale doc/build
 	# patches are removed before calling clean, so we need to fix what setup.py did wrong
 	rm tortoisehg/util/config.py
