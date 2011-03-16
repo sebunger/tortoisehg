@@ -5,7 +5,7 @@ Maintainer: Ludovico Cavedon <cavedon@debian.org>
 Uploaders: Max Bowsher <maxb@f2s.com>
 Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python (>= 2.4), quilt
 Build-Depends-Indep: python-support (>= 0.5.3), docbook-xsl, docbook-xml,
- xsltproc, python-sphinx
+ xsltproc, python-sphinx, pyqt4-dev-tools
 Standards-Version: 3.9.1
 Homepage: http://tortoisehg.bitbucket.org/
 Vcs-Git: git://git.debian.org/git/collab-maint/tortoisehg.git
@@ -14,10 +14,10 @@ XS-Python-Version: >= 2.4
 
 Package: tortoisehg
 Architecture: all
-Depends: mercurial (>= 1.7), mercurial (<< 1.9), python-gobject (>= 2.12.1),
- python-gtk2 (>= 2.10), python-cairo, ${shlibs:Depends}, ${misc:Depends},
+Depends: mercurial (>= 1.8), mercurial (<< 1.10), python-gobject (>= 2.12.1),
+ python-qt4 (>= 4.7), python-qscintilla2, ${shlibs:Depends}, ${misc:Depends},
  ${python:Depends}
-Recommends: libjs-jquery, python-iniparse
+Recommends: libjs-jquery, python-iniparse, python-pygments
 Suggests: tortoisehg-nautilus
 XB-Python-Version: ${python:Versions}
 Description: Graphical tool for working with Mercurial
