@@ -9,19 +9,40 @@ Copyright: 2007-2010, Steve Borho <steve@borho.org>
            2007-2008, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
-Files: tortoisehg/hgtk/*
-Copyright: 2008-2009, Steve Borho <steve@borho.org>
+Files: tortoisehg/hgqt/*
+Copyright: 2008-2010, Steve Borho <steve@borho.org>
+           2010, Yuki KODAMA <endflow.net@gmail.com>
+           2010, David Wilhelm <dave@jumbledpile.com>
+           2010, Johan Samyn <johan.samyn@gmail.com>
+           2010, Michal De Wildt <michael.dewildt@gmail.com>
+           2010, Peer Sommerlund <peso@users.sourceforge.net>
+           2010, Yuya Nishihara <yuya@tcha.org>
+           2010, Adrian Buehlmann <adrian@cadifra.com>
+           2009, Emmanuel Rosa <goaway1000@gmail.com>
            2007-2008, TK Soh <teekaysoh@gmail.com>
            2007, Brad Schick <brad at gmail dot com>
 License: GPL-2
 
-Files: tortoisehg/hgtk/dialog.py
-Copyright: 2006, Szilveszter Farkas (Phanatic) <szilveszter.farkas@gmail.com>
+Files: tortoisehg/hgqt/modeltest.py
+Copyright: 2007, Trolltech ASA
+License: GPL-2
+
+Files: tortoisehg/hgqt/{workbench.py,repoview.py,filelistmodel.py,fileview.py,
+ repofilter.py,manifestmodel.py,blockmatcher.py,manifestdialog.py,
+ filerevmodel.py,repowidget.py,repomodel.py,graph.py,revpanel.py,quickbar.py,
+ filelistview.py,filedialogs.py}
+Copyright: 2007-2010, Logilab
+           2010, Yuya Nishihara <yuya@tcha.org>
+           2010, Adrian Buehlmann <adrian@cadifra.com>
+License: GPL-2
+
+Files: tortoisehg/hgqt/dnd.py
+Copyright: 2011, Daniel Atallah <daniel.atallah@gmail.com>
 License: GPL-2+
 
-Files: tortoisehg/hggtk/thgstatus.py, tortoisehg/hgtk/histdetails.py
-Copyright: 2008-2009, Adrian Buehlmann <adrian@cadifra.com>
-License: GPL-2
+Files: tortoisehg/hgqt/thgrepo.py
+Copyright: 2010, George Marrows <george.marrows@gmail.com>
+License: GPL-2+
 
 Files: tortoisehg/util/hgshelve.py
 Copyright: 2009, Steve Borho <steve@borho.org>
@@ -29,45 +50,13 @@ Copyright: 2009, Steve Borho <steve@borho.org>
            2007, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
-Files: tortoisehg/hgtk/logview/revgraph.py
-Copyright: 2008, Steve Borho <steve@borho.org>
-           2007, Joel Rosdahl <joel@rosdahl.net>
-License: GPL-2
-
-Files: tortoisehg/hgtk/logview/colormap.py
+Files: tortoisehg/util/colormap.py
 Copyright: 2005, Dan Loda <danloda@gmail.com>
 License: GPL-2+
 
-Files: tortoisehg/hgtk/logview/graphcell.py
-Copyright: 2005, Canonical Ltd.
-           2005, Scott James Remnant <scott@ubuntu.com>
+Files: tortoisehg/util/wconfig.py
+Copyright: 2010, Yuya Nishihara <yuya@tcha.org>
 License: GPL-2+
-
-File: tortoisehg/hgtk/chunks.py
-Copyright: 2009, Emmanuel Rosa <goaway1000@gmail.com>
-           2008, Steve Borho <steve@borho.org>
-           2007, TK Soh <teekaysoh@gmail.com>
-           2007, Brad Schick <brad at gmail dot com>
-License: GPL-2
-
-File: tortoisehg/hgtk/status.py
-Copyright: 2008, Emmanuel Rosa <goaway1000@gmail.com>
-           2008, Steve Borho <steve@borho.org>
-           2007, TK Soh <teekaysoh@gmail.com>
-License: GPL-2
-
-File: tortoisehg/hgtk/archive.py
-Copyright: 2009, Emmanuel Rosa <goaway1000@gmail.com>
-License: GPL-2
-
-File: tortoisehg/hgtk/textview.py
-Copyright: 2010, Yuki KODAMA <endflow.net@gmail.com>
-           2009, Florian Heinle
-License: GPL-2
-
-File: tortoisehg/hgtk/thgpbranch.py
-Copyright: 2009, Peer Sommerlund <peer.sommerlund@gmail.com>
-License: GPL-2
 
 Files: contrib/_hgtk
 Copyright: 2009, Steve Borho <steve@borho.org>
@@ -76,11 +65,39 @@ License: GPL-2+
 Files: icons/*
 Copyright: 2009, Steve Borho <steve@borho.org>
            2006-2009, The TortoiseSVN Project
+           Tango Desktop Project
 License: GPL-2
+
+Files: icons/reviewboard.png
+Copyright: Review Board project
+License: MIT
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
 
 Files: i18n/*
 Copyright: 2009, Rosetta Contributors and Canonical Ltd
 License: GPL-2
+
+Files: i18n/msgfmt.py
+Copyright: Martin v. Loewis <loewis@informatik.hu-berlin.de>
+           Christian 'Tiran' Heimes <tiran@cheimes.de>
+           Hanno Schlichting <hanno@hannosch.info>
+License: PSF-2
 
 Files: debian/*
 Copyright: 2009, Ludovico Cavedon <ludovico.cavedon@gmail.com>
