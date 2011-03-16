@@ -50,69 +50,14 @@ If you get an error about an unknown changeset after running
 :command:`hg debugsetparents <number of tip revision>`.
 You can find the number of the tip revision by running :command:`hg log -l 2`.
 
-Hgcr-gui
-========
-
-`CodeReview <http://bitbucket.org/glimchb/hgcr-gui/wiki/Home>`_ management tool
-
-* This extension allows you to manage reviews for your code in any project you like.
-* It helps to keep the review management inside the mercurial.
-* One can add files to the review, remove them and notify reviewr that files are ready for review.
-* The reviewer can mark the code as 'completed' review cycle and return the message to the developer.
-* The project manager can check the review status - which files are reviewd and which are not yet.
-* The extension will automatically spot the files that were changed since their last review and notify about that. 
-* This extension uses GUI from TortoiseHg but also implements command line interface.
-* Code review database is stored in .code-review file in your repository root directory as a map of file and revision when review was done.
-
-**Usage**::
-
-	hg cr [OPTIONS] [FILES]
-
-	Code Review Plugin (requires Mercurial 1.3.x and TortoiseHg 0.9)
-
-	options:
-
-	 -c --complete  Mark CR as complete
-	 -a --add       Add files to CR list
-	 -r --remove    Remove files from CR list
-	 -l --list      Print files in CR list
-
-	use "hg -v help cr" to show global options
-
-.. note::
-	 To start GUI don't give any options.
-
-**More Details**
-
-* I've implemented the review around files and not changesets, because at the end,
-  I want to be able to tell for the specific project if all the files went through
-  code review process or not - the project status.
-* Suppose you have some project that you are in charge and many developers do 
-  write code for it. And there is a group of reviewrs that review the developers code.
-* Is is very difficult to keep track of changes developers do, but simple to find
-  out what files have already been reviewd (by reviewers) and what were not.
-* Using this extension, Developer can mark his files (when finished development 
-  process) as "Ready for review" and send notice to reviewer.
-* Reviewer will pick up the changeset (because changesets are stored in the code
-  review database) and perform code review (put notes inside the developer's code).
-* Afterwards Reviewr will mark the files as "Review Completed" and return the 
-  notice to the developer.
-* The project manager can follow every time what is going on with his/her project. 
-
-**Installation**
-
-You may want to add it to your Mercurial.ini or a repository's hgrc like this::
-
-	[extensions]
-	hgcr-gui=
- 
 Perfarce
 ========
 
 `Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_ home
 page.
 
-This extension is documented `elsewhere <nonhg.html#perfarce>`_.
+This extension is documented in :ref:`perfarce-perforce` section of
+:doc:`nonhg` chapter.
  
 HGEOL
 =====
@@ -142,7 +87,7 @@ The extension prompts for the HTTP password on the first pull/push
 to/from given remote repository (just like it is done by default), but
 saves the password (keyed by the combination of username and remote
 repository url) in the password database. On the next run it checks for
-the username in .hg/hgrc, then for suitable password in the password
+the username in :file:`.hg/hgrc`, then for suitable password in the password
 database, and uses those credentials if found.
 
 Similarly, while sending emails via SMTP server which requires
@@ -163,7 +108,8 @@ First, the extension must be enabled in your Mercurial.ini file as::
 
 The most appropriate password backend should usually be picked automatically,
 without configuration. Still, if necessary, it can be configured using
-~/keyringrc.cfg file (keyringrc.cfg in the home directory of the current user).
+:file:`~/keyringrc.cfg` file (:file:`keyringrc.cfg` in the home directory of
+the current user).
 Refer to `keyring docs <http://pypi.python.org/pypi/keyring>`_
 for more details.
 
@@ -178,8 +124,8 @@ for more details.
 
 **Repository configuration (HTTP)**
 
-Edit repository-local .hg/hgrc and save there the remote repository path and
-the username, but do not save the password. For example::
+Edit repository-local :file:`.hg/hgrc` and save there the remote repository
+path and the username, but do not save the password. For example::
 
 	[paths]
 	myremote = https://my.server.com/hgrepo/someproject
@@ -195,8 +141,8 @@ Simpler form with url-embedded name can also be used::
 	bitbucket = https://User@bitbucket.org/User/project_name/
 
 .. note::
-	If both username and password are given in .hg/hgrc, extension will
-	use them without using the password database. If username is not
+	If both username and password are given in :file:`.hg/hgrc`, extension
+	will use them without using the password database. If username is not
 	given, extension will prompt for credentials every time, also
 	without saving the password. So, in both cases, it is effectively
 	reverting to the default behaviour.
@@ -206,9 +152,9 @@ section documentation for more details.
 
 **Repository configuration (SMTP)**
 
-Edit either repository-local .hg/hgrc, or ~/.hgrc (the latter is usually
-preferable) and set there all standard email and smtp properties, including
-smtp username, but without smtp password. For example::
+Edit either repository-local :file:`.hg/hgrc`, or :file:`~/.hgrc` (the latter
+is usually preferable) and set there all standard email and smtp properties,
+including smtp username, but without smtp password. For example::
 
 	[email]
 	method = smtp
@@ -257,6 +203,14 @@ It adds a number of commands which can be listed with
  pnew           - start a new patch branch
  pstatus        - print status of current (or given) patch branch
  reapply        - reverts the working copy of all files touched by REV to REV
+
+TortoiseHg will provide a new task tab that shows the patch dependency graph.
+
+ .. figure:: figures/pbranch.png
+	:alt: Pbranch task tab
+
+	Pbranch task tab
+ 
 
 **Installation**
 

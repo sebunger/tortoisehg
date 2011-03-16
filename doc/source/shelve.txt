@@ -2,188 +2,114 @@ Shelve
 ======
 
 .. module:: shelve.dialog
-	:synopsis: Dialog used to perform shelve/unshelve operations
+	:synopsis: Dialog used to move changes
 
-.. warning::
-	The win32text extension can cause trouble with hunk selection.  This
-	has been resolved in Mercurial 1.3 and TortoiseHg 0.8, but requires
-	proper configuration. See
-	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_.
+The shelve tool can move changes between the working directory and shelf
+patches.   If the MQ extension has been enabled, it can also move
+changes into and out of unapplied patches.
 
-The purpose of this dialog is to allow the user to *shelve* selected changes
-from the working directory, store them in a special patch file within the
-repository, and then *unshelve* them back at a later time.
+The shelve tool can be launched by the Workbench :guilabel:`Repository -->
+Shelve` menu option, by a toolbar button on working file viewers, or
+by :command:`thg shelve`.
+
+.. note::
+	We highly recommend setting the patch eol configuration to auto if
+	you use the shelve tool with DOS eoln text files.
 
 .. figure:: figures/shelve.png
 	:alt: Shelve dialog
 
 	Shelve dialog
 
-Walking across the toolbar buttons:
+Features
+--------
 
-	:guilabel:`Shelve` 
-		Shelve selected diffs in checked files.
-	:guilabel:`Unshelve`
-		Replace the shelved changes back into the working directory.
-	:guilabel:`Diff`
-		Visual diff checked files
-	:guilabel:`Revert`
-		Revert checked files to last revisioned state.  If merging, it
-		allows you to select the revert parent.
-	:guilabel:`Add`
-		Add checked files that were in unknown '?' or ignored 'I' state.
-	:guilabel:`Move`
-		Move checked files to specified target directory in versioned
-		manner.
-	:guilabel:`Remove`
-		Delete checked unversioned files and/or remove (mark as deleted) any
-		versioned files.
-	:guilabel:`Forget`
-		Forget checked versioned files
+The shelve tool has three toolbars.  A right and left toolbar for the
+two side by side panels, and a central toolbar for refresh and creating
+a new shelf patch.  The right and left toolbars are mirrors of each
+other, offering the same functionality in alternate directions.
+
+The left toolbar has these actions:
+
+	:guilabel:`Delete selected chunks`
+		Remove, or revert, all selected (toggled) chunks in the
+		currently selected file.
+	:guilabel:`Move all files right`
+		Move all changes in all files to the patch selected in the
+		right pane.
+	:guilabel:`Move selected file right`
+		Move all changes in the currently selected file to the patch
+		selected in the right pane.
+	:guilabel:`Edit selected file`
+		If the working directory is being browsed, this button edits the
+		currently selected file.  Else it edits the currently viewed
+		patch file.
+	:guilabel:`Move selected chunks right`
+		Move all selected (toggled) chunks to the patch selected in the
+		right pane.
+
+The central toolbar has two actions:
+
 	:guilabel:`Refresh`
-		Reload the state of the working directory. It tries to retain
-		check and selection state across refresh.
+		Refreshes the patch drop down lists and the working copy view
+	:guilabel:`New Shelf`
+		Creates a new shelf file.  You must enter a name, though a
+		reasonable default is provided.
 
-The file list has four columns:
-
-	1) A checkbox that indicates whether the file is selected for an
-	   operation.  The toolbar buttons only operate on checked files.
-	   "Partially" selected files have a special check state.  This
-	   column header is checkable, it will toggle the file selection
-	   states.
-	2) The :guilabel:`st` column holds the status of the file, defined
-	   by Mercurial's status command, one of 'MARD?IC'.
-	3) The :guilabel:`ms` column holds the merge state of the file,
-	   defined by Mercurial's resolve command, one of ' RU'.
-	4) The canonical path of the file (relative to the repository root)
-
-Below the file list are checkboxes that toggle the display of the
-various classes of files {modified, added, removed, deleted, unknown,
-clean, ignored}.  These check boxes will be disabled if the commit tool
-was given a specific set of files and/or directories.
-
-Tabs
-----
-
-The shelve tool diff pane has four tabs
-	1) Text Diff - shows diff of currently selected file
-	2) Hunk Selection - allows diff hunks of current file to be skipped
-	3) Shelf Preview - displays all selected changes. This previews the
-	   changes that will be removed from the working directory and
-	   stored in the shelf.
-	4) Shelf Contents - the current contents of the shelf.
+The right toolbar will move changes from the patch selected on the
+left side to the patch selected on the right side, or the working
+copy if it has been selected on the right.
 
 
-Shelving Changes
-----------------
+Patch Panes
+-----------
 
-Just like the commit tool, this dialog uses TortoiseHg's integrated hunk
-selection code to allow the user to select the files and change hunks to
-move to the shelf.  When you press the shelve button, the selected
-changes are removed from the working directory and placed in a patch
-file. If the shelf already had changes in it, you will be asked whether
-to replace those changes or to merge these new changes into it.  When
-the shelf has changes, the unshelve button will be active.
+The right and the left patch panes are identical save for the working
+copy changes are only available on the left.  Selectable chunks are only
+displayed if the file is text and is in a modified state.  Added or
+removed files can be shelved but parts of the file cannot be
+individually selected.
 
-
-Unshelving Changes
-------------------
-
-When the unshelve button is pressed, the shelved changes are reapplied
-to the working directory.
+The :guilabel:`Clear` button will empty the currently selected patch or
+revert the entire working copy.  The :guilabel:`Delete` button will
+delete the currently selected shelf patch.
 
 .. note::
-	The unshelved changes will appear as working directory modifications
-	when the shelve tool refreshes it's view of the repository.
+	The :guilabel:`Delete` button is not sensitive when an MQ patch is
+	selected.  MQ patches must be deleted via qdelete using the
+	Workbench context menu or the Patch Queue widget.
 
-How is this different from record/commit?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+When right clicking on a file in the file list, you will get a context
+menu of commands.
 
-Shelved changes are physically removed from the working directory until
-you unshelve them.  This means you can build your project and run tests
-on it while the shelved changes are gone.  This is safer than selecting
-changes at build time since you can test whether the change being
-committed is valid.
+	:guilabel:`Visual Diff`
+		Open the selected file in your default visual diff tool.  Only
+		enabled for working copy files.
+	:guilabel:`Edit Local`
+		Open the working copy version of the selected file.
+	:guilabel:`Revert to Revision`
+		Revert all changes to the selected file.  Only enabled for
+		working copy files.
 
-Shelving changes is also useful for removing partially completed work to
-make sure it doesn't interfere with the debugging of other changes you
-are making.
+Trashcan
+--------
 
-Caveat: the shelved changes are stored in a patch that is based on the
-current working directory contents. There's no guarantee that the patch
-can be cleanly reapplied later if the shelved changes conflict with
-changes made to your code after the shelving.
-
-How is this different from MQ?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The shelf can be considered a single unnamed MQ patch that is never
-converted into a changeset.
-
-The shelve tool can be useful when maintaining a patch queue.
-The shelf can take changes from one patch and re-apply them to another
-patch (or an entirely new patch).
-
-For example:
-	1) Push to a patch you would like to split up
-	2) Open the shelve tool, the top patch changes will be selectable
-	3) Unselect change hunks you want to leave in the patch, then press
-	   :guilabel:`Shelve`
-	4) Refresh top patch using :command:`hg qrefresh`, or use commit tool
-	5) Push or pop to the patch you want to apply shelved patches
-	6) Open the shelve tool and press :guilabel:`Unshelve`
-	7) Refresh top patch (repeat step 4)
-
-You cannot shelve added, removed, or renamed files, but MQ can handle
-this just fine.
-
-How is this different from attic?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The attic extension is a super-set of the shelve feature. In particular,
-attic allows you to have several named *shelves* which can be saved and
-restored independently.
-
-Keyboard navigation
--------------------
-
-:guilabel:`Ctrl-C`
-    in the diff panel will copy the currently highlighted (not selected,
-    but highlighted) diff hunks to the clipboard. These can be pasted
-    into a text buffer to generate any arbitrary patch based from the
-    changes in your working directory.
-
-The code which copies the hunks to the clipboard is intelligent about
-diff headers.  The clipboard contents will always be a valid patch.
-
-
-Configurables
--------------
-
-* :menuselection:`TortoiseHg --> Bottom Diffs`
-* :menuselection:`TortoiseHg --> Tab Width`
-* :menuselection:`TortoiseHg --> Max Diff Size`
+The shelve tool is very conservative with your source and patch files.
+Before it modifies any file it makes a backup under
+:file:`.hg/Trashcan`.  This trashcan can be emptied by running the purge
+dialog from the Workbench :guilabel:`Repository --> Purge` menu option.
 
 From command line
 -----------------
 
 The shelve tool can be started from command line::
 
-	hgtk shelve
+	thg shelve
 
 	aliases: unshelve
 
-	shelve/unshelve tool
+	shelve tool
 
-	use "hgtk -v help shelve" to show global options
-
-To use TortoiseHg's shelve functionality from the Mercurial command
-line, you must enable the extension with lines like these in your
-Mercurial.ini file::
-	
-	[extensions]
-	tortoisehg.util.hgshelve=
-
-This adds commands named :command:`shelve` and :command:`unshelve` to hg.
+	use "thg -v help shelve" to show global options
 
 .. vim: noet ts=4
