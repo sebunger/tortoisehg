@@ -7,15 +7,16 @@ TortoiseHg in daily use
 	
 	common
 	explorer
+	nautilus
+	workbench
 	init
 	clone
 	commit
 	shelve
-	changelog
-	datamine
-	synchronize
+	sync
 	serve
 	guess
 	ignore
+	archive
 
 .. vim: noet ts=4
