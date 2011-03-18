@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo "Starting from version 2.0, TortoiseHg is no longer based on the Gtk+"
+echo "library, but on the Qt library. The command also changed from"
+echo "'/usr/bin/hgtk' to '/usr/bin/thg'."
+echo "'hgtk' is now only a wrapper, please use 'thg'"
+
+exec /usr/bin/thg

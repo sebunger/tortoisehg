@@ -2,3 +2,4 @@ usr/bin
 usr/share
 usr/lib/python*
 etc
+debian/hgtk usr/bin/

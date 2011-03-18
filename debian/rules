@@ -28,6 +28,7 @@ install/tortoisehg::
 binary-post-install/tortoisehg::
 	ln -sf ../../../../javascript/jquery/jquery.js \
 	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
+	ln -sf thg.1.gz debian/tortoisehg/usr/share/man/man1/hgtk.1.gz
 
 # drop automatically created file; see #424898
 clean::
