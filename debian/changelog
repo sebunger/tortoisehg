@@ -1,8 +1,14 @@
 tortoisehg (2.0.2-1) unstable; urgency=low
 
   * New upstream release.
+  * Update copyright file.
+  * Depend on PyQt4 libraries rather than on PyGtk.
+  * Rename manpage from hgtk to thg.
+  * No longer include _hgtk zsh completion file.
+  * Install wrapper script hgtk and add manpage link for it (LP: #732328).
+  * Update manpage with new options and commands.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Tue, 15 Mar 2011 22:55:00 -0700
+ -- Ludovico Cavedon <cavedon@debian.org>  Fri, 18 Mar 2011 19:57:13 -0700
 
 tortoisehg (1.1.9.1-1) unstable; urgency=low
 
