@@ -2,54 +2,12 @@
 <!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
 "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 
-<!--
-
-`xsltproc -''-nonet \
-          -''-param man.charmap.use.subset "0" \
-          -''-param make.year.ranges "1" \
-          -''-param make.single.year.ranges "1" \
-          /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
-          manpage.xml'
-
-A manual page <package>.<section> will be generated. You may view the
-manual page with: nroff -man <package>.<section> | less'. A typical entry
-in a Makefile or Makefile.am is:
-
-DB2MAN = /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/manpages/docbook.xsl
-XP     = xsltproc -''-nonet -''-param man.charmap.use.subset "0"
-
-manpage.1: manpage.xml
-        $(XP) $(DB2MAN) $<
-
-The xsltproc binary is found in the xsltproc package. The XSL files are in
-docbook-xsl. A description of the parameters you can use can be found in the
-docbook-xsl-doc-* packages. Please remember that if you create the nroff
-version in one of the debian/rules file targets (such as build), you will need
-to include xsltproc and docbook-xsl in your Build-Depends control field.
-Alternatively use the xmlto command/package. That will also automatically
-pull in xsltproc and docbook-xsl.
-
-Notes for using docbook2x: docbook2x-man does not automatically create the
-AUTHOR(S) and COPYRIGHT sections. In this case, please add them manually as
-<refsect1> ... </refsect1>.
-
-To disable the automatic creation of the AUTHOR(S) and COPYRIGHT sections
-read /usr/share/doc/docbook-xsl/doc/manpages/authors.html. This file can be
-found in the docbook-xsl-doc-html package.
-
-Validation can be done using: `xmllint -''-noout -''-valid manpage.xml`
-
-General documentation about man-pages and man-page-formatting:
-man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
-
--->
-
   <!-- Fill in your name for FIRSTNAME and SURNAME. -->
   <!ENTITY dhfirstname "Ludovico">
   <!ENTITY dhsurname   "Cavedon">
   <!-- dhusername could also be set to "&firstname; &surname;". -->
   <!ENTITY dhusername  "&dhfirstname; &dhsurname;">
-  <!ENTITY dhemail     "ludovico.cavedon@gmail.com">
+  <!ENTITY dhemail     "cavedon@debian.org">
   <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
        allowed: see man(7), man(1) and
        http://www.tldp.org/HOWTO/Man-Page/q2.html. -->
@@ -76,7 +34,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
       </author>
     </authorgroup>
     <copyright>
-      <year>2009</year>
+      <year>2009-2011</year>
       <holder>&dhusername; &lt;&dhemail;&gt;></holder>
     </copyright>
     <legalnotice>
@@ -90,7 +48,7 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         License can be found in
         <filename>/usr/share/common-licenses/GPL-2</filename>.</para>
     </legalnotice>
-    <date>07/21/2009</date>
+    <date>03/18/2011</date>
   </refentryinfo>
   <refmeta>
     <refentrytitle>&dhucpackage;</refentrytitle>
@@ -149,6 +107,13 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
           </listitem>
         </varlistentry>
         <varlistentry>
+          <term><option>-q</option></term>
+          <term><option>--quiet</option></term>
+          <listitem>
+            <para>Suppress output.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
           <term><option>-h</option></term>
           <term><option>--help</option></term>
           <listitem>
@@ -162,16 +127,33 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
           </listitem>
         </varlistentry>
         <varlistentry>
+          <term><option>--profile</option></term>
+          <listitem>
+            <para>Print command execution profile.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
           <term><option>--nofork</option></term>
           <listitem>
             <para>Do not fork GUI process.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
-          <term><option>-l</option></term>
+          <term><option>--fork</option></term>
+          <listitem>
+            <para>Always fork GUI process.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
           <term><option>--listfile</option></term>
           <listitem>
             <para>Read file list from file.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>--listfileutf8</option></term>
+          <listitem>
+            <para>Read file list from file encoding utf-8.</para>
           </listitem>
         </varlistentry>
       </variablelist>
@@ -194,13 +176,38 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
         <varlistentry>
           <term><option>about</option></term>
           <listitem>
-            <para>About TortoiseHg.</para>
+            <para>About dialog.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
           <term><option>add</option></term>
           <listitem>
             <para>Add files.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>annotate</option></term>
+          <term><option>blame</option></term>
+          <listitem>
+            <para>Annotate dialog.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>archive</option></term>
+          <listitem>
+            <para>Archive dialog.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>backout</option></term>
+          <listitem>
+            <para>Backout tool.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>bisect</option></term>
+          <listitem>
+            <para>Bisect dialog.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
@@ -217,11 +224,34 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
           </listitem>
         </varlistentry>
         <varlistentry>
-          <term><option>datamine</option></term>
-          <term><option>annotate</option></term>
-          <term><option>blame</option></term>
+          <term><option>drag_copy</option></term>
           <listitem>
-            <para>Repository search and annotate tool.</para>
+            <para>Copy the selected files to the desired directory.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>drag_move</option></term>
+          <listitem>
+            <para>Move the selected files to the desired directory.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>email</option></term>
+          <listitem>
+            <para>Send changesets by email.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>forget</option></term>
+          <listitem>
+            <para>Forget selected files.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>grep</option></term>
+          <term><option>search</option></term>
+          <listitem>
+            <para>Grep/search dialog.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
@@ -245,44 +275,87 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
           </listitem>
         </varlistentry>
         <varlistentry>
+          <term><option>import</option></term>
+          <listitem>
+            <para>Import an ordered set of patches.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
           <term><option>init</option></term>
           <listitem>
-            <para>Repository initialization tool.</para>
+            <para>Init dialog.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
           <term><option>log</option></term>
           <term><option>history</option></term>
+          <term><option>explorer</option></term>
+          <term><option>workbench</option></term>
           <listitem>
-            <para>Changelog viewer.</para>
+            <para>Workbench application.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>manifest</option></term>
+          <listitem>
+            <para>Display the current or given revision of the project manifest.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
           <term><option>merge</option></term>
           <listitem>
-            <para>Merge tool.</para>
+            <para>Merge wizard.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
-          <term><option>recovery</option></term>
-          <term><option>rollback</option></term>
-          <term><option>verify</option></term>
+          <term><option>mq</option></term>
           <listitem>
-            <para>Recover, rollback &amp; verify.</para>
+            <para>Mercurial Queue tool.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>purge</option></term>
+          <listitem>
+            <para>Purge unknown and/or ignore files from repository.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>qqueue</option></term>
+          <listitem>
+            <para>Manage multiple MQ patch queues.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>qreorder</option></term>
+          <listitem>
+            <para>Reorder unapplied MQ patches.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>rebase</option></term>
+          <listitem>
+            <para>Rebase dialog.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>rejects</option></term>
+          <listitem>
+            <para>Manually resolve rejected patch chunks.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
           <term><option>remove</option></term>
           <term><option>rm</option></term>
           <listitem>
-            <para>File status viewer in revert mode.</para>
+            <para>Remove selected files.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
           <term><option>rename</option></term>
           <term><option>mv</option></term>
+          <term><option>copy</option></term>
           <listitem>
-            <para>Rename a single file or directory.</para>
+            <para>Rename dialog.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
@@ -292,46 +365,59 @@ man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
           </listitem>
         </varlistentry>
         <varlistentry>
+          <term><option>resolve</option></term>
+          <listitem>
+            <para>Resolve dialog.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
           <term><option>revert</option></term>
           <listitem>
-            <para>File status viewer in revert mode.</para>
+            <para>Revert selected files.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
           <term><option>serve</option></term>
           <listitem>
-            <para>Web server.</para>
+            <para>Start stand-alone webserver.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
           <term><option>shelve</option></term>
           <term><option>unshelve</option></term>
           <listitem>
-            <para>Shelve/unshelve tool.</para>
+            <para>Move changes between working directory and patches.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
           <term><option>status</option></term>
-          <term><option>st</option></term>
           <listitem>
-            <para>File status viewer.</para>
+            <para>Browse working copy status.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
-          <term><option>synch</option></term>
-          <term><option>pull</option></term>
-          <term><option>push</option></term>
-          <term><option>incoming</option></term>
-          <term><option>outgoing</option></term>
-          <term><option>email</option></term>
+          <term><option>strip</option></term>
           <listitem>
-            <para>Repository synchronization tool.</para>
+            <para>Strip dialog.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
-          <term><option>thgstatus</option></term>
+          <term><option>sync</option></term>
+          <term><option>synchronize</option></term>
           <listitem>
-            <para>Update TortoiseHg status cache.</para>
+            <para>Synchronize with other repositories.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>tag</option></term>
+          <listitem>
+            <para>Tag tool.</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term><option>test</option></term>
+          <listitem>
+            <para>Test arbitrary widgets.</para>
           </listitem>
         </varlistentry>
         <varlistentry>
