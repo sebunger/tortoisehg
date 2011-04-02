@@ -1,3 +1,10 @@
+tortoisehg (2.0.3-1) unstable; urgency=low
+
+  * Imported Upstream version 2.0.3
+  * tortoisehg-nautilus recommends ssh-askpass (Closes: #620121).
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Fri, 01 Apr 2011 20:02:00 -0700
+
 tortoisehg (2.0.2-1) unstable; urgency=low
 
   * New upstream release.
