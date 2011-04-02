@@ -56,8 +56,9 @@ class QReorderDialog(QDialog):
                 QListWidget.__init__(self, parent)
                 self.setCurrentRow(0)
             def contextMenuEvent(self, event):
-                self.menuRequested.emit(event.globalPos(),
-                    hglib.fromunicode(self.item(self.currentRow()).text()))
+                i = self.item(self.currentRow())
+                if i:
+                    self.menuRequested.emit(event.globalPos(), i.patchname)
             def focusInEvent(self, e):
                 i = self.item(self.currentRow())
                 if i:
@@ -124,8 +125,9 @@ class QReorderDialog(QDialog):
         patchname = self.menuselection
         dlg = qrename.QRenameDialog(self.repo, patchname, self)
         dlg.finished.connect(dlg.deleteLater)
-        dlg.output.connect(self.parent().output)
-        dlg.makeLogVisible.connect(self.parent().makeLogVisible)
+        if self.parent():
+            dlg.output.connect(self.parent().output)
+            dlg.makeLogVisible.connect(self.parent().makeLogVisible)
         dlg.exec_()
 
     def refresh(self):

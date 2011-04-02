@@ -14,7 +14,7 @@ from mercurial import merge as mergemod
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, wctxactions, visdiff, thgrepo
+from tortoisehg.hgqt import qtlib, cmdui, wctxactions, visdiff, thgrepo, csinfo
 
 MARGINS = (8, 0, 0, 0)
 
@@ -40,6 +40,40 @@ class ResolveDialog(QDialog):
         hbox.addWidget(tb)
         hbox.addWidget(self.stlabel)
 
+        def revisionInfoLayout(repo):
+            """
+            Return a layout containg the revision information (local and other)
+            """
+            hbox = QHBoxLayout()
+            hbox.setSpacing(0)
+            hbox.setContentsMargins(*MARGINS)
+
+            vbox = QVBoxLayout()
+            vbox.setContentsMargins(*MARGINS)
+            hbox.addLayout(vbox)
+            localrevtitle = qtlib.LabeledSeparator(_('Local revision information'))
+            localrevinfo = csinfo.create(repo)
+            localrevinfo.update(repo[None].p1())
+            vbox.addWidget(localrevtitle)
+            vbox.addWidget(localrevinfo)
+            vbox.addStretch()
+
+            vbox = QVBoxLayout()
+            vbox.setContentsMargins(*MARGINS)
+            hbox.addLayout(vbox)
+            otherrevtitle = qtlib.LabeledSeparator(_('Other revision information'))
+            otherrevinfo = csinfo.create(repo)
+            otherrevinfo.update(repo[None].p2())
+
+            vbox.addWidget(otherrevtitle)
+            vbox.addWidget(otherrevinfo)
+            vbox.addStretch()
+
+            return hbox
+
+        if len(self.repo[None].parents()) > 1:
+            self.layout().addLayout(revisionInfoLayout(self.repo))
+
         unres = qtlib.LabeledSeparator(_('Unresolved conflicts'))
         self.layout().addWidget(unres)
 
@@ -54,11 +88,11 @@ class ResolveDialog(QDialog):
         vbox = QVBoxLayout()
         vbox.setContentsMargins(*MARGINS)
         hbox.addLayout(vbox)
-        auto = QPushButton(_('Auto Resolve'))
-        auto.setToolTip(_('Attempt automatic merge'))
+        auto = QPushButton(_('Mercurial Resolve'))
+        auto.setToolTip(_('Attempt automatic (trivial) merge'))
         auto.clicked.connect(lambda: self.merge('internal:merge'))
-        manual = QPushButton(_('Manual Resolve'))
-        manual.setToolTip(_('Merge with selected merge tool'))
+        manual = QPushButton(_('Tool Resolve'))
+        manual.setToolTip(_('Merge using selected merge tool'))
         manual.clicked.connect(self.merge)
         local = QPushButton(_('Take Local'))
         local.setToolTip(_('Accept the local file version (yours)'))

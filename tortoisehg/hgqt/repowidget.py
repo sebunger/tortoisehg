@@ -9,14 +9,14 @@
 import binascii
 import os
 
-from mercurial import util, revset, error
+from mercurial import util, revset, error, patch
 
 from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox
-from tortoisehg.hgqt.qtlib import CustomPrompt, SharedWidget, DemandWidget
+from tortoisehg.hgqt.qtlib import CustomPrompt, DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
@@ -63,7 +63,7 @@ class RepoWidget(QWidget):
         self.revsetfilter = False
         self.branch = ''
         self.bundle = None
-        self.revset = set()
+        self.revset = []
         self.namedTabs = {}
         self.repolen = len(repo)
         self.destroyed.connect(self.repo.thginvalidate)
@@ -158,23 +158,23 @@ class RepoWidget(QWidget):
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
         tt.setTabToolTip(idx, _("Revision details"))
 
-        self.commitDemand = w = DemandWidget(self.createCommitWidget)
+        self.commitDemand = w = DemandWidget('createCommitWidget', self)
         self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
         tt.setTabToolTip(idx, _("Commit"))
 
-        self.syncDemand = w = DemandWidget(self.createSyncWidget)
+        self.syncDemand = w = DemandWidget('createSyncWidget', self)
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
         tt.setTabToolTip(idx, _("Synchronize"))
 
-        self.manifestDemand = w = DemandWidget(self.createManifestWidget)
+        self.manifestDemand = w = DemandWidget('createManifestWidget', self)
         self.manifestTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-annotate'), '')
         tt.setTabToolTip(idx, _('Manifest'))
 
-        self.grepDemand = w = DemandWidget(self.createGrepWidget)
+        self.grepDemand = w = DemandWidget('createGrepWidget', self)
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
         tt.setTabToolTip(idx, _("Search"))
 
-        self.mqDemand = w = DemandWidget(self.createMQWidget)
+        self.mqDemand = w = DemandWidget('createMQWidget', self)
         if 'mq' in self.repo.extensions():
             self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
             tt.setTabToolTip(idx, _("Patch Queue"))
@@ -182,7 +182,7 @@ class RepoWidget(QWidget):
         else:
             self.mqTabIndex = -1
 
-        self.pbranchDemand = w = DemandWidget(self.createPatchBranchWidget)
+        self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
         if 'pbranch' in self.repo.extensions():
             self.pbranchTabIndex = idx = tt.addTab(w, qtlib.geticon('branch'), '')
             tt.setTabToolTip(idx, _("Patch Branch"))
@@ -226,34 +226,26 @@ class RepoWidget(QWidget):
 
         QDesktopServices.openUrl(QUrl(link))
 
-    def getCommitWidget(self):
-        return getattr(self.repo, '_commitwidget', None)  # TODO: ugly
-
     def createCommitWidget(self):
-        cw = self.getCommitWidget()
-        if not cw:
-            pats = {}
-            opts = {}
-            b = QPushButton(_('Commit'))
-            b.setAutoDefault(True)
-            f = b.font()
-            f.setWeight(QFont.Bold)
-            b.setFont(f)
-            cw = CommitWidget(pats, opts, self.repo.root, True, self)
-            cw.buttonHBox.addWidget(b)
-            cw.commitButtonEnable.connect(b.setEnabled)
-            b.clicked.connect(cw.commit)
-            cw.loadSettings(QSettings(), 'workbench')
-            QTimer.singleShot(0, cw.reload)
-            self.repo._commitwidget = cw
+        pats, opts = {}, {}
+        cw = CommitWidget(pats, opts, self.repo.root, True, self)
 
-        cw = SharedWidget(cw)
+        b = QPushButton(_('Commit'))
+        b.setAutoDefault(True)
+        f = b.font()
+        f.setWeight(QFont.Bold)
+        b.setFont(f)
+        cw.buttonHBox.addWidget(b)
+        cw.commitButtonEnable.connect(b.setEnabled)
+        b.clicked.connect(cw.commit)
+        cw.loadSettings(QSettings(), 'workbench')
+
         cw.output.connect(self.output)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
         cw.linkActivated.connect(self._openLink)
-
         cw.showMessage.connect(self.showMessage)
+        QTimer.singleShot(0, cw.reload)
         return cw
 
     def createManifestWidget(self):
@@ -269,17 +261,14 @@ class RepoWidget(QWidget):
         return w
 
     def createSyncWidget(self):
-        sw = getattr(self.repo, '_syncwidget', None)  # TODO: ugly
-        if not sw:
-            sw = SyncWidget(self.repo, self)
-            self.repo._syncwidget = sw
-        sw = SharedWidget(sw)
+        sw = SyncWidget(self.repo, self)
         sw.output.connect(self.output)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
         sw.incomingBundle.connect(self.setBundle)
+        sw.pullCompleted.connect(self.onPullCompleted)
         sw.refreshTargets(self.rev)
         return sw
 
@@ -322,24 +311,35 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.setRepo(self.repo)
         self.manifestDemand.forward('setRepo', self.repo)
 
+    def onPullCompleted(self):
+        if self.bundle:
+            # create a new bundlerepo instance; revision numbers may change
+            brepo = thgrepo.repository(self.repo.ui, self.repo.root,
+                                       bundle=self.bundle)
+            repo = thgrepo.repository(self.repo.ui, self.repo.root)
+            if len(repo) == len(brepo):
+                # all bundle revisions pulled
+                self.clearBundle()
+                self.reload()
+            else:
+                # refresh revset with remaining revisions
+                self.revset = range(len(repo), len(brepo))
+                self.repo = brepo
+                self.repoview.setRepo(brepo)
+                self.revDetailsWidget.setRepo(brepo)
+                self.manifestDemand.forward('setRepo', brepo)
+                self.reload()
+                self.repomodel.revset = self.revset
+                self.repoview.resetBrowseHistory(self.revset)
+                self._reload_rev = self.revset[0]
+
     def acceptBundle(self):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.pullBundle(self.bundle, None)
-        self.clearBundle()
 
     def pullBundleToRev(self):
         self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
         self.syncDemand.pullBundle(self.bundle, self.rev)
-        removed = [self.repo[self.rev]]
-        while removed:
-            ctx = removed.pop()
-            if ctx.node() in self.revset:
-                self.revset.remove(ctx.node())
-                removed.extend(ctx.parents())
-        self.repomodel.revset = self.revset
-        if not self.revset:
-            self.clearBundle()
-        self.refresh()
 
     def rejectBundle(self):
         self.clearBundle()
@@ -347,6 +347,8 @@ class RepoWidget(QWidget):
 
     def clearRevisionSet(self):
         if not self.revset:
+            self.filterbar.hide()
+            self.toolbarVisibilityChanged.emit()
             return
         self.revset = []
         if self.revsetfilter:
@@ -373,8 +375,7 @@ class RepoWidget(QWidget):
         if self.revset:
             self.repomodel.filterbyrevset = checked
             self.reload()
-            self.repoview.resetBrowseHistory(self.revset)
-            self._reload_rev = self.revset[0]
+            self.repoview.resetBrowseHistory(self.revset, self.rev)
 
     def setOutgoingNodes(self, nodes):
         self.filterbar.revsetle.setText('outgoing()')
@@ -435,19 +436,36 @@ class RepoWidget(QWidget):
         self.generateMultipleSelectionMenu()
         self.generateBundleMenu()
 
+    def detectPatches(self, paths):
+        filepaths = []
+        for p in paths:
+            if not os.path.isfile(p):
+                continue
+            try:
+                pf = open(p, 'rb')
+                filename, message, user, date, branch, node, p1, p2 = \
+                        patch.extract(self.repo.ui, pf)
+                if filename:
+                    filepaths.append(p)
+                    os.unlink(filename)
+            except Exception, e:
+                pass
+        return filepaths
+
     def dragEnterEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
-        if util.any(os.path.isfile(p) for p in paths):
+        if self.detectPatches(paths):
             event.setDropAction(Qt.CopyAction)
             event.accept()
 
     def dropEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
-        filepaths = [p for p in paths if os.path.isfile(p)]
-        if filepaths:
-            self.thgimport(filepaths)
-            event.setDropAction(Qt.CopyAction)
-            event.accept()
+        patches = self.detectPatches(paths)
+        if not patches:
+            return
+        event.setDropAction(Qt.CopyAction)
+        event.accept()
+        self.thgimport(patches)
 
     ## Begin Workbench event forwards
 
@@ -742,6 +760,8 @@ class RepoWidget(QWidget):
         self.branch = branch
         self.repomodel.setBranch(branch=branch, allparents=allparents)
         self.titleChanged.emit(self.title())
+        if self.revset:
+            self.repoview.resetBrowseHistory(self.revset, self.rev)
 
     ##
     ## Workbench methods
@@ -760,6 +780,7 @@ class RepoWidget(QWidget):
         self.filterbar.loadSettings(s)
         self.repotabs_splitter.restoreState(
             s.value('repowidget/splitter-'+repoid).toByteArray())
+        QTimer.singleShot(0, lambda: self.toolbarVisibilityChanged.emit())
 
     def okToContinue(self):
         if not self.commitDemand.forward('canExit', default=True):
@@ -1067,8 +1088,15 @@ class RepoWidget(QWidget):
                 a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
+
+        if 'transplant' in self.repo.extensions():
+            a = QAction(_('Transplant Selected to local'), self)
+            a.setIcon(qtlib.getmenuicon('hg-transplant'))
+            a.triggered.connect(self.transplantRevisions)
+            menu.addAction(a)
+
         if 'reviewboard' in self.repo.extensions():
-            a = QAction(_('Post Pair to Review Board...'), self)
+            a = QAction(_('Post Selected to Review Board...'), self)
             a.triggered.connect(self.sendToReviewBoard)
             menu.addAction(a)
         self.paircmenu = menu
@@ -1137,6 +1165,13 @@ class RepoWidget(QWidget):
                 a.setIcon(qtlib.getmenuicon(icon))
             a.triggered.connect(cb)
             menu.addAction(a)
+
+        if 'transplant' in self.repo.extensions():
+            a = QAction(_('Transplant Selected to local'), self)
+            a.setIcon(qtlib.getmenuicon('hg-transplant'))
+            a.triggered.connect(self.transplantRevisions)
+            menu.addAction(a)
+
         if 'reviewboard' in self.repo.extensions():
             a = QAction(_('Post Selected to Review Board...'), self)
             a.triggered.connect(self.sendToReviewBoard)
@@ -1217,6 +1252,12 @@ class RepoWidget(QWidget):
 
     def transplantRevision(self):
         cmdline = ['transplant', '--repository', self.repo.root, str(self.rev)]
+        self.runCommand(cmdline)
+
+    def transplantRevisions(self):
+        cmdline = ['transplant', '--repository', self.repo.root]
+        for rev in self.repoview.selectedRevisions():
+            cmdline.append(str(rev))
         self.runCommand(cmdline)
 
     def backoutToRevision(self):

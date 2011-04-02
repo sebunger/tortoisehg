@@ -23,9 +23,9 @@ class BugReport(QDialog):
         layout = QVBoxLayout()
         self.setLayout(layout)
 
-        lbl = QLabel(_('Please report this bug to our %s bug tracker %s') %
-              (u'<a href="http://bitbucket.org/tortoisehg/thg/wiki/BugReport">',
-               u'</a>'))
+        lbl = QLabel(_('Please report this bug to our '
+            '<a href="%s">bug tracker</a>') %
+            u'http://bitbucket.org/tortoisehg/thg/wiki/BugReport')
         lbl.setOpenExternalLinks(True)
         self.layout().addWidget(lbl)
 
@@ -95,7 +95,7 @@ class BugReport(QDialog):
                         os.path.join(os.getcwd(), 'bugreport.txt'),
                         _('Text files (*.txt)'))
             if fname:
-                open(fname, 'wb').write(self.text)
+                open(fname, 'wb').write(hglib.fromunicode(self.text))
         except (EnvironmentError), e:
             QMessageBox.critical(self, _('Error writing file'), str(e))
 
@@ -132,7 +132,7 @@ class ExceptionMsgBox(QDialog):
             values = opts.get('values', [])
             msgopts = {}
             for i, val in enumerate(values):
-                msgopts['arg' + str(i)] = Qt.escape(val)
+                msgopts['arg' + str(i)] = Qt.escape(hglib.tounicode(val))
             try:
                 text = text % msgopts
             except Exception, e:

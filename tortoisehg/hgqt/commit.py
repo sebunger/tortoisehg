@@ -218,6 +218,11 @@ class CommitWidget(QWidget):
         self.branchop = None
 
         tbar.addAction(_('Options')).triggered.connect(self.details)
+        tbar.setIconSize(QSize(16,16))
+        self.stopAction = tbar.addAction(_('Stop'))
+        self.stopAction.triggered.connect(self.stop)
+        self.stopAction.setIcon(qtlib.geticon('process-stop'))
+        self.stopAction.setEnabled(False)
 
         hbox.addStretch(1)
 
@@ -419,7 +424,7 @@ class CommitWidget(QWidget):
         self.msgte.loadSettings(s, lpref+'msgte')
         self.stwidget.loadSettings(s, lpref+'status')
         self.msghistory = list(s.value(gpref+'history-'+repoid).toStringList())
-        self.msghistory = [m for m in self.msghistory if m]
+        self.msghistory = [unicode(m) for m in self.msghistory if m]
         self.updateRecentMessages()
         self.userhist = s.value(gpref+'userhist').toStringList()
         self.userhist = [u for u in self.userhist if u]
@@ -452,6 +457,7 @@ class CommitWidget(QWidget):
             pass
 
     def addMessageToHistory(self, umsg):
+        umsg = unicode(umsg)
         if umsg in self.msghistory:
             self.msghistory.remove(umsg)
         self.msghistory.insert(0, umsg)
@@ -459,6 +465,7 @@ class CommitWidget(QWidget):
         self.updateRecentMessages()
 
     def addUsernameToHistory(self, user):
+        user = hglib.tounicode(user)
         if user in self.userhist:
             self.userhist.remove(user)
         self.userhist.insert(0, user)
@@ -608,11 +615,21 @@ class CommitWidget(QWidget):
             commandlines.append(cmd)
 
         repo.incrementBusyCount()
+        self.commitButtonEnable.emit(False)
         self.runner.run(*commandlines)
+        self.stopAction.setEnabled(True)
+        self.progress.emit(*cmdui.startProgress(_('Commit'), ''))
+
+    def stop(self):
+        self.runner.cancel()
 
     def commandFinished(self, ret):
+        self.progress.emit(*cmdui.stopProgress(_('Commit')))
+        self.stopAction.setEnabled(False)
+        self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
         if ret == 0:
+            self.branchop = None
             umsg = self.msgte.text()
             if umsg:
                 self.addMessageToHistory(umsg)

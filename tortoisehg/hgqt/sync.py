@@ -56,6 +56,7 @@ class SyncWidget(QWidget):
     outgoingNodes = pyqtSignal(object)
     incomingBundle = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
+    pullCompleted = pyqtSignal()
 
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
@@ -258,6 +259,7 @@ class SyncWidget(QWidget):
             self.setUrl(self.paths['default'])
             self.curalias = 'default'
         else:
+            self.setUrl('')
             self.curalias = None
 
     def refreshStatusTips(self):
@@ -340,13 +342,21 @@ class SyncWidget(QWidget):
         self.postpullbutton.setText(name)
 
         # Refresh related paths
-        known = set(self.paths.values())
-        known.add(self.repo.root)
+        known = set()
+        known.add(os.path.abspath(self.repo.root).lower())
+        for path in self.paths.values():
+            if hg.islocal(path):
+                known.add(os.path.abspath(hg.localpath(path)).lower())
+            else:
+                known.add(path)
         related = {}
         for root, shortname in thgrepo.relatedRepositories(self.repo[0].node()):
-            if root not in known:
+            if root == self.repo.root:
+                continue
+            abs = os.path.abspath(root).lower()
+            if abs not in known:
                 related[root] = shortname
-                known.add(root)
+                known.add(abs)
             if root in thgrepo._repocache:
                 # repositories already opened keep their ui instances in sync
                 repo = thgrepo._repocache[root]
@@ -357,9 +367,13 @@ class SyncWidget(QWidget):
                 tempui.readconfig(os.path.join(root, '.hg', 'hgrc'))
                 ui = tempui
             for alias, path in ui.configitems('paths'):
-                if path not in known:
+                if hg.islocal(path):
+                    abs = os.path.abspath(hg.localpath(path)).lower()
+                else:
+                    abs = path
+                if abs not in known:
                     related[path] = alias
-                    known.add(path)
+                    known.add(abs)
         pairs = [(alias, path) for path, alias in related.items()]
         tm = PathsModel(pairs, self)
         self.reltv.setModel(tm)
@@ -423,20 +437,28 @@ class SyncWidget(QWidget):
         self.refreshStatusTips()
 
     def dragEnterEvent(self, event):
-        event.acceptProposedAction()
+        data = event.mimeData()
+        if data.hasUrls() or data.hasText():
+            event.setDropAction(Qt.CopyAction)
+            event.acceptProposedAction()
 
     def dragMoveEvent(self, event):
-        event.acceptProposedAction()
+        data = event.mimeData()
+        if data.hasUrls() or data.hasText():
+            event.setDropAction(Qt.CopyAction)
+            event.acceptProposedAction()
 
     def dropEvent(self, event):
         data = event.mimeData()
         if data.hasUrls():
             url = data.urls()[0]
             self.setUrl(hglib.fromunicode(url.toString()))
+            event.setDropAction(Qt.CopyAction)
             event.accept()
         elif data.hasText():
             text = data.text()
             self.setUrl(hglib.fromunicode(text))
+            event.setDropAction(Qt.CopyAction)
             event.accept()
 
     def canExit(self):
@@ -486,6 +508,9 @@ class SyncWidget(QWidget):
             try:
                 os.chdir(folder)
                 QProcess.startDetached(shell)
+            except EnvironmentError, e:
+                qtlib.InfoMsgBox(_('Repository not found'),
+                                 hglib.tounicode(str(e)))
             finally:
                 os.chdir(cwd)
         else:
@@ -692,12 +717,14 @@ class SyncWidget(QWidget):
                 self.showMessage.emit(_('Pull from %s completed') % urlu)
             else:
                 self.showMessage.emit(_('Pull from %s aborted, ret %d') % (urlu, ret))
+            self.pullCompleted.emit()
             # handle file conflicts during rebase
-            if os.path.exists(self.repo.join('rebasestate')):
-                dlg = rebase.RebaseDialog(self.repo, self)
-                dlg.finished.connect(dlg.deleteLater)
-                dlg.exec_()
-                return
+            if self.opts.get('rebase'):
+                if os.path.exists(self.repo.join('rebasestate')):
+                    dlg = rebase.RebaseDialog(self.repo, self)
+                    dlg.finished.connect(dlg.deleteLater)
+                    dlg.exec_()
+                    return
             # handle file conflicts during update
             for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
                 if status == 'u':
@@ -725,10 +752,16 @@ class SyncWidget(QWidget):
         urlu = hglib.tounicode(url)
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % urlu)
         if self.embedded and not self.opts.get('subrepos'):
+            def verifyhash(hash):
+                if len(hash) != 40:
+                    return False
+                bad = [c for c in hash if c not in '0123456789abcdef']
+                return not bad
             def outputnodes(ret, data):
                 if ret == 0:
-                    nodes = [n for n in data.splitlines() if len(n) == 40]
-                    self.outgoingNodes.emit(nodes)
+                    nodes = [n for n in data.splitlines() if verifyhash(n)]
+                    if nodes:
+                        self.outgoingNodes.emit(nodes)
                     self.showMessage.emit(_('%d outgoing changesets to %s') %
                                           (len(nodes), urlu))
                 elif ret == 1:
@@ -757,14 +790,14 @@ class SyncWidget(QWidget):
                         changelist = hashes.pop(0)
                         clnum = int(changelist)
                         if len(hashes)>1 and len(hashes[0])==1:
-                           state = hashes.pop(0)
-                           if state == 's':
-                               changelist = _('%s (submitted)') % changelist
-                           elif state == 'p':
-                               changelist = _('%s (pending)') % changelist
-                           else:
-                               raise ValueError
-                        pending[changelist] = hashes
+                            state = hashes.pop(0)
+                            if state == 's':
+                                changelist = _('%s (submitted)') % changelist
+                            elif state == 'p':
+                                changelist = _('%s (pending)') % changelist
+                            else:
+                                raise ValueError
+                            pending[changelist] = hashes
                     except (ValueError, IndexError):
                         text = _('Unable to parse p4pending output')
                 if pending:
@@ -855,7 +888,7 @@ class SyncWidget(QWidget):
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                hglib.tounicode(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
 
 
@@ -954,7 +987,7 @@ class PostPullDialog(QDialog):
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                hglib.tounicode(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
         super(PostPullDialog, self).accept()
 
@@ -1031,7 +1064,7 @@ class SaveDialog(QDialog):
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                hglib.tounicode(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
         super(SaveDialog, self).accept()
 
@@ -1044,7 +1077,7 @@ class SecureDialog(QDialog):
 
         def genfingerprint():
             try:
-                pem = ssl.get_server_certificate( (host, 443) )
+                pem = ssl.get_server_certificate( (host, port) )
                 der = ssl.PEM_cert_to_DER_cert(pem)
             except Exception, e:
                 qtlib.WarningMsgBox(_('Certificate Query Error'),
@@ -1055,6 +1088,10 @@ class SecureDialog(QDialog):
             le.setText(pretty)
 
         user, host, port, folder, passwd, scheme = parseurl(origurl)
+        if port is None:
+            port = 443
+        else:
+            port = int(port)
         uhost = hglib.tounicode(host)
         self.setWindowTitle(_('Security: ') + uhost)
         self.setWindowFlags(self.windowFlags() & \
@@ -1211,7 +1248,7 @@ are expanded in the filename.'''))
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                hglib.tounicode(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
         super(SecureDialog, self).accept()
 
