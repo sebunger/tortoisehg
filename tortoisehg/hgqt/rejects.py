@@ -93,9 +93,18 @@ class RejectsDialog(QDialog):
 
         f = QFile(path)
         f.open(QIODevice.ReadOnly)
+        earlybytes = f.readData(4096)
+        if '\0' in earlybytes:
+            qtlib.ErrorMsgBox(_('Unable to merge rejects'),
+                              _('This appears to be a binary file'))
+            self.hide()
+            QTimer.singleShot(0, self.reject)
+            return
+
+        f.seek(0)
         editor.read(f)
         editor.setModified(False)
-        lexer = lexers.get_lexer(path, f.readData(1024), self)
+        lexer = lexers.get_lexer(path, earlybytes, self)
         editor.setLexer(lexer)
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
@@ -103,7 +112,7 @@ class RejectsDialog(QDialog):
         buf = cStringIO.StringIO()
         try:
             buf.write('diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % path)
-            buf.write(open(path + '.rej', 'r').read())
+            buf.write(open(path + '.rej', 'rb').read())
             buf.seek(0)
         except IOError, e:
             pass
@@ -163,7 +172,7 @@ class RejectsDialog(QDialog):
         buf = cStringIO.StringIO()
         chunk = self.chunks[row]
         chunk.write(buf)
-        self.rejectbrowser.showChunk(buf.getvalue().splitlines()[1:])
+        self.rejectbrowser.showChunk(buf.getvalue().splitlines(True)[1:])
         self.editor.setCursorPosition(chunk.fromline-1, 0)
         self.editor.ensureLineVisible(chunk.fromline-1)
         self.editor.markerDeleteAll(-1)
@@ -178,11 +187,31 @@ class RejectsDialog(QDialog):
         self.rejectbrowser.saveSettings(s, 'rejects/rejbrowse')
 
     def accept(self):
-        f = QFile(self.path)
-        f.open(QIODevice.WriteOnly)
-        self.editor.write(f)
-        self.saveSettings()
-        super(RejectsDialog, self).accept()
+        # If the editor has been modified, we implicitly accept the changes
+        acceptresolution = self.editor.isModified()
+        if not acceptresolution:
+            action = QMessageBox.warning(self,
+                _("Warning"),
+                _("You have marked all rejected patch chunks as resolved yet you " \
+                "have not modified the file on the edit panel.\n\n" \
+                "This probably means that no code from any of the rejected patch " \
+                "chunks made it into the file.\n\n"\
+                "Are you sure that you want to leave the file as is and " \
+                "consider all the rejected patch chunks as resolved?\n\n" \
+                "Doing so may delete them from a shelve, for example, which " \
+                "would mean that you would lose them forever!\n\n"
+                "Click Yes to accept the file as is or No to continue resolving " \
+                "the rejected patch chunks."),
+                QMessageBox.Yes, QMessageBox.No)
+            if action == QMessageBox.Yes:
+                acceptresolution = True
+
+        if acceptresolution:
+            f = QFile(self.path)
+            f.open(QIODevice.WriteOnly)
+            self.editor.write(f)
+            self.saveSettings()
+            super(RejectsDialog, self).accept()
 
     def reject(self):
         self.saveSettings()
@@ -233,7 +262,7 @@ class RejectBrowser(qscilib.Scintilla):
             elif line[0] == '-':
                 removed.append(i)
         self.markerDeleteAll(-1)
-        self.setText(u'\n'.join(utext))
+        self.setText(u''.join(utext))
         for i in added:
             self.markerAdd(i, self.addedMark)
             self.markerAdd(i, self.addedColor)

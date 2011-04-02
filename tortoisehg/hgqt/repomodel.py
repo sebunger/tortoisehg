@@ -35,8 +35,23 @@ COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
            "darkcyan", "gray", "yellow", ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
-ALLCOLUMNS = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Tags', 'Node',
-              'Age', 'LocalTime', 'UTCTime', 'Changes')
+COLUMNHEADERS = (
+    ('Graph', _('Graph', 'column header')),
+    ('Rev', _('Rev', 'column header')),
+    ('Branch', _('Branch', 'column header')),
+    ('Description', _('Description', 'column header')),
+    ('Author', _('Author', 'column header')),
+    ('Tags', _('Tags', 'column header')),
+    ('Node', _('Node', 'column header')),
+    ('Age', _('Age', 'column header')),
+    ('LocalTime', _('Local Time', 'column header')),
+    ('UTCTime', _('UTC Time', 'column header')),
+    ('Changes', _('Changes', 'column header')),
+    )
+
+COLUMNNAMES = dict(COLUMNHEADERS)
+
+ALLCOLUMNS = [h[0] for h in COLUMNHEADERS]
 
 UNAPPLIED_PATCH_COLOR = '#999999'
 
@@ -108,7 +123,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.filterbranch = branch
         self.invalidateCache()
         if self.revset and self.filterbyrevset:
-            grapher = revision_grapher(self.repo, revset=self.revset)
+            grapher = revision_grapher(self.repo, branch=branch, revset=self.revset)
             self.graph = Graph(self.repo, grapher, include_mq=False)
         else:
             grapher = revision_grapher(self.repo, branch=branch,
@@ -379,10 +394,17 @@ class HgRepoListModel(QAbstractTableModel):
     def data(self, index, role):
         if not index.isValid():
             return nullvariant
-        if role in self._roleoffsets:
-            offset = self._roleoffsets[role]
-        else:
+        if role not in self._roleoffsets:
             return nullvariant
+        try:
+            return self.safedata(index, role)
+        except Exception, e:
+            if role == Qt.DisplayRole:
+                return QVariant(hglib.tounicode(str(e)))
+            else:
+                return nullvariant
+
+    def safedata(self, index, role):
         row = index.row()
         self.ensureBuilt(row=row)
         graphlen = len(self.graph)
@@ -393,6 +415,7 @@ class HgRepoListModel(QAbstractTableModel):
         if data is None:
             data = [None,] * (self._roleoffsets[Qt.DecorationRole]+1)
         column = self._columns[index.column()]
+        offset = self._roleoffsets[role]
         if role == Qt.DecorationRole:
             if column != 'Graph':
                 return nullvariant
@@ -451,7 +474,7 @@ class HgRepoListModel(QAbstractTableModel):
     def headerData(self, section, orientation, role):
         if orientation == Qt.Horizontal:
             if role == Qt.DisplayRole:
-                return QVariant(self._columns[section])
+                return QVariant(COLUMNNAMES[self._columns[section]])
             if role == Qt.TextAlignmentRole:
                 return QVariant(Qt.AlignLeft)
         return nullvariant
@@ -509,11 +532,19 @@ class HgRepoListModel(QAbstractTableModel):
 
     def getlog(self, ctx, gnode):
         if ctx.rev() is None:
+            msg = None
             if self.unicodestar:
                 # The Unicode symbol is a black star:
-                return u'\u2605 ' + _('Working Directory') + u' \u2605'
+                msg = u'\u2605 ' + _('Working Directory') + u' \u2605'
             else:
-                return '*** ' + _('Working Directory') + ' ***'
+                msg = '*** ' + _('Working Directory') + ' ***'
+
+            for pctx in ctx.parents():
+                if pctx.node() not in self.repo._branchheads:
+                    text = _('Not a head revision!')
+                    msg += " " + qtlib.markup(text, fg='red', weight='bold')
+
+            return msg
 
         msg = ctx.longsummary()
 
@@ -522,7 +553,7 @@ class HgRepoListModel(QAbstractTableModel):
             text = qtlib.applyeffects(' %s ' % ctx._patchname, effects)
             # qtlib.markup(msg, fg=UNAPPLIED_PATCH_COLOR)
             msg = qtlib.markup(msg)
-            return hglib.tounicode(text + ' ' + msg)
+            return hglib.tounicode(text + ' ') + msg
 
         parts = []
         if ctx.thgbranchhead():

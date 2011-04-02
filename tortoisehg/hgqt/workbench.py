@@ -26,6 +26,14 @@ from tortoisehg.hgqt.settings import SettingsDialog
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+class ThgTabBar(QTabBar):
+    def mouseReleaseEvent(self, event):
+        
+        if event.button() == Qt.MidButton:
+            self.tabCloseRequested.emit(self.tabAt(event.pos()))
+            
+        super(QTabBar, self).mouseReleaseEvent(event)
+
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
     finished = pyqtSignal(int)
@@ -74,6 +82,7 @@ class Workbench(QMainWindow):
         self.setWindowIcon(qtlib.geticon('hg-log'))
 
         self.repoTabsWidget = tw = QTabWidget()
+        tw.setTabBar(ThgTabBar())
         tw.setDocumentMode(True)
         tw.setTabsClosable(True)
         tw.setMovable(True)
@@ -309,16 +318,16 @@ class Workbench(QMainWindow):
         self.menuView.addMenu(menu)
 
         newaction(_('Incoming'), self._repofwd('incoming'), icon='hg-incoming',
-                  tooltip=_('Check for incoming changes from default pull target'),
+                  tooltip=_('Check for incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Pull'), self._repofwd('pull'), icon='hg-pull',
-                  tooltip=_('Pull incoming changes from default pull target'),
+                  tooltip=_('Pull incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
         newaction(_('Outgoing'), self._repofwd('outgoing'), icon='hg-outgoing',
-                   tooltip=_('Detect outgoing changes to default push target'),
+                   tooltip=_('Detect outgoing changes to selected URL'),
                    enabled='repoopen', toolbar='sync')
         newaction(_('Push'), self._repofwd('push'), icon='hg-push',
-                  tooltip=_('Push outgoing changes to default push target'),
+                  tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
 
         self.updateMenu()
@@ -376,7 +385,7 @@ class Workbench(QMainWindow):
         for u in d.urls():
             root = self.find_root(u)
             if root:
-                self.openRepo(root)
+                self.showRepo(root)
                 accept = True
         if accept:
             event.setDropAction(Qt.LinkAction)
@@ -448,6 +457,7 @@ class Workbench(QMainWindow):
         index = self.repoTabsWidget.currentIndex()
         if widget.closeRepoWidget():
             self.repoTabsWidget.removeTab(index)
+            widget.deleteLater()
             self.updateMenu()
 
     def repoTabCloseRequested(self, index):
@@ -455,6 +465,7 @@ class Workbench(QMainWindow):
         w = tw.widget(index)
         if w and w.closeRepoWidget():
             tw.removeTab(index)
+            w.deleteLater()
             self.updateMenu()
 
     def repoTabChanged(self, index=0):
@@ -580,16 +591,13 @@ class Workbench(QMainWindow):
                 repo = thgrepo.repository(path=path)
                 self.addRepoTab(repo)
             except RepoError:
+                upath = hglib.tounicode(path)
                 qtlib.WarningMsgBox(_('Failed to open repository'),
-                        _('%s is not a valid repository') % path)
+                        _('%s is not a valid repository') % upath)
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):
             rw.goto(rev)
-
-    def reloadRepository(self, root):
-        for rw in self._findrepowidget(root):
-            rw.reload()
 
     def _findrepowidget(self, root):
         """Iterates RepoWidget for the specified root"""

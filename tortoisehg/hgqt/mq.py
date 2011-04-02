@@ -19,7 +19,7 @@ from hgext import mq as mqmod
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, rejects, commit, qscilib
-from tortoisehg.hgqt import qqueue, fileview
+from tortoisehg.hgqt import qqueue, fileview, thgimport
 
 # TODO
 # keep original file name in file list item
@@ -415,10 +415,20 @@ class MQWidget(QWidget):
         'Patch has been renamed, issue qrename'
         if self.cmd.running():
             return
+        from tortoisehg.hgqt import qrename
+        newpatchname = hglib.fromunicode(item.text())
+        if newpatchname == item._thgpatch:
+            return
+        else:
+            res = qrename.checkPatchname(self.repo.root,
+                        self.repo.thgactivemqname, newpatchname, self)
+            if not res:
+                item.setText(item._thgpatch)
+                return
         self.repo.incrementBusyCount()
         self.qtbar.setEnabled(False)
         self.cmd.run(['qrename', '-R', self.repo.root, '--',
-                      item._thgpatch, hglib.fromunicode(item.text())])
+                      item._thgpatch, newpatchname])
 
     @pyqtSlot(int)
     def onPatchSelected(self, row):
@@ -782,16 +792,32 @@ class MQWidget(QWidget):
 
     # Capture drop events, try to import into current patch queue
 
-    def dragEnterEvent(self, event):
-        event.acceptProposedAction()
+    def detectPatches(self, paths):
+        filepaths = []
+        for p in paths:
+            if not os.path.isfile(p):
+                continue
+            try:
+                pf = open(p, 'rb')
+                filename, message, user, date, branch, node, p1, p2 = \
+                        patch.extract(self.repo.ui, pf)
+                if filename:
+                    filepaths.append(p)
+                    os.unlink(filename)
+            except Exception, e:
+                pass
+        return filepaths
 
-    def dragMoveEvent(self, event):
-        event.acceptProposedAction()
+    def dragEnterEvent(self, event):
+        paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
+        if self.detectPatches(paths):
+            event.setDropAction(Qt.CopyAction)
+            event.accept()
 
     def dropEvent(self, event):
         paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
-        filepaths = [p for p in paths if os.path.isfile(p)]
-        if filepaths:
+        patches = self.detectPatches(paths)
+        if patches:
             event.setDropAction(Qt.CopyAction)
             event.accept()
         else:
@@ -799,7 +825,7 @@ class MQWidget(QWidget):
             return
         dlg = thgimport.ImportDialog(self.repo, self, mq=True)
         dlg.finished.connect(dlg.deleteLater)
-        dlg.setfilepaths(filepaths)
+        dlg.setfilepaths(patches)
         dlg.exec_()
 
     # End drop events

@@ -51,8 +51,13 @@ class LoadReviewDataThread(QThread):
 
             except rb.ReviewBoardError, e:
                 msg = e.msg
+            except TypeError:
+                msg = _("Invalid reviewboard plugin. Please download the "
+                        "mercurial reviewboard plugin version 3.5 or higher "
+                        "from the website below.\n\n %s") % \
+                        u'http://bitbucket.org/mdelagra/mercurial-reviewboard/'
 
-        self.dialog._error_message = msg
+        self.dialog.error_message = msg
 
     def loadCombos(self):
         #Get the index of a users previously selected repo id
@@ -378,8 +383,11 @@ class PostReviewDialog(QDialog):
     @pyqtSlot()
     def onSettingsButtonClicked(self):
         from tortoisehg.hgqt import settings
-
-        settings.SettingsDialog(parent=self, focus='reviewboard.server').exec_()
+        if settings.SettingsDialog(parent=self, focus='reviewboard.server').exec_():
+            # not use repo.configChanged because it can clobber user input
+            # accidentally.
+            self.repo.invalidateui()  # force reloading config immediately
+            self.readSettings()
 
 def run(ui, *pats, **opts):
     revs = opts.get('rev') or None

@@ -19,7 +19,7 @@ import os
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog 
+from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt import visdiff, wctxactions, revert
 
 from PyQt4.QtCore import *
@@ -32,7 +32,9 @@ class HgFileListView(QTableView):
 
     fileRevSelected = pyqtSignal(object, object, object)
     clearDisplay = pyqtSignal()
-    contextmenu = None
+    linkActivated = pyqtSignal(QString)
+    filecontextmenu = None
+    subrepocontextmenu = None
 
     def __init__(self, parent=None):
         QTableView.__init__(self, parent)
@@ -46,7 +48,7 @@ class HgFileListView(QTableView):
 
         self.createActions()
 
-        self.doubleClicked.connect(self.fileActivated)
+        self.doubleClicked.connect(self.doubleClickHandler)
         self._diff_dialogs = {}
         self._nav_dialogs = {}
 
@@ -122,6 +124,8 @@ class HgFileListView(QTableView):
 
     def fileActivated(self, index, alternate=False):
         selFile = self.model().fileFromIndex(index)
+        if not self._actions['navigate'].isEnabled():
+            return
         if alternate:
             self.navigate(selFile)
         else:
@@ -210,6 +214,22 @@ class HgFileListView(QTableView):
             dlg.raise_()
             dlg.activateWindow()
 
+    def opensubrepo(self):
+        path = os.path.join(self.model().repo.root, self.currentFile())
+        if os.path.isdir(path):
+            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+        else:
+            QMessageBox.warning(self,
+                _("Cannot open subrepository"),
+                _("The selected subrepository does not exist on the working directory"))
+    
+    def doubleClickHandler(self):
+        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
+        if itemissubrepo:
+            self.opensubrepo()
+        else:
+            self.vdiff()
+        
     def createActions(self):
         self.actionShowAllMerge = QAction(_('Show All'), self)
         self.actionShowAllMerge.setToolTip(
@@ -241,6 +261,9 @@ class HgFileListView(QTableView):
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
+            ('opensubrepo', _('Open subrepository'), 'thg-repository-open', 
+              'Alt+Ctrl+O', _('Open the selected subrepository'),
+              self.opensubrepo),
             ]:
             act = QAction(desc, self)
             if icon:
@@ -253,17 +276,26 @@ class HgFileListView(QTableView):
                 act.triggered.connect(cb)
             self._actions[name] = act
             self.addAction(act)
-
+    
     def contextMenuEvent(self, event):
-        if not self.contextmenu:
-            self.contextmenu = QMenu(self)
-            for act in ['diff', 'ldiff', 'edit', 'ledit', 'revert',
-                        'navigate', 'diffnavigate']:
+        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
+
+        # Subrepos and regular items have different context menus
+        if itemissubrepo:
+            contextmenu = self.subrepocontextmenu
+            actionlist = ['opensubrepo']
+        else:
+            contextmenu = self.filecontextmenu
+            actionlist = ['diff', 'ldiff', 'edit', 'ledit', 'revert',
+                        'navigate', 'diffnavigate']
+        if not contextmenu:
+            contextmenu = QMenu(self)
+            for act in actionlist:
                 if act:
-                    self.contextmenu.addAction(self._actions[act])
+                    contextmenu.addAction(self._actions[act])
                 else:
-                    self.contextmenu.addSeparator()
-        self.contextmenu.exec_(event.globalPos())
+                    contextmenu.addSeparator()
+        contextmenu.exec_(event.globalPos())
 
     def resizeEvent(self, event):
         if self.model() is not None:

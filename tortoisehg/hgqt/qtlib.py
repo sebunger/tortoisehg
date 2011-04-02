@@ -12,6 +12,7 @@ import shutil
 import stat
 import tempfile
 import re
+import weakref
 
 from mercurial import extensions
 
@@ -32,9 +33,10 @@ tmproot = None
 def gettempdir():
     global tmproot
     def cleanup():
-        def writeable(arg, dirname, fnames):
-            for fname in fnames:
-                os.chmod(os.path.join(dirname, fname), stat.S_IWUSR)
+        def writeable(arg, dirname, names):
+            for name in names:
+                fullname = os.path.join(dirname, name)
+                os.chmod(fullname, os.stat(fullname).st_mode | stat.S_IWUSR)
         try:
             os.path.walk(tmproot, writeable, None)
             shutil.rmtree(tmproot)
@@ -462,9 +464,9 @@ def fix_application_font():
     except ImportError:
         return
 
-    # On Windows, the font for main window seems to be determined by "icon"
-    # font, but Qt chooses uncustomizable system font.
-    lf = win32gui.SystemParametersInfo(win32con.SPI_GETICONTITLELOGFONT)
+    # use configurable font like GTK, Mozilla XUL or Eclipse SWT
+    ncm = win32gui.SystemParametersInfo(win32con.SPI_GETNONCLIENTMETRICS)
+    lf = ncm['lfMessageFont']
     f = QFont(hglib.tounicode(lf.lfFaceName))
     f.setItalic(lf.lfItalic)
     if lf.lfWeight != win32con.FW_DONTCARE:
@@ -473,7 +475,7 @@ def fix_application_font():
         n, w = filter(lambda e: e[0] <= lf.lfWeight, weights)[-1]
         f.setWeight(w)
     f.setPixelSize(abs(lf.lfHeight))
-    QApplication.setFont(f, 'QMainWindow')
+    QApplication.setFont(f, 'QWidget')
 
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
@@ -750,9 +752,13 @@ class SharedWidget(QWidget):
 class DemandWidget(QWidget):
     'Create a widget the first time it is shown'
 
-    def __init__(self, createfunc, parent=None):
+    def __init__(self, createfuncname, createinst, parent=None):
         super(DemandWidget, self).__init__(parent)
-        self._createfunc = createfunc
+        # We store a reference to the create function name to avoid having a
+        # hard reference to the bound function, which prevents it being
+        # disposed. Weak references to bound functions don't work.
+        self._createfuncname = createfuncname
+        self._createinst = weakref.ref(createinst)
         self._widget = None
         vbox = QVBoxLayout()
         vbox.setContentsMargins(*(0,)*4)
@@ -771,7 +777,8 @@ class DemandWidget(QWidget):
     def get(self):
         """Returns the stored widget"""
         if self._widget is None:
-            self._widget = self._createfunc()
+            func = getattr(self._createinst(), self._createfuncname, None)
+            self._widget = func()
             self.layout().addWidget(self._widget)
         return self._widget
 

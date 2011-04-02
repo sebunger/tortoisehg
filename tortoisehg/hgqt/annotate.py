@@ -171,19 +171,35 @@ class AnnotateView(qscilib.Scintilla):
             qtlib.ErrorMsgBox(_('Unable to annotate'),
                     _('%s is not found in revision %d') % (wfile, ctx.rev()))
             return
-        self._rev = ctx.rev()
-        self.clear()
-        self.annfile = wfile
-        if util.binary(fctx.data()):
-            self.setText(_('File is binary.\n'))
+
+        try:
+            if rev is None:
+                size = fctx.size()
+            else:
+                size = fctx._filelog.rawsize(fctx.filerev())
+        except (EnvironmentError, error.LookupError), e:
+            self.setText(_('File or diffs not displayed: ') + \
+                    hglib.tounicode(str(e)))
+            self.error = p + hglib.tounicode(str(e))
+            return
+
+        if size > ctx._repo.maxdiff:
+            self.setText(_('File or diffs not displayed: ') + \
+                    _('File is larger than the specified max size.\n'))
         else:
-            self.setText(hglib.tounicode(fctx.data()))
-        if line:
-            self.setCursorPosition(int(line) - 1, 0)
-        self._updatelexer(fctx)
-        self._updatemarginwidth()
-        self.sourceChanged.emit(wfile, self._rev)
-        self._updateannotation()
+            self._rev = ctx.rev()
+            self.clear()
+            self.annfile = wfile
+            if util.binary(fctx.data()):
+                self.setText(_('File is binary.\n'))
+            else:
+                self.setText(hglib.tounicode(fctx.data()))
+            if line:
+                self.setCursorPosition(int(line) - 1, 0)
+            self._updatelexer(fctx)
+            self._updatemarginwidth()
+            self.sourceChanged.emit(wfile, self._rev)
+            self._updateannotation()
 
     def _updateannotation(self):
         if not self.isAnnotationEnabled() or not self.annfile:
@@ -237,6 +253,8 @@ class AnnotateView(qscilib.Scintilla):
         """Update the lexer according to the given file"""
         lex = lexers.get_lexer(fctx.path(), hglib.tounicode(fctx.data()), self)
         self.setLexer(lex)
+        if lex is None:
+            self.setFont(qtlib.getfont('fontlog').font())
 
     def _updaterevmargin(self):
         """Update the content of margin area showing revisions"""

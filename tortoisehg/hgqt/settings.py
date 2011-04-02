@@ -41,7 +41,7 @@ class SettingsCombo(QComboBox):
             settings = opts['settings']
             slist = settings.value('settings/'+opts['cpath']).toStringList()
             self.previous = [s for s in slist if s]
-        self.setFixedWidth(ENTRY_WIDTH)
+        self.setMinimumWidth(ENTRY_WIDTH)
 
     def resetList(self):
         self.clear()
@@ -109,10 +109,9 @@ class PasswordEntry(QLineEdit):
         self.opts = opts
         self.curvalue = None
         self.setEchoMode(QLineEdit.Password)
-        self.setFixedWidth(ENTRY_WIDTH)
+        self.setMinimumWidth(ENTRY_WIDTH)
 
     ## common APIs for all edit widgets
-
     def setValue(self, curvalue):
         self.curvalue = curvalue
         if curvalue:
@@ -136,7 +135,7 @@ class FontEntry(QPushButton):
         cpath = self.opts['cpath']
         assert cpath.startswith('tortoisehg.')
         self.fname = cpath[11:]
-        self.setFixedWidth(ENTRY_WIDTH)
+        self.setMinimumWidth(ENTRY_WIDTH)
 
     def on_clicked(self, checked):
         def newFont(font):
@@ -625,8 +624,9 @@ class SettingsDialog(QDialog):
         except error.RepoError:
             repo = None
             if configrepo:
+                uroot = hglib.tounicode(root)
                 qtlib.ErrorMsgBox(_('No repository found'),
-                                  _('no repo at ') + root, parent=self)
+                                  _('no repo at ') + uroot, parent=self)
 
         if repo:
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])

@@ -35,22 +35,24 @@ class patchctx(object):
         self._status = [[], [], []]
         self._fileorder = []
         self._user = ''
-        self._date = ''
         self._desc = ''
         self._branch = ''
         self._node = node.nullid
         self._identity = node.nullid
         self._mtime = None
+        self._fsize = 0
         self._parseerror = None
 
         try:
+            self._mtime = os.path.getmtime(patchpath)
+            self._fsize = os.path.getsize(patchpath)
             ph = mq.patchheader(self._path)
             self._ph = ph
-            self._mtime = os.path.getmtime(patchpath)
             hash = util.sha1(self._path)
             hash.update(str(self._mtime))
             self._identity = hash.digest()
         except EnvironmentError:
+            self._date = util.makedate()
             return
 
         try:
@@ -71,6 +73,10 @@ class patchctx(object):
     def invalidate(self):
         # ensure the patch contents are re-read
         self._mtime = 0
+
+    @property
+    def substate(self):
+        return {}  # unapplied patch won't include .hgsubstate
 
     def __contains__(self, key):
         return key in self._files

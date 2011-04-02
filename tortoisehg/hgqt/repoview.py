@@ -84,9 +84,13 @@ class HgRepoView(QTableView):
         self._in_history = False
         model.layoutChanged.connect(self.resetDelegate)
 
-    def resetBrowseHistory(self, revs):
-        self._rev_history = revs[:]
-        self._rev_pos = -1
+    def resetBrowseHistory(self, revs, reselrev=None):
+        graph = self.model().graph
+        self._rev_history = [r for r in revs if r in graph.nodesdict]
+        if reselrev is not None and reselrev in self._rev_history:
+            self._rev_pos = self._rev_history.index(reselrev)
+        else:
+            self._rev_pos = -1
         self.forward()
 
     def resetDelegate(self):
@@ -244,33 +248,24 @@ class HgRepoView(QTableView):
 
         key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
         s.setValue(key, col_widths)
-        s.setValue('%s/widget_width' % self.cfgname, self.viewport().width())
 
     def resizeEvent(self, e):
         # re-size columns the smart way: the column holding Description
         # is re-sized according to the total widget size.
-        if e.oldSize().width() != e.size().width():
-            key = '%s/widget_width' % self.cfgname
-            widget_width, ok = QSettings().value(key).toInt()
-            if not ok:
-                widget_width = 0
+        if self.resized and e.oldSize().width() != e.size().width():
+            model = self.model()
+            total_width = stretch_col = 0
 
-            if self.resized:
-                model = self.model()
-                vp_width = self.viewport().width()
-                total_width = stretch_col = 0
+            for c in range(model.columnCount(QModelIndex())):
+                if model._columns[c] in model._stretchs:
+                    #save the description column
+                    stretch_col = c
+                else:
+                    #total the other widths
+                    total_width += self.columnWidth(c)
 
-                if vp_width != widget_width:
-                    for c in range(model.columnCount(QModelIndex())):
-                        if model._columns[c] in model._stretchs:
-                            #save the description column
-                            stretch_col = c
-                        else:
-                            #total the other widths
-                            total_width += self.columnWidth(c)
-
-                    width = max(vp_width - total_width, 100)
-                    self.setColumnWidth(stretch_col, width)
+            width = max(self.viewport().width() - total_width, 100)
+            self.setColumnWidth(stretch_col, width)
 
         super(HgRepoView, self).resizeEvent(e)
 

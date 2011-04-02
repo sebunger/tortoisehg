@@ -7,14 +7,14 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-
-from mercurial import error, merge as mergemod
+from mercurial import error
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, csinfo, qtlib, thgrepo, resolve
+
+from PyQt4.QtCore import *
+from PyQt4.QtGui import *
 
 class UpdateDialog(QDialog):
 
@@ -144,7 +144,6 @@ class UpdateDialog(QDialog):
         self.setWindowIcon(qtlib.geticon('hg-update'))
 
         # prepare to show
-        self.rev_combo.lineEdit().selectAll()
         self.cmd.setHidden(True)
         self.cancel_btn.setHidden(True)
         self.detail_btn.setHidden(True)
@@ -152,6 +151,8 @@ class UpdateDialog(QDialog):
         self.autoresolve_chk.setHidden(True)
         self.showlog_chk.setHidden(True)
         self.update_info()
+        if not self.update_btn.isEnabled():
+            self.rev_combo.lineEdit().selectAll()  # need to change rev
 
     ### Private Methods ###
 
@@ -196,7 +197,12 @@ class UpdateDialog(QDialog):
             def isclean():
                 '''whether WD is changed'''
                 wc = self.repo[None]
-                return not (wc.modified() or wc.added() or wc.removed())
+                if wc.modified() or wc.added() or wc.removed():
+                    return False
+                for s in wc.substate:
+                    if wc.sub(s).dirty():
+                        return False
+                return True
             def ismergedchange():
                 '''whether the local changes are merged (have 2 parents)'''
                 wc = self.repo[None]
@@ -313,7 +319,6 @@ class UpdateDialog(QDialog):
         self.cancel_btn.setDisabled(True)
 
 def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
     repo = thgrepo.repository(ui, path=paths.find_root())
     rev = None
     if opts.get('rev'):

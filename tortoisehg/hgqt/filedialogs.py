@@ -132,6 +132,7 @@ class FileLogDialog(_AbstractFileDialog):
 
     def setupUi(self, o):
         self.editToolbar = QToolBar(self)
+        self.editToolbar.setContextMenuPolicy(Qt.PreventContextMenu)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
         self.actionClose = QAction(self, shortcut=QKeySequence.Close)
         self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
@@ -265,6 +266,7 @@ class FileDiffDialog(_AbstractFileDialog):
 
     def setupUi(self, o):
         self.editToolbar = QToolBar(self)
+        self.editToolbar.setContextMenuPolicy(Qt.PreventContextMenu)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
         self.actionClose = QAction(self, shortcut=QKeySequence.Close)
         self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
@@ -399,6 +401,8 @@ class FileDiffDialog(_AbstractFileDialog):
         self.goto(rev)
 
     def revisionSelected(self, rev):
+        if rev is None or rev not in self.filerevmodel.graph.nodesdict:
+            return
         if self.sender() is self.tableView_revisions_right:
             side = 'right'
         else:
