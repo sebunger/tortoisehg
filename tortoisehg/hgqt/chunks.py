@@ -174,26 +174,25 @@ class ChunksWidget(QWidget):
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
             fp = util.atomictempfile(ctx._path, 'wb')
+            buf = cStringIO.StringIO()
             try:
                 if ctx._ph.comments:
-                    fp.write('\n'.join(ctx._ph.comments))
-                    fp.write('\n\n')
+                    buf.write('\n'.join(ctx._ph.comments))
+                    buf.write('\n\n')
                 needsnewline = False
                 for wfile in ctx._fileorder:
                     if wfile == self.currentFile:
                         if revertall:
                             continue
-                        chunks[0].write(fp)
+                        chunks[0].write(buf)
                         for chunk in kchunks:
-                            chunk.write(fp)
-                        if not chunks[-1].selected:
-                            needsnewline = True
+                            chunk.write(buf)
                     else:
-                        if needsnewline:
-                            fp.write('\n')
-                            needsnewline = False
+                        if buf.tell() and buf.getvalue()[-1] != '\n':
+                            buf.write('\n')
                         for chunk in ctx._files[wfile]:
-                            chunk.write(fp)
+                            chunk.write(buf)
+                fp.write(buf.getvalue())
                 fp.rename()
             finally:
                 del fp
@@ -214,7 +213,7 @@ class ChunksWidget(QWidget):
                 wlock = repo.wlock()
                 try:
                     repo.wopener(self.currentFile, 'wb').write(
-                        hglib.fromunicode(self.diffbrowse.origcontents))
+                        repo['.'][self.currentFile].data())
                     fp = cStringIO.StringIO()
                     chunks[0].write(fp)
                     for c in kchunks:
@@ -319,7 +318,8 @@ class ChunksWidget(QWidget):
         else:
             repo.thgbackup(repo.wjoin(wfile))
             wasadded = wfile in repo[None].added()
-            commands.revert(repo.ui, repo, repo.wjoin(wfile), no_backup=True)
+            commands.revert(repo.ui, repo, repo.wjoin(wfile), rev='.',
+                            no_backup=True)
             if wasadded:
                 os.unlink(repo.wjoin(wfile))
         self.fileModified.emit()
@@ -370,6 +370,10 @@ class ChunksWidget(QWidget):
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)
+        if empty:
+            self.currentFile = None
+            self.diffbrowse.clearDisplay()
+            self.diffbrowse.clearChunks()
         self.diffbrowse.updateSummary()
 
     def refresh(self):
@@ -572,7 +576,8 @@ class DiffBrowser(QFrame):
     def displayFile(self, filename, status):
         self.clearDisplay()
         if filename == self._lastfile:
-            reenable = [c.fromline for c in self.curchunks[1:] if c.selected]
+            reenable = [(c.fromline, len(c.before)) for c in self.curchunks[1:]\
+                        if c.selected]
         else:
             reenable = []
         self._lastfile = filename
@@ -619,10 +624,9 @@ class DiffBrowser(QFrame):
                 else:
                     self.sci.markerAdd(start+i, self.vertical)
             start += len(chunk.lines) + 1
-        self.origcontents = fd.olddata
         self.countselected = 0
         self.curchunks = chunks
         for c in chunks[1:]:
-            if c.fromline in reenable:
+            if (c.fromline, len(c.before)) in reenable:
                 self.toggleChunk(c)
         self.updateSummary()

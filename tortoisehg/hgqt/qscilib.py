@@ -83,7 +83,7 @@ class _SciImSupport(object):
 
     def movepreeditcursor(self, pos):
         """Move the cursor to the relative pos inside preedit text"""
-        self._preeditcursorpos = pos
+        self._preeditcursorpos = min(pos, self._preeditlen)
         l, i = self._preeditpos
         self._sci.setCursorPosition(l, i + self._preeditcursorpos)
 
@@ -269,6 +269,9 @@ class Scintilla(QsciScintilla):
         self.clearHighlightText()
         self.SendScintilla(self.SCI_SETINDICATORCURRENT,
                            self._highlightIndicator)
+
+        if len(match) == 0:
+            return
 
         # NOTE: pat and target text are *not* unicode because scintilla
         # requires positions in byte. For accuracy, it should do pattern

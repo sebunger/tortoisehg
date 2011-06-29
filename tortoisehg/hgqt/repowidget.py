@@ -61,7 +61,7 @@ class RepoWidget(QWidget):
         repo.repositoryDestroyed.connect(self.repositoryDestroyed)
         repo.configChanged.connect(self.configChanged)
         self.revsetfilter = False
-        self.branch = ''
+        self.ubranch = u''
         self.bundle = None
         self.revset = []
         self.namedTabs = {}
@@ -156,28 +156,28 @@ class RepoWidget(QWidget):
         w.showMessage.connect(self.showMessage)
         w.updateToRevision.connect(lambda rev: self.updateToRevision())
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
-        tt.setTabToolTip(idx, _("Revision details"))
+        tt.setTabToolTip(idx, _("Revision details", "tab tooltip"))
 
         self.commitDemand = w = DemandWidget('createCommitWidget', self)
         self.commitTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-commit'), '')
-        tt.setTabToolTip(idx, _("Commit"))
+        tt.setTabToolTip(idx, _("Commit", "tab tooltip"))
 
         self.syncDemand = w = DemandWidget('createSyncWidget', self)
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
-        tt.setTabToolTip(idx, _("Synchronize"))
+        tt.setTabToolTip(idx, _("Synchronize", "tab tooltip"))
 
         self.manifestDemand = w = DemandWidget('createManifestWidget', self)
         self.manifestTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-annotate'), '')
-        tt.setTabToolTip(idx, _('Manifest'))
+        tt.setTabToolTip(idx, _("Manifest", "tab tooltip"))
 
         self.grepDemand = w = DemandWidget('createGrepWidget', self)
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
-        tt.setTabToolTip(idx, _("Search"))
+        tt.setTabToolTip(idx, _("Search", "tab tooltip"))
 
         self.mqDemand = w = DemandWidget('createMQWidget', self)
         if 'mq' in self.repo.extensions():
             self.mqTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-mq'), '')
-            tt.setTabToolTip(idx, _("Patch Queue"))
+            tt.setTabToolTip(idx, _("Patch Queue", "tab tooltip"))
             self.namedTabs['mq'] = idx
         else:
             self.mqTabIndex = -1
@@ -185,7 +185,7 @@ class RepoWidget(QWidget):
         self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
         if 'pbranch' in self.repo.extensions():
             self.pbranchTabIndex = idx = tt.addTab(w, qtlib.geticon('branch'), '')
-            tt.setTabToolTip(idx, _("Patch Branch"))
+            tt.setTabToolTip(idx, _("Patch Branch", "tab tooltip"))
             self.namedTabs['pbranch'] = idx
         else:
             self.pbranchTabIndex = -1
@@ -199,8 +199,8 @@ class RepoWidget(QWidget):
         """Returns the expected title for this widget [unicode]"""
         if self.bundle:
             return _('%s <incoming>') % self.repo.shortname
-        elif self.branch:
-            return '%s [%s]' % (self.repo.shortname, self.branch)
+        elif self.ubranch:
+            return u'%s [%s]' % (self.repo.shortname, self.ubranch)
         else:
             return self.repo.shortname
 
@@ -230,7 +230,7 @@ class RepoWidget(QWidget):
         pats, opts = {}, {}
         cw = CommitWidget(pats, opts, self.repo.root, True, self)
 
-        b = QPushButton(_('Commit'))
+        b = QPushButton(_('Commit', 'action button'))
         b.setAutoDefault(True)
         f = b.font()
         f.setWeight(QFont.Bold)
@@ -346,9 +346,8 @@ class RepoWidget(QWidget):
         self.reload()
 
     def clearRevisionSet(self):
+        self.toolbarVisibilityChanged.emit()
         if not self.revset:
-            self.filterbar.hide()
-            self.toolbarVisibilityChanged.emit()
             return
         self.revset = []
         if self.revsetfilter:
@@ -443,6 +442,10 @@ class RepoWidget(QWidget):
                 continue
             try:
                 pf = open(p, 'rb')
+                earlybytes = pf.read(4096)
+                if '\0' in earlybytes:
+                    continue
+                pf.seek(0)
                 filename, message, user, date, branch, node, p1, p2 = \
                         patch.extract(self.repo.ui, pf)
                 if filename:
@@ -575,7 +578,8 @@ class RepoWidget(QWidget):
     def setupModels(self):
         # Filter revision set in case revisions were removed
         self.revset = [r for r in self.revset if r < len(self.repo)]
-        self.repomodel = HgRepoListModel(self.repo, self.branch, self.revset,
+        branch = hglib.fromunicode(self.ubranch)
+        self.repomodel = HgRepoListModel(self.repo, branch, self.revset,
                                          self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
@@ -652,9 +656,12 @@ class RepoWidget(QWidget):
 
     def reload(self):
         'Initiate a refresh of the repo model, rebuild graph'
-        self.repo.thginvalidate()
-        self.rebuildGraph()
-        self.reloadTaskTab()
+        try:
+            self.repo.thginvalidate()
+            self.rebuildGraph()
+            self.reloadTaskTab()
+        except EnvironmentError, e:
+            self.showMessage(hglib.tounicode(str(e)))
 
     def rebuildGraph(self):
         'Called by repositoryChanged signals, and during reload'
@@ -754,10 +761,10 @@ class RepoWidget(QWidget):
         else:
             self.taskTabsWidget.tabBar().hide()
 
-    @pyqtSlot(unicode, bool)
+    @pyqtSlot(QString, bool)
     def setBranch(self, branch, allparents=True):
         'Change the branch filter'
-        self.branch = branch
+        self.ubranch = branch
         self.repomodel.setBranch(branch=branch, allparents=allparents)
         self.titleChanged.emit(self.title())
         if self.revset:
@@ -810,9 +817,12 @@ class RepoWidget(QWidget):
             return False
         s = QSettings()
         if self.isVisible():
-            repoid = str(self.repo[0])
-            s.setValue('repowidget/splitter-'+repoid,
-                       self.repotabs_splitter.saveState())
+            try:
+                repoid = str(self.repo[0])
+                s.setValue('repowidget/splitter-'+repoid,
+                           self.repotabs_splitter.saveState())
+            except EnvironmentError:
+                pass
         self.revDetailsWidget.saveSettings(s)
         self.commitDemand.forward('saveSettings', s, 'workbench')
         self.manifestDemand.forward('saveSettings', s, 'workbench')
@@ -1199,11 +1209,54 @@ class RepoWidget(QWidget):
         if not dir:
             return
         epath = os.path.join(hglib.fromunicode(dir),
-                             self.repo.shortname + '_%r.patch')
+                             hglib.fromunicode(self.repo.shortname)+'_%r.patch')
+
         cmdline = ['export', '--repository', self.repo.root, '--verbose',
                    '--output', epath]
+
+        existingRevisions = []
         for rev in revisions:
+            if os.path.exists(epath % rev):
+                if os.path.isfile(epath % rev):
+                    existingRevisions.append(rev)
+                else:
+                    QMessageBox.warning(self,
+                        _('Cannot export revision'),
+                        (_('Cannot export revision %s into the file named:'
+                        '\n\n%s\n') % (rev, epath % rev)) + \
+                        _('There is already an existing folder '
+                        'with that same name.'))
+                    return
             cmdline.extend(['--rev', str(rev)])
+
+        if existingRevisions:
+            buttonNames = [_("Replace"), _("Append"), _("Abort")]
+
+            warningMessage = \
+                _('There are existing patch files for %d revisions (%s) '
+                'in the selected location (%s).\n\n') \
+                % (len(existingRevisions),
+                    " ,".join([str(rev) for rev in existingRevisions]),
+                    dir)
+
+            warningMessage += \
+                _('What do you want to do?\n') + u'\n' + \
+                u'- ' + _('Replace the existing patch files.\n') + \
+                u'- ' + _('Append the changes to the existing patch files.\n') + \
+                u'- ' + _('Abort the export operation.\n')
+
+            res = qtlib.CustomPrompt(_('Patch files already exist'),
+                warningMessage,
+                self,
+                buttonNames, 0, 2).run()
+
+            if buttonNames[res] == _("Replace"):
+                # Remove the existing patch files
+                for rev in existingRevisions:
+                    os.remove(epath % rev)
+            elif buttonNames[res] == _("Abort"):
+                return
+
         self.runCommand(cmdline)
 
     def visualDiffRevision(self):
@@ -1325,9 +1378,58 @@ class RepoWidget(QWidget):
             endrev = 'qparent'
         else:
             endrev = ''
-        cmdline = ['qimport', '--rev', '%s::%s' % (self.rev, endrev),
-                   '--repository', self.repo.root]
-        self.runCommand(cmdline)
+
+        # Check whether there are existing patches in the MQ queue whose name
+        # collides with the revisions that are going to be imported
+        func = revset.match('%s::%s' % (self.rev, endrev))
+        revList = [c for c in func(self.repo, range(len(self.repo)))]
+
+        if endrev and not revList:
+            # There is a qparent but the revision list is empty
+            # This means that the qparent is not a descendant of the
+            # selected revision
+            QMessageBox.warning(self, _('Cannot import selected revision'),
+                _('The selected revision (rev #%d) cannot be imported '
+                'because it is not a descendant of ''qparent'' (rev #%d)') \
+                % (self.rev, self.repo['qparent'].rev()))
+            return
+
+        revNameSet = set(['%d.diff' % rev for rev in revList])
+        collidingPatchSet = revNameSet.intersection(set(self.repo.mq.series))
+
+        if collidingPatchSet:
+            # We will qimport each revision one by one, starting from the newest
+            # To do so, we will find a valid and unique patch name for each
+            # revision that we must qimport
+            # and then we will import them one by one starting from the newest
+            # one, using these unique names
+            def getUniquePatchName(baseName):
+                patchName = baseName + '.diff'
+                if patchName in collidingPatchSet:
+                    maxRetries = 99
+                    for n in range(1, maxRetries):
+                        patchName = baseName + '_%02d.diff' % n
+                        if not patchName in collidingPatchSet:
+                            break
+                return patchName
+
+            patchNames = {}
+            revList.reverse()
+            for rev in revList:
+                patchNames[rev] = getUniquePatchName(str(rev))
+
+            cmdlines = []
+            for rev in revList:
+                cmdlines.append(['qimport', '--rev', '%s' % rev,
+                           '--repository', self.repo.root,
+                           '--name', patchNames[rev]])
+            self.runCommand(*cmdlines)
+        else:
+            # There were no collisions with existing patch names, we can
+            # simply qimport the whole revision set in a single go
+            cmdline = ['qimport', '--rev', '%s::%s' % (self.rev, endrev),
+                       '--repository', self.repo.root]
+            self.runCommand(cmdline)
 
     def qfinishRevision(self):
         """Finish applied patches up to and including selected revision"""
@@ -1357,10 +1459,10 @@ class RepoWidget(QWidget):
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
 
-    def runCommand(self, cmdline):
+    def runCommand(self, *cmdlines):
         if self.runner.core.running():
             InfoMsgBox(_('Unable to start'),
                        _('Previous command is still running'))
             return
         self.repo.incrementBusyCount()
-        self.runner.run(cmdline)
+        self.runner.run(*cmdlines)

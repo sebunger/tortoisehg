@@ -29,9 +29,9 @@ def parseurl(path):
         p = path[len('ssh://'):]
         user, passwd = None, None
         if p.find('@') != -1:
-            user, p = tuple(p.split('@'))
+            user, p = tuple(p.rsplit('@', 1))
             if user.find(':') != -1:
-                user, passwd = tuple(user.split(':'))
+                user, passwd = tuple(user.rsplit(':', 1))
         m = re.match(r'([^:/]+)(:(\d+))?(/(.*))?$', p)
         if m:
             host = m.group(1)
@@ -148,7 +148,15 @@ class SyncWidget(QWidget):
             tb.addWidget(self.targetcheckbox)
             tb.addWidget(self.targetcombo)
 
-        style = QApplication.style()
+        hbox = QHBoxLayout()
+        hbox.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(hbox)
+        self.optionshdrlabel = lbl = QLabel(_('<b>Selected Options:</b>'))
+        hbox.addWidget(lbl)
+        self.optionslabel = QLabel()
+        self.optionslabel.setAcceptDrops(False)
+        hbox.addWidget(self.optionslabel)
+        hbox.addStretch()
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -201,6 +209,7 @@ class SyncWidget(QWidget):
         self.pathentry.textChanged.connect(self.refreshUrl)
         hbox.addWidget(self.pathentry, 4)
 
+        style = QApplication.style()
         self.savebutton = QPushButton(style.standardIcon(QStyle.SP_DialogSaveButton), '')
         self.savebutton.setToolTip(_('Save current URL under an alias'))
         hbox.addWidget(self.savebutton)
@@ -324,6 +333,7 @@ class SyncWidget(QWidget):
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.opts.update(dlg.outopts)
+            self.refreshUrl()
 
     def reload(self):
         # Refresh configured paths
@@ -387,6 +397,16 @@ class SyncWidget(QWidget):
         for w in self.HostAndPortWidgets:
             w.setHidden(schemeIndex == 0)
         self.securebutton.setHidden(schemeIndex != 3)
+
+        opts = []
+        for opt, value in self.opts.iteritems():
+            if value is True:
+                opts.append('--'+opt)
+            elif value:
+                opts.append('--'+opt+'='+value)
+        self.optionslabel.setText(' '.join(opts))
+        self.optionslabel.setVisible(bool(opts))
+        self.optionshdrlabel.setVisible(bool(opts))
 
     def currentUrl(self, hidepw):
         scheme = _schemes[self.schemecombo.currentIndex()]
@@ -506,11 +526,12 @@ class SyncWidget(QWidget):
         if shell:
             cwd = os.getcwd()
             try:
-                os.chdir(folder)
-                QProcess.startDetached(shell)
-            except EnvironmentError, e:
-                qtlib.InfoMsgBox(_('Repository not found'),
-                                 hglib.tounicode(str(e)))
+                try:
+                    os.chdir(folder)
+                    QProcess.startDetached(shell)
+                except EnvironmentError, e:
+                    qtlib.InfoMsgBox(_('Repository not found'),
+                                     hglib.tounicode(str(e)))
             finally:
                 os.chdir(cwd)
         else:
@@ -694,7 +715,7 @@ class SyncWidget(QWidget):
             bfile = bfile.replace('/', '_')
             bfile = tempfile.mktemp('.hg', bfile+'_', qtlib.gettempdir())
             self.finishfunc = finished
-            cmdline = ['--repository', self.repo.root, 'incoming',
+            cmdline = ['--repository', self.repo.root, 'incoming', '--quiet',
                        '--bundle', bfile]
             self.run(cmdline, ('force', 'branch', 'rev'))
         else:
@@ -1127,8 +1148,8 @@ class SecureDialog(QDialog):
         self.fprintentry = le = QLineEdit(fprint)
         self.fprintradio.toggled.connect(self.fprintentry.setEnabled)
         self.fprintentry.setEnabled(False)
-        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7 
-            le.setPlaceholderText('### host certificate fingerprint ###')
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
+            le.setPlaceholderText(_('### host certificate fingerprint ###'))
         hbox.addWidget(le)
         try:
             import ssl # Python 2.6 or backport for 2.5
@@ -1369,7 +1390,7 @@ class OptionsDialog(QDialog):
     'Utility dialog for configuring uncommon options'
     def __init__(self, opts, parent):
         QDialog.__init__(self, parent)
-        self.setWindowTitle('%s - sync options' % parent.repo.displayname)
+        self.setWindowTitle(_('%s - sync options') % parent.repo.displayname)
         self.repo = parent.repo
 
         layout = QFormLayout()
@@ -1386,7 +1407,7 @@ class OptionsDialog(QDialog):
         layout.addRow(self.forcecb, None)
 
         self.subrepocb = QCheckBox(
-            _('Recurse into subrepositories (--subrepos)'))
+            _('Recurse into subrepositories') + u' (--subrepos)')
         self.subrepocb.setChecked(opts.get('subrepos', False))
         layout.addRow(self.subrepocb, None)
 

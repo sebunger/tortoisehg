@@ -260,7 +260,11 @@ class TagDialog(QDialog):
             else:
                 self.set_status(_("Tag '%s' has been added") % tagu, True)
 
-        cmd = ['tag', '--repository', self.repo.root, '--rev', str(self.rev)]
+        user = qtlib.getCurrentUsername(self, self.repo)
+        if not user:
+            return
+        cmd = ['tag', '--repository', self.repo.root, '--rev', str(self.rev),
+               '--user', user]
         if local:
             cmd.append('--local')
         else:
@@ -285,11 +289,11 @@ class TagDialog(QDialog):
         tagtype = self.repo.tagtype(tag)
         if local:
             if tagtype != 'local':
-                self.set_status(_("tag '%s' is not a local tag") % tagu)
+                self.set_status(_("tag '%s' is not a local tag") % tagu, False)
                 return
         else:
             if tagtype != 'global':
-                self.set_status(_("tag '%s' is not a global tag") % tagu)
+                self.set_status(_("tag '%s' is not a global tag") % tagu, False)
                 return
             parents = self.repo.parents()
             if len(parents) > 1:

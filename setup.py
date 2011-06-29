@@ -13,6 +13,8 @@ import os
 import shutil
 import subprocess
 import cgi
+import tempfile
+import re
 from fnmatch import fnmatch
 from distutils import log
 from distutils.core import setup, Command
@@ -90,6 +92,7 @@ class update_pot(Command):
             for filename in os.listdir(pathname):
                 if filename.endswith('.py'):
                     filelist.append(os.path.join(pathname, filename))
+        filelist.sort()
 
         potfile = 'tortoisehg.pot'
 
@@ -110,11 +113,13 @@ class update_pot(Command):
 class build_qt(Command):
     description = "build PyQt GUIs (.ui) and resources (.qrc)"
     user_options = [('force', 'f', 'forcibly compile everything'
-                     ' (ignore file timestamps)')]
-    boolean_options = ('force',)
+                     ' (ignore file timestamps)'),
+                    ('frozen', None, 'include resources for frozen exe')]
+    boolean_options = ('force', 'frozen')
 
     def initialize_options(self):
         self.force = None
+        self.frozen = False
 
     def finalize_options(self):
         self.set_undefined_options('build', ('force', 'force'))
@@ -144,8 +149,11 @@ class build_qt(Command):
         if not(self.force or newer(qrc_file, py_file)):
             return
         import PyQt4
-        path = os.getenv('PATH')
-        os.putenv('PATH', path + ';' + os.path.dirname(PyQt4.__file__) + '\\bin')
+        origpath = os.getenv('PATH')
+        path = origpath.split(os.pathsep)
+        pyqtfolder = os.path.dirname(PyQt4.__file__)
+        path.append(os.path.join(pyqtfolder, 'bin'))
+        os.putenv('PATH', os.pathsep.join(path))
         if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
             self.warn("Unable to generate python module %s for resource file %s"
                       % (py_file, qrc_file))
@@ -153,7 +161,7 @@ class build_qt(Command):
                 raise SystemExit(1)
         else:
             log.info('compiled %s into %s' % (qrc_file, py_file))
-        os.putenv('PATH', path)
+        os.putenv('PATH', origpath)
 
     def _generate_qrc(self, qrc_file, srcfiles, prefix):
         basedir = os.path.dirname(qrc_file)
@@ -186,12 +194,33 @@ class build_qt(Command):
         finally:
             os.unlink(qrc_file)
 
+    def _build_translations(self, basepath):
+        """Build translations_rc.py which inclues qt_xx.qm"""
+        from PyQt4.QtCore import QLibraryInfo
+        trpath = unicode(QLibraryInfo.location(QLibraryInfo.TranslationsPath))
+        d = tempfile.mkdtemp()
+        try:
+            for e in os.listdir(trpath):
+                if re.match(r'qt_[a-z]{2}(_[A-Z]{2})?\.ts$', e):
+                    r = os.system('lrelease "%s" -qm "%s"'
+                                  % (os.path.join(trpath, e),
+                                     os.path.join(d, e[:-3] + '.qm')))
+                    if r > 0:
+                        self.warn('Unable to generate Qt message file'
+                                  ' from %s' % e)
+            self.build_rc(os.path.join(basepath, 'translations_rc.py'),
+                          d, '/translations')
+        finally:
+            shutil.rmtree(d)
+
     def run(self):
         self._wrapuic()
         basepath = join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
         self.build_rc(os.path.join(basepath, 'icons_rc.py'),
                       os.path.join(os.path.dirname(__file__), 'icons'),
                       '/icons')
+        if self.frozen:
+            self._build_translations(basepath)
         for dirpath, _, filenames in os.walk(basepath):
             for filename in filenames:
                 if filename.endswith('.ui'):

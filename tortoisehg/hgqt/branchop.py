@@ -19,7 +19,7 @@ class BranchOpDialog(QDialog):
     'Dialog for manipulating wctx.branch()'
     def __init__(self, repo, oldbranchop, parent=None):
         QDialog.__init__(self, parent)
-        self.setWindowTitle('%s - branch operation' % repo.displayname)
+        self.setWindowTitle(_('%s - branch operation') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('branch'))
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -89,6 +89,7 @@ class BranchOpDialog(QDialog):
         self.bb = bb
         self.branchCombo = branchCombo
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
+        QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
     def accept(self):

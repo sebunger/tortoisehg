@@ -81,7 +81,10 @@ class ThgRepoWrapper(QObject):
             freq = max(100, int(freq))
         except:
             freq = 500
-        self._timerevent = self.startTimer(freq)
+        if isinstance(repo, bundlerepo.bundlerepository):
+            dbgoutput('not starting timer for bundle repository')
+        else:
+            self._timerevent = self.startTimer(freq)
 
     def timerEvent(self, event):
         if not os.path.exists(self.repo.path):
@@ -448,7 +451,10 @@ def _extendrepo(repo):
         def thgshelves(self):
             self.shelfdir = sdir = self.join('shelves')
             if os.path.isdir(sdir):
-                return os.listdir(sdir)
+                def getModificationTime(x):
+                    return os.path.getmtime(os.path.join(sdir, x))
+                return sorted(os.listdir(sdir),
+                    key=getModificationTime, reverse=True)
             return []
 
         def thginvalidate(self):
@@ -611,5 +617,8 @@ def relatedRepositories(repoid):
         for e in repotreemodel.iterRepoItemFromXml(f):
             if e.basenode() == repoid:
                 yield e.rootpath(), e.shortname()
-    finally:
+    except:
+        f.close()
+        raise
+    else:
         f.close()

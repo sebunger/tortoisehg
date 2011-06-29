@@ -65,6 +65,9 @@ class HgFileListView(QTableView):
         if model._ctx is not None:
             self.contextChanged(model._ctx)
 
+    def setRepo(self, repo):
+        self.model().repo = repo
+
     def contextChanged(self, ctx):
         real = type(ctx.rev()) is int
         wd = ctx.rev() is None
@@ -221,15 +224,19 @@ class HgFileListView(QTableView):
         else:
             QMessageBox.warning(self,
                 _("Cannot open subrepository"),
-                _("The selected subrepository does not exist on the working directory"))
-    
+                _("The selected subrepository does not exist in the working"
+                  " directory"))
+
     def doubleClickHandler(self):
-        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
+        index = self.currentIndex()
+        if not index.isValid():
+            return
+        itemissubrepo = (self.model().dataFromIndex(index)['status'] == 'S')
         if itemissubrepo:
             self.opensubrepo()
         else:
             self.vdiff()
-        
+
     def createActions(self):
         self.actionShowAllMerge = QAction(_('Show All'), self)
         self.actionShowAllMerge.setToolTip(
@@ -261,7 +268,7 @@ class HgFileListView(QTableView):
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
-            ('opensubrepo', _('Open subrepository'), 'thg-repository-open', 
+            ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
               'Alt+Ctrl+O', _('Open the selected subrepository'),
               self.opensubrepo),
             ]:
@@ -276,9 +283,15 @@ class HgFileListView(QTableView):
                 act.triggered.connect(cb)
             self._actions[name] = act
             self.addAction(act)
-    
+
     def contextMenuEvent(self, event):
-        itemissubrepo = (self.model().dataFromIndex(self.currentIndex())['status'] == 'S')
+        index = self.currentIndex()
+        if not index.isValid():
+            return
+        data = self.model().dataFromIndex(index)
+        if data is None:
+            return
+        itemissubrepo = (data['status'] == 'S')
 
         # Subrepos and regular items have different context menus
         if itemissubrepo:

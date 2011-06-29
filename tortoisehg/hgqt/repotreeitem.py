@@ -108,8 +108,11 @@ class RepoTreeItem(object):
         while not xr.atEnd():
             xr.readNext()
             if xr.isStartElement():
-                item = undumpObject(xr, self.model)
-                self.appendChild(item)
+                try:
+                    item = undumpObject(xr, self.model)
+                    self.appendChild(item)
+                except KeyError:
+                    pass # ignore unknown classes in xml
             elif xr.isEndElement():
                 break
 
@@ -210,12 +213,13 @@ class RepoItem(RepoTreeItem):
 
     def startSettings(self, parent):
         try:
-            dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
-                                 root=self._root)
-            self.ensureRepoLoaded()
-            dlg.exec_()
-        except error.RepoError:
-            pass
+            try:
+                dlg = SettingsDialog(configrepo=True, focus='web.name', parent=parent,
+                                     root=self._root)
+                self.ensureRepoLoaded()
+                dlg.exec_()
+            except error.RepoError:
+                pass
         finally:
             dlg.deleteLater()
 
@@ -232,7 +236,8 @@ class RepoItem(RepoTreeItem):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
     def getRepoItem(self, reporoot):
-        if reporoot == self._root:
+        if (reporoot == self._root or
+            (os.name == 'nt' and reporoot.lower() == self._root.lower())):
             return self
         return None
 

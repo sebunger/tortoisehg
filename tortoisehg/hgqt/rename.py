@@ -11,10 +11,10 @@ import os, sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, util, error
+from mercurial import util, error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.hgqt import cmdui, qtlib, thgrepo, manifestmodel
 from tortoisehg.util import hglib, paths
 
 class RenameDialog(QDialog):
@@ -25,10 +25,9 @@ class RenameDialog(QDialog):
     progress = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, ui, pats, parent=None, **opts):
-        super(RenameDialog, self).__init__(parent=None)
+        super(RenameDialog, self).__init__(parent)
         self.iscopy = (opts.get('alias') == 'copy')
-        src = ''
-        dest = ''
+        # pats: local; src, dest: unicode
         src, dest = self.init_data(ui, pats)
         self.init_view(src, dest)
 
@@ -51,11 +50,11 @@ class RenameDialog(QDialog):
         except:
             pass
         os.chdir(self.root)
-        fname = util.normpath(fname)
+        fname = hglib.tounicode(util.normpath(fname))
         if target:
             target = hglib.tounicode(util.normpath(target))
         else:
-            target = hglib.tounicode(fname)
+            target = fname
         return (fname, target)
 
     def init_view(self, src, dest):
@@ -66,12 +65,17 @@ class RenameDialog(QDialog):
         self.src_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.src_txt = QLineEdit(src)
         self.src_txt.setMinimumWidth(300)
-        self.src_btn = QPushButton(_('Browse'))
+        self.src_btn = QPushButton(_('Browse...'))
         self.dest_lbl = QLabel(_('Destination:'))
         self.dest_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.dest_txt = QLineEdit(dest)
-        self.dest_btn = QPushButton(_('Browse'))
+        self.dest_btn = QPushButton(_('Browse...'))
         self.copy_chk = QCheckBox(_('Copy source -> destination'))
+
+        comp = manifestmodel.ManifestCompleter(self)
+        comp.setModel(manifestmodel.ManifestModel(self.repo, parent=comp))
+        self.src_txt.setCompleter(comp)
+        self.dest_txt.setCompleter(comp)
 
         # some extras
         self.dummy_lbl = QLabel('')
@@ -106,14 +110,15 @@ class RenameDialog(QDialog):
         self.cancel_btn.setHidden(True)
 
         # connecting slots
-        self.src_txt.textEdited.connect(self.src_dest_edited)
+        self.src_txt.textChanged.connect(self.src_dest_edited)
         self.src_btn.clicked.connect(self.src_btn_clicked)
-        self.dest_txt.textEdited.connect(self.src_dest_edited)
+        self.dest_txt.textChanged.connect(self.src_dest_edited)
         self.dest_btn.clicked.connect(self.dest_btn_clicked)
         self.copy_chk.toggled.connect(self.copy_chk_toggled)
         self.rename_btn.clicked.connect(self.rename)
         self.detail_btn.clicked.connect(self.detail_clicked)
         self.close_btn.clicked.connect(self.close)
+        self.cancel_btn.clicked.connect(self.cancel_clicked)
 
         # main layout
         self.grid = QGridLayout()
@@ -197,21 +202,21 @@ class RenameDialog(QDialog):
                 caption = _('Select Destination Folder')
         FD = QFileDialog
         if os.path.isfile(curr):
-            filter = 'All Files (*.*)'
-            filename = FD.getOpenFileName(parent=self, caption=caption,
+            path = FD.getOpenFileName(parent=self, caption=caption,
                     options=FD.ReadOnly)
-            response = hglib.fromunicode(filename)
         else:
             path = FD.getExistingDirectory(parent=self, caption=caption,
                     options=FD.ShowDirsOnly | FD.ReadOnly)
-            response = hglib.fromunicode(path)
-        if response:
-            response = os.path.relpath(response, start=self.root)
+        if path:
+            path = util.normpath(unicode(path))
+            pathprefix = util.normpath(hglib.tounicode(self.root)) + '/'
+            if not path.startswith(pathprefix):
+                return
+            relpath = path[len(pathprefix):]
             if mode == 'src':
-                self.src_txt.setText(response)
+                self.src_txt.setText(relpath)
             else:
-                self.dest_txt.setText(response)
-            self.compose_command(self.get_src(), self.get_dest())
+                self.dest_txt.setText(relpath)
 
     def copy_chk_toggled(self):
         self.setRenameCopy()
@@ -234,12 +239,10 @@ class RenameDialog(QDialog):
             cmdline.append('-A')
         cmdline.append(src)
         cmdline.append(dest)
-        vcmdline = ' '.join(['hg'] + cmdline)
-        return (cmdline, vcmdline)
+        return cmdline
 
-    def show_command(self, clinfo):
-        cl, vcl = clinfo
-        self.hgcmd_txt.setText(vcl)
+    def show_command(self, cmdline):
+        self.hgcmd_txt.setText(hglib.tounicode('hg ' + ' '.join(cmdline)))
 
     def rename(self):
         """execute the rename"""
@@ -247,10 +250,6 @@ class RenameDialog(QDialog):
         # check inputs
         src = self.get_src()
         dest = self.get_dest()
-        curr_name = os.path.relpath(src, start=self.root)
-        self.src_txt.setText(curr_name)
-        new_name = os.path.relpath(dest, start=self.root)
-        self.dest_txt.setText(new_name)
         if not os.path.exists(src):
             qtlib.WarningMsgBox(self.msgTitle, _('Source does not exists.'))
             return
@@ -276,9 +275,8 @@ class RenameDialog(QDialog):
             if not res:
                 return
 
-        cmdline, vcl = self.compose_command(src, dest)
-        self.show_command((cmdline, vcl))
-        new_name = util.canonpath(self.root, self.root, new_name)
+        cmdline = self.compose_command(src, dest)
+        self.show_command(cmdline)
         if self.isCaseFoldingOnWin():
             # We do the rename ourselves if it's a pure casefolding
             # action on Windows. Because there is no way to make Hg
@@ -289,7 +287,7 @@ class RenameDialog(QDialog):
                 return
             else:
                 try:
-                    targetdir = os.path.dirname(new_name) or '.'
+                    targetdir = os.path.dirname(dest)
                     if not os.path.isdir(targetdir):
                         os.makedirs(targetdir)
                     os.rename(fullsrc, fulldest)
@@ -309,7 +307,7 @@ class RenameDialog(QDialog):
         else:
             self.cmd.setShowOutput(True)
 
-    def cancel_clicked():
+    def cancel_clicked(self):
         self.cmd.cancel()
 
     def command_started(self):

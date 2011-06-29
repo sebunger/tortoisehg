@@ -26,8 +26,6 @@ from PyQt4.QtGui import *
 #  Chunk selection, tri-state checkboxes for commit
 # Maybe, Maybe Not
 #  Investigate folding/nesting of files
-#  Toolbar
-#  double-click visual diffs
 
 COL_PATH = 0
 COL_STATUS = 1
@@ -100,7 +98,7 @@ class StatusWidget(QWidget):
         tb.clicked.connect(self.refreshWctx)
         le = QLineEdit()
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
-            le.setPlaceholderText('### filter text ###')
+            le.setPlaceholderText(_('### filter text ###'))
         else:
             lbl = QLabel(_('Filter:'))
             hbox.addWidget(lbl)
@@ -188,6 +186,7 @@ class StatusWidget(QWidget):
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
         self.fileview.shelveToolExited.connect(self.refreshWctx)
         self.fileview.setContext(self.repo[None])
+        self.fileview.setMinimumSize(QSize(16, 16))
         vbox.addWidget(self.fileview, 1)
 
         self.split = split
@@ -296,7 +295,7 @@ class StatusWidget(QWidget):
     def onRowClicked(self, index):
         'tree view emitted a clicked signal, index guarunteed valid'
         if index.column() == COL_PATH:
-            self.tv.model().toggleRow(index)
+            self.tv.model().toggleRows([index])
 
     @pyqtSlot(QString)
     def setFilter(self, match):
@@ -415,6 +414,7 @@ class WctxFileTree(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
         self.setTextElideMode(Qt.ElideLeft)
+        self.doubleClicked.connect(self.onDoubleClick)
 
     def scrollTo(self, index, hint=QAbstractItemView.EnsureVisible):
         # don't update horizontal position by selection change
@@ -422,10 +422,17 @@ class WctxFileTree(QTreeView):
         super(WctxFileTree, self).scrollTo(index, hint)
         self.horizontalScrollBar().setValue(orighoriz)
 
+    def onDoubleClick(self, index):
+        if not index.isValid():
+            return
+        path = self.model().getRow(index)[COL_PATH]
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [path], {})
+        if dlg:
+            dlg.exec_()
+
     def keyPressEvent(self, event):
         if event.key() == 32:
-            for index in self.selectedRows():
-                self.model().toggleRow(index)
+            self.model().toggleRows(self.selectedRows())
         if event.key() == Qt.Key_D and event.modifiers() == Qt.ControlModifier:
             selfiles = []
             for index in self.selectedRows():
@@ -474,7 +481,10 @@ class WctxFileTree(QTreeView):
             self.menuAction.emit()
 
     def selectedRows(self):
-        return self.selectionModel().selectedRows()
+        if self.selectionModel():
+            return self.selectionModel().selectedRows()
+        # Invalid selectionModel found
+        return []
 
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()
@@ -483,6 +493,7 @@ class WctxModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         rows = []
         nchecked = {}
+        excludes = [f.strip() for f in opts.get('ciexclude', '').split(',')]
         def mkrow(fname, st):
             ext, sizek = '', ''
             try:
@@ -495,21 +506,21 @@ class WctxModel(QAbstractTableModel):
             return [fname, st, mst, hglib.tounicode(fname), ext[1:], sizek]
         if opts['modified']:
             for m in wctx.modified():
-                nchecked[m] = checked.get(m, True)
+                nchecked[m] = checked.get(m, m not in excludes)
                 rows.append(mkrow(m, 'M'))
         if opts['added']:
             for a in wctx.added():
-                nchecked[a] = checked.get(a, True)
+                nchecked[a] = checked.get(a, a not in excludes)
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
                 mst = r in ms and ms[r].upper() or ""
-                nchecked[r] = checked.get(r, True)
+                nchecked[r] = checked.get(r, r not in excludes)
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
                 mst = d in ms and ms[d].upper() or ""
-                nchecked[d] = checked.get(d, False)
+                nchecked[d] = checked.get(d, d not in excludes)
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
             for u in wctx.unknown():
@@ -614,16 +625,17 @@ class WctxModel(QAbstractTableModel):
         for row in self.rows:
             yield row
 
-    def toggleRow(self, index):
+    def toggleRows(self, indexes):
         'Connected to "activated" signal, emitted by dbl-click or enter'
         if QApplication.keyboardModifiers() & Qt.ControlModifier:
             # ignore Ctrl-Enter events, the user does not want a row
             # toggled just as they are committing.
             return
-        assert index.isValid()
-        fname = self.rows[index.row()][COL_PATH]
         self.layoutAboutToBeChanged.emit()
-        self.checked[fname] = not self.checked[fname]
+        for index in indexes:
+            assert index.isValid()
+            fname = self.rows[index.row()][COL_PATH]
+            self.checked[fname] = not self.checked[fname]
         self.layoutChanged.emit()
         self.checkToggled.emit()
 
@@ -722,29 +734,30 @@ def statusMessage(status, mst, upath):
 
 class StatusType(object):
     preferredOrder = 'MAR!?ICS'
-    def __init__(self, name, icon, desc, uilabel):
+    def __init__(self, name, icon, desc, uilabel, trname):
         self.name = name
         self.icon = icon
         self.desc = desc
         self.uilabel = uilabel
+        self.trname = trname
 
 statusTypes = {
     'M' : StatusType('modified', 'menucommit.ico', _('%s is modified'),
-                     'status.modified'),
+                     'status.modified', _('modified')),
     'A' : StatusType('added', 'fileadd.ico', _('%s is added'),
-                     'status.added'),
+                     'status.added', _('added')),
     'R' : StatusType('removed', 'filedelete.ico', _('%s is removed'),
-                     'status.removed'),
+                     'status.removed', _('removed')),
     '?' : StatusType('unknown', 'shelve.ico', _('%s is not tracked (unknown)'),
-                     'status.unknown'),
+                     'status.unknown', _('unknown')),
     '!' : StatusType('deleted', 'menudelete.ico', _('%s is missing!'),
-                     'status.deleted'),
+                     'status.deleted', _('deleted')),
     'I' : StatusType('ignored', 'ignore.ico', _('%s is ignored'),
-                     'status.ignored'),
+                     'status.ignored', _('ignored')),
     'C' : StatusType('clean', '', _('%s is not modified (clean)'),
-                     'status.clean'),
+                     'status.clean', _('clean')),
     'S' : StatusType('subrepo', 'hg.ico', _('%s is a dirty subrepo'),
-                     'status.subrepo'),
+                     'status.subrepo', _('subrepo')),
 }
 
 
@@ -770,7 +783,7 @@ class StatusFilterButton(QToolButton):
         menu = QMenu(self)
         for c in self._TYPES:
             st = statusTypes[c]
-            a = menu.addAction('%s %s' % (c, st.name))
+            a = menu.addAction('%s %s' % (c, st.trname))
             a.setCheckable(True)
             a.setChecked(c in text)
             a.toggled.connect(self._update)
@@ -825,7 +838,7 @@ class StatusDialog(QDialog):
             from tortoisehg.hgqt import commit
             qtrun(commit.run, ui.ui(), root=link[8:])
         if link.startswith('shelve:'):
-            repo = self.commit.repo
+            repo = self.stwidget.repo
             from tortoisehg.hgqt import shelve
             dlg = shelve.ShelveDialog(repo, self)
             dlg.finished.connect(dlg.deleteLater)

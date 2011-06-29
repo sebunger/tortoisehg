@@ -68,6 +68,11 @@ class MergeDialog(QWizard):
         page.reject()
         super(MergeDialog, self).reject()
 
+    def done(self, ret):
+        self.repo.repositoryChanged.disconnect(self.repositoryChanged)
+        self.repo.configChanged.disconnect(self.configChanged)
+        super(MergeDialog, self).done(ret)
+
 MAIN_PANE    = 0
 PERFORM_PANE = 1
 
@@ -397,7 +402,7 @@ class MergePage(BasePage):
                   (QMessageBox.No, _('Cancel')))
         if qtlib.QuestionMsgBox(_('Confirm Clean Up'), main, text,
                                 labels=labels, parent=self):
-            o = self.cmd.outputLog
+            o = self.cmd.core.outputLog
             o.appendLog(_('Canceling merge...\n'), 'control')
             o.appendLog(_('(Please close any running merge tools)\n'), 'control')
             self.cmd.cancel()
@@ -544,7 +549,7 @@ class MergePage(BasePage):
             else:
                 self.groups.set_visible(False, 'dirty')
                 self.groups.set_visible(False, 'merged')
-                self.wd_status.set_status(_('Clean'), True)
+                self.wd_status.set_status(_('Clean', 'working dir state'), True)
             self.completeChanged.emit()
             if callable(callback):
                 callback()
@@ -688,11 +693,21 @@ class CommitPage(BasePage):
         self.setSubTitle(_('Please wait while committing merged files.'))
 
         # merges must be committed without specifying file list
+        repo = self.wizard().repo
+        user = qtlib.getCurrentUsername(self, repo)
+        if not user:
+            return
+
         message = hglib.fromunicode(self.msg_text.text())
         cmdline = ['commit', '--verbose', '--message', message,
-                   '--repository', self.wizard().repo.root]
+                   '--repository', repo.root, '--user', user]
+        commandlines = [cmdline]
+        pushafter = repo.ui.config('tortoisehg', 'cipushafter')
+        if pushafter:
+            cmd = ['push', '--repository', repo.root, pushafter]
+            commandlines.append(cmd)
         self.wizard().repo.incrementBusyCount()
-        self.cmd.run(cmdline)
+        self.cmd.run(*commandlines)
 
     def isComplete(self):
         if not self.nextEnabled:

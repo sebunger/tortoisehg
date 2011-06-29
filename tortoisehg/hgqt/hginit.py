@@ -106,9 +106,8 @@ class InitDialog(QDialog):
         caption = _('Select Destination Folder')
         path = FD.getExistingDirectory(parent=self, caption=caption,
                 options=FD.ShowDirsOnly | FD.ReadOnly)
-        response = str(path)
-        if response:
-            self.dest_edit.setText(response)
+        if path:
+            self.dest_edit.setText(path)
 
     def compose_command(self):
         # just a stub for extension with extra options (--mq, --ssh, ...)
@@ -158,7 +157,7 @@ class InitDialog(QDialog):
                 os.makedirs(dest)
             except:
                 qtlib.ErrorMsgBox(_('Error executing init'),
-                        _('Cannot create folder %s' % udest))
+                        _('Cannot create folder %s') % udest)
                 return False
 
         _ui = ui.ui()
@@ -175,7 +174,7 @@ class InitDialog(QDialog):
                     _('Unable to create new repository'),
                     hglib.tounicode(str(inst)))
             return False
-        except util.Abort, inst:
+        except util.Abort, e:
             if e.hint:
                 err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                             hglib.tounicode(e.hint))
