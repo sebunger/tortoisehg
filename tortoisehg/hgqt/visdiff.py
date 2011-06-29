@@ -113,7 +113,8 @@ def snapshot(repo, files, ctx):
         f.write(data)
         f.close()
         if ctx.rev() is None:
-            fns_and_mtime.append((dest, repo.wjoin(fn), os.path.getmtime(dest)))
+            fns_and_mtime.append((dest, repo.wjoin(fn), 
+                                  os.lstat(dest).st_mtime))
         else:
             # Make file read/only, to indicate it's static (archival) nature
             os.chmod(dest, stat.S_IREAD)
@@ -123,7 +124,15 @@ def launchtool(cmd, opts, replace, block):
     def quote(match):
         key = match.group()[1:]
         return util.shellquote(replace[key])
-    args = ' '.join(opts)
+    if isinstance(cmd, unicode):
+        cmd = hglib.fromunicode(cmd)
+    lopts = []
+    for opt in opts:
+        if isinstance(opt, unicode):
+            lopts.append(hglib.fromunicode(opt))
+        else:
+            lopts.append(opt)
+    args = ' '.join(lopts)
     args = re.sub(_regex, quote, args)
     cmdline = util.shellquote(cmd) + ' ' + args
     cmdline = util.quotecommand(cmdline)
@@ -333,10 +342,13 @@ def visualdiff(ui, repo, pats, opts):
 
         # detect if changes were made to mirrored working files
         for copy_fn, working_fn, mtime in fns_and_mtime:
-            if os.path.getmtime(copy_fn) != mtime:
-                ui.debug('file changed while diffing. '
-                         'Overwriting: %s (src: %s)\n' % (working_fn, copy_fn))
-                util.copyfile(copy_fn, working_fn)
+            try:
+                if os.lstat(copy_fn).st_mtime != mtime:
+                    ui.debug('file changed while diffing. '
+                            'Overwriting: %s (src: %s)\n' % (working_fn, copy_fn))
+                    util.copyfile(copy_fn, working_fn)
+            except EnvironmentError:
+                pass # Ignore I/O errors or missing files
 
     def dodiffwrapper():
         try:

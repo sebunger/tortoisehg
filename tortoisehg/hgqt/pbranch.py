@@ -256,7 +256,10 @@ class PatchBranchWidget(QWidget):
         opts = {}
         mgr = self.pbranch.patchmanager(self.repo.ui, self.repo, opts)
         graph = mgr.graphforopts(opts)
+        graph_cur = mgr.graphforopts({'tips': True})
         heads = self.repo.branchheads(patch_name)
+        if graph_cur.isinner(patch_name) and not graph.isinner(patch_name):
+            status.append(_('will be closed'))
         if len(heads) > 1:
             status.append(_('needs merge of %i heads\n') % len(heads))
         for dep, through in graph.pendingmerges(patch_name):
@@ -397,6 +400,12 @@ class PatchBranchWidget(QWidget):
             menu.exec_(pos)
 
     # Signal handlers
+
+    def closeEvent(self, event):
+        self.repo.configChanged.disconnect(self.configChanged)
+        self.repo.repositoryChanged.disconnect(self.repositoryChanged)
+        self.repo.workingBranchChanged.disconnect(self.workingBranchChanged)
+        super(PatchBranchWidget, self).closeEvent(event)
 
     def contextMenuEvent(self, event):
         if self.patchlist.geometry().contains(event.pos()):

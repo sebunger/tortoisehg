@@ -363,7 +363,7 @@ INFO = (
           'extension, rebase equates to pull --rebase.  Default: none')),
     )),
 
-({'name': 'commit', 'label': _('Commit'), 'icon': 'menucommit'}, (
+({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'}, (
     _fi(_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is<br>'
           '"Full Name &lt;email@example.com&gt;"')),
@@ -374,7 +374,8 @@ INFO = (
     _fi(_('Close After Commit'), 'tortoisehg.closeci', genBoolCombo,
         _('Close the commit tool after every successful '
           'commit.  Default: False')),
-    _fi(_('Push After Commit'), 'tortoisehg.cipushafter', genEditCombo,
+    _fi(_('Push After Commit'), 'tortoisehg.cipushafter', (genEditCombo,
+         ['default-push', 'default']),
         _('Attempt to push to specified URL or alias after each successful '
           'commit.  Default: No push')),
     _fi(_('Auto Commit List'), 'tortoisehg.autoinc', genEditCombo,

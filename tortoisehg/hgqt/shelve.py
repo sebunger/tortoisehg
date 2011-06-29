@@ -183,12 +183,18 @@ class ShelveDialog(QDialog):
 
         self.statusbar = cmdui.ThgStatusBar(self)
         self.layout().addWidget(self.statusbar)
+        self.showMessage(_('Backup copies of modified files can be found '
+                           'in .hg/Trashcan/'))
 
         self.refreshCombos()
         repo.repositoryChanged.connect(self.refreshCombos)
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
+
+    def done(self, ret):
+        self.repo.repositoryChanged.disconnect(self.refreshCombos)
+        super(ShelveDialog, self).done(ret)
 
     @pyqtSlot()
     def moveFileRight(self):
@@ -366,6 +372,8 @@ class ShelveDialog(QDialog):
     def refreshCombos(self):
         shelvea, shelveb = self.currentPatchA(), self.currentPatchB()
 
+        # Note that thgshelves returns the shelve list ordered from newest to 
+        # oldest
         shelves = self.repo.thgshelves()
         disp = [_('Shelf: %s') % hglib.tounicode(s) for s in shelves]
 

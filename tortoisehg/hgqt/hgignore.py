@@ -198,6 +198,7 @@ class HgignoreDialog(QDialog):
         newfilter = hglib.fromunicode(self.le.text()).strip()
         if newfilter == '':
             return
+        self.le.clear()
         if self.recombo.currentIndex() == 0:
             test = 'glob:' + newfilter
             try:
@@ -217,10 +218,21 @@ class HgignoreDialog(QDialog):
                 qtlib.WarningMsgBox(_('Invalid regexp expression'), str(inst),
                                     parent=self)
                 return
-        self.le.clear()
 
     def refresh(self):
+        try:
+            l = open(self.ignorefile, 'rb').readlines()
+            self.doseoln = l[0].endswith('\r\n')
+        except (IOError, ValueError, IndexError):
+            self.doseoln = os.name == 'nt'
+            l = []
+        self.ignorelines = [line.strip() for line in l]
+        self.ignorelist.clear()
+
         uni = hglib.tounicode
+        
+        self.ignorelist.addItems([uni(l) for l in self.ignorelines])
+
         try:
             self.repo.thginvalidate()
             wctx = self.repo[None]
@@ -235,6 +247,7 @@ class HgignoreDialog(QDialog):
                 err = uni(str(e))
             qtlib.WarningMsgBox(_('Unable to read repository status'),
                                 err, parent=self)
+            self.lclunknowns = []
             return
 
         self.lclunknowns = wctx.unknown()
@@ -247,16 +260,6 @@ class HgignoreDialog(QDialog):
                 self.unknownlist.setCurrentItem(item)
                 # single selection only
                 break
-
-        try:
-            l = open(self.ignorefile, 'rb').readlines()
-            self.doseoln = l[0].endswith('\r\n')
-        except (IOError, ValueError, IndexError):
-            self.doseoln = os.name == 'nt'
-            l = []
-        self.ignorelines = [line.strip() for line in l]
-        self.ignorelist.clear()
-        self.ignorelist.addItems([uni(l) for l in self.ignorelines])
 
     def writeIgnoreFile(self):
         eol = self.doseoln and '\r\n' or '\n'

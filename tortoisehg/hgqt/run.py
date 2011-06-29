@@ -17,6 +17,7 @@ import pdb
 import sys
 import subprocess
 import traceback
+import zlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -265,6 +266,9 @@ def runcommand(ui, args):
                 path, bundle = s
             cmdoptions['bundle'] = os.path.abspath(bundle)
         path = ui.expandpath(path)
+        if not os.path.exists(path) or not os.path.isdir(path+'/.hg'):
+            print 'abort: %s is not a repository' % path
+            return 1
         os.chdir(path)
     if options['fork']:
         cmdoptions['fork'] = True
@@ -362,8 +366,11 @@ class _QtRunner(QObject):
     # It doesn't check the hierarchy of exception classes for simplicity.
     _recoverableexc = {
         error.RepoLookupError: _('Try refreshing your repository.'),
+        zlib.error:            _('Try refreshing your repository.'),
         error.ParseError: _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                             '<a href="#edit:%(arg1)s">edit</a> your config'),
+        error.ConfigError: _('Configuration Error: "%(arg0)s", please '
+                             '<a href="#fix:%(arg0)s">fix</a> your config'),
         }
 
     def __init__(self):
@@ -397,12 +404,13 @@ class _QtRunner(QObject):
     def excepthandler(self):
         'Display exception info; run in main (GUI) thread'
         try:
-            self._showexceptiondialog()
-        except:
-            # make sure to quit mainloop first, so that it never leave
-            # zombie process.
-            self._mainapp.exit(1)
-            self._printexception()
+            try:
+                self._showexceptiondialog()
+            except:
+                # make sure to quit mainloop first, so that it never leave
+                # zombie process.
+                self._mainapp.exit(1)
+                self._printexception()
         finally:
             self.errors = []
 
@@ -449,6 +457,7 @@ class _QtRunner(QObject):
             self._mainapp.setOrganizationName('TortoiseHg')
             self._mainapp.setOrganizationDomain('tortoisehg.org')
             self._mainapp.setApplicationVersion(thgversion.version())
+            self._installtranslator()
             qtlib.setup_font_substitutions()
             qtlib.fix_application_font()
             qtlib.configstyles(ui)
@@ -481,6 +490,13 @@ class _QtRunner(QObject):
             return self._mainapp.exec_()
         finally:
             self._mainapp = None
+
+    def _installtranslator(self):
+        if not i18n.language:
+            return
+        t = QTranslator(self._mainapp)
+        t.load('qt_' + i18n.language, qtlib.gettranslationpath())
+        self._mainapp.installTranslator(t)
 
     def _opendialog(self, dlgfunc, ui, *args, **opts):
         dlg = dlgfunc(ui, *args, **opts)
@@ -687,7 +703,10 @@ def annotate(ui, *pats, **opts):
     from tortoisehg.hgqt.annotate import run
     if len(pats) != 1:
         ui.warn(_('annotate requires a single filename\n'))
-        return
+        if pats:
+            pats = pats[0:]
+        else:
+            return
     return qtrun(run, ui, *pats, **opts)
 
 def init(ui, *pats, **opts):
@@ -777,7 +796,7 @@ def help_(ui, name=None, with_version=False, **opts):
         # description
         doc = i[0].__doc__
         if not doc:
-            doc = _("(No help text available)")
+            doc = _("(no help text available)")
         if ui.quiet:
             doc = doc.splitlines(0)[0]
         ui.write("\n%s\n" % doc.rstrip())
@@ -842,7 +861,7 @@ def help_(ui, name=None, with_version=False, **opts):
 
         # description
         if not doc:
-            doc = _("(No help text available)")
+            doc = _("(no help text available)")
         if hasattr(doc, '__call__'):
             doc = doc()
 
@@ -1035,6 +1054,7 @@ table = {
         _('thg strip [-f] [-n] [[-r] REV]')),
     "^rebase": (rebase,
         [('', 'keep', False, _('keep original changesets')),
+         ('', 'keepbranches', False, _('keep original branch names')),
          ('', 'detach', False, _('force detaching of source from its original '
                                 'branch')),
          ('s', 'source', '',

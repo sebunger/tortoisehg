@@ -176,7 +176,7 @@ class CommitWidget(QWidget):
         self.msghistory = []
         self.repo = repo = self.stwidget.repo
         self.runner = cmdui.Runner(not embedded, self)
-        self.runner.setTitle(_('Commit'))
+        self.runner.setTitle(_('Commit', 'window title'))
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
@@ -188,6 +188,7 @@ class CommitWidget(QWidget):
 
         self.opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         self.opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
+        self.stwidget.opts['ciexclude'] = repo.ui.config('tortoisehg', 'ciexclude', '')
 
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
@@ -209,7 +210,7 @@ class CommitWidget(QWidget):
         self.recentMessagesButton = QToolButton(
             text=_('Copy message'),
             popupMode=QToolButton.InstantPopup,
-            statusTip=_('Copy one of the recent commit messages'))
+            toolTip=_('Copy one of the recent commit messages'))
         tbar.addWidget(self.recentMessagesButton)
         self.updateRecentMessages()
 
@@ -250,6 +251,7 @@ class CommitWidget(QWidget):
         self.split.setSizePolicy(sp)
         # Add our widgets to the top of our splitter
         self.split.addWidget(upperframe)
+        self.split.setCollapsible(0, False)
         # Add status widget document frame below our splitter
         # this reparents the docf from the status splitter
         self.split.addWidget(self.stwidget.docf)
@@ -257,7 +259,10 @@ class CommitWidget(QWidget):
         # add our splitter where the docf used to be
         self.stwidget.split.addWidget(self.split)
         self.msgte = msgte
-        QShortcut(QKeySequence('Ctrl+Return'), self, self.commit)
+        QShortcut(QKeySequence('Ctrl+Return'), self, self.commit).setContext(
+                  Qt.WidgetWithChildrenShortcut)
+        QShortcut(QKeySequence('Ctrl+Enter'), self, self.commit).setContext(
+                  Qt.WidgetWithChildrenShortcut)
 
     @pyqtSlot(QString, QString)
     def fileDisplayed(self, wfile, contents):
@@ -312,6 +317,7 @@ class CommitWidget(QWidget):
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         self.refresh()
+        self.stwidget.refreshWctx() # Trigger reload of working context
 
     def configChanged(self):
         'Repository is reporting its config files have changed'
@@ -471,31 +477,6 @@ class CommitWidget(QWidget):
         self.userhist.insert(0, user)
         self.userhist = self.userhist[:10]
 
-    def getCurrentUsername(self):
-        # 1. Override has highest priority
-        user = self.opts.get('user')
-        if user:
-            return user
-
-        # 2. Read from repository
-        try:
-            return self.repo.ui.username()
-        except error.Abort:
-            pass
-
-        # 3. Get a username from the user
-        QMessageBox.information(self, _('Please enter a username'),
-                    _('You must identify yourself to Mercurial'),
-                    QMessageBox.Ok)
-        from tortoisehg.hgqt.settings import SettingsDialog
-        dlg = SettingsDialog(False, focus='ui.username')
-        dlg.exec_()
-        self.repo.invalidateui()
-        try:
-            return self.repo.ui.username()
-        except error.Abort:
-            return None
-
     def commit(self):
         repo = self.repo
         msg = self.getMessage()
@@ -554,7 +535,7 @@ class CommitWidget(QWidget):
         if len(repo.parents()) > 1:
             files = []
 
-        user = self.getCurrentUsername()
+        user = qtlib.getCurrentUsername(self, self.repo, self.opts)
         if not user:
             return
         self.addUsernameToHistory(user)
@@ -603,10 +584,11 @@ class CommitWidget(QWidget):
         cmdline = ['commit', '--repository', repo.root, '--verbose',
                    '--user', user, '--message='+msg]
         cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
-        for fname in self.opts.get('autoinc', '').split(','):
-            fname = fname.strip()
-            if fname:
-                cmdline.extend(['--include', fname])
+        if len(repo.parents()) == 1:
+            for fname in self.opts.get('autoinc', '').split(','):
+                fname = fname.strip()
+                if fname:
+                    cmdline.extend(['--include', fname])
 
         commandlines.append(cmdline)
 
@@ -618,13 +600,13 @@ class CommitWidget(QWidget):
         self.commitButtonEnable.emit(False)
         self.runner.run(*commandlines)
         self.stopAction.setEnabled(True)
-        self.progress.emit(*cmdui.startProgress(_('Commit'), ''))
+        self.progress.emit(*cmdui.startProgress(_('Commit', 'start progress'), ''))
 
     def stop(self):
         self.runner.cancel()
 
     def commandFinished(self, ret):
-        self.progress.emit(*cmdui.stopProgress(_('Commit')))
+        self.progress.emit(*cmdui.stopProgress(_('Commit', 'stop progress')))
         self.stopAction.setEnabled(False)
         self.commitButtonEnable.emit(True)
         self.repo.decrementBusyCount()
@@ -636,13 +618,12 @@ class CommitWidget(QWidget):
             self.msgte.clear()
             self.msgte.setModified(False)
             self.commitComplete.emit()
-        self.stwidget.refreshWctx()
 
 class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
     def __init__(self, opts, userhistory, parent):
         QDialog.__init__(self, parent)
-        self.setWindowTitle('%s - commit options' % parent.repo.displayname)
+        self.setWindowTitle(_('%s - commit options') % parent.repo.displayname)
         self.repo = parent.repo
 
         layout = QVBoxLayout()
@@ -923,7 +904,7 @@ class CommitDialog(QDialog):
         bb.button(BB.Discard).setDefault(False)
         bb.button(BB.Ok).setDefault(True)
         self.commitButton = bb.button(BB.Ok)
-        self.commitButton.setText(_('Commit'))
+        self.commitButton.setText(_('Commit', 'action button'))
         self.bb = bb
 
         layout.addWidget(self.bb)
@@ -936,12 +917,19 @@ class CommitDialog(QDialog):
         commit.commitComplete.connect(self.postcommit)
         commit.commitButtonEnable.connect(self.commitButton.setEnabled)
 
-        self.setWindowTitle('%s - commit' % commit.repo.displayname)
+        self.setWindowTitle(_('%s - commit') % commit.repo.displayname)
         self.commit = commit
         self.commit.reload()
         self.updateUndo()
         self.commit.msgte.setFocus()
         QShortcut(QKeySequence.Refresh, self, self.refresh)
+
+    def done(self, ret):
+        self.commit.repo.configChanged.disconnect(self.commit.configChanged)
+        self.commit.repo.repositoryChanged.disconnect(self.commit.repositoryChanged)
+        self.commit.repo.workingBranchChanged.disconnect(self.commit.workingBranchChanged)
+        self.commit.repo.repositoryChanged.disconnect(self.updateUndo)
+        super(CommitDialog, self).done(ret)
 
     def linkActivated(self, link):
         link = hglib.fromunicode(link)

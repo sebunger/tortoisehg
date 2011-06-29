@@ -82,8 +82,7 @@ class AnnotateView(qscilib.Scintilla):
         try:
             fctx = self._links[line][0]
             if fctx.rev() != self._lastrev:
-                s = hglib.get_revision_desc(fctx,
-                                            hglib.fromunicode(self.annfile))
+                s = hglib.get_revision_desc(fctx, self.annfile)
                 self.revisionHint.emit(s)
                 self._lastrev = fctx.rev()
         except IndexError:
@@ -94,7 +93,10 @@ class AnnotateView(qscilib.Scintilla):
         menu = self.createStandardContextMenu()
         line = self.lineAt(point)
         point = self.mapToGlobal(point)
-        if line < 0 or not self.isAnnotationEnabled():
+
+        if not self.isAnnotationEnabled():
+            return menu.exec_(point)
+        if line < 0 or line >= len(self._links):
             return menu.exec_(point)
 
         fctx, line = self._links[line]
@@ -159,14 +161,22 @@ class AnnotateView(qscilib.Scintilla):
 
         line is counted from 1.
         """
-        if self.annfile == wfile and self.rev == rev:
+        if isinstance(wfile, (unicode, QString)):
+            # setSource can be used as a slot, in which case wfile is a QString
+            lwfile = hglib.fromunicode(wfile)
+        else:
+            # or it can be called directly with a local encoded wfile string
+            lwfile = wfile
+            wfile = hglib.tounicode(wfile)
+
+        if self.annfile == lwfile and self.rev == rev:
             if line:
                 self.setCursorPosition(int(line) - 1, 0)
             return
 
         try:
             ctx = self.repo[rev]
-            fctx = ctx[hglib.fromunicode(wfile)]
+            fctx = ctx[lwfile]
         except error.LookupError:
             qtlib.ErrorMsgBox(_('Unable to annotate'),
                     _('%s is not found in revision %d') % (wfile, ctx.rev()))
@@ -189,7 +199,7 @@ class AnnotateView(qscilib.Scintilla):
         else:
             self._rev = ctx.rev()
             self.clear()
-            self.annfile = wfile
+            self.annfile = lwfile
             if util.binary(fctx.data()):
                 self.setText(_('File is binary.\n'))
             else:
@@ -205,7 +215,7 @@ class AnnotateView(qscilib.Scintilla):
         if not self.isAnnotationEnabled() or not self.annfile:
             return
         ctx = self.repo[self._rev]
-        fctx = ctx[hglib.fromunicode(self.annfile)]
+        fctx = ctx[self.annfile]
         if util.binary(fctx.data()):
             return
         self._thread.abort()
@@ -344,12 +354,13 @@ class _AnnotateThread(QThread):
         assert self.currentThread() != qApp.thread()
         self._threadid = self.currentThreadId()
         try:
-            data = []
-            for (fctx, line), _text in self._fctx.annotate(True, True):
-                data.append((fctx, line))
-            self.data = data
-        except KeyboardInterrupt:
-            pass
+            try:
+                data = []
+                for (fctx, line), _text in self._fctx.annotate(True, True):
+                    data.append((fctx, line))
+                self.data = data
+            except KeyboardInterrupt:
+                pass
         finally:
             self._threadid = None
             del self._fctx

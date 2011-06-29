@@ -215,6 +215,11 @@ class MQWidget(QWidget):
         self.loadConfigs()
         QTimer.singleShot(0, self.reload)
 
+    def closeEvent(self, event):
+        self.repo.configChanged.disconnect(self.onConfigChanged)
+        self.repo.repositoryChanged.disconnect(self.onRepositoryChanged)
+        super(MQWidget, self).closeEvent(event)
+
     def getUserOptions(self, *optionlist):
         out = []
         for opt in optionlist:
@@ -892,7 +897,7 @@ class OptionsDialog(QDialog):
     'Utility dialog for configuring uncommon options'
     def __init__(self, parent):
         QDialog.__init__(self, parent)
-        self.setWindowTitle('MQ options')
+        self.setWindowTitle(_('MQ options'))
 
         layout = QFormLayout()
         self.setLayout(layout)
