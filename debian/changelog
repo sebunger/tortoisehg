@@ -1,8 +1,9 @@
 tortoisehg (2.0.5-1) unstable; urgency=low
 
   * New upstream release.
+  * Drop build dependency on quilt, as we are using source format v3.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Tue, 28 Jun 2011 23:23:17 -0700
+ -- Ludovico Cavedon <cavedon@debian.org>  Tue, 05 Jul 2011 23:32:16 -0700
 
 tortoisehg (2.0.3-1) unstable; urgency=low
 
