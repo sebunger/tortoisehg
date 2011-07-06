@@ -3,7 +3,7 @@ Section: vcs
 Priority: optional
 Maintainer: Ludovico Cavedon <cavedon@debian.org>
 Uploaders: Max Bowsher <maxb@f2s.com>
-Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python (>= 2.4), quilt
+Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python (>= 2.4)
 Build-Depends-Indep: python-support (>= 0.5.3), docbook-xsl, docbook-xml,
  xsltproc, python-sphinx, pyqt4-dev-tools
 Standards-Version: 3.9.1
