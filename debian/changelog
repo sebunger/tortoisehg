@@ -2,8 +2,9 @@ tortoisehg (2.0.5-1) unstable; urgency=low
 
   * New upstream release.
   * Drop build dependency on quilt, as we are using source format v3.
+  * Update Standards-Version to 3.9.2.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Tue, 05 Jul 2011 23:32:16 -0700
+ -- Ludovico Cavedon <cavedon@debian.org>  Thu, 07 Jul 2011 21:05:38 -0700
 
 tortoisehg (2.0.3-1) unstable; urgency=low
 
