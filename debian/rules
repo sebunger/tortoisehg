@@ -1,16 +1,36 @@
 #!/usr/bin/make -f
 
-DEB_PYTHON_SYSTEM=pysupport
+%:
+	dh $@ --with python2 --buildsystem=python_distutils
 
-include /usr/share/cdbs/1/rules/debhelper.mk
-#include /usr/share/cdbs/1/rules/patchsys-quilt.mk
-include /usr/share/cdbs/1/class/python-distutils.mk
-
-DEB_INSTALL_DOCS_tortoisehg=--exclude=nautilus-thg.py --exclude=mergetools.rc
-DEB_COMPRESS_tortoisehg="-X.js -X_static/* -X _sources/*"
-
-build/tortoisehg:: debian/thg.1
+override_dh_auto_build: debian/thg.1
+	dh_auto_build
 	$(MAKE) -C doc html
+
+override_dh_auto_install:
+	dh_auto_install
+	mkdir -p debian/tmp/etc/mercurial/hgrc.d/
+	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thgmergetools.rc
+	mkdir -p debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/
+	ln -sf ../../../../javascript/jquery/jquery.js \
+	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
+	mkdir -p debian/tortoisehg/usr/share/man/man1/
+	ln -sf thg.1.gz debian/tortoisehg/usr/share/man/man1/hgtk.1.gz
+
+## drop automatically created file; see #424898
+override_dh_clean:
+	dh_auto_clean
+	rm -f debian/pycompat
+	rm -f debian/thg.1
+	rm -fr locale doc/build
+	# patches are removed before calling clean, so we need to fix what setup.py did wrong
+	rm tortoisehg/util/config.py
+
+override_dh_installdocs:
+	dh_installdocs --exclude=nautilus-thg.py --exclude=mergetools.rc
+
+override_dh_compress:
+	dh_compress -X.js -X_static/* -X "_sources/*"
 
 debian/thg.1: debian/thg.1.xml
 	xsltproc --nonet \
@@ -20,20 +40,3 @@ debian/thg.1: debian/thg.1.xml
 		-o debian/ \
 		/usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl \
 		debian/thg.1.xml
-
-install/tortoisehg::
-	mkdir -p debian/tmp/etc/mercurial/hgrc.d/
-	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thgmergetools.rc
-
-binary-post-install/tortoisehg::
-	ln -sf ../../../../javascript/jquery/jquery.js \
-	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
-	ln -sf thg.1.gz debian/tortoisehg/usr/share/man/man1/hgtk.1.gz
-
-# drop automatically created file; see #424898
-clean::
-	rm -f debian/pycompat
-	rm -f debian/thg.1
-	rm -fr locale doc/build
-	# patches are removed before calling clean, so we need to fix what setup.py did wrong
-	rm tortoisehg/util/config.py

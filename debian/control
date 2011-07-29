@@ -3,14 +3,14 @@ Section: vcs
 Priority: optional
 Maintainer: Ludovico Cavedon <cavedon@debian.org>
 Uploaders: Max Bowsher <maxb@f2s.com>
-Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49), python (>= 2.4)
-Build-Depends-Indep: python-support (>= 0.5.3), docbook-xsl, docbook-xml,
+Build-Depends: debhelper (>= 8), python (>= 2.6.6-3~)
+Build-Depends-Indep: docbook-xsl, docbook-xml,
  xsltproc, python-sphinx, pyqt4-dev-tools
 Standards-Version: 3.9.2
 Homepage: http://tortoisehg.bitbucket.org/
 Vcs-Git: git://git.debian.org/git/collab-maint/tortoisehg.git
 Vcs-Browser: http://git.debian.org/?p=collab-maint/tortoisehg.git
-XS-Python-Version: >= 2.4
+X-Python-Version: >= 2.4
 
 Package: tortoisehg
 Architecture: all
@@ -19,7 +19,6 @@ Depends: mercurial (>= 1.9), mercurial (<< 1.11), python-gobject (>= 2.12.1),
  ${python:Depends}
 Recommends: libjs-jquery, python-iniparse, python-pygments
 Suggests: tortoisehg-nautilus
-XB-Python-Version: ${python:Versions}
 Description: Graphical tool for working with Mercurial
  TortoiseHg provides a graphical tool for interacting with the distributed
  revision control system Mercurial.  GUI support is provided for over a dozen
@@ -36,7 +35,6 @@ Depends: tortoisehg (>= ${source:Version}), python-nautilus,
  python-gobject (>= 2.12.1), python-gtk2 (>= 2.10), python-gnome2,
  ${misc:Depends}, ${python:Depends}
 Recommends: ssh-askpass-gnome | ssh-askpass
-XB-Python-Version: ${python:Versions}
 Description: Graphical tool for working with Mercurial (Nautilus extension)
  TortoiseHg provides a graphical tool for interacting with the distributed
  revision control system Mercurial.  GUI support is provided for over a dozen
