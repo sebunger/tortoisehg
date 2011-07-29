@@ -18,7 +18,7 @@ except AttributeError:
 
 def checkhgversion(v):
     """range check the Mercurial version"""
-    reqver = ['1', '8']
+    reqver = ['1', '9']
     v = v.split('+')[0]
     if not v or v == 'unknown' or len(v) >= 12:
         # can't make any intelligent decisions about unknown or hashes
@@ -27,7 +27,7 @@ def checkhgversion(v):
     if vers == reqver or len(vers) < 2:
         return
     nextver = list(reqver)
-    nextver[1] = chr(ord(reqver[1])+1)
+    nextver[1] = str(int(reqver[1])+1)
     if vers == nextver:
         return
     return (('This version of TortoiseHg requires Mercurial '

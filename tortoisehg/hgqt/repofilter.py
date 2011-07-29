@@ -205,6 +205,9 @@ class RepoFilterBar(QToolBar):
             text=_('Branch'), popupMode=QToolButton.InstantPopup,
             statusTip=_('Display graph the named branch only'))
         self._branchMenu = QMenu(self._branchLabel)
+        self._abranchAction = self._branchMenu.addAction(
+            _('Display only active branches'), self.refresh)
+        self._abranchAction.setCheckable(True)
         self._cbranchAction = self._branchMenu.addAction(
             _('Display closed branches'), self.refresh)
         self._cbranchAction.setCheckable(True)
@@ -214,8 +217,8 @@ class RepoFilterBar(QToolBar):
         self._branchLabel.setMenu(self._branchMenu)
 
         self._branchCombo = QComboBox()
+        self._branchCombo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._branchCombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
-        self._branchCombo.setMinimumSize(100,0)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
         self._branchReloading = False
 
@@ -226,7 +229,11 @@ class RepoFilterBar(QToolBar):
         """Update the list of branches"""
         curbranch = self.branch()
 
-        if self._cbranchAction.isChecked():
+        if self._abranchAction.isChecked():
+            branches = sorted(set([self._repo[n].branch()
+                for n in self._repo.heads()
+                if not self._repo[n].extra().get('close')]))
+        elif self._cbranchAction.isChecked():
             branches = sorted(self._repo.branchtags().keys())
         else:
             branches = self._repo.namedbranches
@@ -236,8 +243,9 @@ class RepoFilterBar(QToolBar):
         self._branchCombo.addItem(self._allBranchesLabel)
         for branch in branches:
             self._branchCombo.addItem(branch)
-        self._branchLabel.setEnabled(self.filterEnabled and len(branches) > 1)
-        self._branchCombo.setEnabled(self.filterEnabled and len(branches) > 1)
+            self._branchCombo.setItemData(self._branchCombo.count() - 1, branch, Qt.ToolTipRole)
+        self._branchLabel.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
+        self._branchCombo.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
         self._branchReloading = False
 
         if not curbranch:
