@@ -141,7 +141,7 @@ class ArchiveDialog(QDialog):
         self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
         self.rev_combo.setCurrentIndex(0)
         self.subrepos_chk.setChecked(self.get_subrepos_present())
-        self.dest_edit.setText(self.repo.root)
+        self.dest_edit.setText(hglib.tounicode(self.repo.root))
         self.filesradio.setChecked(True)
         self.update_path()
 
@@ -163,6 +163,7 @@ class ArchiveDialog(QDialog):
         self.arch_btn.clicked.connect(self.archive)
         self.detail_btn.clicked.connect(self.detail_clicked)
         self.close_btn.clicked.connect(self.close)
+        self.cancel_btn.clicked.connect(self.cancel_clicked)
 
         # dialog setting
         self.setWindowTitle(_('Archive - %s') % self.repo.displayname)
@@ -184,23 +185,21 @@ class ArchiveDialog(QDialog):
 
     def browse_clicked(self):
         """Select the destination directory or file"""
-        dest = hglib.fromunicode(self.dest_edit.text())
+        dest = unicode(self.dest_edit.text())
         if not os.path.exists(dest):
             dest = os.path.dirname(dest)
         select = self.get_selected_archive_type()
         FD = QFileDialog
         if select['type'] == 'files':
             caption = _('Select Destination Folder')
-            path = FD.getExistingDirectory(parent=self, caption=caption,
+            response = FD.getExistingDirectory(parent=self, caption=caption,
                     directory=dest, options=FD.ShowDirsOnly | FD.ReadOnly)
-            response = str(path)
         else:
             caption = _('Open File')
             ext = '*' + select['ext']
             filter = '%s (%s)\nAll Files (*.*)' % (select['label'], ext)
-            filename = FD.getOpenFileName(parent=self, caption=caption,
-                    directory=dest, filter=filter, options=FD.ReadOnly );
-            response = str(filename)
+            response = FD.getOpenFileName(parent=self, caption=caption,
+                    directory=dest, filter=filter, options=FD.ReadOnly)
         if response:
             self.dest_edit.setText(response)
             self.update_path()
@@ -250,7 +249,7 @@ class ArchiveDialog(QDialog):
         def remove_rev(path):
             l = ''
             for i in xrange(self.rev_combo.count() - 1):
-                l += hglib.fromunicode(self.rev_combo.itemText(i))
+                l += unicode(self.rev_combo.itemText(i))
             revs = [rev[0] for rev in l]
             revs.append(wdrev)
             if not self.prevtarget is None:
@@ -266,7 +265,7 @@ class ArchiveDialog(QDialog):
             if select['type'] != 'files':
                 path += select['ext']
             return path
-        text = self.rev_combo.currentText()
+        text = unicode(self.rev_combo.currentText())
         if len(text) == 0:
             return
         wdrev = str(self.repo['.'].rev())
@@ -277,15 +276,15 @@ class ArchiveDialog(QDialog):
                 self.repo[hglib.fromunicode(text)]
             except (error.RepoError, error.LookupError):
                 return
-        path = hglib.fromunicode(self.dest_edit.text())
+        path = unicode(self.dest_edit.text())
         path = remove_ext(path)
         path = remove_rev(path)
-        path = add_rev(path, hglib.fromunicode(text))
+        path = add_rev(path, text)
         path = add_ext(path)
         self.dest_edit.setText(path)
         self.prevtarget = text
         type = self.get_selected_archive_type()['type']
-        self.compose_command(path, type)
+        self.compose_command(hglib.fromunicode(path), type)
 
     def compose_command(self, dest, type):
         cmdline = ['archive', '--repository', self.repo.root]
@@ -302,20 +301,20 @@ class ArchiveDialog(QDialog):
                 cmdline.append('-I')
                 cmdline.append(f)
         cmdline.append('--')
-        cmdline.append(hglib.fromunicode(dest))
-        self.hgcmd_txt.setText('hg ' + ' '.join(cmdline))
+        cmdline.append(dest)  # dest: local str
+        self.hgcmd_txt.setText(hglib.tounicode('hg ' + ' '.join(cmdline)))
         return cmdline
 
     def archive(self):
         # verify input
         type = self.get_selected_archive_type()['type']
-        dest = self.dest_edit.text()
+        dest = unicode(self.dest_edit.text())
         if os.path.exists(dest):
             if type == 'files':
                 if os.path.isfile(dest):
                     qtlib.WarningMsgBox(_('Duplicate Name'),
                             _('The destination "%s" already exists as '
-                              'a file!' % dest))
+                              'a file!') % dest)
                     return False
                 elif os.listdir(dest):
                     if not qtlib.QuestionMsgBox(_('Confirm Overwrite'),
@@ -333,11 +332,11 @@ class ArchiveDialog(QDialog):
                 else:
                     qtlib.WarningMsgBox(_('Duplicate Name'),
                           _('The destination "%s" already exists as '
-                            'a folder!' % dest))
+                            'a folder!') % dest)
                     return False
 
         # prepare command line
-        cmdline = self.compose_command(dest, type)
+        cmdline = self.compose_command(hglib.fromunicode(dest), type)
 
         if self.files_in_rev_chk.isChecked():
             self.savedcwd = os.getcwd()
@@ -352,7 +351,7 @@ class ArchiveDialog(QDialog):
         else:
             self.cmd.setShowOutput(True)
 
-    def cancel_clicked():
+    def cancel_clicked(self):
         self.cmd.cancel()
 
     def command_started(self):

@@ -16,8 +16,7 @@ from hgext import mq
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qscilib, qtlib
-from tortoisehg.hgqt.commit import MessageEntry
+from tortoisehg.hgqt import cmdui, qscilib, qtlib, messageentry
 
 class QFoldDialog(QDialog):
 
@@ -36,7 +35,7 @@ class QFoldDialog(QDialog):
 
         mlbl = QLabel(_('New patch message:'))
         self.layout().addWidget(mlbl)
-        self.msgte = MessageEntry(self)
+        self.msgte = messageentry.MessageEntry(self)
         self.msgte.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.layout().addWidget(self.msgte)
 
@@ -46,7 +45,7 @@ class QFoldDialog(QDialog):
 
         self.repo = repo
         q = self.repo.mq
-        q.parse_series()
+        q.parseseries()
         self.patches = [p for p in q.series if p in patches]
 
         class PatchListWidget(QListWidget):

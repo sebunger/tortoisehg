@@ -17,6 +17,8 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdui, qtlib, thgrepo, manifestmodel
 from tortoisehg.util import hglib, paths
 
+# TODO: this dialog should take a repo argument, not ui
+
 class RenameDialog(QDialog):
     """TortoiseHg rename dialog"""
 
@@ -45,8 +47,8 @@ class RenameDialog(QDialog):
                       'from folder<p>%s</p>' % cwd))
             return ('', '')
         try:
-            fname = util.canonpath(self.root, cwd, pats[0])
-            target = util.canonpath(self.root, cwd, pats[1])
+            fname = hglib.canonpath(self.root, cwd, pats[0])
+            target = hglib.canonpath(self.root, cwd, pats[1])
         except:
             pass
         os.chdir(self.root)
