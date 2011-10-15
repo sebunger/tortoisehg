@@ -102,6 +102,43 @@ class SettingsCombo(QComboBox):
     def isDirty(self):
         return self.value() != self.curvalue
 
+class BoolRBGroup(QWidget):
+    def __init__(self, parent=None, **opts):
+        QWidget.__init__(self, parent, toolTip=opts['tooltip'])
+        self.opts = opts
+        self.curvalue = None
+
+        self.trueRB = QRadioButton(_('&True'))
+        self.falseRB = QRadioButton(_('&False'))
+        self.unspecRB = QRadioButton(_('&Unspecified'))
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.trueRB)
+        layout.addWidget(self.falseRB)
+        layout.addWidget(self.unspecRB)
+        self.setLayout(layout)
+
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        self.curvalue = curvalue
+        if curvalue == 'True':
+            self.trueRB.setChecked(True)
+        elif curvalue == 'False':
+            self.falseRB.setChecked(True)
+        else:
+            self.unspecRB.setChecked(True)
+
+    def value(self):
+        if self.trueRB.isChecked():
+            return 'True'
+        elif self.falseRB.isChecked():
+            return 'False'
+        else:
+            return None
+
+    def isDirty(self):
+        return self.value() != self.curvalue
 
 class PasswordEntry(QLineEdit):
     def __init__(self, parent=None, **opts):
@@ -126,18 +163,33 @@ class PasswordEntry(QLineEdit):
     def isDirty(self):
         return self.value() != self.curvalue
 
-class FontEntry(QPushButton):
+class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
-        QPushButton.__init__(self, parent, toolTip=opts['tooltip'])
+        QWidget.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
-        self.clicked.connect(self.on_clicked)
+
+        self.label = QLabel()
+        self.setButton = QPushButton(_('&Set...'))
+        self.clearButton = QPushButton(_('&Clear'))
+
+        layout = QHBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.label)
+        layout.addStretch()
+        layout.addWidget(self.setButton)
+        layout.addWidget(self.clearButton)
+        self.setLayout(layout)
+
+        self.setButton.clicked.connect(self.onSetClicked)
+        self.clearButton.clicked.connect(self.onClearClicked)
+
         cpath = self.opts['cpath']
         assert cpath.startswith('tortoisehg.')
         self.fname = cpath[11:]
         self.setMinimumWidth(ENTRY_WIDTH)
 
-    def on_clicked(self, checked):
+    def onSetClicked(self, checked):
         def newFont(font):
             self.setText(font.toString())
             thgf.setFont(font)
@@ -146,8 +198,13 @@ class FontEntry(QPushButton):
         dlg = QFontDialog(self)
         dlg.currentFontChanged.connect(newFont)
         font, isok = dlg.getFont(origfont, self)
-        self.setText(font.toString())
+        if not isok:
+            return
+        self.label.setText(font.toString())
         thgf.setFont(font)
+
+    def onClearClicked(self, checked):
+        self.label.setText(_unspecstr)
 
     def currentFont(self):
         """currently selected QFont if specified"""
@@ -163,12 +220,12 @@ class FontEntry(QPushButton):
     def setValue(self, curvalue):
         self.curvalue = curvalue
         if curvalue:
-            self.setText(hglib.tounicode(curvalue))
+            self.label.setText(hglib.tounicode(curvalue))
         else:
-            self.setText(_unspecstr)
+            self.label.setText(_unspecstr)
 
     def value(self):
-        utext = self.text()
+        utext = self.label.text()
         if utext == _unspecstr:
             return None
         else:
@@ -279,11 +336,9 @@ def genDefaultCombo(opts, defaults=[]):
     opts['nohist'] = True
     return SettingsCombo(**opts)
 
-def genBoolCombo(opts):
+def genBoolRBGroup(opts):
     'true, false, unspecified'
-    opts['defaults'] = ['True', 'False']
-    opts['nohist'] = True
-    return SettingsCombo(**opts)
+    return BoolRBGroup(**opts)
 
 def genDeferredCombo(opts, func):
     'Values retrieved from a function at popup time'
@@ -387,19 +442,23 @@ INFO = (
         _('Specify the number of spaces that tabs expand to in various '
           'TortoiseHg windows. '
           'Default: 0, Not expanded')),
-    _fi(_('Force Repo Tab'), 'tortoisehg.forcerepotab', genBoolCombo,
+    _fi(_('Force Repo Tab'), 'tortoisehg.forcerepotab', genBoolRBGroup,
         _('Always show repo tabs, even for a single repo. Default: False')),
+    _fi(_('Monitor Repo Changes'), 'tortoisehg.monitorrepo',
+        (genDefaultCombo, ['always', 'localonly']),
+        _('Specify the target filesystem where TortoiseHg monitors changes. '
+          'Default: always')),
     _fi(_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,
         _('The maximum size file (in KB) that TortoiseHg will '
           'show changes for in the changelog, status, and commit windows. '
           'A value of zero implies no limit.  Default: 1024 (1MB)')),
-    _fi(_('Fork GUI'), 'tortoisehg.guifork', genBoolCombo,
+    _fi(_('Fork GUI'), 'tortoisehg.guifork', genBoolRBGroup,
         _('When running from the command line, fork a background '
           'process to run graphical dialogs.  Default: True')),
-    _fi(_('Full Path Title'), 'tortoisehg.fullpath', genBoolCombo,
+    _fi(_('Full Path Title'), 'tortoisehg.fullpath', genBoolRBGroup,
         _('Show a full directory path of the repository in the dialog title '
           'instead of just the root directory name.  Default: False')),
-    _fi(_('Auto-resolve merges'), 'tortoisehg.autoresolve', genBoolCombo,
+    _fi(_('Auto-resolve merges'), 'tortoisehg.autoresolve', genBoolRBGroup,
         _('Indicates whether TortoiseHg should attempt to automatically '
           'resolve changes from both sides to the same file, and only report '
           'merge conflicts when this is not possible. When False, all files '
@@ -421,7 +480,7 @@ INFO = (
         'repository.  You can select the "current" (i.e. the working directory '
         'parent), the current "tip" or the working directory ("workingdir"). '
         'Default: current')),
-    _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolCombo,
+    _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolRBGroup,
         _('Color changesets by author name.  If not enabled, '
           'the changes are colored green for merge, red for '
           'non-trivial parents, black for normal. '
@@ -431,7 +490,7 @@ INFO = (
         _('Show tabs along the side of the bottom half of each repo '
           'widget allowing one to switch task tabs without using the toolbar. '
           'Default: off')),
-    _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolCombo,
+    _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
           'until they reach 80 characters. '
           'Default: False')),
@@ -470,7 +529,7 @@ INFO = (
        _('Suggested length of commit message lines. A red vertical '
          'line will mark this length.  CTRL-E will reflow the current '
          'paragraph to the specified line length. Default: 80')),
-    _fi(_('Close After Commit'), 'tortoisehg.closeci', genBoolCombo,
+    _fi(_('Close After Commit'), 'tortoisehg.closeci', genBoolRBGroup,
         _('Close the commit tool after every successful '
           'commit.  Default: False')),
     _fi(_('Push After Commit'), 'tortoisehg.cipushafter', (genEditCombo,
@@ -485,7 +544,7 @@ INFO = (
        _('Comma separated list of files that are automatically unchecked '
          'when the status, and commit dialogs are opened. '
          'Default: None (leave blank)')),
-    _fi(_('English Messages'), 'tortoisehg.engmsg', genBoolCombo,
+    _fi(_('English Messages'), 'tortoisehg.engmsg', genBoolRBGroup,
        _('Generate English commit messages even if LANGUAGE or LANG '
          'environment variables are set to a non-English language. '
          'This setting is used by the Merge, Tag and Backout dialogs. '
@@ -510,7 +569,7 @@ INFO = (
         _('Comma separated list of archive formats allowed for '
           'downloading')),
     _fi(_('Port'), 'web.port', genIntEditCombo, _('Port to listen on')),
-    _fi(_('Push Requires SSL'), 'web.push_ssl', genBoolCombo,
+    _fi(_('Push Requires SSL'), 'web.push_ssl', genBoolRBGroup,
         _('Whether to require that inbound pushes be transported '
           'over SSL to prevent password sniffing.')),
     _fi(_('Stripes'), 'web.stripes', genIntEditCombo,
@@ -576,7 +635,7 @@ INFO = (
     _fi(_('SMTP Port'), 'smtp.port', genIntEditCombo,
         _('Port to connect to on mail server. '
           'Default: 25')),
-    _fi(_('SMTP TLS'), 'smtp.tls', genBoolCombo,
+    _fi(_('SMTP TLS'), 'smtp.tls', genBoolRBGroup,
         _('Connect to mail server using TLS. '
           'Default: False')),
     _fi(_('SMTP Username'), 'smtp.username', genEditCombo,
@@ -596,7 +655,7 @@ INFO = (
           'crlf.  Strict does no normalization.  Auto does per-file '
           'detection, and is the recommended setting. '
           'Default: strict')),
-    _fi(_('Git Format'), 'diff.git', genBoolCombo,
+    _fi(_('Git Format'), 'diff.git', genBoolRBGroup,
         _('Use git extended diff header format. '
           'Default: False')),
     _fi(_('MQ Git Format'), 'mq.git', (genDefaultCombo,
@@ -605,19 +664,19 @@ INFO = (
        " preserving existing git patches upon qrefresh. If set to 'yes' or"
        " 'no', mq will override the [diff] section and always generate git or"
        " regular patches, possibly losing data in the second case.")),
-    _fi(_('No Dates'), 'diff.nodates', genBoolCombo,
+    _fi(_('No Dates'), 'diff.nodates', genBoolRBGroup,
         _('Do not include modification dates in diff headers. '
           'Default: False')),
-    _fi(_('Show Function'), 'diff.showfunc', genBoolCombo,
+    _fi(_('Show Function'), 'diff.showfunc', genBoolRBGroup,
         _('Show which function each change is in. '
           'Default: False')),
-    _fi(_('Ignore White Space'), 'diff.ignorews', genBoolCombo,
+    _fi(_('Ignore White Space'), 'diff.ignorews', genBoolRBGroup,
         _('Ignore white space when comparing lines. '
           'Default: False')),
-    _fi(_('Ignore WS Amount'), 'diff.ignorewsamount', genBoolCombo,
+    _fi(_('Ignore WS Amount'), 'diff.ignorewsamount', genBoolRBGroup,
         _('Ignore changes in the amount of white space. '
           'Default: False')),
-    _fi(_('Ignore Blank Lines'), 'diff.ignoreblanklines', genBoolCombo,
+    _fi(_('Ignore Blank Lines'), 'diff.ignoreblanklines', genBoolRBGroup,
         _('Ignore changes whose lines are all blank. '
           'Default: False')),
     )),
@@ -973,6 +1032,7 @@ class SettingsForm(QWidget):
         widgets = []
         frame = QFrame()
         form = QFormLayout()
+        form.setContentsMargins(5, 5, 0, 5)
         frame.setLayout(form)
         self.stack.addWidget(frame)
 
@@ -1007,6 +1067,7 @@ class SettingsForm(QWidget):
         widgets = []
         frame = QFrame()
         grid = QGridLayout()
+        grid.setContentsMargins(5, 5, 0, 5)
         frame.setLayout(grid)
         self.stack.addWidget(frame)
         allexts = hglib.allextensions()
@@ -1029,6 +1090,12 @@ class SettingsForm(QWidget):
     def eventFilter(self, obj, event):
         if event.type() in (QEvent.Enter, QEvent.FocusIn):
             self.desctext.setHtml(obj.toolTip())
+        elif event.type() in (QEvent.Leave, QEvent.FocusOut):
+            focus = QApplication.focusWidget()
+            if focus is not None and hasattr(focus, 'toolTip'):
+                self.desctext.setHtml(focus.toolTip())
+            else:
+                self.desctext.setHtml('')
         if event.type() == QEvent.ToolTip:
             return True  # tooltip is shown in self.desctext
         return False

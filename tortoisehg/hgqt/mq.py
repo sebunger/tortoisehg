@@ -65,10 +65,8 @@ def mqNewRefreshCommand(repo, isnew, stwidget, pnwidget, message, opts, olist):
     if message:
         cmdline += ['--message=' + hglib.fromunicode(message)]
     cmdline += getUserOptions(opts, *olist)
-    files = ['--'] + [repo.wjoin(hglib.fromunicode(x))
-                      for x in stwidget.getChecked()]
-    addrem = [repo.wjoin(hglib.fromunicode(x))
-              for x in stwidget.getChecked('!?')]
+    files = ['--'] + [repo.wjoin(x) for x in stwidget.getChecked()]
+    addrem = [repo.wjoin(x) for x in stwidget.getChecked('!?')]
     if len(files) > 1:
         cmdline += files
     else:
@@ -334,7 +332,7 @@ class MQPatchesWidget(QDockWidget):
             cont = True
             for p in self.repo.mq.fullseries:
                 if '#' in p:
-                    cont = QuestionMsgBox('Confirm qreorder',
+                    cont = qtlib.QuestionMsgBox('Confirm qreorder',
                             _('<p>ATTENTION!<br>'
                               'Guard or comment found.<br>'
                               'Reordering patches will destroy them.<br>'
@@ -783,7 +781,7 @@ class MQWidget(QWidget, qtlib.TaskWidget):
             cont = True
             for p in self.repo.mq.fullseries:
                 if '#' in p:
-                    cont = QuestionMsgBox('Confirm qreorder',
+                    cont = qtlib.QuestionMsgBox('Confirm qreorder',
                             _('<p>ATTENTION!<br>'
                               'Guard or comment found.<br>'
                               'Reordering patches will destroy them.<br>'

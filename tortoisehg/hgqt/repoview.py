@@ -268,8 +268,8 @@ class HgRepoView(QTableView):
         """
         Select revision 'rev' (can be anything understood by repo.changectx())
         """
-        if type(rev) is QString:
-            rev = str(rev)
+        if isinstance(rev, (unicode, QString)):
+            rev = hglib.fromunicode(rev)
         try:
             rev = self.repo.changectx(rev).rev()
         except error.RepoError:
@@ -279,7 +279,10 @@ class HgRepoView(QTableView):
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
-                self.setCurrentIndex(idx)
+                # avoid unwanted selection change (#1019)
+                if self.currentIndex().row() != idx.row():
+                    self.setCurrentIndex(idx)
+                self.scrollTo(idx)
 
     def saveSettings(self, s = None):
         if not s:

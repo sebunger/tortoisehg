@@ -86,7 +86,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
             for m in regexp.finditer(editor):
                 expanded.append(editor[pos:m.start()-1])
                 phrase = editor[m.start()+1:m.end()-1]
-                pos=m.end()+1
+                pos = m.end()+1
                 if '$LINENUM' in phrase:
                     if lineno is None:
                         # throw away phrase
@@ -135,7 +135,11 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
 
 _user_shell = None
 def openshell(root, reponame):
-    global _user_shell
+    if not os.path.exists(root):
+        WarningMsgBox(
+            _('Failed to open path in terminal'),
+            _('"%s" is not a valid directory') % hglib.tounicode(root))
+        return
     if _user_shell:
         cwd = os.getcwd()
         try:
@@ -187,7 +191,9 @@ _thgstyles = {
    'control': 'black bold #dddddd_background',
 }
 
-thgstylesheet = '* { white-space: pre; font-family: monospace; font-size: 9pt; }'
+thgstylesheet = '* { white-space: pre; font-family: monospace;' \
+                ' font-size: 9pt; }'
+tbstylesheet = 'QToolBar { border: 0px }'
 
 def configstyles(ui):
     configureshell(ui)
@@ -324,7 +330,8 @@ def descriptionhtmlizer(ui):
     u'<a href="http://example/">http://example/</a>'
     """
     csmatch = r'(\b[0-9a-f]{12}(?:[0-9a-f]{28})?\b)'
-    httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_()|]))'
+    httpmatch = r'(\b(http|https)://([-A-Za-z0-9+&@#/%?=~_()|!:,.;]*' \
+                r'[-A-Za-z0-9+&@#/%=~_()|]))'
     regexp = r'%s|%s' % (csmatch, httpmatch)
     bodyre = re.compile(regexp)
 
@@ -472,6 +479,8 @@ _fontdefaults = {
     'fontlog': 'monospace,10',
     'fontoutputlog': 'sans,8'
 }
+if sys.platform == 'darwin':
+    _fontdefaults['fontoutputlog'] = 'sans,10'
 _fontcache = {}
 
 def initfontcache(ui):
@@ -536,12 +545,12 @@ class CustomPrompt(QMessageBox):
             try:
                 char = s[s.index('&')+1].lower()
                 self.hotkeys[char] = btn
-                if default == i:
-                    self.setDefaultButton(btn)
-                if esc == i:
-                    self.setEscapeButton(btn)
             except (ValueError, IndexError):
                 pass
+            if default == i:
+                self.setDefaultButton(btn)
+            if esc == i:
+                self.setEscapeButton(btn)
 
     def run(self):
         return self.exec_()
@@ -771,8 +780,8 @@ class InfoBar(QFrame):
         self._closebutton.clicked.connect(self.close)
         self.layout().addWidget(self._closebutton)
 
-    def addWidget(self, w):
-        self.layout().insertWidget(self.layout().count() - 2, w)
+    def addWidget(self, w, stretch=0):
+        self.layout().insertWidget(self.layout().count() - 2, w, stretch)
 
     def addRightWidget(self, w):
         self.layout().insertWidget(self.layout().count() - 1, w)
@@ -786,9 +795,9 @@ class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(message, self,
+        self._msglabel = QLabel(message, self, wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse)
-        self.addWidget(self._msglabel)
+        self.addWidget(self._msglabel, stretch=1)
 
 class CommandErrorInfoBar(InfoBar):
     """Show command execution failure (with link to open log window)"""
@@ -797,9 +806,9 @@ class CommandErrorInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(CommandErrorInfoBar, self).__init__(parent)
 
-        self._msglabel = QLabel(message, self,
+        self._msglabel = QLabel(message, self, wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse)
-        self.addWidget(self._msglabel)
+        self.addWidget(self._msglabel, stretch=1)
 
         self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
         self._loglabel.linkActivated.connect(self.linkActivated)
@@ -814,6 +823,8 @@ class ConfirmInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(ConfirmInfoBar, self).__init__(parent)
 
+        # no wordWrap=True and stretch=1, which inserts unwanted space
+        # between _msglabel and _buttons.
         self._msglabel = QLabel(message, self,
                                 textInteractionFlags=Qt.TextSelectableByMouse)
         self.addWidget(self._msglabel)
@@ -896,6 +907,9 @@ class TaskWidget(object):
         """Return True if the widget allows to switch away from it"""
         return True
 
+    def canExit(self):
+        return True
+
 class DemandWidget(QWidget):
     'Create a widget the first time it is shown'
 
@@ -918,8 +932,8 @@ class DemandWidget(QWidget):
 
     def forward(self, funcname, *args, **opts):
         if self._widget:
-            return getattr(self._widget, funcname)(*args)
-        return opts.get('default')
+            return getattr(self._widget, funcname)(*args, **opts)
+        return None
 
     def get(self):
         """Returns the stored widget"""
@@ -935,8 +949,24 @@ class DemandWidget(QWidget):
             return True
         return self._widget.canswitch()
 
+    def canExit(self):
+        if self._widget is None:
+            return True
+        return self._widget.canExit()
+
     def __getattr__(self, name):
         return getattr(self._widget, name)
+
+class Spacer(QWidget):
+    """Spacer to separate controls in a toolbar"""
+
+    def __init__(self, width, height, parent=None):
+        QWidget.__init__(self, parent)
+        self.width = width
+        self.height = height
+
+    def sizeHint(self):
+        return QSize(self.width, self.height)
 
 def getCurrentUsername(widget, repo, opts=None):
     if opts:

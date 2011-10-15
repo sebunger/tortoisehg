@@ -10,16 +10,16 @@
 
 import os
 
-from mercurial import util
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+from mercurial import error
 
 from tortoisehg.util import paths, hglib
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, fileview, status, thgrepo
-from tortoisehg.hgqt import visdiff, revert, revpanel
+from tortoisehg.hgqt import qtlib, fileview, status, thgrepo
+from tortoisehg.hgqt import visdiff, revert, revpanel, workbench
 from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
 from tortoisehg.hgqt.manifestmodel import ManifestModel
 
@@ -41,6 +41,7 @@ class ManifestDialog(QMainWindow):
         self._manifest_widget.revChanged.connect(self._updatewindowtitle)
         self._manifest_widget.pathChanged.connect(self._updatewindowtitle)
         self._manifest_widget.grepRequested.connect(self._openSearchWidget)
+        self._manifest_widget.setContentsMargins(10, 10, 10, 10)
         self.setCentralWidget(self._manifest_widget)
         self.addToolBar(self._manifest_widget.toolbar)
 
@@ -77,6 +78,10 @@ class ManifestDialog(QMainWindow):
     def setSearchPattern(self, text):
         """Set search pattern [unicode]"""
         self._manifest_widget._fileview.searchbar.setPattern(text)
+
+    def setSearchCaseInsensitive(self, ignorecase):
+        """Set if search is case insensitive"""
+        self._manifest_widget._fileview.searchbar.setCaseInsensitive(ignorecase)
 
     @pyqtSlot(unicode, dict)
     def _openSearchWidget(self, pattern, opts):
@@ -139,6 +144,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         navlayout.setContentsMargins(0, 0, 0, 0)
         self._toolbar = QToolBar()
         self._toolbar.setIconSize(QSize(16,16))
+        self._toolbar.setStyleSheet(qtlib.tbstylesheet)
         self._treeview = QTreeView(self, headerHidden=True, dragEnabled=True)
         self._treeview.setContextMenuPolicy(Qt.CustomContextMenu)
         self._treeview.customContextMenuRequested.connect(self.menuRequest)
@@ -212,7 +218,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
               _('Open the selected subrepository in a file browser'),
               self.explore),
             ('terminal', _('Open terminal in subrepository'),
-              'utilities-terminal', 'Alt+Ctrl+T', 
+              'utilities-terminal', 'Alt+Ctrl+T',
               _('Open a shell terminal in the selected subrepository root'),
               self.terminal),
             ]:
@@ -237,7 +243,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def vdiff(self):
         if self.path is None:
             return
-        pats = [self.path]
+        pats = [hglib.fromunicode(self.path)]
         opts = {'change':self.rev}
         dlg = visdiff.visualdiff(self._repo.ui, self._repo, pats, opts)
         if dlg:
@@ -246,7 +252,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def vdifflocal(self):
         if self.path is None:
             return
-        pats = [self.path]
+        pats = [hglib.fromunicode(self.path)]
         assert type(self.rev) is int
         opts = {'rev':['rev(%d)' % self.rev]}
         dlg = visdiff.visualdiff(self._repo.ui, self._repo, pats, opts)
@@ -257,32 +263,39 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if self.path is None:
             return
         if self.rev is None:
-            qtlib.editfiles(self._repo, [self.path], parent=self)
+            qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
+                            parent=self)
         else:
-            base, _ = visdiff.snapshot(self._repo, [self.path],
+            base, _ = visdiff.snapshot(self._repo,
+                                       [hglib.fromunicode(self.path)],
                                        self._repo[self.rev])
-            files = [os.path.join(base, self.path)]
+            files = [os.path.join(base, hglib.fromunicode(self.path))]
             qtlib.editfiles(self._repo, files, parent=self)
 
     def editlocal(self):
         if self.path is None:
             return
-        qtlib.editfiles(self._repo, [self.path], parent=self)
+        qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
+                        parent=self)
 
     def revertfile(self):
         if self.path is None:
             return
-        if self.rev is None:
+        rev = self.rev
+        if rev is None:
             rev = self._repo['.'].rev()
-        dlg = revert.RevertDialog(self._repo, [self.path], self.rev, self)
+        dlg = revert.RevertDialog(self._repo, [hglib.fromunicode(self.path)],
+                                  rev, self)
         dlg.exec_()
 
     def _navigate(self, filename, dlgclass, dlgdict):
         if not filename:
-            filename = self.path
+            filename = hglib.fromunicode(self.path)
         if filename not in dlgdict:
-            dlg = dlgclass(self._repo, filename,
-                            repoviewer=self.window())
+            repoviewer = self.window()
+            if not isinstance(repoviewer, workbench.Workbench):
+                repoviewer = None
+            dlg = dlgclass(self._repo, filename, repoviewer)
             dlgdict[filename] = dlg
             ufname = hglib.tounicode(filename)
             dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
@@ -293,7 +306,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         dlg.activateWindow()
 
     def opensubrepo(self):
-        path = self._repo.wjoin(self.path)
+        path = self._repo.wjoin(hglib.fromunicode(self.path))
         if os.path.isdir(path):
             self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
         else:
@@ -302,14 +315,14 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
                 _("The selected subrepository does not exist on the working directory"))
 
     def explore(self):
-        root = self._repo.wjoin(self.path)
+        root = self._repo.wjoin(hglib.fromunicode(self.path))
         if os.path.isdir(root):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(root))
+            QDesktopServices.openUrl(QUrl.fromLocalFile(hglib.tounicode(root)))
 
     def terminal(self):
-        root = self._repo.wjoin(self.path)
+        root = self._repo.wjoin(hglib.fromunicode(self.path))
         if os.path.isdir(root):
-            qtlib.openshell(root, self.path)
+            qtlib.openshell(root, hglib.fromunicode(self.path))
 
     def showEvent(self, event):
         QWidget.showEvent(self, event)
@@ -436,7 +449,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         self.revChanged.emit(rev)
         self._setupmodel()
         ctx = self._repo[rev]
-        if path and path in ctx:
+        if path and hglib.fromunicode(path) in ctx:
             # recover file selection after reloading the model
             self.setPath(path)
             self._fileview.setContext(ctx)
@@ -459,7 +472,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if path != self.path:
             self.setPath(path)
             ctx = self._repo[rev]
-            if self.path in ctx:
+            if hglib.fromunicode(self.path) in ctx:
                 self._fileview.displayFile(path, self.status)
                 if line:
                     self._fileview.showLine(int(line) - 1)
@@ -468,7 +481,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
 
     @property
     def path(self):
-        """Return currently selected path"""
+        """Return currently selected path [unicode]"""
         return self._treemodel.filePath(self._treeview.currentIndex())
 
     @property
@@ -480,7 +493,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def setPath(self, path):
         """Change path to show"""
         self._treeview.setCurrentIndex(self._treemodel.indexFromPath(path))
-    
+
     def displayFile(self):
         ctx, path = self._treemodel.fileSubrepoCtxFromPath(self.path)
         if ctx is None:
@@ -490,7 +503,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             ctx._repo.maxdiff = self._repo.maxdiff
         self._fileview.setContext(ctx)
         self._fileview.displayFile(path, self.status)
-    
+
     @pyqtSlot()
     def _updatecontent(self):
         self.displayFile()
@@ -515,7 +528,14 @@ def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
 
 def run(ui, *pats, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
-    dlg = ManifestDialog(repo, opts.get('rev'))
+    try:
+        # ManifestWidget expects integer revision
+        rev = repo[opts.get('rev')].rev()
+    except error.RepoLookupError, e:
+        qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
+                          hglib.tounicode(e.message))
+        return
+    dlg = ManifestDialog(repo, rev)
 
     # set initial state after dialog visible
     def init():
@@ -527,11 +547,13 @@ def run(ui, *pats, **opts):
             else:
                 return
             line = opts.get('line') and int(opts['line']) or None
-            dlg.setSource(path, opts.get('rev'), line)
+            dlg.setSource(path, rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])
             if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():
                 dlg._manifest_widget._fileview.actionAnnMode.trigger()
+            if 'ignorecase' in opts:
+                dlg.setSearchCaseInsensitive(opts['ignorecase'])
         except IndexError:
             pass
         dlg.setSearchPattern(hglib.tounicode(opts.get('pattern')) or '')
