@@ -44,7 +44,6 @@ class HgFileView(QFrame):
         QFrame.__init__(self, parent)
         framelayout = QVBoxLayout(self)
         framelayout.setContentsMargins(0,0,0,0)
-        framelayout.setSpacing(0)
 
         l = QHBoxLayout()
         l.setContentsMargins(0,0,0,0)
@@ -62,6 +61,7 @@ class HgFileView(QFrame):
 
         self.diffToolbar = QToolBar(_('Diff Toolbar'))
         self.diffToolbar.setIconSize(QSize(16,16))
+        self.diffToolbar.setStyleSheet(qtlib.tbstylesheet)
         hbox.addWidget(self.diffToolbar)
 
         self.filenamelabel = w = QLabel()
@@ -98,7 +98,6 @@ class HgFileView(QFrame):
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
 
-        self.sci.setFrameStyle(0)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
@@ -514,6 +513,9 @@ class HgFileView(QFrame):
                 self._opcodes = diff.get_opcodes()
                 self._fd = None
                 self._diffs = []
+            elif isinstance(self._opcodes, bool):
+                # catch self._mode changes while this thread is active
+                self._opcodes = []
 
             for tag, alo, ahi, blo, bhi in self._opcodes[:30]:
                 if tag == 'replace':

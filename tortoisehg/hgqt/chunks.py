@@ -382,12 +382,19 @@ class ChunksWidget(QWidget):
                 del fp
             ctx.invalidate()
         else:
-            repo.thgbackup(repo.wjoin(wfile))
+            fullpath = repo.wjoin(wfile)
+            repo.thgbackup(fullpath)
             wasadded = wfile in repo[None].added()
-            commands.revert(repo.ui, repo, repo.wjoin(wfile), rev='.',
-                            no_backup=True)
-            if wasadded:
-                os.unlink(repo.wjoin(wfile))
+            try:
+                commands.revert(repo.ui, repo, fullpath, rev='.',
+                                no_backup=True)
+                if wasadded and os.path.exists(fullpath):
+                    os.unlink(fullpath)
+            except EnvironmentError:
+                qtlib.InfoMsgBox(_("Unable to remove"),
+                                 _("Unable to remove file %s,\n"
+                                   "permission denied") %
+                                    hglib.tounicode(wfile))
         self.fileModified.emit()
 
     def getChunksForFile(self, wfile):
@@ -516,12 +523,16 @@ class DiffBrowser(QFrame):
         w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
         w.linkActivated.connect(self.linkActivated)
 
+        guifont = qtlib.getfont('fontlist').font()
         self.sumlabel = QLabel()
+        self.sumlabel.setFont(guifont)
         self.allbutton = QToolButton()
+        self.allbutton.setFont(guifont)
         self.allbutton.setText(_('All', 'files'))
         self.allbutton.setShortcut(QKeySequence.SelectAll)
         self.allbutton.clicked.connect(self.selectAll)
         self.nonebutton = QToolButton()
+        self.nonebutton.setFont(guifont)
         self.nonebutton.setText(_('None', 'files'))
         self.nonebutton.setShortcut(QKeySequence.New)
         self.nonebutton.clicked.connect(self.selectNone)
@@ -534,10 +545,10 @@ class DiffBrowser(QFrame):
         w.setWordWrap(True)
         w.linkActivated.connect(self.linkActivated)
         self.layout().addWidget(w)
+        self.layout().addSpacing(2)
         w.hide()
 
         self.sci = qscilib.Scintilla(self)
-        self.sci.setFrameStyle(0)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))

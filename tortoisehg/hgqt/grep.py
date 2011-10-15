@@ -34,7 +34,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
 
         mainvbox = QVBoxLayout()
         mainvbox.setSpacing(6)
-        self.setLayout(mainvbox)
 
         hbox = QHBoxLayout()
         hbox.setMargin(2)
@@ -173,15 +172,21 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.searchhistory = [s for s in sh if s]
         self.setCompleters()
 
-        mainvbox.setContentsMargins(2, 2, 2, 2)
         if parent:
             self.closeonesc = False
+            mainvbox.setContentsMargins(0, 0, 0, 0)
+            self.setLayout(mainvbox)
         else:
             self.setWindowTitle(_('TortoiseHg Search'))
             self.resize(800, 550)
             self.closeonesc = True
             self.stbar = cmdui.ThgStatusBar()
-            mainvbox.addWidget(self.stbar)
+            mainvbox.setContentsMargins(5, 5, 5, 5)
+            outervbox = QVBoxLayout()
+            outervbox.addLayout(mainvbox)
+            outervbox.addWidget(self.stbar)
+            outervbox.setContentsMargins(0, 0, 0, 0)
+            self.setLayout(outervbox)
             self.showMessage.connect(self.stbar.showMessage)
             self.progress.connect(self.stbar.progress)
 
@@ -288,6 +293,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
 
         self.tv.setSortingEnabled(False)
         self.tv.pattern = pattern
+        self.tv.icase = icase
         self.regexple.selectAll()
         inc = hglib.fromunicode(self.incle.text())
         if inc: inc = inc.split(', ')
@@ -395,19 +401,18 @@ class HistorySearchThread(QThread):
             fullmsg = ''
             def write(self, msg, *args, **opts):
                 self.fullmsg += msg
-                if self.fullmsg.endswith('\0'):
+                if self.fullmsg.count('\0') >= 6:
                     try:
-                        fname, line, rev, addremove, user, text = \
-                                self.fullmsg.split('\0', 5)
+                        fname, line, rev, addremove, user, text, tail = \
+                                self.fullmsg.split('\0', 6)
                         text = hglib.tounicode(text)
                         text = Qt.escape(text)
-                        text = '<b>%s</b> <span>%s</span>' % (
-                                addremove, text[:-1])
+                        text = '<b>%s</b> <span>%s</span>' % (addremove, text)
                         row = [fname, rev, line, user, text]
                         emitrow(row)
                     except ValueError:
                         pass
-                    self.fullmsg = ''
+                    self.fullmsg = tail
             def progress(topic, pos, item='', unit='', total=None):
                 emitprog(topic, pos, item, unit, total)
         cwd = os.getcwd()
@@ -493,7 +498,8 @@ class CtxSearchThread(QThread):
                 if pos:
                     self.hu.write(line[pos:], label='ui.status')
                     path = os.path.join(prefix, wfile)
-                    row = [path, i + 1, ctx.rev(), None, self.hu.getdata()[0]]
+                    row = [path, i + 1, ctx.rev(), None,
+                           hglib.tounicode(self.hu.getdata()[0])]
                     w = DataWrapper(row)
                     self.matchedRow.emit(w)
                     if self.once:
@@ -525,6 +531,7 @@ class MatchTree(QTableView):
 
         self.repo = repo
         self.pattern = None
+        self.icase = False
         self.embedded = parent.parent() is not None
         self.selectedRows = ()
 
@@ -627,7 +634,7 @@ class MatchTree(QTableView):
     def onAnnotateFile(self):
         from tortoisehg.hgqt.manifestdialog import run
         from tortoisehg.hgqt.run import qtrun
-        repo, ui, pattern = self.repo, self.repo.ui, self.pattern
+        repo, ui, pattern, icase = self.repo, self.repo.ui, self.pattern, self.icase
         seen = set()
         for rev, path, line in self.selectedRows:
             # Only open one annotate instance per file
@@ -644,7 +651,7 @@ class MatchTree(QTableView):
                         rev = repo['.'].rev()
                     srepo = thgrepo.repository(None, root)
                     opts = {'repo': srepo, 'canonpath' : path, 'rev' : rev,
-                            'line': line, 'pattern': pattern}
+                            'line': line, 'pattern': pattern, 'ignorecase': icase}
                     qtrun(run, ui, **opts)
                 else:
                     continue
@@ -652,7 +659,7 @@ class MatchTree(QTableView):
                 if rev is None:
                     rev = repo['.'].rev()
                 opts = {'repo': repo, 'canonpath' : path, 'rev' : rev,
-                        'line': line, 'pattern': pattern}
+                        'line': line, 'pattern': pattern, 'ignorecase': icase}
                 qtrun(run, ui, **opts)
 
     def onViewChangeset(self):
@@ -727,9 +734,8 @@ class MatchModel(QAbstractTableModel):
 
     def sort(self, col, order):
         self.layoutAboutToBeChanged.emit()
-        self.rows.sort(lambda x, y: cmp(x[col], y[col]))
-        if order == Qt.DescendingOrder:
-            self.rows.reverse()
+        self.rows.sort(key=lambda x: x[col],
+                       reverse=(order == Qt.DescendingOrder))
         self.layoutChanged.emit()
 
     ## Custom methods

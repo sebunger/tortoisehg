@@ -20,7 +20,7 @@ from mercurial import merge, subrepo
 from mercurial import ui as uimod
 from mercurial.util import propertycache
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, paths
 from tortoisehg.util.patchctx import patchctx
 
 _repocache = {}
@@ -78,11 +78,15 @@ class ThgRepoWrapper(QObject):
         repo.workingDirectoryChanged = self.workingDirectoryChanged
         repo.workingBranchChanged = self.workingBranchChanged
         self.recordState()
+
+        monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'always')
         if isinstance(repo, bundlerepo.bundlerepository):
             dbgoutput('not watching F/S events for bundle repository')
+        elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
+            dbgoutput('not watching F/S events for network drive')
         else:
             self.watcher = QFileSystemWatcher(self)
-            self.watcher.addPath(repo.path)
+            self.watcher.addPath(hglib.tounicode(repo.path))
             self.watcher.directoryChanged.connect(self.onDirChange)
             self.watcher.fileChanged.connect(self.onFileChange)
             self.addMissingPaths()
@@ -106,12 +110,11 @@ class ThgRepoWrapper(QObject):
         for f in existing:
             if hglib.tounicode(f) not in files:
                 dbgoutput('add file to watcher:', f)
-                self.watcher.addPath(f)
-        _, files = self.repo.uifiles()
-        for f in files:
+                self.watcher.addPath(hglib.tounicode(f))
+        for f in self.repo.uifiles()[1]:
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
                 dbgoutput('add ui file to watcher:', f)
-                self.watcher.addPath(f)
+                self.watcher.addPath(hglib.tounicode(f))
 
     def pollStatus(self):
         if not os.path.exists(self.repo.path):

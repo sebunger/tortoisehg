@@ -51,6 +51,7 @@ def parseurl(path):
     return user, host, port, folder, passwd, scheme
 
 class SyncWidget(QWidget, qtlib.TaskWidget):
+    syncStarted = pyqtSignal()  # incoming/outgoing/pull/push started
     outgoingNodes = pyqtSignal(object)
     incomingBundle = pyqtSignal(QString)
     showMessage = pyqtSignal(unicode)
@@ -60,6 +61,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    beginSuppressPrompt = pyqtSignal()
+    endSuppressPrompt = pyqtSignal()
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
@@ -79,6 +82,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.repo = repo
         self.finishfunc = None
         self.curuser = None
+        self.default_user = None
+        self.lastsshuser = None
         self.curpw = None
         self.updateInProgress = False
         self.opts = {}
@@ -96,6 +101,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.resize(850, 550)
 
         tb = QToolBar(self)
+        tb.setStyleSheet(qtlib.tbstylesheet)
         self.layout().addWidget(tb)
         self.opbuttons = []
 
@@ -148,6 +154,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         tb.addWidget(self.optionsbutton)
 
         self.targetcombo = QComboBox()
+        self.targetcombo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.targetcombo.setSizeAdjustPolicy(QComboBox.AdjustToMinimumContentsLength)
         self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
         self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
@@ -156,9 +164,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             tb.addWidget(self.targetcheckbox)
             tb.addWidget(self.targetcombo)
 
+        bottomlayout = QVBoxLayout()
+        if not parent:
+            bottomlayout.setContentsMargins(5, 5, 5, 5)
+        else:
+            bottomlayout.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(bottomlayout)
+
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
         self.optionshdrlabel = lbl = QLabel(_('<b>Selected Options:</b>'))
         hbox.addWidget(lbl)
         self.optionslabel = QLabel()
@@ -168,7 +183,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
         hbox.addWidget(QLabel(_('<b>Remote Repository:</b>')))
         self.urllabel = QLabel()
         self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
@@ -178,20 +193,25 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
-        layout.addLayout(hbox)
+        bottomlayout.addLayout(hbox)
 
         self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
+        tbar.setStyleSheet(qtlib.tbstylesheet)
         tbar.setIconSize(QSize(16, 16))
         hbox.addWidget(tbar)
         self.schemecombo = QComboBox()
         for s in self._schemes:
             self.schemecombo.addItem(s)
-        self.schemecombo.currentIndexChanged.connect(self.refreshUrl)
+        self.schemecombo.currentIndexChanged.connect(self.schemeChange)
         tbar.addWidget(self.schemecombo)
+        tbar.addWidget(qtlib.Spacer(2, 2))
 
         a = tbar.addAction(qtlib.geticon('thg-password'), _('Security'))
         a.setToolTip(_('Manage HTTPS connection security and user authentication'))
         self.securebutton = a
+        tbar.addWidget(qtlib.Spacer(2, 2))
+
+        self.hostAndPortActions = []
 
         fontm = QFontMetrics(self.font())
         self.hostentry = QLineEdit()
@@ -199,27 +219,29 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.hostentry.setAcceptDrops(False)
         self.hostentry.setFixedWidth(30 * fontm.width('9'))
         self.hostentry.textChanged.connect(self.refreshUrl)
-        tbar.addWidget(self.hostentry)
+        self.hostAndPortActions.append(tbar.addWidget(self.hostentry))
+        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
 
-        self.HostAndPortWidgets = [self.hostentry]
         w = QLabel(':')
-        tbar.addWidget(w)
-        self.HostAndPortWidgets.append(w)
+        self.hostAndPortActions.append(tbar.addWidget(w))
+        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
         self.portentry = QLineEdit()
         self.portentry.setAcceptDrops(False)
         self.portentry.setToolTip(_('Port'))
         self.portentry.setFixedWidth(8 * fontm.width('9'))
+        self.portentry.setValidator(QIntValidator(0, 65536, self.portentry))
         self.portentry.textChanged.connect(self.refreshUrl)
-        tbar.addWidget(self.portentry)
-        self.HostAndPortWidgets.append(self.portentry)
+        self.hostAndPortActions.append(tbar.addWidget(self.portentry))
+        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
         w = QLabel('/')
-        tbar.addWidget(w)
-        self.HostAndPortWidgets.append(w)
+        self.hostAndPortActions.append(tbar.addWidget(w))
+        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
         self.pathentry = QLineEdit()
         self.pathentry.setAcceptDrops(False)
         self.pathentry.setToolTip(_('Path'))
         self.pathentry.textChanged.connect(self.refreshUrl)
         tbar.addWidget(self.pathentry)
+        tbar.addWidget(qtlib.Spacer(2, 2))
 
         style = QApplication.style()
         a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
@@ -258,7 +280,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         pathsbox.addWidget(self.reltv)
         hbox.addWidget(pathsframe)
 
-        self.layout().addLayout(hbox, 1)
+        bottomlayout.addLayout(hbox, 1)
 
         self.savebutton.triggered.connect(self.saveclicked)
         self.securebutton.triggered.connect(self.secureclicked)
@@ -266,13 +288,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.optionsbutton.pressed.connect(self.editOptions)
 
         cmd = cmdui.Widget(not self.embedded, True, self)
+        cmd.commandStarted.connect(self.beginSuppressPrompt)
         cmd.commandStarted.connect(self.commandStarted)
+        cmd.commandFinished.connect(self.endSuppressPrompt)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.makeLogVisible.connect(self.makeLogVisible)
         cmd.output.connect(self.output)
+        cmd.output.connect(self.outputHook)
         cmd.progress.connect(self.progress)
+        if not self.embedded:
+            self.showMessage.connect(cmd.stbar.showMessage)
 
-        layout.addWidget(cmd)
+        bottomlayout.addWidget(cmd)
         cmd.setVisible(False)
         self.cmd = cmd
 
@@ -284,8 +311,22 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.setUrl('')
             self.curalias = None
 
+        self.default_user = self.curuser
+        self.lastsshuser = self.curuser
+
     def canswitch(self):
         return not self.targetcheckbox.isChecked()
+
+    def schemeChange(self):
+        if self.default_user:
+            scheme = self._schemes[self.schemecombo.currentIndex()]
+            if scheme == 'ssh':
+                self.default_user = self.curuser
+                self.curuser = self.lastsshuser
+            else:
+                self.curuser = self.default_user
+
+        self.refreshUrl()
 
     def refreshStatusTips(self):
         url = self.currentUrl(True)
@@ -306,12 +347,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('branch: ') + uname)
+            self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
             self.targetargs.append(['--branch', name])
             if ctx.thgbranchhead() and name == ctx.branch():
                 selIndex = self.targetcombo.count() - 1
         for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('bookmark: ') + uname)
+            self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
             self.targetargs.append(['--bookmark', name])
             if name in ctx.bookmarks():
                 selIndex = self.targetcombo.count() - 1
@@ -405,8 +448,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
         schemeIndex = self.schemecombo.currentIndex()
-        for w in self.HostAndPortWidgets:
-            w.setDisabled(schemeIndex == 0)
+        for w in self.hostAndPortActions:
+            w.setVisible(schemeIndex != 0)
         self.securebutton.setVisible(schemeIndex >= 3)
 
         opts = []
@@ -428,6 +471,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             host = self.hostentry.text()
             port = self.portentry.text()
             parts = [scheme, '://']
+            if scheme == 'ssh' and '@' in host:
+                user, host = unicode(host).split('@', 1)
+                self.curuser = hglib.fromunicode(user)
+                self.lastsshuser = self.curuser
             if self.curuser:
                 parts.append(self.curuser)
                 if self.curpw:
@@ -483,14 +530,19 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         data = event.mimeData()
         if data.hasUrls():
             url = data.urls()[0]
-            self.setUrl(hglib.fromunicode(url.toString()))
+            lurl = hglib.fromunicode(url.toString())
             event.setDropAction(Qt.CopyAction)
             event.accept()
         elif data.hasText():
             text = data.text()
-            self.setUrl(hglib.fromunicode(text))
+            lurl = hglib.fromunicode(text)
             event.setDropAction(Qt.CopyAction)
             event.accept()
+        else:
+            return
+        if lurl.startswith('file:///'):
+            lurl = lurl[8:]
+        self.setUrl(lurl)
 
     def canExit(self):
         return not self.cmd.core.running()
@@ -600,6 +652,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def run(self, cmdline, details):
         if self.cmd.core.running():
             return
+        self.lastcmdline = list(cmdline)
         for name in list(details) + ['remotecmd']:
             val = self.opts.get(name)
             if not val:
@@ -637,7 +690,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 cmdline.append('--insecure')
             if user:
                 cleanurl = hglib.removeauth(cururl)
-                res = hglib.readauthforuri(self.repo.ui, cleanurl)
+                res = hglib.readauthforuri(self.repo.ui, cleanurl, user)
                 if res:
                     group, auth = res
                     if auth.get('username'):
@@ -655,6 +708,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmdline.append(cururl)
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline, display=display, useproc='p4://' in cururl)
+
+    def outputHook(self, msg, label):
+        if '\'hg push --new-branch\'' in msg:
+            self.needNewBranch = True
 
     ##
     ## Workbench toolbar buttons
@@ -703,6 +760,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     ##
 
     def inclicked(self):
+        self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         self.showMessage.emit(_('Getting incoming changesets from %s...') % urlu)
@@ -738,6 +796,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def pullclicked(self):
+        self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         def finished(ret, output):
@@ -776,6 +835,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(cmdline, ('force', 'branch', 'rev', 'bookmark'))
 
     def outclicked(self):
+        self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % urlu)
@@ -849,13 +909,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self, confirm, rev=None, branch=None):
+        validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark')
+        self.syncStarted.emit()
         url = self.currentUrl(True)
         urlu = hglib.tounicode(url)
         if (not hg.islocal(self.currentUrl(False)) and confirm
             and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
-                                     % urlu)
+                                     % urlu, parent=self)
             if not r:
                 self.showMessage.emit(_('Push to %s aborted') % urlu)
                 self.pushCompleted.emit()
@@ -867,6 +929,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.showMessage.emit(_('Push to %s completed') % urlu)
             else:
                 self.showMessage.emit(_('Push to %s aborted, ret %d') % (urlu, ret))
+                if self.needNewBranch:
+                    r = qtlib.QuestionMsgBox(_('Confirm New Branch'),
+                                             _('One or more of the changesets that you '
+                                               'are attempting to push involve the '
+                                               'creation of a new branch.  Do you want '
+                                               'to create a new branch in the remote '
+                                               'repository?'), parent=self)
+                    if r:
+                        cmdline = self.lastcmdline
+                        cmdline.extend(['--new-branch'])
+                        self.run(cmdline, validopts)
+                        return
             self.pushCompleted.emit()
         self.finishfunc = finished
         cmdline = ['--repository', self.repo.root, 'push']
@@ -874,7 +948,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline.extend(['--rev', str(rev)])
         if branch:
             cmdline.extend(['--branch', branch])
-        self.run(cmdline, ('force', 'new-branch', 'branch', 'rev', 'bookmark'))
+        self.needNewBranch = False
+        self.run(cmdline, validopts)
 
     def postpullclicked(self):
         dlg = PostPullDialog(self.repo, self)
@@ -1106,7 +1181,7 @@ class SaveDialog(QDialog):
             path = self.origurl
         if alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
-                    _('%s already exists, replace URL?') % alias):
+                    _('%s already exists, replace URL?') % alias, parent=self):
                 return
         cfg.set('paths', alias, path)
         self.repo.incrementBusyCount()
@@ -1149,7 +1224,7 @@ class SecureDialog(QDialog):
 
         # if the already user has an [auth] configuration for this URL, use it
         cleanurl = hglib.removeauth(origurl)
-        res = hglib.readauthforuri(repo.ui, cleanurl)
+        res = hglib.readauthforuri(repo.ui, cleanurl, user)
         if res:
             self.alias, auth = res
         else:

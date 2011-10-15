@@ -60,7 +60,10 @@ class BranchOpDialog(QDialog):
             grid.addWidget(newbranch, 1, 0)
             grid.addWidget(branchCombo, 1, 1)
             grid.addWidget(closebranch, 2, 0)
+            grid.setColumnStretch(0, 0)
+            grid.setColumnStretch(1, 1)
             layout.addLayout(grid)
+            layout.addStretch()
 
             newbranch.toggled.connect(branchCombo.setEnabled)
             branchCombo.setEnabled(False)

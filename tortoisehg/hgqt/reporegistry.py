@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import error, hg, ui, util
+from mercurial import commands, error, hg, ui, util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
@@ -15,9 +15,6 @@ from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-import qtlib
-
 
 def settingsfilename():
     """Return path to thg-reporegistry.xml as unicode"""
@@ -31,6 +28,7 @@ class RepoTreeView(QTreeView):
     menuRequested = pyqtSignal(object, object)
     openRepo = pyqtSignal(QString, bool)
     dropAccepted = pyqtSignal()
+    updateSettingsFile = pyqtSignal()
 
     def __init__(self, parent):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
@@ -49,11 +47,14 @@ class RepoTreeView(QTreeView):
         self.setDragDropMode(QAbstractItemView.DragDrop)
         self.setDefaultDropAction(Qt.MoveAction)
         self.setDropIndicatorShown(True)
-        self.setEditTriggers(QAbstractItemView.DoubleClicked)
+        self.setEditTriggers(QAbstractItemView.DoubleClicked
+                             | QAbstractItemView.EditKeyPressed)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         QShortcut('Return', self, self.showFirstTabOrOpen).setContext(
                   Qt.WidgetShortcut)
         QShortcut('Enter', self, self.showFirstTabOrOpen).setContext(
+                  Qt.WidgetShortcut)
+        QShortcut('Delete', self, self.removeSelected).setContext(
                   Qt.WidgetShortcut)
 
     def contextMenuEvent(self, event):
@@ -199,6 +200,25 @@ class RepoTreeView(QTreeView):
             root = self.selitem.internalPointer().rootpath()
             self.openRepo.emit(hglib.tounicode(root), True)
 
+    def removeSelected(self):
+        'remove selected repository'
+        s = self.selitem
+        item = s.internalPointer()
+        if 'remove' not in item.menulist():  # check capability
+            return
+        if not item.okToDelete():
+            labels = [(QMessageBox.Yes, _('&Delete')),
+                      (QMessageBox.No, _('Cancel'))]
+            if not qtlib.QuestionMsgBox(_('Confirm Delete'),
+                                    _("Delete Group '%s' and all its entries?")%
+                                    item.name, labels=labels, parent=self):
+                return
+        m = self.model()
+        row = s.row()
+        parent = s.parent()
+        m.removeRows(row, 1, parent)
+        self.selectionChanged(None, None)
+        self.updateSettingsFile.emit()
 
 class RepoRegistryView(QDockWidget):
 
@@ -241,6 +261,7 @@ class RepoRegistryView(QDockWidget):
         tv.showMessage.connect(self.showMessage)
         tv.menuRequested.connect(self.onMenuRequest)
         tv.openRepo.connect(self.openRepo)
+        tv.updateSettingsFile.connect(self.updateSettingsFile)
         tv.dropAccepted.connect(self.dropAccepted)
 
         self.createActions()
@@ -251,6 +272,8 @@ class RepoRegistryView(QDockWidget):
         # Note that we must make sure that the settings file exists before
         # setting thefile watcher
         if not os.path.exists(sfile):
+            if not os.path.exists(os.path.dirname(sfile)):
+                os.makedirs(os.path.dirname(sfile))
             tv.model().write(sfile)
         self.watcher = QFileSystemWatcher(self)
         self.watcher.addPath(sfile)
@@ -321,8 +344,23 @@ class RepoRegistryView(QDockWidget):
         self.expand()
         self._pendingReloadModel = False
 
-    def expand(self):
-        self.tview.expandToDepth(0)
+    def expand(self, it=None):
+        if not it:
+            self.tview.expandToDepth(0)
+        else:
+            # Create a list of ancestors (including the selected item)
+            from repotreeitem import RepoGroupItem
+            itchain = [it]
+            while(not isinstance(itchain[-1], RepoGroupItem)):
+                itchain.append(itchain[-1].parent())
+
+            # Starting from the topmost ancestor (a root item), expand the
+            # ancestors one by one
+            m = self.tview.model()
+            idx = self.tview.rootIndex()
+            for it in reversed(itchain):
+                idx = m.index(it.row(), 0, idx)
+                self.tview.expand(idx)
 
     def addRepo(self, root):
         'workbench has opened a new repowidget, ensure it is in the registry'
@@ -347,6 +385,9 @@ class RepoRegistryView(QDockWidget):
             self._activeTabRepo = it
             it.setActive(True)
             self.tview.dataChanged(QModelIndex(), QModelIndex())
+
+            # Make sure that the active tab is visible by expanding its parent
+            self.expand(it.parent())
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)
@@ -463,10 +504,10 @@ class RepoRegistryView(QDockWidget):
 
     def addSubrepo(self):
         'menu action handler for adding a new subrepository'
-        root = self.selitem.internalPointer().rootpath()
+        root = hglib.tounicode(self.selitem.internalPointer().rootpath())
         caption = _('Select an existing repository to add as a subrepo')
         FD = QFileDialog
-        path = hglib.fromunicode(FD.getExistingDirectory(caption=caption,
+        path = unicode(FD.getExistingDirectory(caption=caption,
             directory=root, options=FD.ShowDirsOnly | FD.ReadOnly))
         if path:
             sroot = paths.find_root(path)
@@ -480,14 +521,14 @@ class RepoRegistryView(QDockWidget):
 
                 # Is is already on the selected repository substate list?
                 try:
-                    repo = hg.repository(ui.ui(), root)
+                    repo = hg.repository(ui.ui(), hglib.fromunicode(root))
                 except:
                     qtlib.WarningMsgBox(_('Cannot open repository'),
                         _('The selected repository:<br><br>%s<br><br>'
                         'cannot be open!') % root, parent=self)
                     return
 
-                if srelroot in repo['.'].substate:
+                if hglib.fromunicode(srelroot) in repo['.'].substate:
                     qtlib.WarningMsgBox(_('Subrepository already exists'),
                         _('The selected repository:<br><br>%s<br><br>'
                         'is already a subrepository of:<br><br>%s<br><br>'
@@ -498,7 +539,8 @@ class RepoRegistryView(QDockWidget):
 
                     # Read the current .hgsub file contents
                     lines = []
-                    if os.path.exists(repo.wjoin('.hgsub')):
+                    hasHgsub = os.path.exists(repo.wjoin('.hgsub'))
+                    if hasHgsub:
                         try:
                             fsub = repo.wopener('.hgsub', 'r')
                             lines = fsub.readlines()
@@ -513,6 +555,7 @@ class RepoRegistryView(QDockWidget):
                     # subrepos!) is not already on the .hgsub file
                     linesep = ''
                     for line in lines:
+                        line = hglib.tounicode(line)
                         spath = line.split("=")[0].strip()
                         if not spath:
                             continue
@@ -527,7 +570,8 @@ class RepoRegistryView(QDockWidget):
                             return
 
                     # Append the new subrepo to the end of the .hgsub file
-                    lines.append('%s = %s' % (srelroot, srelroot))
+                    lines.append(hglib.fromunicode('%s = %s'
+                                                   % (srelroot, srelroot)))
                     lines = [line.strip(linesep) for line in lines]
 
                     # and update the .hgsub file
@@ -535,6 +579,9 @@ class RepoRegistryView(QDockWidget):
                         fsub = repo.wopener('.hgsub', 'w')
                         fsub.write(linesep.join(lines))
                         fsub.close()
+
+                        if not hasHgsub:
+                            commands.add(ui.ui(), repo, '.hgsub')
 
                         qtlib.InfoMsgBox(
                             _('Subrepo added to .hgsub file'),
@@ -591,27 +638,13 @@ class RepoRegistryView(QDockWidget):
         clip.setText(self.selitem.internalPointer().rootpath())
 
     def startRename(self):
-        self.tview.edit(self.selitem)
+        self.tview.edit(self.tview.currentIndex())
 
     def newGroup(self):
         self.tview.model().addGroup(_('New Group'))
 
     def removeSelected(self):
-        s = self.selitem
-        item = s.internalPointer()
-        if not item.okToDelete():
-            labels = [(QMessageBox.Yes, _('&Delete')),
-                      (QMessageBox.No, _('Cancel'))]
-            if not qtlib.QuestionMsgBox(_('Confirm Delete'),
-                                    _("Delete Group '%s' and all its entries?")%
-                                    item.name, labels=labels, parent=self):
-                return
-        m = self.tview.model()
-        row = s.row()
-        parent = s.parent()
-        m.removeRows(row, 1, parent)
-        self.tview.selectionChanged(None, None)
-        self.updateSettingsFile()
+        self.tview.removeSelected()
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):

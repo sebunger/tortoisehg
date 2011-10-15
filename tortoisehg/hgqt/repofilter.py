@@ -9,6 +9,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import revset, qtlib
 
@@ -40,7 +41,7 @@ class RepoFilterBar(QToolBar):
 
         #Check if the font contains the glyph needed by the branch combo
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
-             self._allBranchesLabel = u'*** %s ***' % _('Show all')
+            self._allBranchesLabel = u'*** %s ***' % _('Show all')
 
         self.entrydlg = revset.RevisionSetQuery(repo, self)
         self.entrydlg.progress.connect(self.progress)
@@ -65,7 +66,9 @@ class RepoFilterBar(QToolBar):
         self.clearBtn.setToolTip(_('Clear current query and query text'))
         self.clearBtn.clicked.connect(self.onClearButtonClicked)
         self.addWidget(self.clearBtn)
+        self.addWidget(qtlib.Spacer(2, 2))
         self.addWidget(combo)
+        self.addWidget(qtlib.Spacer(2, 2))
 
         self.searchBtn = QToolButton(self)
         self.searchBtn.setIcon(qtlib.geticon('view-filter'))
@@ -194,7 +197,10 @@ class RepoFilterBar(QToolBar):
             self.hide()
 
     def saveSettings(self, s):
-        repoid = str(self._repo[0])
+        try:
+            repoid = str(self._repo[0])
+        except EnvironmentError:
+            return
         s.setValue('revset/' + repoid + '/geom', self.entrydlg.saveGeometry())
         s.setValue('revset/' + repoid + '/queries', self.revsethist)
         s.setValue('revset/' + repoid + '/filter', self.filtercb.isChecked())
@@ -202,8 +208,9 @@ class RepoFilterBar(QToolBar):
 
     def _initbranchfilter(self):
         self._branchLabel = QToolButton(
-            text=_('Branch'), popupMode=QToolButton.InstantPopup,
+            text=_('Branch'), popupMode=QToolButton.MenuButtonPopup,
             statusTip=_('Display graph the named branch only'))
+        self._branchLabel.clicked.connect(self._branchLabel.showMenu)
         self._branchMenu = QMenu(self._branchLabel)
         self._abranchAction = self._branchMenu.addAction(
             _('Display only active branches'), self.refresh)
@@ -223,6 +230,7 @@ class RepoFilterBar(QToolBar):
         self._branchReloading = False
 
         self.addWidget(self._branchLabel)
+        self.addWidget(qtlib.Spacer(2, 2))
         self.addWidget(self._branchCombo)
 
     def _updatebranchfilter(self):
@@ -242,8 +250,10 @@ class RepoFilterBar(QToolBar):
         self._branchCombo.clear()
         self._branchCombo.addItem(self._allBranchesLabel)
         for branch in branches:
-            self._branchCombo.addItem(branch)
-            self._branchCombo.setItemData(self._branchCombo.count() - 1, branch, Qt.ToolTipRole)
+            self._branchCombo.addItem(hglib.tounicode(branch))
+            self._branchCombo.setItemData(self._branchCombo.count() - 1,
+                                          hglib.tounicode(branch),
+                                          Qt.ToolTipRole)
         self._branchLabel.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
         self._branchCombo.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
         self._branchReloading = False

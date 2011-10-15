@@ -38,6 +38,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
+    beginSuppressPrompt = pyqtSignal()
+    endSuppressPrompt = pyqtSignal()
 
     def __init__(self, repo, pats, opts, embedded=False, parent=None, rev=None):
         QWidget.__init__(self, parent=parent)
@@ -56,7 +58,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         opts['pushafter'] = repo.ui.config('tortoisehg', 'cipushafter', '')
         opts['autoinc'] = repo.ui.config('tortoisehg', 'autoinc', '')
         opts['bugtraqplugin'] = repo.ui.config('tortoisehg', 'issue.bugtraqplugin', None)
-        opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'tortoisehg.issue.bugtraqparameters', None)
+        opts['bugtraqparameters'] = repo.ui.config('tortoisehg', 'issue.bugtraqparameters', None)
         self.opts = opts # user, date
 
         self.stwidget = status.StatusWidget(repo, pats, opts, self)
@@ -70,6 +72,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
+        self.runner.commandStarted.connect(self.beginSuppressPrompt)
+        self.runner.commandFinished.connect(self.endSuppressPrompt)
         self.runner.commandFinished.connect(self.commandFinished)
 
         layout = QVBoxLayout()
@@ -87,6 +91,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         hbox.setMargin(0)
         hbox.setContentsMargins(*(0,)*4)
         tbar = QToolBar(_("Commit Dialog Toolbar"), self)
+        tbar.setStyleSheet(qtlib.tbstylesheet)
         hbox.addWidget(tbar)
 
         self.branchbutton = tbar.addAction(_('Branch: '))
@@ -98,8 +103,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         self.recentMessagesButton = QToolButton(
             text=_('Copy message'),
-            popupMode=QToolButton.InstantPopup,
+            popupMode=QToolButton.MenuButtonPopup,
             toolTip=_('Copy one of the recent commit messages'))
+        self.recentMessagesButton.clicked.connect(self.recentMessagesButton.showMenu)
         tbar.addWidget(self.recentMessagesButton)
         self.updateRecentMessages()
 
@@ -433,7 +439,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 for tokentype, value in lexer.get_tokens(contents):
                     if tokentype in Token.Name and len(value) > 4:
                         tokens.add(value)
-            except ClassNotFound:
+            except ClassNotFound, TypeError:
                 pass
         except ImportError:
             pass
@@ -683,15 +689,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                                 self.repo)
             if commandlines is None:
                 return
-        files = self.stwidget.getChecked('MAR?!S')
-        if not (files or brcmd or newbranch):
+        self.files = self.stwidget.getChecked('MAR?!S')
+        if not (self.files or brcmd or newbranch):
             qtlib.WarningMsgBox(_('No files checked'),
                                 _('No modified files checkmarked for commit'),
                                 parent=self)
             self.stwidget.tv.setFocus()
             return
         if len(repo.parents()) > 1:
-            files = []
+            self.files = []
 
         user = qtlib.getCurrentUsername(self, self.repo, self.opts)
         if not user:
@@ -741,7 +747,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             dcmd = []
         cmdline = ['commit', '--repository', repo.root, '--verbose',
                    '--user', user, '--message='+msg]
-        cmdline += dcmd + brcmd + [repo.wjoin(f) for f in files]
+        cmdline += dcmd + brcmd + [repo.wjoin(f) for f in self.files]
         if len(repo.parents()) == 1:
             for fname in self.opts.get('autoinc', '').split(','):
                 fname = fname.strip()
@@ -784,6 +790,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                     self.addMessageToHistory(umsg)
                 self.setMessage('')
                 if self.currentAction == 'commit':
+                    shlib.shell_notify(self.files)
                     self.commitComplete.emit()
 
 class DetailsDialog(QDialog):
@@ -1048,13 +1055,15 @@ class CommitDialog(QDialog):
         self.opts = opts
 
         layout = QVBoxLayout()
-        layout.setContentsMargins(2, 2, 2, 2)
         layout.setMargin(0)
-        layout.setSpacing(0)
         self.setLayout(layout)
 
+        toplayout = QVBoxLayout()
+        toplayout.setContentsMargins(5, 5, 5, 0)
+        layout.addLayout(toplayout)
+        
         commit = CommitWidget(repo, pats, opts, False, self)
-        layout.addWidget(commit, 1)
+        toplayout.addWidget(commit, 1)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         commit.showMessage.connect(self.statusbar.showMessage)
@@ -1074,7 +1083,7 @@ class CommitDialog(QDialog):
         self.commitButton.setText(_('Commit', 'action button'))
         self.bb = bb
 
-        layout.addWidget(self.bb)
+        toplayout.addWidget(self.bb)
         layout.addWidget(self.statusbar)
 
         s = QSettings()
@@ -1147,7 +1156,8 @@ class CommitDialog(QDialog):
 def run(ui, *pats, **opts):
     from tortoisehg.util import paths
     from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
+    root = opts.get('root', paths.find_root())
+    repo = thgrepo.repository(ui, path=root)
     pats = hglib.canonpaths(pats)
     os.chdir(repo.root)
     return CommitDialog(repo, pats, opts)

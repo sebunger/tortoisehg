@@ -77,10 +77,15 @@ class ThgStatusBar(QStatusBar):
         self.lbl = QLabel()
         self.lbl.linkActivated.connect(self.linkActivated)
         self.addWidget(self.lbl)
+        self.setStyleSheet('QStatusBar::item { border: none }')
 
     @pyqtSlot(unicode)
-    def showMessage(self, ustr):
+    def showMessage(self, ustr, error=False):
         self.lbl.setText(ustr)
+        if error:
+            self.lbl.setStyleSheet('QLabel { color: red }')
+        else:
+            self.lbl.setStyleSheet('')
 
     def clear(self):
         keys = self.topics.keys()
@@ -297,15 +302,19 @@ class Core(QObject):
     @pyqtSlot(int)
     def onThreadFinished(self, ret):
         if self.stbar:
+            error = False
             if ret is None:
                 self.stbar.clear()
                 if self.thread.abortbyuser:
                     status = _('Terminated by user')
                 else:
                     status = _('Terminated')
-            else:
+            elif ret == 0:
                 status = _('Finished')
-            self.stbar.showMessage(status)
+            else:
+                status = _('Failed!')
+                error = True
+            self.stbar.showMessage(status, error)
 
         self.display = None
         if ret == 0 and self.runNext():
@@ -503,6 +512,7 @@ class ConsoleWidget(QWidget):
         self.setFocusProxy(self._logwidget)
         self.setRepository(None)
         self.openPrompt()
+        self.suppressPrompt = False
 
     def _initlogwidget(self):
         self._logwidget = _LogWidgetForConsole(self)
@@ -557,7 +567,8 @@ class ConsoleWidget(QWidget):
         try:
             self._logwidget.appendLog(msg, label)
         finally:
-            self.openPrompt()
+            if not self.suppressPrompt:
+                self.openPrompt()
 
     @pyqtSlot(object)
     def setRepository(self, repo):
@@ -617,6 +628,7 @@ class ConsoleWidget(QWidget):
 
     @_cmdtable
     def _cmd_hg(self, args):
+        self.closePrompt()
         if self._repo:
             args = ['--cwd', self._repo.root] + args
         self._cmdcore.run(args)
@@ -728,7 +740,7 @@ class Dialog(QDialog):
 
         vbox = QVBoxLayout()
         vbox.setSpacing(4)
-        vbox.setContentsMargins(*(1,)*4)
+        vbox.setContentsMargins(5, 5, 5, 5)
 
         # command output area
         vbox.addWidget(self.core.outputLog, 1)

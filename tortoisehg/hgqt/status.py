@@ -11,7 +11,7 @@ from mercurial import hg, util, cmdutil, error, context, merge
 
 from tortoisehg.util import paths, hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, htmlui, wctxactions, visdiff, cmdui, fileview
+from tortoisehg.hgqt import qtlib, wctxactions, visdiff, cmdui, fileview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -48,7 +48,7 @@ class StatusWidget(QWidget):
     showMessage = pyqtSignal(unicode)
     fileDisplayed = pyqtSignal(QString, QString)
 
-    def __init__(self, repo, pats, opts, parent=None):
+    def __init__(self, repo, pats, opts, parent=None, checkable=True):
         QWidget.__init__(self, parent)
 
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
@@ -56,6 +56,7 @@ class StatusWidget(QWidget):
         self.opts.update(opts)
         self.repo = repo
         self.pats = pats
+        self.checkable = checkable
         self.pctx = None
         self.savechecks = True
         self.refthread = None
@@ -90,7 +91,7 @@ class StatusWidget(QWidget):
         frame.setLayout(vbox)
         hbox = QHBoxLayout()
         hbox.setMargin(4)
-        hbox.setContentsMargins(2, 0, 0, 0)
+        hbox.setContentsMargins(0, 0, 0, 0)
         self.refreshBtn = tb = QToolButton()
         tb.setToolTip(_('Refresh file list'))
         tb.setIcon(qtlib.geticon('view-refresh'))
@@ -110,24 +111,28 @@ class StatusWidget(QWidget):
         self.statusfilter = StatusFilterButton(
             statustext=st, types=StatusType.preferredOrder)
 
-        self.checkAllTT = _('Check all files')
-        self.checkNoneTT = _('Uncheck all files')
-        self.checkAllNoneBtn = QCheckBox()
-        self.checkAllNoneBtn.setToolTip(self.checkAllTT)
-        self.checkAllNoneBtn.stateChanged.connect(self.checkAllNone)
+        if self.checkable:
+            self.checkAllTT = _('Check all files')
+            self.checkNoneTT = _('Uncheck all files')
+            self.checkAllNoneBtn = QCheckBox()
+            self.checkAllNoneBtn.setToolTip(self.checkAllTT)
+            self.checkAllNoneBtn.stateChanged.connect(self.checkAllNone)
 
         self.filelistToolbar = QToolBar(_('Status File List Toolbar'))
         self.filelistToolbar.setIconSize(QSize(16,16))
+        self.filelistToolbar.setStyleSheet(qtlib.tbstylesheet)
         hbox.addWidget(self.filelistToolbar)
-        self.filelistToolbar.addWidget(self.checkAllNoneBtn)
-        self.filelistToolbar.addSeparator()
+        if self.checkable:
+            self.filelistToolbar.addWidget(qtlib.Spacer(3, 2))
+            self.filelistToolbar.addWidget(self.checkAllNoneBtn)
+            self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(le)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.statusfilter)
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
         self.actions = wctxactions.WctxActions(self.repo, self)
-        tv = WctxFileTree(self.repo)
+        tv = WctxFileTree(self.repo, checkable=checkable)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
         split.addWidget(frame)
@@ -186,12 +191,16 @@ class StatusWidget(QWidget):
         self.diffvbox = vbox
 
     def checkAllNone(self):
-        if self.checkAllNoneBtn.isChecked():
+        state = self.checkAllNoneBtn.checkState()
+        if state == Qt.Checked:
             self.checkAll()
             self.checkAllNoneBtn.setToolTip(self.checkNoneTT)
         else:
-            self.checkNone()
+            if state == Qt.Unchecked:
+                self.checkNone()
             self.checkAllNoneBtn.setToolTip(self.checkAllTT)
+        if state != Qt.PartiallyChecked:
+            self.checkAllNoneBtn.setTristate(False)
 
     def getTitle(self):
         if self.pats:
@@ -239,7 +248,8 @@ class StatusWidget(QWidget):
         else:
             self.reselection = None
 
-        self.checkAllNoneBtn.setEnabled(False)
+        if self.checkable:
+            self.checkAllNoneBtn.setEnabled(False)
         self.refreshBtn.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Refresh'), _('status')))
         self.refthread = StatusThread(self.repo, self.pctx, self.pats, self.opts)
@@ -252,7 +262,8 @@ class StatusWidget(QWidget):
 
     def reloadComplete(self):
         self.refthread.wait()
-        self.checkAllNoneBtn.setEnabled(True)
+        if self.checkable:
+            self.checkAllNoneBtn.setEnabled(True)
         self.refreshBtn.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
         if self.refthread.wctx is not None:
@@ -274,14 +285,16 @@ class StatusWidget(QWidget):
                                     parent=self)
         ms = merge.mergestate(self.repo)
         tm = WctxModel(wctx, ms, self.pctx, self.savechecks, self.opts,
-                       checked, self)
-        tm.checkToggled.connect(self.updateCheckCount)
+                       checked, self, checkable=self.checkable)
+        if self.checkable:
+            tm.checkToggled.connect(self.updateCheckCount)
 
         self.tv.setModel(tm)
         self.tv.setSortingEnabled(True)
-        self.tv.setColumnHidden(COL_PATH, bool(wctx.p2()))
+        self.tv.setColumnHidden(COL_PATH, bool(wctx.p2()) or not self.checkable)
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
-        self.updateCheckCount()
+        if self.checkable:
+            self.updateCheckCount()
 
         for col in (COL_PATH, COL_STATUS, COL_MERGE_STATE):
             w = self.tv.sizeHintForColumn(col)
@@ -323,7 +336,8 @@ class StatusWidget(QWidget):
         if status in 'MAR!':
             self.actions.allactions[0].trigger()
         elif status == 'S':
-            self.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+            self.linkActivated.emit(
+                u'subrepo:' + hglib.tounicode(self.repo.wjoin(path)))
 
     @pyqtSlot(QString)
     def setFilter(self, match):
@@ -335,6 +349,13 @@ class StatusWidget(QWidget):
         model = self.tv.model()
         if model:
             model.checkCount = len(self.getChecked())
+            if model.checkCount == 0:
+                state = Qt.Unchecked
+            elif model.checkCount == len(model.rows):
+                state = Qt.Checked
+            else:
+                state = Qt.PartiallyChecked
+            self.checkAllNoneBtn.setCheckState(state)
 
     def checkAll(self):
         model = self.tv.model()
@@ -452,7 +473,7 @@ class StatusThread(QThread):
 class WctxFileTree(QTreeView):
     menuRequest = pyqtSignal(QPoint, object)
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repo, parent=None, checkable=True):
         QTreeView.__init__(self, parent)
         self.repo = repo
         self.setSelectionMode(QTreeView.ExtendedSelection)
@@ -515,7 +536,7 @@ class WctxFileTree(QTreeView):
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()
 
-    def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent):
+    def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent, checkable=True):
         QAbstractTableModel.__init__(self, parent)
         self.checkCount = 0
         rows = []
@@ -550,12 +571,10 @@ class WctxModel(QAbstractTableModel):
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
             for r in wctx.removed():
-                mst = r in ms and ms[r].upper() or ""
                 nchecked[r] = checked.get(r, r not in excludes and pctxmatch(r))
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
             for d in wctx.deleted():
-                mst = d in ms and ms[d].upper() or ""
                 nchecked[d] = checked.get(d, d not in excludes and pctxmatch(d))
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
@@ -584,6 +603,7 @@ class WctxModel(QAbstractTableModel):
         self.checked = nchecked
         self.unfiltered = rows
         self.rows = rows
+        self.checkable = checkable
 
     def rowCount(self, parent):
         if parent.isValid():
@@ -607,7 +627,7 @@ class WctxModel(QAbstractTableModel):
 
         path, status, mst, upath, ext, sz = self.rows[index.row()]
         if index.column() == COL_PATH:
-            if role == Qt.CheckStateRole:
+            if role == Qt.CheckStateRole and self.checkable:
                 # also Qt.PartiallyChecked
                 if self.checked[path]:
                     return Qt.Checked
@@ -643,7 +663,7 @@ class WctxModel(QAbstractTableModel):
 
     def flags(self, index):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled
-        if index.column() == COL_PATH:
+        if index.column() == COL_PATH and self.checkable:
             flags |= Qt.ItemIsUserCheckable
         return flags
 
@@ -721,8 +741,7 @@ class WctxModel(QAbstractTableModel):
         # 2.- Perform a primary sort by the actual column that we are sorting on
 
         # Secondary sort:
-        self.rows.sort(lambda x, y: \
-                cmp(x[COL_PATH].lower(), y[COL_PATH].lower()))
+        self.rows.sort(key=lambda x: x[COL_PATH].lower())
 
         if col == COL_PATH_DISPLAY:
             # Already sorted!
@@ -736,13 +755,13 @@ class WctxModel(QAbstractTableModel):
             # Now we can perform the primary sort
             if col == COL_PATH:
                 c = self.checked
-                self.rows.sort(lambda x, y: cmp(c[x[col]], c[y[col]]))
+                self.rows.sort(key=lambda x: c[x[col]])
             elif col == COL_STATUS:
                 self.rows.sort(key=lambda x: getStatusRank(x[col]))
             elif col == COL_MERGE_STATE:
                 self.rows.sort(key=lambda x: getMergeStatusRank(x[col]))
             else:
-                self.rows.sort(lambda x, y: cmp(x[col], y[col]))
+                self.rows.sort(key=lambda x: x[col])
 
         if order == Qt.DescendingOrder:
             self.rows.reverse()
@@ -810,10 +829,11 @@ class StatusFilterButton(QToolButton):
         #if 'text' not in kwargs:
         #    kwargs['text'] = _('Status')
         super(StatusFilterButton, self).__init__(
-            parent, popupMode=QToolButton.InstantPopup,
+            parent, popupMode=QToolButton.MenuButtonPopup,
             icon=qtlib.geticon('hg-status'),
             toolButtonStyle=Qt.ToolButtonTextBesideIcon, **kwargs)
 
+        self.clicked.connect(self.showMenu)
         self._initactions(statustext)
 
     def _initactions(self, text):
@@ -850,10 +870,13 @@ class StatusDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowIcon(qtlib.geticon('hg-status'))
         layout = QVBoxLayout()
-        layout.setContentsMargins(0, 6, 0, 0)
+        layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
-        self.stwidget = StatusWidget(repo, pats, opts, self)
-        layout.addWidget(self.stwidget, 1)
+        toplayout = QVBoxLayout()
+        toplayout.setContentsMargins(10, 10, 10, 0);
+        self.stwidget = StatusWidget(repo, pats, opts, self, checkable=False)
+        toplayout.addWidget(self.stwidget, 1)
+        layout.addLayout(toplayout)
 
         self.statusbar = cmdui.ThgStatusBar(self)
         layout.addWidget(self.statusbar)
@@ -874,7 +897,7 @@ class StatusDialog(QDialog):
         if link.startswith('subrepo:'):
             from tortoisehg.hgqt.run import qtrun
             from tortoisehg.hgqt import commit
-            qtrun(commit.run, self.commit.repo.ui, root=link[8:])
+            qtrun(commit.run, self.stwidget.repo.ui, root=link[8:])
         if link.startswith('shelve:'):
             from tortoisehg.hgqt import shelve
             dlg = shelve.ShelveDialog(self.stwidget.repo, self)

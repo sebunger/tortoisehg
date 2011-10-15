@@ -85,7 +85,7 @@ class Workbench(QMainWindow):
         # Create the actions that will be displayed on the context menu
         self.createActions()
         self.lastClosedRepoRootList = []
-        
+
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.8)
@@ -519,7 +519,7 @@ class Workbench(QMainWindow):
         for u in d.urls():
             root = self.find_root(u)
             if root:
-                self.showRepo(root)
+                self.showRepo(hglib.tounicode(root))
                 accept = True
         if accept:
             event.setDropAction(Qt.LinkAction)
@@ -644,6 +644,8 @@ class Workbench(QMainWindow):
             self.statusbar.progress(tp, p, i, u, tl, repo.root))
         rw.output.connect(self.log.output)
         rw.makeLogVisible.connect(self.log.setShown)
+        rw.beginSuppressPrompt.connect(self.log.beginSuppressPrompt)
+        rw.endSuppressPrompt.connect(self.log.endSuppressPrompt)
         rw.revisionSelected.connect(self.updateHistoryActions)
         rw.repoLinkClicked.connect(self.openLinkedRepo)
         rw.taskTabsWidget.currentChanged.connect(self.updateTaskViewMenu)
@@ -803,10 +805,6 @@ class Workbench(QMainWindow):
         wb = "Workbench/"
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
-        save = s.value(wb + 'saveRepos').toBool()
-        self.actionSaveRepos.setChecked(save)
-        for path in hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(','):
-            self._openRepo(path, False)
 
         # Load the repo registry settings. Note that we must allow the
         # repo registry to assemble itself before toggling its settings
@@ -836,6 +834,11 @@ class Workbench(QMainWindow):
 
         # Manually reload the model now, to apply the settings
         self.reporegistry.reloadModel()
+
+        save = s.value(wb + 'saveRepos').toBool()
+        self.actionSaveRepos.setChecked(save)
+        for path in hglib.fromunicode(s.value(wb + 'openrepos').toString()).split(','):
+            self._openRepo(path, False)
 
         # Allow repo registry to assemble itself before toggling path state
         sp = s.value(wb + 'showPaths').toBool()

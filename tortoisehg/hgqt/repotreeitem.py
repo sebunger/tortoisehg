@@ -215,8 +215,12 @@ class RepoItem(RepoTreeItem):
             cpath = self.getCommonPath()
         except:
             cpath = ''
-        spath = os.path.normpath(self._root)
-        if cpath and spath.startswith(cpath):
+        spath2 = spath = os.path.normpath(self._root)
+
+        if os.name == 'nt':
+            spath2 = spath2.lower()
+
+        if cpath and spath2.startswith(cpath):
             iShortPathStart = len(cpath) + 1
             spath = spath[iShortPathStart:]
         return hglib.tounicode(spath)
@@ -255,44 +259,75 @@ class RepoItem(RepoTreeItem):
 
     def appendSubrepos(self, repo=None):
         invalidRepoList = []
-        try:
-            sri = None
-            if repo is None:
-                repo = hg.repository(ui.ui(), self._root)
-            wctx = repo['.']
-            for subpath in wctx.substate:
+
+        # Mercurial repos are the only ones that can have subrepos
+        if self.repotype() == 'hg':
+            try:
                 sri = None
-                abssubpath = repo.wjoin(subpath)
-                subtype = wctx.substate[subpath][2]
-                sriIsValid = os.path.isdir(abssubpath)
-                sri = SubrepoItem(abssubpath, subtype=subtype)
-                sri._valid = sriIsValid
-                self.appendChild(sri)
+                if repo is None:
+                    repo = hg.repository(ui.ui(), self._root)
+                wctx = repo['.']
+                for subpath in wctx.substate:
+                    sri = None
+                    abssubpath = repo.wjoin(subpath)
+                    subtype = wctx.substate[subpath][2]
+                    sriIsValid = os.path.isdir(abssubpath)
+                    sri = SubrepoItem(abssubpath, subtype=subtype)
+                    sri._valid = sriIsValid
+                    self.appendChild(sri)
 
-                if not sriIsValid:
-                    self._valid = False
-                    sri._valid = False
-                    invalidRepoList.append(repo.wjoin(subpath))
-                    return invalidRepoList
-                    continue
-
-                if subtype == 'hg':
-                    # Only recurse into mercurial subrepos
-                    sctx = wctx.sub(subpath)
-                    invalidSubrepoList = sri.appendSubrepos(sctx._repo)
-                    if invalidSubrepoList:
+                    if not sriIsValid:
                         self._valid = False
-                        invalidRepoList += invalidSubrepoList
+                        sri._valid = False
+                        invalidRepoList.append(repo.wjoin(subpath))
+                        return invalidRepoList
+                        continue
 
-        except (EnvironmentError, error.RepoError, util.Abort), e:
-            # Add the repo to the list of repos/subrepos
-            # that could not be open
-            self._valid = False
-            if sri:
-                sri._valid = False
-                invalidRepoList.append(abssubpath)
-            invalidRepoList.append(self._root)
+                    if subtype == 'hg':
+                        # Only recurse into mercurial subrepos
+                        sctx = wctx.sub(subpath)
+                        invalidSubrepoList = sri.appendSubrepos(sctx._repo)
+                        if invalidSubrepoList:
+                            self._valid = False
+                            invalidRepoList += invalidSubrepoList
 
+            except (EnvironmentError, error.RepoError, util.Abort), e:
+                # Add the repo to the list of repos/subrepos
+                # that could not be open
+                self._valid = False
+                if sri:
+                    sri._valid = False
+                    invalidRepoList.append(abssubpath)
+                invalidRepoList.append(self._root)
+            except Exception, e:
+                # If any other sort of exception happens, show the corresponding
+                # error message, but do not crash!
+                # Note that we _also_ will mark the offending repos as invalid
+                # It is unfortunate that Python 2.4, which we target does not
+                # support combined try/except/finally clauses, forcing us
+                # to duplicate some code here
+                self._valid = False
+                if sri:
+                    sri._valid = False
+                    invalidRepoList.append(abssubpath)
+                invalidRepoList.append(self._root)
+
+                # Show a warning message indicating that there was an error
+                if repo:
+                    rootpath = repo.root
+                else:
+                    rootpath = self._root
+                warningMessage = (_('An exception happened while loading the ' \
+                    'subrepos of:<br><br>"%s"<br><br>') + \
+                    _('The exception error message was:<br><br>%s<br><br>') +\
+                    _('Click OK to continue or Abort to exit.')) \
+                    % (rootpath, e.message)
+                res = qtlib.WarningMsgBox(_('Error loading subrepos'),
+                                    warningMessage,
+                                    buttons = QMessageBox.Ok | QMessageBox.Abort)
+                # Let the user abort so that he gets the full exception info
+                if res == QMessageBox.Abort:
+                    raise
         return invalidRepoList
 
     def setActive(self, sel):
@@ -449,35 +484,10 @@ class RepoGroupItem(RepoTreeItem):
             # If a group has no repo items, the common path is empty
             self._commonpath = ''
         else:
-            # Calculate the group common path
-            def splitPath(path):
-                path = os.path.normpath(path)
-                return path.split(os.path.sep)[:-1]
+            childs = [os.path.normcase(child.rootpath())
+                        for child in self.childs]
+            self._commonpath = os.path.dirname(os.path.commonprefix(childs))
 
-            cpath = splitPath(self.childs[0].rootpath())
-
-            for c in self.childs[1:]:
-                if not cpath:
-                    # There is no common path
-                    break
-                # Update the common path to the common path with the current
-                # child
-                childpath = splitPath(c.rootpath())
-                # The common part cannot go beyond the smaller of the current
-                # common path and the current child
-                clen = min(len(cpath), len(childpath))
-                cpath = cpath[:clen]
-                childpath = childpath[:clen]
-                if cpath == childpath:
-                    # Trivial case
-                    continue
-                for n in range(clen):
-                    # From left to right, find the first path part that is not
-                    # the same
-                    if cpath[n] != childpath[n]:
-                        cpath = cpath[:n]
-                        break
-            self._commonpath = os.path.sep.join(cpath)
         return self._commonpath
 
     def getCommonPath(self):

@@ -11,7 +11,7 @@ import os
 
 from mercurial import revset, error, patch
 
-from tortoisehg.util import hglib
+from tortoisehg.util import hglib, shlib
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
@@ -44,6 +44,8 @@ class RepoWidget(QWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
+    beginSuppressPrompt = pyqtSignal()
+    endSuppressPrompt = pyqtSignal()
 
     repoChanged = pyqtSignal(QString)
 
@@ -116,6 +118,8 @@ class RepoWidget(QWidget):
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
+        self.runner.commandStarted.connect(self.beginSuppressPrompt)
+        self.runner.commandFinished.connect(self.endSuppressPrompt)
         self.runner.commandFinished.connect(self.onCommandFinished)
 
         # Select the widget chosen by the user
@@ -194,6 +198,7 @@ class RepoWidget(QWidget):
         self.updateTaskTabs()
 
         self.revDetailsWidget = w = RevDetailsWidget(self.repo, self)
+        self.revDetailsWidget.filelisttbar.setStyleSheet(qtlib.tbstylesheet)
         w.linkActivated.connect(self._openLink)
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)
@@ -244,6 +249,10 @@ class RepoWidget(QWidget):
             idx = self.namedTabs[tabname]
             self.taskTabsWidget.setCurrentIndex(idx)
 
+            # restore default splitter position if task tab is invisible
+            if self.repotabs_splitter.sizes()[1] == 0:
+                self.repotabs_splitter.setSizes([1, 1])
+
     def title(self):
         """Returns the expected title for this widget [unicode]"""
         if self.bundle:
@@ -291,12 +300,16 @@ class RepoWidget(QWidget):
         w.setFocus()  # to handle key press by InfoBar
         return w
 
+    @pyqtSlot()
     def clearInfoBar(self, priority=None):
         """Close current infobar if available; return True if got empty"""
         it = self._infobarlayout.itemAt(0)
         if not it:
             return True
         if priority is None or it.widget().infobartype <= priority:
+            # removes current infobar explicitly, because close() seems to
+            # delay deletion until next eventloop.
+            self._infobarlayout.removeItem(it)
             it.widget().close()
             return True
         else:
@@ -334,6 +347,8 @@ class RepoWidget(QWidget):
         cw.output.connect(self.output)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
+        cw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
+        cw.endSuppressPrompt.connect(self.endSuppressPrompt)
         cw.linkActivated.connect(self._openLink)
         cw.showMessage.connect(self.showMessage)
         QTimer.singleShot(0, cw.reload)
@@ -358,6 +373,9 @@ class RepoWidget(QWidget):
         sw.output.connect(self._showOutputOnInfoBar)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
+        sw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
+        sw.endSuppressPrompt.connect(self.endSuppressPrompt)
+        sw.syncStarted.connect(self.clearInfoBar)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
         sw.showMessage.connect(self._showMessageOnInfoBar)
@@ -450,12 +468,14 @@ class RepoWidget(QWidget):
                 self._reload_rev = self.revset[0]
 
     def acceptBundle(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-        self.syncDemand.pullBundle(self.bundle, None)
+        if self.bundle:
+            self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
+            self.syncDemand.pullBundle(self.bundle, None)
 
     def pullBundleToRev(self):
-        self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-        self.syncDemand.pullBundle(self.bundle, self.rev)
+        if self.bundle:
+            self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
+            self.syncDemand.pullBundle(self.bundle, self.rev)
 
     def rejectBundle(self):
         self.clearBundle()
@@ -463,6 +483,7 @@ class RepoWidget(QWidget):
 
     @pyqtSlot()
     def clearRevisionSet(self):
+        self.filterbar.revsetle.clear()
         self.toolbarVisibilityChanged.emit()
         self.outgoingMode = False
         if not self.revset:
@@ -701,9 +722,8 @@ class RepoWidget(QWidget):
     def setupModels(self):
         # Filter revision set in case revisions were removed
         self.revset = [r for r in self.revset if r < len(self.repo)]
-        branch = hglib.fromunicode(self.ubranch)
         self.repomodel = HgRepoListModel(self.repo, self.repoview.colselect[0],
-                                         branch, self.revset,
+                                         self.ubranch, self.revset,
                                          self.revsetfilter, self)
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
@@ -734,6 +754,7 @@ class RepoWidget(QWidget):
 
     def onRevisionClicked(self, rev):
         'User clicked on a repoview row'
+        self.clearInfoBar(qtlib.InfoBar.INFO)
         tw = self.taskTabsWidget
         cw = tw.currentWidget()
         if not cw.canswitch():
@@ -749,7 +770,6 @@ class RepoWidget(QWidget):
     def onRevisionSelected(self, rev):
         'View selection changed, could be a reload'
         self.showMessage('')
-        self.clearInfoBar(qtlib.InfoBar.INFO)
         if self.repomodel.graph is None:
             return
         try:
@@ -821,7 +841,7 @@ class RepoWidget(QWidget):
                                    'cleared'))
             elif self.revset:
                 self.revset = []
-                self.filterbar.revsetle.setText('')
+                self.filterbar.revsetle.clear()
                 self.showMessage(_('Repository stripped, revision set cleared'))
         if not self.bundle:
             self.repolen = len(self.repo)
@@ -838,7 +858,7 @@ class RepoWidget(QWidget):
                     while self._reload_rev not in self.repo.mq.series and idx:
                         idx -= 1
                         self._reload_rev = self._last_series[idx]
-            except (AttributeError, IndexError):
+            except (AttributeError, IndexError, ValueError):
                 self._reload_rev = 'tip'
         elif len(self.repo) <= self.rev:
             self._reload_rev = 'tip'
@@ -945,20 +965,20 @@ class RepoWidget(QWidget):
         QTimer.singleShot(0, lambda: self.toolbarVisibilityChanged.emit())
 
     def okToContinue(self):
-        if not self.commitDemand.forward('canExit', default=True):
+        if not self.commitDemand.canExit():
             self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
             self.showMessage(_('Commit tab cannot exit'))
             return False
-        if not self.syncDemand.forward('canExit', default=True):
+        if not self.syncDemand.canExit():
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
             self.showMessage(_('Sync tab cannot exit'))
             return False
         if 'mq' in self.repo.extensions():
-            if not self.mqDemand.forward('canExit', default=True):
+            if not self.mqDemand.canExit():
                 self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
                 self.showMessage(_('MQ tab cannot exit'))
                 return False
-        if not self.grepDemand.forward('canExit', default=True):
+        if not self.grepDemand.canExit():
             self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
             self.showMessage(_('Search tab cannot exit'))
             return False
@@ -1270,8 +1290,7 @@ class RepoWidget(QWidget):
             if ctxa.ancestor(ctxb) == ctxb:
                 revs = self.menuselection[:]
             elif ctxa.ancestor(ctxb) == ctxa:
-                revs = self.menuselection[:]
-                revs.reverse()
+                revs = reversed(self.menuselection)
             else:
                 InfoMsgBox(_('Unable to compress history'),
                            _('Selected changeset pair not related'))
@@ -1413,27 +1432,48 @@ class RepoWidget(QWidget):
     def exportRevisions(self, revisions):
         if not revisions:
             revisions = [self.rev]
-        udir = QFileDialog.getExistingDirectory(self, _('Export patch'),
-                                               hglib.tounicode(self.repo.root))
-        if not udir:
-            return
-        strdir = hglib.fromunicode(udir)
-        epath = os.path.join(strdir,
-                             hglib.fromunicode(self.repo.shortname)+'_%r.patch')
+        if len(revisions) == 1:
+            if isinstance(self.rev, int):
+                defaultpath = self.repo.wjoin('%d.patch' % self.rev)
+            else:
+                defaultpath = self.repo.root
+
+            ret = QFileDialog.getSaveFileName(self, _('Export patch'),
+                                              hglib.tounicode(defaultpath),
+                                              _('Patch Files (*.patch)'))
+            if not ret:
+                return
+            epath = str(ret)
+            strdir = os.path.dirname(epath)
+            udir = hglib.tounicode(strdir)
+            custompath = True
+        else:
+            udir = QFileDialog.getExistingDirectory(self, _('Export patch'),
+                                                   hglib.tounicode(self.repo.root))
+            if not udir:
+                return
+            strdir = hglib.fromunicode(udir)
+            epath = os.path.join(strdir,
+                                 hglib.fromunicode(self.repo.shortname)+'_%r.patch')
+            custompath = False
 
         cmdline = ['export', '--repository', self.repo.root, '--verbose',
                    '--output', epath]
 
         existingRevisions = []
         for rev in revisions:
-            if os.path.exists(epath % rev):
-                if os.path.isfile(epath % rev):
+            if custompath:
+                path = epath
+            else:
+                path = epath % rev
+            if os.path.exists(path):
+                if os.path.isfile(path):
                     existingRevisions.append(rev)
                 else:
                     QMessageBox.warning(self,
                         _('Cannot export revision'),
                         (_('Cannot export revision %s into the file named:'
-                        '\n\n%s\n') % (rev, epath % rev)) + \
+                        '\n\n%s\n') % (rev, hglib.tounicode(epath % rev))) + \
                         _('There is already an existing folder '
                         'with that same name.'))
                     return
@@ -1463,7 +1503,10 @@ class RepoWidget(QWidget):
             if buttonNames[res] == _("Replace"):
                 # Remove the existing patch files
                 for rev in existingRevisions:
-                    os.remove(epath % rev)
+                    if custompath:
+                        os.remove(epath)
+                    else:
+                        os.remove(epath % rev)
             elif buttonNames[res] == _("Abort"):
                 return
 
@@ -1473,24 +1516,26 @@ class RepoWidget(QWidget):
             # Show a message box with a link to the export folder and to the
             # exported file
             rev = revisions[0]
-            patchfilename = os.path.normpath(epath % rev)
-            patchdirname = os.path.normpath(strdir)
+            patchfilename = os.path.normpath(epath)
+            patchdirname = os.path.normpath(os.path.dirname(epath))
             patchshortname = os.path.basename(patchfilename)
+            if patchdirname.endswith(os.path.sep):
+                patchdirname = patchdirname[:-1]
             qtlib.InfoMsgBox(_('Patch exported'),
                 _('Revision #%d (%s) was exported to:<p>'
                 '<a href="file:///%s">%s</a>%s'
                 '<a href="file:///%s">%s</a>') \
                 % (rev, str(self.repo[rev]),
-                patchdirname, patchdirname, os.path.sep,
-                patchfilename, patchshortname))
+                hglib.tounicode(patchdirname), hglib.tounicode(patchdirname), os.path.sep,
+                hglib.tounicode(patchfilename), hglib.tounicode(patchshortname)))
         else:
             # Show a message box with a link to the export folder
             qtlib.InfoMsgBox(_('Patches exported'),
                 _('%d patches were exported to:<p>'
                 '<a href="file:///%s">%s</a>') \
                 % (len(revisions),
-                strdir,
-                strdir))
+                hglib.tounicode(strdir),
+                hglib.tounicode(strdir)))
 
     def visualDiffRevision(self):
         opts = dict(change=self.rev)
@@ -1500,7 +1545,8 @@ class RepoWidget(QWidget):
             dlg.deleteLater()
 
     def visualDiffToLocal(self):
-        assert type(self.rev) is int
+        if self.rev is None:
+            return
         opts = dict(rev=['rev(%d)' % self.rev])
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
@@ -1768,6 +1814,7 @@ class RepoWidget(QWidget):
 
     def onCommandFinished(self, ret):
         self.repo.decrementBusyCount()
+        shlib.shell_notify(self.repo.root)
 
     def runCommand(self, *cmdlines):
         if self.runner.core.running():
