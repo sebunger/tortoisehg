@@ -1,0 +1,8 @@
+tortoisehg (2.1.4-1) unstable; urgency=low
+
+  * The TortoiseHg Nautilus extension (tortoisehg-nautilus) has been removed
+    beause it is not comptabile with Gtk+ 3 and there is no interested from
+    upstream in porting it to the new library
+    (http://groups.google.com/group/thg-dev/msg/8c6b89fd1fd20ac9).
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sat, 29 Oct 2011 13:37:09 -0700
