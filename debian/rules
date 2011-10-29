@@ -8,14 +8,14 @@ override_dh_auto_build: debian/thg.1
 	$(MAKE) -C doc html
 
 override_dh_auto_install:
-	dh_auto_install
+	dh_auto_install --destdir=debian/tmp/
 	mkdir -p debian/tmp/etc/mercurial/hgrc.d/
 	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thgmergetools.rc
-	mkdir -p debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/
+	mkdir -p debian/tmp/usr/share/doc/tortoisehg/html/_static/
 	ln -sf ../../../../javascript/jquery/jquery.js \
-	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
-	mkdir -p debian/tortoisehg/usr/share/man/man1/
-	ln -sf thg.1.gz debian/tortoisehg/usr/share/man/man1/hgtk.1.gz
+	    debian/tmp/usr/share/doc/tortoisehg/html/_static/jquery.js
+	mkdir -p debian/tmp/usr/share/man/man1/
+	ln -sf thg.1.gz debian/tmp/usr/share/man/man1/hgtk.1.gz
 
 ## drop automatically created file
 override_dh_clean:
