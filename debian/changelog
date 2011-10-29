@@ -1,8 +1,12 @@
 tortoisehg (2.1.4-1) unstable; urgency=low
 
   * New upstream release.
+  * Drop Nautilus extension as it does not support Gtk 3 (Closes: #644697,
+    #612574, LP: #859104).
+  * No longer remove config.py, as it will be removed by unapplying patches.
+  * Add NEWS file reporting removal of toirtoisehg-nautilus.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Fri, 14 Oct 2011 23:43:48 -0700
+ -- Ludovico Cavedon <cavedon@debian.org>  Sat, 29 Oct 2011 14:58:14 -0700
 
 tortoisehg (2.1.1-1) unstable; urgency=low
 
