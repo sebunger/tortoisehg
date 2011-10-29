@@ -5,8 +5,9 @@ tortoisehg (2.1.4-1) unstable; urgency=low
     #612574, LP: #859104).
   * No longer remove config.py, as it will be removed by unapplying patches.
   * Add NEWS file reporting removal of toirtoisehg-nautilus.
+  * Use system underscore.js instead of a private copy.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Sat, 29 Oct 2011 14:58:14 -0700
+ -- Ludovico Cavedon <cavedon@debian.org>  Sat, 29 Oct 2011 15:17:58 -0700
 
 tortoisehg (2.1.1-1) unstable; urgency=low
 
