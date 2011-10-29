@@ -17,14 +17,12 @@ override_dh_auto_install:
 	mkdir -p debian/tortoisehg/usr/share/man/man1/
 	ln -sf thg.1.gz debian/tortoisehg/usr/share/man/man1/hgtk.1.gz
 
-## drop automatically created file; see #424898
+## drop automatically created file
 override_dh_clean:
 	dh_auto_clean
 	rm -f debian/pycompat
 	rm -f debian/thg.1
 	rm -fr locale doc/build
-	# patches are removed before calling clean, so we need to fix what setup.py did wrong
-	rm tortoisehg/util/config.py
 
 override_dh_installdocs:
 	dh_installdocs --exclude=nautilus-thg.py --exclude=mergetools.rc
