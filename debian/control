@@ -17,7 +17,7 @@ Architecture: all
 Depends: mercurial (>= 1.9), mercurial (<< 1.11), python-gobject (>= 2.12.1),
  python-qt4 (>= 4.7), python-qscintilla2, ${shlibs:Depends}, ${misc:Depends},
  ${python:Depends}
-Recommends: libjs-jquery, python-iniparse, python-pygments
+Recommends: libjs-jquery, libjs-underscore, python-iniparse, python-pygments
 Description: Graphical tool for working with Mercurial
  TortoiseHg provides a graphical tool for interacting with the distributed
  revision control system Mercurial.  GUI support is provided for over a dozen

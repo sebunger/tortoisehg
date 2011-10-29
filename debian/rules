@@ -14,6 +14,8 @@ override_dh_auto_install:
 	mkdir -p debian/tmp/usr/share/doc/tortoisehg/html/_static/
 	ln -sf ../../../../javascript/jquery/jquery.js \
 	    debian/tmp/usr/share/doc/tortoisehg/html/_static/jquery.js
+	ln -sf ../../../../javascript/underscore/underscore.js \
+	    debian/tmp/usr/share/doc/tortoisehg/html/_static/underscore.js
 	mkdir -p debian/tmp/usr/share/man/man1/
 	ln -sf thg.1.gz debian/tmp/usr/share/man/man1/hgtk.1.gz
 
