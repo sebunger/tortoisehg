@@ -1,8 +1,9 @@
 usr/bin
 usr/share
 usr/lib/python*
-etc
 debian/hgtk usr/bin/
+etc
 debian/tortoisehg.xpm usr/share/pixmaps/
 debian/tortoisehg.png usr/share/icons/hicolor/48x48/apps/
 debian/tortoisehg.desktop usr/share/applications/
+
