@@ -292,8 +292,11 @@ class HgRepoView(QTableView):
         for c in range(self.model().columnCount(QModelIndex())):
             col_widths.append(self.columnWidth(c))
 
-        key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
-        s.setValue(key, col_widths)
+        try:
+            key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
+            s.setValue(key, col_widths)
+        except EnvironmentError:
+            pass
 
     def resizeEvent(self, e):
         # re-size columns the smart way: the column holding Description
@@ -325,7 +328,7 @@ class HgRepoViewStyle(QStyle):
             # Drop indicators should be painted using the full viewport width
             vp = widget.viewport().rect()
             painter.drawRect(vp.x(), option.rect.y(),
-                             vp.width() - 1, option.rect.height())
+                             vp.width() - 1, 0.5)
         else:
             self._style.drawPrimitive(element, option, painter, widget)
     # Delegate all other methods overridden by QProxyStyle to the base class

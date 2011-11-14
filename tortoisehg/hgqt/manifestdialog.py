@@ -89,12 +89,6 @@ class ManifestDialog(QMainWindow):
         from tortoisehg.hgqt import run
         run.grep(self._repo.ui, hglib.fromunicode(pattern), **opts)
 
-    @pyqtSlot(unicode, object, int)
-    def _openInEditor(self, path, rev, line):
-        """Open editor to show the specified file"""
-        _openineditor(self._repo, path, rev, line,
-                      pattern=self._fileview.searchbar.pattern(), parent=self)
-
 class ManifestWidget(QWidget, qtlib.TaskWidget):
     """Display file tree and contents at the specified revision"""
 
@@ -205,8 +199,12 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
               self.vdifflocal),
             ('edit', _('View at Revision'), 'view-at-revision', 'Alt+Ctrl+E',
               _('View file as it appeared at this revision'), self.editfile),
+            ('open', _('Open at Revision'), '', 'Alt+Ctrl+O',
+              _('Open file as it appeared at this revision'), self.openfile),
             ('ledit', _('Edit Local'), 'edit-file', 'Shift+Ctrl+E',
               _('Edit current file in working copy'), self.editlocal),
+            ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
+              _('Edit current file in working copy'), self.openlocal),
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
@@ -259,7 +257,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if dlg:
             dlg.exec_()
 
-    def editfile(self):
+    def editfile(self, editor=None):
         if self.path is None:
             return
         if self.rev is None:
@@ -272,11 +270,29 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             files = [os.path.join(base, hglib.fromunicode(self.path))]
             qtlib.editfiles(self._repo, files, parent=self)
 
-    def editlocal(self):
+    def openfile(self, editor=None):
+        if self.path is None:
+            return
+        if self.rev is None:
+            qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
+                            parent=self)
+        else:
+            base, _ = visdiff.snapshot(self._repo,
+                                       [hglib.fromunicode(self.path)],
+                                       self._repo[self.rev])
+            files = [os.path.join(base, hglib.fromunicode(self.path))]
+            qtlib.editfiles(self._repo, files, parent=self)
+
+    def editlocal(self, editor=None):
         if self.path is None:
             return
         qtlib.editfiles(self._repo, [hglib.fromunicode(self.path)],
                         parent=self)
+
+    def openlocal(self):
+        if self.path is None:
+            return
+        qtlib.openfiles(self.repo, [hglib.fromunicode(self.path)])
 
     def revertfile(self):
         if self.path is None:
@@ -317,7 +333,7 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
     def explore(self):
         root = self._repo.wjoin(hglib.fromunicode(self.path))
         if os.path.isdir(root):
-            QDesktopServices.openUrl(QUrl.fromLocalFile(hglib.tounicode(root)))
+            qtlib.openlocalurl(root)
 
     def terminal(self):
         root = self._repo.wjoin(hglib.fromunicode(self.path))
@@ -337,7 +353,10 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
         if itemissubrepo:
             self.opensubrepo()
         else:
-            self.vdiff()
+            if self._treemodel.fileStatus(index) in 'C?':
+                self.editfile()
+            else:
+                self.vdiff()
 
     def menuRequest(self, point):
         selmodel = self._treeview.selectionModel()
@@ -517,15 +536,6 @@ def connectsearchbar(manifestwidget, searchbar):
     searchbar.conditionChanged.connect(manifestwidget.highlightText)
     searchbar.searchRequested.connect(manifestwidget.find)
 
-def _openineditor(repo, path, rev, line=None, pattern=None, parent=None):
-    """Open editor to show the specified file [unicode]"""
-    path = hglib.fromunicode(path)
-    pattern = hglib.fromunicode(pattern)
-    base = visdiff.snapshot(repo, [path], repo[rev])[0]
-    files = [os.path.join(base, path)]
-    qtlib.editfiles(repo, files, line, pattern, parent=self)
-
-
 def run(ui, *pats, **opts):
     repo = opts.get('repo') or thgrepo.repository(ui, paths.find_root())
     try:
@@ -547,7 +557,7 @@ def run(ui, *pats, **opts):
             else:
                 return
             line = opts.get('line') and int(opts['line']) or None
-            dlg.setSource(path, rev, line)
+            dlg.setSource(hglib.tounicode(path), rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])
             if dlg._manifest_widget._fileview.actionAnnMode.isEnabled():

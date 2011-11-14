@@ -11,7 +11,7 @@ import shlex
 import binascii
 import cStringIO
 
-from mercurial import patch, util
+from mercurial import patch, util, error
 from mercurial import node
 from mercurial.util import propertycache
 from hgext import mq, record
@@ -67,8 +67,11 @@ class patchctx(object):
             if ph.message:
                 ph.diffstartline += 1
         self._user = ph.user or ''
-        self._date = ph.date and util.parsedate(ph.date) or util.makedate()
         self._desc = ph.message and '\n'.join(ph.message).strip() or ''
+        try:
+            self._date = ph.date and util.parsedate(ph.date) or util.makedate()
+        except error.Abort:
+            self._date = util.makedate()
 
     def invalidate(self):
         # ensure the patch contents are re-read
@@ -127,6 +130,11 @@ class patchctx(object):
     def thgbranchhead(self):        return False
     def thgmqunappliedpatch(self):  return True
     def thgid(self):                return self._identity
+
+    # largefiles/kbfiles methods
+    def hasStandin(self, file):     return False
+    def isStandin(self, path):      return False
+    def removeStandin(self, path):  return path
 
     def longsummary(self):
         summary = hglib.tounicode(self.description())

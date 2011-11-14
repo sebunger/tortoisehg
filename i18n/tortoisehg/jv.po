@@ -1,21 +1,21 @@
-# Hebrew translation for tortoisehg
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Javanese translation for tortoisehg
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
 # This file is distributed under the same license as the tortoisehg package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-11-03 13:11-0200\n"
-"PO-Revision-Date: 2009-10-18 09:25+0000\n"
-"Last-Translator: peso <peer.sommerlund@gmail.com>\n"
-"Language-Team: Hebrew <he@li.org>\n"
+"PO-Revision-Date: 2011-10-17 08:45+0000\n"
+"Last-Translator: uring <Unknown>\n"
+"Language-Team: Javanese <jv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-11-04 05:07+0000\n"
+"Plural-Forms: nplurals=2; plural=n != 0;\n"
+"X-Launchpad-Export-Date: 2011-11-04 05:08+0000\n"
 "X-Generator: Launchpad (build 14231)\n"
 
 #: TortoiseHgOverlayServer.py:51
@@ -24,11 +24,11 @@ msgstr ""
 
 #: TortoiseHgOverlayServer.py:162
 msgid "Exit"
-msgstr ""
+msgstr "Metu"
 
 #: tortoisehg/hgqt/about.py:31 tortoisehg/hgtk/gdialog.py:505
 msgid "About"
-msgstr ""
+msgstr "Sekitaripun"
 
 #: tortoisehg/hgqt/about.py:56
 msgid "Copyright 2008-2011 Steve Borho and others"
@@ -40,7 +40,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/about.py:71
 msgid "You can visit our site here"
-msgstr ""
+msgstr "Njenengan saget ndugi situs kulo wonten ngriki"
 
 #: tortoisehg/hgqt/about.py:80
 msgid "&License"
@@ -56,16 +56,16 @@ msgstr ""
 #: tortoisehg/hgqt/about.py:106
 #, python-format
 msgid "version %s"
-msgstr ""
+msgstr "versi %s"
 
 #: tortoisehg/hgqt/about.py:107
 #, python-format
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
-msgstr ""
+msgstr "kale Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #: tortoisehg/hgqt/about.py:156 tortoisehg/hgtk/about.py:70
 msgid "A new version of TortoiseHg is ready for download!"
-msgstr ""
+msgstr "Versi anyar TortoiseHg siap di unduh"
 
 #: tortoisehg/hgqt/archive.py:20 tortoisehg/hgtk/archive.py:18
 msgid "= Working Directory Parent ="
@@ -79,11 +79,11 @@ msgstr ""
 #: tortoisehg/hgtk/csinfo.py:212 tortoisehg/hgtk/cslist.py:142
 #: tortoisehg/hgtk/tagadd.py:66
 msgid "Revision:"
-msgstr ""
+msgstr "Revisi:"
 
 #: tortoisehg/hgqt/archive.py:46 tortoisehg/hgtk/archive.py:62
 msgid "Only files modified/created in this revision"
-msgstr ""
+msgstr "Namung berkas sing diubah/digawe dalemipun revisi punika"
 
 #: tortoisehg/hgqt/archive.py:47 tortoisehg/hgqt/grep.py:68
 #: tortoisehg/hgqt/sync.py:1533
@@ -93,7 +93,7 @@ msgstr ""
 #: tortoisehg/hgqt/archive.py:54 tortoisehg/hgqt/hginit.py:34
 #: tortoisehg/hgtk/archive.py:72 tortoisehg/hgtk/clone.py:106
 msgid "Destination path:"
-msgstr "נתיב היעד:"
+msgstr "Path sing dituju"
 
 #: tortoisehg/hgqt/archive.py:58 tortoisehg/hgqt/clone.py:58
 #: tortoisehg/hgqt/clone.py:69 tortoisehg/hgqt/clone.py:138
@@ -103,16 +103,16 @@ msgstr "נתיב היעד:"
 #: tortoisehg/hgtk/hginit.py:55 tortoisehg/hgtk/thgconfig.py:394
 #: tortoisehg/hgtk/thgimport.py:63
 msgid "Browse..."
-msgstr "עיין..."
+msgstr "Nggolek'i"
 
 #: tortoisehg/hgqt/archive.py:65 tortoisehg/hgtk/archive.py:77
 msgid "Archive types:"
-msgstr ""
+msgstr "Macem-macem simpenan:"
 
 #: tortoisehg/hgqt/archive.py:69 tortoisehg/hgqt/archive.py:240
 #: tortoisehg/hgtk/archive.py:75
 msgid "Directory of files"
-msgstr "תיקיית קבצים"
+msgstr ""
 
 #: tortoisehg/hgqt/archive.py:70 tortoisehg/hgtk/archive.py:83
 msgid "Uncompressed tar archive"
@@ -165,12 +165,12 @@ msgstr ""
 #: tortoisehg/hgqt/wctxactions.py:334 tortoisehg/hgtk/shellconf.py:28
 #: tortoisehg/hgtk/thgshelve.py:163
 msgid "Cancel"
-msgstr ""
+msgstr "Wurung"
 
 #: tortoisehg/hgqt/archive.py:168 tortoisehg/hgtk/archive.py:29
 #, python-format
 msgid "Archive - %s"
-msgstr "ארכיון - %s"
+msgstr "Simpenan - %s"
 
 #: tortoisehg/hgqt/archive.py:193 tortoisehg/hgqt/hginit.py:106
 #: tortoisehg/hgqt/rename.py:204 tortoisehg/hgtk/archive.py:195
@@ -501,7 +501,7 @@ msgstr ""
 #: tortoisehg/hgqt/rebase.py:194 tortoisehg/hgtk/bugreport.py:48
 #: tortoisehg/hgtk/hgcmd.py:50 tortoisehg/hgtk/thgmq.py:142
 msgid "Close"
-msgstr "סגור"
+msgstr ""
 
 #: tortoisehg/hgqt/bisect.py:83
 msgid "Error encountered."
@@ -8171,7 +8171,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/archive.py:59
 msgid "Archive revision:"
-msgstr "גרסת הארכיון:"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:96
 msgid "Archive"
