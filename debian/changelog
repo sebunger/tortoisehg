@@ -1,3 +1,9 @@
+tortoisehg (2.2-1) unstable; urgency=low
+
+  * New upstream version (Closes: #647780).
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 13 Nov 2011 19:00:16 -0800
+
 tortoisehg (2.1.4-1) unstable; urgency=low
 
   * New upstream release.
