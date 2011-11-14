@@ -1,8 +1,10 @@
 tortoisehg (2.2-1) unstable; urgency=low
 
   * New upstream version (Closes: #647780).
+  * Add menu and desktop entry for workbench (Closes: #647266).
+  * Use .links file rather than create symlinks in the rules file.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Sun, 13 Nov 2011 19:00:16 -0800
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 13 Nov 2011 23:31:03 -0800
 
 tortoisehg (2.1.4-1) unstable; urgency=low
 
