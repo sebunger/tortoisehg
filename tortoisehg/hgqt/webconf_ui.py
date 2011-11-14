@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/steve/tools/thg/tortoisehg/hgqt/webconf.ui'
+# Form implementation generated from reading ui file 'tortoisehg/hgqt/webconf.ui'
 #
-# Created: Wed Oct  5 22:45:32 2011
-#      by: PyQt4 UI code generator 4.8.3
+# Created: Sun Nov 13 23:18:49 2011
+#      by: PyQt4 UI code generator 4.8.6
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -19,11 +19,13 @@ class Ui_WebconfForm(object):
     def setupUi(self, WebconfForm):
         WebconfForm.setObjectName(_fromUtf8("WebconfForm"))
         WebconfForm.resize(455, 300)
+        WebconfForm.setWindowTitle(_('Webconf'))
         self.form_layout = QtGui.QVBoxLayout(WebconfForm)
         self.form_layout.setObjectName(_fromUtf8("form_layout"))
         self.path_layout = QtGui.QHBoxLayout()
         self.path_layout.setObjectName(_fromUtf8("path_layout"))
         self.path_label = QtGui.QLabel(WebconfForm)
+        self.path_label.setText(_('Config File:'))
         self.path_label.setObjectName(_fromUtf8("path_label"))
         self.path_layout.addWidget(self.path_label)
         self.path_edit = QtGui.QComboBox(WebconfForm)
@@ -36,9 +38,11 @@ class Ui_WebconfForm(object):
         self.path_edit.setObjectName(_fromUtf8("path_edit"))
         self.path_layout.addWidget(self.path_edit)
         self.open_button = QtGui.QToolButton(WebconfForm)
+        self.open_button.setText(_('Open'))
         self.open_button.setObjectName(_fromUtf8("open_button"))
         self.path_layout.addWidget(self.open_button)
         self.save_button = QtGui.QToolButton(WebconfForm)
+        self.save_button.setText(_('Save'))
         self.save_button.setObjectName(_fromUtf8("save_button"))
         self.path_layout.addWidget(self.save_button)
         self.form_layout.addLayout(self.path_layout)
@@ -58,12 +62,15 @@ class Ui_WebconfForm(object):
         self.addremove_layout = QtGui.QVBoxLayout()
         self.addremove_layout.setObjectName(_fromUtf8("addremove_layout"))
         self.add_button = QtGui.QToolButton(WebconfForm)
+        self.add_button.setText(_('Add'))
         self.add_button.setObjectName(_fromUtf8("add_button"))
         self.addremove_layout.addWidget(self.add_button)
         self.edit_button = QtGui.QToolButton(WebconfForm)
+        self.edit_button.setText(_('Edit'))
         self.edit_button.setObjectName(_fromUtf8("edit_button"))
         self.addremove_layout.addWidget(self.edit_button)
         self.remove_button = QtGui.QToolButton(WebconfForm)
+        self.remove_button.setText(_('Remove'))
         self.remove_button.setObjectName(_fromUtf8("remove_button"))
         self.addremove_layout.addWidget(self.remove_button)
         spacerItem = QtGui.QSpacerItem(0, 0, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
@@ -76,11 +83,5 @@ class Ui_WebconfForm(object):
         QtCore.QMetaObject.connectSlotsByName(WebconfForm)
 
     def retranslateUi(self, WebconfForm):
-        WebconfForm.setWindowTitle(_('Webconf'))
-        self.path_label.setText(_('Config File:'))
-        self.open_button.setText(_('Open'))
-        self.save_button.setText(_('Save'))
-        self.add_button.setText(_('Add'))
-        self.edit_button.setText(_('Edit'))
-        self.remove_button.setText(_('Remove'))
+        pass
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/steve/tools/thg/tortoisehg/hgqt/serve.ui'
+# Form implementation generated from reading ui file 'tortoisehg/hgqt/serve.ui'
 #
-# Created: Wed Oct  5 22:45:31 2011
-#      by: PyQt4 UI code generator 4.8.3
+# Created: Sun Nov 13 23:18:49 2011
+#      by: PyQt4 UI code generator 4.8.6
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -19,6 +19,7 @@ class Ui_ServeDialog(object):
     def setupUi(self, ServeDialog):
         ServeDialog.setObjectName(_fromUtf8("ServeDialog"))
         ServeDialog.resize(500, 400)
+        ServeDialog.setWindowTitle(_('Serve'))
         self.dialog_layout = QtGui.QVBoxLayout(ServeDialog)
         self.dialog_layout.setObjectName(_fromUtf8("dialog_layout"))
         self.top_layout = QtGui.QHBoxLayout()
@@ -27,16 +28,18 @@ class Ui_ServeDialog(object):
         self.opts_layout.setFieldGrowthPolicy(QtGui.QFormLayout.ExpandingFieldsGrow)
         self.opts_layout.setObjectName(_fromUtf8("opts_layout"))
         self.port_label = QtGui.QLabel(ServeDialog)
+        self.port_label.setText(_('Port:'))
         self.port_label.setObjectName(_fromUtf8("port_label"))
         self.opts_layout.setWidget(0, QtGui.QFormLayout.LabelRole, self.port_label)
         self.port_edit = QtGui.QSpinBox(ServeDialog)
         self.port_edit.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.port_edit.setMinimum(1)
         self.port_edit.setMaximum(65535)
-        self.port_edit.setProperty(_fromUtf8("value"), 8000)
+        self.port_edit.setProperty("value", 8000)
         self.port_edit.setObjectName(_fromUtf8("port_edit"))
         self.opts_layout.setWidget(0, QtGui.QFormLayout.FieldRole, self.port_edit)
         self.status_label = QtGui.QLabel(ServeDialog)
+        self.status_label.setText(_('Status:'))
         self.status_label.setObjectName(_fromUtf8("status_label"))
         self.opts_layout.setWidget(1, QtGui.QFormLayout.LabelRole, self.status_label)
         self.status_edit = QtGui.QLabel(ServeDialog)
@@ -54,16 +57,19 @@ class Ui_ServeDialog(object):
         self.actions_layout = QtGui.QVBoxLayout()
         self.actions_layout.setObjectName(_fromUtf8("actions_layout"))
         self.start_button = QtGui.QPushButton(ServeDialog)
+        self.start_button.setText(_('Start'))
         self.start_button.setDefault(True)
         self.start_button.setObjectName(_fromUtf8("start_button"))
         self.actions_layout.addWidget(self.start_button)
         self.stop_button = QtGui.QPushButton(ServeDialog)
+        self.stop_button.setText(_('Stop'))
         self.stop_button.setAutoDefault(False)
         self.stop_button.setObjectName(_fromUtf8("stop_button"))
         self.actions_layout.addWidget(self.stop_button)
         spacerItem = QtGui.QSpacerItem(0, 5, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.actions_layout.addItem(spacerItem)
         self.settings_button = QtGui.QPushButton(ServeDialog)
+        self.settings_button.setText(_('Settings'))
         self.settings_button.setAutoDefault(False)
         self.settings_button.setObjectName(_fromUtf8("settings_button"))
         self.actions_layout.addWidget(self.settings_button)
@@ -85,10 +91,5 @@ class Ui_ServeDialog(object):
         ServeDialog.setTabOrder(self.settings_button, self.details_tabs)
 
     def retranslateUi(self, ServeDialog):
-        ServeDialog.setWindowTitle(_('Serve'))
-        self.port_label.setText(_('Port:'))
-        self.status_label.setText(_('Status:'))
-        self.start_button.setText(_('Start'))
-        self.stop_button.setText(_('Stop'))
-        self.settings_button.setText(_('Settings'))
+        pass
 

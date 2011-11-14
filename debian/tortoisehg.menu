@@ -1,0 +1,7 @@
+?package(tortoisehg):\
+    needs="X11"\
+    section="Applications/Programming"\
+    title="TortoiseHG Workbench"\
+    command="thg log"\
+    hints="SVN,VCS"\
+    icon="/usr/share/pixmaps/tortoisehg.xpm"
