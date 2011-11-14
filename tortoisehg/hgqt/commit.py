@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 
 from mercurial import ui, util, error
 
@@ -14,7 +15,7 @@ from tortoisehg.util import hglib, shlib, wconfig, bugtraq
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import qtlib, qscilib, status, cmdui, branchop, revpanel
-from tortoisehg.hgqt import hgrcutil, mq
+from tortoisehg.hgqt import hgrcutil, mq, lfprompt
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -120,8 +121,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             except Exception, e:
                 tracker = self.opts['bugtraqplugin'].split(' ', 1)[1]
                 qtlib.ErrorMsgBox(_('Issue Tracker'),
-                                  _('Failed to load issue tracker \'%s\': %s'
-                                    % (tracker, e)),
+                                  _('Failed to load issue tracker \'%s\': %s')
+                                    % (tracker, hglib.tounicode(str(e))),
                                   parent=self)
                 self.bugtraq = None
             else:
@@ -495,6 +496,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.refresh()
 
     @pyqtSlot()
+    def refreshWctx(self):
+        'User has requested a working context refresh'
+        self.stwidget.refreshWctx() # Trigger reload of working context
+
+    @pyqtSlot()
     def reload(self):
         'User has requested a reload'
         self.repo.thginvalidate()
@@ -676,6 +682,22 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.msgte.setFocus()
             return
 
+        linkmandatory = self.repo.ui.config('tortoisehg',
+                                            'issue.linkmandatory', False)
+        if linkmandatory:
+            issueregex = self.repo.ui.config('tortoisehg', 'issue.regex')
+            if issueregex:
+                m = re.search(issueregex, msg)
+                if not m:
+                    qtlib.WarningMsgBox(_('Nothing Commited'),
+                                        _('No issue link was found in the commit message.  '
+                                          'The commit message should contain an issue '
+                                          'link.  Configure this in the \'Issue Tracking\' '
+                                          'section of the settings.'),
+                                        parent=self)
+                    self.msgte.setFocus()
+                    return False
+
         commandlines = []
 
         brcmd = []
@@ -712,6 +734,22 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                     (_('&Add'), _('Cancel')), 0, 1,
                     checkedUnknowns).run()
             if res == 0:
+                haslf = 'largefiles' in repo.extensions()
+                haskbf = 'kbfiles' in repo.extensions()
+                if haslf or haskbf:
+                    result = lfprompt.promptForLfiles(self, repo.ui, repo,
+                                                      checkedUnknowns, haskbf)
+                    if not result:
+                        return
+                    checkedUnknowns, lfiles = result
+                    if lfiles:
+                        if haslf:
+                            cmd = ['add', '--repository', repo.root, '--large'] + \
+                                  [repo.wjoin(f) for f in lfiles]
+                        else:
+                            cmd = ['add', '--repository', repo.root, '--bf'] + \
+                                  [repo.wjoin(f) for f in lfiles]
+                        commandlines.append(cmd)
                 cmd = ['add', '--repository', repo.root] + \
                       [repo.wjoin(f) for f in checkedUnknowns]
                 commandlines.append(cmd)
@@ -1061,7 +1099,7 @@ class CommitDialog(QDialog):
         toplayout = QVBoxLayout()
         toplayout.setContentsMargins(5, 5, 5, 0)
         layout.addLayout(toplayout)
-        
+
         commit = CommitWidget(repo, pats, opts, False, self)
         toplayout.addWidget(commit, 1)
 

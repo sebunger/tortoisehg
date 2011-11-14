@@ -48,6 +48,7 @@ class Workbench(QMainWindow):
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
         rr.openRepo.connect(self.openRepo)
+        rr.removeRepo.connect(self.removeRepo)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
         self.activeRepoChanged.connect(rr.setActiveTabRepo)
@@ -473,6 +474,15 @@ class Workbench(QMainWindow):
         root = hglib.fromunicode(root)
         self._openRepo(root, reuse)
 
+    def removeRepo(self, root):
+        """ Close tab if the repo is removed from reporegistry [unicode] """
+        root = hglib.fromunicode(root)
+        for i in xrange(self.repoTabsWidget.count()):
+            w = self.repoTabsWidget.widget(i)
+            if hglib.tounicode(w.repo.root) == os.path.normpath(root):
+                self.repoTabCloseRequested(i)
+                return
+
     @pyqtSlot(QString)
     def openLinkedRepo(self, path):
         self.showRepo(path)
@@ -655,7 +665,15 @@ class Workbench(QMainWindow):
         rw.repoChanged.connect(self.reporegistry.repoChanged)
 
         tw = self.repoTabsWidget
-        index = self.repoTabsWidget.addTab(rw, rw.title())
+        # We can open new tabs next to the current one or next to the last tab
+        openTabAfterCurrent = self.ui.configbool('tortoisehg',
+            'opentabsaftercurrent', True)
+        if openTabAfterCurrent:
+            index = self.repoTabsWidget.insertTab(
+                tw.currentIndex()+1, rw, rw.title())
+        else:
+            index = self.repoTabsWidget.addTab(rw, rw.title())
+
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(
             lambda title: tw.setTabText(tw.indexOf(rw), title))
@@ -874,7 +892,7 @@ class Workbench(QMainWindow):
     def explore(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(w.repo.root))
+            qtlib.openlocalurl(w.repo.root)
 
     def terminal(self):
         w = self.repoTabsWidget.currentWidget()

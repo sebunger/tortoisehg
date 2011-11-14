@@ -1,50 +1,50 @@
-# Hebrew translation for tortoisehg
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Indonesian translation for tortoisehg
+# Copyright (c) 2011 Rosetta Contributors and Canonical Ltd 2011
 # This file is distributed under the same license as the tortoisehg package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2011.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2011-11-03 13:11-0200\n"
-"PO-Revision-Date: 2009-10-18 09:25+0000\n"
-"Last-Translator: peso <peer.sommerlund@gmail.com>\n"
-"Language-Team: Hebrew <he@li.org>\n"
+"PO-Revision-Date: 2011-10-21 15:28+0000\n"
+"Last-Translator: uring <Unknown>\n"
+"Language-Team: Indonesian <id@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2011-11-04 05:07+0000\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Launchpad-Export-Date: 2011-11-04 05:08+0000\n"
 "X-Generator: Launchpad (build 14231)\n"
 
 #: TortoiseHgOverlayServer.py:51
 msgid "TortoiseHg Overlay Icon Server"
-msgstr ""
+msgstr "Hamparan Ikon Server TortoiseHg"
 
 #: TortoiseHgOverlayServer.py:162
 msgid "Exit"
-msgstr ""
+msgstr "Keluar"
 
 #: tortoisehg/hgqt/about.py:31 tortoisehg/hgtk/gdialog.py:505
 msgid "About"
-msgstr ""
+msgstr "Informasi program"
 
 #: tortoisehg/hgqt/about.py:56
 msgid "Copyright 2008-2011 Steve Borho and others"
-msgstr ""
+msgstr "Hak cipta 2008-2011 Steve Borho dan lainnya"
 
 #: tortoisehg/hgqt/about.py:61 tortoisehg/hgtk/about.py:42
 msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr ""
+msgstr "Beberapa ikon adalah milik proyek TortoiseSVN"
 
 #: tortoisehg/hgqt/about.py:71
 msgid "You can visit our site here"
-msgstr ""
+msgstr "Anda bisa mengunjungi situs kami disini"
 
 #: tortoisehg/hgqt/about.py:80
 msgid "&License"
-msgstr ""
+msgstr "&Lisensi"
 
 #: tortoisehg/hgqt/about.py:86 tortoisehg/hgqt/archive.py:108
 #: tortoisehg/hgqt/hgemail_ui.py:273 tortoisehg/hgqt/hginit.py:58
@@ -56,20 +56,20 @@ msgstr ""
 #: tortoisehg/hgqt/about.py:106
 #, python-format
 msgid "version %s"
-msgstr ""
+msgstr "versi %s"
 
 #: tortoisehg/hgqt/about.py:107
 #, python-format
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
-msgstr ""
+msgstr "dengan Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #: tortoisehg/hgqt/about.py:156 tortoisehg/hgtk/about.py:70
 msgid "A new version of TortoiseHg is ready for download!"
-msgstr ""
+msgstr "Versi baru TortoiseHG sudah ada untuk di unduh!"
 
 #: tortoisehg/hgqt/archive.py:20 tortoisehg/hgtk/archive.py:18
 msgid "= Working Directory Parent ="
-msgstr ""
+msgstr "= Induk Direktori Kerja ="
 
 #: tortoisehg/hgqt/archive.py:40 tortoisehg/hgqt/backout.py:420
 #: tortoisehg/hgqt/bookmark.py:50 tortoisehg/hgqt/csinfo.py:105
@@ -79,11 +79,11 @@ msgstr ""
 #: tortoisehg/hgtk/csinfo.py:212 tortoisehg/hgtk/cslist.py:142
 #: tortoisehg/hgtk/tagadd.py:66
 msgid "Revision:"
-msgstr ""
+msgstr "Revisi:"
 
 #: tortoisehg/hgqt/archive.py:46 tortoisehg/hgtk/archive.py:62
 msgid "Only files modified/created in this revision"
-msgstr ""
+msgstr "Hanya berkas yang diubah/dibuat dalam revisi ini"
 
 #: tortoisehg/hgqt/archive.py:47 tortoisehg/hgqt/grep.py:68
 #: tortoisehg/hgqt/sync.py:1533
@@ -93,7 +93,7 @@ msgstr ""
 #: tortoisehg/hgqt/archive.py:54 tortoisehg/hgqt/hginit.py:34
 #: tortoisehg/hgtk/archive.py:72 tortoisehg/hgtk/clone.py:106
 msgid "Destination path:"
-msgstr "נתיב היעד:"
+msgstr "Path tujuan:"
 
 #: tortoisehg/hgqt/archive.py:58 tortoisehg/hgqt/clone.py:58
 #: tortoisehg/hgqt/clone.py:69 tortoisehg/hgqt/clone.py:138
@@ -103,16 +103,16 @@ msgstr "נתיב היעד:"
 #: tortoisehg/hgtk/hginit.py:55 tortoisehg/hgtk/thgconfig.py:394
 #: tortoisehg/hgtk/thgimport.py:63
 msgid "Browse..."
-msgstr "עיין..."
+msgstr "Telusur..."
 
 #: tortoisehg/hgqt/archive.py:65 tortoisehg/hgtk/archive.py:77
 msgid "Archive types:"
-msgstr ""
+msgstr "Tipe arsip:"
 
 #: tortoisehg/hgqt/archive.py:69 tortoisehg/hgqt/archive.py:240
 #: tortoisehg/hgtk/archive.py:75
 msgid "Directory of files"
-msgstr "תיקיית קבצים"
+msgstr "Direktori berkas-berkas"
 
 #: tortoisehg/hgqt/archive.py:70 tortoisehg/hgtk/archive.py:83
 msgid "Uncompressed tar archive"
@@ -137,19 +137,19 @@ msgstr ""
 #: tortoisehg/hgqt/archive.py:84 tortoisehg/hgqt/clone.py:157
 #: tortoisehg/hgqt/hginit.py:67 tortoisehg/hgqt/rename.py:84
 msgid "Hg command:"
-msgstr ""
+msgstr "Perintah hg:"
 
 #: tortoisehg/hgqt/archive.py:88 tortoisehg/hgqt/rename.py:89
 msgid "Always show output"
-msgstr ""
+msgstr "Selalu menampilkan keluaran"
 
 #: tortoisehg/hgqt/archive.py:106
 msgid "&Archive"
-msgstr ""
+msgstr "&Arsip"
 
 #: tortoisehg/hgqt/archive.py:111 tortoisehg/hgqt/rename.py:107
 msgid "&Detail"
-msgstr ""
+msgstr "&Detil"
 
 #: tortoisehg/hgqt/archive.py:114 tortoisehg/hgqt/backout.py:300
 #: tortoisehg/hgqt/commit.py:376 tortoisehg/hgqt/commit.py:384
@@ -165,54 +165,54 @@ msgstr ""
 #: tortoisehg/hgqt/wctxactions.py:334 tortoisehg/hgtk/shellconf.py:28
 #: tortoisehg/hgtk/thgshelve.py:163
 msgid "Cancel"
-msgstr ""
+msgstr "Batal"
 
 #: tortoisehg/hgqt/archive.py:168 tortoisehg/hgtk/archive.py:29
 #, python-format
 msgid "Archive - %s"
-msgstr "ארכיון - %s"
+msgstr "Arsip - %s"
 
 #: tortoisehg/hgqt/archive.py:193 tortoisehg/hgqt/hginit.py:106
 #: tortoisehg/hgqt/rename.py:204 tortoisehg/hgtk/archive.py:195
 #: tortoisehg/hgtk/clone.py:107 tortoisehg/hgtk/hginit.py:95
 msgid "Select Destination Folder"
-msgstr ""
+msgstr "Pilih Direktori yang dituju"
 
 #: tortoisehg/hgqt/archive.py:197
 msgid "Open File"
-msgstr ""
+msgstr "Buka Berkas"
 
 #: tortoisehg/hgqt/archive.py:227 tortoisehg/hgtk/archive.py:171
 msgid "Tar archives"
-msgstr ""
+msgstr "Arsip-arsip tar"
 
 #: tortoisehg/hgqt/archive.py:230 tortoisehg/hgtk/archive.py:174
 msgid "Bzip2 tar archives"
-msgstr ""
+msgstr "Arsip-arsip tar bzip2"
 
 #: tortoisehg/hgqt/archive.py:233 tortoisehg/hgtk/archive.py:177
 msgid "Gzip tar archives"
-msgstr ""
+msgstr "Arsip-arsip tar gzip"
 
 #: tortoisehg/hgqt/archive.py:236 tortoisehg/hgqt/archive.py:239
 msgid "Zip archives"
-msgstr ""
+msgstr "Arsip zip"
 
 #: tortoisehg/hgqt/archive.py:314 tortoisehg/hgqt/archive.py:332
 msgid "Duplicate Name"
-msgstr ""
+msgstr "Nama Rangkap"
 
 #: tortoisehg/hgqt/archive.py:315
 #, python-format
 msgid "The destination \"%s\" already exists as a file!"
-msgstr ""
+msgstr "Yang dituju \"%s\" sudah ada sebagai berkas!"
 
 #: tortoisehg/hgqt/archive.py:319 tortoisehg/hgqt/archive.py:326
 #: tortoisehg/hgtk/archive.py:213 tortoisehg/hgtk/archive.py:219
 #: tortoisehg/hgtk/gtklib.py:594 tortoisehg/hgtk/thgconfig.py:574
 #: tortoisehg/hgtk/thgconfig.py:1077
 msgid "Confirm Overwrite"
-msgstr ""
+msgstr "Konfirmasi untuk ditimpa"
 
 #: tortoisehg/hgqt/archive.py:320
 #, python-format
@@ -221,6 +221,9 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"Direktori \"%s\" tidak kosong!\n"
+"\n"
+"Anda ingin menimpanya?"
 
 #: tortoisehg/hgqt/archive.py:327 tortoisehg/hgtk/gtklib.py:595
 #, python-format
@@ -229,11 +232,14 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"Berkas \"%s\" sudah ada!\n"
+"\n"
+"Anda ingin menimpanya?"
 
 #: tortoisehg/hgqt/archive.py:333
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
-msgstr ""
+msgstr "Yang dituju \"%s\" sudah ada sebagai folder!"
 
 #: tortoisehg/hgqt/backout.py:29
 #, python-format
@@ -279,7 +285,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:153
 msgid "Current local revision"
-msgstr ""
+msgstr "Revisi lokal saat ini"
 
 #: tortoisehg/hgqt/backout.py:171
 msgid "Merge parent to backout to"
@@ -294,7 +300,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:179
 #, python-format
 msgid "First Parent: revision %s (%s)"
-msgstr ""
+msgstr "Induk Pertama: revisi %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:185
 msgid "Backout to the first parent of the merge revision"
@@ -303,7 +309,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:190
 #, python-format
 msgid "Second Parent: revision %s (%s)"
-msgstr ""
+msgstr "Induk Kedua: revisi %s (%s)"
 
 #: tortoisehg/hgqt/backout.py:195
 msgid "Backout to the second parent of the merge revision"
@@ -311,12 +317,12 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:203 tortoisehg/hgqt/merge.py:154
 msgid "Working directory status"
-msgstr ""
+msgstr "Status direktori kerja"
 
 #: tortoisehg/hgqt/backout.py:209 tortoisehg/hgqt/compress.py:69
 #: tortoisehg/hgqt/merge.py:162 tortoisehg/hgqt/rebase.py:110
 msgid "Checking..."
-msgstr ""
+msgstr "Memeriksa..."
 
 #: tortoisehg/hgqt/backout.py:217
 msgid ""
@@ -329,7 +335,7 @@ msgstr ""
 #: tortoisehg/hgqt/rebase.py:73 tortoisehg/hgqt/sync.py:1077
 #: tortoisehg/hgqt/update.py:103
 msgid "Automatically resolve merge conflicts where possible"
-msgstr ""
+msgstr "Otomatis menyelesaikan konflik penggabungan bila dimungkinkan"
 
 #: tortoisehg/hgqt/backout.py:274 tortoisehg/hgqt/merge.py:285
 msgid "<b>Uncommitted local changes are detected</b>"
@@ -337,7 +343,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/backout.py:278 tortoisehg/hgtk/recovery.py:52
 msgid "Clean"
-msgstr ""
+msgstr "Bersih"
 
 #: tortoisehg/hgqt/backout.py:299 tortoisehg/hgqt/compress.py:149
 #: tortoisehg/hgqt/merge.py:234 tortoisehg/hgqt/merge.py:311
@@ -345,12 +351,12 @@ msgstr ""
 #: tortoisehg/hgqt/update.py:260 tortoisehg/hgtk/thgconfig.py:775
 #: tortoisehg/hgtk/update.py:233
 msgid "&Discard"
-msgstr ""
+msgstr "&Dibuang"
 
 #: tortoisehg/hgqt/backout.py:301 tortoisehg/hgqt/compress.py:151
 #: tortoisehg/hgqt/merge.py:313 tortoisehg/hgqt/rebase.py:232
 msgid "Confirm Discard"
-msgstr ""
+msgstr "Konfirmasi Untuk Dibuang"
 
 #: tortoisehg/hgqt/backout.py:302 tortoisehg/hgqt/compress.py:152
 #: tortoisehg/hgqt/merge.py:314 tortoisehg/hgqt/rebase.py:233
@@ -364,6 +370,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:328 tortoisehg/hgqt/merge.py:342
 msgid "All conflicting files will be marked unresolved."
 msgstr ""
+"Semua berkas-berkas yang konflik akan ditandai dengan tidak terselesaikan."
 
 #: tortoisehg/hgqt/backout.py:341
 msgid ""
@@ -376,6 +383,8 @@ msgid ""
 "%d files have <b>merge conflicts</b> that must be <a "
 "href=\"resolve\"><b>resolved</b></a>"
 msgstr ""
+"%d berkas mempunyai <b>konflik penggabungan</b> yang harus <a "
+"href=\"resolve\"></b>diselesaikan</b></a>"
 
 #: tortoisehg/hgqt/backout.py:377 tortoisehg/hgqt/merge.py:405
 msgid "No merge conflicts, ready to commit"
@@ -389,17 +398,17 @@ msgstr ""
 #: tortoisehg/hgtk/commit.py:236 tortoisehg/hgtk/history.py:66
 #: tortoisehg/hgtk/history.py:481 tortoisehg/hgtk/history.py:1223
 msgid "Parents"
-msgstr ""
+msgstr "Induk-induk"
 
 #: tortoisehg/hgqt/backout.py:426 tortoisehg/hgqt/merge.py:453
 #: tortoisehg/hgqt/repomodel.py:574 tortoisehg/hgqt/repomodel.py:576
 #: tortoisehg/hgqt/shelve.py:24 tortoisehg/hgqt/thgimport.py:87
 msgid "Working Directory"
-msgstr ""
+msgstr "Direktori Kerja"
 
 #: tortoisehg/hgqt/backout.py:466 tortoisehg/hgqt/merge.py:490
 msgid "Working Directory (merged)"
-msgstr ""
+msgstr "Direktori Kerja (digabung)"
 
 #: tortoisehg/hgqt/backout.py:474 tortoisehg/hgqt/merge.py:498
 msgid "Commit message"
@@ -422,7 +431,7 @@ msgstr ""
 #: tortoisehg/hgqt/mq.py:822 tortoisehg/hgtk/backout.py:139
 #: tortoisehg/hgtk/commit.py:580
 msgid "Confirm Discard Message"
-msgstr ""
+msgstr "Pesan Konfirmasi Untuk Dibuang"
 
 #: tortoisehg/hgqt/backout.py:515 tortoisehg/hgtk/backout.py:140
 msgid "Discard current backout message?"
@@ -461,7 +470,7 @@ msgstr ""
 #: tortoisehg/hgqt/backout.py:620 tortoisehg/hgqt/cmdui.py:313
 #: tortoisehg/hgqt/merge.py:602 tortoisehg/hgtk/p4pending.py:101
 msgid "Finished"
-msgstr ""
+msgstr "Diselesaikan"
 
 #: tortoisehg/hgqt/backout.py:625
 msgid "Backout changeset"
@@ -470,54 +479,54 @@ msgstr ""
 #: tortoisehg/hgqt/bisect.py:22
 #, python-format
 msgid "Bisect - %s"
-msgstr ""
+msgstr "Bisect - %s"
 
 #: tortoisehg/hgqt/bisect.py:34
 msgid "Known good revision:"
-msgstr ""
+msgstr "Revisi bagus yang diketahui:"
 
 #: tortoisehg/hgqt/bisect.py:38 tortoisehg/hgqt/bisect.py:48
 #: tortoisehg/hgqt/repowidget.py:428 tortoisehg/hgtk/history.py:1875
 msgid "Accept"
-msgstr ""
+msgstr "Diterima"
 
 #: tortoisehg/hgqt/bisect.py:43
 msgid "Known bad revision:"
-msgstr ""
+msgstr "Revisi buruk yang diketahui:"
 
 #: tortoisehg/hgqt/bisect.py:59
 msgid "Revision is Good"
-msgstr ""
+msgstr "Revisi yang Bagus"
 
 #: tortoisehg/hgqt/bisect.py:61
 msgid "Revision is Bad"
-msgstr ""
+msgstr "Revisi yang Buruk"
 
 #: tortoisehg/hgqt/bisect.py:63
 msgid "Skip this Revision"
-msgstr ""
+msgstr "Lewati Revisi ini"
 
 #: tortoisehg/hgqt/bisect.py:72 tortoisehg/hgqt/compress.py:138
 #: tortoisehg/hgqt/rebase.py:194 tortoisehg/hgtk/bugreport.py:48
 #: tortoisehg/hgtk/hgcmd.py:50 tortoisehg/hgtk/thgmq.py:142
 msgid "Close"
-msgstr "סגור"
+msgstr "Tutup"
 
 #: tortoisehg/hgqt/bisect.py:83
 msgid "Error encountered."
-msgstr ""
+msgstr "Ditemukan kesalahan."
 
 #: tortoisehg/hgqt/bisect.py:88
 msgid "Culprit found."
-msgstr ""
+msgstr "Menemukan masalahnya."
 
 #: tortoisehg/hgqt/bisect.py:93 tortoisehg/hgqt/grep.py:64
 msgid "Revision"
-msgstr ""
+msgstr "Revisi"
 
 #: tortoisehg/hgqt/bisect.py:94
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr ""
+msgstr "Periksa revisi ini dan laporkan temuan. (baik/buruk/lewat)"
 
 #: tortoisehg/hgqt/bisect.py:114 tortoisehg/hgqt/bisect.py:135
 #: tortoisehg/hgqt/commit.py:775 tortoisehg/hgqt/commit.py:1042
@@ -526,30 +535,30 @@ msgstr ""
 #: tortoisehg/hgqt/wctxactions.py:172
 #, python-format
 msgid "%s (hint: %s)"
-msgstr ""
+msgstr "%s (tanda: %s)"
 
 #: tortoisehg/hgqt/bookmark.py:57 tortoisehg/hgtk/bookmark.py:66
 msgid "Bookmark:"
-msgstr ""
+msgstr "Penunjuk:"
 
 #: tortoisehg/hgqt/bookmark.py:62 tortoisehg/hgtk/bookmark.py:78
 msgid "New Name:"
-msgstr ""
+msgstr "Nama Baru:"
 
 #: tortoisehg/hgqt/bookmark.py:67 tortoisehg/hgqt/commit.py:729
 #: tortoisehg/hgqt/tag.py:98 tortoisehg/hgqt/wctxactions.py:47
 #: tortoisehg/hgqt/wctxactions.py:53
 msgid "&Add"
-msgstr ""
+msgstr "T&ambah"
 
 #: tortoisehg/hgqt/bookmark.py:68
 msgid "Re&name"
-msgstr ""
+msgstr "Me&namai"
 
 #: tortoisehg/hgqt/bookmark.py:69 tortoisehg/hgqt/commit.py:758
 #: tortoisehg/hgqt/tag.py:99
 msgid "&Remove"
-msgstr ""
+msgstr "Singki&rkan"
 
 #: tortoisehg/hgqt/bookmark.py:70
 msgid "&Move"
@@ -558,43 +567,43 @@ msgstr ""
 #: tortoisehg/hgqt/bookmark.py:92 tortoisehg/hgtk/bookmark.py:34
 #, python-format
 msgid "Bookmark - %s"
-msgstr ""
+msgstr "Penunjuk - %s"
 
 #: tortoisehg/hgqt/bookmark.py:159 tortoisehg/hgqt/bookmark.py:213
 #, python-format
 msgid "A bookmark named \"%s\" already exists"
-msgstr ""
+msgstr "Penunjuk yang disebut \"%s\" sudah ada"
 
 #: tortoisehg/hgqt/bookmark.py:164
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr ""
+msgstr "Penunjuk '%s' telah ditambahkan"
 
 #: tortoisehg/hgqt/bookmark.py:175
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr ""
+msgstr "Penunjuk yang disebut \"%s\" tidak ada"
 
 #: tortoisehg/hgqt/bookmark.py:180
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr ""
+msgstr "Penunjuk '%s' telah dipindahkan"
 
 #: tortoisehg/hgqt/bookmark.py:191 tortoisehg/hgqt/bookmark.py:209
 #: tortoisehg/hgtk/bookmark.py:287
 #, python-format
 msgid "Bookmark '%s' does not exist"
-msgstr ""
+msgstr "Penunjuk '%s' tidak ada"
 
 #: tortoisehg/hgqt/bookmark.py:195
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr ""
+msgstr "Penunjuk '%s' telah disingkirkan"
 
 #: tortoisehg/hgqt/bookmark.py:218
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr ""
+msgstr "Penunjuk '%s' telah diberi nama '%s'"
 
 #: tortoisehg/hgqt/branchop.py:22
 #, python-format
@@ -625,68 +634,71 @@ msgstr ""
 #, python-format
 msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 msgstr ""
+"Silahkan melaporkan bug ini pada kami melalui <a href=\"%s\">pelacak bug</a>"
 
 #: tortoisehg/hgqt/bugreport.py:44 tortoisehg/hgqt/qscilib.py:181
 #: tortoisehg/hgqt/rename.py:166
 msgid "Copy"
-msgstr ""
+msgstr "Salin"
 
 #: tortoisehg/hgqt/bugreport.py:45
 msgid "Quit"
-msgstr ""
+msgstr "Keluar"
 
 #: tortoisehg/hgqt/bugreport.py:48 tortoisehg/hgtk/bugreport.py:25
 msgid "TortoiseHg Bug Report"
-msgstr ""
+msgstr "Laporan Bug TortoiseHg"
 
 #: tortoisehg/hgqt/bugreport.py:95 tortoisehg/hgtk/bugreport.py:87
 msgid "Save error report to"
-msgstr ""
+msgstr "Simpan laporan kesalahan ke"
 
 #: tortoisehg/hgqt/bugreport.py:97
 msgid "Text files (*.txt)"
-msgstr ""
+msgstr "Berkas teks (*.txt)"
 
 #: tortoisehg/hgqt/bugreport.py:101
 msgid "Error writing file"
-msgstr ""
+msgstr "Kesalahan menulis berkas"
 
 #: tortoisehg/hgqt/bugreport.py:124 tortoisehg/hgqt/qqueue.py:342
 #: tortoisehg/hgqt/qreorder.py:228
 msgid "TortoiseHg Error"
-msgstr ""
+msgstr "Kesalahan TortoiseHg"
 
 #: tortoisehg/hgqt/bugreport.py:146
 msgid ""
 "If you still have trouble, <a href=\"#bugreport\">please file a bug "
 "report</a>."
 msgstr ""
+"Bila anda mendapatkan masalah, <a href=\"#bugreport\">silahkan melaporkan "
+"berkas bug</a>."
 
 #: tortoisehg/hgqt/chunks.py:89 tortoisehg/hgqt/grep.py:566
 #: tortoisehg/hgqt/manifestdialog.py:195 tortoisehg/hgqt/revdetails.py:230
 #: tortoisehg/util/menuthg.py:76
 msgid "Visual Diff"
-msgstr ""
+msgstr "Diff Visual"
 
 #: tortoisehg/hgqt/chunks.py:90 tortoisehg/hgqt/manifestdialog.py:196
 #: tortoisehg/hgqt/revdetails.py:231
 msgid "View file changes in external diff tool"
-msgstr ""
+msgstr "Menampilkan berkas perubahan kedalam sarana diff eksternal"
 
 #: tortoisehg/hgqt/chunks.py:91 tortoisehg/hgqt/manifestdialog.py:202
 #: tortoisehg/hgqt/revdetails.py:239
 msgid "Edit Local"
-msgstr ""
+msgstr "Ubah Lokal"
 
 #: tortoisehg/hgqt/chunks.py:92 tortoisehg/hgqt/manifestdialog.py:203
 #: tortoisehg/hgqt/revdetails.py:240
 msgid "Edit current file in working copy"
-msgstr ""
+msgstr "Ubah berkas ini dalam salinan kerja"
 
 #: tortoisehg/hgqt/chunks.py:93 tortoisehg/hgqt/manifestdialog.py:204
 #: tortoisehg/hgqt/revdetails.py:241
 msgid "Revert to Revision"
-msgstr ""
+msgstr "Kembali ke Revisi"
 
 #: tortoisehg/hgqt/chunks.py:94 tortoisehg/hgqt/manifestdialog.py:205
 #: tortoisehg/hgqt/revdetails.py:242
@@ -695,7 +707,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/chunks.py:193
 msgid "Patch failed to apply"
-msgstr ""
+msgstr "Patch gagal untuk diterapkan"
 
 #: tortoisehg/hgqt/chunks.py:199 tortoisehg/hgqt/mq.py:245
 #: tortoisehg/hgqt/mq.py:750
@@ -704,7 +716,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/chunks.py:201
 msgid "Edit patched file and rejects?"
-msgstr ""
+msgstr "Ubah berkas patch dan menolaknya?"
 
 #: tortoisehg/hgqt/chunks.py:235
 msgid "No deletable chunks"
@@ -716,15 +728,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/chunks.py:240
 msgid "Remove all file changes?"
-msgstr ""
+msgstr "Singkirkan semua berkas-berkas yang dirubah?"
 
 #: tortoisehg/hgqt/chunks.py:273
 msgid "file has been deleted, refresh"
-msgstr ""
+msgstr "berkas telah dihapus, disegarkan"
 
 #: tortoisehg/hgqt/chunks.py:276
 msgid "file has been modified, refresh"
-msgstr ""
+msgstr "berkas telah diubah, disegarkan"
 
 #: tortoisehg/hgqt/chunks.py:310
 msgid "Unable to merge chunks"
@@ -733,10 +745,12 @@ msgstr ""
 #: tortoisehg/hgqt/chunks.py:311
 msgid "Add or remove patches must be merged in the working directory"
 msgstr ""
+"Menambah atau menyingkirkan patch yang harus digabungkan dalam direktori "
+"kerja"
 
 #: tortoisehg/hgqt/chunks.py:397
 msgid "Unable to remove"
-msgstr ""
+msgstr "Tidak bisa disingkirkan"
 
 #: tortoisehg/hgqt/chunks.py:398
 #, python-format
@@ -744,16 +758,18 @@ msgid ""
 "Unable to remove file %s,\n"
 "permission denied"
 msgstr ""
+"Tidak bisa menyingkirkan berkas %s,\n"
+"perizinan ditolak"
 
 #: tortoisehg/hgqt/chunks.py:534
 msgctxt "files"
 msgid "All"
-msgstr ""
+msgstr "Semua"
 
 #: tortoisehg/hgqt/chunks.py:539
 msgctxt "files"
 msgid "None"
-msgstr ""
+msgstr "Tanpa"
 
 #: tortoisehg/hgqt/chunks.py:595
 #, python-format
@@ -763,12 +779,12 @@ msgstr ""
 #: tortoisehg/hgqt/clone.py:61 tortoisehg/hgqt/rename.py:66
 #: tortoisehg/hgqt/thgimport.py:62 tortoisehg/hgtk/thgimport.py:82
 msgid "Source:"
-msgstr ""
+msgstr "Sumber:"
 
 #: tortoisehg/hgqt/clone.py:72 tortoisehg/hgqt/rename.py:71
 #: tortoisehg/hgtk/hginit.py:58
 msgid "Destination:"
-msgstr ""
+msgstr "Tujuan:"
 
 #: tortoisehg/hgqt/clone.py:95 tortoisehg/hgqt/commit.py:113
 #: tortoisehg/hgqt/merge.py:202 tortoisehg/hgqt/mq.py:622
@@ -776,7 +792,7 @@ msgstr ""
 #: tortoisehg/hgqt/sync.py:161 tortoisehg/hgqt/tag.py:64
 #: tortoisehg/hgtk/hgemail.py:64
 msgid "Options"
-msgstr ""
+msgstr "Opsi-opsi"
 
 #: tortoisehg/hgqt/clone.py:127 tortoisehg/hgtk/clone.py:127
 msgid "Clone to revision:"
@@ -784,7 +800,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/clone.py:130 tortoisehg/hgtk/clone.py:141
 msgid "Do not update the new working directory"
-msgstr ""
+msgstr "Jangan update salinan kerja baru"
 
 #: tortoisehg/hgqt/clone.py:131 tortoisehg/hgtk/clone.py:142
 msgid "Use pull protocol to copy metadata"
@@ -796,16 +812,16 @@ msgstr ""
 
 #: tortoisehg/hgqt/clone.py:138
 msgid "Include patch queue"
-msgstr ""
+msgstr "Menyertakan antrian patch"
 
 #: tortoisehg/hgqt/clone.py:141 tortoisehg/hgtk/clone.py:149
 #: tortoisehg/hgtk/history.py:467 tortoisehg/hgtk/synch.py:179
 msgid "Use proxy server"
-msgstr ""
+msgstr "Gunakan server proxy"
 
 #: tortoisehg/hgqt/clone.py:147
 msgid "Do not verify host certificate"
-msgstr ""
+msgstr "Jangan verifikasikan sertifikat host"
 
 #: tortoisehg/hgqt/clone.py:151 tortoisehg/hgqt/sync.py:1552
 #: tortoisehg/hgtk/clone.py:159 tortoisehg/hgtk/synch.py:202
@@ -814,7 +830,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/clone.py:154
 msgid "Start revision:"
-msgstr ""
+msgstr "Revisi dimulai:"
 
 #: tortoisehg/hgqt/clone.py:180
 msgid "&Clone"
@@ -824,7 +840,7 @@ msgstr ""
 #: tortoisehg/hgqt/thgimport.py:118 tortoisehg/hgqt/thgstrip.py:112
 #: tortoisehg/hgqt/update.py:147
 msgid "Detail"
-msgstr ""
+msgstr "Detil"
 
 #: tortoisehg/hgqt/clone.py:193
 #, python-format
@@ -839,85 +855,85 @@ msgstr ""
 
 #: tortoisehg/hgqt/clone.py:325
 msgid "Error creating destination folder"
-msgstr ""
+msgstr "Terjadi kesalahan saat membuat folder yang dituju"
 
 #: tortoisehg/hgqt/clone.py:326
 msgid "Please specify a different path."
-msgstr ""
+msgstr "Silahkan menentukan path yang berbeda."
 
 #: tortoisehg/hgqt/clone.py:349 tortoisehg/hgtk/clone.py:288
 msgid "Source path is empty"
-msgstr ""
+msgstr "Path sumber kosong"
 
 #: tortoisehg/hgqt/clone.py:350
 msgid "Please enter a valid source path."
-msgstr ""
+msgstr "Silahkan memasukkan path sumber yang sah."
 
 #: tortoisehg/hgqt/clone.py:356 tortoisehg/hgtk/clone.py:294
 msgid "Source and destination are the same"
-msgstr ""
+msgstr "Sumber dan tujuannya sama"
 
 #: tortoisehg/hgqt/clone.py:357
 msgid "Please specify different paths."
-msgstr ""
+msgstr "Silahkan menentukan path-path yang berbeda."
 
 #: tortoisehg/hgqt/clone.py:381
 msgid "Please enter a new destination path."
-msgstr ""
+msgstr "Silahkan menentukan path tujuan yang baru."
 
 #: tortoisehg/hgqt/clone.py:404
 msgid "Select source repository"
-msgstr ""
+msgstr "Pilih sumber repositori"
 
 #: tortoisehg/hgqt/clone.py:414
 msgid "Select destination repository"
-msgstr ""
+msgstr "Pilih repositori tujuan"
 
 #: tortoisehg/hgqt/clone.py:424
 msgid "Select patch folder"
-msgstr ""
+msgstr "Pilih folder patch"
 
 #: tortoisehg/hgqt/clone.py:432
 msgid "The selected patch folder is not under the source repository."
-msgstr ""
+msgstr "Folder patch yang dipilih tidak dalam repositori sumber."
 
 #: tortoisehg/hgqt/cmdui.py:232 tortoisehg/hgqt/thread.py:369
 #, python-format
 msgid "[command returned code %d %%s]"
-msgstr ""
+msgstr "[kode mengembalikan perintah %d %%s]"
 
 #: tortoisehg/hgqt/cmdui.py:234 tortoisehg/hgqt/thread.py:371
 #, python-format
 msgid "[command completed successfully %s]"
-msgstr ""
+msgstr "[berhasil melengkapi perintah %s]"
 
 #: tortoisehg/hgqt/cmdui.py:246
 msgid "failed to start command\n"
-msgstr ""
+msgstr "gagal memulai perintah\n"
 
 #: tortoisehg/hgqt/cmdui.py:250 tortoisehg/hgqt/cmdui.py:548
 msgid "error while running command\n"
-msgstr ""
+msgstr "gagal saat menjalankan perintah\n"
 
 #: tortoisehg/hgqt/cmdui.py:298 tortoisehg/hgtk/statusbar.py:39
 msgid "Running..."
-msgstr ""
+msgstr "Berjalan..."
 
 #: tortoisehg/hgqt/cmdui.py:309
 msgid "Terminated by user"
-msgstr ""
+msgstr "Dihentikan oleh pengguna"
 
 #: tortoisehg/hgqt/cmdui.py:311
 msgid "Terminated"
-msgstr ""
+msgstr "Dihentikan"
 
 #: tortoisehg/hgqt/cmdui.py:315
 msgid "Failed!"
-msgstr ""
+msgstr "Gagal!"
 
 #: tortoisehg/hgqt/cmdui.py:543
 msgid "failed to run command\n"
-msgstr ""
+msgstr "gagal menjalankan perintah\n"
 
 #: tortoisehg/hgqt/cmdui.py:544
 msgid "crashed\n"
@@ -931,28 +947,30 @@ msgstr ""
 #: tortoisehg/hgqt/cmdui.py:618
 #, python-format
 msgid "no matches found: %s"
-msgstr ""
+msgstr "tidak ada kesesuaian: %s"
 
 #: tortoisehg/hgqt/cmdui.py:773
 msgid "TortoiseHg Command Dialog"
-msgstr ""
+msgstr "Dialog Perintah TortoiseHg"
 
 #: tortoisehg/hgqt/cmdui.py:793 tortoisehg/hgqt/merge.py:101
 #: tortoisehg/hgqt/rebase.py:253 tortoisehg/hgqt/resolve.py:357
 #: tortoisehg/hgqt/settings.py:913 tortoisehg/hgtk/commit.py:322
 #: tortoisehg/hgtk/merge.py:196 tortoisehg/hgtk/thgconfig.py:846
 msgid "Confirm Exit"
-msgstr ""
+msgstr "Keluar Dikonfirmasi"
 
 #: tortoisehg/hgqt/cmdui.py:794
 msgid ""
 "Mercurial command is still running.\n"
 "Are you sure you want to terminate?"
 msgstr ""
+"Perintah pada Mercurial masih berjalan.\n"
+"Apakah anda yakin ingin menghentikannya?"
 
 #: tortoisehg/hgqt/cmdui.py:838
 msgid "TortoiseHg"
-msgstr ""
+msgstr "TortoiseHg"
 
 #: tortoisehg/hgqt/commit.py:72
 msgctxt "window title"
@@ -969,7 +987,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/commit.py:106
 msgid "Copy message"
-msgstr ""
+msgstr "Pesan menyalin"
 
 #: tortoisehg/hgqt/commit.py:108
 msgid "Copy one of the recent commit messages"
@@ -978,12 +996,12 @@ msgstr ""
 #: tortoisehg/hgqt/commit.py:123 tortoisehg/hgqt/commit.py:461
 #: tortoisehg/hgqt/settings.py:303
 msgid "Issue Tracker"
-msgstr ""
+msgstr "Pelacak Isu"
 
 #: tortoisehg/hgqt/commit.py:124
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
-msgstr ""
+msgstr "Gagal memuat pelacak isu '%s': %s"
 
 #: tortoisehg/hgqt/commit.py:134 tortoisehg/hgqt/grep.py:53
 #: tortoisehg/hgqt/serve_ui.py:87 tortoisehg/hgtk/datamine.py:54
@@ -991,7 +1009,7 @@ msgstr ""
 #: tortoisehg/hgtk/recovery.py:48 tortoisehg/hgtk/serve.py:65
 #: tortoisehg/hgtk/synch.py:53
 msgid "Stop"
-msgstr ""
+msgstr "Berhenti"
 
 #: tortoisehg/hgqt/commit.py:236
 msgid "Commit changes"
@@ -1007,21 +1025,21 @@ msgstr ""
 
 #: tortoisehg/hgqt/commit.py:237
 msgid "Create a new patch"
-msgstr ""
+msgstr "Buat patch baru"
 
 #: tortoisehg/hgqt/commit.py:237 tortoisehg/hgqt/mq.py:976
 #: tortoisehg/hgtk/commit.py:657
 msgid "QNew"
-msgstr ""
+msgstr "QNew"
 
 #: tortoisehg/hgqt/commit.py:238
 msgid "Refresh current patch"
-msgstr ""
+msgstr "Segarkan patch ini"
 
 #: tortoisehg/hgqt/commit.py:238 tortoisehg/hgqt/mq.py:605
 #: tortoisehg/hgqt/mq.py:985 tortoisehg/hgtk/commit.py:660
 msgid "QRefresh"
-msgstr ""
+msgstr "QRefresh"
 
 #: tortoisehg/hgqt/commit.py:369 tortoisehg/hgtk/commit.py:1185
 msgid "Confirm Branch Change"
@@ -1057,7 +1075,7 @@ msgstr ""
 #: tortoisehg/hgqt/commit.py:413
 msgctxt "start progress"
 msgid "MQ Action"
-msgstr ""
+msgstr "Aksi MQ"
 
 #: tortoisehg/hgqt/commit.py:515
 msgid "Close Branch: "
@@ -1071,11 +1089,11 @@ msgstr ""
 #: tortoisehg/hgqt/update.py:87 tortoisehg/hgtk/changeset.py:581
 #: tortoisehg/hgtk/update.py:90
 msgid "Parent:"
-msgstr ""
+msgstr "Induk:"
 
 #: tortoisehg/hgqt/commit.py:530 tortoisehg/hgqt/pbranch.py:878
 msgid "Patch name:"
-msgstr ""
+msgstr "Nama patch:"
 
 #: tortoisehg/hgqt/commit.py:557
 #, python-format
@@ -1104,7 +1122,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/commit.py:711
 msgid "No files checked"
-msgstr ""
+msgstr "Tidak ada berkas yang dicentang"
 
 #: tortoisehg/hgqt/commit.py:712
 msgid "No modified files checkmarked for commit"
@@ -1113,19 +1131,19 @@ msgstr ""
 #: tortoisehg/hgqt/commit.py:727 tortoisehg/hgqt/lfprompt.py:16
 #: tortoisehg/hgqt/lfprompt.py:28
 msgid "Confirm Add"
-msgstr ""
+msgstr "Konfirmasi Penambahan"
 
 #: tortoisehg/hgqt/commit.py:728
 msgid "Add selected untracked files?"
-msgstr ""
+msgstr "Tambahkan berkas-berkas tak terlacak yang telah dipilih?"
 
 #: tortoisehg/hgqt/commit.py:756 tortoisehg/hgqt/quickop.py:174
 msgid "Confirm Remove"
-msgstr ""
+msgstr "Konfirmasi Penyingkiran"
 
 #: tortoisehg/hgqt/commit.py:757
 msgid "Remove selected deleted files?"
-msgstr ""
+msgstr "Singkirkan berkas-berkas yang dihapus sesuai pilihan?"
 
 #: tortoisehg/hgqt/commit.py:798
 msgctxt "start progress"
@@ -1139,12 +1157,12 @@ msgstr ""
 
 #: tortoisehg/hgqt/commit.py:840
 msgid "Set username:"
-msgstr ""
+msgstr "Atur nama pengguna:"
 
 #: tortoisehg/hgqt/commit.py:867 tortoisehg/hgqt/commit.py:914
 #: tortoisehg/hgqt/commit.py:937
 msgid "Save in Repo"
-msgstr ""
+msgstr "Simpan dalam Repo"
 
 #: tortoisehg/hgqt/commit.py:872
 msgid "Save Global"
@@ -1152,12 +1170,12 @@ msgstr ""
 
 #: tortoisehg/hgqt/commit.py:884
 msgid "Set Date:"
-msgstr ""
+msgstr "Atur Tanggal:"
 
 #: tortoisehg/hgqt/commit.py:888 tortoisehg/hgtk/history.py:1589
 #: tortoisehg/hgtk/synch.py:148 tortoisehg/hgtk/update.py:128
 msgid "Update"
-msgstr ""
+msgstr "Update"
 
 #: tortoisehg/hgqt/commit.py:907
 msgid "Push After Commit:"
@@ -1165,18 +1183,18 @@ msgstr ""
 
 #: tortoisehg/hgqt/commit.py:930
 msgid "Auto Includes:"
-msgstr ""
+msgstr "Otomatis Menyertakan:"
 
 #: tortoisehg/hgqt/commit.py:969
 msgid "Unable to save username"
-msgstr ""
+msgstr "Tidak bisa menyimpan nama pengguna"
 
 #: tortoisehg/hgqt/commit.py:970 tortoisehg/hgqt/commit.py:993
 #: tortoisehg/hgqt/commit.py:1016 tortoisehg/hgqt/sync.py:1019
 #: tortoisehg/hgqt/sync.py:1117 tortoisehg/hgqt/sync.py:1187
 #: tortoisehg/hgqt/sync.py:1355
 msgid "Iniparse must be installed."
-msgstr ""
+msgstr "Iniparse harus sudah terpasang."
 
 #: tortoisehg/hgqt/commit.py:985 tortoisehg/hgqt/commit.py:1008
 #: tortoisehg/hgqt/commit.py:1031 tortoisehg/hgqt/settings.py:1255
@@ -1184,7 +1202,7 @@ msgstr ""
 #: tortoisehg/hgqt/sync.py:1205 tortoisehg/hgqt/sync.py:1394
 #: tortoisehg/hgtk/thgconfig.py:1654
 msgid "Unable to write configuration file"
-msgstr ""
+msgstr "Tidak bisa menulis berkas konfigurasi"
 
 #: tortoisehg/hgqt/commit.py:992
 msgid "Unable to save after commit push"
@@ -1192,15 +1210,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/commit.py:1015
 msgid "Unable to save auto include list"
-msgstr ""
+msgstr "Tidak bisa menyimpan daftar otomatis menyertakan"
 
 #: tortoisehg/hgqt/commit.py:1046
 msgid "Invalid date format"
-msgstr ""
+msgstr "Susunan tanggal tidak benar"
 
 #: tortoisehg/hgqt/commit.py:1066
 msgid "No username configured"
-msgstr ""
+msgstr "Tidak ada nama pengguna yang dikonfigurasi"
 
 #: tortoisehg/hgqt/commit.py:1116 tortoisehg/hgqt/compress.py:122
 #: tortoisehg/hgqt/pbranch.py:871 tortoisehg/hgqt/repowidget.py:337
@@ -1219,11 +1237,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/compress.py:45
 msgid "Onto destination"
-msgstr ""
+msgstr "Pada tujuan"
 
 #: tortoisehg/hgqt/compress.py:63
 msgid "Compress"
-msgstr ""
+msgstr "Kompres"
 
 #: tortoisehg/hgqt/compress.py:75
 #, python-format
@@ -1250,11 +1268,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/csinfo.py:48 tortoisehg/hgtk/csinfo.py:49
 msgid "must be specified repository"
-msgstr ""
+msgstr "harus menentukan repositorinya"
 
 #: tortoisehg/hgqt/csinfo.py:85 tortoisehg/hgtk/csinfo.py:86
 msgid "must be specified 'type' in style"
-msgstr ""
+msgstr "harus menentukan style 'tipe' -nya"
 
 #: tortoisehg/hgqt/csinfo.py:106 tortoisehg/hgqt/postreview_ui.py:165
 #: tortoisehg/hgqt/qfold.py:85 tortoisehg/hgqt/qreorder.py:89
@@ -1265,16 +1283,16 @@ msgstr ""
 #: tortoisehg/hgqt/csinfo.py:107 tortoisehg/hgqt/csinfo.py:113
 #: tortoisehg/hgtk/csinfo.py:213 tortoisehg/hgtk/csinfo.py:218
 msgid "User:"
-msgstr ""
+msgstr "Pengguna:"
 
 #: tortoisehg/hgqt/csinfo.py:107 tortoisehg/hgqt/csinfo.py:108
 #: tortoisehg/hgtk/csinfo.py:213 tortoisehg/hgtk/csinfo.py:214
 msgid "Date:"
-msgstr ""
+msgstr "Tanggal:"
 
 #: tortoisehg/hgqt/csinfo.py:107 tortoisehg/hgtk/csinfo.py:213
 msgid "Age:"
-msgstr ""
+msgstr "Usia:"
 
 #: tortoisehg/hgqt/csinfo.py:108 tortoisehg/hgqt/csinfo.py:110
 #: tortoisehg/hgqt/sync.py:1558 tortoisehg/hgtk/csinfo.py:214
@@ -1284,12 +1302,12 @@ msgstr ""
 
 #: tortoisehg/hgqt/csinfo.py:109
 msgid "Close:"
-msgstr ""
+msgstr "Tutup:"
 
 #: tortoisehg/hgqt/csinfo.py:110 tortoisehg/hgqt/csinfo.py:111
 #: tortoisehg/hgtk/csinfo.py:215 tortoisehg/hgtk/csinfo.py:216
 msgid "Tags:"
-msgstr ""
+msgstr "Tags:"
 
 #: tortoisehg/hgqt/csinfo.py:111 tortoisehg/hgtk/csinfo.py:216
 msgid "Transplant:"
@@ -1301,7 +1319,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/csinfo.py:112 tortoisehg/hgtk/csinfo.py:217
 msgid "Subversion:"
-msgstr ""
+msgstr "Subversion:"
 
 #: tortoisehg/hgqt/cslist.py:48 tortoisehg/hgqt/cslist.py:130
 #: tortoisehg/hgtk/cslist.py:384
@@ -1310,18 +1328,18 @@ msgstr ""
 
 #: tortoisehg/hgqt/cslist.py:49 tortoisehg/hgtk/cslist.py:91
 msgid "Use compact view"
-msgstr ""
+msgstr "Gunakan tampilan kompak"
 
 #: tortoisehg/hgqt/cslist.py:87 tortoisehg/hgqt/revpanel.py:21
 #: tortoisehg/hgqt/revpanel.py:28 tortoisehg/hgtk/changeset.py:585
 #: tortoisehg/hgtk/cslist.py:143
 msgid "Patch:"
-msgstr ""
+msgstr "Patch:"
 
 #: tortoisehg/hgqt/cslist.py:133 tortoisehg/hgtk/cslist.py:409
 #, python-format
 msgid "Displaying %(count)d of %(total)d items"
-msgstr ""
+msgstr "Menampilkan %(count)d pada %(total)d"
 
 #: tortoisehg/hgqt/docklog.py:23
 msgid "Output Log"
@@ -3286,7 +3304,7 @@ msgstr ""
 #: tortoisehg/hgqt/repowidget.py:1483 tortoisehg/hgqt/repowidget.py:1510
 #: tortoisehg/hgtk/gdialog.py:863
 msgid "Abort"
-msgstr ""
+msgstr "Batal"
 
 #: tortoisehg/hgqt/rebase.py:118
 #, python-format
@@ -4704,7 +4722,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/revset.py:134
 msgid "all revisions converted from subversion"
-msgstr ""
+msgstr "semua revisi-revisi dikonversi dari subversion"
 
 #: tortoisehg/hgqt/revset.py:136
 msgid "changeset which represents converted svn revision"
@@ -4731,14 +4749,16 @@ msgid ""
 "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
 "revsets</a>"
 msgstr ""
+"<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
+"revsets</a>"
 
 #: tortoisehg/hgqt/revset.py:221
 msgid "Searching..."
-msgstr ""
+msgstr "Mencari..."
 
 #: tortoisehg/hgqt/revset.py:222 tortoisehg/hgqt/revset.py:234
 msgid "Running"
-msgstr ""
+msgstr "Berjalan"
 
 #: tortoisehg/hgqt/revset.py:222
 msgid "query"
@@ -4772,7 +4792,7 @@ msgstr ""
 #: tortoisehg/hgqt/run.py:142 tortoisehg/hgtk/hgtk.py:128
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
-msgstr ""
+msgstr "tidak bisa membaca berkas \"%s\". Diabaikan.\n"
 
 #: tortoisehg/hgqt/run.py:246
 #, python-format
@@ -4784,7 +4804,7 @@ msgstr ""
 #: tortoisehg/hgqt/run.py:249
 #, python-format
 msgid "thg: unknown command '%s'\n"
-msgstr ""
+msgstr "thg: perintah tidak diketahui '%s'\n"
 
 #: tortoisehg/hgqt/run.py:253
 #, python-format
@@ -4794,22 +4814,22 @@ msgstr ""
 #: tortoisehg/hgqt/run.py:256
 #, python-format
 msgid "thg: %s\n"
-msgstr ""
+msgstr "thg: %s\n"
 
 #: tortoisehg/hgqt/run.py:259 tortoisehg/hgqt/thread.py:320
 #: tortoisehg/hgqt/thread.py:330 tortoisehg/hgtk/hgtk.py:219
 #, python-format
 msgid "abort: %s!\n"
-msgstr ""
+msgstr "batal: %s!\n"
 
 #: tortoisehg/hgqt/run.py:310 tortoisehg/hgtk/hgtk.py:267
 #: tortoisehg/hgtk/hgtk.py:466
 msgid "There is no Mercurial repository here (.hg not found)"
-msgstr ""
+msgstr "Tidak ada repositori Mercurial disini (.hg tidak ada)"
 
 #: tortoisehg/hgqt/run.py:322 tortoisehg/hgtk/hgtk.py:279
 msgid "invalid arguments"
-msgstr ""
+msgstr "argumen-argumen tak valid"
 
 #: tortoisehg/hgqt/run.py:328 tortoisehg/hgtk/hgtk.py:285
 #, python-format
@@ -4821,10 +4841,12 @@ msgid ""
 "lsprof not available - install from "
 "http://codespeak.net/svn/user/arigo/hack/misc/lsprof/"
 msgstr ""
+"lsprof tidak tersedia - pasang dari "
+"http://codespeak.net/svn/user/arigo/hack/misc/lsprof/"
 
 #: tortoisehg/hgqt/run.py:427 tortoisehg/hgqt/run.py:428
 msgid "Try refreshing your repository."
-msgstr ""
+msgstr "Coba menyegarkan repositori anda."
 
 #: tortoisehg/hgqt/run.py:431
 #, python-format
@@ -4832,15 +4854,17 @@ msgid ""
 "Configuration Error: \"%(arg0)s\",<br>Please <a "
 "href=\"#fix:%(arg0)s\">fix</a> your config"
 msgstr ""
+"Kesalahan Konfigurasi: \"%(arg0)s\".<br>Harap <a "
+"href=\"#fix:%(arg0)s\">memperbaiki</a> konfigurasi anda"
 
 #: tortoisehg/hgqt/run.py:433
 #, python-format
 msgid "Operation aborted:<br><br>%(arg0)s."
-msgstr ""
+msgstr "Pelaksanaan dibatalkan:<br><br>%(arg0)s."
 
 #: tortoisehg/hgqt/run.py:434
 msgid "Repository is locked"
-msgstr ""
+msgstr "Repositori dikunci"
 
 #: tortoisehg/hgqt/run.py:491
 msgid "hint:"
@@ -4852,7 +4876,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:499
 msgid "Close this application?"
-msgstr ""
+msgstr "Menutup aplikasi ini?"
 
 #: tortoisehg/hgqt/run.py:782
 msgid "annotate requires a single filename\n"
@@ -4860,26 +4884,29 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:839 tortoisehg/hgtk/hgtk.py:546
 msgid "global options:"
-msgstr ""
+msgstr "opsi-opsi global:"
 
 #: tortoisehg/hgqt/run.py:841
 msgid "use \"thg help\" for the full list of commands"
-msgstr ""
+msgstr "gunakan \"thg help\" untuk seluruh daftar perintah-perintah"
 
 #: tortoisehg/hgqt/run.py:845
 msgid ""
 "use \"thg help\" for the full list of commands or \"thg -v\" for details"
 msgstr ""
+"gunakan \"thg help\" untuk seluruh daftar perintah-perintah atau \"thg -v\" "
+"untuk detilnya"
 
 #: tortoisehg/hgqt/run.py:848
 #, python-format
 msgid "use \"thg -v help%s\" to show aliases and global options"
 msgstr ""
+"gunakan \"thg -v help%s\" untuk menampilkan alias dan opsi-opsi global"
 
 #: tortoisehg/hgqt/run.py:851
 #, python-format
 msgid "use \"thg -v help %s\" to show global options"
-msgstr ""
+msgstr "gunakan \"thg -v help %s\" untuk menampilkan opsi-opsi global"
 
 #: tortoisehg/hgqt/run.py:863 tortoisehg/hgqt/run.py:972
 #: tortoisehg/hgtk/hgtk.py:570 tortoisehg/hgtk/hgtk.py:679
@@ -4887,6 +4914,8 @@ msgid ""
 "list of commands:\n"
 "\n"
 msgstr ""
+"daftar perintah-perintah:\n"
+"\n"
 
 #: tortoisehg/hgqt/run.py:871 tortoisehg/hgtk/hgtk.py:578
 #, python-format
@@ -4894,19 +4923,21 @@ msgid ""
 "\n"
 "aliases: %s\n"
 msgstr ""
+"\n"
+"alias: %s\n"
 
 #: tortoisehg/hgqt/run.py:876 tortoisehg/hgqt/run.py:908
 #: tortoisehg/hgqt/run.py:941 tortoisehg/hgtk/hgtk.py:615
 msgid "(no help text available)"
-msgstr ""
+msgstr "(tidak ada teks bantuan yang tersedia)"
 
 #: tortoisehg/hgqt/run.py:884 tortoisehg/hgtk/hgtk.py:591
 msgid "options:\n"
-msgstr ""
+msgstr "opsi-opsi:\n"
 
 #: tortoisehg/hgqt/run.py:913 tortoisehg/hgtk/hgtk.py:620
 msgid "no commands defined\n"
-msgstr ""
+msgstr "tidak ada perintah-perintah tertentu\n"
 
 #: tortoisehg/hgqt/run.py:965
 msgid "Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
@@ -4917,24 +4948,26 @@ msgid ""
 "basic commands:\n"
 "\n"
 msgstr ""
+"perintah-perintah dasar:\n"
+"\n"
 
 #: tortoisehg/hgqt/run.py:986 tortoisehg/hgtk/hgtk.py:693
 #, python-format
 msgid " (default: %s)"
-msgstr ""
+msgstr " (standar: %s)"
 
 #: tortoisehg/hgqt/run.py:1003 tortoisehg/hgtk/hgtk.py:710
 #, python-format
 msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
-msgstr ""
+msgstr "Dialog TortoiseHg (versi %s), Mercurial (versi %s)\n"
 
 #: tortoisehg/hgqt/run.py:1032 tortoisehg/hgtk/hgtk.py:744
 msgid "repository root directory or symbolic path name"
-msgstr ""
+msgstr "direktori atau nama simbolis path root repositori"
 
 #: tortoisehg/hgqt/run.py:1033 tortoisehg/hgtk/hgtk.py:745
 msgid "enable additional output"
-msgstr ""
+msgstr "aktifkan keluaran tambahan"
 
 #: tortoisehg/hgqt/run.py:1034 tortoisehg/hgtk/hgtk.py:746
 msgid "suppress output"
@@ -4942,7 +4975,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1035 tortoisehg/hgtk/hgtk.py:747
 msgid "display help and exit"
-msgstr ""
+msgstr "menampilkan bantuan dan keluar"
 
 #: tortoisehg/hgqt/run.py:1036 tortoisehg/hgtk/hgtk.py:748
 msgid "start debugger"
@@ -4962,7 +4995,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1040 tortoisehg/hgtk/hgtk.py:752
 msgid "read file list from file"
-msgstr ""
+msgstr "baca daftar berkas dari berkas"
 
 #: tortoisehg/hgqt/run.py:1041
 msgid "read file list from file encoding utf-8"
@@ -4970,7 +5003,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1045
 msgid "thg about"
-msgstr ""
+msgstr "thg about"
 
 #: tortoisehg/hgqt/run.py:1046
 msgid "thg add [FILE]..."
@@ -5058,15 +5091,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1079
 msgid "thg commit [OPTIONS] [FILE]..."
-msgstr ""
+msgstr "thg commit [OPTIONS] [FILE]..."
 
 #: tortoisehg/hgqt/run.py:1080
 msgid "thg drag_move SOURCE... DEST"
-msgstr ""
+msgstr "thg drag_move SOURCE... DEST"
 
 #: tortoisehg/hgqt/run.py:1081
 msgid "thg drag_copy SOURCE... DEST"
-msgstr ""
+msgstr "thg drag_copy SOURCE... DEST"
 
 #: tortoisehg/hgqt/run.py:1083
 msgid "ignore case during search"
@@ -5074,15 +5107,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1084
 msgid "thg grep"
-msgstr ""
+msgstr "thg grep"
 
 #: tortoisehg/hgqt/run.py:1085
 msgid "thg guess"
-msgstr ""
+msgstr "thg guess"
 
 #: tortoisehg/hgqt/run.py:1086
 msgid "thg hgignore [FILE]"
-msgstr ""
+msgstr "thg hgignore [FILE]"
 
 #: tortoisehg/hgqt/run.py:1088 tortoisehg/hgtk/hgtk.py:826
 msgid "import to the patch queue (MQ)"
@@ -5090,11 +5123,11 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1089
 msgid "thg import [OPTION] [SOURCE]..."
-msgstr ""
+msgstr "thg import [OPTION] [SOURCE]..."
 
 #: tortoisehg/hgqt/run.py:1090
 msgid "thg init [DEST]"
-msgstr ""
+msgstr "thg init [DEST]"
 
 #: tortoisehg/hgqt/run.py:1093
 msgid "a revision to send"
@@ -5102,7 +5135,7 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1094
 msgid "thg email [REVS]"
-msgstr ""
+msgstr "thg email [REVS]"
 
 #: tortoisehg/hgqt/run.py:1097 tortoisehg/hgtk/hgtk.py:767
 msgid "limit number of changes displayed"
@@ -5110,76 +5143,76 @@ msgstr ""
 
 #: tortoisehg/hgqt/run.py:1098
 msgid "thg log [OPTIONS] [FILE]"
-msgstr ""
+msgstr "thg log [OPTIONS] [FILE]"
 
 #: tortoisehg/hgqt/run.py:1101
 msgid "revision to display"
-msgstr ""
+msgstr "revisi untuk ditampilkan"
 
 #: tortoisehg/hgqt/run.py:1104
 msgid "thg manifest [-r REV] [FILE]"
-msgstr ""
+msgstr "thg manifest [-r REV] [FILE]"
 
 #: tortoisehg/hgqt/run.py:1107
 msgid "revision to merge"
-msgstr ""
+msgstr "revisi untuk digabungkan"
 
 #: tortoisehg/hgqt/run.py:1108
 msgid "thg merge [[-r] REV]"
-msgstr ""
+msgstr "thg merge [[-r] REV]"
 
 #: tortoisehg/hgqt/run.py:1109
 msgid "thg remove [FILE]..."
-msgstr ""
+msgstr "thg remove [FILE]..."
 
 #: tortoisehg/hgqt/run.py:1110
 msgid "thg mq"
-msgstr ""
+msgstr "thg mq"
 
 #: tortoisehg/hgqt/run.py:1111
 msgid "thg resolve"
-msgstr ""
+msgstr "thg resolve"
 
 #: tortoisehg/hgqt/run.py:1112
 msgid "thg revert [FILE]..."
-msgstr ""
+msgstr "thg revert [FILE]..."
 
 #: tortoisehg/hgqt/run.py:1113
 msgid "thg forget [FILE]..."
-msgstr ""
+msgstr "thg forget [FILE]..."
 
 #: tortoisehg/hgqt/run.py:1114
 msgid "thg rename SOURCE [DEST]..."
-msgstr ""
+msgstr "thg rename SOURCE [DEST]..."
 
 #: tortoisehg/hgqt/run.py:1118 tortoisehg/hgtk/hgtk.py:792
 #: tortoisehg/hgtk/serve.py:367
 msgid "name of the hgweb config file (serve more than one repository)"
-msgstr ""
+msgstr "nama berkas konfigurasi hgweb (melayani lebih dari satu repositori)"
 
 #: tortoisehg/hgqt/run.py:1120 tortoisehg/hgtk/hgtk.py:794
 msgid "name of the hgweb config file (DEPRECATED)"
-msgstr ""
+msgstr "nama berkas konfigurasi hgweb (DEPRECATED)"
 
 #: tortoisehg/hgqt/run.py:1121
 msgid "thg serve [--web-conf FILE]"
-msgstr ""
+msgstr "thg serve [--web-conf FILE]"
 
 #: tortoisehg/hgqt/run.py:1122
 msgid "thg sync"
-msgstr ""
+msgstr "thg sync"
 
 #: tortoisehg/hgqt/run.py:1124
 msgid "show files without changes"
-msgstr ""
+msgstr "tampilkan berkas-berkas tanpa merubah"
 
 #: tortoisehg/hgqt/run.py:1125
 msgid "show ignored files"
-msgstr ""
+msgstr "tampilkan berkas yang diabaikan"
 
 #: tortoisehg/hgqt/run.py:1126
 msgid "thg status [OPTIONS] [FILE]"
-msgstr ""
+msgstr "thg status [OPTIONS] [FILE]"
 
 #: tortoisehg/hgqt/run.py:1128 tortoisehg/hgqt/run.py:1159
 msgid "discard uncommitted changes (no backup)"
@@ -8059,15 +8092,15 @@ msgstr ""
 
 #: tortoisehg/hgqt/workbench.py:336
 msgid "Help"
-msgstr ""
+msgstr "Bantuan"
 
 #: tortoisehg/hgqt/workbench.py:337
 msgid "About Qt"
-msgstr ""
+msgstr "Informasi Program Qt"
 
 #: tortoisehg/hgqt/workbench.py:338 tortoisehg/util/menuthg.py:73
 msgid "About TortoiseHg"
-msgstr ""
+msgstr "Informasi Program TortoiseHg"
 
 #: tortoisehg/hgqt/workbench.py:351
 msgid "Filter Toolbar"
@@ -8171,7 +8204,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/archive.py:59
 msgid "Archive revision:"
-msgstr "גרסת הארכיון:"
+msgstr ""
 
 #: tortoisehg/hgtk/archive.py:96
 msgid "Archive"
@@ -9382,7 +9415,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/hgtk.py:756
 msgid "hgtk about"
-msgstr ""
+msgstr "hgtk about"
 
 #: tortoisehg/hgtk/hgtk.py:757
 msgid "hgtk add [FILE]..."
@@ -9482,43 +9515,43 @@ msgstr ""
 
 #: tortoisehg/hgtk/hgtk.py:799
 msgid "remove the status cache"
-msgstr ""
+msgstr "menyingkirkan cache status"
 
 #: tortoisehg/hgtk/hgtk.py:800
 msgid "show the contents of the status cache (no update)"
-msgstr ""
+msgstr "memperlihatkan konten pada cache status (tanpa update)"
 
 #: tortoisehg/hgtk/hgtk.py:802
 msgid "udpate all repos in current dir"
-msgstr ""
+msgstr "update semua repos dalam direkroti ini"
 
 #: tortoisehg/hgtk/hgtk.py:803
 msgid "hgtk thgstatus [OPTION]"
-msgstr ""
+msgstr "hgtk thgstatus [OPTION]"
 
 #: tortoisehg/hgtk/hgtk.py:814
 msgid "hgtk version [OPTION]"
-msgstr ""
+msgstr "hgtk version [OPTION]"
 
 #: tortoisehg/hgtk/hgtk.py:816
 msgid "show the command options"
-msgstr ""
+msgstr "menunjukkan opsi-opsi perintah"
 
 #: tortoisehg/hgtk/hgtk.py:817
 msgid "[-o] CMD"
-msgstr ""
+msgstr "[-o] CMD"
 
 #: tortoisehg/hgtk/hgtk.py:818
 msgid "hgtk help [COMMAND]"
-msgstr ""
+msgstr "hgtk help [COMMAND]"
 
 #: tortoisehg/hgtk/hgtk.py:825
 msgid "import to the repository"
-msgstr ""
+msgstr "impor ke repositori"
 
 #: tortoisehg/hgtk/hgtk.py:827
 msgid "hgtk import [OPTION] [SOURCE]..."
-msgstr ""
+msgstr "hgtk import [OPTION] [SOURCE]..."
 
 #: tortoisehg/hgtk/hgtk.py:832
 msgid "hgtk shellconfig"
@@ -9526,7 +9559,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/histdetails.py:35
 msgid "Log Details"
-msgstr ""
+msgstr "Detil Log"
 
 #: tortoisehg/hgtk/histdetails.py:40
 msgid "Columns"
@@ -9534,7 +9567,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/histdetails.py:87
 msgid "Move Up"
-msgstr ""
+msgstr "Pindah keatas"
 
 #: tortoisehg/hgtk/histdetails.py:90
 msgid "Move Down"
@@ -9543,7 +9576,7 @@ msgstr ""
 #: tortoisehg/hgtk/history.py:53 tortoisehg/hgtk/history.py:475
 msgctxt "changesets"
 msgid "All"
-msgstr ""
+msgstr "Semua"
 
 #: tortoisehg/hgtk/history.py:58 tortoisehg/hgtk/history.py:477
 msgid "Tagged"
@@ -9556,7 +9589,7 @@ msgstr ""
 #: tortoisehg/hgtk/history.py:70 tortoisehg/hgtk/history.py:483
 #: tortoisehg/hgtk/history.py:1229
 msgid "Heads"
-msgstr ""
+msgstr "Kepala"
 
 #: tortoisehg/hgtk/history.py:74 tortoisehg/hgtk/history.py:485
 msgid "Merges"
@@ -9576,15 +9609,15 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:100
 msgid "Revision Set"
-msgstr ""
+msgstr "Atur Revisi"
 
 #: tortoisehg/hgtk/history.py:100 tortoisehg/hgtk/history.py:496
 msgid "Keywords"
-msgstr ""
+msgstr "Kata-kunci"
 
 #: tortoisehg/hgtk/history.py:101 tortoisehg/hgtk/history.py:499
 msgid "Date"
-msgstr ""
+msgstr "Tanggal"
 
 #: tortoisehg/hgtk/history.py:101 tortoisehg/hgtk/history.py:105
 #: tortoisehg/hgtk/history.py:493
@@ -9624,7 +9657,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:250 tortoisehg/hgtk/history.py:1533
 msgid "Reload revision history"
-msgstr ""
+msgstr "Memuat kembali sejarah revisi"
 
 #: tortoisehg/hgtk/history.py:252
 msgid "Reset _Marks"
@@ -9632,7 +9665,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:254
 msgid "Reset revision marks"
-msgstr ""
+msgstr "Reset penanda revisi"
 
 #: tortoisehg/hgtk/history.py:266 tortoisehg/hgtk/history.py:385
 msgid "Patch Branch"
@@ -9681,7 +9714,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:376
 msgid "Identify"
-msgstr ""
+msgstr "Tunda"
 
 #: tortoisehg/hgtk/history.py:378
 msgid "Pending"
@@ -9717,7 +9750,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:425
 msgid "_Navigate"
-msgstr ""
+msgstr "_Navigasi"
 
 #: tortoisehg/hgtk/history.py:426
 msgid "Tip"
@@ -9737,11 +9770,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/history.py:437
 msgid "_Synchronize"
-msgstr ""
+msgstr "_Sinkronisasi"
 
 #: tortoisehg/hgtk/history.py:446
 msgid "Email..."
-msgstr ""
+msgstr "Email..."
 
 #: tortoisehg/hgtk/history.py:451
 msgid "Accept Bundle"
@@ -11804,19 +11837,19 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgmq.py:771
 msgid "Top"
-msgstr ""
+msgstr "Atas"
 
 #: tortoisehg/hgtk/thgmq.py:773
 msgid "Up"
-msgstr ""
+msgstr "Keatas"
 
 #: tortoisehg/hgtk/thgmq.py:775
 msgid "Down"
-msgstr ""
+msgstr "Kebawah"
 
 #: tortoisehg/hgtk/thgmq.py:777
 msgid "Bottom"
-msgstr ""
+msgstr "Bawah"
 
 #: tortoisehg/hgtk/thgmq.py:798
 msgid "_Goto"
@@ -11824,7 +11857,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgmq.py:800
 msgid "_Rename"
-msgstr ""
+msgstr "_Ganti nama"
 
 #: tortoisehg/hgtk/thgmq.py:802
 msgid "_Finish Applied"
@@ -11832,7 +11865,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgmq.py:805 tortoisehg/hgtk/thgmq.py:835
 msgid "_Delete"
-msgstr ""
+msgstr "_Hapus"
 
 #: tortoisehg/hgtk/thgmq.py:807 tortoisehg/hgtk/thgmq.py:838
 msgid "F_old"
@@ -11848,31 +11881,31 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgmq.py:872
 msgid "Show 'qparent'"
-msgstr ""
+msgstr "Tampilkan 'qparent'"
 
 #: tortoisehg/hgtk/thgmq.py:876
 msgid "Force"
-msgstr ""
+msgstr "Paksakan"
 
 #: tortoisehg/hgtk/thgmq.py:896 tortoisehg/hgtk/thgpbranch.py:747
 msgid "Succeed"
-msgstr ""
+msgstr "Berhasil"
 
 #: tortoisehg/hgtk/thgpbranch.py:209
 msgid "St"
-msgstr ""
+msgstr "St"
 
 #: tortoisehg/hgtk/thgpbranch.py:211
 msgid "Title"
-msgstr ""
+msgstr "Judul"
 
 #: tortoisehg/hgtk/thgpbranch.py:212
 msgid "Message"
-msgstr ""
+msgstr "Pesan"
 
 #: tortoisehg/hgtk/thgpbranch.py:329
 msgid "pending pmerges"
-msgstr ""
+msgstr "tunda pmerge"
 
 #: tortoisehg/hgtk/thgpbranch.py:330
 msgid "no pending pmerges"
@@ -11880,11 +11913,11 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:432
 msgid "New Patch Name"
-msgstr ""
+msgstr "Nama Patch Baru"
 
 #: tortoisehg/hgtk/thgpbranch.py:488
 msgid "Pending Pmerge"
-msgstr ""
+msgstr "Tunda Pmerge"
 
 #: tortoisehg/hgtk/thgpbranch.py:489
 #, python-format
@@ -11906,7 +11939,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:507
 msgid "Applied MQ patch"
-msgstr ""
+msgstr "Patch MQ diterapkan"
 
 #: tortoisehg/hgtk/thgpbranch.py:508
 msgid ""
@@ -11920,7 +11953,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:653
 msgid "_new"
-msgstr ""
+msgstr "_baru"
 
 #: tortoisehg/hgtk/thgpbranch.py:655
 msgid "_goto (update workdir)"
@@ -11928,39 +11961,39 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgpbranch.py:657
 msgid "_edit message"
-msgstr ""
+msgstr "_ubah pesan"
 
 #: tortoisehg/hgtk/thgpbranch.py:658
 msgid "_rename"
-msgstr ""
+msgstr "_ganti nama"
 
 #: tortoisehg/hgtk/thgpbranch.py:659
 msgid "_delete"
-msgstr ""
+msgstr "_hapus"
 
 #: tortoisehg/hgtk/thgpbranch.py:660
 msgid "_finish"
-msgstr ""
+msgstr "_selesai"
 
 #: tortoisehg/hgtk/thgpbranch.py:696
 msgid "Show graph"
-msgstr ""
+msgstr "Tampilkan grafik"
 
 #: tortoisehg/hgtk/thgpbranch.py:697
 msgid "Show status"
-msgstr ""
+msgstr "Tampilkan status"
 
 #: tortoisehg/hgtk/thgpbranch.py:698
 msgid "Show name"
-msgstr ""
+msgstr "Tampilkan nama"
 
 #: tortoisehg/hgtk/thgpbranch.py:699
 msgid "Show title"
-msgstr ""
+msgstr "Tampilkan judul"
 
 #: tortoisehg/hgtk/thgpbranch.py:700
 msgid "Show message"
-msgstr ""
+msgstr "Tampilkan pesan"
 
 #: tortoisehg/hgtk/thgpbranch.py:709
 msgid "Show internal branches"
@@ -11980,7 +12013,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgshelve.py:76
 msgid "Abandon"
-msgstr ""
+msgstr "Tinggalkan"
 
 #: tortoisehg/hgtk/thgshelve.py:77
 msgid "abandon shelved changes"
@@ -12020,7 +12053,7 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgshelve.py:232
 msgid "Abandon Error"
-msgstr ""
+msgstr "Tinggalkan Kesalahan"
 
 #: tortoisehg/hgtk/thgstrip.py:111
 msgid "Backup all (default)"
@@ -12032,15 +12065,15 @@ msgstr ""
 
 #: tortoisehg/hgtk/thgstrip.py:121
 msgid "Strip"
-msgstr ""
+msgstr "Potong"
 
 #: tortoisehg/hgtk/thgstrip.py:140
 msgid "Stripped successfully"
-msgstr ""
+msgstr "Pemotongan berhasil"
 
 #: tortoisehg/hgtk/thgstrip.py:143
 msgid "Canceled stripping"
-msgstr ""
+msgstr "Pemotongan dibatalkan"
 
 #: tortoisehg/hgtk/thgstrip.py:145
 msgid "Failed to strip"
@@ -12049,12 +12082,12 @@ msgstr ""
 #: tortoisehg/hgtk/thgstrip.py:179
 #, python-format
 msgid "%s changesets"
-msgstr ""
+msgstr "%s perubahan"
 
 #: tortoisehg/hgtk/thgstrip.py:180
 #, python-format
 msgid "%s will be stripped"
-msgstr ""
+msgstr "%s akan dipotong"
 
 #: tortoisehg/hgtk/thgstrip.py:215
 msgid ""
@@ -12065,23 +12098,23 @@ msgstr ""
 #: tortoisehg/hgtk/thgstrip.py:252
 #, python-format
 msgid "Saved at: %s"
-msgstr ""
+msgstr "Disimpan pada: %s"
 
 #: tortoisehg/hgtk/thgstrip.py:256
 msgid "Open..."
-msgstr ""
+msgstr "Buka..."
 
 #: tortoisehg/hgtk/update.py:107
 msgid "Always show log"
-msgstr ""
+msgstr "Selalu tampilkan log"
 
 #: tortoisehg/hgtk/update.py:152
 msgid "Updated successfully"
-msgstr ""
+msgstr "Berhasil di-update"
 
 #: tortoisehg/hgtk/update.py:156
 msgid "Failed to update"
-msgstr ""
+msgstr "Update gagal"
 
 #: tortoisehg/hgtk/update.py:231
 msgid ""
@@ -12096,42 +12129,42 @@ msgstr ""
 
 #: tortoisehg/hgtk/update.py:280
 msgid "[canceled by user]\n"
-msgstr ""
+msgstr "[dibatalkan oleh pengguna]\n"
 
 #: tortoisehg/hgtk/update.py:285
 #, python-format
 msgid "invalid dialog result: %s"
-msgstr ""
+msgstr "hasil dialog cacat: %s"
 
 #: tortoisehg/hgtk/visdiff.py:331
 #, python-format
 msgid "unable to clean temp directory: %s\n"
-msgstr ""
+msgstr "tidak bisa membersihkan direktori temp: %s\n"
 
 #: tortoisehg/hgtk/visdiff.py:347
 msgid "Visual Diffs"
-msgstr ""
+msgstr "Diff Visual"
 
 #: tortoisehg/hgtk/visdiff.py:354
 msgid "changeset "
-msgstr ""
+msgstr "perubahan "
 
 #: tortoisehg/hgtk/visdiff.py:356
 #, python-format
 msgid "revisions %d to %d"
-msgstr ""
+msgstr "revisi %d ke %d"
 
 #: tortoisehg/hgtk/visdiff.py:530
 msgid "Unable to delete temp files"
-msgstr ""
+msgstr "Tidak bisa menghapus berkas-berkas temp"
 
 #: tortoisehg/hgtk/visdiff.py:531
 msgid "Close diff tools and try again, or quit to leak files?"
-msgstr ""
+msgstr "Tutup sarana diff dan coba lagi, atau keluar ke berkas yang bocor?"
 
 #: tortoisehg/hgtk/visdiff.py:532
 msgid "Try &Again"
-msgstr ""
+msgstr "Cob&a Lagi"
 
 #: tortoisehg/hgtk/visdiff.py:532
 msgid "&Quit"
@@ -12143,11 +12176,11 @@ msgstr ""
 
 #: tortoisehg/util/hglib.py:347
 msgid "eol is incompatible with win32text"
-msgstr ""
+msgstr "eol tidak sesuai dengan win32text"
 
 #: tortoisehg/util/hglib.py:349
 msgid "win32text is incompatible with eol"
-msgstr ""
+msgstr "win32text tidak sesuai dengan eol"
 
 #: tortoisehg/util/hglib.py:351
 msgid "hgsubversion is incompatible with perfarce"
@@ -12208,16 +12241,16 @@ msgstr[1] ""
 
 #: tortoisehg/util/hglib.py:560
 msgid "in the future"
-msgstr ""
+msgstr "masa sepan"
 
 #: tortoisehg/util/hglib.py:564
 msgid "now"
-msgstr ""
+msgstr "sekarang"
 
 #: tortoisehg/util/hgshelve.py:48
 #, python-format
 msgid "Unsupported line endings type: %s"
-msgstr ""
+msgstr "Tidak mendukung tipe akhir baris: %s"
 
 #: tortoisehg/util/hgshelve.py:102
 #, python-format
@@ -12226,11 +12259,11 @@ msgstr ""
 
 #: tortoisehg/util/hgshelve.py:123 tortoisehg/util/hgshelve.py:150
 msgid "this modifies a binary file (all or nothing)\n"
-msgstr ""
+msgstr "hal ini memodifikasi berkas biner (semua atau tiak sama sekali)\n"
 
 #: tortoisehg/util/hgshelve.py:128 tortoisehg/util/hgshelve.py:155
 msgid "this is a binary file\n"
-msgstr ""
+msgstr "ini adalah berkas biner\n"
 
 #: tortoisehg/util/hgshelve.py:139
 #, python-format
@@ -12246,15 +12279,15 @@ msgstr ""
 #: tortoisehg/util/hgshelve.py:304
 #, python-format
 msgid "unhandled transition: %s -> %s"
-msgstr ""
+msgstr "transisi tidak ditertangani: %s -> %s"
 
 #: tortoisehg/util/hgshelve.py:330
 msgid " [Ynsfdaq?] "
-msgstr ""
+msgstr " [Ynsfdaq?] "
 
 #: tortoisehg/util/hgshelve.py:346
 msgid "user quit"
-msgstr ""
+msgstr "pengguna keluar"
 
 #: tortoisehg/util/hgshelve.py:360
 #, python-format
@@ -12263,7 +12296,7 @@ msgstr ""
 
 #: tortoisehg/util/hgshelve.py:361
 msgid " and "
-msgstr ""
+msgstr " dan "
 
 #: tortoisehg/util/hgshelve.py:371
 #, python-format
@@ -12273,17 +12306,17 @@ msgstr ""
 #: tortoisehg/util/hgshelve.py:410
 #, python-format
 msgid "backup %r as %r\n"
-msgstr ""
+msgstr "backup %r sebagai %r\n"
 
 #: tortoisehg/util/hgshelve.py:414
 #, python-format
 msgid "file copy of %s failed\n"
-msgstr ""
+msgstr "menyalin berkas %s gagal\n"
 
 #: tortoisehg/util/hgshelve.py:433
 #, python-format
 msgid "removing backup file : %r\n"
-msgstr ""
+msgstr "menyingkirkan berkas backup : %r\n"
 
 #: tortoisehg/util/hgshelve.py:437
 msgid "delete of shelve backup failed"
@@ -12307,7 +12340,7 @@ msgstr ""
 
 #: tortoisehg/util/hgshelve.py:539
 msgid "applying patch\n"
-msgstr ""
+msgstr "menerapkan patch\n"
 
 #: tortoisehg/util/hgshelve.py:546
 msgid "saving patch to shelve\n"
@@ -12316,7 +12349,7 @@ msgstr ""
 #: tortoisehg/util/hgshelve.py:557 tortoisehg/util/hgshelve.py:612
 #, python-format
 msgid "restoring %r to %r\n"
-msgstr ""
+msgstr "mengembalikan %r ke %r\n"
 
 #: tortoisehg/util/hgshelve.py:559
 msgid "removing shelve file\n"
@@ -12325,7 +12358,7 @@ msgstr ""
 #: tortoisehg/util/hgshelve.py:562
 #, python-format
 msgid "abort: backup restore failed, %s\n"
-msgstr ""
+msgstr "batal: gagal mengembalikan backup, %s\n"
 
 #: tortoisehg/util/hgshelve.py:579
 msgid "nothing to unshelve\n"
@@ -12341,7 +12374,7 @@ msgstr ""
 
 #: tortoisehg/util/hgshelve.py:610
 msgid "restoring backup files\n"
-msgstr ""
+msgstr "mengembalikan berkas-berkas backup\n"
 
 #: tortoisehg/util/hgshelve.py:619
 msgid "removing shelved patches\n"
@@ -12405,11 +12438,11 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:22
 msgid "Create Repository Here"
-msgstr ""
+msgstr "Buat repositori di sini"
 
 #: tortoisehg/util/menuthg.py:23
 msgid "Create a new repository"
-msgstr ""
+msgstr "Membuat repositori baru"
 
 #: tortoisehg/util/menuthg.py:26
 msgid "Create clone here from source"
@@ -12417,55 +12450,55 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:28
 msgid "File Status"
-msgstr ""
+msgstr "Status Berkas"
 
 #: tortoisehg/util/menuthg.py:29
 msgid "Repository status & changes"
-msgstr ""
+msgstr "Status & perubahan repositori"
 
 #: tortoisehg/util/menuthg.py:31
 msgid "Add Files..."
-msgstr ""
+msgstr "Tambah berkas..."
 
 #: tortoisehg/util/menuthg.py:32
 msgid "Add files to version control"
-msgstr ""
+msgstr "Menambah berkas pada kendali versi"
 
 #: tortoisehg/util/menuthg.py:34
 msgid "Revert Files..."
-msgstr ""
+msgstr "Kembalikan Berkas..."
 
 #: tortoisehg/util/menuthg.py:35
 msgid "Revert file changes"
-msgstr ""
+msgstr "Mengembalikan berkas yang telah diubah"
 
 #: tortoisehg/util/menuthg.py:37
 msgid "Forget Files..."
-msgstr ""
+msgstr "Lupa berkas-berkas..."
 
 #: tortoisehg/util/menuthg.py:38 tortoisehg/util/menuthg.py:41
 msgid "Remove files from version control"
-msgstr ""
+msgstr "Menyingkirkan berkas-berkas dari kendali versi"
 
 #: tortoisehg/util/menuthg.py:40
 msgid "Remove Files..."
-msgstr ""
+msgstr "Menyingkirkan Berkas..."
 
 #: tortoisehg/util/menuthg.py:43
 msgid "Rename File"
-msgstr ""
+msgstr "Menamai Berkas"
 
 #: tortoisehg/util/menuthg.py:44
 msgid "Rename file or directory"
-msgstr ""
+msgstr "Menamai berkas atau direktori"
 
 #: tortoisehg/util/menuthg.py:47
 msgid "View change history in repository"
-msgstr ""
+msgstr "Lihat sejarah perubahan dalam repositori"
 
 #: tortoisehg/util/menuthg.py:50
 msgid "View change history of selected files"
-msgstr ""
+msgstr "Lihat sejarah perubahan pada berkas-berkas yang dipilih"
 
 #: tortoisehg/util/menuthg.py:53
 msgid "Synchronize with remote repository"
@@ -12473,15 +12506,15 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:56
 msgid "Start web server for this repository"
-msgstr ""
+msgstr "Mulai server web pada repositori ini"
 
 #: tortoisehg/util/menuthg.py:59
 msgid "Update working directory"
-msgstr ""
+msgstr "Update direktori kerja"
 
 #: tortoisehg/util/menuthg.py:61
 msgid "Update Icons"
-msgstr ""
+msgstr "Update Ikon-ikon"
 
 #: tortoisehg/util/menuthg.py:62
 msgid "Update icons for this repository"
@@ -12489,7 +12522,7 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:64
 msgid "Global Settings"
-msgstr ""
+msgstr "Pengaturan Global"
 
 #: tortoisehg/util/menuthg.py:65
 msgid "Configure user wide settings"
@@ -12497,35 +12530,35 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:67
 msgid "Repository Settings"
-msgstr ""
+msgstr "Pengaturan Repositori"
 
 #: tortoisehg/util/menuthg.py:68
 msgid "Configure repository settings"
-msgstr ""
+msgstr "Mengatur pengaturan repositori"
 
 #: tortoisehg/util/menuthg.py:70
 msgid "Explorer Extension Settings"
-msgstr ""
+msgstr "Pengaturan Ekstensi Eksplorer"
 
 #: tortoisehg/util/menuthg.py:71
 msgid "Configure Explorer extension"
-msgstr ""
+msgstr "Mengatur ekstensi Explorer"
 
 #: tortoisehg/util/menuthg.py:74
 msgid "Show About Dialog"
-msgstr ""
+msgstr "Menampilkan Dialog Informasi Program"
 
 #: tortoisehg/util/menuthg.py:77
 msgid "View changes using GUI diff tool"
-msgstr ""
+msgstr "Melihat perubahan menggunakan sarana diff GUI"
 
 #: tortoisehg/util/menuthg.py:79
 msgid "Edit Ignore Filter"
-msgstr ""
+msgstr "Ubah Penyaring Diabaikan"
 
 #: tortoisehg/util/menuthg.py:80
 msgid "Edit repository ignore filter"
-msgstr ""
+msgstr "Ubah penyaring yang diabaikan pada repositori"
 
 #: tortoisehg/util/menuthg.py:82
 msgid "Guess Renames"
@@ -12533,11 +12566,11 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:83
 msgid "Detect renames and copies"
-msgstr ""
+msgstr "Deteksi penamaan dan penyalinan"
 
 #: tortoisehg/util/menuthg.py:85
 msgid "Search History"
-msgstr ""
+msgstr "Sejarah Pencarian"
 
 #: tortoisehg/util/menuthg.py:86
 msgid "Search file revisions for patterns"
@@ -12545,7 +12578,7 @@ msgstr ""
 
 #: tortoisehg/util/menuthg.py:88
 msgid "DnD Synchronize"
-msgstr ""
+msgstr "Sinkronisasi DnD"
 
 #: tortoisehg/util/menuthg.py:89
 msgid "Synchronize with dragged repository"
@@ -12569,7 +12602,7 @@ msgstr ""
 #: tortoisehg/util/prej.py:231
 #, python-format
 msgid "file %s already exists\n"
-msgstr ""
+msgstr "berkas %s sudah ada\n"
 
 #: tortoisehg/util/prej.py:283
 #, python-format
@@ -12604,7 +12637,7 @@ msgstr ""
 #: tortoisehg/util/prej.py:562
 #, python-format
 msgid "binary patch is %d bytes, not %d"
-msgstr ""
+msgstr "patch biner adalah %d, bukan %d"
 
 #: tortoisehg/util/prej.py:587
 #, python-format
@@ -12633,4 +12666,4 @@ msgstr ""
 #: tortoisehg/util/version.py:17
 #, python-format
 msgid "repository %s not found"
-msgstr ""
+msgstr "repositori %s tidak ditemukan"

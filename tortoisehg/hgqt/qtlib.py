@@ -64,11 +64,42 @@ def openhelpcontents(url):
             chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
             if os.path.exists(chm):
                 fullurl = (r'mk:@MSITStore:%s::/' % chm) + url
-                QDesktopServices.openUrl(QUrl.fromLocalFile(fullurl))
+                openlocalurl(fullurl)
                 return
         QDesktopServices.openUrl(QUrl(fullurl))
 
-def editfiles(repo, files, lineno=None, search=None, parent=None):
+def openlocalurl(path):
+    '''open the given path with the default application
+
+    takes str, unicode or QString as argument
+    returns True if open was successfull
+    '''
+
+    if isinstance(path, str):
+        path = QString(hglib.tounicode(path))
+    elif isinstance(path, unicode):
+        path = QString(path)
+    if os.name == 'nt' and path.startsWith('\\\\'):
+        # network share, special handling because of qt bug 13359
+        # see http://bugreports.qt.nokia.com/browse/QTBUG-13359
+        qurl = QUrl()
+        qurl.setUrl(QDir.toNativeSeparators(path))
+    else:
+        qurl = QUrl.fromLocalFile(path)
+    return QDesktopServices.openUrl(qurl)
+
+def openfiles(repo, files, parent=None):
+    if os.name == 'nt':
+        editor = 'start'
+    elif os.name == 'mac':
+        editor = 'open'
+    elif os.name == 'posix':
+        editor = 'xdg-open'
+    else:
+        editor = None
+    editfiles(repo, files, editor=editor)
+
+def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
     if len(files) == 1:
         path = repo.wjoin(files[0])
         cwd = os.path.dirname(path)
@@ -78,6 +109,8 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
     files = [util.shellquote(util.localpath(f)) for f in files]
     editor = repo.ui.config('tortoisehg', 'editor')
     assert len(files) == 1 or lineno == None
+    if not editor:
+        editor = repo.ui.config('tortoisehg', 'editor')
     if editor:
         try:
             regexp = re.compile('\[([^\]]*)\]')
