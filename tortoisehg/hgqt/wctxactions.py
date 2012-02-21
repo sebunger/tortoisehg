@@ -18,7 +18,7 @@ from PyQt4.QtGui import *
 class WctxActions(QObject):
     'container class for working context actions'
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent, checkable=True):
         super(WctxActions, self).__init__(parent)
 
         self.menu = QMenu(parent)
@@ -41,7 +41,15 @@ class WctxActions(QObject):
         make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
         make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
         make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+O')
-        make(_('Copy path'), copyPath, frozenset('MARC?!I'), '')
+        allactions.append(None)
+        make(_('Open subrepository'), opensubrepo, frozenset('S'),
+            'thg-repository-open', 'ALT+CTRL+O')
+        make(_('Explore subrepository'), explore, frozenset('S'),
+            'system-file-manager', 'ALT+CTRL+E')
+        make(_('Open terminal in subrepository'), terminal, frozenset('S'),
+            'utilities-terminal', 'ALT+CTRL+T')
+        allactions.append(None)
+        make(_('Copy path'), copyPath, frozenset('MARC?!IS'), '')
         make(_('View missing'), viewmissing, frozenset('R!'))
         allactions.append(None)
         make(_('&Revert...'), revert, frozenset('MAR!'), 'hg-revert')
@@ -64,6 +72,10 @@ class WctxActions(QObject):
         allactions.append(None)
         make(_('Mark unresolved'), unmark, frozenset('r'))
         make(_('Mark resolved'), mark, frozenset('u'))
+        if checkable:
+            allactions.append(None)
+            make(_('Check'), check, frozenset('MARC?!IS'), '')
+            make(_('Uncheck'), uncheck, frozenset('MARC?!IS'), '')
         self.allactions = allactions
 
     def updateActionSensitivity(self, selrows):
@@ -159,9 +171,11 @@ class WctxActions(QObject):
                 notify = func(parent, hu, repo, files)
                 o, e = hu.getdata()
                 if e:
-                    QMessageBox.warning(parent, name + _(' errors'), e)
+                    QMessageBox.warning(parent, name + _(' errors'),
+                        hglib.tounicode(e))
                 elif o:
-                    QMessageBox.information(parent, name + _(' output'), o)
+                    QMessageBox.information(parent, name + _(' output'),
+                        hglib.tounicode(o))
                 elif notify:
                     wfiles = [repo.wjoin(x) for x in files]
                     shlib.shell_notify(wfiles)
@@ -203,7 +217,7 @@ def copyPath(parent, ui, repo, files):
     clip = QApplication.clipboard()
     absfiles = [hglib.fromunicode(QDir.toNativeSeparators(repo.wjoin(fname)))
          for fname in files]
-    clip.setText(os.linesep.join(absfiles))
+    clip.setText(hglib.tounicode(os.linesep.join(absfiles)))
 
 def vdiff(parent, ui, repo, files):
     dlg = visdiff.visualdiff(ui, repo, files, {})
@@ -215,6 +229,25 @@ def edit(parent, ui, repo, files, lineno=None, search=None):
 
 def openfile(parent, ui, repo, files):
     qtlib.openfiles(repo, files, parent)
+
+def opensubrepo(parent, ui, repo, files):
+    for filename in files:
+        path = os.path.join(repo.root, files[0])
+        if os.path.isdir(path):
+            parent.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+        else:
+            QMessageBox.warning(self,
+                _("Cannot open subrepository"),
+                _("The selected subrepository does not exist on the working directory"))
+
+def explore(parent, ui, repo, files):
+    qtlib.openfiles(repo, files, parent)
+
+def terminal(parent, ui, repo, files):
+    for filename in files:
+        root = repo.wjoin(filename)
+        if os.path.isdir(root):
+            qtlib.openshell(root, filename)
 
 def viewmissing(parent, ui, repo, files):
     base, _ = visdiff.snapshot(repo, files, repo['.'])
@@ -384,4 +417,12 @@ def resolve_with(tool, repo, files):
     opts = {'tool': tool}
     paths = [repo.wjoin(f) for f in files]
     commands.resolve(repo.ui, repo, *paths, **opts)
+    return True
+
+def check(parent, ui, repo, files):
+    parent.tv.model().check(files)
+    return True
+
+def uncheck(parent, ui, repo, files):
+    parent.tv.model().check(files, False)
     return True

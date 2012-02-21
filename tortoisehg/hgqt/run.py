@@ -484,10 +484,11 @@ class _QtRunner(QObject):
         opts['error'] = ''.join(''.join(traceback.format_exception(*args))
                                 for args in self.errors)
         etype, evalue = self.errors[0][:2]
-        if len(self.errors) == 1 and etype in self._recoverableexc:
+        if (len(set(e[0] for e in self.errors)) == 1
+            and etype in self._recoverableexc):
             opts['values'] = evalue
             errstr = self._recoverableexc[etype]
-            if etype == error.Abort and evalue.hint:
+            if etype is error.Abort and evalue.hint:
                 errstr = u''.join([errstr, u'<br><b>', _('hint:'),
                                    u'</b> %(arg1)s'])
                 opts['values'] = [str(evalue), evalue.hint]
@@ -1120,7 +1121,7 @@ table = {
            _('name of the hgweb config file (DEPRECATED)'))],
          _('thg serve [--web-conf FILE]')),
     "^sync|synchronize": (sync, [], _('thg sync')),
-    "^status": (status,
+    "^status|st": (status,
          [('c', 'clean', False, _('show files without changes')),
           ('i', 'ignored', False, _('show ignored files'))],
         _('thg status [OPTIONS] [FILE]')),

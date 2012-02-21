@@ -8,7 +8,7 @@
 
 import os
 
-from mercurial import commands, util
+from mercurial import util
 
 from tortoisehg.util import hglib
 
@@ -240,6 +240,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
               _('Edit current file in working copy'), self.editlocal),
             ('lopen', _('Open Local'), '', 'Shift+Ctrl+O',
               _('Edit current file in working copy'), self.openlocal),
+            ('copypath', _('Copy Path'), '', 'Shift+Ctrl+C',
+              _('Copy full path of file(s) to the clipboard'),
+              self.copypath),
             ('revert', _('Revert to Revision'), 'hg-revert', 'Alt+Ctrl+T',
               _('Revert file(s) to contents at this revision'),
               self.revertfile),
@@ -291,7 +294,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
         rev = self.ctx.rev()
-        if type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev():
+        if (type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev()
+            or (rev not in self.repo
+                and rev not in self.repo.thgmqunappliedpatches)):
             rev = 'tip'
         self.onRevisionSelected(rev)
 
@@ -337,31 +342,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         filenames = self.filelist.getSelectedFiles()
         if not filenames:
             return
-        rev = self.ctx.rev()
-        for curfile in filenames:
-            wfile = util.localpath(curfile)
-            wfile, ext = os.path.splitext(os.path.basename(wfile))
-            if wfile:
-                filename = "%s@%d%s" % (wfile, rev, ext)
-            else:
-                filename = "%s@%d" % (ext, rev)
-
-            result = QFileDialog.getSaveFileName(parent=self, caption=_("Save file to"),
-                                                 directory=filename) 
-            if not result:
-                continue
-            cwd = os.getcwd()
-            try:
-                os.chdir(self.repo.root)
-                try:
-                    commands.cat(self.repo.ui, self.repo,
-                        curfile,
-                        rev = rev,
-                        output = hglib.fromunicode(result))
-                except (util.Abort, IOError), e:
-                    QMessageBox.critical(self, _('Unable to save file'), hglib.tounicode(str(e)))
-            finally:
-                os.chdir(cwd)
+        qtlib.savefiles(self.repo, filenames, self.ctx.rev(), self)
 
     def editlocal(self):
         filenames = self.filelist.getSelectedFiles()
@@ -374,6 +355,11 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         if not filenames:
             return
         qtlib.openfiles(self.repo, filenames)
+
+    def copypath(self):
+        absfiles = [util.localpath(self.repo.wjoin(hglib.fromunicode(f)))
+                    for f in self.filelist.getSelectedFiles()]
+        QApplication.clipboard().setText(hglib.tounicode(os.linesep.join(absfiles)))
 
     def revertfile(self):
         fileSelection = self.filelist.getSelectedFiles()
@@ -451,7 +437,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
-                            'ledit', 'lopen', None, 'revert', None,
+                            'ledit', 'lopen', 'copypath', None, 'revert', None,
                             'navigate', 'diffnavigate']
 
         if not contextmenu:

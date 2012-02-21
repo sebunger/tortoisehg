@@ -28,8 +28,9 @@ class HgignoreDialog(QDialog):
     def __init__(self, repo, parent=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
-        self.setWindowFlags(self.windowFlags() &
-                            ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags()
+            & ~Qt.WindowContextHelpButtonHint
+            | Qt.WindowMaximizeButtonHint)
 
         self.repo = repo
         self.pats = pats
@@ -263,8 +264,11 @@ class HgignoreDialog(QDialog):
             return
 
         if not self.pats:
-            self.pats = [self.lclunknowns[i.row()]
+            try:
+                self.pats = [self.lclunknowns[i.row()]
                          for i in self.unknownlist.selectedIndexes()]
+            except IndexError:
+                self.pats = []
         self.lclunknowns = wctx.unknown()
         self.unknownlist.clear()
         self.unknownlist.addItems([uni(u) for u in self.lclunknowns])
