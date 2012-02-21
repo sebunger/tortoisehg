@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'tortoisehg/hgqt/hgemail.ui'
+# Form implementation generated from reading ui file '/home/steve/tools/thg/tortoisehg/hgqt/hgemail.ui'
 #
-# Created: Sun Nov 13 23:18:49 2011
-#      by: PyQt4 UI code generator 4.8.6
+# Created: Mon Jan  2 19:07:38 2012
+#      by: PyQt4 UI code generator 4.8.5
 #
 # WARNING! All changes made in this file will be lost!
 

@@ -90,6 +90,7 @@ class ThgRepoWrapper(QObject):
         else:
             self.watcher = QFileSystemWatcher(self)
             self.watcher.addPath(hglib.tounicode(repo.path))
+            self.watcher.addPath(hglib.tounicode(repo.path + '/store'))
             self.watcher.directoryChanged.connect(self.onDirChange)
             self.watcher.fileChanged.connect(self.onFileChange)
             self.addMissingPaths()
@@ -169,10 +170,12 @@ class ThgRepoWrapper(QObject):
 
     def _getwatchedfiles(self):
         watchedfiles = [self.repo.sjoin('00changelog.i')]
+        watchedfiles.append(self.repo.sjoin('phaseroots'))
         watchedfiles.append(self.repo.join('localtags'))
         watchedfiles.append(self.repo.join('bookmarks'))
         watchedfiles.append(self.repo.join('bookmarks.current'))
         if hasattr(self.repo, 'mq'):
+            watchedfiles.append(self.repo.mq.path)
             watchedfiles.append(self.repo.mq.join('series'))
             watchedfiles.append(self.repo.mq.join('guards'))
             watchedfiles.append(self.repo.join('patches.queue'))
@@ -565,9 +568,33 @@ def _extendrepo(repo):
         
     return thgrepository
 
+_maxchangectxclscache = 10
+_changectxclscache = {}  # parentcls: extendedcls
 
 def _extendchangectx(changectx):
-    class thgchangectx(changectx.__class__):
+    # cache extended changectx class, since we may create bunch of instances
+    parentcls = changectx.__class__
+    try:
+        return _changectxclscache[parentcls]
+    except KeyError:
+        pass
+
+    # in case each changectx instance is wrapped by some extension, there's
+    # limit on cache size. it may be possible to use weakref.WeakKeyDictionary
+    # on Python 2.5 or later.
+    if len(_changectxclscache) >= _maxchangectxclscache:
+        _changectxclscache.clear()
+    _changectxclscache[parentcls] = cls = _createchangectxcls(parentcls)
+    return cls
+
+def _createchangectxcls(parentcls):
+    class thgchangectx(parentcls):
+        def sub(self, path):
+            srepo = super(thgchangectx, self).sub(path)
+            if isinstance(srepo, subrepo.hgsubrepo):
+                srepo._repo.__class__ = _extendrepo(srepo._repo)
+            return srepo
+
         def thgtags(self):
             '''Returns all unhidden tags for self'''
             htlist = self._repo._thghiddentags
@@ -650,7 +677,7 @@ def _extendchangectx(changectx):
                 if self._repo.lfStandin(file) in self.manifest():
                     return self._repo.lfStandin(file)
             return self._repo.bfStandin(file)
-                    
+
     return thgchangectx
 
 _pctxcache = {}

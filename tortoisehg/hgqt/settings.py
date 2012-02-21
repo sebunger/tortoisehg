@@ -30,6 +30,11 @@ def hasExtension(extname):
             return True
     return False
 
+# Detect if hg >= 2.1
+def phasesSupport():
+    from mercurial import commands
+    return hasattr(commands, 'phase')
+
 class SettingsCombo(QComboBox):
     def __init__(self, parent=None, **opts):
         QComboBox.__init__(self, parent, toolTip=opts['tooltip'])
@@ -325,27 +330,27 @@ class PathBrowser(QWidget):
     def __init__(self, parent=None, **opts):
         QWidget.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
-        
+
         self.lineEdit = QLineEdit()
         completer = QCompleter(self)
         completer.setModel(QDirModel(completer))
         self.lineEdit.setCompleter(completer)
-        
+
         self.browseButton = QPushButton(_('&Browse...'))
         self.browseButton.clicked.connect(self.browse)
-        
+
         layout = QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.lineEdit)
         layout.addWidget(self.browseButton)
         self.setLayout(layout)
-        
+
     def browse(self):
         dir = QFileDialog.getExistingDirectory(self, directory=self.lineEdit.text(),
                                                options=QFileDialog.ShowDirsOnly)
         if dir:
             self.lineEdit.setText(dir)
-    
+
     ## common APIs for all edit widgets
     def setValue(self, curvalue):
         self.curvalue = curvalue
@@ -353,14 +358,14 @@ class PathBrowser(QWidget):
             self.lineEdit.setText(hglib.tounicode(curvalue))
         else:
             self.lineEdit.setText('')
-            
+
     def value(self):
         utext = self.lineEdit.text()
         return utext and hglib.fromunicode(utext) or None
-    
+
     def isDirty(self):
         return self.value() != self.curvalue
-        
+
 def genEditCombo(opts, defaults=[]):
     opts['canedit'] = True
     opts['defaults'] = defaults
@@ -573,8 +578,16 @@ INFO = (
         _('Operation which is performed directly after a successful pull. '
           'update equates to pull --update, fetch equates to the fetch '
           'extension, rebase equates to pull --rebase.  Default: none')),
+    _fi(_('Default Push'), 'tortoisehg.defaultpush', (genDefaultCombo,
+        ['all', 'branch', 'revision']),
+        _('Select the revisions that will be pushed by default, '
+        'whenever you click the Push button.'
+        '<ul><li><b>all</b>: The default. Push all changes in <i>all branches</i>.'
+        '<li><b>branch</b>: Push all changes in the <i>current branch</i>.'
+        '<li><b>revision</b>: Push the changes in the current branch '
+        '<i><u>up to</u> the current revision</i>.</ul><p>'
+        'Default: all')),
     )),
-
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'}, (
     _fi(_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is:<br>'
@@ -603,6 +616,9 @@ INFO = (
          'environment variables are set to a non-English language. '
          'This setting is used by the Merge, Tag and Backout dialogs. '
          'Default: False')),
+    _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
+       _('Make MQ patches secret (instead of draft). '
+         'Default: False'), visible=phasesSupport),
     _fi(_('Monitor working<br>directory changes'),
         'tortoisehg.refreshwdstatus',
         (genDefaultCombo,
@@ -794,6 +810,13 @@ INFO = (
     _fi(_('Configure Issue Tracker'), 'tortoisehg.issue.bugtraqparameters', genBugTraqEdit,
         _('Configure the selected COM Bug Tracker plugin.'),
         master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
+    _fi(_('Issue Tracker Trigger'), 'tortoisehg.issue.bugtraqtrigger', (genDefaultCombo,
+        ['never', 'commit']),
+        _('Determines when the issue tracker state will be updated by TortoiseHg. Valid settings values are:'
+        '<ul><li><b>never</b>: Do not update the Issue Tracker state automaticaly.'
+        '<li><b>commit</b>: Update the Issue Tracker state after a successful commit.</ol><p>'
+        'Default: never'),
+        master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
     )),
 
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
@@ -811,7 +834,7 @@ INFO = (
     _fi(_('Target People'), 'reviewboard.target_people', genEditCombo,
         _('A comma separated list of target people')),
     )),
-    
+
 ({'name': 'kbfiles', 'label': _('Kiln Bfiles'), 'icon': 'kiln', 'extension': 'kbfiles'}, (
     _fi(_('Patterns'), 'kilnbfiles.patterns', genEditCombo,
         _('Files with names meeting the specified patterns will be automatically '
@@ -832,6 +855,21 @@ INFO = (
         _('Path to the directory where a system-wide cache of largefiles will be stored')),
     )),
 
+({'name': 'projrc', 'label': _('Projrc'), 'icon': 'settings_projrc', 'extension': 'projrc'}, (
+    _fi(_('Require confirmation'), 'projrc.confirm', genBoolRBGroup,
+        _('Ask the user to confirm the update of the local "projrc" configuration file '
+        'when the remote projrc file changes. Default is "True".')),
+    _fi(_('Servers'), 'projrc.servers', genEditCombo,
+        _('List of Servers from which "projrc" configuration files must be pulled. '
+        'Set it to "*" to pull from all servers. Set it to "default" to pull from the default sync path.'
+        'Default is pull from NO servers.')),
+    _fi(_('Include'), 'projrc.include', genEditCombo,
+        _('List of settings that will be pulled form the project configuration file. Default is include NO settings.')),
+    _fi(_('Exclude'), 'projrc.exclude', genEditCombo,
+        _('List of settings that will NOT be pulled form the project configuration file. '
+        'Default is exclude none of the included settings.')),
+    )),
+
 )
 
 CONF_GLOBAL = 0
@@ -842,7 +880,8 @@ class SettingsDialog(QDialog):
     def __init__(self, configrepo=False, focus=None, parent=None, root=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('TortoiseHg Settings'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint |
+            Qt.WindowMaximizeButtonHint)
         self.setWindowIcon(qtlib.geticon('settings_repo'))
 
         if not hasattr(wconfig.config(), 'write'):
@@ -889,6 +928,14 @@ class SettingsDialog(QDialog):
                                   _('no repo at ') + uroot, parent=self)
 
         if repo:
+            if 'projrc' in repo.extensions():
+                projrcpath = os.sep.join([repo.root, '.hg', 'projrc'])
+                if os.path.exists(projrcpath):
+                    rtab = SettingsForm(rcpath=projrcpath, focus=focus, readonly=True)
+                    self.conftabs.addTab(rtab, qtlib.geticon('settings_projrc'),
+                                         _('%s project settings (.hg/projrc)') % os.path.basename(repo.displayname))
+                    rtab.restartRequested.connect(self._pushRestartRequest)
+
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             rtab = SettingsForm(rcpath=reporcpath, focus=focus)
             self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
@@ -957,8 +1004,11 @@ class SettingsForm(QWidget):
 
     restartRequested = pyqtSignal(unicode)
 
-    def __init__(self, rcpath, focus=None, parent=None):
+    def __init__(self, rcpath, focus=None, parent=None, readonly=False):
         super(SettingsForm, self).__init__(parent)
+
+        # If forcereadonly is false, the settings form will be readonly if the corresponding ini file is readonly
+        self.forcereadonly = readonly
 
         if isinstance(rcpath, (list, tuple)):
             self.rcpath = rcpath
@@ -1057,7 +1107,7 @@ class SettingsForm(QWidget):
     def refresh(self, *args):
         # refresh config values
         self.ini = self.loadIniFile(self.rcpath)
-        self.readonly = not (hasattr(self.ini, 'write')
+        self.readonly = self.forcereadonly or not (hasattr(self.ini, 'write')
                                 and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
         self.fnedit.setText(hglib.tounicode(self.fn))

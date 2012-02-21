@@ -360,12 +360,24 @@ class RepoRegistryView(QDockWidget):
                 idx = m.index(it.row(), 0, idx)
                 self.tview.expand(idx)
 
-    def addRepo(self, root):
-        'workbench has opened a new repowidget, ensure it is in the registry'
+    def addRepo(self, root, groupname=None):
+        """
+        Add a repo to the repo registry, optionally specifying the parent repository group
+
+        The main use of this method is when the workbench has opened a new repowidget
+        """
         m = self.tview.model()
         it = m.getRepoItem(root, lookForSubrepos=True)
         if it == None:
-            m.addRepo(None, root, -1)
+            group = None
+            if groupname:
+                # Get the group index of the RepoGroup corresponding to the target group name
+                for it in m.rootItem.childs:
+                    if groupname == it.name:
+                        rootidx = self.tview.rootIndex()
+                        group = m.index(it.row(), 0, rootidx)
+                        break
+            m.addRepo(group, root, -1)
             self.updateSettingsFile()
 
     def setActiveTabRepo(self, root):
@@ -431,6 +443,12 @@ class RepoRegistryView(QDockWidget):
              ("copypath", _("Copy path"), '',
                 _("Copy the root path of the repository to the clipboard"),
                 self.copyPath),
+             ("sortbyname", _("Sort by name"), '',
+                _("Sort the group by short name"), self.sortbyname),
+             ("sortbypath", _("Sort by path"), '',
+                _("Sort the group by full path"), self.sortbypath),
+             ("sortbyhgsub", _("Sort by .hgsub"), '',
+                _("Order the subrepos as in .hgsub"), self.sortbyhgsub),
              ]
         return a
 
@@ -455,14 +473,20 @@ class RepoRegistryView(QDockWidget):
         menulist = selitem.internalPointer().menulist()
         if not menulist:
             return
-        self.contextmenu.clear()
-        for act in menulist:
-            if act:
-                self.contextmenu.addAction(self._actions[act])
-            else:
-                self.contextmenu.addSeparator()
+        self.addtomenu(self.contextmenu, menulist)
         self.selitem = selitem
         self.contextmenu.exec_(point)
+
+    def addtomenu(self, menu, actlist):
+        menu.clear()
+        for act in actlist:
+            if isinstance(act, basestring) and act in self._actions:
+                menu.addAction(self._actions[act])
+            elif isinstance(act, tuple) and len(act) == 2:
+                submenu = menu.addMenu(act[0])
+                self.addtomenu(submenu, act[1])
+            else:
+                menu.addSeparator()
 
     #
     ## Menu action handlers
@@ -472,7 +496,7 @@ class RepoRegistryView(QDockWidget):
         root = self.selitem.internalPointer().rootpath()
         d = clone.CloneDialog(args=[root, root + '-clone'], parent=self)
         d.finished.connect(d.deleteLater)
-        d.clonedRepository.connect(self.open)
+        d.clonedRepository.connect(self.openClone)
         d.show()
 
     def explore(self):
@@ -513,7 +537,25 @@ class RepoRegistryView(QDockWidget):
 
             root = os.path.normcase(os.path.normpath(root))
 
-            if sroot != root and root == paths.find_root(os.path.dirname(path)):
+            if not os.path.isdir(sroot):
+                qtlib.WarningMsgBox(_('Cannot add subrepository'),
+                    _('"%s" is not a folder' % sroot),
+                    parent=self)
+                return
+            elif sroot == root:
+                qtlib.WarningMsgBox(_('Cannot add subrepository'),
+                    _('A repository cannot be added as a subrepo of itself'),
+                    parent=self)
+                return
+            elif root != paths.find_root(os.path.dirname(path)):
+                qtlib.WarningMsgBox(_('Cannot add subrepository'),
+                    _('The selected folder:<br><br>%s<br><br>'
+                    'is not inside the target repository.<br><br>'
+                    'This may be allowed but is greatly discouraged.<br>'
+                    'If you want to add a non trivial subrepository mapping '
+                    'you must manually edit the <i>.hgsub</i> file') % root, parent=self)
+                return
+            else:
                 # The selected path is the root of a repository that is inside
                 # the selected repository
 
@@ -549,9 +591,10 @@ class RepoRegistryView(QDockWidget):
                             fsub.close()
                         except:
                             qtlib.WarningMsgBox(
-                                _('Failed to add repository'),
+                                _('Failed to add subrepository'),
                                 _('Cannot open the .hgsub file in:<br><br>%s') \
                                 % root, parent=self)
+                            return
 
                     # Make sure that the selected subrepo (or one of its
                     # subrepos!) is not already on the .hgsub file
@@ -581,18 +624,17 @@ class RepoRegistryView(QDockWidget):
                         fsub = repo.wopener('.hgsub', 'w')
                         fsub.write(linesep.join(lines))
                         fsub.close()
-
                         if not hasHgsub:
-                            commands.add(ui.ui(), repo, '.hgsub')
-
+                            commands.add(ui.ui(), repo, repo.wjoin('.hgsub'))
                         qtlib.InfoMsgBox(
                             _('Subrepo added to .hgsub file'),
                             _('The selected subrepo:<br><br><i>%s</i><br><br>'
-                            'has been added to the .hgsub file.<br><br>'
+                            'has been added to the .hgsub file of the repository:<br><br><i>%s</i><br><br>'
                             'Remember that in order to finish adding the '
-                            'subrepo<br><i>you must still commit</i> the '
-                            '.hgsub file changes.') \
-                            % root, parent=self)
+                            'subrepo <i>you must still <u>commit</u></i> the '
+                            'changes to the .hgsub file in order to confirm '
+                            'the addition of the subrepo.') \
+                            % (srelroot, root), parent=self)
                     except:
                         qtlib.WarningMsgBox(
                             _('Failed to add repository'),
@@ -616,7 +658,17 @@ class RepoRegistryView(QDockWidget):
     def openAll(self):
         for root in self.selitem.internalPointer().childRoots():
             self.openRepo.emit(hglib.tounicode(root), False)
-    def open(self, root=None):
+
+    def openClone(self, root=None, sourceroot=None):
+        m = self.tview.model()
+        src = m.getRepoItem(hglib.fromunicode(sourceroot))
+        if src:
+            groupname = src.parent().name
+        else:
+            groupname = None
+        self.open(root, groupname)
+
+    def open(self, root=None, groupname=None):
         'open context menu action, open repowidget unconditionally'
         if not root:
             root = self.selitem.internalPointer().rootpath()
@@ -628,6 +680,8 @@ class RepoRegistryView(QDockWidget):
             else:
                 repotype = 'unknown'
         if repotype == 'hg':
+            if groupname:
+                self.addRepo(hglib.tounicode(root), groupname)
             self.openRepo.emit(hglib.tounicode(root), False)
         else:
             qtlib.WarningMsgBox(
@@ -637,7 +691,7 @@ class RepoRegistryView(QDockWidget):
 
     def copyPath(self):
         clip = QApplication.clipboard()
-        clip.setText(self.selitem.internalPointer().rootpath())
+        clip.setText(hglib.tounicode(self.selitem.internalPointer().rootpath()))
 
     def startRename(self):
         self.tview.edit(self.tview.currentIndex())
@@ -656,6 +710,34 @@ class RepoRegistryView(QDockWidget):
 
         if root is not None:
             self.removeRepo.emit(hglib.tounicode(root))
+
+    def sortbyname(self):
+        childs = self.selitem.internalPointer().childs
+        self.tview.model().sortchilds(childs, lambda x: x.shortname())
+
+    def sortbypath(self):
+        childs = self.selitem.internalPointer().childs
+        self.tview.model().sortchilds(childs, lambda x: util.normpath(x.rootpath()))
+
+    def sortbyhgsub(self):
+        ip = self.selitem.internalPointer()
+        repo = hg.repository(ui.ui(), ip.rootpath())
+        ctx = repo['.']
+        wfile = '.hgsub'
+        if wfile not in ctx:
+            return self.sortbypath()
+        data = ctx[wfile].data().strip()
+        data = data.split('\n')
+        getsubpath = lambda x: x.split('=')[0].strip()
+        abspath = lambda x: util.normpath(repo.wjoin(x))
+        hgsuborder = [abspath(getsubpath(x)) for x in data]
+        def keyfunc(x):
+            try:
+                return hgsuborder.index(util.normpath(x.rootpath()))
+            except:
+                # If an item is not found, place it at the top
+                return 0
+        self.tview.model().sortchilds(ip.childs, keyfunc)
 
     @pyqtSlot(QString, QString)
     def shortNameChanged(self, uroot, uname):

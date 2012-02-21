@@ -14,7 +14,7 @@ import threading
 import tempfile
 import re
 
-from mercurial import hg, cmdutil, util, error, match, copies
+from mercurial import hg, cmdutil, util, error, match
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
@@ -89,7 +89,7 @@ def snapshot(repo, files, ctx):
     base = os.path.join(qtlib.gettempdir(), dirname)
     fns_and_mtime = []
     if not os.path.exists(base):
-        os.mkdir(base)
+        os.makedirs(base)
     for fn in files:
         wfn = util.pconvert(fn)
         if not wfn in ctx:
@@ -100,18 +100,21 @@ def snapshot(repo, files, ctx):
             # File has already been snapshot
             continue
         destdir = os.path.dirname(dest)
-        if not os.path.isdir(destdir):
-            os.makedirs(destdir)
-        data = repo.wwritedata(wfn, ctx[wfn].data())
-        f = open(dest, 'wb')
-        f.write(data)
-        f.close()
-        if ctx.rev() is None:
-            fns_and_mtime.append((dest, repo.wjoin(fn), 
-                                  os.lstat(dest).st_mtime))
-        else:
-            # Make file read/only, to indicate it's static (archival) nature
-            os.chmod(dest, stat.S_IREAD)
+        try:
+            if not os.path.isdir(destdir):
+                os.makedirs(destdir)
+            data = repo.wwritedata(wfn, ctx[wfn].data())
+            f = open(dest, 'wb')
+            f.write(data)
+            f.close()
+            if ctx.rev() is None:
+                fns_and_mtime.append((dest, repo.wjoin(fn), 
+                                    os.lstat(dest).st_mtime))
+            else:
+                # Make file read/only, to indicate it's static (archival) nature
+                os.chmod(dest, stat.S_IREAD)
+        except EnvironmentError:
+            pass
     return base, fns_and_mtime
 
 def launchtool(cmd, opts, replace, block):
@@ -205,9 +208,9 @@ def visualdiff(ui, repo, pats, opts):
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
     if ctx1b:
         mod_b, add_b, rem_b = map(set, repo.status(ctx1b.node(), n2, m)[:3])
-        cpy = copies.copies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
+        cpy = hglib.mergecopies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
     else:
-        cpy = copies.copies(repo, ctx1a, ctx2, repo[-1])[0]
+        cpy = hglib.pathcopies(ctx1a, ctx2)
         mod_b, add_b, rem_b = set(), set(), set()
     MA = mod_a | add_a | mod_b | add_b
     MAR = MA | rem_a | rem_b
@@ -351,7 +354,7 @@ def visualdiff(ui, repo, pats, opts):
             dodiff()
         finally:
             # cleanup happens atexit
-            ui.note(_('cleaning up temp directory\n'))
+            ui.note('cleaning up temp directory\n')
 
     if opts.get('mainapp'):
         dodiffwrapper()

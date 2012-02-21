@@ -221,13 +221,21 @@ class RepoItem(RepoTreeItem):
             spath2 = spath2.lower()
 
         if cpath and spath2.startswith(cpath):
-            iShortPathStart = len(cpath) + 1
+            iShortPathStart = len(cpath)
             spath = spath[iShortPathStart:]
+            if spath and spath[0] in '/\\':
+                # do not show a slash at the beginning of the short path
+                spath = spath[1:]
+
         return hglib.tounicode(spath)
 
     def menulist(self):
-        return ['open', 'clone', 'addsubrepo', None, 'explore',
-                'terminal', 'copypath', None, 'rename', 'remove', None, 'settings']
+        acts = ['open', 'clone', 'addsubrepo', None, 'explore',
+                'terminal', 'copypath', None, 'rename', 'remove']
+        if self.childCount() > 0:
+            acts.extend([None, (_('Sort'), ['sortbyname', 'sortbyhgsub'])])
+        acts.extend([None, 'settings'])
+        return acts
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
@@ -267,7 +275,8 @@ class RepoItem(RepoTreeItem):
                 if repo is None:
                     repo = hg.repository(ui.ui(), self._root)
                 wctx = repo['.']
-                for subpath in wctx.substate:
+                sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
+                for subpath in sorted(wctx.substate, key=sortkey):
                     sri = None
                     abssubpath = repo.wjoin(subpath)
                     subtype = wctx.substate[subpath][2]
@@ -398,8 +407,12 @@ class SubrepoItem(RepoItem):
         if isinstance(self._parent, RepoGroupItem):
             return super(SubrepoItem, self).menulist()
         else:
-            return ['open', 'clone', 'addsubrepo', None, 'explore', 'terminal',
-                'copypath', None, 'settings']
+            acts = ['open', 'clone', 'addsubrepo', None, 'explore',
+                    'terminal', 'copypath']
+            if self.childCount() > 0:
+                acts.extend([None, (_('Sort'), ['sortbyname', 'sortbyhgsub'])])
+            acts.extend([None, 'settings'])
+            return acts
 
     def getSupportedDragDropActions(self):
         if issubclass(type(self.parent()), RepoGroupItem):
@@ -446,7 +459,8 @@ class RepoGroupItem(RepoTreeItem):
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
-            None, 'reloadRegistry']
+            None, (_('Sort'), ['sortbyname', 'sortbypath']), None,
+            'reloadRegistry']
 
     def flags(self):
         return (Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled
@@ -500,7 +514,8 @@ class AllRepoGroupItem(RepoGroupItem):
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename',
-            None, 'reloadRegistry']
+            None, (_('Sort'), ['sortbyname', 'sortbypath']), None,
+            'reloadRegistry']
 
     def undump(self, xr):
         a = xr.attributes()

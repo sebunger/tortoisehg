@@ -249,10 +249,10 @@ class FileData(object):
                     data = []
                 else:
                     _ui.pushbuffer()
-                    commands.status(_ui, srepo)
+                    commands.status(_ui, srepo, modified=True, added=True, removed=True, deleted=True)
                     data = _ui.popbuffer()
                     if data:
-                        out.append(_('File Status:') + u'\n')
+                        out.append(_('The subrepository is dirty.') + u' ' + _('File Status:') + u'\n')
                         out.append(hglib.tounicode(data))
                         out.append(u'\n')
 
@@ -350,10 +350,10 @@ class FileData(object):
             fctx, newdata = res
             self.contents = newdata
             change = None
-            for pfctx in fctx.parents():
-                if 'x' in fctx.flags() and 'x' not in pfctx.flags():
+            for pctx in ctx.parents():
+                if 'x' in fctx.flags() and 'x' not in pctx.flags(wfile):
                     change = _('set')
-                elif 'x' not in fctx.flags() and 'x' in pfctx.flags():
+                elif 'x' not in fctx.flags() and 'x' in pctx.flags(wfile):
                     change = _('unset')
             if change:
                 lbl = _("exec mode has been <font color='red'>%s</font>")

@@ -106,10 +106,10 @@ class PostReviewDialog(QDialog):
 
     @pyqtSlot()
     def passwordPrompt(self):
-        pwd, ok = QInputDialog.getText(self,
-                                       _('Review Board'),
-                                       _('Password:'),
-                                       mode=QLineEdit.Password)
+        pwd, ok = qtlib.getTextInput(self,
+                                     _('Review Board'),
+                                     _('Password:'),
+                                     mode=QLineEdit.Password)
         if ok and pwd:
             self.password = pwd
             return True
@@ -198,9 +198,9 @@ class PostReviewDialog(QDialog):
             return hglib.revrange(self.repo,
                                   iter(str(e) for e in revs))
         if selected_revs:
-             selectedrevs = purerevs(selected_revs)
+            selectedrevs = purerevs(selected_revs)
         else:
-             selectedrevs = purerevs(revs)
+            selectedrevs = purerevs(revs)
 
         self._changesets = _ChangesetsModel(self.repo,
                                             # TODO: [':'] is inefficient
