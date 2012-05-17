@@ -273,15 +273,18 @@ class HgRepoView(QTableView):
         try:
             rev = self.repo.changectx(rev).rev()
         except error.RepoError:
-            self.showMessage.emit(_("Can't find revision '%s'") % rev)
+            self.showMessage.emit(_("Can't find revision '%s'")
+                                  % hglib.tounicode(str(rev)))
         except LookupError, e:
-            self.showMessage.emit(hglib.fromunicode(str(e)))
+            self.showMessage.emit(hglib.tounicode(str(e)))
         else:
             idx = self.model().indexFromRev(rev)
             if idx is not None:
                 # avoid unwanted selection change (#1019)
                 if self.currentIndex().row() != idx.row():
-                    self.setCurrentIndex(idx)
+                    flags = (QItemSelectionModel.ClearAndSelect
+                             | QItemSelectionModel.Rows)
+                    self.selectionModel().setCurrentIndex(idx, flags)
                 self.scrollTo(idx)
 
     def saveSettings(self, s = None):

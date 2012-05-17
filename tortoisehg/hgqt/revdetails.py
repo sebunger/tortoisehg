@@ -253,7 +253,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
               'Alt+Ctrl+E', _('Open the selected subrepository'),
               self.explore),
             ('terminal', _('Open terminal in subrepository'),
-              'utilities-terminal', 'Alt+Ctrl+T', 
+              'utilities-terminal', 'Alt+Ctrl+T',
               _('Open a shell terminal in the selected subrepository root'),
               self.terminal),
             ]:
@@ -274,8 +274,12 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.ctx = ctx = self.repo.changectx(rev)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
+        msg = ctx.description()
+        inlinetags = self.repo.ui.configbool('tortoisehg', 'issue.inlinetags')
+        if ctx.tags() and inlinetags:
+            msg = ' '.join(['[%s]' % tag for tag in ctx.tags()]) + ' ' + msg
         self.message.setHtml('<pre>%s</pre>'
-                             % self._deschtmlize(ctx.description()))
+                             % self._deschtmlize(msg))
         real = type(rev) is int
         wd = rev is None
         for act in ['navigate', 'diffnavigate', 'ldiff', 'edit', 'save']:
@@ -295,7 +299,8 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         'Task tab is reloaded, or repowidget is refreshed'
         rev = self.ctx.rev()
         if (type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev()
-            or (rev not in self.repo
+            or (rev is not None  # wctxrev in repo raises TypeError
+                and rev not in self.repo
                 and rev not in self.repo.thgmqunappliedpatches)):
             rev = 'tip'
         self.onRevisionSelected(rev)
@@ -433,7 +438,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         # Subrepos and regular items have different context menus
         if itemissubrepo:
             contextmenu = self.subrepocontextmenu
-            actionlist = ['opensubrepo', 'explore', 'terminal']
+            actionlist = ['opensubrepo', 'explore', 'terminal', None, 'revert']
         else:
             contextmenu = self.filecontextmenu
             actionlist = ['diff', 'ldiff', None, 'edit', 'save', None,
@@ -453,7 +458,10 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             else:
                 self.filecontextmenu = contextmenu
 
-        if len(self.filelist.getSelectedFiles()) > 1 and not itemissubrepo:
+        ln = len(self.filelist.getSelectedFiles())
+        if ln == 0:
+            return
+        if ln > 1 and not itemissubrepo:
             singlefileactions = False
         else:
             singlefileactions = True

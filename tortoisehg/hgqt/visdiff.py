@@ -14,7 +14,7 @@ import threading
 import tempfile
 import re
 
-from mercurial import hg, cmdutil, util, error, match
+from mercurial import hg, util, error, match, scmutil, copies
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, paths
@@ -191,7 +191,7 @@ def visualdiff(ui, repo, pats, opts):
             else:
                 ctx1a = p[0]
         else:
-            n1, n2 = hglib.revpair(repo, revs)
+            n1, n2 = scmutil.revpair(repo, revs)
             ctx1a, ctx2 = repo[n1], repo[n2]
             p = ctx2.parents()
             if not revs and len(p) > 1:
@@ -202,15 +202,15 @@ def visualdiff(ui, repo, pats, opts):
                        _('You likely need to refresh this application'))
         return None
 
-    pats = hglib.expandpats(pats)
+    pats = scmutil.expandpats(pats)
     m = match.match(repo.root, '', pats, None, None, 'relpath')
     n2 = ctx2.node()
     mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
     if ctx1b:
         mod_b, add_b, rem_b = map(set, repo.status(ctx1b.node(), n2, m)[:3])
-        cpy = hglib.mergecopies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
+        cpy = copies.mergecopies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
     else:
-        cpy = hglib.pathcopies(ctx1a, ctx2)
+        cpy = copies.pathcopies(ctx1a, ctx2)
         mod_b, add_b, rem_b = set(), set(), set()
     MA = mod_a | add_a | mod_b | add_b
     MAR = MA | rem_a | rem_b
