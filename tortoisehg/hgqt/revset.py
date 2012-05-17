@@ -51,6 +51,9 @@ _common = (
        'mercurial/hg.1.html#dates">help dates</a>')),
     ('ancestor(single, single)',
      _('Greatest common ancestor of the two changesets.')),
+    ('matching(revset [, ''field(s) to match''])',
+     _('Find revisions that "match" one or more fields of the given set of '
+       'revisions.')),
 )
 
 _filepatterns = (
@@ -379,7 +382,7 @@ class RevsetThread(QThread):
         cwd = os.getcwd()
         try:
             os.chdir(self.repo.root)
-            func = hglib.revsetmatch(self.repo.ui, self.text)
+            func = revset.match(self.repo.ui, self.text)
             l = []
             for c in func(self.repo, range(len(self.repo))):
                 l.append(c)

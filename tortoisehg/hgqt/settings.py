@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, util, error, extensions
+from mercurial import ui, util, error, extensions, scmutil
 
 from tortoisehg.util import hglib, settings, paths, wconfig, i18n, bugtraq
 from tortoisehg.hgqt.i18n import _
@@ -151,12 +151,11 @@ class BoolRBGroup(QWidget):
     def isDirty(self):
         return self.value() != self.curvalue
 
-class PasswordEntry(QLineEdit):
+class LineEditBox(QLineEdit):
     def __init__(self, parent=None, **opts):
         QLineEdit.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
-        self.setEchoMode(QLineEdit.Password)
         self.setMinimumWidth(ENTRY_WIDTH)
 
     ## common APIs for all edit widgets
@@ -173,6 +172,48 @@ class PasswordEntry(QLineEdit):
 
     def isDirty(self):
         return self.value() != self.curvalue
+
+class PasswordEntry(LineEditBox):
+    def __init__(self, parent=None, **opts):
+        QLineEdit.__init__(self, parent, toolTip=opts['tooltip'])
+        self.opts = opts
+        self.curvalue = None
+        self.setEchoMode(QLineEdit.Password)
+        self.setMinimumWidth(ENTRY_WIDTH)
+class TextEntry(QTextEdit):
+    def __init__(self, parent=None, **opts):
+        QTextEdit.__init__(self, parent, toolTip=opts['tooltip'])
+        self.opts = opts
+        self.curvalue = None
+        self.setMinimumWidth(ENTRY_WIDTH)
+
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        self.curvalue = curvalue
+        if curvalue:
+            self.setPlainText(hglib.tounicode(curvalue))
+        else:
+            self.setPlainText('')
+
+    def value(self):
+        # It is not possible to set a multi-line value with an empty line
+        utext = self.removeEmptyLines(self.toPlainText())
+        return utext and hglib.fromunicode(utext) or None
+
+    def isDirty(self):
+        return self.value() != self.curvalue
+
+    def removeEmptyLines(self, text):
+        if not text:
+            return text
+        rawlines = hglib.fromunicode(text).splitlines()
+        lines = []
+        for line in rawlines:
+            if not line.strip():
+                continue
+            lines.append(line)
+        return os.linesep.join(lines)
+
 
 class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
@@ -377,9 +418,16 @@ def genIntEditCombo(opts):
     opts['validator'] = QIntValidator()
     return SettingsCombo(**opts)
 
+def genLineEditBox(opts):
+    'Generate a single line text entry box'
+    return LineEditBox(**opts)
+
 def genPasswordEntry(opts):
     'Generate a password entry box'
     return PasswordEntry(**opts)
+def genTextEntry(opts):
+    'Generate a multi-line text input entry box'
+    return TextEntry(**opts)
 
 def genDefaultCombo(opts, defaults=[]):
     'user must select from a list'
@@ -464,7 +512,7 @@ INFO = (
         _('Graphical merge program for resolving merge conflicts.  If left '
         'unspecified, Mercurial will use the first applicable tool it finds '
         'on your system or use its internal merge tool that leaves conflict '
-        'markers in place.  Chose internal:merge to force conflict markers ,'
+        'markers in place.  Choose internal:merge to force conflict markers, '
         'internal:prompt to always select local or other, or internal:dump '
         'to leave files in the working directory for manual merging')),
     _fi(_('Visual Diff Tool'), 'tortoisehg.vdiff',
@@ -523,6 +571,11 @@ INFO = (
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
+    _fi(_('Single Workbench Window'), 'tortoisehg.workbench.single', genBoolRBGroup,
+        _('Select whether you want to have a single workbench window. '
+        'If you disable this setting you will get a new workbench window everytime that you use the "Hg Workbench"'
+        'command on the explorer context menu. Default: True'),
+        restartneeded=True, globalonly=True),
     _fi(_('Default widget'), 'tortoisehg.defaultwidget', (genDefaultCombo,
         ['revdetails', 'commit', 'mq', 'sync', 'manifest', 'search']),
         _('Select the initial widget that will be shown when opening a '
@@ -587,6 +640,19 @@ INFO = (
         '<li><b>revision</b>: Push the changes in the current branch '
         '<i><u>up to</u> the current revision</i>.</ul><p>'
         'Default: all')),
+    _fi(_('Activate Bookmarks'), 'tortoisehg.activatebookmarks', (genDefaultCombo,
+        ['auto', 'prompt', 'never']),
+        _('Select when TortoiseHg will show a prompt to activate a bookmark '
+        'when updating to a revision that has one or more bookmarks.'
+        '<ul><li><b>auto</b>: Try to automatically activate bookmarks. When '
+        'updating to a revision that has a single bookmark it will be activated '
+        'automatically. Show a prompt if there is more than one bookmark on the '
+        'revision that is being updated to.'
+        '<li><b>prompt</b>: The default. Show a prompt when updating to a '
+        'revision that has one or more bookmarks.'
+        '<li><b>never</b>: Never show any prompt to activate any bookmarks.'
+        '</ul><p>'
+        'Default: prompt')),
     )),
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'}, (
     _fi(_('Username'), 'ui.username', genEditCombo,
@@ -635,6 +701,18 @@ INFO = (
         '- <b>alwayslocal</b>: same as "<b>always</b>" but restricts forced '
         'refreshes to <i>local repos</i>.<br>'
         'Default: auto')),
+    _fi(_('Confirm adding unknown files'), 'tortoisehg.confirmaddfiles', genBoolRBGroup,
+        _('Determines if TortoiseHg should show a confirmation dialog '
+        'before adding new files in a commit. '
+        'If True, a confirmation dialog will be showed. '
+        'If False, selected new files will be included in the '
+        'commit with no confirmation dialog.  Default: True')),
+    _fi(_('Confirm deleting files'), 'tortoisehg.confirmdeletefiles', genBoolRBGroup,
+        _('Determines if TortoiseHg should show a confirmation dialog '
+        'before removing files in a commit. '
+        'If True, a confirmation dialog will be showed. '
+        'If False, selected deleted files will be included in the '
+        'commit with no confirmation dialog.  Default: True')),
     )),
 
 ({'name': 'web', 'label': _('Web Server'), 'icon': 'proxy'}, (
@@ -799,6 +877,8 @@ INFO = (
           'while {1} refers to the first group and so on. If no {n} tokens'
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
+    _fi(_('Inline Tags'), 'tortoisehg.issue.inlinetags', genBoolRBGroup,
+        _('Show tags at start of commit message.')),
     _fi(_('Mandatory Issue Reference'), 'tortoisehg.issue.linkmandatory', genBoolRBGroup,
         _('When committing, require that a reference to an issue be specified.  '
           'If enabled, the regex configured in \'Issue Regex\' must find a match '
@@ -813,8 +893,8 @@ INFO = (
     _fi(_('Issue Tracker Trigger'), 'tortoisehg.issue.bugtraqtrigger', (genDefaultCombo,
         ['never', 'commit']),
         _('Determines when the issue tracker state will be updated by TortoiseHg. Valid settings values are:'
-        '<ul><li><b>never</b>: Do not update the Issue Tracker state automaticaly.'
-        '<li><b>commit</b>: Update the Issue Tracker state after a successful commit.</ol><p>'
+        '<ul><li><b>never</b>: Do not update the Issue Tracker state automatically.'
+        '<li><b>commit</b>: Update the Issue Tracker state after a successful commit.</ul><p>'
         'Default: never'),
         master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
     )),
@@ -849,16 +929,22 @@ INFO = (
     _fi(_('Patterns'), 'largefiles.patterns', genEditCombo,
         _('Files with names meeting the specified patterns will be automatically '
           'added as largefiles')),
-    _fi(_('Size'), 'largefiles.size', genEditCombo,
+    _fi(_('Minimum Size'), 'largefiles.minsize', genEditCombo,
         _('Files of at least the specified size (in megabytes) will be added as largefiles')),
-    _fi(_('System Cache'), 'largefiles.systemcache', genPathBrowser,
-        _('Path to the directory where a system-wide cache of largefiles will be stored')),
+    _fi(_('User Cache'), 'largefiles.usercache', genPathBrowser,
+        _('Path to the directory where a user\'s cache of largefiles will be stored')),
     )),
 
 ({'name': 'projrc', 'label': _('Projrc'), 'icon': 'settings_projrc', 'extension': 'projrc'}, (
-    _fi(_('Require confirmation'), 'projrc.confirm', genBoolRBGroup,
-        _('Ask the user to confirm the update of the local "projrc" configuration file '
-        'when the remote projrc file changes. Default is "True".')),
+    _fi(_('Require confirmation'), 'projrc.confirm', (genDefaultCombo, ['always', 'first', 'never']),
+        _('When to ask the user to confirm the update of the local "projrc" configuration file '
+        'when the remote projrc file changes. Possible values are:'
+        '<ul><li><b>always</b>: [<i>default</i>] '
+        'Always show a confirmation prompt before updating the local .hg/projrc file.'
+        '<li><b>first</b>: Show a confirmation dialog when the repository is cloned '
+        'or when a remote projrc file is found for the first time.'
+        '<li><b>never</b>: Update the local .hg/projrc file automatically, '
+        'without requiring any user confirmation.</ul>')),
     _fi(_('Servers'), 'projrc.servers', genEditCombo,
         _('List of Servers from which "projrc" configuration files must be pulled. '
         'Set it to "*" to pull from all servers. Set it to "default" to pull from the default sync path.'
@@ -868,8 +954,21 @@ INFO = (
     _fi(_('Exclude'), 'projrc.exclude', genEditCombo,
         _('List of settings that will NOT be pulled form the project configuration file. '
         'Default is exclude none of the included settings.')),
-    )),
+    _fi(_('Update on incoming'), 'projrc.updateonincoming', (genDefaultCombo, ['never', 'prompt', 'auto']),
+        _('Let the user update the projrc on incoming:'
+        '<ul><li><b>never</b>: [<i>default</i>] '
+        'Show whether the remote projrc file has changed, '
+        'but do not update (nor ask to update) the local projrc file.'
+        '<li><b>prompt</b>: Look for changes to the projrc file. '
+        'If there are changes _always_ show a confirmation prompt, '
+        'asking the user if it wants to update its local projrc file.'
+        '<li><b>auto</b>: Look for changes to the projrc file. '
+        'Use the value of the "projrc.confirm" configuration key to '
+        'determine whether to show a confirmation dialog or not '
+        'before updating the local projrc file.</ul><p>'
+        'Default: never')),
 
+    )),
 )
 
 CONF_GLOBAL = 0
@@ -908,7 +1007,7 @@ class SettingsDialog(QDialog):
 
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
-        utab = SettingsForm(rcpath=hglib.user_rcpath(), focus=focus)
+        utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
                              _("%s's global settings") % username())
         utab.restartRequested.connect(self._pushRestartRequest)
@@ -1194,7 +1293,7 @@ class SettingsForm(QWidget):
                 w = func(opts)
             w.installEventFilter(self)
             if e.globalonly:
-                w.setEnabled(self.rcpath == hglib.user_rcpath())
+                w.setEnabled(self.rcpath == scmutil.userrcpath())
             lbl = QLabel(e.label)
             lbl.installEventFilter(self)
             lbl.setToolTip(e.tooltip)

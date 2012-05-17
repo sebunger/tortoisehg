@@ -12,65 +12,8 @@ import time
 import urllib
 
 from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
-from mercurial import encoding, templatefilters, filemerge, error
-from mercurial import demandimport, revset
+from mercurial import encoding, templatefilters, filemerge, error, scmutil
 from mercurial import dispatch as hgdispatch
-
-
-demandimport.disable()
-try:
-    # hg >= 1.9
-    from mercurial.scmutil import canonpath, userrcpath
-    user_rcpath = userrcpath
-except (ImportError, AttributeError):
-    # hg <= 1.8
-    from mercurial.util import canonpath, user_rcpath
-try:
-    # hg >= 1.9
-    from mercurial.util import localpath
-except (ImportError, AttributeError):
-    # hg <= 1.8
-    from mercurial.hg import localpath
-try:
-    # hg >= 1.9
-    from mercurial.util import hidepassword, removeauth
-except (ImportError, AttributeError):
-    # hg <= 1.8
-    from mercurial.url import hidepassword, removeauth
-try:
-    # hg >= 1.9
-    from mercurial.httpconnection import readauthforuri as hgreadauthforuri
-except (ImportError, AttributeError):
-    # hg <= 1.8
-    from mercurial.url import readauthforuri as hgreadauthforuri
-try:
-    # hg >= 1.9
-    from mercurial.scmutil import revrange, expandpats, revpair, match, matchall
-except (ImportError, AttributeError):
-    # hg <= 1.8
-    from mercurial.cmdutil import revrange, expandpats, revpair, match, matchall
-try:
-    # hg >= 2.1 (0bd17a4bed88)
-    from mercurial.copies import mergecopies, pathcopies
-except (ImportError, AttributeError):
-    from mercurial.copies import copies as mergecopies
-    def pathcopies(c1, c2):
-        return mergecopies(c1._repo, c1, c2, c1._repo[-1], False)[0]
-demandimport.enable()
-
-def readauthforuri(ui, uri, user):
-    try:
-        return hgreadauthforuri(ui, uri, user)
-    except TypeError:
-        return hgreadauthforuri(ui, uri)
-
-def revsetmatch(ui, pattern):
-    try:
-        # hg >= 1.9
-        return revset.match(ui, pattern)
-    except TypeError:
-        # hg <= 1.8
-        return revset.match(pattern)
 
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
@@ -394,13 +337,14 @@ def canonpaths(list):
     root = paths.find_root(cwd)
     for f in list:
         try:
-            canonpats.append(canonpath(root, cwd, f))
+            canonpats.append(scmutil.canonpath(root, cwd, f))
         except util.Abort:
             # Attempt to resolve case folding conflicts.
             fu = f.upper()
             cwdu = cwd.upper()
             if fu.startswith(cwdu):
-                canonpats.append(canonpath(root, cwd, f[len(cwd+os.sep):]))
+                canonpats.append(scmutil.canonpath(root, cwd,
+                                                   f[len(cwd+os.sep):]))
             else:
                 # May already be canonical
                 canonpats.append(f)
@@ -500,6 +444,54 @@ def difftools(ui):
     _difftools = tools
     return tools
 
+def tortoisehgtools(ui, selectedlocation=None):
+    '''
+    Parse 'tortoisehg-tools' section of ini file. Changes:
+    
+    [tortoisehg-tools]
+    update_to_tip.icon = hg-update
+    update_to_tip.command = hg update tip
+    update_to_tip.tooltip = Update to tip
+    update_to_tip.location = workbench,repowidget
+    
+    into following dictionary
+    
+    {'update_to_tip': 
+        {'icon': 'hg-update', 
+         'command': 'hg update tip', 
+         'tooltip': 'Update to tip',
+         'location': 'workbench,repowidget'}
+    }
+    
+    If selectedlocation is set, only return those tools whose
+    location matches the selected location.
+    If a tool has no location set, it will be assumed that it must be
+    shown on the 'workbench' toolbar
+    '''
+    tools = {}
+    toolnames = []
+    for key, value in ui.configitems('tortoisehg-tools'):
+        toolname, field = key.split('.')
+        if toolname not in tools:
+            tools[toolname] = {}
+            toolnames.append(toolname)
+        bvalue = util.parsebool(value)
+        if bvalue is not None:
+            value = bvalue
+        tools[toolname][field] = value
+    
+    if selectedlocation is None:
+        return tools, toolnames
+    # Only return the tools that are linked to the selected location
+    selectedtools = {}
+    selectedtoolnames = []
+    for name in toolnames:
+        info = tools[name]
+        location = info.get('location', 'workbench').replace(' ', '').split(',')
+        if selectedlocation in location:
+            selectedtools[name] = info
+            selectedtoolnames.append(name)
+    return selectedtools, selectedtoolnames
 
 def hgcmd_toq(q, label, args):
     '''
@@ -622,7 +614,7 @@ def validate_synch_path(path, repo):
     for alias, path_aux in repo.ui.configitems('paths'):
         if path == alias:
             return_path = path_aux
-        elif path == hidepassword(path_aux):
+        elif path == util.hidepassword(path_aux):
             return_path = path_aux
     return return_path
 
