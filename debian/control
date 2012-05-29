@@ -18,6 +18,7 @@ Depends: mercurial (>= 2.1~), mercurial (<< 2.3~), python-gobject (>= 2.12.1),
  python-qt4 (>= 4.7), python-qscintilla2, ${shlibs:Depends}, ${misc:Depends},
  ${python:Depends}
 Recommends: libjs-jquery, libjs-underscore, python-iniparse, python-pygments
+Suggests: tortoisehg-nautilus
 Description: Graphical tool for working with Mercurial
  TortoiseHg provides a graphical tool for interacting with the distributed
  revision control system Mercurial.  GUI support is provided for over a dozen
@@ -27,4 +28,21 @@ Description: Graphical tool for working with Mercurial
  which allows easy selection of diffs from multiple files and packaging into
  changesets, and which is more powerful and easier to use than available
  alternatives such as qct and hgct (commit-tool).
+
+Package: tortoisehg-nautilus
+Architecture: all
+Depends: tortoisehg (>= ${source:Version}), python-nautilus (>= 1.1-2),
+ python-gi, ${misc:Depends}, ${python:Depends}
+Recommends: ssh-askpass-gnome | ssh-askpass
+Description: Graphical tool for working with Mercurial (Nautilus extension)
+ TortoiseHg provides a graphical tool for interacting with the distributed
+ revision control system Mercurial.  GUI support is provided for over a dozen
+ operations, including add files, commit changes, manage ignore filter, view
+ change log, merge, recover/rollback, edit configuration, synchronize
+ repository, and many others.   The highlight is the interactive commit tool
+ which allows easy selection of diffs from multiple files and packaging into
+ changesets, and which is more powerful and easier to use than available
+ alternatives such as qct and hgct (commit-tool).
+ .
+ This package contains the Nautilus extension for TortoiseHg.
 
