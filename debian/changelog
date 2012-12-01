@@ -1,7 +1,19 @@
+tortoisehg (2.6-1) experimental; urgency=low
+
+  * Imported Upstream version 2.6 (Closes: #689707).
+  * Remove fix-config-path.patch (applied upstream).
+  * Update copyright.
+  * Update mercurial version dependency.
+  * Update location of nautilus extension.
+  * Fix linking to system JS libraries.
+  * Symlink duplicated email1.png file.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sat, 01 Dec 2012 19:25:02 -0800
+
 tortoisehg (2.4-2) unstable; urgency=medium
 
   * Add fix-config-path.patch to fix crash on new installations of
-    tortoisehg-nautilus (Closes: #678558).
+    tortoisehg-nautilus (Closes: #678558, LP: #1024136).
 
  -- Ludovico Cavedon <cavedon@debian.org>  Sun, 16 Sep 2012 22:39:10 +0200
 
