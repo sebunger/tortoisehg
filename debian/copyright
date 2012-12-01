@@ -55,12 +55,6 @@ Files: tortoisehg/hgqt/thgrepo.py
 Copyright: 2010, George Marrows <george.marrows@gmail.com>
 License: GPL-2+
 
-Files: tortoisehg/util/hgshelve.py
-Copyright: 2009, Steve Borho <steve@borho.org>
-           2007, Bryan O'Sullivan <bos@serpentine.com>
-           2007, TK Soh <teekaysoh@gmail.com>
-License: GPL-2
-
 Files: tortoisehg/util/colormap.py
 Copyright: 2005, Dan Loda <danloda@gmail.com>
 License: GPL-2+
@@ -68,6 +62,10 @@ License: GPL-2+
 Files: tortoisehg/util/wconfig.py
 Copyright: 2010, Yuya Nishihara <yuya@tcha.org>
 License: GPL-2+
+
+Files: tortoisehg/hgqt/customtools.py
+Copyright: 2012, Angel Ezquerra <angel.ezquerra@gmail.com>
+License: GPL-2
 
 Files: icons/*
 Copyright: 2009, Steve Borho <steve@borho.org>
