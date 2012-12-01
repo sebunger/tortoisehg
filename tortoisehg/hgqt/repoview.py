@@ -18,7 +18,7 @@ from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import htmldelegate
+from tortoisehg.hgqt import htmldelegate, qtlib
 from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 
 from PyQt4.QtCore import *
@@ -35,6 +35,7 @@ class HgRepoView(QTableView):
     revisionAltClicked = pyqtSignal(object)
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
+    revisionSelectionChanged = pyqtSignal(QItemSelection, QItemSelection)
     menuRequested = pyqtSignal(QPoint, object)
     showMessage = pyqtSignal(unicode)
 
@@ -68,6 +69,7 @@ class HgRepoView(QTableView):
         self.setDragDropMode(QAbstractItemView.InternalMove)
 
         self.setStyle(HgRepoViewStyle(self.style()))
+        self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -92,7 +94,7 @@ class HgRepoView(QTableView):
 
     def createActions(self):
         menu = QMenu(self)
-        act = QAction(_('Choose log columns...'), self)
+        act = QAction(_('Choose Log Columns...'), self)
         act.triggered.connect(self.setHistoryColumns)
         menu.addAction(act)
         self.headermenu = menu
@@ -115,6 +117,7 @@ class HgRepoView(QTableView):
         if not QFontMetrics(self.font()).inFont(QString(u'\u2327').at(0)):
             model.unicodexinabox = False
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
+        self.selectionModel().selectionChanged.connect(self.revisionSelectionChanged)
         self.resetDelegate()
         self._rev_history = []
         self._rev_pos = -1
@@ -321,6 +324,9 @@ class HgRepoView(QTableView):
 
         super(HgRepoView, self).resizeEvent(e)
 
+    def enablefilterpalette(self, enable):
+        self._paletteswitcher.enablefilterpalette(enable)
+
 class HgRepoViewStyle(QStyle):
     "Override a style's drawPrimitive method to customize the drop indicator"
     def __init__(self, style):
@@ -329,9 +335,10 @@ class HgRepoViewStyle(QStyle):
     def drawPrimitive(self, element, option, painter, widget=None):
         if element == QStyle.PE_IndicatorItemViewItemDrop:
             # Drop indicators should be painted using the full viewport width
-            vp = widget.viewport().rect()
-            painter.drawRect(vp.x(), option.rect.y(),
-                             vp.width() - 1, 0.5)
+            if option.rect.height() != 0:
+                vp = widget.viewport().rect()
+                painter.drawRect(vp.x(), option.rect.y(),
+                                 vp.width() - 1, 0.5)
         else:
             self._style.drawPrimitive(element, option, painter, widget)
     # Delegate all other methods overridden by QProxyStyle to the base class

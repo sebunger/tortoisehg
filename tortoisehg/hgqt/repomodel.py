@@ -14,7 +14,7 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import binascii
+import binascii, re
 
 from mercurial import util, error
 from mercurial.util import propertycache
@@ -48,6 +48,7 @@ COLUMNHEADERS = (
     ('Description', _('Description', 'column header')),
     ('Author', _('Author', 'column header')),
     ('Tags', _('Tags', 'column header')),
+    ('Latest tags', _('Latest tags', 'column header')),
     ('Node', _('Node', 'column header')),
     ('Age', _('Age', 'column header')),
     ('LocalTime', _('Local Time', 'column header')),
@@ -69,6 +70,46 @@ def get_color(n, ignore=()):
     if not colors: # ghh, no more available colors...
         colors = COLORS
     return colors[n % len(colors)]
+
+def _parsebranchcolors(value):
+    r"""Parse tortoisehg.branchcolors setting
+
+    >>> _parsebranchcolors('foo:#123456  bar:#789abc ')
+    [('foo', '#123456'), ('bar', '#789abc')]
+    >>> _parsebranchcolors(r'foo\ bar:black foo\:bar:white')
+    [('foo bar', 'black'), ('foo:bar', 'white')]
+
+    >>> _parsebranchcolors(r'\u00c0:black')
+    [('\xc0', 'black')]
+    >>> _parsebranchcolors('\xc0:black')
+    [('\xc0', 'black')]
+
+    >>> _parsebranchcolors(None)
+    []
+    >>> _parsebranchcolors('ill:formed:value no-value')
+    []
+    >>> _parsebranchcolors(r'\ubad:unicode-repr')
+    []
+    """
+    if not value:
+        return []
+
+    colors = []
+    for e in re.split(r'(?:(?<=\\\\)|(?<!\\)) ', value):
+        pair = re.split(r'(?:(?<=\\\\)|(?<!\\)):', e)
+        if len(pair) != 2:
+            continue # ignore ill-formed
+        key, val = pair
+        key = key.replace('\\:', ':').replace('\\ ', ' ')
+        if r'\u' in key:
+            # apply unicode_escape only if \u found, so that raw non-ascii
+            # value isn't always mangled.
+            try:
+                key = hglib.fromunicode(key.decode('unicode_escape'))
+            except (UnicodeDecodeError, UnicodeEncodeError):
+                continue
+        colors.append((key, val))
+    return colors
 
 class HgRepoListModel(QAbstractTableModel):
     """
@@ -102,6 +143,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.unicodestar = True
         self.unicodexinabox = True
         self.cfgname = cfgname
+        self.latesttags = {-1: 'null'}
 
         # To be deleted
         self._user_colors = {}
@@ -119,13 +161,18 @@ class HgRepoListModel(QAbstractTableModel):
 
         # Always assign the first color to the default branch
         self.namedbranch_color('default')
+
+        # Set the colors specified in the tortoisehg.brachcolors config key
+        self._branch_colors.update(_parsebranchcolors(
+            self.repo.ui.config('tortoisehg', 'branchcolors')))
+
         # Then assign colors to all branches in alphabetical order
         # Note that re-assigning the color to the default branch
         # is not expensive
         for branch in sorted(self.repo.branchtags().keys()):
             self.namedbranch_color(branch)
 
-    def setBranch(self, branch=None, allparents=True):
+    def setBranch(self, branch=None, allparents=False):
         self.filterbranch = branch  # unicode
         self.invalidateCache()
         if self.revset and self.filterbyrevset:
@@ -142,7 +189,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.layoutChanged.emit()
         self.ensureBuilt(row=0)
         self.showMessage.emit('')
-        QTimer.singleShot(0, lambda: self.filled.emit())
+        QTimer.singleShot(0, self, SIGNAL('filled()'))
 
     def reloadConfig(self):
         _ui = self.repo.ui
@@ -254,7 +301,7 @@ class HgRepoListModel(QAbstractTableModel):
             return '8' * 12 + '+'
         if column in ('LocalTime', 'UTCTime'):
             return hglib.displaytime(util.makedate())
-        if column == 'Tags':
+        if column in ('Tags', 'Latest tags'):
             try:
                 return sorted(self.repo.tags().keys(), key=lambda x: len(x))[-1][:10]
             except IndexError:
@@ -565,6 +612,33 @@ class HgRepoListModel(QAbstractTableModel):
                 b += u'--'
         return b
 
+    def getlatesttags(self, ctx, gnode):
+        rev = ctx.rev()
+        todo = [rev]
+        repo = self.repo
+        while todo:
+            rev = todo.pop()
+            if rev in self.latesttags:
+                continue
+            ctx = repo[rev]
+            tags = [t for t in ctx.tags() if repo.tagtype(t) == 'global']
+            if tags:
+                self.latesttags[rev] = ':'.join(sorted(tags))
+                continue
+            try:
+                if (ctx.parents()):
+                    ptag = max(
+                        self.latesttags[p.rev()] for p in ctx.parents())
+                else:
+                    ptag = ""
+            except KeyError:
+                # Cache miss - recurse
+                todo.append(rev)
+                todo.extend(p.rev() for p in ctx.parents())
+                continue
+            self.latesttags[rev] = ptag
+        return self.latesttags[rev]
+
     def gettags(self, ctx, gnode):
         if ctx.rev() is None:
             return ''
@@ -663,7 +737,8 @@ class HgRepoListModel(QAbstractTableModel):
 
     def getconv(self, ctx, gnode):
         if ctx.rev() is not None:
-            cvt = ctx.extra().get('convert_revision', '')
+            extra = ctx.extra()
+            cvt = extra.get('convert_revision', '')
             if cvt:
                 if cvt.startswith('svn:'):
                     return cvt.split('@')[-1]
@@ -693,6 +768,7 @@ class HgRepoListModel(QAbstractTableModel):
         'Description': getlog,
         'Author':   getauthor,
         'Tags':     gettags,
+        'Latest tags':     getlatesttags,
         'Branch':   getbranch,
         'Filename': lambda self, ctx, gnode: gnode.extra[0],
         'Age':      lambda self, ctx, gnode: hglib.age(ctx.date()).decode('utf-8'),

@@ -13,6 +13,14 @@ from mercurial import ui as uimod
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
 
+def _exceedsMaxLineLength(data, maxlength=100000):
+    if len(data) < maxlength:
+        return False
+    for line in data.splitlines():
+        if len(line) > maxlength:
+            return True
+    return False
+
 class FileData(object):
     def __init__(self, ctx, ctx2, wfile, status=None):
         self.contents = None
@@ -28,6 +36,7 @@ class FileData(object):
             self.error = hglib.tounicode(str(e))
 
     def checkMaxDiff(self, ctx, wfile, maxdiff, status):
+        self.error = None
         p = _('File or diffs not displayed: ')
         try:
             fctx = ctx.filectx(wfile)
@@ -45,10 +54,16 @@ class FileData(object):
             self.error = p + _('File is larger than the specified max size.\n'
                                'maxdiff = %s KB') % (maxdiff // 1024)
             return None
+
         try:
             data = fctx.data()
             if '\0' in data or ctx.isStandin(wfile):
                 self.error = p + _('File is binary')
+            elif _exceedsMaxLineLength(data):
+                # it's incredibly slow to render long line by QScintilla
+                self.error = p + \
+                    _('File may be binary (maximum line length exceeded)')
+            if self.error:
                 if status != 'A':
                     return None
 
@@ -85,17 +100,32 @@ class FileData(object):
 
         isbfile = False
         repo = ctx._repo
+        maxdiff = repo.maxdiff
         self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
 
         if isinstance(ctx, patchctx.patchctx):
             self.diff = ctx.thgmqpatchdata(wfile)
             flags = ctx.flags(wfile)
-            if flags in ('x', '-'):
-                lbl = _("exec mode has been <font color='red'>%s</font>")
-                change = (flags == 'x') and _('set') or _('unset')
-                self.elabel = lbl % change
+            if flags == 'x':
+                self.elabel = _("exec mode has been <font color='red'>set</font>")
+            elif flags == '-':
+                self.elabel = _("exec mode has been <font color='red'>unset</font>")
             elif flags == 'l':
                 self.flabel += _(' <i>(is a symlink)</i>')
+
+            # Do not show patches that are too big or may be binary
+            p = _('Diff not displayed: ')
+            data = self.diff
+            size = len(data)
+            if (size > maxdiff):
+                self.error = p + _('File is larger than the specified max size.\n'
+                               'maxdiff = %s KB') % (maxdiff // 1024)
+            elif '\0' in data:
+                self.error = p + _('File is binary')
+            elif _exceedsMaxLineLength(data):
+                # it's incredibly slow to render long line by QScintilla
+                self.error = p + \
+                    _('File may be binary (maximum line length exceeded)')
             return
 
         if ctx2:
@@ -239,7 +269,7 @@ class FileData(object):
                         else:
                             self.error = _('Not a Mercurial subrepo, not previewable')
                             return
-                except (util.Abort), e:
+                except (util.Abort, KeyError), e:
                     sactual = ''
 
                 out = []
@@ -297,7 +327,6 @@ class FileData(object):
 
         # TODO: elif check if a subdirectory (for manifest tool)
 
-        maxdiff = repo.maxdiff
         mde = _('File or diffs not displayed: '
                 'File is larger than the specified max size.\n'
                 'maxdiff = %s KB') % (maxdiff // 1024)
@@ -349,15 +378,11 @@ class FileData(object):
                 return
             fctx, newdata = res
             self.contents = newdata
-            change = None
             for pctx in ctx.parents():
                 if 'x' in fctx.flags() and 'x' not in pctx.flags(wfile):
-                    change = _('set')
+                    self.elabel = _("exec mode has been <font color='red'>set</font>")
                 elif 'x' not in fctx.flags() and 'x' in pctx.flags(wfile):
-                    change = _('unset')
-            if change:
-                lbl = _("exec mode has been <font color='red'>%s</font>")
-                self.elabel = lbl % change
+                    self.elabel = _("exec mode has been <font color='red'>unset</font>")
 
         if status == 'A':
             renamed = fctx.renamed()

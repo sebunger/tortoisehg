@@ -6,6 +6,7 @@
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
 
+import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -34,7 +35,7 @@ class RepoFilterBar(QToolBar):
 
     _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
-    def __init__(self, repo, parent):
+    def __init__(self, repo, parent=None):
         super(RepoFilterBar, self).__init__(parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.setIconSize(QSize(16,16))
@@ -44,7 +45,8 @@ class RepoFilterBar(QToolBar):
         self._permanent_queries = list(_permanent_queries)
         username = repo.ui.config('ui', 'username')
         if username:
-            self._permanent_queries.insert(0, hgrevset.formatspec('author(%s)', username))
+            self._permanent_queries.insert(0,
+                hgrevset.formatspec('author(%s)', os.path.expandvars(username)))
         self.filterEnabled = True
 
         #Check if the font contains the glyph needed by the branch combo
@@ -186,7 +188,7 @@ class RepoFilterBar(QToolBar):
         full = self.revsethist + self._permanent_queries
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
-        self.revsetcombo.lineEdit().setText(query)
+        self.revsetcombo.setCurrentIndex(self.revsetcombo.findText(query))
 
     def loadSettings(self, s):
         repoid = str(self._repo[0])
@@ -197,6 +199,10 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.clear()
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
+
+        self._branchReloading = True
+        self.setBranch(s.value('revset/' + repoid + '/branch').toString())
+        self._branchReloading = False
 
         # Show the filter bar if necessary
         if s.value('revset/' + repoid + '/showrepofilterbar').toBool():
@@ -213,6 +219,7 @@ class RepoFilterBar(QToolBar):
         s.setValue('revset/' + repoid + '/queries', self.revsethist)
         s.setValue('revset/' + repoid + '/filter', self.filtercb.isChecked())
         s.setValue('revset/' + repoid + '/showrepofilterbar', not self.isHidden())
+        s.setValue('revset/' + repoid + '/branch', self.branch())
 
     def _initbranchfilter(self):
         self._branchLabel = QToolButton(
@@ -254,6 +261,10 @@ class RepoFilterBar(QToolBar):
         else:
             branches = self._repo.namedbranches
 
+        # easy access to common branches (Python sorted() is stable)
+        priomap = {self._repo.dirstate.branch(): -2, 'default': -1}
+        branches = sorted(branches, key=lambda e: priomap.get(e, 0))
+
         self._branchReloading = True
         self._branchCombo.clear()
         self._branchCombo.addItem(self._allBranchesLabel)
@@ -262,25 +273,30 @@ class RepoFilterBar(QToolBar):
             self._branchCombo.setItemData(self._branchCombo.count() - 1,
                                           hglib.tounicode(branch),
                                           Qt.ToolTipRole)
-        self._branchLabel.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
-        self._branchCombo.setEnabled(self.filterEnabled and (len(branches) > 1 or self._abranchAction.isChecked()))
+        self._branchCombo.setEnabled(self.filterEnabled and bool(branches))
         self._branchReloading = False
 
-        if not curbranch:
-            curbranch = self._allBranchesLabel
-        self.setBranch(curbranch)
+        if curbranch and curbranch not in branches:
+            self._emitBranchChanged()  # falls back to "show all"
+        else:
+            self.setBranch(curbranch)
 
     @pyqtSlot(unicode)
     def setBranch(self, branch):
         """Change the current branch by name [unicode]"""
-        self._branchCombo.setCurrentIndex(self._branchCombo.findText(branch))
+        if not branch:
+            index = 0
+        else:
+            index = self._branchCombo.findText(branch)
+        if index >= 0:
+            self._branchCombo.setCurrentIndex(index)
 
     def branch(self):
         """Return the current branch name [unicode]"""
-        curbranch = self._branchCombo.currentText()
-        if curbranch == self._allBranchesLabel:
-            curbranch = ''
-        return unicode(curbranch)
+        if self._branchCombo.currentIndex() == 0:
+            return ''
+        else:
+            return unicode(self._branchCombo.currentText())
 
     @pyqtSlot()
     def _emitBranchChanged(self):

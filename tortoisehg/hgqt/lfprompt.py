@@ -22,12 +22,15 @@ class LfilesPrompt(qtlib.CustomPrompt):
                                       'to add these files as largefiles?'), parent,
                                       (_('Add as &Largefiles'), _('Add as &Normal Files'), _('Cancel')),
                                       0, 2, files)
-                                      
+
 def promptForLfiles(parent, ui, repo, files):
     lfiles = []
     uself = 'largefiles' in repo.extensions()
     section = 'largefiles'
-    minsize = int(ui.config(section, 'minsize', default='10'))
+    try:
+        minsize = int(ui.config(section, 'minsize', default='10'))
+    except ValueError:
+        minsize = 10
     patterns = ui.config(section, 'patterns', default=())
     if patterns:
         patterns = patterns.split(' ')
@@ -39,7 +42,7 @@ def promptForLfiles(parent, ui, repo, files):
             # patterns have always precedence over size
             lfiles.append(wfile)
         else:
-            # check for minimal size        
+            # check for minimal size
             filesize = os.path.getsize(repo.wjoin(wfile))
             if filesize > minsize*1024*1024:
                 lfiles.append(wfile)

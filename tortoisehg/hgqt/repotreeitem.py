@@ -183,6 +183,7 @@ class RepoItem(RepoTreeItem):
         self._basenode = basenode
 
     def setShortName(self, uname):
+        uname = unicode(uname)
         if uname != self._shortname:
             self._shortname = uname
 
@@ -191,7 +192,7 @@ class RepoItem(RepoTreeItem):
             if column == 0:
                 baseiconname = 'hg'
                 if paths.is_unc_path(self.rootpath()):
-                    baseiconname = 'remote-repo'
+                    baseiconname = 'thg-remote-repo'
                 ico = qtlib.geticon(baseiconname)
                 if not self._valid:
                     ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
@@ -276,6 +277,11 @@ class RepoItem(RepoTreeItem):
             try:
                 sri = None
                 if repo is None:
+                    if not os.path.exists(self._root):
+                        self._valid = False
+                        return [self._root]
+                    elif not os.path.exists(os.path.join(self._root, '.hgsub')):
+                        return []  # skip repo creation, which is expensive
                     repo = hg.repository(ui.ui(), self._root)
                 wctx = repo['.']
                 sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
@@ -356,7 +362,7 @@ class RepoItem(RepoTreeItem):
                     _('An error occurred while updating the repository hgrc '
                       'file (%s)') % hglib.tounicode(abshgrcpath))
                 return False
-            self.setShortName(shortname)
+            self.setShortName(value.toString())
             return True
         return False
 
