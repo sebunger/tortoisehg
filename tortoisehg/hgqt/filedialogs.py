@@ -19,11 +19,13 @@ Qt4 dialogs to display hg revisions of a file
 
 import os
 import difflib
+import functools
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
 from tortoisehg.hgqt import fileview, repoview, revpanel, revert
+from tortoisehg.hgqt.qscilib import Scintilla
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -83,6 +85,7 @@ class FileLogDialog(_AbstractFileDialog):
         super(FileLogDialog, self).__init__(repo, filename, repoviewer)
         self._readSettings()
         self.menu = None
+        self.dualmenu = None
 
     def closeEvent(self, event):
         self._writeSettings()
@@ -114,8 +117,10 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar = QToolBar(self)
         self.editToolbar.setContextMenuPolicy(Qt.PreventContextMenu)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
-        self.actionClose = QAction(self, shortcut=QKeySequence.Close)
-        self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
+        self.actionClose = QAction(self)
+        self.actionClose.setShortcuts(QKeySequence.Close)
+        self.actionReload = QAction(self)
+        self.actionReload.setShortcuts(QKeySequence.Refresh)
         self.editToolbar.addAction(self.actionReload)
         self.addAction(self.actionClose)
 
@@ -123,6 +128,19 @@ class FileLogDialog(_AbstractFileDialog):
         self.setCentralWidget(self.splitter)
         cs = ('fileLogDialog', _('File History Log Columns'))
         self.repoview = repoview.HgRepoView(self.repo, cs[0], cs, self.splitter)
+
+        # It does not make sense to select more than two revisions at a time.
+        # Rather than enforcing a max selection size we simply let the user
+        # know when it has selected too many revisions by using the status bar
+        def checkValidSelection(selected, deselected):
+            selection = self.repoview.selectedRevisions()
+            if len(selection) > 2:
+                msg = _('Too many rows selected for menu')
+            else:
+                msg = ''
+            self.textView.showMessage.emit(msg)
+        self.repoview.revisionSelectionChanged.connect(checkValidSelection)
+
         self.contentframe = QFrame(self.splitter)
 
         vbox = QVBoxLayout()
@@ -189,18 +207,28 @@ class FileLogDialog(_AbstractFileDialog):
     @pyqtSlot(QPoint, object)
     def viewMenuRequest(self, point, selection):
         'User requested a context menu in repo view widget'
-        if not selection:
+        if not selection or len(selection) > 2:
             return
-        if self.menu is None:
+        if len(selection) == 2:
+            if self.dualmenu is None:
+                self.dualmenu = menu = QMenu(self)
+                a = menu.addAction(_('Diff selected changesets...'))
+                a.triggered.connect(self.onVisualDiffRevs)
+                a = menu.addAction(_('Diff selected file revisions...'))
+                a.setIcon(qtlib.getmenuicon('visualdiff'))
+                a.triggered.connect(self.onVisualDiffFileRevs)
+            else:
+                menu = self.dualmenu
+        elif self.menu is None:
             self.menu = menu = QMenu(self)
-            a = menu.addAction(_('Visual diff...'))
+            a = menu.addAction(_('Diff changeset to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiff)
-            a = menu.addAction(_('Diff to local...'))
+            a = menu.addAction(_('Diff changeset to local...'))
             a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffToLocal)
             menu.addSeparator()
-            a = menu.addAction(_('Visual diff file...'))
+            a = menu.addAction(_('Diff file to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiffFile)
             a = menu.addAction(_('Diff file to local...'))
@@ -218,8 +246,10 @@ class FileLogDialog(_AbstractFileDialog):
             a = menu.addAction(_('Revert to revision...'))
             a.setIcon(qtlib.getmenuicon('hg-revert'))
             a.triggered.connect(self.onRevertFileToRevision)
+        else:
+            menu = self.menu
         self.selection = selection
-        self.menu.exec_(point)
+        menu.exec_(point)
 
     def onVisualDiff(self):
         opts = dict(change=self.selection[0])
@@ -230,6 +260,17 @@ class FileLogDialog(_AbstractFileDialog):
 
     def onVisualDiffToLocal(self):
         opts = dict(rev=['rev(%d)' % self.selection[0]])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onVisualDiffRevs(self):
+        revs = self.selection
+        if len(revs) != 2:
+            self.textView.showMessage.emit(_('You must select two revisions to diff'))
+            return
+        opts = dict(rev=revs)
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
@@ -248,6 +289,18 @@ class FileLogDialog(_AbstractFileDialog):
         rev = self.selection[0]
         paths = [self.filerevmodel.graph.filename(rev)]
         opts = dict(rev=['rev(%d)' % rev])
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
+        if dlg:
+            dlg.exec_()
+            dlg.deleteLater()
+
+    def onVisualDiffFileRevs(self):
+        revs = self.selection
+        if len(revs) != 2:
+            self.textView.showMessage.emit(_('You must select two revisions to diff'))
+            return
+        paths = [self.filerevmodel.graph.filename(revs[0])]
+        opts = dict(rev=['rev(%d)' % rev for rev in revs])
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
         if dlg:
             dlg.exec_()
@@ -357,8 +410,10 @@ class FileDiffDialog(_AbstractFileDialog):
         self.editToolbar = QToolBar(self)
         self.editToolbar.setContextMenuPolicy(Qt.PreventContextMenu)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
-        self.actionClose = QAction(self, shortcut=QKeySequence.Close)
-        self.actionReload = QAction(self, shortcut=QKeySequence.Refresh)
+        self.actionClose = QAction(self)
+        self.actionClose.setShortcuts(QKeySequence.Close)
+        self.actionReload = QAction(self)
+        self.actionReload.setShortcuts(QKeySequence.Refresh)
         self.editToolbar.addAction(self.actionReload)
         self.addAction(self.actionClose)
 
@@ -378,9 +433,16 @@ class FileDiffDialog(_AbstractFileDialog):
                                                              cs, self)
         self.horizontalLayout.addWidget(self.tableView_revisions_left)
         self.horizontalLayout.addWidget(self.tableView_revisions_right)
+        self.tableView_revisions_right.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableView_revisions_left.setSelectionMode(QAbstractItemView.SingleSelection)
         self.frame = QFrame()
         self.splitter.addWidget(layouttowidget(self.horizontalLayout))
         self.splitter.addWidget(self.frame)
+
+    def fileViewMenuRequest(self, sci, point):
+        menu = sci.createStandardContextMenu()
+        point = sci.viewport().mapToGlobal(point)
+        menu.exec_(point)
 
     def setupViews(self):
         self.tableViews = {'left': self.tableView_revisions_left,
@@ -401,11 +463,15 @@ class FileDiffDialog(_AbstractFileDialog):
             lexer = None
 
         for side, idx  in (('left', 0), ('right', 3)):
-            sci = QsciScintilla(self.frame)
+            sci = Scintilla(self.frame)
             sci.verticalScrollBar().setFocusPolicy(Qt.StrongFocus)
             sci.setFocusProxy(sci.verticalScrollBar())
             sci.verticalScrollBar().installEventFilter(self)
-            sci.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+            sci.setContextMenuPolicy(Qt.CustomContextMenu)
+            sci.customContextMenuRequested.connect(
+                functools.partial(self.fileViewMenuRequest, sci))
+
             sci.setFrameShape(QFrame.NoFrame)
             sci.setMarginLineNumbers(1, True)
             sci.SendScintilla(sci.SCI_SETSELEOLFILLED, True)
@@ -450,7 +516,9 @@ class FileDiffDialog(_AbstractFileDialog):
             table.revisionActivated.connect(self.onRevisionActivated)
 
             self.viewers[side].verticalScrollBar().valueChanged.connect(
-                    lambda value, side=side: self.vbar_changed(value, side))
+                    lambda value, side=side: self.sbar_changed(value, side, 'vertical'))
+            self.viewers[side].horizontalScrollBar().valueChanged.connect(
+                    lambda value, side=side: self.sbar_changed(value, side, 'horizontal'))
 
         self.setTabOrder(table, self.viewers['left'])
         self.setTabOrder(self.viewers['left'], self.viewers['right'])
@@ -641,9 +709,9 @@ class FileDiffDialog(_AbstractFileDialog):
             self.update_page_steps(keeppos)
             self.timer.start()
 
-    def vbar_changed(self, value, side):
+    def sbar_changed(self, value, side, bartype='vertical'):
         """
-        Callback called when the vertical scrollbar of a file viewer
+        Callback called when a scrollbar of a file viewer
         is changed, so we can update the position of the other file
         viewer.
         """
@@ -659,7 +727,10 @@ class FileDiffDialog(_AbstractFileDialog):
         dv = value - lo
 
         blo, bhi = self._diffmatch[oside][i]
-        vbar = self.viewers[oside].verticalScrollBar()
+        if bartype == 'vertical':
+            vbar = self.viewers[oside].verticalScrollBar()
+        else:
+            vbar = self.viewers[oside].horizontalScrollBar()
         if (dv) < (bhi - blo):
             bvalue = blo + dv
         else:
@@ -679,14 +750,14 @@ class FileDiffDialog(_AbstractFileDialog):
             return
         if self.menu is None:
             self.menu = menu = QMenu(self)
-            a = menu.addAction(_('Visual diff...'))
+            a = menu.addAction(_('Diff to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiff)
             a = menu.addAction(_('Diff to local...'))
             a.setIcon(qtlib.getmenuicon('ldiff'))
             a.triggered.connect(self.onVisualDiffToLocal)
             menu.addSeparator()
-            a = menu.addAction(_('Visual diff file...'))
+            a = menu.addAction(_('Diff file to parent...'))
             a.setIcon(qtlib.getmenuicon('visualdiff'))
             a.triggered.connect(self.onVisualDiffFile)
             a = menu.addAction(_('Diff file to local...'))

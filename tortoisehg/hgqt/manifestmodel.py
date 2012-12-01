@@ -111,7 +111,7 @@ class ManifestModel(QAbstractItemModel):
                 else:
                     ic = self._icons.get(ext, None)
                     if not ic:
-                        ic = self._fileiconprovider.icon(QFileInfo(self._repo.wjoin(e.path)))
+                        ic = self._fileiconprovider.icon(QFileInfo(self._wjoin(e.path)))
                         if not ic.availableSizes():
                             ic = self._fileicon
                         self._icons[ext] = ic
@@ -129,10 +129,9 @@ class ManifestModel(QAbstractItemModel):
                   'svn': 'thg-svn-subrepo',
                 }
                 stype = self.subrepoType(index)
-                if stype:
+                if stype in _subrepoType2IcoMap:
                     ic = qtlib.geticon(_subrepoType2IcoMap[stype])
-            ic = qtlib.getoverlaidicon(ic,
-                icOverlay)  # XXX
+            ic = qtlib.getoverlaidicon(ic, icOverlay)
         return ic
 
     def fileStatus(self, index):
@@ -252,6 +251,9 @@ class ManifestModel(QAbstractItemModel):
     def statusFilter(self):
         """Return the current status filter"""
         return self._statusfilter
+
+    def _wjoin(self, path):
+        return os.path.join(hglib.tounicode(self._repo.root), unicode(path))
 
     @property
     def _rootentry(self):

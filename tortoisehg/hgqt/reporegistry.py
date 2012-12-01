@@ -336,30 +336,39 @@ class RepoRegistryView(QDockWidget):
             QTimer.singleShot(1000 * UPDATE_DELAY, self.reloadModel)
 
     def reloadModel(self):
+        oldmodel = self.tview.model()
         self.tview.setModel(
             repotreemodel.RepoTreeModel(settingsfilename(), self,
                 self.showSubrepos, self.showNetworkSubrepos,
                 self.showShortPaths))
+        oldmodel.deleteLater()
         self.expand()
+        self.setActiveTabRepo()
         self._pendingReloadModel = False
 
-    def expand(self, it=None):
-        if not it:
-            self.tview.expandToDepth(0)
-        else:
-            # Create a list of ancestors (including the selected item)
-            from repotreeitem import RepoGroupItem
-            itchain = [it]
-            while(not isinstance(itchain[-1], RepoGroupItem)):
-                itchain.append(itchain[-1].parent())
+    def _getItemAndAncestors(self, it):
+        """Create a list of ancestors (including the selected item)"""
+        from repotreeitem import RepoGroupItem
+        itchain = [it]
+        while(not isinstance(itchain[-1], RepoGroupItem)):
+            itchain.append(itchain[-1].parent())
+        return reversed(itchain)
 
-            # Starting from the topmost ancestor (a root item), expand the
-            # ancestors one by one
-            m = self.tview.model()
-            idx = self.tview.rootIndex()
-            for it in reversed(itchain):
-                idx = m.index(it.row(), 0, idx)
-                self.tview.expand(idx)
+    def expand(self):
+        self.tview.expandToDepth(0)
+
+    def scrollTo(self, it=None, scrollHint=RepoTreeView.EnsureVisible):
+        if not it:
+            return
+
+        # Create a list of ancestors (including the selected item)
+        itchain = self._getItemAndAncestors(it)
+
+        m = self.tview.model()
+        idx = self.tview.rootIndex()
+        for it in itchain:
+            idx = m.index(it.row(), 0, idx)
+        self.tview.scrollTo(idx, hint=scrollHint)
 
     def addRepo(self, root, groupname=None):
         """
@@ -381,24 +390,29 @@ class RepoRegistryView(QDockWidget):
             m.addRepo(group, root, -1)
             self.updateSettingsFile()
 
-    def setActiveTabRepo(self, root):
+    def setActiveTabRepo(self, root=None):
         """"
         The selected tab has changed on the workbench
         Unmark the previously selected tab and mark the new one as selected on
         the Repo Registry as well
         """
-        root = hglib.fromunicode(root)
-        if self._activeTabRepo:
-            self._activeTabRepo.setActive(False)
-        m = self.tview.model()
-        it = m.getRepoItem(root, lookForSubrepos=True)
+        it = None
+        if root:
+            root = hglib.fromunicode(root)
+            if self._activeTabRepo:
+                self._activeTabRepo.setActive(False)
+            m = self.tview.model()
+            it = m.getRepoItem(root, lookForSubrepos=True)
+        elif self._activeTabRepo:
+            it = self._activeTabRepo
         if it:
             self._activeTabRepo = it
             it.setActive(True)
             self.tview.dataChanged(QModelIndex(), QModelIndex())
 
             # Make sure that the active tab is visible by expanding its parent
-            self.expand(it.parent())
+            # and scrolling to it if necessary
+            self.scrollTo(it)
 
     def showPaths(self, show):
         self.tview.setColumnHidden(1, not show)
@@ -687,7 +701,7 @@ class RepoRegistryView(QDockWidget):
                 repotype = 'unknown'
         if repotype == 'hg':
             if groupname:
-                self.addRepo(hglib.tounicode(root), groupname)
+                self.addRepo(root, groupname)
             self.openRepo.emit(hglib.tounicode(root), False)
         else:
             qtlib.WarningMsgBox(
@@ -719,7 +733,7 @@ class RepoRegistryView(QDockWidget):
 
     def sortbyname(self):
         childs = self.selitem.internalPointer().childs
-        self.tview.model().sortchilds(childs, lambda x: x.shortname())
+        self.tview.model().sortchilds(childs, lambda x: x.shortname().lower())
 
     def sortbypath(self):
         childs = self.selitem.internalPointer().childs

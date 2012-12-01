@@ -58,7 +58,7 @@ def gettempdir():
 def openhelpcontents(url):
     'Open online help, use local CHM file if available'
     if not url.startswith('http'):
-        fullurl = 'http://tortoisehg.org/manual/2.1/' + url
+        fullurl = 'http://tortoisehg.org/manual/2.4/' + url
         # Use local CHM file if it can be found
         if os.name == 'nt' and paths.bin_path:
             chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
@@ -172,9 +172,9 @@ def savefiles(repo, files, rev, parent=None):
             filename = "%s@%d%s" % (wfile, rev, ext)
         else:
             filename = "%s@%d" % (ext, rev)
-        result = QFileDialog.getSaveFileName(parent=parent,
-                                             caption=_("Save file to"),
-                                             directory=filename) 
+        result = QFileDialog.getSaveFileName(
+            parent=parent, caption=_("Save file to"),
+            directory=hglib.tounicode(filename))
         if not result:
             continue
         cwd = os.getcwd()
@@ -904,7 +904,9 @@ class StatusInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
         self._msglabel = QLabel(message, self, wordWrap=True,
-                                textInteractionFlags=Qt.TextSelectableByMouse)
+                                textInteractionFlags=Qt.TextSelectableByMouse \
+                                | Qt.LinksAccessibleByMouse)
+        self._msglabel.linkActivated.connect(self.linkActivated)
         self.addWidget(self._msglabel, stretch=1)
 
 class CommandErrorInfoBar(InfoBar):
@@ -915,7 +917,9 @@ class CommandErrorInfoBar(InfoBar):
         super(CommandErrorInfoBar, self).__init__(parent)
 
         self._msglabel = QLabel(message, self, wordWrap=True,
-                                textInteractionFlags=Qt.TextSelectableByMouse)
+                                textInteractionFlags=Qt.TextSelectableByMouse \
+                                | Qt.LinksAccessibleByMouse)
+        self._msglabel.linkActivated.connect(self.linkActivated)
         self.addWidget(self._msglabel, stretch=1)
 
         self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
@@ -934,7 +938,9 @@ class ConfirmInfoBar(InfoBar):
         # no wordWrap=True and stretch=1, which inserts unwanted space
         # between _msglabel and _buttons.
         self._msglabel = QLabel(message, self,
-                                textInteractionFlags=Qt.TextSelectableByMouse)
+                                textInteractionFlags=Qt.TextSelectableByMouse \
+                                | Qt.LinksAccessibleByMouse)
+        self._msglabel.linkActivated.connect(self.linkActivated)
         self.addWidget(self._msglabel)
 
         self._buttons = QDialogButtonBox(self)
@@ -1102,12 +1108,87 @@ def getCurrentUsername(widget, repo, opts=None):
     except error.Abort:
         return None
 
-def getTextInput(parent, title, label, mode=QLineEdit.Normal, text='',
-  flags=Qt.WindowFlags()):
-    # the flags argument is supported under Qt 4.6, but probably with
-    # a different name (see issue 252), so we simply call everything
-    # positionally
-    return QInputDialog.getText(parent, title, label, mode, text,
-      Qt.CustomizeWindowHint | Qt.WindowTitleHint |
-      Qt.WindowCloseButtonHint | flags)
+class _EncodingSafeInputDialog(QInputDialog):
+    def accept(self):
+        try:
+            hglib.fromunicode(self.textValue())
+            return super(_EncodingSafeInputDialog, self).accept()
+        except UnicodeEncodeError:
+            WarningMsgBox(_('Text Translation Failure'),
+                          _('Unable to translate input to local encoding.'),
+                          parent=self)
 
+def getTextInput(parent, title, label, mode=QLineEdit.Normal, text='',
+                 flags=Qt.WindowFlags()):
+    flags |= (Qt.CustomizeWindowHint | Qt.WindowTitleHint
+              | Qt.WindowCloseButtonHint)
+    dlg = _EncodingSafeInputDialog(parent, flags)
+    dlg.setWindowTitle(title)
+    dlg.setLabelText(label)
+    dlg.setTextValue(text)
+    dlg.setTextEchoMode(mode)
+
+    r = dlg.exec_()
+    dlg.setParent(None)  # so that garbage collected
+    return r and dlg.textValue() or '', bool(r)
+
+def keysequence(o):
+    """Create QKeySequence from string or QKeySequence"""
+    if isinstance(o, (QKeySequence, QKeySequence.StandardKey)):
+        return o
+    try:
+        return getattr(QKeySequence, str(o))  # standard key
+    except AttributeError:
+        return QKeySequence(o)
+
+def modifiedkeysequence(o, modifier):
+    """Create QKeySequence of modifier key prepended"""
+    origseq = QKeySequence(keysequence(o))
+    return QKeySequence('%s+%s' % (modifier, origseq.toString()))
+
+def newshortcutsforstdkey(key, *args, **kwargs):
+    """Create [QShortcut,...] for all key bindings of the given StandardKey"""
+    return [QShortcut(keyseq, *args, **kwargs)
+            for keyseq in QKeySequence.keyBindings(key)]
+
+class PaletteSwitcher(object):
+    """
+    Class that can be used to enable a predefined, alterantive background color
+    for a widget
+
+    This is normally used to change the color of widgets when they display some
+    "filtered" content which is a subset of the actual widget contents.
+
+    The alternative background color is fixed, and depends on the original
+    background color (dark and light backgrounds use a different alternative
+    color).
+
+    The alterenative color cannot be changed because the idea is to set a
+    consistent "filter" style for all widgets.
+
+    An instance of this class must be added as a property of the widget whose
+    background we want to change. The constructor takes the "target widget" as
+    its only parameter.
+
+    In order to enable or disable the background change, simply call the
+    enablefilterpalette() method.
+    """
+    def __init__(self, targetwidget):
+        self._targetwidget = targetwidget
+        self._defaultpalette = targetwidget.palette()
+        bgcolor = self._defaultpalette.color(QPalette.Base)
+        if bgcolor.black() <= 128:
+            # Light theme
+            filterbgcolor = QColor('#FFFFB7')
+        else:
+            # Dark theme
+            filterbgcolor = QColor('darkgrey')
+        self._filterpalette = QPalette()
+        self._filterpalette.setColor(QPalette.Base, filterbgcolor)
+
+    def enablefilterpalette(self, enabled=False):
+        if enabled:
+            pl = self._filterpalette
+        else:
+            pl = self._defaultpalette
+        self._targetwidget.setPalette(pl)

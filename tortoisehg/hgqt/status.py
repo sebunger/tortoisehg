@@ -292,7 +292,10 @@ class StatusWidget(QWidget):
         if self.checkable:
             tm.checkToggled.connect(self.updateCheckCount)
 
+        oldtm = self.tv.model()
         self.tv.setModel(tm)
+        if oldtm:
+            oldtm.deleteLater()
         self.tv.setSortingEnabled(True)
         self.tv.setColumnHidden(COL_PATH, bool(wctx.p2()) or not self.checkable)
         self.tv.setColumnHidden(COL_MERGE_STATE, not tm.anyMerge())
@@ -349,6 +352,7 @@ class StatusWidget(QWidget):
         model = self.tv.model()
         if model:
             model.setFilter(match)
+            self.tv.enablefilterpalette(bool(match))
 
     def updateCheckCount(self):
         model = self.tv.model()
@@ -497,6 +501,7 @@ class WctxFileTree(QTreeView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.menuRequested)
         self.setTextElideMode(Qt.ElideLeft)
+        self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
     def scrollTo(self, index, hint=QAbstractItemView.EnsureVisible):
         # don't update horizontal position by selection change
@@ -549,6 +554,9 @@ class WctxFileTree(QTreeView):
             return self.selectionModel().selectedRows()
         # Invalid selectionModel found
         return []
+
+    def enablefilterpalette(self, enable):
+        self._paletteswitcher.enablefilterpalette(enable)
 
 class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal()
@@ -799,7 +807,8 @@ class WctxModel(QAbstractTableModel):
     def setFilter(self, match):
         'simple match in filename filter'
         self.layoutAboutToBeChanged.emit()
-        self.rows = [r for r in self.unfiltered if match in r[COL_PATH_DISPLAY]]
+        self.rows = [r for r in self.unfiltered
+                     if unicode(match) in r[COL_PATH_DISPLAY]]
         self.layoutChanged.emit()
         self.reset()
 
@@ -917,7 +926,8 @@ class StatusDialog(QDialog):
         self.setWindowFlags(Qt.Window)
         self.loadSettings()
 
-        QShortcut(QKeySequence.Refresh, self, self.stwidget.refreshWctx)
+        qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self,
+                                    self.stwidget.refreshWctx)
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def linkActivated(self, link):
