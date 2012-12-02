@@ -11,11 +11,6 @@ override_dh_auto_install:
 	dh_auto_install --destdir=debian/tmp/
 	mkdir -p debian/tmp/etc/mercurial/hgrc.d/
 	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thgmergetools.rc
-	mkdir -p debian/tmp/usr/share/doc/tortoisehg/html/_static/
-	ln -sf ../../../../javascript/jquery/jquery.js \
-	    debian/tmp/usr/share/doc/tortoisehg/html/_static/jquery.js
-	ln -sf ../../../../javascript/underscore/underscore.js \
-	    debian/tmp/usr/share/doc/tortoisehg/html/_static/underscore.js
 
 ## drop automatically created file
 override_dh_clean:
@@ -26,6 +21,11 @@ override_dh_clean:
 
 override_dh_installdocs:
 	dh_installdocs --exclude=nautilus-thg.py --exclude=mergetools.rc
+	ln -sf ../../../../javascript/jquery/jquery.js \
+	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
+	ln -sf ../../../../javascript/underscore/underscore.js \
+	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/underscore.js
+	ln -sf email.png debian/tortoisehg/usr/share/doc/tortoisehg/html/_images/email1.png
 
 override_dh_compress:
 	dh_compress -X.js -X_static/* -X "_sources/*"
