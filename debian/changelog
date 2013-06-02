@@ -1,3 +1,9 @@
+tortoisehg (2.8-1) UNRELEASED; urgency=low
+
+  * Imported Upstream version 2.8 (Closes: #702715, #704117, #710757).
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 02 Jun 2013 02:16:48 -0700
+
 tortoisehg (2.6-1) experimental; urgency=low
 
   * Imported Upstream version 2.6 (Closes: #689707).
