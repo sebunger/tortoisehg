@@ -1,6 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=TortoiseHG Workbench
-Icon=tortoisehg
-Exec=thg log
-Categories=Development;RevisionControl
