@@ -42,7 +42,8 @@ class Workbench(QMainWindow):
 
     def __init__(self, createserver=False):
         QMainWindow.__init__(self)
-        self.progressDialog = QProgressDialog('TortoiseHg - Initializing Workbench', QString(), 0, 100)
+        self.progressDialog = QProgressDialog(
+            'TortoiseHg - Initializing Workbench', QString(), 0, 100)
         self.progressDialog.setAutoClose(False)
 
         self.ui = ui.ui()
@@ -53,7 +54,7 @@ class Workbench(QMainWindow):
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
         rr.openRepo.connect(self.openRepo)
-        rr.removeRepo.connect(self.removeRepo)
+        rr.removeRepo.connect(self.closeRepo)
         rr.progressReceived.connect(self.progress)
         rr.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, rr)
@@ -81,26 +82,35 @@ class Workbench(QMainWindow):
             QShortcut(QKeySequence('CTRL+Q'), self, self.close)
         if sys.platform == 'darwin':
             self.dockMenu = QMenu(self)
-            self.dockMenu.addAction(_('New Workbench...'),
+            self.dockMenu.addAction(_('New &Workbench'),
                                     self.newWorkbench)
-            self.dockMenu.addAction(_('New Repository...'),
+            self.dockMenu.addAction(_('&New Repository...'),
                                     self.newRepository)
-            self.dockMenu.addAction(_('Clone Repository...'),
+            self.dockMenu.addAction(_('Clon&e Repository...'),
                                     self.cloneRepository)
-            self.dockMenu.addAction(_('Open Repository...'),
+            self.dockMenu.addAction(_('&Open Repository...'),
                                     self.openRepository)
             qt_mac_set_dock_menu(self.dockMenu)
+            # On Mac OS X, we do not want icons on menus
+            qt_mac_set_menubar_icons(False)
 
         # Create the actions that will be displayed on the context menu
         self.createActions()
         self.lastClosedRepoRootList = []
         self.progressDialog.close()
         self.progressDialog = None
+        self._dialogs = []
 
         self.server = None
         if createserver:
-            # Enable the Workbench Server that is used to maintain a single workbench instance
+            # Enable the Workbench Server that is used to maintain a single
+            # workbench instance
             self.createWorkbenchServer()
+
+    def _forgetdialog(self, dlg):
+        """forget the dialog to be garbage collectable"""
+        assert dlg in self._dialogs
+        self._dialogs.remove(dlg)
 
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
@@ -116,7 +126,8 @@ class Workbench(QMainWindow):
         tw.setMovable(True)
         tw.tabBar().hide()
         tw.tabBar().setContextMenuPolicy(Qt.CustomContextMenu)
-        tw.tabBar().customContextMenuRequested.connect(self.tabBarContextMenuRequest)
+        tw.tabBar().customContextMenuRequested.connect(
+            self.tabBarContextMenuRequest)
         tw.lastClickedTab = -1 # No tab clicked yet
 
         sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -142,16 +153,16 @@ class Workbench(QMainWindow):
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
-        self.edittbar = QToolBar(_("Edit Toolbar"), objectName='edittbar')
+        self.edittbar = QToolBar(_("&Edit Toolbar"), objectName='edittbar')
         self.addToolBar(self.edittbar)
-        self.docktbar = QToolBar(_("Dock Toolbar"), objectName='docktbar')
+        self.docktbar = QToolBar(_("&Dock Toolbar"), objectName='docktbar')
         self.addToolBar(self.docktbar)
-        self.synctbar = QToolBar(_('Sync Toolbar'), objectName='synctbar')
-        self.addToolBar(self.synctbar)
-        self.tasktbar = QToolBar(_('Task Toolbar'), objectName='taskbar')
+        self.tasktbar = QToolBar(_('&Task Toolbar'), objectName='taskbar')
         self.addToolBar(self.tasktbar)
-        self.customtbar = QToolBar(_('Custom Toolbar'), objectName='custombar')
+        self.customtbar = QToolBar(_('&Custom Toolbar'), objectName='custombar')
         self.addToolBar(self.customtbar)
+        self.synctbar = QToolBar(_('S&ync Toolbar'), objectName='synctbar')
+        self.addToolBar(self.synctbar)
 
         # availability map of actions; applied by updateMenu()
         self._actionavails = {'repoopen': []}
@@ -161,34 +172,34 @@ class Workbench(QMainWindow):
         newaction = self._addNewAction
         newseparator = self._addNewSeparator
 
-        newaction(_("New &Workbench..."), self.newWorkbench,
+        newaction(_("New &Workbench"), self.newWorkbench,
                   shortcut='Shift+Ctrl+W', menu='file', icon='hg-log')
         newseparator(menu='file')
         newaction(_("&New Repository..."), self.newRepository,
                   shortcut='New', menu='file', icon='hg-init')
-        newaction(_("Clone Repository..."), self.cloneRepository,
+        newaction(_("Clon&e Repository..."), self.cloneRepository,
                   shortcut=modifiedkeysequence('New', modifier='Shift'),
                   menu='file', icon='hg-clone')
         newseparator(menu='file')
         newaction(_("&Open Repository..."), self.openRepository,
                   shortcut='Open', menu='file')
-        newaction(_("&Close Repository"), self.closeRepository,
+        newaction(_("&Close Repository"), self.closeCurrentRepoTab,
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
-        newaction(_('&Settings...'), self.editSettings, icon='settings_user',
+        newaction(_('&Settings'), self.editSettings, icon='settings_user',
                   shortcut='Preferences', menu='file')
         newseparator(menu='file')
         newaction(_("E&xit"), self.close, shortcut='Quit', menu='file')
 
         a = self.reporegistry.toggleViewAction()
-        a.setText(_('Show Repository Registry'))
+        a.setText(_('Sh&ow Repository Registry'))
         a.setShortcut('Ctrl+Shift+O')
         a.setIcon(qtlib.geticon('thg-reporegistry'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
 
         a = self.mqpatches.toggleViewAction()
-        a.setText(_('Show Patch Queue'))
+        a.setText(_('Show &Patch Queue'))
         a.setIcon(qtlib.geticon('thg-mq'))
         self.docktbar.addAction(a)
         self.menuView.addAction(a)
@@ -201,31 +212,15 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu(_('Repository Registry Options'))
-        self.actionShowPaths = \
-        newaction(_("Show Paths"), self.reporegistry.showPaths,
-                  checkable=True, menu='viewregistryopts')
-
-        self.actionShowSubrepos = \
-            newaction(_("Show Subrepos on Registry"),
-                self.reporegistry.setShowSubrepos,
-                  checkable=True, menu='viewregistryopts')
-
-        self.actionShowNetworkSubrepos = \
-            newaction(_("Show Subrepos for remote repositories"),
-                self.reporegistry.setShowNetworkSubrepos,
-                  checkable=True, menu='viewregistryopts')
-
-        self.actionShowShortPaths = \
-            newaction(_("Show Short Paths"),
-                self.reporegistry.setShowShortPaths,
-                  checkable=True, menu='viewregistryopts')
+        self.menuViewregistryopts = self.menuView.addMenu(
+            _('R&epository Registry Options'))
+        self.menuViewregistryopts.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
-        newaction(_("Choose Log Columns..."), self.setHistoryColumns,
+        newaction(_("C&hoose Log Columns..."), self.setHistoryColumns,
                   menu='view')
         self.actionSaveRepos = \
-        newaction(_("Save Open Repositories On Exit"), checkable=True,
+        newaction(_("Save Open Repositories on E&xit"), checkable=True,
                   menu='view')
         newseparator(menu='view')
 
@@ -242,7 +237,7 @@ class Workbench(QMainWindow):
         # note that 'grep' and 'search' are equivalent
         taskdefs = {
             'commit': ('hg-commit', _('&Commit')),
-            'mq': ('thg-qrefresh', _('MQ Patch')),
+            'mq': ('thg-qrefresh', _('M&Q Patch')),
             'pbranch': ('branch', _('&Patch Branch')),
             'log': ('hg-log', _("Revision &Details")),
             'manifest': ('hg-annotate', _('&Manifest')),
@@ -272,7 +267,7 @@ class Workbench(QMainWindow):
 
         newseparator(menu='view')
 
-        newaction(_("&Refresh"), self._repofwd('reload'), icon='view-refresh',
+        newaction(_("&Refresh"), self.refresh, icon='view-refresh',
                   shortcut='Refresh', enabled='repoopen',
                   menu='view', toolbar='edit',
                   tooltip=_('Refresh current repository'))
@@ -281,66 +276,66 @@ class Workbench(QMainWindow):
                   shortcut=modifiedkeysequence('Refresh', modifier='Shift'),
                   tooltip=_('Refresh only the current task tab'),
                   menu='view')
-        newaction(_("Load all revisions"), self.loadall,
+        newaction(_("Load &All Revisions"), self.loadall,
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
-        newaction(_("&Goto revision..."), self.gotorev,
+        newaction(_("&Goto Revision..."), self.gotorev,
                   enabled='repoopen', menu='view', shortcut='Ctrl+/',
                   tooltip=_('Go to a specific revision'))
 
-        newaction(_("Web Server..."), self.serve, enabled='repoopen',
+        newaction(_("Start &Web Server"), self.serve, enabled='repoopen',
                   menu='repository')
         newseparator(menu='repository')
-        newaction(_("Shelve..."), self._repofwd('shelve'), icon='shelve',
+        newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
-        newaction(_("Import..."), self._repofwd('thgimport'), icon='hg-import',
+        newaction(_("&Import..."), self._repofwd('thgimport'), icon='hg-import',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Verify"), self._repofwd('verify'), enabled='repoopen',
+        newaction(_("&Verify"), self._repofwd('verify'), enabled='repoopen',
                   menu='repository')
-        newaction(_("Recover"), self._repofwd('recover'),
+        newaction(_("Re&cover"), self._repofwd('recover'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Resolve..."), self._repofwd('resolve'), icon='hg-merge',
+        newaction(_("&Resolve..."), self._repofwd('resolve'), icon='hg-merge',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Rollback/Undo..."), self._repofwd('rollback'),
+        newaction(_("Rollback/&Undo..."), self._repofwd('rollback'),
                   shortcut='Ctrl+u',
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Purge..."), self._repofwd('purge'), enabled='repoopen',
+        newaction(_("&Purge..."), self._repofwd('purge'), enabled='repoopen',
                   icon='hg-purge', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Bisect..."), self._repofwd('bisect'),
+        newaction(_("&Bisect..."), self._repofwd('bisect'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("Explore"), self.explore, shortcut='Shift+Ctrl+X',
+        newaction(_("E&xplore"), self.explore, shortcut='Shift+Ctrl+X',
                   icon='system-file-manager', enabled='repoopen',
                   menu='repository')
-        newaction(_("Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
+        newaction(_("&Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
                   icon='utilities-terminal', enabled='repoopen',
                   menu='repository')
 
-        newaction(_("Help"), self.onHelp, menu='help', icon='help-browser')
-        newaction(_("Explorer Help"), self.onHelpExplorer, menu='help')
+        newaction(_("&Help"), self.onHelp, menu='help', icon='help-browser')
+        newaction(_("E&xplorer Help"), self.onHelpExplorer, menu='help')
         visiblereadme = 'repoopen'
         if  self.ui.config('tortoisehg', 'readme', None):
             visiblereadme = True
-        newaction(_("README"), self.onReadme, menu='help', icon='help-readme',
+        newaction(_("&Readme"), self.onReadme, menu='help', icon='help-readme',
                   visible=visiblereadme, shortcut='Ctrl+F1')
         newseparator(menu='help')
-        newaction(_("About Qt"), QApplication.aboutQt, menu='help')
-        newaction(_("About TortoiseHg"), self.onAbout, menu='help',
+        newaction(_("About &Qt"), QApplication.aboutQt, menu='help')
+        newaction(_("&About TortoiseHg"), self.onAbout, menu='help',
                   icon='thg-logo')
 
         newseparator(toolbar='edit')
         self.actionCurrentRev = \
-        newaction(_("Go to current revision"), self._repofwd('gotoParent'), icon='go-home',
-                  tooltip=_('Go to current revision'),
+        newaction(_("Go to current revision"), self._repofwd('gotoParent'),
+                  icon='go-home', tooltip=_('Go to current revision'),
                   enabled=True, toolbar='edit', shortcut='Ctrl+.')
         self.actionGoTo = \
-        newaction(_("Go to a specific revision"), self.gotorev, icon='go-to-rev',
-                  tooltip=_('Go to a specific revision'),
+        newaction(_("Go to a specific revision"), self.gotorev,
+                  icon='go-to-rev', tooltip=_('Go to a specific revision'),
                   enabled=True, toolbar='edit')
         self.actionBack = \
         newaction(_("Back"), self._repofwd('back'), icon='go-previous',
@@ -351,12 +346,12 @@ class Workbench(QMainWindow):
         newseparator(toolbar='edit', menu='View')
 
         self.filtertbaction = \
-        newaction(_('Filter Toolbar'), self._repotogglefwd('toggleFilterBar'),
+        newaction(_('&Filter Toolbar'), self._repotogglefwd('toggleFilterBar'),
                   icon='view-filter', shortcut='Ctrl+S', enabled='repoopen',
                   toolbar='edit', menu='View', checkable=True,
                   tooltip=_('Filter graph with revision sets or branches'))
 
-        menu = QMenu(_('Workbench Toolbars'), self)
+        menu = QMenu(_('&Workbench Toolbars'), self)
         menu.addAction(self.edittbar.toggleViewAction())
         menu.addAction(self.docktbar.toggleViewAction())
         menu.addAction(self.synctbar.toggleViewAction())
@@ -364,20 +359,63 @@ class Workbench(QMainWindow):
         menu.addAction(self.customtbar.toggleViewAction())
         self.menuView.addMenu(menu)
 
-        newaction(_('Incoming'), self._repofwd('incoming'), icon='hg-incoming',
+        newaction(_('Incoming'), data='incoming', icon='hg-incoming',
                   tooltip=_('Check for incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Pull'), self._repofwd('pull'), icon='hg-pull',
+        newaction(_('Pull'), data='pull', icon='hg-pull',
                   tooltip=_('Pull incoming changes from selected URL'),
                   enabled='repoopen', toolbar='sync')
-        newaction(_('Outgoing'), self._repofwd('outgoing'), icon='hg-outgoing',
-                   tooltip=_('Detect outgoing changes to selected URL'),
-                   enabled='repoopen', toolbar='sync')
-        newaction(_('Push'), self._repofwd('push'), icon='hg-push',
+        newaction(_('Outgoing'), data='outgoing', icon='hg-outgoing',
+                  tooltip=_('Detect outgoing changes to selected URL'),
+                  enabled='repoopen', toolbar='sync')
+        newaction(_('Push'), data='push', icon='hg-push',
                   tooltip=_('Push outgoing changes to selected URL'),
                   enabled='repoopen', toolbar='sync')
+        self.urlCombo = QComboBox(self)
+        self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        self.synctbar.addWidget(self.urlCombo)
+        self.synctbar.actionTriggered.connect(self._runSyncAction)
 
         self.updateMenu()
+
+    def _setupUrlCombo(self, repo):
+        'repository has been switched, fill urlCombo with URLs'
+        aliases = [hglib.tounicode(alias)
+                   for alias, path in repo.ui.configitems('paths')]
+        if 'default' in aliases:
+            aliases.remove('default')
+            aliases.insert(0, 'default')
+        for a in aliases[:]:
+            if a + '-push' in aliases:
+                # add foo,foo-push entry to top of menu
+                aliases.insert(0, (a, a + '-push'))
+                # move foo,foo-push individual entries to bottom
+                aliases.remove(a)
+                aliases.remove(a + '-push')
+                aliases.append(a)
+                aliases.append(a + '-push')
+
+        self.urlCombo.clear()
+        for a in aliases:
+            # text, (pull-alias, push-alias)
+            if isinstance(a, tuple):
+                self.urlCombo.addItem(u'\u2193 %s | %s \u2191' % a, a)
+            else:
+                self.urlCombo.addItem(a, (a, a))
+
+    #@pyqtSlot()
+    def _setupUrlComboIfCurrent(self):
+        w = self.repoTabsWidget.currentWidget()
+        if self.sender() is w:
+            self._setupUrlCombo(w.repo)
+
+    def _syncUrlFor(self, op):
+        """Current URL alias for the given sync operation"""
+        urlindex = self.urlCombo.currentIndex()
+        if urlindex < 0:
+            return
+        opindex = {'incoming': 0, 'pull': 0, 'outgoing': 1, 'push': 1}[op]
+        return self.urlCombo.itemData(urlindex).toPyObject()[opindex]
 
     def _setupCustomTools(self, ui):
         tools, toollist = hglib.tortoisehgtools(ui,
@@ -399,12 +437,14 @@ class Workbench(QMainWindow):
             if not command:
                 continue
             showoutput = info.get('showoutput', False)
+            workingdir = info.get('workingdir', '')
             label = info.get('label', name)
             tooltip = info.get('tooltip', _("Execute custom tool '%s'") % label)
             icon = info.get('icon', 'tools-spanner-hammer')
 
             self._addNewAction(label,
-                self._repofwd('runCustomCommand', [command, showoutput]),
+                self._repofwd('runCustomCommand',
+                              [command, showoutput, workingdir]),
                 icon=icon, tooltip=tooltip,
                 enabled=True, toolbar='custom')
 
@@ -429,10 +469,7 @@ class Workbench(QMainWindow):
             else:
                 action.triggered.connect(slot)
         if icon:
-            if toolbar:
-                action.setIcon(qtlib.geticon(icon))
-            else:
-                action.setIcon(qtlib.getmenuicon(icon))
+            action.setIcon(qtlib.geticon(icon))
         if shortcut:
             keyseq = qtlib.keysequence(shortcut)
             if isinstance(keyseq, QKeySequence.StandardKey):
@@ -486,7 +523,7 @@ class Workbench(QMainWindow):
         for name, desc, icon, tip, cb in self._action_defs():
             act = self._actions[name]
             if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
+                act.setIcon(qtlib.geticon(icon))
             if tip:
                 act.setStatusTip(tip)
             if cb:
@@ -563,12 +600,13 @@ class Workbench(QMainWindow):
         root = hglib.fromunicode(root)
         self._openRepo(root, reuse)
 
-    def removeRepo(self, root):
+    @pyqtSlot(QString)
+    def closeRepo(self, root):
         """ Close tab if the repo is removed from reporegistry [unicode] """
-        root = hglib.fromunicode(root)
+        root = os.path.normpath(hglib.fromunicode(root))
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
-            if hglib.tounicode(w.repo.root) == os.path.normpath(root):
+            if w.repo.root == root:
                 self.repoTabCloseRequested(i)
                 return
 
@@ -599,21 +637,12 @@ class Workbench(QMainWindow):
                 return w
         return self._openRepo(root, False)
 
-    @pyqtSlot(QString, QString)
-    def showClonedRepo(self, root, src=None):
-        """Activate the repo tab or open it on if not available [unicode]
-
-        This method simply calls showRepo, ignoring the second argument on the received signal
-        """
-        self.showRepo(root)
-
     @pyqtSlot(unicode, QString)
     def setRevsetFilter(self, path, filter):
         for i in xrange(self.repoTabsWidget.count()):
             w = self.repoTabsWidget.widget(i)
             if hglib.tounicode(w.repo.root) == path:
-                w.filterbar.revsetle.setText(filter)
-                w.filterbar.returnPressed()
+                w.setFilter(filter)
                 return
 
     def find_root(self, url):
@@ -743,12 +772,12 @@ class Workbench(QMainWindow):
     def reopenLastClosedTabs(self):
         for n, reporoot in enumerate(self.lastClosedRepoRootList):
             self.progress(_('Reopening tabs'), n,
-                _('Reopening repository %s') % reporoot, '', len(self.lastClosedRepoRootList))
+                _('Reopening repository %s') % reporoot, '',
+                len(self.lastClosedRepoRootList))
             if os.path.isdir(reporoot):
                 self.showRepo(reporoot)
         self.lastClosedRepoRootList = []
-        self.progress(_('Reopening tabs'), len(self.lastClosedRepoRootList),
-            _('All repositories open'), '', len(self.lastClosedRepoRootList))
+        self.progress(_('Reopening tabs'), None, '', '', None)
 
     def repoTabChanged(self, index=0):
         w = self.repoTabsWidget.currentWidget()
@@ -759,6 +788,7 @@ class Workbench(QMainWindow):
                 root = w.repo.root
                 self.activeRepoChanged.emit(hglib.tounicode(root))
                 self._setupCustomTools(w.repo.ui)
+                self._setupUrlCombo(w.repo)
         else:
             self.activeRepoChanged.emit("")
         repo = w and w.repo or None
@@ -789,7 +819,7 @@ class Workbench(QMainWindow):
         rw.toolbarVisibilityChanged.connect(self.updateToolBarActions)
         rw.shortNameChanged.connect(self.reporegistry.shortNameChanged)
         rw.baseNodeChanged.connect(self.reporegistry.baseNodeChanged)
-        rw.repoChanged.connect(self.reporegistry.repoChanged)
+        rw.repoChanged.connect(self.reporegistry.scanRepo)
 
         tw = self.repoTabsWidget
         # We can open new tabs next to the current one or next to the last tab
@@ -803,9 +833,10 @@ class Workbench(QMainWindow):
         tw.setTabToolTip(index, hglib.tounicode(repo.root))
         tw.setCurrentIndex(index)
         rw.titleChanged.connect(self._updateRepoTabTitle)
+        rw.repoConfigChanged.connect(self._setupUrlComboIfCurrent)
         rw.showIcon.connect(
             lambda icon: tw.setTabIcon(tw.indexOf(rw), icon))
-        self.reporegistry.addRepo(repo.root)
+        self.reporegistry.addRepo(hglib.tounicode(repo.root))
 
         self.updateMenu()
         return rw
@@ -860,6 +891,23 @@ class Workbench(QMainWindow):
 
         return forwarder
 
+    # no @pyqtSlot(); as of PyQt 4.9.3, it makes self.sender() wrong through
+    # the following path: reload -> titleChanged -> _updateRepoTabTitle,
+    # if _updateRepoTabTitle is not decorated as @pyqtSlot.
+    def refresh(self):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            getattr(w, 'reload')()
+            self._setupUrlCombo(w.repo)
+
+    @pyqtSlot(QAction)
+    def _runSyncAction(self, action):
+        w = self.repoTabsWidget.currentWidget()
+        if w:
+            op = str(action.data().toString())
+            w.setSyncUrl(self._syncUrlFor(op) or '')
+            getattr(w, op)()
+
     def serve(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
@@ -907,8 +955,10 @@ class Workbench(QMainWindow):
             args = []
         dlg = CloneDialog(args, parent=self)
         dlg.finished.connect(dlg.deleteLater)
-        dlg.clonedRepository.connect(self.showClonedRepo)
-        dlg.exec_()
+        dlg.clonedRepository.connect(self.showRepo)
+        dlg.destroyed.connect(lambda: self._forgetdialog(dlg))
+        dlg.show()
+        self._dialogs.append(dlg)
 
     def openRepository(self):
         """ Open repo from File menu """
@@ -964,16 +1014,20 @@ class Workbench(QMainWindow):
         qtlib.openhelpcontents('explorer.html')
 
     def onReadme(self, *args):
-        """ Display the README file or URL for the current repo, or the global README if no repo is open"""
+        """Display the README file or URL for the current repo, or the global
+        README if no repo is open"""
         readme = None
         def getCurrentReadme(repo):
             """
             Get the README file that is configured for the current repo.
 
-            README files can be set in 3 ways, which are checked in the following order of decreasing priority:
-            - From the tortoisehg.readme key on the current repo's configuration file
+            README files can be set in 3 ways, which are checked in the
+            following order of decreasing priority:
+            - From the tortoisehg.readme key on the current repo's configuration
+              file
             - An existing "README" file found on the repository root
-                * Valid README files are those called README and whose extension is one of the following:
+                * Valid README files are those called README and whose extension
+                  is one of the following:
                     ['', '.txt', '.html', '.pdf', '.doc', '.docx', '.ppt', '.pptx',
                      '.markdown', '.textile', '.rdoc', '.org', '.creole',
                      '.mediawiki','.rst', '.asciidoc', '.pod']
@@ -992,22 +1046,27 @@ class Workbench(QMainWindow):
                         # The readme is set on the current repo configuration file
                         return readme
 
-                # Otherwise try to see if there is a file at the root of the repository
-                # that matches any of the valid README file names (in a non case-sensitive way)
+                # Otherwise try to see if there is a file at the root of the
+                # repository that matches any of the valid README file names
+                # (in a non case-sensitive way)
                 # Note that we try to match the valid README names in order
                 validreadmes = ['readme.txt', 'read.me', 'readme.html',
-                                'readme.pdf', 'readme.doc', 'readme.docx', 'readme.ppt', 'readme.pptx',
-                                'readme.md', 'readme.markdown', 'readme.mkdn', 'readme.rst', 'readme.textile', 'readme.rdoc',
+                                'readme.pdf', 'readme.doc', 'readme.docx',
+                                'readme.ppt', 'readme.pptx',
+                                'readme.md', 'readme.markdown', 'readme.mkdn',
+                                'readme.rst', 'readme.textile', 'readme.rdoc',
                                 'readme.asciidoc', 'readme.org', 'readme.creole',
                                 'readme.mediawiki', 'readme.pod', 'readme']
 
-                readmefiles = [filename for filename in os.listdir(repo.root) if filename.lower().startswith('read')]
+                readmefiles = [filename for filename in os.listdir(repo.root)
+                               if filename.lower().startswith('read')]
                 for validname in validreadmes:
                     for filename in readmefiles:
                         if filename.lower() == validname:
                             return repo.wjoin(filename)
 
-            # Otherwise try use the global setting (or None if readme is just not configured)
+            # Otherwise try use the global setting (or None if readme is just
+            # not configured)
             return readmeglobal
 
         w = self.repoTabsWidget.currentWidget()
@@ -1030,11 +1089,6 @@ class Workbench(QMainWindow):
         wb = "Workbench/"
         s.setValue(wb + 'geometry', self.saveGeometry())
         s.setValue(wb + 'windowState', self.saveState())
-        s.setValue(wb + 'showPaths', self.actionShowPaths.isChecked())
-        s.setValue(wb + 'showSubrepos', self.actionShowSubrepos.isChecked())
-        s.setValue(wb + 'showNetworkSubrepos',
-            self.actionShowNetworkSubrepos.isChecked())
-        s.setValue(wb + 'showShortPaths', self.actionShowShortPaths.isChecked())
         s.setValue(wb + 'saveRepos', self.actionSaveRepos.isChecked())
         repostosave = []
         lastactiverepo = ''
@@ -1055,41 +1109,13 @@ class Workbench(QMainWindow):
         self.restoreGeometry(s.value(wb + 'geometry').toByteArray())
         self.restoreState(s.value(wb + 'windowState').toByteArray())
 
-        # Load the repo registry settings. Note that we must allow the
-        # repo registry to assemble itself before toggling its settings
-        # Also the view path setttings should be enabled last, once we have
-        # loaded the repo subrepositories (if needed)
-
-        # Normally, checking the "show subrepos" and the "show network subrepos"
-        # settings will trigger a reload of the repo registry.
-        # To avoid reloading it twice (every time we set one of its view
-        # settings), we tell the setters to avoid reloading the repo tree
-        # model, and then we  manually reload the model
-        ssr = s.value(wb + 'showSubrepos',
-            defaultValue=QVariant(True)).toBool()
-        snsr = s.value(wb + 'showNetworkSubrepos',
-            defaultValue=QVariant(True)).toBool()
-        ssp = s.value(wb + 'showShortPaths',
-            defaultValue=QVariant(True)).toBool()
-        self.reporegistry.setShowSubrepos(ssr, False)
-        self.reporegistry.setShowNetworkSubrepos(snsr, False)
-        self.reporegistry.setShowShortPaths(ssp)
-
-        # Note that calling setChecked will NOT reload the model if the new
-        # setting is the same as the one in the repo registry
-        QTimer.singleShot(0, lambda: self.actionShowSubrepos.setChecked(ssr))
-        QTimer.singleShot(0, lambda: self.actionShowNetworkSubrepos.setChecked(snsr))
-        QTimer.singleShot(0, lambda: self.actionShowShortPaths.setChecked(ssp))
-
-        # Manually reload the model now, to apply the settings
-        self.reporegistry.reloadModel()
-
         save = s.value(wb + 'saveRepos').toBool()
         self.actionSaveRepos.setChecked(save)
 
-        # Reload the all the repos that were open on the last session
-        # This may be a lengthy operation, which happens before the Workbench GUI is open
-        # We use a progress dialog to let the user know that the workbench is being loaded
+        # Reload the all the repos that were open on the last session.
+        # This may be a lengthy operation, which happens before the Workbench
+        # GUI is open. We use a progress dialog to let the user know that the
+        # workbench is being loaded
         openreposvalue = unicode(s.value(wb + 'openrepos').toString())
         if openreposvalue:
             openrepos = openreposvalue.split(',')
@@ -1102,8 +1128,7 @@ class Workbench(QMainWindow):
             QCoreApplication.processEvents()
             self._openRepo(hglib.fromunicode(upath), False)
             QCoreApplication.processEvents()
-        self.progress(_('Reopening tabs'), len(openrepos),
-                      _('All repositories open'), '', len(openrepos))
+        self.progress(_('Reopening tabs'), None, '', '', None)
 
         # Activate the tab that was last active on the last session (if any)
         # Note that if a "root" has been passed to the "thg" command,
@@ -1117,10 +1142,6 @@ class Workbench(QMainWindow):
         # reopen these repos again
         s.setValue(wb + 'openrepos', '')
         s.setValue(wb + 'lastactiverepo', '')
-
-        # Allow repo registry to assemble itself before toggling path state
-        sp = s.value(wb + 'showPaths').toBool()
-        QTimer.singleShot(0, lambda: self.actionShowPaths.setChecked(sp))
 
     def goto(self, root, rev):
         for rw in self._findrepowidget(root):
@@ -1147,7 +1168,8 @@ class Workbench(QMainWindow):
                 return False
         return True
 
-    def closeRepository(self):
+    @pyqtSlot()
+    def closeCurrentRepoTab(self):
         """close the current repo tab"""
         self.repoTabCloseRequested(self.repoTabsWidget.currentIndex())
 
@@ -1159,13 +1181,13 @@ class Workbench(QMainWindow):
     def terminal(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
-            qtlib.openshell(w.repo.root, w.repo.displayname)
+            qtlib.openshell(w.repo.root, w.repo.displayname, w.repo.ui)
 
     def editSettings(self):
         tw = self.repoTabsWidget
         w = tw.currentWidget()
         twrepo = (w and w.repo.root or '')
-        sd = SettingsDialog(configrepo=False, focus='tortoisehg.authorcolor',
+        sd = SettingsDialog(configrepo=False,
                             parent=self, root=twrepo)
         sd.exec_()
 

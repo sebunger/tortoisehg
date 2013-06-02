@@ -7,60 +7,29 @@
 # GNU General Public License version 2 or any later version.
 
 import os
-import re
 import tempfile
-import urlparse
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, ui, url, util, error, demandimport, scmutil, httpconnection
-from mercurial import merge as mergemod
+from mercurial import hg, ui, util, scmutil, httpconnection
 
-from tortoisehg.util import hglib, wconfig, paths
+from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, hgrcutil
 
-def parseurl(path):
-    if path.startswith('ssh://'):
-        scheme = 'ssh'
-        p = path[len('ssh://'):]
-        user, passwd = None, None
-        if p.find('@') != -1:
-            user, p = tuple(p.rsplit('@', 1))
-            if user.find(':') != -1:
-                user, passwd = tuple(user.rsplit(':', 1))
-        m = re.match(r'([^:/]+)(:(\d+))?(/(.*))?$', p)
-        if m:
-            host = m.group(1)
-            port = m.group(3)
-            folder = m.group(5) or '.'
-        else:
-            qtlib.WarningMsgBox(_('Malformed ssh URL'), hglib.tounicode(path))
-            host, port, folder = '', '', ''
-    elif path.startswith(('http://', 'https://', 'svn+https://', 'git://')):
-        # work around http://bugs.python.org/issue7904
-        if 'svn+https' not in urlparse.uses_netloc:
-            urlparse.uses_netloc.append('svn+https')
-        if 'git' not in urlparse.uses_netloc:
-            urlparse.uses_netloc.append('git')
-        snpaqf = urlparse.urlparse(path)
-        scheme, netloc, folder, params, query, fragment = snpaqf
-        host, port, user, passwd = hglib.netlocsplit(netloc)
-        if folder.startswith('/'):
-            folder = folder[1:]
-    else:
-        user, host, port, passwd = [''] * 4
-        folder = path
-        scheme = 'local'
-    return user, host, port, folder, passwd, scheme
+def parseurl(url):
+    assert type(url) == unicode
+    return util.url(hglib.fromunicode(url))
 
-def linkify(urlu):
-    scheme = parseurl(hglib.fromunicode(urlu))[5].lower()
-    if scheme in ('local', 'http', 'https'):
-        return u'<a href="%s">%s</a>' % (urlu, urlu)
+def linkify(url):
+    assert type(url) == unicode
+    u = util.url(hglib.fromunicode(url))
+    if u.scheme in ('local', 'http', 'https'):
+        safe = util.hidepassword(hglib.fromunicode(url))
+        return u'<a href="%s">%s</a>' % (url, hglib.tounicode(safe))
     else:
-        return urlu
+        return url
 
 class SyncWidget(QWidget, qtlib.TaskWidget):
     syncStarted = pyqtSignal()  # incoming/outgoing/pull/push started
@@ -88,19 +57,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.setLayout(layout)
         self.setAcceptDrops(True)
 
-        self._schemes = ['local', 'ssh', 'http', 'https']
-        if 'hgsubversion' in repo.extensions():
-            self._schemes.append('svn+https')
-        if 'hggit' in repo.extensions() or 'git' in repo.extensions():
-            self._schemes.append('git')
-
         self.repo = repo
         self.finishfunc = None
-        self.curuser = None
-        self.default_user = None
-        self.lastsshuser = None
-        self.curpw = None
-        self.updateInProgress = False
         self.opts = {}
         self.cmenu = None
         self.embedded = bool(parent)
@@ -117,7 +75,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             if val:
                 self.opts[opt] = val
 
-        self.repo.configChanged.connect(self.configChanged)
+        self.repo.configChanged.connect(self.reload)
 
         if self.embedded:
             layout.setContentsMargins(2, 2, 2, 2)
@@ -141,17 +99,17 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return a
 
         self.incomingAction = \
-        newaction(_('Preview incoming changesets from remote repository'),
+        newaction(_('Check for incoming changes from selected URL'),
              'hg-incoming', self.inclicked)
         self.pullAction = \
-        newaction(_('Pull incoming changesets from remote repository'),
+        newaction(_('Pull incoming changes from selected URL'),
              'hg-pull', lambda: self.pullclicked())
         self.outgoingAction = \
-        newaction(_('Filter outgoing changesets to remote repository'),
+        newaction(_('Detect outgoing changes to selected URL'),
              'hg-outgoing', self.outclicked)
         self.pushAction = \
-        newaction(_('Push outgoing changesets to remote repository'),
-             'hg-push', lambda: self.pushclicked(True))
+        newaction(_('Push outgoing changes to selected URL'),
+             'hg-push', lambda: self.pushclicked(None))
         newaction(_('Email outgoing changesets for remote repository'),
              'mail-forward', self.emailclicked)
 
@@ -210,28 +168,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         bottomlayout.addLayout(hbox)
-        hbox.addWidget(QLabel(_('<b>Remote Repository:</b>')))
-        self.urllabel = QLabel()
-        self.urllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.urllabel.setAcceptDrops(False)
-        hbox.addWidget(self.urllabel)
-        self.pushlabel = QLabel(_('<b>Remote Push Repository:</b>'))
-        hbox.addWidget(self.pushlabel)
-        self.pushlabel.hide()
-        self.pushurllabel = QLabel()
-        self.pushurllabel.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        self.pushurllabel.setAcceptDrops(False)
-        hbox.addWidget(self.pushurllabel)
-        hbox.addStretch()
-
-        hbox = QHBoxLayout()
-        hbox.setContentsMargins(0, 0, 0, 0)
-        bottomlayout.addLayout(hbox)
 
         self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
         tbar.setStyleSheet(qtlib.tbstylesheet)
         tbar.setIconSize(QSize(16, 16))
         hbox.addWidget(tbar)
+
+        a = tbar.addAction(qtlib.geticon('thg-password'), _('Security'))
+        a.setToolTip(_('Manage HTTPS connection security and user authentication'))
+        self.securebutton = a
+        tbar.addWidget(qtlib.Spacer(2, 2))
 
         style = QApplication.style()
         a = tbar.addAction(style.standardIcon(QStyle.SP_DialogSaveButton),
@@ -240,48 +186,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.savebutton = a
         tbar.addWidget(qtlib.Spacer(2, 2))
 
-        self.schemecombo = QComboBox()
-        for s in self._schemes:
-            self.schemecombo.addItem(s)
-        self.schemecombo.currentIndexChanged.connect(self.schemeChange)
-        tbar.addWidget(self.schemecombo)
-        tbar.addWidget(qtlib.Spacer(2, 2))
+        self.urlentry = QLineEdit()
+        self.urlentry.textChanged.connect(self.urlChanged)
+        tbar.addWidget(self.urlentry)
 
-        a = tbar.addAction(qtlib.geticon('thg-password'), _('Security'))
-        a.setToolTip(_('Manage HTTPS connection security and user authentication'))
-        self.securebutton = a
-        tbar.addWidget(qtlib.Spacer(2, 2))
-
-        self.hostAndPortActions = []
-
-        fontm = QFontMetrics(self.font())
-        self.hostentry = QLineEdit()
-        self.hostentry.setToolTip(_('Hostname'))
-        self.hostentry.setAcceptDrops(False)
-        self.hostentry.setFixedWidth(30 * fontm.width('9'))
-        self.hostentry.textChanged.connect(self.refreshUrl)
-        self.hostAndPortActions.append(tbar.addWidget(self.hostentry))
-        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
-
-        w = QLabel(':')
-        self.hostAndPortActions.append(tbar.addWidget(w))
-        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
-        self.portentry = QLineEdit()
-        self.portentry.setAcceptDrops(False)
-        self.portentry.setToolTip(_('Port'))
-        self.portentry.setFixedWidth(8 * fontm.width('9'))
-        self.portentry.setValidator(QIntValidator(0, 65536, self.portentry))
-        self.portentry.textChanged.connect(self.refreshUrl)
-        self.hostAndPortActions.append(tbar.addWidget(self.portentry))
-        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
-        w = QLabel('/')
-        self.hostAndPortActions.append(tbar.addWidget(w))
-        self.hostAndPortActions.append(tbar.addWidget(qtlib.Spacer(2, 2)))
-        self.pathentry = QLineEdit()
-        self.pathentry.setAcceptDrops(False)
-        self.pathentry.setToolTip(_('Path'))
-        self.pathentry.textChanged.connect(self.refreshUrl)
-        tbar.addWidget(self.pathentry)
+        # even though currentRowChanged fires pathSelected, clicked signal is
+        # also connected to it. otherwise urlentry won't be updated when the
+        # selection moves between hgrctv and reltv.
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -337,41 +248,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         cmd.setVisible(False)
         self.cmd = cmd
 
+        self.curalias = None
         self.reload()
         if 'default' in self.paths:
-            self.curalias = 'default'
-            self.setUrl(self.paths['default'])
+            self.setUrl('default')
         else:
-            self.curalias = None
-            self.setUrl('')
-
-        self.default_user = self.curuser
-        self.lastsshuser = self.curuser
-        QTimer.singleShot(0, lambda:self.pathentry.setFocus())
+            self.setEditUrl('')
 
     def canswitch(self):
         return not self.targetcheckbox.isChecked()
-
-    def schemeChange(self):
-        if self.default_user:
-            scheme = self._schemes[self.schemecombo.currentIndex()]
-            if scheme == 'ssh':
-                self.default_user = self.curuser
-                self.curuser = self.lastsshuser
-            else:
-                self.curuser = self.default_user
-
-        self.refreshUrl()
-
-    def refreshStatusTips(self):
-        url = self.currentUrl(True)
-        urlu = hglib.tounicode(url)
-        self.incomingAction.setStatusTip(_('Preview incoming changesets from %s') % urlu)
-        self.pullAction.setStatusTip(_('Pull incoming changesets from %s') % urlu)
-        url = self.currentPushUrl()
-        urlu = hglib.tounicode(url)
-        self.outgoingAction.setStatusTip(_('Filter outgoing changesets to %s') % urlu)
-        self.pushAction.setStatusTip(_('Push outgoing changesets to %s') % urlu)
 
     def loadTargets(self, ctx):
         self.targetcombo.clear()
@@ -412,10 +297,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             index = 0
         self.targetcombo.setCurrentIndex(index)
 
-    def configChanged(self):
-        'Repository is reporting its config files have changed'
-        self.reload()
-
     def editOptions(self):
         dlg = OptionsDialog(self.opts, self)
         dlg.setWindowFlags(Qt.Sheet)
@@ -430,6 +311,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     val = hglib.tounicode(val)
                 s.setValue('sync/' + opt, val)
 
+    @pyqtSlot()
     def reload(self):
         # Refresh configured paths
         self.paths = {}
@@ -440,6 +322,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.paths[ alias ] = cfg['paths'][ alias ]
         tm = PathsModel(self.paths.items(), self)
         self.hgrctv.setModel(tm)
+        sm = self.hgrctv.selectionModel()
+        sm.currentRowChanged.connect(self.pathSelected)
 
         # Refresh post-pull
         self.cachedpp = self.repo.postpull
@@ -484,24 +368,22 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         pairs = [(alias, path) for path, alias in related.items()]
         tm = PathsModel(pairs, self)
         self.reltv.setModel(tm)
+        sm = self.reltv.selectionModel()
+        sm.currentRowChanged.connect(self.pathSelected)
+
+        # restore the current alias and its url
+        if self.curalias in self.paths:
+            self.setUrl(hglib.tounicode(self.curalias))
+
+    def currentUrl(self):
+        return unicode(self.urlentry.text())
+
+    def urlChanged(self):
+        self.securebutton.setEnabled('https://' in self.currentUrl())
 
     def refreshUrl(self):
-        'User has changed schema/host/port/path'
-        if self.updateInProgress:
-            return
-        self.urllabel.setText(hglib.tounicode(self.currentUrl(True)))
-        if self.curalias and self.curalias + '-push' in self.paths:
-            self.pushlabel.show()
-            self.pushurllabel.setText(hglib.tounicode(self.currentPushUrl()))
-        else:
-            self.pushlabel.hide()
-            self.pushurllabel.setText('')
-
-        schemeIndex = self.schemecombo.currentIndex()
-        scheme = self._schemes[schemeIndex]
-        for w in self.hostAndPortActions:
-            w.setVisible(schemeIndex != 0)
-        self.securebutton.setVisible(scheme.endswith('https'))
+        'User has selected a new URL'
+        self.urlChanged()
 
         opts = []
         for opt, value in self.opts.iteritems():
@@ -513,79 +395,30 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.optionslabel.setVisible(bool(opts))
         self.optionshdrlabel.setVisible(bool(opts))
 
-    def currentUrl(self, hidepw):
-        scheme = self._schemes[self.schemecombo.currentIndex()]
-        if scheme == 'local':
-            return hglib.fromunicode(self.pathentry.text())
-        else:
-            path = self.pathentry.text()
-            host = self.hostentry.text()
-            port = self.portentry.text()
-            parts = [scheme, '://']
-            if scheme == 'ssh' and '@' in host:
-                user, host = unicode(host).split('@', 1)
-                self.curuser = hglib.fromunicode(user)
-                self.lastsshuser = self.curuser
-            if self.curuser:
-                parts.append(self.curuser)
-                if self.curpw:
-                    parts.append(':')
-                    parts.append(hidepw and '***' or self.curpw)
-                parts.append('@')
-            parts.append(hglib.fromunicode(host))
-            if port:
-                parts.extend([':', hglib.fromunicode(port)])
-            parts.extend(['/', hglib.fromunicode(path)])
-            return ''.join(parts)
-
-    def currentPushUrl(self):
-        if self.curalias and self.curalias + '-push' in self.paths:
-            url = self.paths[self.curalias + '-push']
-            user, host, port, folder, passwd, scheme = parseurl(url)
-            parts = [scheme, '://']
-            if scheme == 'local':
-                return folder
-            if scheme == 'ssh' and '@' in host:
-                user, host = host.split('@', 1)
-            if user:
-                parts.append(user)
-                if passwd:
-                    parts.append(':***')
-                parts.append('@')
-            parts.append(host)
-            if port:
-                parts.extend([':', port])
-            parts.extend(['/', folder])
-            return ''.join(parts)
-        else:
-            return self.currentUrl(True)
-
     def pathSelected(self, index):
         aliasindex = index.sibling(index.row(), 0)
         alias = aliasindex.data(Qt.DisplayRole).toString()
         self.curalias = hglib.fromunicode(alias)
         path = index.model().realUrl(index)
-        self.setUrl(path)
+        self.setEditUrl(hglib.tounicode(path))
+
+    def setEditUrl(self, newurl):
+        'Set the current URL without changing the alias [unicode]'
+        self.urlentry.setText(newurl)
+        self.refreshUrl()
 
     def setUrl(self, newurl):
-        'User has selected a new URL: newurl is expected in local encoding'
-        try:
-            user, host, port, folder, passwd, scheme = parseurl(newurl)
-        except TypeError:
-            return
-        self.updateInProgress = True
-        for i, val in enumerate(self._schemes):
-            if scheme == val:
-                self.schemecombo.setCurrentIndex(i)
-                break
-        self.hostentry.setText(hglib.tounicode(host or ''))
-        self.portentry.setText(hglib.tounicode(port or ''))
-        self.pathentry.setText(hglib.tounicode(folder or ''))
-        self.curuser = user
-        self.curpw = passwd
-        self.updateInProgress = False
-        self.refreshUrl()
-        self.refreshStatusTips()
+        'Set the current URL to the given alias or URL [unicode]'
+        model = self.hgrctv.model()
+        for col in (0, 1):  # search known (alias, url)
+            ixs = model.match(model.index(0, col), Qt.DisplayRole, newurl, 1,
+                              Qt.MatchFixedString | Qt.MatchCaseSensitive)
+            if ixs:
+                self.hgrctv.setCurrentIndex(ixs[0])
+                self.pathSelected(ixs[0])  # in case of row not changed
+                return
+
+        self.setEditUrl(newurl)
 
     def dragEnterEvent(self, event):
         data = event.mimeData()
@@ -602,20 +435,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def dropEvent(self, event):
         data = event.mimeData()
         if data.hasUrls():
-            url = data.urls()[0]
-            lurl = hglib.fromunicode(url.toString())
+            url = unicode(data.urls()[0].toString())
             event.setDropAction(Qt.CopyAction)
             event.accept()
         elif data.hasText():
-            text = data.text()
-            lurl = hglib.fromunicode(text)
+            url = unicode(data.text())
             event.setDropAction(Qt.CopyAction)
             event.accept()
         else:
             return
-        if lurl.startswith('file:///'):
-            lurl = lurl[8:]
-        self.setUrl(lurl)
+        if url.startswith('file:///'):
+            url = url[8:]
+        self.setUrl(url)
 
     def canExit(self):
         return not self.cmd.core.running()
@@ -628,18 +459,18 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             acts = []
             menu = QMenu(self)
             for text, cb, icon in (
-                (_('Explore'), self.exploreurl, 'system-file-manager'),
-                (_('Terminal'), self.terminalurl, 'utilities-terminal'),
-                (_('Copy path'), self.copypath, ''),
+                (_('E&xplore'), self.exploreurl, 'system-file-manager'),
+                (_('&Terminal'), self.terminalurl, 'utilities-terminal'),
+                (_('Copy &Path'), self.copypath, ''),
                 separator,
-                (_('Edit...'), self.editurl, 'general'),
-                (_('Remove'), self.removeurl, 'menudelete')):
+                (_('&Edit...'), self.editurl, 'general'),
+                (_('&Remove...'), self.removeurl, 'menudelete')):
                 if text is None:
                     menu.addSeparator()
                     continue
                 act = QAction(text, self)
                 if icon:
-                    act.setIcon(qtlib.getmenuicon(icon))
+                    act.setIcon(qtlib.geticon(icon))
                 act.triggered.connect(cb)
                 acts.append(act)
                 menu.addAction(act)
@@ -653,31 +484,31 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.cmenu.exec_(point)
 
     def exploreurl(self):
-        url = hglib.fromunicode(self.menuurl)
-        u, h, p, folder, pw, scheme = parseurl(url)
-        if scheme == 'local':
-            qtlib.openlocalurl(folder)
+        url = unicode(self.menuurl)
+        u = parseurl(url)
+        if not u.scheme or u.scheme == 'file':
+            qtlib.openlocalurl(u.path)
         else:
             QDesktopServices.openUrl(QUrl(url))
 
     def terminalurl(self):
-        url = hglib.fromunicode(self.menuurl)
-        u, h, p, folder, pw, scheme = parseurl(url)
-        if scheme != 'local':
+        url = unicode(self.menuurl)
+        u = parseurl(url)
+        if u.scheme and u.scheme != 'file':
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
             return
-        qtlib.openshell(folder, 'repo ' + folder)
+        qtlib.openshell(u.path, 'repo ' + u.path)
 
     def editurl(self):
         alias = hglib.fromunicode(self.menualias)
-        url = hglib.fromunicode(self.menuurl)
-        dlg = SaveDialog(self.repo, alias, url, url, self, edit=True)
+        urlu = unicode(self.menuurl)
+        dlg = SaveDialog(self.repo, alias, urlu, self, edit=True)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
-            self.setUrl(hglib.fromunicode(dlg.urlentry.text()))
+            self.reload()
 
     def removeurl(self):
         if qtlib.QuestionMsgBox(_('Confirm path delete'),
@@ -717,9 +548,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             alias = 'default'
         else:
             alias = 'new'
-        url = self.currentUrl(False)
-        safeurl = self.currentUrl(True)
-        dlg = SaveDialog(self.repo, alias, url, safeurl, self)
+        dlg = SaveDialog(self.repo, alias, self.currentUrl(), self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
@@ -727,7 +556,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.reload()
 
     def secureclicked(self):
-        dlg = SecureDialog(self.repo, self.currentUrl(False), self)
+        dlg = SecureDialog(self.repo, self.currentUrl(), self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
         dlg.exec_()
@@ -751,6 +580,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if self.finishfunc:
             output = self.cmd.core.rawoutput()
             self.finishfunc(ret, output)
+            self.finishfunc = None # allow GC to clean temp functions
 
     def run(self, cmdline, details):
         if self.cmd.core.running():
@@ -780,34 +610,26 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if self.opts.get('debug'):
             cmdline.append('--debug')
 
-        cururl = self.currentUrl(False)
-        implicitpushrepo = False
-        if ('push' in cmdline or 'outgoing' in cmdline) and \
-           self.curalias and self.curalias + '-push' in self.paths:
-            implicitpushrepo = True
-            cururl = self.paths[self.curalias + '-push']
+        cururl = self.currentUrl()
+        lurl = hglib.fromunicode(cururl)
+        u = parseurl(cururl)
 
-        if not cururl:
-            host = ''
-            folder = ''
-        else:
-            user, host, port, folder, passwd, scheme = parseurl(cururl)
-
-        if not host and not folder:
+        if not u.host and not u.path:
             self.switchToRequest.emit('sync')
             qtlib.WarningMsgBox(_('No remote repository URL or path set'),
-                    _('No valid <i>default</i> remote repository URL or path has been configured for this repository.<p>'
-                    'Please type and save a remote repository path on the Sync widget.'),
+                    _('No valid <i>default</i> remote repository URL or path '
+                      'has been configured for this repository.<p>Please type '
+                      'and save a remote repository path on the Sync widget.'),
                     parent=self)
             return
 
-        if scheme == 'https':
-            if self.repo.ui.configbool('insecurehosts', host):
+        if u.scheme == 'https':
+            if self.repo.ui.configbool('insecurehosts', u.host):
                 cmdline.append('--insecure')
-            if user:
-                cleanurl = util.removeauth(cururl)
+            if u.user:
+                cleanurl = util.removeauth(lurl)
                 res = httpconnection.readauthforuri(self.repo.ui, cleanurl,
-                                                    user)
+                                                    u.user)
                 if res:
                     group, auth = res
                     if auth.get('username'):
@@ -817,18 +639,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                               'this host and inside this URL.  Remove '
                               'authentication info from this URL?'),
                             parent=self):
-                            self.setUrl(cleanurl)
+                            self.setEditUrl(hglib.tounicode(cleanurl))
                             self.saveclicked()
 
-        safeurl = self.currentUrl(True)
-        if implicitpushrepo:
-            safeurl = self.currentPushUrl()
-
+        safeurl = util.hidepassword(lurl)
         display = ' '.join(cmdline + [safeurl]).replace('\n', '^M')
         if not self.opts.get('mq'):
-            cmdline.append(cururl)
+            cmdline.append(lurl)
         self.repo.incrementBusyCount()
-        self.cmd.run(cmdline, display=display, useproc='p4://' in cururl)
+        self.cmd.run(cmdline, display=display, useproc='p4://' in lurl)
 
     def outputHook(self, msg, label):
         if '\'hg push --new-branch\'' in msg:
@@ -867,13 +686,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if self.cmd.core.running():
             self.output.emit(_('sync command already running'), 'control')
             return
-        save = self.currentUrl(False)
+        save = self.currentUrl()
         orev = self.opts.get('rev')
-        self.setUrl(bundle)
+        self.setEditUrl(hglib.tounicode(bundle))
         if rev is not None:
             self.opts['rev'] = str(rev)
         self.pullclicked(bsource)
-        self.setUrl(save)
+        self.setEditUrl(save)
         self.opts['rev'] = orev
 
     ##
@@ -882,21 +701,20 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def inclicked(self):
         self.syncStarted.emit()
-        url = self.currentUrl(True)
-        urlu = hglib.tounicode(url)
-        link = linkify(urlu)
+        url = self.currentUrl()
+        link = linkify(url)
         self.showMessage.emit(_('Getting incoming changesets from %s...') % link)
         if self.embedded and not url.startswith('p4://') and \
            not self.opts.get('subrepos'):
             def finished(ret, output):
                 if ret == 0 and os.path.exists(bfile):
                     self.showMessage.emit(_('Found incoming changesets from %s') % link)
-                    self.incomingBundle.emit(hglib.tounicode(bfile), urlu)
+                    self.incomingBundle.emit(hglib.tounicode(bfile), url)
                 elif ret == 1:
                     self.showMessage.emit(_('No incoming changesets from %s') % link)
                 else:
                     self.showMessage.emit(_('Incoming from %s aborted, ret %d') % (link, ret))
-            bfile = url
+            bfile = hglib.fromunicode(url)
             for badchar in (':', '*', '\\', '?', '#'):
                 bfile = bfile.replace(badchar, '')
             bfile = bfile.replace('/', '_')
@@ -917,20 +735,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline = ['--repository', self.repo.root, 'incoming']
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
-    def pullclicked(self, urltoshow=None):
+    def pullclicked(self, url=None):
         self.syncStarted.emit()
-        url = self.currentUrl(True)
-        urlu = hglib.tounicode(url)
-        link = linkify(urlu)
-        if urltoshow is None:
-            urltoshow = urlu
-        linktoshow = linkify(urltoshow)
+        link = linkify(url or self.currentUrl())
+
         def finished(ret, output):
             if ret == 0:
-                self.showMessage.emit(_('Pull from %s completed') % linktoshow)
+                self.showMessage.emit(_('Pull from %s completed') % link)
             else:
                 self.showMessage.emit(_('Pull from %s aborted, ret %d')
-                                      % (linktoshow, ret))
+                                      % (link, ret))
             self.pullCompleted.emit()
             # handle file conflicts during rebase
             if self.opts.get('rebase'):
@@ -966,9 +780,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def outclicked(self):
         self.syncStarted.emit()
-        url = self.currentPushUrl()
-        urlu = hglib.tounicode(url)
-        link = linkify(urlu)
+
+        link = linkify(self.currentUrl())
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % link)
         if self.embedded and not self.opts.get('subrepos'):
             def verifyhash(hash):
@@ -1004,7 +817,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
 
     def p4pending(self):
-        p4url = self.currentUrl(False)
+        p4url = hglib.fromunicode(self.currentUrl())
         def finished(ret, output):
             pending = {}
             if ret == 0:
@@ -1047,6 +860,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(['--repository', self.repo.root, 'p4pending', '--verbose'], ())
 
     def pushclicked(self, confirm, rev=None, branch=None, pushall=False):
+        if confirm is None:
+            confirm = self.repo.ui.configbool('tortoisehg', 'confirmpush', True)
         if rev == '':
             rev = None
         if branch == '':
@@ -1056,14 +871,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                              'branch=%r' % (pushall, rev, branch))
         validopts = ('force', 'new-branch', 'branch', 'rev', 'bookmark', 'mq')
         self.syncStarted.emit()
-        url = self.currentPushUrl()
-        urlu = hglib.tounicode(url)
-        link = linkify(urlu)
-        if (not hg.islocal(self.currentPushUrl()) and confirm
-            and not self.targetcheckbox.isChecked()):
+
+        lurl = hglib.fromunicode(self.currentUrl())
+        link = linkify(self.currentUrl())
+        if (not hg.islocal(lurl) and confirm and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
-                                     % urlu, parent=self)
+                                     % link, parent=self)
             if not r:
                 self.showMessage.emit(_('Push to %s aborted') % link)
                 self.pushCompleted.emit()
@@ -1095,7 +909,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if not pushall and rev is None and branch is None:
             # Read the tortoisehg.defaultpush setting to determine what to push by default
             defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
-            if defaultpush == 'all':
+            if self.targetcheckbox.isChecked():
+                # target selection overrides defaultpush
+                pass
+            elif defaultpush == 'all':
                 # This is the default
                 pass
             elif defaultpush == 'branch':
@@ -1103,8 +920,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             elif defaultpush == 'revision':
                 rev = '.'
             else:
-                self.showMessage.emit(_('Invalid default push revision: %s.'
-                                        'Please check your mercurial configuration '
+                self.showMessage.emit(_('Invalid default push revision: %s. '
+                                        'Please check your Mercurial configuration '
                                         '(tortoisehg.defaultpush)') % defaultpush)
                 self.pushCompleted.emit()
                 return
@@ -1153,10 +970,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                     directory=self.repo.root,
                                     filter=_FILE_FILTER)
         if bundlefile:
-            # Select the "Local" scheme
-            self.schemecombo.setCurrentIndex(0)
             # Set the pull source to the selected bundle file
-            self.pathentry.setText(bundlefile)
+            self.urlentry.setText(bundlefile)
             # Execute the incomming command, which will show the revisions in
             # the bundle, and let the user accept or reject them
             self.inclicked()
@@ -1181,6 +996,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         self.repo.decrementBusyCount()
+        self.reload()
 
 
 class PostPullDialog(QDialog):
@@ -1286,7 +1102,7 @@ class PostPullDialog(QDialog):
         super(PostPullDialog, self).reject()
 
 class SaveDialog(QDialog):
-    def __init__(self, repo, alias, origurl, safeurl, parent, edit=False):
+    def __init__(self, repo, alias, urlu, parent, edit=False):
         super(SaveDialog, self).__init__(parent)
 
         self.setWindowTitle(_('Save Path'))
@@ -1294,7 +1110,7 @@ class SaveDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         self.repo = repo
-        self.origurl = origurl
+        self.origurl = hglib.fromunicode(urlu)
         self.setLayout(QFormLayout(fieldGrowthPolicy=QFormLayout.ExpandingFieldsGrow))
 
         self.origalias = alias
@@ -1303,18 +1119,20 @@ class SaveDialog(QDialog):
         self.aliasentry.textChanged.connect(self.aliasChanged)
         self.layout().addRow(_('Alias'), self.aliasentry)
 
+        safeurl = util.hidepassword(self.origurl)
+
         self.edit = edit
         if edit:
-            self.urlentry = QLineEdit(hglib.tounicode(origurl))
+            self.urlentry = QLineEdit(urlu)
             self.urlentry.textChanged.connect(self.urlChanged)
             self.layout().addRow(_('URL'), self.urlentry)
         else:
             self.urllabel = QLabel(hglib.tounicode(safeurl))
             self.layout().addRow(_('URL'), self.urllabel)
 
-        user, host, port, folder, passwd, scheme = parseurl(origurl)
-        if not edit and (user or passwd) and scheme in ('http', 'https'):
-            cleanurl = util.removeauth(origurl)
+        u = parseurl(urlu)
+        if not edit and (u.user or u.passwd) and u.scheme in ('http', 'https'):
+            cleanurl = util.removeauth(self.origurl)
             def showurl(showclean):
                 newurl = showclean and cleanurl or safeurl
                 self.urllabel.setText(hglib.tounicode(newurl))
@@ -1386,22 +1204,22 @@ class SaveDialog(QDialog):
         self.bb.button(QDialogButtonBox.Save).setEnabled(enabled)
 
 class SecureDialog(QDialog):
-    def __init__(self, repo, origurl, parent):
+    def __init__(self, repo, urlu, parent):
         super(SecureDialog, self).__init__(parent)
 
         def genfingerprint():
-            if port is None:
+            if u.port is None:
                 portnum = 443
             else:
                 try:
-                    portnum = int(port)
+                    portnum = int(u.port)
                 except ValueError:
                     qtlib.WarningMsgBox(_('Certificate Query Error'),
                                         _('Invalid port number: %s')
-                                        % hglib.tounicode(port), parent=self)
+                                        % hglib.tounicode(u.port), parent=self)
                     return
             try:
-                pem = ssl.get_server_certificate( (host, portnum) )
+                pem = ssl.get_server_certificate( (u.host, portnum) )
                 der = ssl.PEM_cert_to_DER_cert(pem)
             except Exception, e:
                 qtlib.WarningMsgBox(_('Certificate Query Error'),
@@ -1411,21 +1229,21 @@ class SecureDialog(QDialog):
             pretty = ":".join([hash[x:x + 2] for x in xrange(0, len(hash), 2)])
             le.setText(pretty)
 
-        user, host, port, folder, passwd, scheme = parseurl(origurl)
-        uhost = hglib.tounicode(host)
+        u = parseurl(urlu)
+        uhost = hglib.tounicode(u.host)
         self.setWindowTitle(_('Security: ') + uhost)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
         # if the already user has an [auth] configuration for this URL, use it
-        cleanurl = util.removeauth(origurl)
-        res = httpconnection.readauthforuri(repo.ui, cleanurl, user)
+        cleanurl = util.removeauth(hglib.fromunicode(urlu))
+        res = httpconnection.readauthforuri(repo.ui, cleanurl, u.user)
         if res:
             self.alias, auth = res
         else:
-            self.alias, auth = host, {}
+            self.alias, auth = u.host, {}
         self.repo = repo
-        self.host = host
+        self.host = u.host
         if cleanurl.startswith('svn+https://'):
             self.schemes = 'svn+https'
         else:
@@ -1447,7 +1265,7 @@ class SecureDialog(QDialog):
         self.insecureradio = QRadioButton(
             _('No host validation, but still encrypted (bad)'))
         hbox = QHBoxLayout()
-        fprint = repo.ui.config('hostfingerprints', host, '')
+        fprint = repo.ui.config('hostfingerprints', u.host, '')
         self.fprintentry = le = QLineEdit(fprint)
         self.fprintradio.toggled.connect(self.fprintentry.setEnabled)
         self.fprintentry.setEnabled(False)
@@ -1472,7 +1290,7 @@ class SecureDialog(QDialog):
         self.cacertradio.setChecked(True) # default
         if fprint:
             self.fprintradio.setChecked(True)
-        elif repo.ui.config('insecurehosts', host):
+        elif repo.ui.config('insecurehosts', u.host):
             self.insecureradio.setChecked(True)
 
         authbox = QGroupBox(_('User Authentication'))
@@ -1480,7 +1298,7 @@ class SecureDialog(QDialog):
         authbox.setLayout(form)
         self.layout().addWidget(authbox)
 
-        self.userentry = QLineEdit(user or auth.get('username', ''))
+        self.userentry = QLineEdit(u.user or auth.get('username', ''))
         self.userentry.setToolTip(
 _('''Optional. Username to authenticate with. If not given, and the remote
 site requires basic or digest authentication, the user will be prompted for
@@ -1488,7 +1306,7 @@ it. Environment variables are expanded in the username letting you do
 foo.username = $USER.'''))
         form.addRow(_('Username'), self.userentry)
 
-        self.pwentry = QLineEdit(passwd or auth.get('password', ''))
+        self.pwentry = QLineEdit(u.passwd or auth.get('password', ''))
         self.pwentry.setEchoMode(QLineEdit.Password)
         self.pwentry.setToolTip(
 _('''Optional. Password to authenticate with. If not given, and the remote
@@ -1658,24 +1476,24 @@ class PathsModel(QAbstractTableModel):
             usafepath = hglib.tounicode(safepath)
             self.rows.append([ualias, usafepath, path])
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0 # no child
         return len(self.rows)
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0 # no child
         return len(self.headers)
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
         if role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
         return QVariant()
 
-    def headerData(self, col, orientation, role):
+    def headerData(self, col, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
             return QVariant()
         else:
@@ -1775,4 +1593,7 @@ class OptionsDialog(QDialog):
 
 def run(ui, *pats, **opts):
     repo = thgrepo.repository(ui, path=paths.find_root())
-    return SyncWidget(repo, None, **opts)
+    w = SyncWidget(repo, None, **opts)
+    if pats:
+        w.setUrl(hglib.tounicode(pats[0]))
+    return w

@@ -12,11 +12,12 @@ from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
-from PyQt4.QtCore import Qt, QObject, QDir
+from PyQt4.QtCore import Qt, QObject, QDir, pyqtSignal, pyqtSlot
 from PyQt4.QtGui import *
 
 class WctxActions(QObject):
     'container class for working context actions'
+    runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent, checkable=True):
         super(WctxActions, self).__init__(parent)
@@ -30,47 +31,48 @@ class WctxActions(QObject):
             action._filetypes = types
             action._runfunc = func
             if icon:
-                action.setIcon(qtlib.getmenuicon(icon))
+                action.setIcon(qtlib.geticon(icon))
             if keys:
                 action.setShortcut(QKeySequence(keys))
             action.triggered.connect(self.runAction)
             parent.addAction(action)
             allactions.append(action)
 
-        make(_('&Diff to parent'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
-        make(_('Copy patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
-        make(_('Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
-        make(_('Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+L')
+        make(_('&Diff to Parent'), vdiff, frozenset('MAR!'), 'visualdiff', 'CTRL+D')
+        make(_('&Copy Patch'), copyPatch, frozenset('MAR!'), 'copy-patch')
+        make(_('&Edit'), edit, frozenset('MACI?'), 'edit-file', 'SHIFT+CTRL+E')
+        make(_('&Open'), openfile, frozenset('MACI?'), '', 'SHIFT+CTRL+L')
         allactions.append(None)
-        make(_('Open subrepository'), opensubrepo, frozenset('S'),
-            'thg-repository-open', 'Shift+Ctrl+O')
-        make(_('Explore subrepository'), explore, frozenset('S'),
+        make(_('Open S&ubrepository'), opensubrepo, frozenset('S'),
+            'thg-repository-open')
+        make(_('E&xplore Subrepository'), explore, frozenset('S'),
             'system-file-manager')
-        make(_('Open terminal in subrepository'), terminal, frozenset('S'),
+        make(_('Open &Terminal'), terminal, frozenset('S'),
             'utilities-terminal')
         allactions.append(None)
-        make(_('Copy path'), copyPath, frozenset('MARC?!IS'), '')
-        make(_('View missing'), viewmissing, frozenset('R!'))
+        make(_('Copy &Path'), copyPath, frozenset('MARC?!IS'), '')
+        make(_('&View Missing'), viewmissing, frozenset('R!'))
         allactions.append(None)
         make(_('&Revert...'), revert, frozenset('SMAR!'), 'hg-revert')
         make(_('&Add'), add, frozenset('R'), 'fileadd')
         allactions.append(None)
-        make(_('File History'), log, frozenset('MARC!'), 'hg-log')
+        make(_('File &History'), log, frozenset('MARC!'), 'hg-log')
         make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
         if 'largefiles' in self.repo.extensions():
             make(_('Add &Largefiles...'), addlf, frozenset('I?'))
-        make(_('&Detect Renames...'), guessRename, frozenset('A?!'),
+        make(_('De&tect Renames...'), guessRename, frozenset('A?!'),
              'detect_rename')
         make(_('&Ignore...'), ignore, frozenset('?'), 'ignore')
-        make(_('Remove versioned'), remove, frozenset('C'), 'remove')
-        make(_('&Delete unversioned...'), delete, frozenset('?I'), 'hg-purge')
+        make(_('Re&move Versioned'), remove, frozenset('C'), 'remove')
+        make(_('&Delete Unversioned...'), delete, frozenset('?I'), 'hg-purge')
         allactions.append(None)
-        make(_('Mark unresolved'), unmark, frozenset('r'))
-        make(_('Mark resolved'), mark, frozenset('u'))
+        make(_('&Mark Unresolved'), unmark, frozenset('r'))
+        make(_('&Mark Resolved'), mark, frozenset('u'))
         if checkable:
+            # no &-shortcut because check/uncheck can be done by space key
             allactions.append(None)
             make(_('Check'), check, frozenset('MARC?!IS'), '')
             make(_('Uncheck'), uncheck, frozenset('MARC?!IS'), '')
@@ -105,23 +107,59 @@ class WctxActions(QObject):
                 menu.addAction(action)
                 addedActions = True
 
-        def make(text, func, types, icon=None):
+        def make(text, func, types, icon=None, inmenu=None):
             if not types & alltypes:
                 return
-            action = menu.addAction(text)
+            if inmenu is None:
+                inmenu = menu
+            action = inmenu.addAction(text)
             action._filetypes = types
             action._runfunc = func
             if icon:
-                action.setIcon(qtlib.getmenuicon(icon))
-            action.triggered.connect(self.runAction)
+                action.setIcon(qtlib.geticon(icon))
+            if func is not None:
+                action.triggered.connect(self.runAction)
+            return action
 
         if len(repo.parents()) > 1:
-            make(_('View other'), viewother, frozenset('MA'))
+            make(_('View O&ther'), viewother, frozenset('MA'))
 
         if len(selrows) == 1:
             menu.addSeparator()
             make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
-            make(_('Rename...'), rename, frozenset('MC'), 'hg-rename')
+            make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename')
+
+        def _setupCustomSubmenu(menu):
+            tools, toollist = hglib.tortoisehgtools(self.repo.ui,
+                selectedlocation='workbench.commit.custom-menu')
+            if not tools:
+                return
+            menu.addSeparator()
+            submenu = menu.addMenu(_('Custom Tools'))
+            submenu.triggered.connect(self._runCustomCommandByMenu)
+            emptysubmenu = True
+            for name in toollist:
+                if name == '|':
+                    submenu.addSeparator()
+                    continue
+                info = tools.get(name, None)
+                if info is None:
+                    continue
+                command = info.get('command', None)
+                if not command:
+                    continue
+                label = info.get('label', name)
+                icon = info.get('icon', 'tools-spanner-hammer')
+                status = info.get('status', 'MAR!C?S')
+                a = make(label, None, frozenset(status),
+                    icon=icon, inmenu=submenu)
+                if a is not None:
+                    a.setData(name)
+                    emptysubmenu = False
+            if emptysubmenu:
+                menu.removeAction(submenu.menuAction())
+
+        _setupCustomSubmenu(menu)
 
         # Add 'was renamed from' actions for unknown files
         t, path = selrows[0]
@@ -138,9 +176,9 @@ class WctxActions(QObject):
 
         # Add restart merge actions for resolved files
         if alltypes & frozenset('u'):
-            f = make(_('Restart Merge...'), resolve, frozenset('u'))
+            f = make(_('Restart Mer&ge'), resolve, frozenset('u'))
             files = [f for t, f in selrows if 'u' in t]
-            rmenu = QMenu(_('Restart merge with'), self.parent())
+            rmenu = QMenu(_('Restart Merge &with'), self.parent())
             for tool in hglib.mergetools(repo.ui):
                 def mkaction(rtool):
                     a = rmenu.addAction(hglib.tounicode(rtool))
@@ -149,6 +187,12 @@ class WctxActions(QObject):
             menu.addSeparator()
             menu.addMenu(rmenu)
         return menu
+
+    @pyqtSlot(QAction)
+    def _runCustomCommandByMenu(self, action):
+        files = [wfile for t, wfile in self.selrows if t & action._filetypes]
+        self.runCustomCommandRequested.emit(
+            str(action.data().toString()), files)
 
     def runAction(self):
         'run wrapper for all action methods'
@@ -232,7 +276,7 @@ def opensubrepo(parent, ui, repo, files):
     for filename in files:
         path = os.path.join(repo.root, filename)
         if os.path.isdir(path):
-            parent.linkActivated.emit(u'subrepo:'+hglib.tounicode(path))
+            parent.linkActivated.emit(u'repo:' + hglib.tounicode(path))
         else:
             QMessageBox.warning(parent,
                 _("Cannot open subrepository"),
@@ -245,7 +289,7 @@ def terminal(parent, ui, repo, files):
     for filename in files:
         root = repo.wjoin(filename)
         if os.path.isdir(root):
-            qtlib.openshell(root, filename)
+            qtlib.openshell(root, filename, repo.ui)
 
 def viewmissing(parent, ui, repo, files):
     base, _ = visdiff.snapshot(repo, files, repo['.'])
@@ -363,16 +407,11 @@ def delete(parent, ui, repo, files):
     return True
 
 def copy(parent, ui, repo, files):
+    from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    wfile = repo.wjoin(files[0])
-    fd = QFileDialog(parent)
-    fname = fd.getSaveFileName(parent, _('Copy file to'), wfile)
-    if not fname:
-        return False
-    fname = hglib.fromunicode(fname)
-    wfiles = [wfile, fname]
-    opts = {'force': True}  # existing file is already checked by QFileDialog
-    commands.copy(ui, repo, *wfiles, **opts)
+    dlg = RenameDialog(ui, files, parent, iscopy=True)
+    dlg.finished.connect(dlg.deleteLater)
+    dlg.exec_()
     return True
 
 def rename(parent, ui, repo, files):
@@ -408,7 +447,7 @@ def resolve_with(tool, repo, files):
     return True
 
 def check(parent, ui, repo, files):
-    parent.tv.model().check(files)
+    parent.tv.model().check(files, True)
     return True
 
 def uncheck(parent, ui, repo, files):

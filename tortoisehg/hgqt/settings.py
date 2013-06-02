@@ -9,7 +9,8 @@ import os
 
 from mercurial import ui, util, error, extensions, scmutil, phases
 
-from tortoisehg.util import hglib, settings, paths, wconfig, i18n
+from tortoisehg.util import hglib, paths, wconfig, i18n, editor
+from tortoisehg.util import terminal
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
 
@@ -436,7 +437,7 @@ def genEditCombo(opts, defaults=[]):
 def genIntEditCombo(opts):
     'EditCombo, only allows integer values'
     opts['canedit'] = True
-    opts['validator'] = QIntValidator()
+    opts['validator'] = QIntValidator(None)  # missing parent=None on PyQt4.6
     return SettingsCombo(**opts)
 
 def genLineEditBox(opts):
@@ -465,6 +466,11 @@ def genDeferredCombo(opts, func):
     opts['defer'] = func
     opts['nohist'] = True
     return SettingsCombo(**opts)
+
+def genEditableDeferredCombo(opts, func):
+    'Values retrieved from a function at popup time'
+    opts['canedit'] = True
+    return genDeferredCombo(opts, func)
 
 def genFontEdit(opts):
     return FontEntry(**opts)
@@ -498,6 +504,12 @@ def findDiffTools():
 
 def findMergeTools():
     return hglib.mergetools(ui.ui())
+
+def findEditors():
+    return editor.findeditors(ui.ui())
+
+def findTerminals():
+    return terminal.findterminals(ui.ui())
 
 def genCheckBox(opts):
     opts['nohist'] = True
@@ -547,12 +559,14 @@ INFO = (
           'section of your Mercurial configuration files.  If left '
           'unspecified, TortoiseHg will use the selected merge tool. '
           'Failing that it uses the first applicable tool it finds.')),
-    _fi(_('Visual Editor'), 'tortoisehg.editor', genEditCombo,
-        _('Specify the visual editor used to view files.  Format:<br>'
-          'myeditor -flags [$FILE --num=$LINENUM][--search $SEARCH]<br><br>'
-          'See <a href="%s">OpenAtLine</a>'
-          % 'http://bitbucket.org/tortoisehg/thg/wiki/OpenAtLine')),
-    _fi(_('Shell'), 'tortoisehg.shell', genEditCombo,
+    _fi(_('Visual Editor'), 'tortoisehg.editor',
+        (genEditableDeferredCombo, findEditors),
+        _('Specify visual editor, as described in the [editor-tools] '
+          'section of your Mercurial configuration files.  If left '
+          'unspecified, TortoiseHg will use the first applicable tool '
+          'it finds.')),
+    _fi(_('Shell'), 'tortoisehg.shell',
+        (genEditableDeferredCombo, findTerminals),
         _('Specify the command to launch your preferred terminal shell '
           'application. If the value includes the string %(reponame)s, the '
           'name of the repository will be substituted in place of '
@@ -623,6 +637,10 @@ INFO = (
           'the changes are colored green for merge, red for '
           'non-trivial parents, black for normal. '
           'Default: False')),
+    _fi(_('Full Authorname'), 'tortoisehg.fullauthorname', genBoolRBGroup,
+        _('Show full authorname in Logview. If not enabled, '
+          'only a short part, usually name without email is shown. '
+          'Default: False')),
     _fi(_('Task Tabs'), 'tortoisehg.tasktabs', (genDefaultCombo,
          ['east', 'west', 'off']),
         _('Show tabs along the side of the bottom half of each repo '
@@ -673,6 +691,11 @@ INFO = (
         '<li><b>revision</b>: Push the changes in the current branch '
         '<i><u>up to</u> the current revision</i>.</ul><p>'
         'Default: all')),
+    _fi(_('Confirm Push'), 'tortoisehg.confirmpush', genBoolRBGroup,
+        _('Determines if TortoiseHg should show a confirmation dialog '
+          'before pushing changesets. '
+          'If False, push will be performed without any confirmation dialog. '
+          'Default: True')),
     _fi(_('Activate Bookmarks'), 'tortoisehg.activatebookmarks', (genDefaultCombo,
         ['auto', 'prompt', 'never']),
         _('Select when TortoiseHg will show a prompt to activate a bookmark '
@@ -867,10 +890,13 @@ INFO = (
           'Default: False')),
     _fi(_('MQ Git Format'), 'mq.git', (genDefaultCombo,
         ['auto', 'keep', 'yes', 'no']),
-     _("If set to 'keep', mq will obey the [diff] section configuration while"
+     _("When set to 'auto', mq will automatically use git patches when required"
+       " to avoid losing changes to file modes, copy records or binary files."
+       " If set to 'keep', mq will obey the [diff] section configuration while"
        " preserving existing git patches upon qrefresh. If set to 'yes' or"
        " 'no', mq will override the [diff] section and always generate git or"
-       " regular patches, possibly losing data in the second case.")),
+       " regular patches, possibly losing data in the second case."
+       " Default: auto")),
     _fi(_('No Dates'), 'diff.nodates', genBoolRBGroup,
         _('Do not include modification dates in diff headers. '
           'Default: False')),
@@ -1045,6 +1071,10 @@ class SettingsDialog(QDialog):
                            'view is readonly.'), parent=self)
             print 'Please install http://code.google.com/p/iniparse/'
 
+        if not focus:
+            focus = QSettings().value('settings/lastpage', 'log').toString()
+        focus = unicode(focus)
+
         layout = QVBoxLayout()
         self.setLayout(layout)
 
@@ -1061,6 +1091,7 @@ class SettingsDialog(QDialog):
                 return hglib.tounicode(name)
             return _('User')
 
+        self._activeformidx = configrepo and CONF_REPO or CONF_GLOBAL
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
         utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
@@ -1105,8 +1136,8 @@ class SettingsDialog(QDialog):
         self.bb = bb
 
         self._restartreqs = set()
-
-        self.conftabs.setCurrentIndex(configrepo and CONF_REPO or CONF_GLOBAL)
+        self.conftabs.setCurrentIndex(self._activeformidx)
+        self.conftabs.currentChanged.connect(self._currentFormChanged)
 
     def isDirty(self):
         return util.any(self.conftabs.widget(i).isDirty()
@@ -1143,6 +1174,7 @@ class SettingsDialog(QDialog):
         self.applyChanges()
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
+        s.setValue('settings/lastpage', self._getactivepagename())
         s.sync()
         QDialog.accept(self)
 
@@ -1151,8 +1183,23 @@ class SettingsDialog(QDialog):
             return
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
+        s.setValue('settings/lastpage', self._getactivepagename())
         s.sync()
         QDialog.reject(self)
+
+    def _getactivepagename(self):
+        if self._activeformidx is None:
+            return ''
+        activeform = self.conftabs.widget(self._activeformidx)
+        if not activeform:
+            return ''
+        return activeform._activepagename
+
+    def _currentFormChanged(self, idx):
+        activepagename = self._getactivepagename()
+        if activepagename:
+            self.conftabs.widget(idx).focusPage(activepagename)
+        self._activeformidx = idx
 
 class SettingsForm(QWidget):
     """Widget for each settings file"""
@@ -1193,7 +1240,7 @@ class SettingsForm(QWidget):
         tophbox.addWidget(reload)
 
         bothbox = QHBoxLayout()
-        layout.addLayout(bothbox, stretch=8)
+        layout.addLayout(bothbox, 8)
         pageList = QListWidget()
         pageList.setResizeMode(QListView.Fixed)
         stack = QStackedWidget()
@@ -1208,7 +1255,7 @@ class SettingsForm(QWidget):
 
         desctext = QTextBrowser()
         desctext.setOpenExternalLinks(True)
-        layout.addWidget(desctext, stretch=2)
+        layout.addWidget(desctext, 2)
         self.desctext = desctext
 
         self.settings = QSettings()
@@ -1227,10 +1274,17 @@ class SettingsForm(QWidget):
             pageList.addItem(item)
 
         self.refresh()
-        self.focusField(focus or 'ui.merge')
+
+        if not self.focusField(focus):
+            # The selected setting may not exist
+            # (e.g. if an extension has been disabled)
+            self.pageList.setCurrentRow(0)
 
     @pyqtSlot(int)
     def activatePage(self, index):
+        if index >= 0:
+            self._activepagename = unicode(INFO[index][0]['name'])
+
         stackindex = self.pageListIndexToStack.get(index, -1)
         if stackindex >= 0:
             self.stack.setCurrentIndex(stackindex)
@@ -1331,15 +1385,31 @@ class SettingsForm(QWidget):
                 return
         self.refresh()
 
+    def focusPage(self, focuspage):
+        'Set change page to focuspage'
+        for i, (meta, info) in enumerate(INFO):
+            if meta['name'] == focuspage:
+                self._activepagename = meta['name']
+                self.pageList.setCurrentRow(i)
+                QTimer.singleShot(0, lambda:
+                    self.activatePage(i))
+                return True
+        return False
+
     def focusField(self, focusfield):
         'Set page and focus to requested datum'
+        if not focusfield:
+            return False
+        if focusfield.find('.') < 0:
+            return self.focusPage(focusfield)
         for i, (meta, info) in enumerate(INFO):
             for n, e in enumerate(info):
                 if e.cpath == focusfield:
                     self.pageList.setCurrentRow(i)
                     QTimer.singleShot(0, lambda:
                             self.pages[meta['name']][2][n].setFocus())
-                    return
+                    return True
+        return False
 
     def fillFrame(self, info):
         widgets = []

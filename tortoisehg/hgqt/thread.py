@@ -1,4 +1,4 @@
-# thread.py - A seprated thread to run Mercurial command
+# thread.py - A separate thread to run Mercurial commands
 #
 # Copyright 2009 Steve Borho <steve@borho.org>
 # Copyright 2010 Yuki KODAMA <endflow.net@gmail.com>
@@ -6,17 +6,16 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
 import Queue
 import time
-import urllib2
+import urllib2, urllib
 import socket
 import errno
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util, error
+from mercurial import util, error, subrepo
 from mercurial import ui as uimod
 
 from tortoisehg.util import thread2, hglib
@@ -24,6 +23,12 @@ from tortoisehg.hgqt.i18n import _, localgettext
 from tortoisehg.hgqt import qtlib
 
 local = localgettext()
+
+try:
+    _InterventionRequired = error.InterventionRequired
+except AttributeError:  # hg<2.6
+    class _InterventionRequired(Exception):
+        pass
 
 class DataWrapper(object):
     def __init__(self, data):
@@ -266,8 +271,20 @@ class CmdThread(QThread):
 
             for k, v in ui.configitems('defaults'):
                 ui.setconfig('defaults', k, '')
+            # disable worker because it only works in main thread:
+            #   signal.signal(signal.SIGINT, signal.SIG_IGN)
+            #   ValueError: signal only works in main thread
+            ui.setconfig('worker', 'numcpus', 1)
             self.ret = 255
             self.ret = hglib.dispatch(ui, self.cmdline) or 0
+        except subrepo.SubrepoAbort, e:
+            errormsg = str(e)
+            label = 'ui.error'
+            if e.subrepo:
+                label += ' subrepo=%s' % urllib.quote(e.subrepo)
+            ui.write_err(local._('abort: ') + errormsg + '\n', label=label)
+            if e.hint:
+                ui.write_err(local._('hint: ') + str(e.hint) + '\n', label=label)
         except util.Abort, e:
             ui.write_err(local._('abort: ') + str(e) + '\n')
             if e.hint:
@@ -312,6 +329,14 @@ class CmdThread(QThread):
         except error.LockUnavailable, inst:
             ui.warn(local._("abort: could not lock %s: %s\n") %
                 (inst.desc or inst.filename, inst.strerror))
+        except error.CommandError, inst:
+            if inst.args[0]:
+                ui.warn(local._("hg %s: %s\n") % (inst.args[0], inst.args[1]))
+            else:
+                ui.warn(local._("hg: %s\n") % inst.args[1])
+        except error.OutOfBandError, inst:
+            ui.warn(local._("abort: remote error:\n"))
+            ui.warn(''.join(inst.args))
         except error.RepoError, inst:
             ui.warn(local._("abort: %s!\n") % inst)
         except error.ResponseError, inst:
@@ -324,6 +349,11 @@ class CmdThread(QThread):
                 ui.warn("\n%r\n" % util.ellipsis(inst.args[1]))
         except error.RevlogError, inst:
             ui.warn(local._("abort: %s!\n") % inst)
+        except error.UnknownCommand, inst:
+            ui.warn(local._("hg: unknown command '%s'\n") % inst.args[0])
+        except _InterventionRequired, inst:
+            ui.warn("%s\n" % inst)
+            self.ret = 1
         except socket.error, inst:
             ui.warn(local._("abort: %s!\n") % str(inst))
         except IOError, inst:
@@ -351,10 +381,8 @@ class CmdThread(QThread):
             else:
                 ui.warn(local._("abort: %s\n") % inst.strerror)
         except Exception, inst:
-            if 'THGDEBUG' in os.environ:
-                import traceback
-                traceback.print_exc()
             ui.write_err(str(inst) + '\n')
+            raise
         except KeyboardInterrupt:
             self.ret = -1
 

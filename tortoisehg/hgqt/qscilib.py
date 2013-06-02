@@ -130,7 +130,19 @@ class Scintilla(QsciScintilla):
         self.setWrapVisualFlags(QsciScintilla.WrapFlagByBorder)
         self.textChanged.connect(self._resetfindcond)
         self._resetfindcond()
+        self.highlightLines = set()
+        self._setMultipleSelectionOptions()
         unbindConflictedKeys(self)
+
+    def _setMultipleSelectionOptions(self):
+        if hasattr(QsciScintilla, 'SCI_SETMULTIPLESELECTION'):
+            self.SendScintilla(QsciScintilla.SCI_SETMULTIPLESELECTION, True)
+            self.SendScintilla(QsciScintilla.SCI_SETADDITIONALSELECTIONTYPING,
+                               True)
+            self.SendScintilla(QsciScintilla.SCI_SETMULTIPASTE,
+                               QsciScintilla.SC_MULTIPASTE_EACH)
+            self.SendScintilla(QsciScintilla.SCI_SETVIRTUALSPACEOPTIONS,
+                               QsciScintilla.SCVS_RECTANGULARSELECTION)
 
     def read(self, f):
         result = super(Scintilla, self).read(f)
@@ -179,53 +191,53 @@ class Scintilla(QsciScintilla):
         else:
             self._stdMenu.clear()
         if not self.isReadOnly():
-            a = self._stdMenu.addAction(_('Undo'), self.undo)
+            a = self._stdMenu.addAction(_('&Undo'), self.undo)
             a.setShortcuts(QKeySequence.Undo)
             a.setEnabled(self.isUndoAvailable())
-            a = self._stdMenu.addAction(_('Redo'), self.redo)
+            a = self._stdMenu.addAction(_('&Redo'), self.redo)
             a.setShortcuts(QKeySequence.Redo)
             a.setEnabled(self.isRedoAvailable())
             self._stdMenu.addSeparator()
-            a = self._stdMenu.addAction(_('Cut'), self.cut)
+            a = self._stdMenu.addAction(_('Cu&t'), self.cut)
             a.setShortcuts(QKeySequence.Cut)
             a.setEnabled(self.hasSelectedText())
-        a = self._stdMenu.addAction(_('Copy'), self.copy)
+        a = self._stdMenu.addAction(_('&Copy'), self.copy)
         a.setShortcuts(QKeySequence.Copy)
         a.setEnabled(self.hasSelectedText())
         if not self.isReadOnly():
-            a = self._stdMenu.addAction(_('Paste'), self.paste)
+            a = self._stdMenu.addAction(_('&Paste'), self.paste)
             a.setShortcuts(QKeySequence.Paste)
-            a = self._stdMenu.addAction(_('Delete'), self.removeSelectedText)
+            a = self._stdMenu.addAction(_('&Delete'), self.removeSelectedText)
             a.setShortcuts(QKeySequence.Delete)
             a.setEnabled(self.hasSelectedText())
         self._stdMenu.addSeparator()
-        a = self._stdMenu.addAction(_('Select All'), self.selectAll)
+        a = self._stdMenu.addAction(_('Select &All'), self.selectAll)
         a.setShortcuts(QKeySequence.SelectAll)
         self._stdMenu.addSeparator()
         qsci = QsciScintilla
-        wrapmenu = QMenu(_('Wrap'), self)
-        for name, mode in ((_('None', 'wrap mode'), qsci.WrapNone),
-                           (_('Word'), qsci.WrapWord),
-                           (_('Character'), qsci.WrapCharacter)):
+        wrapmenu = QMenu(_('&Wrap'), self)
+        for name, mode in ((_('&None', 'wrap mode'), qsci.WrapNone),
+                           (_('&Word'), qsci.WrapWord),
+                           (_('&Character'), qsci.WrapCharacter)):
             def mkaction(n, m):
                 a = wrapmenu.addAction(n)
                 a.setCheckable(True)
                 a.setChecked(self.wrapMode() == m)
                 a.triggered.connect(lambda: self.setWrapMode(m))
             mkaction(name, mode)
-        wsmenu = QMenu(_('Whitespace'), self)
-        for name, mode in ((_('Visible'), qsci.WsVisible),
-                           (_('Invisible'), qsci.WsInvisible),
-                           (_('AfterIndent'), qsci.WsVisibleAfterIndent)):
+        wsmenu = QMenu(_('White&space'), self)
+        for name, mode in ((_('&Visible'), qsci.WsVisible),
+                           (_('&Invisible'), qsci.WsInvisible),
+                           (_('&AfterIndent'), qsci.WsVisibleAfterIndent)):
             def mkaction(n, m):
                 a = wsmenu.addAction(n)
                 a.setCheckable(True)
                 a.setChecked(self.whitespaceVisibility() == m)
                 a.triggered.connect(lambda: self.setWhitespaceVisibility(m))
             mkaction(name, mode)
-        vsmenu = QMenu(_('EOL Visibility'), self)
-        for name, mode in ((_('Visible'), True),
-                           (_('Invisible'), False)):
+        vsmenu = QMenu(_('EOL &Visibility'), self)
+        for name, mode in ((_('&Visible'), True),
+                           (_('&Invisible'), False)):
             def mkaction(n, m):
                 a = vsmenu.addAction(n)
                 a.setCheckable(True)
@@ -236,30 +248,30 @@ class Scintilla(QsciScintilla):
         tabindentsmenu = None
         acmenu = None
         if not self.isReadOnly():
-            eolmodemenu = QMenu(_('EOL Mode'), self)
-            for name, mode in ((_('Windows'), qsci.EolWindows),
-                               (_('Unix'), qsci.EolUnix),
-                               (_('Mac'), qsci.EolMac)):
+            eolmodemenu = QMenu(_('EOL &Mode'), self)
+            for name, mode in ((_('&Windows'), qsci.EolWindows),
+                               (_('&Unix'), qsci.EolUnix),
+                               (_('&Mac'), qsci.EolMac)):
                 def mkaction(n, m):
                     a = eolmodemenu.addAction(n)
                     a.setCheckable(True)
                     a.setChecked(self.eolMode() == m)
                     a.triggered.connect(lambda: self.setEolMode(m))
                 mkaction(name, mode)
-            tabindentsmenu = QMenu(_('TAB inserts'), self)
-            for name, mode in ((_('Auto'), -1),
-                               (_('TAB'), True),
-                               (_('Spaces'), False)):
+            tabindentsmenu = QMenu(_('&TAB Inserts'), self)
+            for name, mode in ((_('&Auto'), -1),
+                               (_('&TAB'), True),
+                               (_('&Spaces'), False)):
                 def mkaction(n, m):
                     a = tabindentsmenu.addAction(n)
                     a.setCheckable(True)
                     a.setChecked(self.indentationsUseTabs() == m or \
-                        (self.autoUseTabs and n == 'Auto'))
+                        (self.autoUseTabs and m == -1))
                     a.triggered.connect(lambda: self.setIndentationsUseTabs(m))
                 mkaction(name, mode)
-            acmenu = QMenu(_('Auto-Complete'), self)
-            for name, value in ((_('Enable'), 2),
-                                (_('Disable'), -1)):
+            acmenu = QMenu(_('&Auto-Complete'), self)
+            for name, value in ((_('&Enable'), 2),
+                                (_('&Disable'), -1)):
                 def mkaction(n, v):
                     a = acmenu.addAction(n)
                     a.setCheckable(True)
@@ -267,7 +279,7 @@ class Scintilla(QsciScintilla):
                     a.triggered.connect(lambda: self.setAutoCompletionThreshold(v))
                 mkaction(name, value)
 
-        editoptsmenu = QMenu(_('Editor Options'), self)
+        editoptsmenu = QMenu(_('&Editor Options'), self)
         editoptsmenu.addMenu(wrapmenu)
         editoptsmenu.addSeparator()
         editoptsmenu.addMenu(wsmenu)
@@ -352,12 +364,15 @@ class Scintilla(QsciScintilla):
         for m in pat.finditer(unicode(self.text()).encode('utf-8')):
             self.SendScintilla(self.SCI_INDICATORFILLRANGE,
                                m.start(), m.end() - m.start())
+            line = self.lineIndexFromPosition(m.start())[0]
+            self.highlightLines.add(line)
 
     @pyqtSlot()
     def clearHighlightText(self):
         self.SendScintilla(self.SCI_SETINDICATORCURRENT,
                            self._highlightIndicator)
         self.SendScintilla(self.SCI_INDICATORCLEARRANGE, 0, self.length())
+        self.highlightLines.clear()
 
     @util.propertycache
     def _highlightIndicator(self):
@@ -386,6 +401,61 @@ class Scintilla(QsciScintilla):
         if self.autoUseTabs and self.lines():
             tabs = findTabIndentsInLines(hglib.fromunicode(self.text()))
         super(Scintilla, self).setIndentationsUseTabs(tabs)
+
+    def lineNearPoint(self, point):
+        """Return the closest line to the pixel position; similar to lineAt(),
+        but returns valid line number even if no character fount at point"""
+        # lineAt() uses the strict request, SCI_POSITIONFROMPOINTCLOSE
+        chpos = self.SendScintilla(self.SCI_POSITIONFROMPOINT,
+                                   point.x(), point.y())
+        return self.SendScintilla(self.SCI_LINEFROMPOSITION, chpos)
+
+    # compability mode with QScintilla from Ubuntu 10.04
+    if not hasattr(QsciScintilla, 'HiddenIndicator'):
+        HiddenIndicator = QsciScintilla.INDIC_HIDDEN
+    if not hasattr(QsciScintilla, 'PlainIndicator'):
+        PlainIndicator = QsciScintilla.INDIC_PLAIN
+    if not hasattr(QsciScintilla, 'StrikeIndicator'):
+        StrikeIndicator = QsciScintilla.INDIC_STRIKE
+
+    if not hasattr(QsciScintilla, 'indicatorDefine'):
+        def indicatorDefine(self, style, indicatorNumber=-1):
+            # compatibility layer allows only one indicator to be defined
+            if indicatorNumber == -1:
+                indicatorNumber = 1
+            self.SendScintilla(self.SCI_INDICSETSTYLE, indicatorNumber, style)
+            return indicatorNumber
+
+    if not hasattr(QsciScintilla, 'setIndicatorDrawUnder'):
+        def setIndicatorDrawUnder(self, under, indicatorNumber):
+            self.SendScintilla(self.SCI_INDICSETUNDER, indicatorNumber, under)
+
+    if not hasattr(QsciScintilla, 'setIndicatorForegroundColor'):
+        def setIndicatorForegroundColor(self, color, indicatorNumber):
+            self.SendScintilla(self.SCI_INDICSETFORE, indicatorNumber, color)
+            self.SendScintilla(self.SCI_INDICSETALPHA, indicatorNumber,
+                               color.alpha())
+
+    if not hasattr(QsciScintilla, 'clearIndicatorRange'):
+        def clearIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo,
+                                indicatorNumber):
+            start = self.positionFromLineIndex(lineFrom, indexFrom)
+            finish = self.positionFromLineIndex(lineTo, indexTo)
+
+            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber)
+            self.SendScintilla(self.SCI_INDICATORCLEARRANGE,
+                               start, finish - start)
+
+    if not hasattr(QsciScintilla, 'fillIndicatorRange'):
+        def fillIndicatorRange(self, lineFrom, indexFrom, lineTo, indexTo,
+                               indicatorNumber):
+            start = self.positionFromLineIndex(lineFrom, indexFrom)
+            finish = self.positionFromLineIndex(lineTo, indexTo)
+
+            self.SendScintilla(self.SCI_SETINDICATORCURRENT, indicatorNumber)
+            self.SendScintilla(self.SCI_INDICATORFILLRANGE,
+                               start, finish - start)
+
 
 class SearchToolBar(QToolBar):
     conditionChanged = pyqtSignal(unicode, bool, bool)
@@ -593,7 +663,9 @@ def findTabIndentsInLines(lines, linestocheck=100):
 def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
-    dialog.setWindowFlags(dialog.windowFlags() & ~Qt.WindowContextHelpButtonHint | Qt.WindowMaximizeButtonHint)
+    dialog.setWindowFlags(dialog.windowFlags()
+                          & ~Qt.WindowContextHelpButtonHint
+                          | Qt.WindowMaximizeButtonHint)
     dialog.setWindowTitle(filename)
     dialog.setLayout(QVBoxLayout())
     editor = Scintilla()
@@ -611,6 +683,9 @@ def fileEditor(filename, **opts):
     searchbar.conditionChanged.connect(editor.highlightText)
     searchbar.hide()
     def showsearchbar():
+        text = editor.selectedText()
+        if text:
+            searchbar.setPattern(text)
         searchbar.show()
         searchbar.setFocus(Qt.OtherFocusReason)
     qtlib.newshortcutsforstdkey(QKeySequence.Find, dialog, showsearchbar)

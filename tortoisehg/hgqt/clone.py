@@ -73,12 +73,8 @@ class CloneDialog(QDialog):
         grid.addWidget(self.dest_combo, 1, 1)
         grid.addWidget(self.dest_btn, 1, 2)
 
-        # workaround for QComboBox to test edited text case-sensitively
-        # see src/gui/widgets/qcombobox.cpp:
-        # QComboBoxPrivate::_q_editingFinished() and matchFlags()
-        for name in ('src_combo', 'dest_combo'):
-            w = getattr(self, name).lineEdit()
-            w.completer().setCaseSensitivity(Qt.CaseSensitive)
+        for combo in (self.src_combo, self.dest_combo):
+            qtlib.allowCaseChangingInput(combo)
 
         s = QSettings()
         self.shist = s.value('clone/source').toStringList()
@@ -221,7 +217,7 @@ class CloneDialog(QDialog):
         rev = opts.get('rev')
         if rev:
             self.rev_chk.setChecked(True)
-            self.rev_text.setText(hglib.tounicode(', '.join(rev)))
+            self.rev_text.setText(hglib.tounicode(rev))
         self.noupdate_chk.setChecked(bool(opts.get('noupdate')))
         self.pproto_chk.setChecked(bool(opts.get('pull')))
         self.uncomp_chk.setChecked(bool(opts.get('uncompressed')))
@@ -260,12 +256,9 @@ class CloneDialog(QDialog):
         rev = hglib.fromunicode(self.rev_text.text().trimmed())
         startrev = hglib.fromunicode(self.startrev_text.text().trimmed())
         if self.qclone_chk.isChecked():
-            qclonedir = hglib.fromunicode(self.qclone_txt.text().trimmed())
-            if qclonedir == '':
-                qclonedir = '.hg\patches'
-                self.qclone_txt.setText(qclonedir)
             cmdline = ['qclone']
-            if not qclonedir in ['.hg\patches', '.hg/patches', '']:
+            qclonedir = hglib.fromunicode(self.qclone_txt.text().trimmed())
+            if qclonedir:
                 cmdline += ['--patches', qclonedir]
         else:
             cmdline = ['clone']
@@ -422,19 +415,11 @@ class CloneDialog(QDialog):
     def onBrowseQclone(self):
         FD = QFileDialog
         caption = _("Select patch folder")
-        upath = FD.getExistingDirectory(self, caption, \
-            self.qclone_txt.text(), QFileDialog.ShowDirsOnly)
+        upatchroot = os.path.join(unicode(self.src_combo.currentText()), '.hg')
+        upath = FD.getExistingDirectory(self, caption, upatchroot,
+                                        QFileDialog.ShowDirsOnly)
         if upath:
-            path = hglib.fromunicode(upath).replace('/', os.sep)
-            src = hglib.fromunicode(self.src_combo.currentText())
-            if not path.startswith(src):
-                qtlib.ErrorMsgBox('TortoiseHg QClone',
-                    _('The selected patch folder is not'
-                      ' under the source repository.'),
-                    '<p>src = %s</p><p>path = %s</p>' % (src, path))
-                return
-            path = path.replace(src + os.sep, '')
-            self.qclone_txt.setText(QDir.toNativeSeparators(hglib.tounicode(path)))
+            self.qclone_txt.setText(QDir.toNativeSeparators(upath))
             self.qclone_txt.setFocus()
         self.composeCommand()
 

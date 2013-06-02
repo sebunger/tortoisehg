@@ -26,9 +26,9 @@ class RenameDialog(QDialog):
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, ui, pats, parent=None, **opts):
+    def __init__(self, ui, pats, parent=None, iscopy=False):
         super(RenameDialog, self).__init__(parent)
-        self.iscopy = (opts.get('alias') == 'copy')
+        self.iscopy = iscopy
         # pats: local; src, dest: unicode
         src, dest = self.init_data(ui, pats)
         self.init_view(src, dest)
@@ -236,9 +236,7 @@ class RenameDialog(QDialog):
         else:
             cmdline = ['rename']
         cmdline += ['-R', self.repo.root]
-        cmdline.append('-v')
-        if self.isCaseFoldingOnWin():
-            cmdline.append('-A')
+        cmdline.append('-vf')
         cmdline.append(src)
         cmdline.append(dest)
         return cmdline
@@ -276,31 +274,13 @@ class RenameDialog(QDialog):
                     defaultbutton=QMessageBox.No)
             if not res:
                 return
+        if self.isCaseFoldingOnWin() and self.copy_chk.isChecked():
+            qtlib.ErrorMsgBox(self.errTitle,
+                _('Cannot do a pure casefolding copy on Windows'))
+            return
 
         cmdline = self.compose_command(src, dest)
         self.show_command(cmdline)
-        if self.isCaseFoldingOnWin():
-            # We do the rename ourselves if it's a pure casefolding
-            # action on Windows. Because there is no way to make Hg
-            # do 'hg mv foo Foo' correctly there.
-            if self.copy_chk.isChecked():
-                qtlib.ErrorMsgBox(self.errTitle,
-                        _('Cannot do a pure casefolding copy on Windows'))
-                return
-            else:
-                try:
-                    targetdir = os.path.dirname(fulldest)
-                    if not os.path.isdir(targetdir):
-                        os.makedirs(targetdir)
-                    os.rename(fullsrc, fulldest)
-                except (OSError, IOError), inst:
-                    if self.copy_chk.isChecked():
-                        txt = _('The following error was caught while copying:')
-                    else:
-                        txt = _('The following error was caught while renaming:')
-                    qtlib.ErrorMsgBox(self.errTitle, txt,
-                            hglib.tounicode(str(inst)))
-                    return
         self.cmd.run(cmdline)
 
     def detail_clicked(self):
@@ -351,4 +331,5 @@ class RenameDialog(QDialog):
         s.setValue('rename/geom', self.saveGeometry())
 
 def run(ui, *pats, **opts):
-    return RenameDialog(ui, pats, **opts)
+    iscopy = (opts.get('alias') == 'copy')
+    return RenameDialog(ui, pats, iscopy=iscopy)

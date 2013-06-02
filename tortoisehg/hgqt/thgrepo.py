@@ -13,6 +13,7 @@ import sys
 import shutil
 import tempfile
 import re
+import time
 
 from PyQt4.QtCore import *
 
@@ -51,6 +52,8 @@ def repository(_ui=None, path='', create=False, bundle=None):
             _ui = uimod.ui()
         try:
             repo = hg.repository(_ui, path, create)
+            # get unfiltered repo in version safe manner
+            repo = getattr(repo, 'unfiltered', lambda: repo)()
             repo.__class__ = _extendrepo(repo)
             repo._pyqtobj = ThgRepoWrapper(repo)
             _repocache[path] = repo
@@ -84,6 +87,7 @@ class ThgRepoWrapper(QObject):
         repo.workingDirectoryChanged = self.workingDirectoryChanged
         repo.workingBranchChanged = self.workingBranchChanged
         self.recordState()
+        self._uimtime = time.time()
 
         monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'always')
         if isinstance(repo, bundlerepo.bundlerepository):
@@ -94,19 +98,14 @@ class ThgRepoWrapper(QObject):
             self.watcher = QFileSystemWatcher(self)
             self.watcher.addPath(hglib.tounicode(repo.path))
             self.watcher.addPath(hglib.tounicode(repo.path + '/store'))
-            self.watcher.directoryChanged.connect(self.onDirChange)
-            self.watcher.fileChanged.connect(self.onFileChange)
+            self.watcher.directoryChanged.connect(self._pollChanges)
+            self.watcher.fileChanged.connect(self._pollChanges)
             self.addMissingPaths()
 
-    @pyqtSlot(QString)
-    def onDirChange(self, directory):
-        'Catch any writes to .hg/ folder, most importantly lock files'
-        self.pollStatus()
-        self.addMissingPaths()
-
-    @pyqtSlot(QString)
-    def onFileChange(self, file):
-        'Catch writes or deletions of files we are interested in'
+    @pyqtSlot()
+    def _pollChanges(self):
+        '''Catch writes or deletions of files, or writes to .hg/ folder,
+        most importantly lock files'''
         self.pollStatus()
         self.addMissingPaths()
 
@@ -163,7 +162,7 @@ class ThgRepoWrapper(QObject):
             self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
             self._branchmtime = os.path.getmtime(self.repo.join('branch'))
             self._rawbranch = self.repo.opener('branch').read()
-        except EnvironmentError, ValueError:
+        except EnvironmentError:
             self._dirstatemtime = None
             self._branchmtime = None
             self._rawbranch = None
@@ -258,10 +257,11 @@ class ThgRepoWrapper(QObject):
     def _checkuimtime(self):
         'Check for modified config files, or a new .hg/hgrc file'
         try:
-            oldmtime, files = self.repo.uifiles()
-            mtime = [os.path.getmtime(f) for f in files if os.path.isfile(f)]
-            if max(mtime) > oldmtime:
+            files = self.repo.uifiles()[1]
+            mtime = max(os.path.getmtime(f) for f in files if os.path.isfile(f))
+            if mtime > self._uimtime:
                 dbgoutput('config change detected')
+                self._uimtime = mtime
                 self.repo.invalidateui()
                 self.configChanged.emit()
         except (EnvironmentError, ValueError):
@@ -461,6 +461,7 @@ def _extendrepo(repo):
                 heads.extend(nodes)
             return heads
 
+        # TODO: remove _uimtime which is superseded by ThgRepoWrapper._uimtime
         def uifiles(self):
             'Returns latest mtime and complete list of config files'
             return self._uimtime, self._uifiles
@@ -567,13 +568,13 @@ def _extendrepo(repo):
             if 'largefiles' in self.extensions() or 'kbfiles' in self.extensions():
                 path = _kbfregex.sub('', path)
             return path
-        
+
         def bfStandin(self, path):
             return '.kbf/' + path
 
         def lfStandin(self, path):
             return '.hglf/' + path
-        
+
     return thgrepository
 
 _maxchangectxclscache = 10
@@ -600,7 +601,11 @@ def _createchangectxcls(parentcls):
         def sub(self, path):
             srepo = super(thgchangectx, self).sub(path)
             if isinstance(srepo, subrepo.hgsubrepo):
-                srepo._repo.__class__ = _extendrepo(srepo._repo)
+                r = srepo._repo
+                # get unfiltered repo in version safe manner
+                r = getattr(r, 'unfiltered', lambda: r)()
+                r.__class__ = _extendrepo(r)
+                srepo._repo = r
             return srepo
 
         def thgtags(self):
@@ -664,7 +669,7 @@ def _createchangectxcls(parentcls):
                     summary += u' \u2026' # ellipsis ...
 
             return summary
-        
+
         def hasStandin(self, file):
             if 'largefiles' in self._repo.extensions():
                 if self._repo.lfStandin(file) in self.manifest():
@@ -676,10 +681,10 @@ def _createchangectxcls(parentcls):
 
         def isStandin(self, path):
             return self._repo.isStandin(path)
-        
+
         def removeStandin(self, path):
             return self._repo.removeStandin(path)
-        
+
         def findStandin(self, file):
             if 'largefiles' in self._repo.extensions():
                 if self._repo.lfStandin(file) in self.manifest():

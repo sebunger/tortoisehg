@@ -498,12 +498,6 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
             self.patchDiffMessage.setText(_('No patch branch selected'))
             self.patchDiffStack.setCurrentWidget(self.patchDiffMessage)
 
-    def closeEvent(self, event):
-        self.repo.configChanged.disconnect(self.configChanged)
-        self.repo.repositoryChanged.disconnect(self.repositoryChanged)
-        self.repo.workingBranchChanged.disconnect(self.workingBranchChanged)
-        super(PatchBranchWidget, self).closeEvent(event)
-
     def contextMenuEvent(self, event):
         if self.patchlist.geometry().contains(event.pos()):
             self.show_patch_cmenu(event.globalPos())
@@ -512,12 +506,15 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         self.repo.decrementBusyCount()
         self.refresh()
 
+    @pyqtSlot()
     def configChanged(self):
         pass
 
+    @pyqtSlot()
     def repositoryChanged(self):
         self.refresh()
 
+    @pyqtSlot()
     def workingBranchChanged(self):
         self.refresh()
 
@@ -694,10 +691,6 @@ class PatchBranchModel(QAbstractTableModel):
             return QVariant(text)
         elif role == Qt.ForegroundRole:
             return gnode.node.color
-            if ctx.thgpbunappliedpatch():
-                return QColor(UNAPPLIED_PATCH_COLOR)
-            if column == 'Name':
-                return QVariant(QColor(self.namedbranch_color(ctx.branch())))
         elif role == Qt.DecorationRole:
             if column == 'Graph':
                 return self.graphctx(ctx, gnode)
@@ -843,7 +836,7 @@ class PNewDialog(QDialog):
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon("fileadd"))
         self.setWindowTitle(_('New Patch Branch'))
-        
+
         def AddField(var, label, optional=False):
             hbox = QHBoxLayout()
             SP = QSizePolicy
@@ -854,7 +847,7 @@ class PNewDialog(QDialog):
                 le.setEnabled(False)
                 cb.toggled.connect(le.setEnabled)
                 hbox.addWidget(cb)
-                setattr(self, var+'cb', cb) 
+                setattr(self, var+'cb', cb)
             else:
                 hbox.addWidget(QLabel(label))
             hbox.addWidget(le)
@@ -872,7 +865,7 @@ class PNewDialog(QDialog):
             self.commitButton.setText(_('Commit', 'action button'))
             self.bb = bb
             return bb
-            
+
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
         self.setLayout(layout)
@@ -887,7 +880,7 @@ class PNewDialog(QDialog):
 
     def patchname(self):
         return self.patchnamele.text()
-    
+
     def getCmd(self, cwd):
         cmd = ['pnew', '--cwd', cwd, hglib.fromunicode(self.patchname())]
         optList = [('patchtext','--text'),

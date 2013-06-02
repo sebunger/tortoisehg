@@ -15,18 +15,18 @@ import tempfile
 import re
 import weakref
 
+from mercurial.i18n import _ as hggettext
 from mercurial import commands, extensions, error, util
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib, paths, editor, terminal
 from tortoisehg.hgqt.i18n import _
 from hgext.color import _styles
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-if PYQT_VERSION_STR.split('.') < ['4', '7'] or \
-   QT_VERSION_STR.split('.') < ['4', '6']:
-    sys.stderr.write('TortoiseHg requires Qt 4.6 and PyQt 4.7\n')
+if PYQT_VERSION < 0x40600 or QT_VERSION < 0x40600:
+    sys.stderr.write('TortoiseHg requires Qt 4.6 and PyQt 4.6\n')
     sys.stderr.write('You have Qt %s and PyQt %s\n' %
                      (QT_VERSION_STR, PYQT_VERSION_STR))
     sys.exit()
@@ -58,7 +58,7 @@ def gettempdir():
 def openhelpcontents(url):
     'Open online help, use local CHM file if available'
     if not url.startswith('http'):
-        fullurl = 'http://tortoisehg.org/manual/2.4/' + url
+        fullurl = 'http://tortoisehg.org/manual/2.7/' + url
         # Use local CHM file if it can be found
         if os.name == 'nt' and paths.bin_path:
             chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
@@ -92,8 +92,9 @@ def openfiles(repo, files, parent=None):
     for filename in files:
         openlocalurl(repo.wjoin(filename))
 
-def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
+def editfiles(repo, files, lineno=None, search=None, parent=None):
     if len(files) == 1:
+        # if editing a single file, open in cwd context of that file
         filename = files[0].strip()
         if not filename:
             return
@@ -102,20 +103,55 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
         cwd = os.path.dirname(path)
         files = [os.path.basename(path)]
     else:
+        # else edit in cwd context of repo root
         cwd = repo.root
+
+    toolpath, args, argsln, argssearch = editor.detecteditor(repo, files)
+    if os.path.basename(toolpath) in ('vi', 'vim', 'hgeditor'):
+        res = QMessageBox.critical(parent,
+                    _('No visual editor configured'),
+                    _('Please configure a visual editor.'))
+        from tortoisehg.hgqt.settings import SettingsDialog
+        dlg = SettingsDialog(False, focus='tortoisehg.editor')
+        dlg.exec_()
+        return
+
     files = [util.shellquote(util.localpath(f)) for f in files]
-    editor = repo.ui.config('tortoisehg', 'editor')
     assert len(files) == 1 or lineno == None
-    if not editor:
-        editor = repo.ui.config('tortoisehg', 'editor')
-    if editor:
+
+    cmdline = None
+    if search:
+        assert lineno is not None
+        if argssearch:
+            cmdline = ' '.join([toolpath, argssearch])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+            cmdline = cmdline.replace('$SEARCH', search)
+        elif argsln:
+            cmdline = ' '.join([toolpath, argsln])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+        elif args:
+            cmdline = ' '.join([toolpath, args])
+    elif lineno:
+        if argsln:
+            cmdline = ' '.join([toolpath, argsln])
+            cmdline = cmdline.replace('$LINENUM', str(lineno))
+        elif args:
+            cmdline = ' '.join([toolpath, args])
+    else:
+        if args:
+            cmdline = ' '.join([toolpath, args])
+
+    if cmdline is None:
+        # editor was not specified by editor-tools configuration, fall
+        # back to older tortoisehg.editor OpenAtLine parsing
+        cmdline = ' '.join([toolpath] + files) # default
         try:
             regexp = re.compile('\[([^\]]*)\]')
             expanded = []
             pos = 0
-            for m in regexp.finditer(editor):
-                expanded.append(editor[pos:m.start()-1])
-                phrase = editor[m.start()+1:m.end()-1]
+            for m in regexp.finditer(toolpath):
+                expanded.append(toolpath[pos:m.start()-1])
+                phrase = toolpath[m.start()+1:m.end()-1]
                 pos = m.end()+1
                 if '$LINENUM' in phrase:
                     if lineno is None:
@@ -131,38 +167,38 @@ def editfiles(repo, files, lineno=None, search=None, parent=None, editor=None):
                     phrase = phrase.replace('$FILE', files[0])
                     files = []
                 expanded.append(phrase)
-            expanded.append(editor[pos:])
+            expanded.append(toolpath[pos:])
             cmdline = ' '.join(expanded + files)
         except ValueError, e:
             # '[' or ']' not found
-            cmdline = ' '.join([editor] + files)
+            pass
         except TypeError, e:
             # variable expansion failed
-            cmdline = ' '.join([editor] + files)
-    else:
-        editor = os.environ.get('HGEDITOR') or repo.ui.config('ui', 'editor') \
-                 or os.environ.get('EDITOR', 'vi')
-        cmdline = ' '.join([editor] + files)
-    if os.path.basename(editor) in ('vi', 'vim', 'hgeditor'):
-        res = QMessageBox.critical(parent,
-                    _('No visual editor configured'),
-                    _('Please configure a visual editor.'))
-        from tortoisehg.hgqt.settings import SettingsDialog
-        dlg = SettingsDialog(False, focus='tortoisehg.editor')
-        dlg.exec_()
-        return
+            pass
 
-    cmdline = util.quotecommand(cmdline)
     shell = not (len(cwd) >= 2 and cwd[0:2] == r'\\')
     try:
-        subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
-                         stderr=None, stdout=None, stdin=None, cwd=cwd)
+        if '$FILES' in cmdline:
+            cmdline = cmdline.replace('$FILES', ' '.join(files))
+            cmdline = util.quotecommand(cmdline)
+            subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
+                             stderr=None, stdout=None, stdin=None, cwd=cwd)
+        elif '$FILE' in cmdline:
+            for file in files:
+                cmd = cmdline.replace('$FILE', file)
+                cmd = util.quotecommand(cmd)
+                subprocess.Popen(cmd, shell=shell, creationflags=openflags,
+                                 stderr=None, stdout=None, stdin=None, cwd=cwd)
+        else:
+            # assume filenames were expanded already
+            cmdline = util.quotecommand(cmdline)
+            subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
+                             stderr=None, stdout=None, stdin=None, cwd=cwd)
     except (OSError, EnvironmentError), e:
         QMessageBox.warning(parent,
                 _('Editor launch failure'),
                 u'%s : %s' % (hglib.tounicode(cmdline),
                               hglib.tounicode(str(e))))
-    return False
 
 def savefiles(repo, files, rev, parent=None):
     for curfile in files:
@@ -184,22 +220,24 @@ def savefiles(repo, files, rev, parent=None):
                 commands.cat(repo.ui, repo, curfile, rev=rev,
                              output=hglib.fromunicode(result))
             except (util.Abort, IOError), e:
-                QMessageBox.critical(self, _('Unable to save file'),
+                QMessageBox.critical(parent, _('Unable to save file'),
                                      hglib.tounicode(str(e)))
         finally:
             os.chdir(cwd)
 
-_user_shell = None
-def openshell(root, reponame):
+def openshell(root, reponame, ui=None):
     if not os.path.exists(root):
         WarningMsgBox(
             _('Failed to open path in terminal'),
             _('"%s" is not a valid directory') % hglib.tounicode(root))
         return
-    if _user_shell:
+    shell, args = terminal.detectterminal(ui)
+    if shell:
         cwd = os.getcwd()
         try:
-            shellcmd = _user_shell % {'reponame': reponame}
+            if args:
+                shell = shell + ' ' + util.expandpath(args)
+            shellcmd = shell % {'root': root, 'reponame': reponame}
             os.chdir(root)
             started = QProcess.startDetached(shellcmd)
         finally:
@@ -210,18 +248,6 @@ def openshell(root, reponame):
     else:
         InfoMsgBox(_('No shell configured'),
                    _('A terminal shell must be configured'))
-
-def configureshell(ui):
-    global _user_shell
-    _user_shell = ui.config('tortoisehg', 'shell')
-    if _user_shell:
-        return
-    if sys.platform == 'darwin':
-        return # Terminal.App does not support open-to-folder
-    elif os.name == 'nt':
-        _user_shell = 'cmd.exe /K title %(reponame)s'
-    else:
-        _user_shell = 'xterm -T "%(reponame)s"'
 
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
@@ -255,8 +281,6 @@ thgstylesheet = '* { white-space: pre; font-family: monospace;' \
 tbstylesheet = 'QToolBar { border: 0px }'
 
 def configstyles(ui):
-    configureshell(ui)
-
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
         _styles.update(getattr(ext, 'colortable', {}))
@@ -441,6 +465,14 @@ def descriptionhtmlizer(ui):
 
 _iconcache = {}
 
+if hasattr(QIcon, 'hasThemeIcon'):  # PyQt>=4.7
+    def _findthemeicon(name):
+        if QIcon.hasThemeIcon(name):
+            return QIcon.fromTheme(name)
+else:
+    def _findthemeicon(name):
+        pass
+
 def _findicon(name):
     # TODO: icons should be placed at single location before release
     if os.path.isabs(name):
@@ -466,6 +498,17 @@ _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
                         (QSize(32, 32), '32x32/actions', '.png'),
                         (QSize(24, 24), '24x24/actions', '.png')]
 
+def getallicons():
+    """Get a sorted, unique list of all available icons"""
+    iconset = set()
+    for size, subdir, sfx in _SCALABLE_ICON_PATHS:
+        path = ':/icons/%s' % (subdir)
+        d = QDir(path)
+        d.setNameFilters(['*%s' % sfx])
+        for iconname in d.entryList():
+            iconset.add(unicode(iconname).rsplit('.', 1)[0])
+    return sorted(iconset)
+
 def _findscalableicon(name):
     """Find icon from qrc by using freedesktop-like icon lookup"""
     o = QIcon()
@@ -485,22 +528,14 @@ def geticon(name):
     This searches for the icon from theme, Qt resource or icons directory,
     named as 'name.(svg|png|ico)'.
     """
-    if QIcon.hasThemeIcon(name):
-        return QIcon.fromTheme(name)
-
     try:
         return _iconcache[name]
     except KeyError:
-        _iconcache[name] = (_findscalableicon(name) or _findicon(name)
+        _iconcache[name] = (_findthemeicon(name)
+                            or _findscalableicon(name)
+                            or _findicon(name)
                             or QIcon(':/icons/fallback.svg'))
         return _iconcache[name]
-
-if sys.platform == 'darwin':
-    # On Mac OS X, we do not want icons on menus
-    def getmenuicon(name):
-        return QIcon()
-else:
-    getmenuicon = geticon
 
 
 def getoverlaidicon(base, overlay):
@@ -523,6 +558,19 @@ def getpixmap(name, width=16, height=16):
         pixmap = geticon(name).pixmap(width, height)
     _pixmapcache[key] = pixmap
     return pixmap
+
+def getcheckboxpixmap(state, bgcolor, widget):
+    pix = QPixmap(16,16)
+    painter = QPainter(pix)
+    painter.fillRect(0, 0, 16, 16, bgcolor)
+    option = QStyleOptionButton()
+    style = QApplication.style()
+    option.initFrom(widget)
+    option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
+    option.rect.moveTo(1, 1)
+    option.state |= state
+    style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
+    return pix
 
 class ThgFont(QObject):
     changed = pyqtSignal(QFont)
@@ -693,6 +741,19 @@ def fix_application_font():
     f.setPixelSize(abs(lf.lfHeight))
     QApplication.setFont(f, 'QWidget')
 
+def allowCaseChangingInput(combo):
+    """Allow case-changing input of known combobox item
+
+    QComboBox performs case-insensitive inline completion by default. It's
+    all right, but sadly it implies case-insensitive check for duplicates,
+    i.e. you can no longer enter "Foo" if the combobox contains "foo".
+
+    For details, read QComboBoxPrivate::_q_editingFinished() and matchFlags()
+    of src/gui/widgets/qcombobox.cpp.
+    """
+    assert isinstance(combo, QComboBox) and combo.isEditable()
+    combo.completer().setCaseSensitivity(Qt.CaseSensitive)
+
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
 
@@ -710,10 +771,12 @@ class PMButton(QPushButton):
         icon = expanded and self.minus or self.plus
         self.setIcon(icon)
 
-        def clicked():
-            icon = self.is_expanded() and self.plus or self.minus
-            self.setIcon(icon)
-        self.clicked.connect(clicked)
+        self.clicked.connect(self._toggle_icon)
+
+    @pyqtSlot()
+    def _toggle_icon(self):
+        icon = self.is_expanded() and self.plus or self.minus
+        self.setIcon(icon)
 
     def set_expanded(self, state=True):
         icon = state and self.minus or self.plus
@@ -843,16 +906,65 @@ class LabeledSeparator(QWidget):
 
         self.setLayout(box)
 
+# Strings and regexes used to convert hashes and subrepo paths into links
+_hashregex = re.compile(r'\b[0-9a-fA-F]{12,}')
+# Currently converting subrepo paths into links only works in English
+_subrepoindicatorpattern = hglib.tounicode(hggettext('(in subrepo %s)') + '\n')
+
+def _linkifyHash(message, subrepo=''):
+    if subrepo:
+        p = 'repo:%s?' % subrepo
+    else:
+        p = 'cset:'
+    replaceexpr = lambda m: '<a href="%s">%s</a>' % (p + m.group(0), m.group(0))
+    return _hashregex.sub(replaceexpr, message)
+
+def _linkifySubrepoRef(message, subrepo, hash=''):
+    if hash:
+        hash = '?' + hash
+    subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
+    subrepoindicator = _subrepoindicatorpattern % subrepo
+    linkifiedsubrepoindicator = _subrepoindicatorpattern % subrepolink
+    message = message.replace(subrepoindicator, linkifiedsubrepoindicator)
+    return message
+
+def linkifyMessage(message, subrepo=None):
+    r"""Convert revision id hashes and subrepo paths in messages into links
+
+    >>> linkifyMessage('abort: 0123456789ab!\nhint: foo\n')
+    u'abort: <a href="cset:0123456789ab">0123456789ab</a>!<br>hint: foo<br>'
+    >>> linkifyMessage('abort: foo (in subrepo bar)\n', subrepo='bar')
+    u'abort: foo (in subrepo <a href="repo:bar">bar</a>)<br>'
+    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\nhint: foo\n',
+    ...                subrepo='bar') #doctest: +NORMALIZE_WHITESPACE
+    u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
+    (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
+
+    subrepo name containing regexp backreference, \g:
+
+    >>> linkifyMessage('abort: 0123456789ab! (in subrepo foo\\goo)\n',
+    ...                subrepo='foo\\goo') #doctest: +NORMALIZE_WHITESPACE
+    u'abort: <a href="repo:foo\\goo?0123456789ab">0123456789ab</a>!
+    (in subrepo <a href="repo:foo\\goo?0123456789ab">foo\\goo</a>)<br>'
+    """
+    message = unicode(message)
+    message = _linkifyHash(message, subrepo)
+    if subrepo:
+        hash = ''
+        m = _hashregex.search(message)
+        if m:
+            hash = m.group(0)
+        message = _linkifySubrepoRef(message, subrepo, hash)
+    return message.replace('\n', '<br>')
+
 class InfoBar(QFrame):
     """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
-
-    You shouldn't reuse InfoBar object after close(). It is automatically
-    deleted.
 
     Layout::
 
         |widgets ...                |right widgets ...|x|
     """
+    finished = pyqtSignal(int)  # mimic QDialog
     linkActivated = pyqtSignal(unicode)
 
     # type of InfoBar (the number denotes its priority)
@@ -871,8 +983,6 @@ class InfoBar(QFrame):
     def __init__(self, parent=None):
         super(InfoBar, self).__init__(parent, frameShape=QFrame.StyledPanel,
                                       frameShadow=QFrame.Plain)
-        self.setAttribute(Qt.WA_DeleteOnClose)
-
         self.setAutoFillBackground(True)
         p = self.palette()
         p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
@@ -894,16 +1004,29 @@ class InfoBar(QFrame):
     def addRightWidget(self, w):
         self.layout().insertWidget(self.layout().count() - 1, w)
 
+    def closeEvent(self, event):
+        if self.isVisible():
+            self.finished.emit(0)
+        super(InfoBar, self).closeEvent(event)
+
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
             self.close()
         super(InfoBar, self).keyPressEvent(event)
 
+    def heightForWidth(self, width):
+        # loosely based on the internal strategy of QBoxLayout
+        if self.layout().hasHeightForWidth():
+            return super(InfoBar, self).heightForWidth(width)
+        else:
+            return self.sizeHint().height()
+
 class StatusInfoBar(InfoBar):
     """Show status message"""
     def __init__(self, message, parent=None):
         super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(message, self, wordWrap=True,
+        self._msglabel = QLabel(message, self,
+                                wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
@@ -916,7 +1039,8 @@ class CommandErrorInfoBar(InfoBar):
     def __init__(self, message, parent=None):
         super(CommandErrorInfoBar, self).__init__(parent)
 
-        self._msglabel = QLabel(message, self, wordWrap=True,
+        self._msglabel = QLabel(message, self,
+                                wordWrap=True,
                                 textInteractionFlags=Qt.TextSelectableByMouse \
                                 | Qt.LinksAccessibleByMouse)
         self._msglabel.linkActivated.connect(self.linkActivated)
@@ -956,17 +1080,21 @@ class ConfirmInfoBar(InfoBar):
 
     def closeEvent(self, event):
         if self.isVisible():
+            self.finished.emit(1)
             self.rejected.emit()
+            self.hide()  # avoid double emission of finished signal
         super(ConfirmInfoBar, self).closeEvent(event)
 
     @pyqtSlot()
     def _accept(self):
+        self.finished.emit(0)
         self.accepted.emit()
         self.hide()
         self.close()
 
     @pyqtSlot()
     def _reject(self):
+        self.finished.emit(1)
         self.rejected.emit()
         self.hide()
         self.close()
@@ -1082,6 +1210,17 @@ class Spacer(QWidget):
     def sizeHint(self):
         return QSize(self.width, self.height)
 
+def _configuredusername(ui):
+    # need to check the existence before calling ui.username(); otherwise it
+    # may fall back to the system default.
+    if (not os.environ.get('HGUSER') and not ui.config('ui', 'username')
+        and not os.environ.get('EMAIL')):
+        return None
+    try:
+        return ui.username()
+    except error.Abort:
+        return None
+
 def getCurrentUsername(widget, repo, opts=None):
     if opts:
         # 1. Override has highest priority
@@ -1090,10 +1229,9 @@ def getCurrentUsername(widget, repo, opts=None):
             return user
 
     # 2. Read from repository
-    try:
-        return repo.ui.username()
-    except error.Abort:
-        pass
+    user = _configuredusername(repo.ui)
+    if user:
+        return user
 
     # 3. Get a username from the user
     QMessageBox.information(widget, _('Please enter a username'),
@@ -1103,10 +1241,7 @@ def getCurrentUsername(widget, repo, opts=None):
     dlg = SettingsDialog(False, focus='ui.username')
     dlg.exec_()
     repo.invalidateui()
-    try:
-        return repo.ui.username()
-    except error.Abort:
-        return None
+    return _configuredusername(repo.ui)
 
 class _EncodingSafeInputDialog(QInputDialog):
     def accept(self):
@@ -1174,7 +1309,7 @@ class PaletteSwitcher(object):
     enablefilterpalette() method.
     """
     def __init__(self, targetwidget):
-        self._targetwidget = targetwidget
+        self._targetwref = weakref.ref(targetwidget)  # avoid circular ref
         self._defaultpalette = targetwidget.palette()
         bgcolor = self._defaultpalette.color(QPalette.Base)
         if bgcolor.black() <= 128:
@@ -1187,8 +1322,11 @@ class PaletteSwitcher(object):
         self._filterpalette.setColor(QPalette.Base, filterbgcolor)
 
     def enablefilterpalette(self, enabled=False):
+        targetwidget = self._targetwref()
+        if not targetwidget:
+            return
         if enabled:
             pl = self._filterpalette
         else:
             pl = self._defaultpalette
-        self._targetwidget.setPalette(pl)
+        targetwidget.setPalette(pl)

@@ -48,8 +48,9 @@ class BranchOpDialog(QDialog):
             closebranch = QRadioButton(_('Close current branch'))
             branchCombo = QComboBox()
             branchCombo.setEditable(True)
+            qtlib.allowCaseChangingInput(branchCombo)
 
-            wbu = hglib.tounicode(wctx.branch())
+            wbu = wctx.branch()
             for name in repo.namedbranches:
                 if name == wbu:
                     continue
