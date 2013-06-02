@@ -48,49 +48,48 @@ class FilectxActions(QObject):
         self._itemissubrepo = False
         self._itemisdir = False
 
-        self._diff_dialogs = {}
         self._nav_dialogs = {}
         self._contextmenus = {}
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
-            ('navigate', _('File history'), 'hg-log', 'Shift+Return',
+            ('navigate', _('File &History'), 'hg-log', 'Shift+Return',
              _('Show the history of the selected file'), self.navigate),
-            ('filter', _('Folder history'), 'hg-log', None,
+            ('filter', _('Folder &History'), 'hg-log', None,
              _('Show the history of the selected file'), self.filterfile),
-            ('diffnavigate', _('Compare file revisions'), 'compare-files', None,
+            ('diffnavigate', _('Co&mpare File Revisions'), 'compare-files', None,
              _('Compare revisions of the selected file'), self.diffNavigate),
-            ('diff', _('Diff to parent'), 'visualdiff', 'Ctrl+D',
+            ('diff', _('&Diff to Parent'), 'visualdiff', 'Ctrl+D',
              _('View file changes in external diff tool'), self.vdiff),
-            ('ldiff', _('Diff to local'), 'ldiff', 'Shift+Ctrl+D',
+            ('ldiff', _('Diff to &Local'), 'ldiff', 'Shift+Ctrl+D',
              _('View changes to current in external diff tool'),
              self.vdifflocal),
-            ('edit', _('View at Revision'), 'view-at-revision', 'Shift+Ctrl+E',
+            ('edit', _('&View at Revision'), 'view-at-revision', 'Shift+Ctrl+E',
              _('View file as it appeared at this revision'), self.editfile),
-            ('save', _('Save at Revision'), None, 'Shift+Ctrl+S',
+            ('save', _('&Save at Revision...'), None, 'Shift+Ctrl+S',
              _('Save file as it appeared at this revision'), self.savefile),
-            ('ledit', _('Edit Local'), 'edit-file', None,
+            ('ledit', _('&Edit Local'), 'edit-file', None,
              _('Edit current file in working copy'), self.editlocal),
-            ('lopen', _('Open Local'), '', 'Shift+Ctrl+L',
+            ('lopen', _('&Open Local'), '', 'Shift+Ctrl+L',
              _('Edit current file in working copy'), self.openlocal),
-            ('copypath', _('Copy Path'), '', 'Shift+Ctrl+C',
+            ('copypath', _('Copy &Path'), '', 'Shift+Ctrl+C',
              _('Copy full path of file(s) to the clipboard'), self.copypath),
-            ('revert', _('Revert to Revision'), 'hg-revert', 'Shift+Ctrl+R',
+            ('revert', _('&Revert to Revision...'), 'hg-revert', 'Shift+Ctrl+R',
              _('Revert file(s) to contents at this revision'),
              self.revertfile),
-            ('opensubrepo', _('Open subrepository'), 'thg-repository-open',
-             'Shift+Ctrl+O', _('Open the selected subrepository'),
+            ('opensubrepo', _('Open S&ubrepository'), 'thg-repository-open',
+             None, _('Open the selected subrepository'),
              self.opensubrepo),
-            ('explore', _('Explore folder'), 'system-file-manager',
+            ('explore', _('E&xplore Folder'), 'system-file-manager',
              None, _('Open the selected folder in the system file manager'),
              self.explore),
-            ('terminal', _('Open terminal here'), 'utilities-terminal', None,
+            ('terminal', _('Open &Terminal'), 'utilities-terminal', None,
              _('Open a shell terminal in the selected folder'),
              self.terminal),
             ]:
             act = QAction(desc, self)
             if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
+                act.setIcon(qtlib.geticon(icon))
             if key:
                 act.setShortcut(key)
             if tip:
@@ -173,10 +172,10 @@ class FilectxActions(QObject):
         return contextmenu
 
     def navigate(self):
-        self._navigate(FileLogDialog, self._nav_dialogs)
+        self._navigate(FileLogDialog)
 
     def diffNavigate(self):
-        self._navigate(FileDiffDialog, self._diff_dialogs)
+        self._navigate(FileDiffDialog)
 
     def filterfile(self):
         """Ask to only show the revisions in which files on that folder are
@@ -255,10 +254,11 @@ class FilectxActions(QObject):
                                   parent=self.parent())
         dlg.exec_()
 
-    def _navigate(self, dlgclass, dlgdict):
+    def _navigate(self, dlgclass):
         repo, filename, rev = self._findsubsingle(self._currentfile)
         if filename and len(repo.file(filename)) > 0:
-            if self._currentfile not in dlgdict:
+            fullpath = repo.wjoin(filename)
+            if (dlgclass, fullpath) not in self._nav_dialogs:
                 # dirty hack to pass workbench only if available
                 from tortoisehg.hgqt import workbench  # avoid cyclic dep
                 repoviewer = None
@@ -266,15 +266,24 @@ class FilectxActions(QObject):
                                                 workbench.Workbench):
                     repoviewer = self.parent().window()
                 dlg = dlgclass(repo, filename, repoviewer=repoviewer)
-                dlgdict[self._currentfile] = dlg
+                self._nav_dialogs[dlgclass, fullpath] = dlg
+                assert dlg.repo.wjoin(dlg.filename) == fullpath
+                dlg.finished.connect(self._forgetnavdialog)
                 ufname = hglib.tounicode(filename)
                 dlg.setWindowTitle(_('Hg file log viewer - %s') % ufname)
                 dlg.setWindowIcon(qtlib.geticon('hg-log'))
-            dlg = dlgdict[self._currentfile]
+            dlg = self._nav_dialogs[dlgclass, fullpath]
             dlg.goto(rev)
             dlg.show()
             dlg.raise_()
             dlg.activateWindow()
+
+    #@pyqtSlot()
+    def _forgetnavdialog(self):
+        dlg = self.sender()
+        dlg.finished.disconnect(self._forgetnavdialog)
+        fullpath = dlg.repo.wjoin(dlg.filename)
+        del self._nav_dialogs[dlg.__class__, fullpath]
 
     def _findsub(self, paths):
         """Find the nearest (sub-)repository for the given paths
@@ -306,7 +315,7 @@ class FilectxActions(QObject):
         if os.path.isdir(path):
             spath = path[len(self.repo.root)+1:]
             source, revid, stype = self.ctx.substate[spath]
-            link = u'subrepo:' + hglib.tounicode(path)
+            link = u'repo:' + hglib.tounicode(path)
             if stype == 'hg':
                 link = u'%s?%s' % (link, revid)
             self.linkActivated.emit(link)
@@ -324,4 +333,4 @@ class FilectxActions(QObject):
     def terminal(self):
         root = self.repo.wjoin(self._currentfile)
         if os.path.isdir(root):
-            qtlib.openshell(root, self._currentfile)
+            qtlib.openshell(root, self._currentfile, self.repo.ui)

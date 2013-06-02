@@ -6,12 +6,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from mercurial import hg, error
+from mercurial import hg, error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
-from tortoisehg.hgqt import qscilib, thgrepo, messageentry
+from tortoisehg.hgqt import qscilib, thgrepo, messageentry, commit
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -52,9 +52,11 @@ class MergeDialog(QWizard):
         repo.configChanged.connect(self.configChanged)
         self.repo = repo
 
+    @pyqtSlot()
     def repositoryChanged(self):
         self.currentPage().repositoryChanged()
 
+    @pyqtSlot()
     def configChanged(self):
         self.currentPage().configChanged()
 
@@ -65,11 +67,6 @@ class MergeDialog(QWizard):
     def reject(self):
         if self.currentPage().canExit():
             super(MergeDialog, self).reject()
-
-    def done(self, ret):
-        self.repo.repositoryChanged.disconnect(self.repositoryChanged)
-        self.repo.configChanged.disconnect(self.configChanged)
-        super(MergeDialog, self).done(ret)
 
 
 class BasePage(QWizardPage):
@@ -94,13 +91,15 @@ class BasePage(QWizardPage):
         pass
 
     def currentPage(self):
-        pass
+        self.wizard().setOption(QWizard.NoDefaultButton, False)
 
     def canExit(self):
         if len(self.repo.parents()) == 2:
             main = _('Do you want to exit?')
-            text = _('To finish merging, you need to commit '
-                     'the working directory.')
+            text = _('To finish merging, you must commit '
+                     'the working directory.\n\n'
+                     'To cancel the merge you can update to one '
+                     'of the merge parent revisions.')
             labels = ((QMessageBox.Yes, _('&Exit')),
                       (QMessageBox.No, _('Cancel')))
             if not qtlib.QuestionMsgBox(_('Confirm Exit'), main, text,
@@ -268,6 +267,7 @@ class SummaryPage(BasePage):
         return True
 
     def currentPage(self):
+        super(SummaryPage, self).currentPage()
         self.refresh()
 
     def refresh(self):
@@ -367,6 +367,7 @@ class MergePage(BasePage):
         self.layout().addWidget(self.autonext)
 
     def currentPage(self):
+        super(MergePage, self).currentPage()
         if self.field('discard').toBool():
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
@@ -500,6 +501,7 @@ class CommitPage(BasePage):
                                     withupdate=True)
         mergeCsInfo.linkActivated.connect(self.onLinkActivated)
         self.layout().addWidget(mergeCsInfo)
+        self.mergeCsInfo = mergeCsInfo
 
         # commit message area
         msg_sep = qtlib.LabeledSeparator(_('Commit message'))
@@ -534,8 +536,29 @@ class CommitPage(BasePage):
         self.skiplast.setChecked(checked)
         self.layout().addWidget(self.skiplast)
 
+        hblayout = QHBoxLayout()
+        self.opts = commit.readrepoopts(self.repo)
+        self.optionsbtn = QPushButton(_('Commit Options'))
+        self.optionsbtn.clicked.connect(self.details)
+        hblayout.addWidget(self.optionsbtn)
+        self.optionslabelfmt = _('<b>Selected Options:</b> %s')
+        self.optionslabel = QLabel('')
+        hblayout.addWidget(self.optionslabel)
+        hblayout.addStretch()
+        self.layout().addLayout(hblayout)
+
+        self.setButtonText(QWizard.CommitButton, _('Commit Now'))
+        # The cancel button does not really "cancel" the merge
+        self.setButtonText(QWizard.CancelButton, _('Commit Later'))
+
+        # Update the options label
+        self.refresh()
+
     def refresh(self):
-        pass
+        opts = commit.commitopts2str(self.opts)
+        self.optionslabel.setText(self.optionslabelfmt
+            % hglib.tounicode(opts))
+        self.optionslabel.setVisible(bool(opts))
 
     def cleanupPage(self):
         s = QSettings()
@@ -543,6 +566,10 @@ class CommitPage(BasePage):
         self.msgEntry.saveSettings(s, 'merge/message')
 
     def currentPage(self):
+        super(CommitPage, self).currentPage()
+        self.wizard().setOption(QWizard.NoDefaultButton, True)
+        self.mergeCsInfo.update()  # show post-merge state
+
         engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
         wctx = self.repo[None]
         if wctx.p1().branch() == wctx.p2().branch():
@@ -577,7 +604,7 @@ class CommitPage(BasePage):
                 self.wizard().close()
             return True
 
-        user = qtlib.getCurrentUsername(self, self.repo)
+        user = qtlib.getCurrentUsername(self, self.repo, self.opts)
         if not user:
             return False
 
@@ -587,6 +614,28 @@ class CommitPage(BasePage):
         message = hglib.fromunicode(self.msgEntry.text())
         cmdline = ['commit', '--verbose', '--message', message,
                    '--repository', self.repo.root, '--user', user]
+        if self.opts.get('recurseinsubrepos'):
+            cmdline.append('--subrepos')
+        try:
+            date = self.opts.get('date')
+            if date:
+                util.parsedate(date)
+                dcmd = ['--date', date]
+            else:
+                dcmd = []
+        except error.Abort, e:
+            if e.hint:
+                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
+                                            hglib.tounicode(e.hint))
+            else:
+                err = hglib.tounicode(str(e))
+            qtlib.WarningMsgBox(_('TortoiseHg Merge Commit'),
+                _('Error creating interpreting commit date (%s).\n'
+                  'Using current date instead.'), err)
+            dcmd = []
+
+        cmdline += dcmd
+
         commandlines = [cmdline]
         pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
         if pushafter:
@@ -613,6 +662,22 @@ class CommitPage(BasePage):
             self.wizard().next()
         self.completeChanged.emit()
 
+    def readUserHistory(self):
+        'Load user history from the global commit settings'
+        s = QSettings()
+        userhist = s.value('commit/userhist').toStringList()
+        userhist = [u for u in userhist if u]
+        return userhist
+
+    def details(self):
+        self.userhist = self.readUserHistory()
+        dlg = commit.DetailsDialog(self.opts, self.userhist, self, mode='merge')
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        if dlg.exec_() == QDialog.Accepted:
+            self.opts.update(dlg.outopts)
+            self.refresh()
 
 class ResultPage(BasePage):
     def __init__(self, repo, parent):
@@ -630,6 +695,7 @@ class ResultPage(BasePage):
         self.layout().addStretch(1)
 
     def currentPage(self):
+        super(ResultPage, self).currentPage()
         self.mergeCsInfo.update(self.repo['tip'])
         self.wizard().setOption(QWizard.NoCancelButton, True)
 

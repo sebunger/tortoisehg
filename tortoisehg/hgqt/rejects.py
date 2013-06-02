@@ -8,7 +8,7 @@
 import cStringIO
 import os
 
-from mercurial import hg, util, patch, commands
+from mercurial import hg, util, patch, commands, ui
 from hgext import record
 
 from tortoisehg.util import hglib
@@ -91,14 +91,14 @@ class RejectsDialog(QDialog):
         self.editor.loadSettings(s, 'rejects/editor')
         self.rejectbrowser.loadSettings(s, 'rejects/rejbrowse')
 
-        f = QFile(path)
+        f = QFile(hglib.tounicode(path))
         if not f.open(QIODevice.ReadOnly):
             qtlib.ErrorMsgBox(_('Unable to merge rejects'),
                               _("Can't read this file (maybe deleted)"))
             self.hide()
             QTimer.singleShot(0, self.reject)
             return
-        earlybytes = f.readData(4096)
+        earlybytes = f.read(4096)
         if '\0' in earlybytes:
             qtlib.ErrorMsgBox(_('Unable to merge rejects'),
                               _('This appears to be a binary file'))
@@ -109,7 +109,7 @@ class RejectsDialog(QDialog):
         f.seek(0)
         editor.read(f)
         editor.setModified(False)
-        lexer = lexers.get_lexer(path, earlybytes, self)
+        lexer = lexers.getlexer(ui.ui(), path, earlybytes, self)
         editor.setLexer(lexer)
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
@@ -213,7 +213,7 @@ class RejectsDialog(QDialog):
                 acceptresolution = True
 
         if acceptresolution:
-            f = QFile(self.path)
+            f = QFile(hglib.tounicode(self.path))
             f.open(QIODevice.WriteOnly)
             self.editor.write(f)
             self.saveSettings()
@@ -250,7 +250,7 @@ class RejectBrowser(qscilib.Scintilla):
         mask = (1 << self.addedMark) | (1 << self.removedMark) | \
                (1 << self.addedColor) | (1 << self.removedColor)
         self.setMarginMarkerMask(1, mask)
-        lexer = lexers.get_diff_lexer(self)
+        lexer = lexers.difflexer(self)
         self.setLexer(lexer)
 
     def menuRequested(self, point):

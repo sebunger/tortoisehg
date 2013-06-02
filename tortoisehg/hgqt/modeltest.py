@@ -327,7 +327,7 @@ class ModelTest(QtCore.QObject):
         #       qDebug << self.model.index(i, 0).data().toString()
         #   qDebug() << c['next'] << self.model.data(model.index(end+1, 0, c['parent']))
 
-        assert(c['next'] == self.model.data(model.index(end+1, 0, c['parent'])))
+        assert(c['next'] == self.model.data(self.model.index(end+1, 0, c['parent'])))
 
     def rowsAboutToBeRemoved(self, parent, start, end):
         """
@@ -443,7 +443,8 @@ class ModelTest(QtCore.QObject):
                 # recursively go down the children
                 if self.model.hasChildren(index) and depth < 10:
                     # qDebug() << r << c << "hasChildren" << self.model.rowCount(index)
-                    self.checkChildren(index, ++depth)
+                    depth += 1
+                    self.checkChildren(index, depth)
                 #else:
                 #   if depth >= 10:
                 #       qDebug() << "checked 10 deep"

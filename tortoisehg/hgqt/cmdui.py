@@ -28,7 +28,7 @@ def stopProgress(topic):
 class ProgressMonitor(QWidget):
     'Progress bar for use in workbench status bar'
     def __init__(self, topic, parent):
-        super(ProgressMonitor, self).__init__(parent=parent)
+        super(ProgressMonitor, self).__init__(parent)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*(0,)*4)
@@ -58,8 +58,10 @@ class ProgressMonitor(QWidget):
         self.idle = True
 
     def setcounts(self, cur, max):
-        self.pbar.setMaximum(max)
-        self.pbar.setValue(cur)
+        # cur and max may exceed INT_MAX, which confuses QProgressBar
+        assert max != 0
+        self.pbar.setMaximum(100)
+        self.pbar.setValue(int(cur * 100 / max))
 
     def unknown(self):
         self.pbar.setMinimum(0)
@@ -70,7 +72,7 @@ class ThgStatusBar(QStatusBar):
     linkActivated = pyqtSignal(QString)
 
     def __init__(self, parent=None):
-        QStatusBar.__init__(self, parent=parent)
+        QStatusBar.__init__(self, parent)
         self.topics = {}
         self.lbl = QLabel()
         self.lbl.linkActivated.connect(self.linkActivated)
@@ -131,6 +133,39 @@ class ThgStatusBar(QStatusBar):
             pm.status.setText('%s %s' % (unicode(pos), item))
             pm.unknown()
 
+
+def _quotecmdarg(arg):
+    # only for display; no use to construct command string for os.system()
+    if not arg or ' ' in arg or '\\' in arg or '"' in arg:
+        return '"%s"' % arg.replace('"', '\\"')
+    else:
+        return arg
+
+def _prettifycmdline(cmdline):
+    r"""Build pretty command-line string for display
+
+    >>> _prettifycmdline(['--repository', 'foo', 'status'])
+    'status'
+    >>> _prettifycmdline(['--cwd', 'foo', 'resolve', '--', '--repository'])
+    'resolve -- --repository'
+    >>> _prettifycmdline(['log', 'foo\\bar', '', 'foo bar', 'foo"bar'])
+    'log "foo\\bar" "" "foo bar" "foo\\"bar"'
+    """
+    try:
+        argcount = cmdline.index('--')
+    except ValueError:
+        argcount = len(cmdline)
+    printables = []
+    pos = 0
+    while pos < argcount:
+        if cmdline[pos] in ('-R', '--repository', '--cwd'):
+            pos += 2
+        else:
+            printables.append(cmdline[pos])
+            pos += 1
+    printables.extend(cmdline[argcount:])
+
+    return ' '.join(_quotecmdarg(e) for e in printables)
 
 class Core(QObject):
     """Core functionality for running Mercurial command.
@@ -220,7 +255,7 @@ class Core(QObject):
             if display:
                 cmd = '%% hg %s\n' % display
             else:
-                cmd = '%% hg %s\n' % ' '.join(cmdline)
+                cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
             self.output.emit(cmd, 'control')
             proc.start(exepath, cmdline, QIODevice.ReadOnly)
 
@@ -272,7 +307,8 @@ class Core(QObject):
 
         cmdline = self.queue.pop(0)
 
-        self.thread = thread.CmdThread(cmdline, self.display, self.parent())
+        display = self.display or _prettifycmdline(cmdline)
+        self.thread = thread.CmdThread(cmdline, display, self.parent())
         self.thread.started.connect(self.onCommandStarted)
         self.thread.commandFinished.connect(self.onThreadFinished)
 
@@ -315,11 +351,13 @@ class Core(QObject):
             self.stbar.showMessage(status, error)
 
         self.display = None
+        self.thread.setParent(None)  # assist gc
         if ret == 0 and self.runNext():
             return # run next command
         else:
             self.queue = []
             text = self.thread.rawoutput.join('')
+            self.thread = None
             self.rawoutlines = [hglib.fromunicode(text, 'replace')]
 
         self.commandFinished.emit(ret)

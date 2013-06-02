@@ -50,12 +50,14 @@ class UpdateDialog(QDialog):
         # updating subrepositories.
         combo.setMinimumWidth(450)
 
-        if rev is None:
-            rev = self.repo.dirstate.branch()
-        else:
-            rev = str(rev)
-        combo.addItem(hglib.tounicode(rev))
-        combo.setCurrentIndex(0)
+        # always include integer revision
+        try:
+            assert not isinstance(rev, (unicode, QString))
+            ctx = self.repo[rev]
+            if isinstance(ctx.rev(), int):  # could be None or patch name
+                combo.addItem(str(ctx.rev()))
+        except error.RepoLookupError:
+            pass
 
         for name in repo.namedbranches:
             combo.addItem(hglib.tounicode(name))
@@ -64,6 +66,16 @@ class UpdateDialog(QDialog):
         tags.sort(reverse=True)
         for tag in tags:
             combo.addItem(hglib.tounicode(tag))
+
+        if rev is None:
+            selecturev = hglib.tounicode(self.repo.dirstate.branch())
+        else:
+            selecturev = hglib.tounicode(str(rev))
+        selectindex = combo.findText(selecturev)
+        if selectindex >= 0:
+            combo.setCurrentIndex(selectindex)
+        else:
+            combo.setEditText(selecturev)
 
         ### target revision info
         items = ('%(rev)s', ' %(branch)s', ' %(tags)s', '<br />%(summary)s')
@@ -224,7 +236,7 @@ class UpdateDialog(QDialog):
         rev = hglib.fromunicode(self.rev_combo.currentText())
 
         activatebookmarkmode = self.repo.ui.config(
-            'tortoisehg', 'activatebookmarks', 'auto')
+            'tortoisehg', 'activatebookmarks', 'prompt')
         if activatebookmarkmode != 'never':
             bookmarks = self.repo[rev].bookmarks()
             if bookmarks and rev not in bookmarks:
@@ -244,7 +256,7 @@ class UpdateDialog(QDialog):
                             'called "<i>%s</i>".<p>Do you want to activate it?'
                             '<br></b><i>You can disable this prompt by configuring '
                             'Settings/Workbench/Activate Bookmarks</i>') \
-                            % (str(rev), bookmarks[0]))
+                            % (hglib.tounicode(rev), bookmarks[0]))
                     if activatebookmark:
                         selectedbookmark = bookmarks[0]
                 else:
@@ -258,7 +270,7 @@ class UpdateDialog(QDialog):
                         'if you don\'t want to activate any of them.<p>'
                         '<p><i>You can disable this prompt by configuring '
                         'Settings/Workbench/Activate Bookmarks</i><p>') \
-                        % (str(rev), len(bookmarks)),
+                        % (hglib.tounicode(rev), len(bookmarks)),
                         self, bookmarks, self.repo._bookmarkcurrent).run()
                 if selectedbookmark:
                     rev = selectedbookmark
@@ -333,16 +345,18 @@ class UpdateDialog(QDialog):
 
                 dlg = QMessageBox(QMessageBox.Question, _('Confirm Update'),
                                   '', QMessageBox.Cancel, self)
-                buttons = {}
+                buttonnames = {}
                 for name in opts:
                     label, desc = data[name]
                     msg += '\n'
                     msg += desc
-                    buttons[name] = dlg.addButton(label, QMessageBox.ActionRole)
+                    btn = dlg.addButton(label, QMessageBox.ActionRole)
+                    buttonnames[btn] = name
                 dlg.setDefaultButton(QMessageBox.Cancel)
                 dlg.setText(msg)
                 dlg.exec_()
-                return buttons, dlg.clickedButton(), opts
+                clicked = buttonnames.get(dlg.clickedButton())
+                return clicked
 
             # If merge-by-default, we want to merge whenever possible,
             # without prompting user (similar to command-line behavior)
@@ -351,16 +365,16 @@ class UpdateDialog(QDialog):
             if clean:
                 cmdline.append('--check')
             elif not (defaultmerge and islocalmerge(cur, node, clean)):
-                buttons, clicked, options = confirmupdate(clean)
-                if buttons['discard'] == clicked:
+                clicked = confirmupdate(clean)
+                if clicked == 'discard':
                     cmdline.append('--clean')
-                elif 'shelve' in options and buttons['shelve'] == clicked:
+                elif clicked == 'shelve':
                     from tortoisehg.hgqt import shelve
                     dlg = shelve.ShelveDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
-                elif 'merge' in options and buttons['merge'] == clicked:
+                elif clicked == 'merge':
                     pass # no args
                 else:
                     return

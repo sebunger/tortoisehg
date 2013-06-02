@@ -6,12 +6,16 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import cStringIO
 
 from mercurial import error, match, patch, util, mdiff
 from mercurial import ui as uimod
+from hgext import record
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.hgqt.i18n import _
+
+forcedisplaymsg = _('Display the file anyway')
 
 def _exceedsMaxLineLength(data, maxlength=100000):
     if len(data) < maxlength:
@@ -22,7 +26,7 @@ def _exceedsMaxLineLength(data, maxlength=100000):
     return False
 
 class FileData(object):
-    def __init__(self, ctx, ctx2, wfile, status=None):
+    def __init__(self, ctx, ctx2, wfile, status=None, changeselect=False, force=False):
         self.contents = None
         self.ucontents = None
         self.error = None
@@ -30,12 +34,13 @@ class FileData(object):
         self.diff = None
         self.flabel = u''
         self.elabel = u''
+        self.changes = None
         try:
-            self.readStatus(ctx, ctx2, wfile, status)
+            self.readStatus(ctx, ctx2, wfile, status, changeselect, force)
         except (EnvironmentError, error.LookupError), e:
             self.error = hglib.tounicode(str(e))
 
-    def checkMaxDiff(self, ctx, wfile, maxdiff, status):
+    def checkMaxDiff(self, ctx, wfile, maxdiff, status, force):
         self.error = None
         p = _('File or diffs not displayed: ')
         try:
@@ -50,20 +55,23 @@ class FileData(object):
         except (EnvironmentError, error.LookupError), e:
             self.error = p + hglib.tounicode(str(e))
             return None
-        if size > maxdiff:
+        if not force and size > maxdiff:
             self.error = p + _('File is larger than the specified max size.\n'
                                'maxdiff = %s KB') % (maxdiff // 1024)
+            self.error += u'\n\n' + forcedisplaymsg
             return None
 
         try:
             data = fctx.data()
-            if '\0' in data or ctx.isStandin(wfile):
-                self.error = p + _('File is binary')
-            elif _exceedsMaxLineLength(data):
-                # it's incredibly slow to render long line by QScintilla
-                self.error = p + \
-                    _('File may be binary (maximum line length exceeded)')
+            if not force:
+                if '\0' in data or ctx.isStandin(wfile):
+                    self.error = p + _('File is binary')
+                elif _exceedsMaxLineLength(data):
+                    # it's incredibly slow to render long line by QScintilla
+                    self.error = p + \
+                        _('File may be binary (maximum line length exceeded)')
             if self.error:
+                self.error += u'\n\n' + forcedisplaymsg
                 if status != 'A':
                     return None
 
@@ -71,7 +79,10 @@ class FileData(object):
                 if renamed:
                     oldname, node = renamed
                     fr = hglib.tounicode(oldname)
-                    self.flabel += _(' <i>(renamed from %s)</i>') % fr
+                    if oldname in ctx:
+                        self.flabel += _(' <i>(copied from %s)</i>') % fr
+                    else:
+                        self.flabel += _(' <i>(renamed from %s)</i>') % fr
                 else:
                     self.flabel += _(' <i>(was added)</i>')
 
@@ -84,7 +95,7 @@ class FileData(object):
     def isValid(self):
         return self.error is None
 
-    def readStatus(self, ctx, ctx2, wfile, status):
+    def readStatus(self, ctx, ctx2, wfile, status, changeselect, force):
         def getstatus(repo, n1, n2, wfile):
             m = match.exact(repo.root, repo.getcwd(), [wfile])
             modified, added, removed = repo.status(n1, n2, match=m)[:3]
@@ -114,18 +125,22 @@ class FileData(object):
                 self.flabel += _(' <i>(is a symlink)</i>')
 
             # Do not show patches that are too big or may be binary
-            p = _('Diff not displayed: ')
-            data = self.diff
-            size = len(data)
-            if (size > maxdiff):
-                self.error = p + _('File is larger than the specified max size.\n'
-                               'maxdiff = %s KB') % (maxdiff // 1024)
-            elif '\0' in data:
-                self.error = p + _('File is binary')
-            elif _exceedsMaxLineLength(data):
-                # it's incredibly slow to render long line by QScintilla
-                self.error = p + \
-                    _('File may be binary (maximum line length exceeded)')
+            if not force:
+                p = _('Diff not displayed: ')
+                data = self.diff
+                size = len(data)
+                if (size > maxdiff):
+                    self.error = p + _('File is larger than the specified max size.\n'
+                                   'maxdiff = %s KB') % (maxdiff // 1024)
+                elif '\0' in data:
+                    self.error = p + _('File is binary')
+                elif _exceedsMaxLineLength(data):
+                    # it's incredibly slow to render long line by QScintilla
+                    self.error = p + \
+                        _('File may be binary (maximum line length exceeded)')
+                if self.error:
+                    self.error += u'\n\n' + forcedisplaymsg
+
             return
 
         if ctx2:
@@ -270,7 +285,9 @@ class FileData(object):
                             self.error = _('Not a Mercurial subrepo, not previewable')
                             return
                 except (util.Abort, KeyError), e:
-                    sactual = ''
+                    self.error = (_('Error previewing subrepo: %s')
+                                  % hglib.tounicode(str(e)))
+                    return
 
                 out = []
                 _ui = uimod.ui()
@@ -318,7 +335,7 @@ class FileData(object):
                 }[sstatedesc]
                 self.flabel += ' <i>' + lbl + '</i>'
                 if sactual:
-                    lbl = _(' <a href="subrepo:%s">open...</a>')
+                    lbl = ' <a href="repo:%%s">%s</a>' % _('open...')
                     self.flabel += lbl % hglib.tounicode(srepo.root)
             except (EnvironmentError, error.RepoError, util.Abort), e:
                 self.error = _('Error previewing subrepo: %s') % \
@@ -363,7 +380,7 @@ class FileData(object):
                 data = '\0'
             else:
                 data = ctx.filectx(wfile).data()
-            if '\0' in data:
+            if not force and '\0' in data:
                 self.error = 'binary file'
             else:
                 self.contents = data
@@ -373,7 +390,7 @@ class FileData(object):
             if ctx.hasStandin(wfile):
                 wfile = ctx.findStandin(wfile)
                 isbfile = True
-            res = self.checkMaxDiff(ctx, wfile, maxdiff, status)
+            res = self.checkMaxDiff(ctx, wfile, maxdiff, status, force)
             if res is None:
                 return
             fctx, newdata = res
@@ -392,7 +409,10 @@ class FileData(object):
 
             oldname, node = renamed
             fr = hglib.tounicode(oldname)
-            self.flabel += _(' <i>(renamed from %s)</i>') % fr
+            if oldname in ctx:
+                self.flabel += _(' <i>(copied from %s)</i>') % fr
+            else:
+                self.flabel += _(' <i>(renamed from %s)</i>') % fr
             olddata = repo.filectx(oldname, fileid=node).data()
         elif status == 'M':
             if wfile not in ctx2:
@@ -405,13 +425,48 @@ class FileData(object):
             return
 
         self.olddata = olddata
-        newdate = util.datestr(ctx.date())
-        olddate = util.datestr(ctx2.date())
-        revs = [str(ctx), str(ctx2)]
-        diffopts = patch.diffopts(repo.ui, {})
-        diffopts.git = False
-        if isbfile:
-            olddata += '\0'
-            newdata += '\0'
-        self.diff = mdiff.unidiff(olddata, olddate, newdata, newdate,
-                                  oldname, wfile, revs, diffopts)
+        if changeselect:
+            diffopts = patch.diffopts(repo.ui, {})
+            diffopts.git = True
+            m = match.exact(repo.root, repo.root, [wfile])
+            fp = cStringIO.StringIO()
+            for c in patch.diff(repo, ctx.node(), None, match=m, opts=diffopts):
+                fp.write(c)
+            fp.seek(0)
+
+            # feed diffs through record.parsepatch() for more fine grained
+            # chunk selection
+            filediffs = record.parsepatch(fp)
+            if filediffs:
+                self.changes = filediffs[0]
+            else:
+                self.diff = ''
+                return
+            self.changes.excludecount = 0
+            values = []
+            lines = 0
+            for chunk in self.changes.hunks:
+                buf = cStringIO.StringIO()
+                chunk.write(buf)
+                chunk.excluded = False
+                val = buf.getvalue()
+                values.append(val)
+                chunk.lineno = lines
+                chunk.linecount = len(val.splitlines())
+                lines += chunk.linecount
+            self.diff = ''.join(values)
+        else:
+            diffopts = patch.diffopts(repo.ui, {})
+            diffopts.git = False
+            newdate = util.datestr(ctx.date())
+            olddate = util.datestr(ctx2.date())
+            if isbfile:
+                olddata += '\0'
+                newdata += '\0'
+            difftext = mdiff.unidiff(olddata, olddate, newdata, newdate,
+                                     oldname, wfile, opts=diffopts)
+            if difftext:
+                self.diff = ('diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
+                             + difftext)
+            else:
+                self.diff = ''

@@ -90,7 +90,8 @@ class ManifestDialog(QMainWindow):
     def _linkHandler(self, link):
         ulink = unicode(link)
         if ulink.startswith('cset:'):
-            rev = ulink[len('cset:'):]
+            changeid = hglib.fromunicode(ulink[len('cset:'):])
+            rev = self._repo[changeid].rev()
             self._manifest_widget.setRev(rev)
         else:
             self.linkActivated.emit(link)
@@ -356,10 +357,11 @@ class ManifestWidget(QWidget, qtlib.TaskWidget):
             ctx = self._repo[rev]
             if hglib.fromunicode(self.path) in ctx:
                 self._fileview.displayFile(path, self.status)
-                if line:
-                    self._fileview.showLine(int(line) - 1)
             else:
                 self._fileview.clearDisplay()
+                return
+        if line:
+            self._fileview.showLine(line - 1)
 
     @property
     def path(self):
@@ -408,6 +410,14 @@ def run(ui, *pats, **opts):
         qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
                           hglib.tounicode(e.message))
         return
+    try:
+        line = opts.get('line') and int(opts['line']) or None
+    except ValueError:
+        qtlib.ErrorMsgBox(_('Failed to open Manifest dialog'),
+                          _('The specified line number "%s" is invalid.')
+                          % hglib.tounicode(opts.get('line')))
+        return
+
     dlg = ManifestDialog(repo, rev)
 
     # set initial state after dialog visible
@@ -419,7 +429,6 @@ def run(ui, *pats, **opts):
                 path = opts['canonpath']
             else:
                 return
-            line = opts.get('line') and int(opts['line']) or None
             dlg.setSource(hglib.tounicode(path), rev, line)
             if opts.get('pattern'):
                 dlg.setSearchPattern(opts['pattern'])

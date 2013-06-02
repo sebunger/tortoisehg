@@ -6,7 +6,7 @@
 # of the GNU General Public License, incorporated herein by reference.
 
 import cStringIO
-import os
+import os, re
 
 from mercurial import hg, util, patch, commands, cmdutil
 from mercurial import match as matchmod, ui as uimod
@@ -16,7 +16,7 @@ from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, visdiff, revert
-from tortoisehg.hgqt import filelistmodel, filelistview, filedata
+from tortoisehg.hgqt import filelistmodel, filelistview, filedata, blockmatcher
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -96,7 +96,7 @@ class ChunksWidget(QWidget):
             ]:
             act = QAction(desc, self)
             if icon:
-                act.setIcon(qtlib.getmenuicon(icon))
+                act.setIcon(qtlib.geticon(icon))
             if key:
                 act.setShortcut(key)
             if tip:
@@ -189,8 +189,9 @@ class ChunksWidget(QWidget):
         except (patch.PatchError, EnvironmentError), err:
             ok = False
             self.showMessage.emit(hglib.tounicode(str(err)))
+        rejfilere = re.compile(r'\b%s\.rej\b' % re.escape(wfile))
         for line in ui.popbuffer().splitlines():
-            if line.endswith(wfile + '.rej'):
+            if rejfilere.search(line):
                 if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
                                         hglib.tounicode(line) + u'<br><br>' +
                                         _('Edit patched file and rejects?'),
@@ -345,7 +346,6 @@ class ChunksWidget(QWidget):
                 return True
             finally:
                 del fp
-            return False
         else:
             # Apply chunks to wfile
             repo.thgbackup(repo.wjoin(wfile))
@@ -358,7 +358,6 @@ class ChunksWidget(QWidget):
                 return self.runPatcher(fp, wfile, True)
             finally:
                 wlock.release()
-            return False
 
     def getFileList(self):
         return self.ctx.files()
@@ -506,6 +505,7 @@ class DiffBrowser(QFrame):
         self.countselected = 0
         self._ctx = None
         self._lastfile = None
+        self._status = None
 
         vbox = QVBoxLayout()
         vbox.setContentsMargins(0,0,0,0)
@@ -524,6 +524,11 @@ class DiffBrowser(QFrame):
         w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
         w.linkActivated.connect(self.linkActivated)
 
+        self.searchbar = qscilib.SearchToolBar(hidable=True)
+        self.searchbar.hide()
+        self.searchbar.searchRequested.connect(self.find)
+        self.searchbar.conditionChanged.connect(self.highlightText)
+
         guifont = qtlib.getfont('fontlist').font()
         self.sumlabel = QLabel()
         self.sumlabel.setFont(guifont)
@@ -537,6 +542,15 @@ class DiffBrowser(QFrame):
         self.nonebutton.setText(_('None', 'files'))
         self.nonebutton.setShortcut(QKeySequence.New)
         self.nonebutton.clicked.connect(self.selectNone)
+        self.actionFind = self.searchbar.toggleViewAction()
+        self.actionFind.setIcon(qtlib.geticon('edit-find'))
+        self.actionFind.setToolTip(_('Toggle display of text search bar'))
+        qtlib.newshortcutsforstdkey(QKeySequence.Find, self, self.searchbar.show)
+        self.diffToolbar = QToolBar(_('Diff Toolbar'))
+        self.diffToolbar.setIconSize(QSize(16, 16))
+        self.diffToolbar.setStyleSheet(qtlib.tbstylesheet)
+        self.diffToolbar.addAction(self.actionFind)
+        hbox.addWidget(self.diffToolbar)
         hbox.addStretch(1)
         hbox.addWidget(self.sumlabel)
         hbox.addWidget(self.allbutton)
@@ -549,6 +563,7 @@ class DiffBrowser(QFrame):
         self.layout().addSpacing(2)
         w.hide()
 
+        self._forceviewindicator = None
         self.sci = qscilib.Scintilla(self)
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
@@ -562,8 +577,15 @@ class DiffBrowser(QFrame):
         self.sci.setMarginWidth(1, QFontMetrics(self.font()).width('XX'))
         self.sci.setMarginSensitivity(1, True)
         self.sci.marginClicked.connect(self.marginClicked)
-        self.selected = self.sci.markerDefine(qsci.Plus, -1)
-        self.unselected = self.sci.markerDefine(qsci.Minus, -1)
+
+        self._checkedpix = qtlib.getcheckboxpixmap(QStyle.State_On,
+                                                   Qt.gray, self)
+        self.selected = self.sci.markerDefine(self._checkedpix, -1)
+
+        self._uncheckedpix = qtlib.getcheckboxpixmap(QStyle.State_Off,
+                                                     Qt.gray, self)
+        self.unselected = self.sci.markerDefine(self._uncheckedpix, -1)
+
         self.vertical = self.sci.markerDefine(qsci.VerticalLine, -1)
         self.divider = self.sci.markerDefine(qsci.Background, -1)
         self.selcolor = self.sci.markerDefine(qsci.Background, -1)
@@ -573,10 +595,20 @@ class DiffBrowser(QFrame):
                (1 << self.vertical) | (1 << self.selcolor) | (1 << self.divider)
         self.sci.setMarginMarkerMask(1, mask)
 
-        self.layout().addWidget(self.sci, 1)
+        self.blksearch = blockmatcher.BlockList(self)
+        self.blksearch.linkScrollBar(self.sci.verticalScrollBar())
+        self.blksearch.setVisible(False)
 
-        lexer = lexers.get_diff_lexer(self)
+        hbox = QHBoxLayout()
+        hbox.addWidget(self.sci)
+        hbox.addWidget(self.blksearch)
+
+        lexer = lexers.difflexer(self)
         self.sci.setLexer(lexer)
+
+        self.layout().addLayout(hbox)
+        self.layout().addWidget(self.searchbar)
+
         self.clearDisplay()
 
     def menuRequested(self, point):
@@ -649,13 +681,32 @@ class DiffBrowser(QFrame):
         self.sci.clear()
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
+        self.blksearch.clear()
 
     def clearChunks(self):
         self.curchunks = []
         self.countselected = 0
         self.updateSummary()
 
-    def displayFile(self, filename, status):
+    def _setupForceViewIndicator(self):
+        if not self._forceviewindicator:
+            self._forceviewindicator = self.sci.indicatorDefine(self.sci.PlainIndicator)
+            self.sci.setIndicatorDrawUnder(True, self._forceviewindicator)
+            self.sci.setIndicatorForegroundColor(
+                QColor('blue'), self._forceviewindicator)
+            # delay until next event-loop in order to complete mouse release
+            self.sci.SCN_INDICATORRELEASE.connect(self.forceDisplayFile,
+                                                  Qt.QueuedConnection)
+
+    def forceDisplayFile(self):
+        if self.curchunks:
+            return
+        self.sci.setText(_('Please wait while the file is opened ...'))
+        QTimer.singleShot(10,
+            lambda: self.displayFile(self._lastfile, self._status, force=True))
+
+    def displayFile(self, filename, status, force=False):
+        self._status = status
         self.clearDisplay()
         if filename == self._lastfile:
             reenable = [(c.fromline, len(c.before)) for c in self.curchunks[1:]\
@@ -665,7 +716,7 @@ class DiffBrowser(QFrame):
         self._lastfile = filename
         self.clearChunks()
 
-        fd = filedata.FileData(self._ctx, None, filename, status)
+        fd = filedata.FileData(self._ctx, None, filename, status, force=force)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -675,7 +726,18 @@ class DiffBrowser(QFrame):
         self.filenamelabel.setText(fd.flabel)
 
         if not fd.isValid() or not fd.diff:
-            self.sci.setText(fd.error or '')
+            if fd.error is None:
+                self.sci.clear()
+                return
+            self.sci.setText(fd.error)
+            forcedisplaymsg = filedata.forcedisplaymsg
+            linkstart = fd.error.find(forcedisplaymsg)
+            if linkstart >= 0:
+                # add the link to force to view the data anyway
+                self._setupForceViewIndicator()
+                self.sci.fillIndicatorRange(
+                    0, linkstart, 0, linkstart+len(forcedisplaymsg),
+                    self._forceviewindicator)
             return
         elif type(self._ctx.rev()) is str:
             chunks = self._ctx._files[filename]
@@ -697,10 +759,10 @@ class DiffBrowser(QFrame):
         self.sci.markerDeleteAll(-1)
         for chunk in chunks[1:]:
             chunk.lrange = (start, start+len(chunk.lines))
-            chunk.mline = start + len(chunk.lines)/2
+            chunk.mline = start
             if start:
                 self.sci.markerAdd(start-1, self.divider)
-            for i in xrange(1,len(chunk.lines)-1):
+            for i in xrange(0,len(chunk.lines)):
                 if start + i == chunk.mline:
                     self.sci.markerAdd(chunk.mline, self.unselected)
                 else:
@@ -713,3 +775,20 @@ class DiffBrowser(QFrame):
             if (c.fromline, len(c.before)) in reenable:
                 self.toggleChunk(c)
         self.updateSummary()
+
+    @pyqtSlot(unicode, bool, bool, bool)
+    def find(self, exp, icase=True, wrap=False, forward=True):
+        self.sci.find(exp, icase, wrap, forward)
+
+    @pyqtSlot(unicode, bool)
+    def highlightText(self, match, icase=False):
+        self._lastSearch = match, icase
+        self.sci.highlightText(match, icase)
+        blk = self.blksearch
+        blk.clear()
+        blk.setUpdatesEnabled(False)
+        blk.clear()
+        for l in self.sci.highlightLines:
+            blk.addBlock('s', l, l + 1)
+        blk.setVisible(bool(match))
+        blk.setUpdatesEnabled(True)

@@ -7,7 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 shortlicense = '''
-Copyright (C) 2008-2012 Steve Borho <steve@borho.org> and others.
+Copyright (C) 2008-2013 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
@@ -29,8 +29,7 @@ from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
 from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.util import version as thgversion
-from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.bugreport import run as bugrun
+from tortoisehg.hgqt import bugreport, qtlib
 
 try:
     from tortoisehg.util.config import nofork as config_nofork
@@ -64,8 +63,8 @@ def dispatch(args):
         errstring = _('Error string "%(arg0)s" at %(arg1)s<br>Please '
                       '<a href="#edit:%(arg1)s">edit</a> your config')
         main = QApplication(sys.argv)
-        dlg = ExceptionMsgBox(hglib.tounicode(str(e)), errstring, opts,
-                              parent=None)
+        dlg = ExceptionMsgBox(hglib.tounicode(str(e)),
+                              hglib.tounicode(errstring), opts, parent=None)
         dlg.exec_()
     except SystemExit:
         pass
@@ -76,8 +75,10 @@ def dispatch(args):
         opts = {}
         opts['cmd'] = ' '.join(sys.argv[1:])
         opts['error'] = traceback.format_exc()
-        opts['nofork'] = True
-        return qtrun(bugrun, u, **opts)
+        main = QApplication(sys.argv)
+        dlg = bugreport.BugReport(opts)
+        dlg.exec_()
+        return -1
     except KeyboardInterrupt:
         print _('\nCaught keyboard interrupt, aborting.\n')
 
@@ -220,7 +221,7 @@ def _parse(ui, args):
         c.append((o[0], o[1], options[o[1]], o[3]))
 
     try:
-        args = fancyopts.fancyopts(args, c, cmdoptions)
+        args = fancyopts.fancyopts(args, c, cmdoptions, True)
     except fancyopts.getopt.GetoptError, inst:
         raise error.CommandError(cmd, inst)
 
@@ -526,13 +527,14 @@ class _QtRunner(QObject):
         QSettings.setDefaultFormat(QSettings.IniFormat)
 
         self._mainapp = QApplication(sys.argv)
-        self._gc = GarbageCollector(self, self.debug)
         try:
+            self._gc = GarbageCollector(self, self.debug)
             # default org is used by QSettings
             self._mainapp.setApplicationName('TortoiseHgQt')
             self._mainapp.setOrganizationName('TortoiseHg')
             self._mainapp.setOrganizationDomain('tortoisehg.org')
             self._mainapp.setApplicationVersion(thgversion.version())
+            self._fixlibrarypaths()
             self._installtranslator()
             qtlib.setup_font_substitutions()
             qtlib.fix_application_font()
@@ -555,6 +557,8 @@ class _QtRunner(QObject):
             if dlg:
                 dlg.show()
                 dlg.raise_()
+            else:
+                return -1
         except:
             # Exception before starting eventloop needs to be postponed;
             # otherwise it will be ignored silently.
@@ -569,6 +573,12 @@ class _QtRunner(QObject):
             return self._mainapp.exec_()
         finally:
             self._mainapp = None
+
+    def _fixlibrarypaths(self):
+        # make sure to use the bundled Qt plugins to avoid ABI incompatibility
+        # http://qt-project.org/doc/qt-4.8/deployment-windows.html#qt-plugins
+        if os.name == 'nt' and getattr(sys, 'frozen', False):
+            self._mainapp.setLibraryPaths([self._mainapp.applicationDirPath()])
 
     def _installtranslator(self):
         if not i18n.language:
@@ -697,10 +707,9 @@ def mq(ui, *pats, **opts):
     from tortoisehg.hgqt.mq import run
     return qtrun(run, ui, *pats, **opts)
 
-def test(ui, *pats, **opts):
-    """test arbitrary widgets"""
-    from tortoisehg.hgqt.mq import run
-    return qtrun(run, ui, *pats, **opts)
+def debugbugreport(ui, *pats, **opts):
+    """open bugreport dialog by exception"""
+    raise Exception(' '.join(pats))
 
 def purge(ui, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
@@ -831,6 +840,11 @@ def drag_copy(ui, *pats, **opts):
 def thgimport(ui, *pats, **opts):
     """import an ordered set of patches"""
     from tortoisehg.hgqt.thgimport import run
+    return qtrun(run, ui, *pats, **opts)
+
+def revdetails(ui, *pats, **opts):
+    """revision details tool"""
+    from tortoisehg.hgqt.revdetails import run
     return qtrun(run, ui, *pats, **opts)
 
 ### help management, adapted from mercurial.commands.help_()
@@ -1079,7 +1093,7 @@ table = {
              '(only a repository)')),
           ('u', 'updaterev', '',
            _('revision, tag or branch to check out')),
-          ('r', 'rev', [], _('include the specified changeset')),
+          ('r', 'rev', '', _('include the specified changeset')),
           ('b', 'branch', [],
            _('clone only the specified branch')),
           ('', 'pull', None, _('use pull protocol to copy metadata')),
@@ -1110,8 +1124,12 @@ table = {
          _('thg email [REVS]')),
     "^log|history|explorer|workbench":
         (log,
-         [('l', 'limit', '', _('limit number of changes displayed'))],
+         [('l', 'limit', '', _('(DEPRECATED)'))],
          _('thg log [OPTIONS] [FILE]')),
+    "^revdetails":
+        (revdetails,
+         [('r', 'rev', '', _('the revision to show'))],
+         _('thg revdetails [-r REV]')),
     "manifest":
         (manifest,
          [('r', 'rev', '', _('revision to display')),
@@ -1135,7 +1153,7 @@ table = {
           ('', 'webdir-conf', '',
            _('name of the hgweb config file (DEPRECATED)'))],
          _('thg serve [--web-conf FILE]')),
-    "^sync|synchronize": (sync, [], _('thg sync')),
+    "^sync|synchronize": (sync, [], _('thg sync [PEER]')),
     "^status|st": (status,
          [('c', 'clean', False, _('show files without changes')),
           ('i', 'ignored', False, _('show ignored files'))],
@@ -1148,13 +1166,12 @@ table = {
     "^rebase": (rebase,
         [('', 'keep', False, _('keep original changesets')),
          ('', 'keepbranches', False, _('keep original branch names')),
-         ('', 'detach', False, _('force detaching of source from its original '
-                                'branch')),
+         ('', 'detach', False, _('(DEPRECATED)')),
          ('s', 'source', '',
           _('rebase from the specified changeset')),
          ('d', 'dest', '',
           _('rebase onto the specified changeset'))],
-        _('thg rebase -s REV -d REV [--keep] [--detach]')),
+        _('thg rebase -s REV -d REV [--keep]')),
     "^tag":
         (tag,
          [('f', 'force', None, _('replace existing tag')),
@@ -1165,7 +1182,7 @@ table = {
          _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]')),
     "shelve|unshelve": (shelve, [], _('thg shelve')),
     "rejects": (rejects, [], _('thg rejects [FILE]')),
-    "test": (test, [], _('thg test')),
+    "debugbugreport": (debugbugreport, [], _('thg debugbugreport [TEXT]')),
     "help": (help_, [], _('thg help [COMMAND]')),
     "^purge": (purge, [], _('thg purge')),
     "^qreorder": (qreorder, [], _('thg qreorder')),

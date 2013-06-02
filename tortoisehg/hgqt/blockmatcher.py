@@ -44,6 +44,7 @@ class BlockList(QWidget):
         self.blockTypes = {'+': QColor(0xA0, 0xFF, 0xB0, ),#0xa5),
                            '-': QColor(0xFF, 0xA0, 0xA0, ),#0xa5),
                            'x': QColor(0xA0, 0xA0, 0xFF, ),#0xa5),
+                           's': QColor(0xFF, 0xA5, 0x00, ),#0xa5),
                            }
         self._sbar = None
         self._value = 0
@@ -128,6 +129,24 @@ class BlockList(QWidget):
         p.setBrush(self._vrectcolor)
         p.drawRect(0, self._value, w, self._pagestep)
         p.restore()
+
+    def scrollToPos(self, y):
+        # Scroll to the position which specified by Y coodinate.
+        if not isinstance(self._sbar, QScrollBar):
+            return
+        ratio = float(y) / self.height()
+        minimum, maximum, step = self._minimum, self._maximum, self._pagestep
+        value = minimum + (maximum + step - minimum) * ratio - (step * 0.5)
+        value = min(maximum, max(minimum, value))  # round to valid range.
+        self.setValue(value)
+
+    def mousePressEvent(self, event):
+        super(BlockList, self).mousePressEvent(event)
+        self.scrollToPos(event.y())
+
+    def mouseMoveEvent(self, event):
+        super(BlockList, self).mouseMoveEvent(event)
+        self.scrollToPos(event.y())
 
 class BlockMatch(BlockList):
     """

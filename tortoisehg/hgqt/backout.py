@@ -43,9 +43,11 @@ class BackoutDialog(QWizard):
         repo.repositoryChanged.connect(self.repositoryChanged)
         repo.configChanged.connect(self.configChanged)
 
+    @pyqtSlot()
     def repositoryChanged(self):
         self.currentPage().repositoryChanged()
 
+    @pyqtSlot()
     def configChanged(self):
         self.currentPage().configChanged()
 
@@ -263,6 +265,7 @@ class SummaryPage(BasePage):
         self.groups.set_visible(True, 'prog')
         self.th.start()
 
+    @pyqtSlot()
     def threadFinished(self):
         self.groups.set_visible(False, 'prog')
         if self.th.canceled:

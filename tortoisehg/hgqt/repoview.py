@@ -24,11 +24,6 @@ from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class HgRepoViewHeader(QHeaderView):
-    menuRequested = pyqtSignal(QPoint)
-    def contextMenuEvent(self, event):
-        self.menuRequested.emit(event.globalPos())
-
 class HgRepoView(QTableView):
 
     revisionClicked = pyqtSignal(object)
@@ -52,10 +47,13 @@ class HgRepoView(QTableView):
         vh.hide()
         vh.setDefaultSectionSize(20)
 
-        header = HgRepoViewHeader(Qt.Horizontal, self)
+        header = self.horizontalHeader()
+        header.setClickable(False)
+        # AlignBottom because RepoWidget steals top of header space for InfoBar
+        header.setDefaultAlignment(Qt.AlignLeft | Qt.AlignBottom)
         header.setHighlightSections(False)
-        header.menuRequested.connect(self.headerMenuRequest)
-        self.setHorizontalHeader(header)
+        header.setContextMenuPolicy(Qt.CustomContextMenu)
+        header.customContextMenuRequested.connect(self.headerMenuRequest)
 
         self.createActions()
 
@@ -63,7 +61,8 @@ class HgRepoView(QTableView):
         self.htmlDelegate = htmldelegate.HTMLDelegate(self)
 
         self.setAcceptDrops(True)
-        self.setDefaultDropAction(Qt.MoveAction)
+        if PYQT_VERSION >= 0x40700:
+            self.setDefaultDropAction(Qt.MoveAction)
         self.setDragEnabled(True)
         self.setDropIndicatorShown(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
@@ -94,13 +93,14 @@ class HgRepoView(QTableView):
 
     def createActions(self):
         menu = QMenu(self)
-        act = QAction(_('Choose Log Columns...'), self)
+        act = QAction(_('C&hoose Log Columns...'), self)
         act.triggered.connect(self.setHistoryColumns)
         menu.addAction(act)
         self.headermenu = menu
 
+    @pyqtSlot(QPoint)
     def headerMenuRequest(self, point):
-        self.headermenu.exec_(point)
+        self.headermenu.exec_(self.horizontalHeader().mapToGlobal(point))
 
     def setHistoryColumns(self):
         dlg = ColumnSelectDialog(self.colselect[0], self.colselect[1],

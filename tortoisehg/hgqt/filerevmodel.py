@@ -36,7 +36,7 @@ class FileRevModel(HgRepoListModel):
     _allcolumns = tuple(h[0] for h in FILE_COLUMNHEADERS)
     _allcolnames = dict(FILE_COLUMNHEADERS)
 
-    _columns = ('Rev', 'Branch', 'Description', 'Author', 'Age', 'Filename')
+    _columns = ('Graph', 'Rev', 'Branch', 'Description', 'Author', 'Age', 'Filename')
     _stretchs = {'Description': 1, }
     _getcolumns = "getFilelogColumns"
 
@@ -70,8 +70,7 @@ class FileRevModel(HgRepoListModel):
             # works with both versions.
             self.heads = [fl.index[fl.rev(x)][4] for x in fl.heads()]
             self.ensureBuilt(row=self.fill_step/2)
-            QTimer.singleShot(0, lambda: self.filled.emit())
-            self._fill_timer = self.startTimer(500)
+            QTimer.singleShot(0, self, SIGNAL('filled()'))
         else:
             self.graph = None
             self.heads = []
