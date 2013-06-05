@@ -13,7 +13,7 @@ override_dh_auto_install:
 	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thgmergetools.rc
 
 ## drop automatically created file
-override_dh_clean:
+override_dh_auto_clean:
 	dh_auto_clean
 	rm -f debian/pycompat
 	rm -f debian/thg.1
