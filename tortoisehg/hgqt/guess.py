@@ -9,7 +9,7 @@ import os
 
 from mercurial import hg, ui, mdiff, similar, patch
 
-from tortoisehg.util import hglib, shlib
+from tortoisehg.util import hglib, shlib, thread2
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, htmlui, cmdui
@@ -69,6 +69,7 @@ class DetectRenameDialog(QDialog):
 
         self.unrevlist = QListWidget()
         self.unrevlist.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.unrevlist.doubleClicked.connect(self.onUnrevDoubleClicked)
         utvbox.addWidget(self.unrevlist)
 
         simhbox = QHBoxLayout()
@@ -275,6 +276,10 @@ class DetectRenameDialog(QDialog):
                 hu.write(t, label=l)
         self.difftb.setHtml(hu.getdata()[0])
 
+    def onUnrevDoubleClicked(self, index):
+        file = hglib.fromunicode(self.unrevlist.model().data(index).toString())
+        qtlib.editfiles(self.repo, [file])
+
     def accept(self):
         s = QSettings()
         s.setValue('guess/geom', self.saveGeometry())
@@ -393,7 +398,7 @@ class RenameSearchThread(QThread):
         self.ufiles = ufiles
         self.minpct = minpct
         self.copies = copies
-        self.stopped = False
+        self.threadid = None
 
     def run(self):
         def emit(topic, pos, item='', unit='', total=None):
@@ -402,13 +407,25 @@ class RenameSearchThread(QThread):
             unit = hglib.tounicode(unit or '')
             self.progress.emit(topic, pos, item, unit, total)
         self.repo.ui.progress = emit
+        self.threadid = int(self.currentThreadId())
         try:
-            self.search(self.repo)
-        except Exception, e:
-            self.showMessage.emit(hglib.tounicode(str(e)))
+            try:
+                self.search(self.repo)
+            except KeyboardInterrupt:
+                pass
+            except Exception, e:
+                self.showMessage.emit(hglib.tounicode(str(e)))
+        finally:
+            self.threadid = None
 
     def cancel(self):
-        self.stopped = True
+        tid = self.threadid
+        if tid is None:
+            return
+        try:
+            thread2._async_raise(tid, KeyboardInterrupt)
+        except ValueError:
+            pass
 
     def search(self, repo):
         wctx = repo[None]
@@ -427,8 +444,6 @@ class RenameSearchThread(QThread):
         exacts = []
         gen = similar._findexactmatches(repo, added, removed)
         for o, n in gen:
-            if self.stopped:
-                return
             old, new = o.path(), n.path()
             exacts.append(old)
             self.match.emit([old, new, 1.0])
@@ -437,13 +452,5 @@ class RenameSearchThread(QThread):
         removed = [r for r in removed if r.path() not in exacts]
         gen = similar._findsimilarmatches(repo, added, removed, self.minpct)
         for o, n, s in gen:
-            if self.stopped:
-                return
             old, new, sim = o.path(), n.path(), s
             self.match.emit([old, new, sim])
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(None, path=paths.find_root())
-    return DetectRenameDialog(repo, None, *pats)

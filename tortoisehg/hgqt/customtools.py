@@ -16,6 +16,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import re
+
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
@@ -281,6 +283,225 @@ class ToolsFrame(QFrame):
             w.refresh()
 
 
+class HooksFrame(QFrame):
+    def __init__(self, ini, parent=None, **opts):
+        super(HooksFrame, self).__init__(parent, **opts)
+        self.ini = ini
+        # The frame is created empty, and will be populated on 'refresh',
+        # which usually happens when the frames is activated
+        self.setValue({})
+
+        topbox = QHBoxLayout()
+        self.setLayout(topbox)
+        self.hooktable = QTableWidget(0, 3, parent)
+        self.hooktable.setHorizontalHeaderLabels((_('Type'), _('Name'), _('Command')))
+        self.hooktable.sortByColumn(0, Qt.AscendingOrder)
+        self.hooktable.setSelectionBehavior(self.hooktable.SelectRows)
+        self.hooktable.setSelectionMode(self.hooktable.SingleSelection)
+        self.hooktable.cellDoubleClicked.connect(self.editHook)
+        topbox.addWidget(self.hooktable)
+        buttonbox = QVBoxLayout()
+        self.btnnew = QPushButton(_('New hook'))
+        buttonbox.addWidget(self.btnnew)
+        self.btnnew.clicked.connect(self.newHook)
+        self.btnedit = QPushButton(_('Edit hook'))
+        buttonbox.addWidget(self.btnedit)
+        self.btnedit.clicked.connect(self.editCurrentHook)
+        self.btndelete = QPushButton(_('Delete hook'))
+        self.btndelete.clicked.connect(self.deleteCurrentHook)
+        buttonbox.addWidget(self.btndelete)
+        buttonbox.addStretch()
+        topbox.addLayout(buttonbox)
+
+    def newHook(self):
+        td = HookConfigDialog(self)
+        res = td.exec_()
+        if res:
+            hooktype, command, hookname = td.value()
+            # Does the new hook already exist?
+            hooks = self.value()
+            if hooktype in hooks:
+                existingcommand = hooks[hooktype].get(hookname, None)
+                if existingcommand is not None:
+                    if existingcommand == command:
+                        # The command already exists "as is"!
+                        return
+                    if not qtlib.QuestionMsgBox(
+                            _('Replace existing hook?'),
+                            _('There is an existing %s.%s hook.\n\n'
+                            'Do you want to replace it?')
+                            % (hooktype, hookname),
+                            parent=self):
+                        return
+                    # Delete existing matching hooks in reverse order
+                    # (otherwise the row numbers will be wrong after the first
+                    # deletion)
+                    for r in reversed(self.findHooks(
+                            hooktype=hooktype, hookname=hookname)):
+                        self.deleteHook(r)
+            self.hooktable.setSortingEnabled(False)
+            row = self.hooktable.rowCount()
+            self.hooktable.insertRow(row)
+            for c, text in enumerate((hooktype, hookname, command)):
+                self.hooktable.setItem(row, c, QTableWidgetItem(text))
+            # Make the hook column not editable (a dialog is used to edit it)
+            itemhook = self.hooktable.item(row, 0)
+            itemhook.setFlags(itemhook.flags() & ~Qt.ItemIsEditable)
+            self.hooktable.setSortingEnabled(True)
+            self.hooktable.resizeColumnsToContents()
+            self.updatebuttons()
+
+    def editHook(self, r, c=0):
+        if r < 0:
+            r = 0
+        numrows = self.hooktable.rowCount()
+        if not numrows or r >= numrows:
+            return False
+        if c > 0:
+            # Only show the edit dialog when clicking
+            # on the "Hook Type" (i.e. the 1st) column
+            return False
+        hooktype = self.hooktable.item(r, 0).text()
+        hookname = self.hooktable.item(r, 1).text()
+        command = self.hooktable.item(r, 2).text()
+        td = HookConfigDialog(self, hooktype=hooktype,
+                              command=command, hookname=hookname)
+        res = td.exec_()
+        if res:
+            hooktype, command, hookname = td.value()
+            # Update the table
+            # Note that we must disable the ordering while the table
+            # is updated to avoid updating the wrong cell!
+            self.hooktable.setSortingEnabled(False)
+            self.hooktable.item(r, 0).setText(hooktype)
+            self.hooktable.item(r, 1).setText(hookname)
+            self.hooktable.item(r, 2).setText(command)
+            self.hooktable.setSortingEnabled(True)
+            self.hooktable.clearSelection()
+            self.hooktable.setState(self.hooktable.NoState)
+            self.hooktable.resizeColumnsToContents()
+        return bool(res)
+
+    def editCurrentHook(self):
+        self.editHook(self.hooktable.currentRow())
+
+    def deleteHook(self, row=None):
+        if row is None:
+            row = self.hooktable.currentRow()
+            if row < 0:
+                row = self.hooktable.rowCount() - 1
+        self.hooktable.removeRow(row)
+        self.hooktable.resizeColumnsToContents()
+        self.updatebuttons()
+
+    def deleteCurrentHook(self):
+        self.deleteHook()
+
+    def findHooks(self, hooktype=None, hookname=None, command=None):
+        matchingrows = []
+        for r in range(self.hooktable.rowCount()):
+            currhooktype = hglib.fromunicode(self.hooktable.item(r, 0).text())
+            currhookname = hglib.fromunicode(self.hooktable.item(r, 1).text())
+            currcommand = hglib.fromunicode(self.hooktable.item(r, 2).text())
+            matchinghooktype = hooktype is None or hooktype == currhooktype
+            matchinghookname = hookname is None or hookname == currhookname
+            matchingcommand = command is None or command == currcommand
+            if matchinghooktype and matchinghookname and matchingcommand:
+                matchingrows.append(r)
+        return matchingrows
+
+    def updatebuttons(self):
+        tablehasitems = self.hooktable.rowCount() > 0
+        self.btnedit.setEnabled(tablehasitems)
+        self.btndelete.setEnabled(tablehasitems)
+
+    def applyChanges(self, ini):
+        # widget.value() returns the _NEW_ values
+        # widget.curvalue returns the _ORIGINAL_ values (yes, this is a bit
+        # misleading! "cur" means "current" as in currently valid)
+        emitChanged = False
+        if not self.isDirty():
+            return emitChanged
+        emitChanged = True
+
+        # 1. Delete the previous hook configurations
+        section = 'hooks'
+        hooks = self.curvalue
+        for hooktype in hooks:
+            for keyname in hooks[hooktype]:
+                try:
+                    keyname = '%s.%s' % (hooktype, keyname)
+                    del ini[section][keyname]
+                except KeyError:
+                    pass
+        # 2. Save the new configurations
+        hooks = self.value()
+        for hooktype in hooks:
+            for field in sorted(hooks[hooktype]):
+                if field:
+                    keyname = '%s.%s' % (hooktype, field)
+                else:
+                    keyname = hooktype
+                value = hooks[hooktype][field]
+                if value:
+                    ini.set(section, keyname, value)
+        return emitChanged
+
+    ## common APIs for all edit widgets
+    def setValue(self, curvalue):
+        self.curvalue = dict(curvalue)
+
+    def value(self):
+        hooks = {}
+        for r in range(self.hooktable.rowCount()):
+            hooktype = hglib.fromunicode(self.hooktable.item(r, 0).text())
+            hookname = hglib.fromunicode(self.hooktable.item(r, 1).text())
+            command = hglib.fromunicode(self.hooktable.item(r, 2).text())
+            if hooktype not in hooks:
+                hooks[hooktype] = {}
+            hooks[hooktype][hookname] = command
+        return hooks
+
+    def isDirty(self):
+        return self.value() != self.curvalue
+
+    def gethooks(self):
+        hooks = {}
+        for key, value in self.ini.items('hooks'):
+            keyparts = key.split('.', 1)
+            hooktype = keyparts[0]
+            if len(keyparts) == 1:
+                name = ''
+            else:
+                name = keyparts[1]
+            if hooktype not in hooks:
+                hooks[hooktype] = {}
+            hooks[hooktype][name] = value
+        return hooks
+
+    def refresh(self):
+        hooks = self.gethooks()
+        self.setValue(hooks)
+        self.hooktable.setSortingEnabled(False)
+        self.hooktable.setRowCount(0)
+        for hooktype in sorted(hooks):
+            for name in sorted(hooks[hooktype]):
+                itemhook = QTableWidgetItem(hglib.tounicode(hooktype))
+                # Make the hook column not editable
+                # (a dialog is used to edit it)
+                itemhook.setFlags(itemhook.flags() & ~Qt.ItemIsEditable)
+                itemname = QTableWidgetItem(hglib.tounicode(name))
+                itemtool = QTableWidgetItem(
+                    hglib.tounicode(hooks[hooktype][name]))
+                self.hooktable.insertRow(self.hooktable.rowCount())
+                self.hooktable.setItem(self.hooktable.rowCount() - 1, 0, itemhook)
+                self.hooktable.setItem(self.hooktable.rowCount() - 1, 1, itemname)
+                self.hooktable.setItem(self.hooktable.rowCount() - 1, 2, itemtool)
+        self.hooktable.setSortingEnabled(True)
+        self.hooktable.resizeColumnsToContents()
+        self.updatebuttons()
+
+
 class ToolListBox(QListWidget):
     SEPARATOR = '------'
     def __init__(self, ini, parent=None, location=None, minimumwidth=None,
@@ -391,8 +612,82 @@ class ToolListBox(QListWidget):
             icon = validtools.get(toolname, {}).get('icon', None)
             self.addOrInsertItem(toolname, icon=icon)
 
-class CustomToolConfigDialog(QDialog):
-    'Dialog for editing the a custom tool configuration'
+
+class CustomConfigDialog(QDialog):
+    '''Custom Config Dialog base class'''
+
+    def __init__(self, parent=None, dialogname='', **kwargs):
+        QDialog.__init__(self, parent, **kwargs)
+        self.dialogname = dialogname
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+
+        self.hbox = QHBoxLayout()
+        self.formvbox = QFormLayout()
+
+        self.hbox.addLayout(self.formvbox)
+        vbox = QVBoxLayout()
+        self.okbutton = QPushButton(_('OK'))
+        self.okbutton.clicked.connect(self.okClicked)
+        vbox.addWidget(self.okbutton)
+        self.cancelbutton = QPushButton(_('Cancel'))
+        self.cancelbutton.clicked.connect(self.reject)
+        vbox.addWidget(self.cancelbutton)
+        vbox.addStretch()
+        self.hbox.addLayout(vbox)
+        self.setLayout(self.hbox)
+        self.setMaximumHeight(self.sizeHint().height())
+        self._readsettings()
+
+    def value(self):
+        return None
+
+    def _genCombo(self, items, selecteditem=None):
+        index = 0
+        if selecteditem:
+            try:
+                index = items.index(selecteditem)
+            except ValueError:
+                pass
+        combo = QComboBox()
+        combo.addItems(items)
+        if index:
+            combo.setCurrentIndex(index)
+        return combo
+
+    def _addConfigItem(self, parent, label, configwidget, tooltip=None):
+        if tooltip:
+            configwidget.setToolTip(tooltip)
+        parent.addRow(label, configwidget)
+        return configwidget
+
+    def okClicked(self):
+        errormsg = self.validateForm()
+        if errormsg:
+            qtlib.WarningMsgBox(_('Missing information'), errormsg)
+            return
+        return self.accept()
+
+    def validateForm(self):
+        return '' # No error
+
+    def _readsettings(self):
+        s = QSettings()
+        if self.dialogname:
+            self.restoreGeometry(s.value(self.dialogname + '/geom').toByteArray())
+        return s
+
+    def _writesettings(self):
+        s = QSettings()
+        if self.dialogname:
+            s.setValue(self.dialogname + '/geom', self.saveGeometry())
+
+    def done(self, r):
+        self._writesettings()
+        super(CustomConfigDialog, self).done(r)
+
+
+class CustomToolConfigDialog(CustomConfigDialog):
+    '''Dialog for editing custom tool configurations'''
 
     _enablemappings = [(_('All items'), 'istrue'),
                        (_('Working directory'), 'iswd'),
@@ -406,14 +701,12 @@ class CustomToolConfigDialog(QDialog):
     _defaulticonstring = _('<default icon>')
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
-        QDialog.__init__(self, parent)
+        super(CustomToolConfigDialog, self).__init__(parent,
+            dialogname='customtools',
+            windowTitle=_('Configure Custom Tool'),
+            windowIcon=qtlib.geticon(self._defaulticonname))
 
-        self.setWindowIcon(qtlib.geticon(self._defaulticonname))
-        self.setWindowTitle(_('Configure Custom Tool'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
-        self.hbox = QHBoxLayout()
-        vbox = QFormLayout()
+        vbox = self.formvbox
 
         command = toolconfig.get('command', '')
         workingdir = toolconfig.get('workingdir', '')
@@ -492,20 +785,6 @@ class CustomToolConfigDialog(QDialog):
             combo, _('When enabled, automatically show the Output Log when the '
             'command is run.\nDefault: False.'))
 
-        self.hbox.addLayout(vbox)
-        vbox = QVBoxLayout()
-        self.okbutton = QPushButton(_('OK'))
-        self.okbutton.clicked.connect(self.okClicked)
-        vbox.addWidget(self.okbutton)
-        self.cancelbutton = QPushButton(_('Cancel'))
-        self.cancelbutton.clicked.connect(self.reject)
-        vbox.addWidget(self.cancelbutton)
-        vbox.addStretch()
-        self.hbox.addLayout(vbox)
-        self.setLayout(self.hbox)
-        self.setMaximumHeight(self.sizeHint().height())
-        self._readsettings()
-
     def value(self):
         toolname = str(self.name.text()).strip()
         toolconfig = {
@@ -521,34 +800,8 @@ class CustomToolConfigDialog(QDialog):
             toolconfig['icon'] = ''
         return toolname, toolconfig
 
-    def _genCombo(self, items, selecteditem=None):
-        index = 0
-        if selecteditem:
-            try:
-                index = items.index(selecteditem)
-            except ValueError:
-                pass
-        combo = QComboBox()
-        combo.addItems(items)
-        if index:
-            combo.setCurrentIndex(index)
-        return combo
-
-    def _addConfigItem(self, parent, label, configwidget, tooltip=None):
-        if tooltip:
-            configwidget.setToolTip(tooltip)
-        parent.addRow(label, configwidget)
-        return configwidget
-
     def _enable2label(self, value):
         return dict((v, l) for l, v in self._enablemappings).get(value)
-
-    def okClicked(self):
-        errormsg = self.validateForm()
-        if errormsg:
-            qtlib.WarningMsgBox(_('Missing information'), errormsg)
-            return
-        return self.accept()
 
     def validateForm(self):
         name, config = self.value()
@@ -560,14 +813,98 @@ class CustomToolConfigDialog(QDialog):
             return _('You must set a command to run.')
         return '' # No error
 
-    def _readsettings(self):
-        s = QSettings()
-        self.restoreGeometry(s.value('customtools/geom').toByteArray())
 
-    def _writesettings(self):
-        s = QSettings()
-        s.setValue('customtools/geom', self.saveGeometry())
+class HookConfigDialog(CustomConfigDialog):
+    '''Dialog for editing the a hook configuration'''
 
-    def done(self, r):
-        self._writesettings()
-        super(CustomToolConfigDialog, self).done(r)
+    _hooktypes = (
+        'changegroup',
+        'commit',
+        'incoming',
+        'outgoing',
+        'prechangegroup',
+        'precommit',
+        'prelistkeys',
+        'preoutgoing',
+        'prepushkey',
+        'pretag',
+        'pretxnchangegroup',
+        'pretxncommit',
+        'preupdate',
+        'listkeys',
+        'pushkey',
+        'tag',
+        'update',
+    )
+    _rehookname = re.compile('^[^=\s]*$')
+
+    def __init__(self, parent=None, hooktype=None, command='', hookname=''):
+        super(HookConfigDialog, self).__init__(parent,
+            dialogname='hookconfigdialog',
+            windowTitle=_('Configure Hook'),
+            windowIcon=qtlib.geticon('tools-hooks'))
+
+        vbox = self.formvbox
+        combo = self._genCombo(self._hooktypes, hooktype)
+        self.hooktype = self._addConfigItem(vbox, _('Hook type'),
+            combo, _('Select when your command will be run'))
+        self.name = self._addConfigItem(vbox, _('Tool name'),
+            QLineEdit(hookname), _('The hook name. It cannot contain spaces.'))
+        self.command = self._addConfigItem(vbox, _('Command'),
+            QLineEdit(command), _('The command that will be executed.\n'
+                 'To execute a python function prepend the command with '
+                 '"python:".\n'))
+
+    def value(self):
+        hooktype = str(self.hooktype.currentText())
+        hookname = str(self.name.text()).strip()
+        command = str(self.command.text()).strip()
+        return hooktype, command, hookname
+
+    def validateForm(self):
+        hooktype, command, hookname = self.value()
+        if hooktype not in self._hooktypes:
+            return _('You must set a valid hook type.')
+        if self._rehookname.match(hookname) is None:
+            return _('The hook name cannot contain any spaces, '
+                     'tabs or \'=\' characters.')
+        if not command:
+            return _('You must set a command to run.')
+        return '' # No error
+
+
+def addCustomToolsSubmenu(menu,
+        ui, location, make, slot, label=_('Custom Tools')):
+    '''
+    Add a custom tools submenu to an existing menus
+
+    This can be used, for example, to add the custom tools submenu to the
+    different file context menus
+    '''
+    tools, toollist = hglib.tortoisehgtools(ui,
+        selectedlocation=location)
+    if not tools:
+        return
+    submenu = menu.addMenu(label)
+    submenu.triggered.connect(slot)
+    emptysubmenu = True
+    for name in toollist:
+        if name == '|':
+            submenu.addSeparator()
+            continue
+        info = tools.get(name, None)
+        if info is None:
+            continue
+        command = info.get('command', None)
+        if not command:
+            continue
+        label = info.get('label', name)
+        icon = info.get('icon', CustomToolConfigDialog._defaulticonname)
+        status = info.get('status', 'MAR!C?S')
+        a = make(label, None, frozenset(status),
+            icon=icon, inmenu=submenu)
+        if a is not None:
+            a.setData(name)
+            emptysubmenu = False
+    if emptysubmenu:
+        menu.removeAction(submenu.menuAction())

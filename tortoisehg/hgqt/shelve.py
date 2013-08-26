@@ -8,7 +8,7 @@
 import os
 import time
 
-from mercurial import commands, error
+from mercurial import commands, error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
@@ -60,6 +60,7 @@ class ShelveDialog(QDialog):
         ahbox.setContentsMargins(2, 2, 2, 2)
         avbox.addLayout(ahbox)
         self.comboa = QComboBox(self)
+        self.comboa.setMinimumContentsLength(10)  # allow to cut long content
         self.comboa.currentIndexChanged.connect(self.comboAChanged)
         self.clearShelfButtonA = QPushButton(_('Clear'))
         self.clearShelfButtonA.setToolTip(_('Clear the current shelf file'))
@@ -89,6 +90,7 @@ class ShelveDialog(QDialog):
         bhbox.setContentsMargins(2, 2, 2, 2)
         bvbox.addLayout(bhbox)
         self.combob = QComboBox(self)
+        self.combob.setMinimumContentsLength(10)  # allow to cut long content
         self.combob.currentIndexChanged.connect(self.comboBChanged)
         self.clearShelfButtonB = QPushButton(_('Clear'))
         self.clearShelfButtonB.setToolTip(_('Clear the current shelf file'))
@@ -255,11 +257,16 @@ class ShelveDialog(QDialog):
             if not ok:
                 return
             shelve = hglib.fromunicode(name)
-            invalids = (':', '#', '/', '\\', '<', '>', '|')
+            invalids = (':', '#', '/', '\\')
             bads = [c for c in shelve if c in invalids]
             if bads:
                 qtlib.ErrorMsgBox(_('Bad filename'),
-                                  _('A shelf name cannot contain :#/\\<>|'))
+                                  _('A shelf name cannot contain %s')
+                                  % ''.join(bads))
+                return
+            badmsg = util.checkosfilename(shelve)
+            if badmsg:
+                qtlib.ErrorMsgBox(_('Bad filename'), hglib.tounicode(badmsg))
                 return
         try:
             fn = os.path.join('shelves', shelve)
@@ -482,12 +489,3 @@ class ShelveDialog(QDialog):
     def reject(self):
         self.storeSettings()
         super(ShelveDialog, self).reject()
-
-def run(ui, *pats, **opts):
-    if 'repo' in opts:
-        repo = opts['repo']
-    else:
-        from tortoisehg.util import paths
-        from tortoisehg.hgqt import thgrepo
-        repo = thgrepo.repository(ui, path=paths.find_root())
-    return ShelveDialog(repo)

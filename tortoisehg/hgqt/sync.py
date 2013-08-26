@@ -17,6 +17,7 @@ from mercurial import hg, ui, util, scmutil, httpconnection
 from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, thgrepo, rebase, resolve, hgrcutil
+from tortoisehg.hgqt import hgemail
 
 def parseurl(url):
     assert type(url) == unicode
@@ -42,8 +43,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
-    beginSuppressPrompt = pyqtSignal()
-    endSuppressPrompt = pyqtSignal()
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
     switchToRequest = pyqtSignal(QString)
@@ -62,7 +61,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.opts = {}
         self.cmenu = None
         self.embedded = bool(parent)
-        self.targetargs = []
 
         s = QSettings()
         for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug', 'mq'):
@@ -233,12 +231,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.optionsbutton.pressed.connect(self.editOptions)
 
         cmd = cmdui.Widget(not self.embedded, True, self)
-        cmd.commandStarted.connect(self.beginSuppressPrompt)
         cmd.commandStarted.connect(self.commandStarted)
-        cmd.commandFinished.connect(self.endSuppressPrompt)
         cmd.commandFinished.connect(self.commandFinished)
         cmd.makeLogVisible.connect(self.makeLogVisible)
-        cmd.output.connect(self.output)
         cmd.output.connect(self.outputHook)
         cmd.progress.connect(self.progress)
         if not self.embedded:
@@ -247,6 +242,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         bottomlayout.addWidget(cmd)
         cmd.setVisible(False)
         self.cmd = cmd
+
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth, *args: dlgmeth(self, *args), parent=self)
 
         self.curalias = None
         self.reload()
@@ -260,24 +258,21 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def loadTargets(self, ctx):
         self.targetcombo.clear()
-        #The parallel targetargs record is the argument list to pass to hg
-        self.targetargs = []
-        selIndex = 0;
-        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)))
-        self.targetargs.append(['--rev', str(ctx.rev())])
+        # itemData(role=UserRole) is the argument list to pass to hg
+        selIndex = 0
+        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)),
+                                 ('--rev', str(ctx.rev())))
 
         for name in self.repo.namedbranches:
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('branch: ') + uname)
+            self.targetcombo.addItem(_('branch: ') + uname, ('--branch', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
-            self.targetargs.append(['--branch', name])
             if ctx.thgbranchhead() and name == ctx.branch():
                 selIndex = self.targetcombo.count() - 1
         for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
-            self.targetcombo.addItem(_('bookmark: ') + uname)
+            self.targetcombo.addItem(_('bookmark: ') + uname, ('--bookmark', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name, Qt.ToolTipRole)
-            self.targetargs.append(['--bookmark', name])
             if name in ctx.bookmarks():
                 selIndex = self.targetcombo.count() - 1
 
@@ -296,6 +291,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if index < 0:
             index = 0
         self.targetcombo.setCurrentIndex(index)
+
+    def isTargetSelected(self):
+        return self.targetcheckbox.isChecked()
 
     def editOptions(self):
         dlg = OptionsDialog(self.opts, self)
@@ -370,10 +368,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.reltv.setModel(tm)
         sm = self.reltv.selectionModel()
         sm.currentRowChanged.connect(self.pathSelected)
-
-        # restore the current alias and its url
-        if self.curalias in self.paths:
-            self.setUrl(hglib.tounicode(self.curalias))
 
     def currentUrl(self):
         return unicode(self.urlentry.text())
@@ -508,6 +502,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         dlg.setWindowModality(Qt.WindowModal)
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
+            self.setEditUrl(dlg.urlentry.text())
             self.reload()
 
     def removeurl(self):
@@ -556,6 +551,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.reload()
 
     def secureclicked(self):
+        if not parseurl(self.currentUrl()).host:
+            qtlib.WarningMsgBox(_('No host specified'),
+                                _('Please set a valid URL to continue.'),
+                                parent=self)
+            return
         dlg = SecureDialog(self.repo, self.currentUrl(), self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
@@ -578,9 +578,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             b.setEnabled(True)
         self.stopAction.setEnabled(False)
         if self.finishfunc:
+            # allow GC to clean temp finishfunc. here we need to nullify it
+            # before calling, because it may be reassigned in finishfunc().
+            f = self.finishfunc
+            self.finishfunc = None
             output = self.cmd.core.rawoutput()
-            self.finishfunc(ret, output)
-            self.finishfunc = None # allow GC to clean temp functions
+            f(ret, output)
 
     def run(self, cmdline, details):
         if self.cmd.core.running():
@@ -600,10 +603,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if 'rev' in details and '--rev' not in cmdline:
             if self.embedded and self.targetcheckbox.isChecked():
                 idx = self.targetcombo.currentIndex()
-                if idx != -1 and idx < len(self.targetargs):
-                    args = self.targetargs[idx]
+                if idx != -1:
+                    args = self.targetcombo.itemData(idx).toPyObject()
                     if args[0][2:] not in details:
-                        args[0] = '--rev'
+                        args = ('--rev',) + args[1:]
                     cmdline += args
         if self.opts.get('noproxy'):
             cmdline += ['--config', 'http_proxy.host=']
@@ -649,9 +652,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline, display=display, useproc='p4://' in lurl)
 
+    @pyqtSlot(QString, QString)
     def outputHook(self, msg, label):
-        if '\'hg push --new-branch\'' in msg:
+        label = unicode(label)
+        if "'hg push --new-branch'" in msg and 'ui.error' in label.split():
+            # not report as error because it will be handled internally in the
+            # same session (see pushclicked.finished)
             self.needNewBranch = True
+            label = ' '.join(l for l in label.split() if l != 'ui.error')
+        self.output.emit(msg, label)
 
     ##
     ## Workbench toolbar buttons
@@ -699,10 +708,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     ## Sync dialog buttons
     ##
 
+    def linkifyWithTarget(self, url):
+        link = linkify(url)
+        if self.embedded and self.targetcheckbox.isChecked():
+            link += u" (%s)" % self.targetcombo.currentText()
+        return link
+
     def inclicked(self):
         self.syncStarted.emit()
         url = self.currentUrl()
-        link = linkify(url)
+        link = self.linkifyWithTarget(url)
         self.showMessage.emit(_('Getting incoming changesets from %s...') % link)
         if self.embedded and not url.startswith('p4://') and \
            not self.opts.get('subrepos'):
@@ -737,7 +752,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def pullclicked(self, url=None):
         self.syncStarted.emit()
-        link = linkify(url or self.currentUrl())
+        link = self.linkifyWithTarget(url or self.currentUrl())
 
         def finished(ret, output):
             if ret == 0:
@@ -747,7 +762,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                       % (link, ret))
             self.pullCompleted.emit()
             # handle file conflicts during rebase
-            if self.opts.get('rebase'):
+            if self.opts.get('rebase') or self.opts.get('updateorrebase'):
                 if os.path.exists(self.repo.join('rebasestate')):
                     dlg = rebase.RebaseDialog(self.repo, self)
                     dlg.finished.connect(dlg.deleteLater)
@@ -771,6 +786,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             cmdline += ['--rebase', '--config', uimerge]
         elif self.cachedpp == 'update':
             cmdline += ['--update', '--config', uimerge]
+        elif self.cachedpp == 'updateorrebase':
+            cmdline += ['--update', '--rebase', '--config', uimerge]
         elif self.cachedpp == 'fetch':
             cmdline[2] = 'fetch'
         elif self.opts.get('mq'):
@@ -781,7 +798,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def outclicked(self):
         self.syncStarted.emit()
 
-        link = linkify(self.currentUrl())
+        link = self.linkifyWithTarget(self.currentUrl())
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % link)
         if self.embedded and not self.opts.get('subrepos'):
             def verifyhash(hash):
@@ -873,7 +890,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.syncStarted.emit()
 
         lurl = hglib.fromunicode(self.currentUrl())
-        link = linkify(self.currentUrl())
+        link = self.linkifyWithTarget(self.currentUrl())
         if (not hg.islocal(lurl) and confirm and not self.targetcheckbox.isChecked()):
             r = qtlib.QuestionMsgBox(_('Confirm Push to remote Repository'),
                                      _('Push to remote repository\n%s\n?')
@@ -901,6 +918,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     if r:
                         cmdline = self.lastcmdline
                         cmdline.extend(['--new-branch'])
+                        self.finishfunc = finished  # should be called again
                         self.run(cmdline, validopts)
                         return
             self.pushCompleted.emit()
@@ -944,16 +962,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.showMessage.emit(_('Determining outgoing changesets to email...'))
         def outputnodes(ret, data):
             if ret == 0:
-                nodes = [n for n in data.splitlines() if len(n) == 40]
+                nodes = tuple(n for n in data.splitlines() if len(n) == 40)
                 self.showMessage.emit(_('%d outgoing changesets') %
                                         len(nodes))
                 try:
-                    outgoingrevs = [cmdline[cmdline.index('--rev') + 1]]
+                    outgoingrevs = (cmdline[cmdline.index('--rev') + 1],)
                 except ValueError:
                     outgoingrevs = None
-                from tortoisehg.hgqt import run as _run
-                _run.email(ui.ui(), repo=self.repo, rev=nodes,
-                           outgoing=True, outgoingrevs=outgoingrevs)
+                self._dialogs.open(SyncWidget._createEmailDialog, nodes,
+                                   outgoingrevs)
             elif ret == 1:
                 self.showMessage.emit(_('No outgoing changesets'))
             else:
@@ -963,12 +980,16 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     '--template', '{node}\n']
         self.run(cmdline, ('force', 'branch', 'rev'))
 
+    def _createEmailDialog(self, revs, outgoingrevs):
+        return hgemail.EmailDialog(self.repo, revs, outgoing=True,
+                                   outgoingrevs=outgoingrevs)
+
     def unbundle(self):
         caption = _("Select bundle file")
-        _FILE_FILTER = "%s" % _("Bundle files (*.hg)")
-        bundlefile = QFileDialog.getOpenFileName(parent=self, caption=caption,
-                                    directory=self.repo.root,
-                                    filter=_FILE_FILTER)
+        _FILE_FILTER = ';;'.join([_("Bundle files (*.hg)"),
+                                  _("All files (*)")])
+        bundlefile = QFileDialog.getOpenFileName(
+            self, caption, hglib.tounicode(self.repo.root), _FILE_FILTER)
         if bundlefile:
             # Set the pull source to the selected bundle file
             self.urlentry.setText(bundlefile)
@@ -1026,13 +1047,18 @@ class PostPullDialog(QDialog):
             layout.addWidget(self.fetch)
         else:
             self.fetch = None
-        if 'rebase' in repo.extensions() or repo.postpull == 'rebase':
+        if ('rebase' in repo.extensions()
+            or repo.postpull in ('rebase', 'updateorrebase')):
             if 'rebase' in repo.extensions():
-                btntxt = _('Rebase - rebase local commits above pulled changes')
+                rebasetxt = _('Rebase - rebase local commits above pulled changes')
+                updateorrebasetxt = _('UpdateOrRebase - pull, then try to update or rebase')
             else:
-                btntxt = _('Rebase - use rebase extension (rebase is not active!)')
-            self.rebase = QRadioButton(btntxt)
+                rebasetxt = _('Rebase - use rebase extension (rebase is not active!)')
+                updateorrebasetxt = _('UpdateOrRebase - use rebase extension (rebase is not active!)')
+            self.rebase = QRadioButton(rebasetxt)
             layout.addWidget(self.rebase)
+            self.updateOrRebase = QRadioButton(updateorrebasetxt)
+            layout.addWidget(self.updateOrRebase)
 
         self.none.setChecked(True)
         if repo.postpull == 'update':
@@ -1041,6 +1067,8 @@ class PostPullDialog(QDialog):
             self.fetch.setChecked(True)
         elif repo.postpull == 'rebase':
             self.rebase.setChecked(True)
+        elif repo.postpull == 'updateorrebase':
+            self.updateOrRebase.setChecked(True)
 
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                            'where possible'))
@@ -1074,8 +1102,10 @@ class PostPullDialog(QDialog):
             return 'update'
         elif (self.fetch and self.fetch.isChecked()):
             return 'fetch'
-        else:
+        elif (self.rebase and self.rebase.isChecked()):
             return 'rebase'
+        else:
+            return 'updateorrebase'
 
     def accept(self):
         path = self.repo.join('hgrc')
@@ -1147,6 +1177,17 @@ class SaveDialog(QDialog):
         else:
             self.clearcb = None
 
+        s = QSettings()
+        self.updatesubpaths = QCheckBox(_('Update subrepo paths'))
+        self.updatesubpaths.setChecked(
+            s.value('sync/updatesubpaths', True).toBool())
+        self.updatesubpaths.setToolTip(
+            _('Update or create a path alias called \'%s\' on all subrepos, '
+              'using this URL as the base URL, '
+              'appending the local relative subrepo path to it')
+            % hglib.tounicode(alias))
+        self.layout().addRow(self.updatesubpaths)
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -1157,8 +1198,8 @@ class SaveDialog(QDialog):
 
         QTimer.singleShot(0, lambda:self.aliasentry.setFocus())
 
-    def accept(self):
-        fn = self.repo.join('hgrc')
+    def savePath(self, repo, alias, path, confirm=True):
+        fn = repo.join('hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save an URL'),
@@ -1166,14 +1207,7 @@ class SaveDialog(QDialog):
             return
         if fn is None:
             return
-        alias = hglib.fromunicode(self.aliasentry.text())
-        if self.edit:
-            path = hglib.fromunicode(self.urlentry.text())
-        elif self.clearcb and self.clearcb.isChecked():
-            path = self.cleanurl
-        else:
-            path = self.origurl
-        if (not self.edit or path != self.origurl) and alias in cfg['paths']:
+        if confirm and (not self.edit or path != self.origurl) and alias in cfg['paths']:
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
                 _('%s already exists, replace URL?') % hglib.tounicode(alias),
                 parent=self):
@@ -1181,13 +1215,52 @@ class SaveDialog(QDialog):
         cfg.set('paths', alias, path)
         if self.edit and alias != self.origalias:
             cfg.remove('paths', self.origalias)
-        self.repo.incrementBusyCount()
         try:
             wconfig.writefile(cfg, fn)
         except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
+        if self.updatesubpaths.isChecked():
+            ctx = repo['.']
+            for subname in ctx.substate:
+                if ctx.substate[subname][2] != 'hg':
+                    continue
+                if not os.path.exists(repo.wjoin(subname)):
+                    continue
+                defaultsubpath = ctx.substate[subname][0]
+                pathurl = util.url(path)
+                if pathurl.scheme:
+                    subpath = str(pathurl).rstrip('/') + '/' + subname
+                else:
+                    subpath = os.path.normpath(os.path.join(path, subname))
+                if defaultsubpath != subname:
+                    if not qtlib.QuestionMsgBox(
+                            _('Confirm URL replace'),
+                            _('Subrepo \'%s\' has a non trivial '
+                              'default sync URL:<p>%s<p>'
+                              'Replace it with the following URL?:'
+                              '<p>%s')
+                                % (hglib.tounicode(subname),
+                                    hglib.tounicode(defaultsubpath),
+                                    hglib.tounicode(subpath)),
+                            parent=self):
+                        continue
+                subrepo = hg.repository(repo.ui, path=repo.wjoin(subname))
+                self.savePath(subrepo, alias, subpath, confirm=False)
+
+    def accept(self):
+        alias = hglib.fromunicode(self.aliasentry.text())
+        if self.edit:
+            path = hglib.fromunicode(self.urlentry.text())
+        elif self.clearcb and self.clearcb.isChecked():
+            path = self.cleanurl
+        else:
+            path = self.origurl
+        self.repo.incrementBusyCount()
+        self.savePath(self.repo, alias, path)
         self.repo.decrementBusyCount()
+        s = QSettings()
+        s.setValue('sync/updatesubpaths', self.updatesubpaths.isChecked())
         super(SaveDialog, self).accept()
 
     def reject(self):
@@ -1230,6 +1303,7 @@ class SecureDialog(QDialog):
             le.setText(pretty)
 
         u = parseurl(urlu)
+        assert u.host
         uhost = hglib.tounicode(u.host)
         self.setWindowTitle(_('Security: ') + uhost)
         self.setWindowFlags(self.windowFlags() & \
@@ -1405,6 +1479,7 @@ class PathsTree(QTreeView):
 
     def __init__(self, parent, editable):
         QTreeView.__init__(self, parent)
+        self.setDragDropMode(QTreeView.DragOnly)
         self.setSelectionMode(QTreeView.SingleSelection)
         self.editable = editable
 
@@ -1430,38 +1505,6 @@ class PathsTree(QTreeView):
             if r:
                 self.removeAlias.emit(alias)
 
-    def selectedUrls(self):
-        for index in self.selectedRows():
-            yield index.sibling(index.row(), 1).data(Qt.DisplayRole).toString()
-
-    def dragObject(self):
-        urls = []
-        for url in self.selectedUrls():
-            u = QUrl()
-            u.setPath(url)
-            urls.append(u)
-        if urls:
-            d = QDrag(self)
-            m = QMimeData()
-            m.setUrls(urls)
-            d.setMimeData(m)
-            d.start(Qt.CopyAction)
-
-    def mousePressEvent(self, event):
-        self.pressPos = event.pos()
-        self.pressTime = QTime.currentTime()
-        return super(PathsTree, self).mousePressEvent(event)
-
-    def mouseMoveEvent(self, event):
-        d = event.pos() - self.pressPos
-        if d.manhattanLength() < QApplication.startDragDistance():
-            return QTreeView.mouseMoveEvent(self, event)
-        elapsed = self.pressTime.msecsTo(QTime.currentTime())
-        if elapsed < QApplication.startDragTime():
-            return super(PathsTree, self).mouseMoveEvent(event)
-        self.dragObject()
-        return super(PathsTree, self).mouseMoveEvent(event)
-
     def selectedRows(self):
         return self.selectionModel().selectedRows()
 
@@ -1470,7 +1513,7 @@ class PathsModel(QAbstractTableModel):
         QAbstractTableModel.__init__(self, parent)
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
-        for alias, path in pathlist:
+        for alias, path in sorted(pathlist):
             safepath = util.hidepassword(path)
             ualias = hglib.tounicode(alias)
             usafepath = hglib.tounicode(safepath)
@@ -1498,6 +1541,20 @@ class PathsModel(QAbstractTableModel):
             return QVariant()
         else:
             return QVariant(self.headers[col])
+
+    def mimeData(self, indexes):
+        urls = []
+        for i in indexes:
+            u = QUrl()
+            u.setPath(self.rows[i.row()][1])
+            urls.append(u)
+
+        m = QMimeData()
+        m.setUrls(urls)
+        return m
+
+    def mimeTypes(self):
+        return ['text/uri-list']
 
     def flags(self, index):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled
@@ -1589,11 +1646,3 @@ class OptionsDialog(QDialog):
 
         self.outopts = outopts
         QDialog.accept(self)
-
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    w = SyncWidget(repo, None, **opts)
-    if pats:
-        w.setUrl(hglib.tounicode(pats[0]))
-    return w

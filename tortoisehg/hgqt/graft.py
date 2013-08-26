@@ -94,6 +94,16 @@ class GraftDialog(QDialog):
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
         self.layout().addWidget(self.autoresolvechk)
 
+        self.currentuservechk = QCheckBox(_('Use my user name instead of graft '
+                                            'committer user name'))
+        self.layout().addWidget(self.currentuservechk)
+
+        self.currentdatevechk = QCheckBox(_('Use current date'))
+        self.layout().addWidget(self.currentdatevechk)
+
+        self.logvechk = QCheckBox(_('Append graft info to log message'))
+        self.layout().addWidget(self.logvechk)
+
         self.cmd = cmdui.Widget(True, True, self)
         self.cmd.commandFinished.connect(self.commandFinished)
         self.showMessage.connect(self.cmd.stbar.showMessage)
@@ -176,6 +186,12 @@ class GraftDialog(QDialog):
         cmdline = ['graft', '--repository', self.repo.root]
         cmdline += ['--config', 'ui.merge=internal:' +
                     (self.autoresolvechk.isChecked() and 'merge' or 'fail')]
+        if self.currentuservechk.isChecked():
+            cmdline += ['--currentuser']
+        if self.currentdatevechk.isChecked():
+            cmdline += ['--currentdate']
+        if self.logvechk.isChecked():
+            cmdline += ['--log']
         if os.path.exists(self._graftstatefile):
             cmdline += ['--continue']
         else:
@@ -294,19 +310,3 @@ class GraftDialog(QDialog):
                                         labels=labels, parent=self):
                 return
         super(GraftDialog, self).reject()
-
-def run(ui, *revs, **opts):
-    from tortoisehg.util import paths
-    repo = thgrepo.repository(ui, path=paths.find_root())
-
-    revs = list(revs)
-    revs.extend(opts['rev'])
-
-    if os.path.exists(repo.join('graftstate')):
-        qtlib.InfoMsgBox(_('Graft already in progress'),
-                          _('Resuming graft already in progress'))
-    elif not revs:
-        qtlib.ErrorMsgBox(_('Abort'),
-                          _('You must provide revisions to graft'))
-        import sys; sys.exit()
-    return GraftDialog(repo, None, source=revs)

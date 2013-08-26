@@ -87,8 +87,14 @@ class patchctx(object):
     def substate(self):
         return {}  # unapplied patch won't include .hgsubstate
 
+    # unlike changectx, `k in pctx` and `iter(pctx)` just iterates files
+    # included in the patch file, because it does not know the full manifest.
+
     def __contains__(self, key):
         return key in self._files
+
+    def __iter__(self):
+        return iter(sorted(self._files))
 
     def __str__(self):      return node.short(self.node())
     def node(self):         return self._node
@@ -106,6 +112,13 @@ class patchctx(object):
     def extra(self):        return {}
     def p1(self):           return None
     def p2(self):           return None
+    def obsolete(self):     return False
+    def extinct(self):      return False
+    def unstable(self):     return False
+    def bumped(self):       return False
+    def divergent(self):    return False
+    def troubled(self):     return False
+    def troubles(self):     return []
 
     def flags(self, wfile):
         if wfile == self._parseErrorFileName:
@@ -143,25 +156,11 @@ class patchctx(object):
     def removeStandin(self, path):  return path
 
     def longsummary(self):
-        summary = hglib.tounicode(self.description())
         if self._repo.ui.configbool('tortoisehg', 'longsummary'):
             limit = 80
-            lines = summary.splitlines()
-            if lines:
-                summary = lines.pop(0)
-                while len(summary) < limit and lines:
-                    summary += u'  ' + lines.pop(0)
-                summary = summary[0:limit]
-            else:
-                summary = ''
         else:
-            lines = summary.splitlines()
-            summary = lines and lines[0] or ''
-
-            if summary and len(lines) > 1:
-                summary += u' \u2026' # ellipsis ...
-
-        return summary
+            limit = None
+        return hglib.longsummary(self.description(), limit)
 
     def changesToParent(self, whichparent):
         'called by filelistmodel to get list of files'

@@ -101,9 +101,23 @@ class HgFileListModel(QAbstractTableModel):
 
     def indexFromFile(self, filename):
         if filename in self._filesdict:
-            row = self._files.index(self._filesdict[filename])
-            return self.index(row, 0)
+            try:
+                row = self._files.index(self._filesdict[filename])
+                return self.index(row, 0)
+            except ValueError:
+                pass
         return QModelIndex()
+
+    def setFilter(self, match):
+        'simple match in filename filter'
+        self.layoutAboutToBeChanged.emit()
+        oldindexes = [(self.indexFromFile(r['path']), r['path'])
+                      for r in self._files]
+        self._files = [r for r in self._unfilteredfiles
+            if hglib.fromunicode(match) in r['path']]
+        for oi, filename in oldindexes:
+            self.changePersistentIndex(oi, self.indexFromFile(filename))
+        self.layoutChanged.emit()
 
     def _buildDesc(self, parent):
         files = []
@@ -159,6 +173,10 @@ class HgFileListModel(QAbstractTableModel):
                 self._files += [x for x in _files if x['path'] not in _paths]
         except EnvironmentError, e:
             self.showMessage.emit(hglib.tounicode(str(e)))
+        # Make a "copy" of self._files that can be used as the data source
+        # when filtering. Note that there is no need for this to be an actual
+        # copy, because self._files will be recreated on setFilter()
+        self._unfilteredfiles = self._files
         self._filesdict = dict([(f['path'], f) for f in self._files])
 
     def data(self, index, role):

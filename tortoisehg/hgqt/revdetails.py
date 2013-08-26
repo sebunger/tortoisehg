@@ -26,6 +26,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     grepRequested = pyqtSignal(unicode, dict)
     revisionSelected = pyqtSignal(int)
     updateToRevision = pyqtSignal(int)
+    runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent, rev=None):
         QWidget.__init__(self, parent)
@@ -87,7 +88,6 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.filelisttbar = QToolBar(_('File List Toolbar'))
         self.filelisttbar.setIconSize(QSize(16,16))
         self.filelist = HgFileListView(self.repo, self, True)
-        self.filelist.linkActivated.connect(self.linkActivated)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.filelist.customContextMenuRequested.connect(self.menuRequest)
         self.filelist.doubleClicked.connect(self.onDoubleClick)
@@ -142,8 +142,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
                                     lineWrapMode=QTextEdit.NoWrap,
                                     openLinks=False)
         self.message.minimumSizeHint = lambda: QSize(0, 25)
-        self.message.anchorClicked.connect(
-            lambda url: self.linkActivated.emit(url.toString()))
+        self.message.anchorClicked.connect(self._forwardAnchorClicked)
 
         sp = SP(SP.Expanding, SP.Expanding)
         sp.setHorizontalStretch(0)
@@ -197,7 +196,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def createActions(self):
         self.actionUpdate = a = self.filelisttbar.addAction(
             qtlib.geticon('hg-update'), _('Update to this revision'))
-        a.triggered.connect(lambda: self.updateToRevision.emit(self.ctx.rev()))
+        a.triggered.connect(self._emitUpdateToRevision)
         self.filelisttbar.addSeparator()
         self.actionShowAllMerge = QAction(_('Show All'), self)
         self.actionShowAllMerge.setToolTip(
@@ -206,6 +205,13 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.actionShowAllMerge.setChecked(False)
         self.actionShowAllMerge.setEnabled(False)
         self.filelisttbar.addAction(self.actionShowAllMerge)
+
+        le = QLineEdit()
+        if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
+            le.setPlaceholderText(_('### filter text ###'))
+        self.filefilter = le
+        self.filelisttbar.addWidget(self.filefilter)
+        self.filefilter.textEdited.connect(self.setFilter)
 
         self.actionNextLine = QAction('Next line', self)
         self.actionNextLine.setShortcut(Qt.SHIFT + Qt.Key_Down)
@@ -227,6 +233,8 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._fileactions = filectxactions.FilectxActions(self.repo, self,
                                                           rev=self.ctx.rev())
         self._fileactions.linkActivated.connect(self.linkActivated)
+        self._fileactions.runCustomCommandRequested.connect(
+            self.runCustomCommandRequested)
         self.addActions(self._fileactions.actions())
 
     def onRevisionSelected(self, rev):
@@ -245,6 +253,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.actionShowAllMerge.setEnabled(len(ctx.parents()) == 2)
         self.fileview.setContext(ctx)
         self.filelist.setContext(ctx)
+        self.setFilter(self.filefilter.text())
 
     @pyqtSlot()
     def _updatedeschtmlizer(self):
@@ -260,6 +269,14 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
                 and rev not in self.repo.thgmqunappliedpatches)):
             rev = 'tip'
         self.onRevisionSelected(rev)
+
+    @pyqtSlot(QUrl)
+    def _forwardAnchorClicked(self, url):
+        self.linkActivated.emit(url.toString())
+
+    @pyqtSlot()
+    def _emitUpdateToRevision(self):
+        self.updateToRevision.emit(self.ctx.rev())
 
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
@@ -298,6 +315,13 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
                                     self.filelist.currentFile(),
                                     itemissubrepo)
 
+    @pyqtSlot(QString)
+    def setFilter(self, match):
+        model = self.filelist.model()
+        if model is not None:
+            model.setFilter(match)
+            self.filelist.enablefilterpalette(bool(match))
+
     def saveSettings(self, s):
         wb = "RevDetailsWidget/"
         for n in self.splitternames:
@@ -321,7 +345,6 @@ class RevDetailsDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-log'))
-        self.repoviewer = None
 
         layout = QVBoxLayout()
         layout.setMargin(0)
@@ -371,15 +394,9 @@ class RevDetailsDialog(QDialog):
             except ValueError:
                 linkpath = linktarget
                 rev = None
-            if self.repoviewer is None:
-                # prevent recursive import
-                from workbench import Workbench
-                self.repoviewer = Workbench()
-            self.repoviewer.show()
-            self.repoviewer.activateWindow()
-            self.repoviewer.raise_()
-            self.repoviewer.showRepo(hglib.tounicode(linkpath))
-            self.repoviewer.goto(linkpath, rev)
+            # TODO: implement by using signal-slot if possible
+            from tortoisehg.hgqt import run
+            run.qtrun.showRepoInWorkbench(hglib.tounicode(linkpath), rev)
 
     @pyqtSlot()
     def refresh(self):
@@ -389,19 +406,11 @@ class RevDetailsDialog(QDialog):
         else:
             hash = self.revdetails.ctx.hex()[:12]
             revstr = '@%s: %s' % (str(revnum), hash)
-        self.setWindowTitle(_('%s - Revision Details (%s)') % (self.revdetails.repo.displayname, revstr))
+        self.setWindowTitle(_('%s - Revision Details (%s)')
+                            % (self.revdetails.repo.displayname, revstr))
         self.revdetails.reload()
 
     def done(self, ret):
         s = QSettings()
         s.setValue('revdetails/geom', self.saveGeometry())
         super(RevDetailsDialog, self).done(ret)
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    from tortoisehg.hgqt import thgrepo
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    pats = hglib.canonpaths(pats)
-    os.chdir(repo.root)
-    rev = opts.get('rev', '.')
-    return RevDetailsDialog(repo, rev=rev)
