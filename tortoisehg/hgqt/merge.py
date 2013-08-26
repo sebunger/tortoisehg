@@ -54,11 +54,13 @@ class MergeDialog(QWizard):
 
     @pyqtSlot()
     def repositoryChanged(self):
-        self.currentPage().repositoryChanged()
+        if self.currentPage():
+            self.currentPage().repositoryChanged()
 
     @pyqtSlot()
     def configChanged(self):
-        self.currentPage().configChanged()
+        if self.currentPage():
+            self.currentPage().configChanged()
 
     def pageChanged(self, id):
         if id != -1:
@@ -725,16 +727,3 @@ class CheckThread(QThread):
 
     def cancel(self):
         self.canceled = True
-
-def run(ui, *pats, **opts):
-    from tortoisehg.util import paths
-    rev = opts.get('rev') or None
-    if not rev and len(pats):
-        rev = pats[0]
-    if not rev:
-        import sys
-        qtlib.InfoMsgBox(_('Unable to merge'),
-                         _('Merge revision not specified or not found'))
-        sys.exit()
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    return MergeDialog(rev, repo, None)

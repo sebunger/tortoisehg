@@ -11,11 +11,11 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, error
+from mercurial import error
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
+from tortoisehg.util import hglib
+from tortoisehg.hgqt import cmdui, qtlib
 
 WD_PARENT = _('= Working Directory Parent =')
 
@@ -26,7 +26,7 @@ class ArchiveDialog(QDialog):
     makeLogVisible = pyqtSignal(bool)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, ui, repo, rev=None, parent=None):
+    def __init__(self, repo, rev=None, parent=None):
         super(ArchiveDialog, self).__init__(parent)
 
         # main layout
@@ -122,23 +122,24 @@ class ArchiveDialog(QDialog):
         self.vbox.addLayout(self.hbox)
 
         # set default values
-        self.ui = ui
         self.repo = repo
-        self.initrev = rev
         self.prevtarget = None
         self.rev_combo.addItem(WD_PARENT)
         for b in self.repo.branchtags():
-            self.rev_combo.addItem(b)
+            self.rev_combo.addItem(hglib.tounicode(b))
         tags = list(self.repo.tags())
         tags.sort(reverse=True)
         for t in tags:
-            self.rev_combo.addItem(t)
-        if self.initrev:
-            text = str(self.initrev)
-            if self.rev_combo.findText(text, Qt.MatchFlags(Qt.MatchExactly)) == -1:
-                self.rev_combo.insertItems(0, [text])
+            self.rev_combo.addItem(hglib.tounicode(t))
+        if rev:
+            text = hglib.tounicode(str(rev))
+            selectindex = self.rev_combo.findText(text)
+            if selectindex >= 0:
+                self.rev_combo.setCurrentIndex(selectindex)
+            else:
+                self.rev_combo.insertItem(0, text)
+                self.rev_combo.setCurrentIndex(0)
         self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
-        self.rev_combo.setCurrentIndex(0)
         self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.dest_edit.setText(hglib.tounicode(self.repo.root))
         self.filesradio.setChecked(True)
@@ -146,10 +147,7 @@ class ArchiveDialog(QDialog):
 
         # connecting slots
         self.dest_edit.textEdited.connect(self.dest_edited)
-        self.connect(self.rev_combo, SIGNAL('currentIndexChanged(int)'),
-                     self.rev_combo_changed)
-        self.connect(self.rev_combo, SIGNAL('editTextChanged(QString)'),
-                     self.rev_combo_changed)
+        self.rev_combo.editTextChanged.connect(self.rev_combo_changed)
         self.dest_btn.clicked.connect(self.browse_clicked)
         self.files_in_rev_chk.stateChanged.connect(self.dest_edited)
         self.subrepos_chk.toggled.connect(self.onSubreposToggled)
@@ -173,7 +171,7 @@ class ArchiveDialog(QDialog):
         self.rev_combo.setFocus()
         self._readsettings()
 
-    def rev_combo_changed(self, index):
+    def rev_combo_changed(self):
         self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.update_path()
 
@@ -195,9 +193,10 @@ class ArchiveDialog(QDialog):
         else:
             caption = _('Select Destination File')
             ext = '*' + select['ext']
-            filter = '%s (%s)\nAll Files (*.*)' % (select['label'], ext)
-        response = FD.getSaveFileName(parent=self, caption=caption,
-                directory=dest, filter=filter, options=FD.ReadOnly)
+            filter = ';;'.join(['%s (%s)' % (select['label'], ext),
+                                _('All files (*)')])
+        response = FD.getSaveFileName(self, caption, dest, filter, None,
+                                      FD.ReadOnly)
         if response:
             self.dest_edit.setText(response)
             self.update_path()
@@ -209,8 +208,11 @@ class ArchiveDialog(QDialog):
 
     def get_subrepos_present(self):
         rev = self.get_selected_rev()
-        ctx = self.repo[rev]
-        return '.hgsubstate' in ctx.files() or '.hgsubstate' in ctx.manifest()
+        try:
+            ctx = self.repo[rev]
+        except (error.LookupError, error.RepoLookupError):
+            return False
+        return '.hgsubstate' in ctx
 
     def get_selected_rev(self):
         rev = self.rev_combo.currentText()
@@ -397,8 +399,3 @@ class ArchiveDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('archive/geom', self.saveGeometry())
-
-def run(ui, *revs, **opts):
-    rev = opts.get('rev')
-    repo = thgrepo.repository(ui, paths.find_root())
-    return ArchiveDialog(repo.ui, repo, rev)

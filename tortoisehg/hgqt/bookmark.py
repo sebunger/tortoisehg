@@ -5,25 +5,19 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error
-
-from tortoisehg.util import hglib, i18n
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui
-
-keep = i18n.keepgettext()
 
 class BookmarkDialog(QDialog):
     showMessage = pyqtSignal(QString)
     output = pyqtSignal(QString, QString)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev, parent):
+    def __init__(self, repo, rev, parent=None):
         super(BookmarkDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
@@ -61,6 +55,15 @@ class BookmarkDialog(QDialog):
         self.newNameEdit = QLineEdit()
         self.newNameEdit.textEdited.connect(self.bookmarkTextChanged)
         form.addRow(_('New Name:'), self.newNameEdit)
+
+        ### Activate checkbox
+        self.activateCheckBox = QCheckBox()
+        if self.node == self.repo['.'].node():
+            self.activateCheckBox.setChecked(True)
+        else:
+            self.activateCheckBox.setChecked(False)
+            self.activateCheckBox.setEnabled(False)
+        form.addRow(_('Activate:'), self.activateCheckBox)
 
         ## bottom buttons
         BB = QDialogButtonBox
@@ -105,11 +108,12 @@ class BookmarkDialog(QDialog):
         self.bookmarkCombo.setFocus()
         self.bookmarkTextChanged()
 
+    @pyqtSlot()
     def refresh(self):
         """ update display on dialog with recent repo data """
         # add bookmarks to drop-down list
         marks = self.repo._bookmarks.keys()[:]
-        marks.sort(reverse=True)
+        marks.sort()
         cur = self.bookmarkCombo.currentText()
         self.bookmarkCombo.clear()
         for bookmark in marks:
@@ -136,6 +140,9 @@ class BookmarkDialog(QDialog):
             self.moveBtn.setEnabled(False)
             self.renameBtn.setEnabled(False)
             self.newNameEdit.setEnabled(False)
+
+    def setBookmarkName(self, name):
+        self.bookmarkCombo.setEditText(name)
 
     def set_status(self, text, icon=None):
         self.status.setShown(True)
@@ -164,8 +171,10 @@ class BookmarkDialog(QDialog):
         def finished():
             self.set_status(_("Bookmark '%s' has been added") % bookmark, True)
 
-        cmdline = ['bookmarks', '--repository', self.repo.root,
-                   '--rev', str(self.rev), bookmarklocal]
+        cmdline = ['bookmarks', '--repository', self.repo.root]
+        if not self.activateCheckBox.isChecked():
+            cmdline.extend(['--rev', str(self.rev)])
+        cmdline.append(bookmarklocal)
         self.cmd.run(cmdline)
         self.finishfunc = finished
 
@@ -180,8 +189,10 @@ class BookmarkDialog(QDialog):
         def finished():
             self.set_status(_("Bookmark '%s' has been moved") % bookmark, True)
 
-        cmdline = ['bookmarks', '--repository', self.repo.root,
-                   '--rev', str(self.rev), '--force', bookmarklocal]
+        cmdline = ['bookmarks', '--repository', self.repo.root]
+        if not self.activateCheckBox.isChecked():
+            cmdline.extend(['--rev', str(self.rev)])
+        cmdline.extend(['--force', bookmarklocal])
         self.cmd.run(cmdline)
         self.finishfunc = finished
 
@@ -223,8 +234,3 @@ class BookmarkDialog(QDialog):
                    '--rename', namelocal, newnamelocal]
         self.cmd.run(cmdline)
         self.finishfunc = finished
-
-    def reject(self):
-        # prevent signals from reaching deleted objects
-        self.repo.repositoryChanged.disconnect(self.refresh)
-        super(BookmarkDialog, self).reject()

@@ -714,7 +714,8 @@ class RepoRegistryView(QDockWidget):
 
     def sortbypath(self):
         childs = self.selitem.internalPointer().childs
-        self.tview.model().sortchilds(childs, lambda x: util.normpath(x.rootpath()))
+        self.tview.model().sortchilds(
+            childs, lambda x: os.path.normcase(util.normpath(x.rootpath())))
 
     def sortbyhgsub(self):
         ip = self.selitem.internalPointer()
@@ -736,15 +737,13 @@ class RepoRegistryView(QDockWidget):
                 return 0
         self.tview.model().sortchilds(ip.childs, keyfunc)
 
-    @pyqtSlot(QString, QString)
-    def shortNameChanged(self, uroot, uname):
+    def setShortName(self, uroot, uname):
         it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
         if it:
             it.setShortName(uname)
             self.tview.model().layoutChanged.emit()
 
-    @pyqtSlot(QString, object)
-    def baseNodeChanged(self, uroot, basenode):
+    def setBaseNode(self, uroot, basenode):
         it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
         if it:
             it.setBaseNode(basenode)

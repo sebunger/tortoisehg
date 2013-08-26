@@ -31,11 +31,12 @@ class CloneDialog(QDialog):
         self.ret = None
 
         dest = src = cwd = os.getcwd()
-        if len(args) > 1:
-            src = args[0]
-            dest = args[1]
-        elif len(args):
-            src = args[0]
+        if args:
+            if len(args) > 1:
+                src = args[0]
+                dest = args[1]
+            else:
+                src = args[0]
         udest = hglib.tounicode(dest)
         usrc = hglib.tounicode(src)
         ucwd = hglib.tounicode(cwd)
@@ -80,11 +81,13 @@ class CloneDialog(QDialog):
         self.shist = s.value('clone/source').toStringList()
         for path in self.shist:
             if path: self.src_combo.addItem(path)
+        self.src_combo.setCurrentIndex(-1)
         self.src_combo.setEditText(usrc)
 
         self.dhist = s.value('clone/dest').toStringList()
         for path in self.dhist:
             if path: self.dest_combo.addItem(path)
+        self.dest_combo.setCurrentIndex(-1)
         self.dest_combo.setEditText(udest)
 
         ### options
@@ -226,6 +229,17 @@ class CloneDialog(QDialog):
         self.src_combo.lineEdit().selectAll()
 
         self.composeCommand()
+
+    def setSource(self, url):
+        assert not self.isRunning()
+        self.src_combo.setEditText(url)
+
+    def setDestination(self, url):
+        assert not self.isRunning()
+        self.dest_combo.setEditText(url)
+
+    def isRunning(self):
+        return self.cmd.core.running()
 
     ### Private Methods ###
 
@@ -518,6 +532,3 @@ class CloneDialog(QDialog):
             self.cmd.cancel()
             return
         QDialog.reject(self)
-
-def run(ui, *pats, **opts):
-    return CloneDialog(pats, opts)

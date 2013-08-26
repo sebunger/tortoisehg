@@ -19,16 +19,17 @@ from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox, WarningMsgBox
 from tortoisehg.hgqt.qtlib import DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
-from tortoisehg.hgqt import archive, thgimport, thgstrip, run, purge, bookmark
+from tortoisehg.hgqt import archive, thgimport, thgstrip, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
 from tortoisehg.hgqt import qdelete, qreorder, qfold, qrename, shelve
-from tortoisehg.hgqt import matching, graft
+from tortoisehg.hgqt import matching, graft, hgemail, postreview
+from tortoisehg.hgqt import sign
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
 from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
-from tortoisehg.hgqt.manifestdialog import ManifestWidget
+from tortoisehg.hgqt.manifestdialog import ManifestDialog, ManifestWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.pbranch import PatchBranchWidget
@@ -44,17 +45,6 @@ class RepoWidget(QWidget):
     output = pyqtSignal(QString, QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
-    beginSuppressPrompt = pyqtSignal()
-    endSuppressPrompt = pyqtSignal()
-
-    # The following signals should be exchanged directly between workbench and
-    # thgrepo. But it isn't possible because workbench cannot filter out known
-    # repo from the result of thgrepo.repository().
-    closeSelfSignal = pyqtSignal(QWidget)
-    repoChanged = pyqtSignal(QString)
-    repoConfigChanged = pyqtSignal(QString)
-    shortNameChanged = pyqtSignal(QString, QString)
-    baseNodeChanged = pyqtSignal(QString, object)
 
     revisionSelected = pyqtSignal(object)
 
@@ -66,13 +56,14 @@ class RepoWidget(QWidget):
     repoLinkClicked = pyqtSignal(unicode)
     """Emitted when clicked a link to open repository"""
 
-    def __init__(self, repo, parent=None, bundle=None):
+    def __init__(self, repoagent, parent=None, bundle=None):
         QWidget.__init__(self, parent, acceptDrops=True)
 
-        self.repo = repo
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.repositoryDestroyed.connect(self.repositoryDestroyed)
-        repo.configChanged.connect(self.configChanged)
+        self._repoagent = repoagent
+        # TODO: use _repoagent where appropriate
+        self.repo = repo = repoagent.rawRepo()
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.configChanged.connect(self.configChanged)
         self.revsetfilter = False
         self.bundle = None  # bundle file name [local encoding]
         self.bundlesource = None  # source URL of incoming bundle [unicode]
@@ -81,8 +72,6 @@ class RepoWidget(QWidget):
         self.busyIcons = []
         self.namedTabs = {}
         self.repolen = len(repo)
-        self.shortname = None
-        self.basenode = None
         self.destroyed.connect(self.repo.thginvalidate)
 
         # Determine the "initial revision" that must be shown when
@@ -92,7 +81,7 @@ class RepoWidget(QWidget):
         # - "current":    Select the current (i.e. working dir parent) revision
         # - "tip":        Select tip of the repository
         # - "workingdir": Select the working directory pseudo-revision
-        initialRevision= \
+        initialRevision = \
             self.repo.ui.config('tortoisehg', 'initialrevision', 'current').lower()
 
         initialRevisionDict = {
@@ -125,9 +114,10 @@ class RepoWidget(QWidget):
         self.runner.output.connect(self.output)
         self.runner.progress.connect(self.progress)
         self.runner.makeLogVisible.connect(self.makeLogVisible)
-        self.runner.commandStarted.connect(self.beginSuppressPrompt)
-        self.runner.commandFinished.connect(self.endSuppressPrompt)
         self.runner.commandFinished.connect(self.onCommandFinished)
+
+        self._dialogs = qtlib.DialogKeeper(
+            lambda self, dlgmeth, *args: dlgmeth(self, *args), parent=self)
 
         # Select the widget chosen by the user
         defaultWidget = \
@@ -212,7 +202,9 @@ class RepoWidget(QWidget):
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)
         w.showMessage.connect(self.showMessage)
-        w.updateToRevision.connect(lambda rev: self.updateToRevision())
+        w.updateToRevision.connect(self.updateToRevision)
+        w.runCustomCommandRequested.connect(
+            self.handleRunCustomCommandRequest)
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
         self.namedTabs['log'] = idx
         tt.setTabToolTip(idx, _("Revision details", "tab tooltip"))
@@ -228,6 +220,7 @@ class RepoWidget(QWidget):
             tt.setTabToolTip(idx, _("MQ Patch", "tab tooltip"))
             self.namedTabs['mq'] = idx
         else:
+            self.mqDemand = None
             self.mqTabIndex = -1
 
         self.syncDemand = w = DemandWidget('createSyncWidget', self)
@@ -253,9 +246,6 @@ class RepoWidget(QWidget):
         else:
             self.pbranchTabIndex = -1
 
-        self.taskTabsWidget.currentChanged.connect(
-            self._refreshCommitTabIfNeeded)
-
     @pyqtSlot(QString)
     def switchToNamedTaskTab(self, tabname):
         tabname = str(tabname)
@@ -270,6 +260,9 @@ class RepoWidget(QWidget):
             # restore default splitter position if task tab is invisible
             if self.repotabs_splitter.sizes()[1] == 0:
                 self.repotabs_splitter.setSizes([1, 1])
+
+    def repoRootPath(self):
+        return self._repoagent.rootPath()
 
     def title(self):
         """Returns the expected title for this widget [unicode]"""
@@ -418,15 +411,22 @@ class RepoWidget(QWidget):
         cw.output.connect(self.output)
         cw.progress.connect(self.progress)
         cw.makeLogVisible.connect(self.makeLogVisible)
-        cw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
-        cw.endSuppressPrompt.connect(self.endSuppressPrompt)
         cw.linkActivated.connect(self._openLink)
         cw.showMessage.connect(self.showMessage)
         cw.grepRequested.connect(self.grep)
         cw.runCustomCommandRequested.connect(
             self.handleRunCustomCommandRequest)
-        QTimer.singleShot(0, cw.reload)
+        QTimer.singleShot(0, self._initCommitWidgetLate)
         return cw
+
+    @pyqtSlot()
+    def _initCommitWidgetLate(self):
+        cw = self.commitDemand.get()
+        cw.reload()
+        # auto-refresh should be enabled after initial reload(); otherwise
+        # refreshWctx() can be doubled
+        self.taskTabsWidget.currentChanged.connect(
+            self._refreshCommitTabIfNeeded)
 
     def createManifestWidget(self):
         if isinstance(self.rev, basestring):
@@ -440,6 +440,8 @@ class RepoWidget(QWidget):
         w.showMessage.connect(self.showMessage)
         w.grepRequested.connect(self.grep)
         w.revsetFilterRequested.connect(self.setFilter)
+        w.runCustomCommandRequested.connect(
+            self.handleRunCustomCommandRequest)
         return w
 
     def createSyncWidget(self):
@@ -447,8 +449,6 @@ class RepoWidget(QWidget):
         sw.output.connect(self.output)
         sw.progress.connect(self.progress)
         sw.makeLogVisible.connect(self.makeLogVisible)
-        sw.beginSuppressPrompt.connect(self.beginSuppressPrompt)
-        sw.endSuppressPrompt.connect(self.endSuppressPrompt)
         sw.syncStarted.connect(self.clearInfoBar)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
@@ -499,7 +499,7 @@ class RepoWidget(QWidget):
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
         self.revset = range(oldlen, newlen)
-        self.repomodel.revset = self.revset
+        self.repomodel.setRevset(self.revset)
         self.reload(invalidate=False)
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
@@ -519,7 +519,8 @@ class RepoWidget(QWidget):
         self.filterbar.setEnableFilter(True)
         self.filterbar.setQuery('')
         self.revset = []
-        self.repomodel.revset = self.revset
+        self.repomodel.setRevset(self.revset)
+        self.repoview.enablefilterpalette(False)
         self.bundle = None
         self.bundlesource = None
         self.titleChanged.emit(self.title())
@@ -540,6 +541,12 @@ class RepoWidget(QWidget):
 
     def pullBundleToRev(self):
         if self.bundle:
+            # manually remove infobar to work around unwanted rejectBundle
+            # during pull operation (issue #2596)
+            if self._activeInfoBar:
+                self._activeInfoBar.hide()
+                self._freeInfoBar()
+
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
             self.syncDemand.pullBundle(self.bundle, self.rev,
                                        self.bundlesource)
@@ -565,7 +572,7 @@ class RepoWidget(QWidget):
             self.reload()
             return True
         else:
-            self.repomodel.revset = []
+            self.repomodel.setRevset([])
             self.refresh()
         return False
 
@@ -576,7 +583,7 @@ class RepoWidget(QWidget):
         if self.revsetfilter:
             self.reload()
         else:
-            self.repomodel.revset = self.revset
+            self.repomodel.setRevset(self.revset)
             self.refresh()
         self.repoview.resetBrowseHistory(self.revset)
         self._reload_rev = self.revset[0]
@@ -603,9 +610,14 @@ class RepoWidget(QWidget):
         numnodes = len(nodes)
         numoutgoing = numnodes
 
-        # Read the tortoisehg.defaultpush setting to determine what to push
-        # by default, and set the button label and action accordingly
-        defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush', 'all')
+        if self.syncDemand.get().isTargetSelected():
+            # Outgoing preview is already filtered by target selection
+            defaultpush = None
+        else:
+            # Read the tortoisehg.defaultpush setting to determine what to push
+            # by default, and set the button label and action accordingly
+            defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush',
+                                              'all')
         rev = None
         branch = None
         pushall = False
@@ -710,9 +722,6 @@ class RepoWidget(QWidget):
         pbw.makeLogVisible.connect(self.makeLogVisible)
         return pbw
 
-    def reponame(self):
-        return self.repo.shortname
-
     @property
     def rev(self):
         """Returns the current active revision"""
@@ -809,16 +818,18 @@ class RepoWidget(QWidget):
 
     def thgimport(self, paths=None):
         dlg = thgimport.ImportDialog(self.repo, self)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.patchImported.connect(self.gotoTip)
         if paths:
             dlg.setfilepaths(paths)
         dlg.exec_()
 
     def shelve(self, arg=None):
+        self._dialogs.open(RepoWidget._createShelveDialog)
+
+    def _createShelveDialog(self):
         dlg = shelve.ShelveDialog(self.repo, self)
-        dlg.finished.connect(dlg.deleteLater)
-        dlg.exec_()
+        dlg.finished.connect(self._refreshCommitTabIfNeeded)
+        return dlg
 
     def verify(self):
         cmdline = ['--repository', self.repo.root, 'verify', '--verbose']
@@ -878,7 +889,7 @@ class RepoWidget(QWidget):
                     _('Your current working revision (%d) will be removed '
                       'by this rollback, leaving uncommitted changes.\n '
                       'Continue?' % rev)):
-                    return
+                return
         cmdline = ['rollback', '--repository', self.repo.root, '--verbose']
         self.runCommand(cmdline)
 
@@ -888,7 +899,6 @@ class RepoWidget(QWidget):
         dlg.setWindowModality(Qt.WindowModal)
         dlg.showMessage.connect(self.showMessage)
         dlg.progress.connect(self.progress)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     ## End workbench event forwards
@@ -899,6 +909,7 @@ class RepoWidget(QWidget):
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
         self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
         self.grepDemand.setSearch(pattern, **opts)
+        self.grepDemand.runSearch()
 
     def setupModels(self):
         # Filter revision set in case revisions were removed
@@ -906,7 +917,8 @@ class RepoWidget(QWidget):
         self.repomodel = HgRepoListModel(self.repo, self.repoview.colselect[0],
                                          self.filterbar.branch(), self.revset,
                                          self.revsetfilter, self,
-                                         self.filterbar.getShowHidden())
+                                         self.filterbar.getShowHidden(),
+                                         self.filterbar.branchAncestorsIncluded())
         self.repomodel.filled.connect(self.modelFilled)
         self.repomodel.loaded.connect(self.modelLoaded)
         self.repomodel.showMessage.connect(self.showMessage)
@@ -923,14 +935,6 @@ class RepoWidget(QWidget):
         'initial batch of revisions loaded'
         self.repoview.goto(self._reload_rev) # emits revisionSelected
         self.repoview.resizeColumns()
-        if self.repo.shortname != self.shortname:
-            self.shortname = self.repo.shortname
-            self.shortNameChanged.emit(hglib.tounicode(self.repo.root),
-                                       self.shortname)
-        if len(self.repo) and self.repo[0].node() != self.basenode:
-            self.basenode = self.repo[0].node()
-            self.baseNodeChanged.emit(hglib.tounicode(self.repo.root),
-                                      self.basenode)
 
     def modelLoaded(self):
         'all revisions loaded (graph generator completed)'
@@ -1029,6 +1033,7 @@ class RepoWidget(QWidget):
             elif self.revset:
                 self.revset = []
                 self.filterbar.setQuery('')
+                self.repoview.enablefilterpalette(False)
                 self.showMessage(_('Repository stripped, revision set cleared'))
         if not self.bundle:
             self.repolen = len(self.repo)
@@ -1081,11 +1086,6 @@ class RepoWidget(QWidget):
         self.filterbar.refresh()
 
     @pyqtSlot()
-    def repositoryDestroyed(self):
-        'Repository has detected itself to be deleted'
-        self.closeSelfSignal.emit(self)
-
-    @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
         if self.isVisible():
@@ -1100,9 +1100,6 @@ class RepoWidget(QWidget):
         else:
             self.dirty = True
 
-        # Update the repo registry entries related to the current repo
-        self.repoChanged.emit(hglib.tounicode(self.repo.root))
-
     @pyqtSlot()
     def configChanged(self):
         'Repository is reporting its config files have changed'
@@ -1110,12 +1107,6 @@ class RepoWidget(QWidget):
         self.revDetailsWidget.reload()
         self.titleChanged.emit(self.title())
         self.updateTaskTabs()
-        if self.repo.shortname != self.shortname:
-            self.shortname = self.repo.shortname
-            self.shortNameChanged.emit(hglib.tounicode(self.repo.root),
-                                       self.shortname)
-
-        self.repoConfigChanged.emit(hglib.tounicode(self.repo.root))
 
     def updateTaskTabs(self):
         val = self.repo.ui.config('tortoisehg', 'tasktabs', 'off').lower()
@@ -1167,7 +1158,7 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
             self.showMessage(_('Sync tab cannot exit'))
             return False
-        if 'mq' in self.repo.extensions():
+        if self.mqDemand:
             if not self.mqDemand.canExit():
                 self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
                 self.showMessage(_('MQ tab cannot exit'))
@@ -1351,13 +1342,17 @@ class RepoWidget(QWidget):
             return act
         menu = QMenu(self)
         if mode == 'outgoing':
+            pushtypeicon = {'all': None, 'branch': None, 'revision': None}
+            defaultpush = self.repo.ui.config(
+                'tortoisehg', 'defaultpush', 'all')
+            pushtypeicon[defaultpush] = 'hg-push'
             submenu = menu.addMenu(_('Pus&h'))
-            entry(submenu, None, isrev, _('Push to &Here'), '',
-                  self.pushToRevision)
-            entry(submenu, None, isrev, _('Push Selected &Branch'), '',
-                  self.pushBranch)
-            entry(submenu, None, isrev, _('Push &All'), 'hg-push',
-                  self.pushAll)
+            entry(submenu, None, isrev, _('Push to &Here'),
+                  pushtypeicon['revision'], self.pushToRevision)
+            entry(submenu, None, isrev, _('Push Selected &Branch'),
+                  pushtypeicon['branch'], self.pushBranch)
+            entry(submenu, None, isrev, _('Push &All'),
+                  pushtypeicon['all'], self.pushAll)
             entry(menu)
         entry(menu, None, isrev, _('&Update...'), 'hg-update',
               self.updateToRevision)
@@ -1378,6 +1373,8 @@ class RepoWidget(QWidget):
               self.tagToRevision)
         entry(menu, None, fixed, _('Boo&kmark...'), 'hg-bookmarks',
               self.bookmarkRevision)
+        entry(menu, 'gpg', fixed, _('Sig&n...'), 'hg-sign',
+              self.signRevision)
         entry(menu)
         entry(menu, None, fixed, _('&Backout...'), 'hg-revert',
               self.backoutToRevision)
@@ -1391,7 +1388,7 @@ class RepoWidget(QWidget):
         entry(submenu, None, isrev, _('E&xport Patch...'), 'hg-export',
               self.exportRevisions)
         entry(submenu, None, isrev, _('&Email Patch...'), 'mail-forward',
-              self.emailRevision)
+              self.emailSelectedRevisions)
         entry(submenu, None, isrev, _('&Archive...'), 'hg-archive',
               self.archiveRevision)
         entry(submenu, None, isrev, _('&Bundle Rev and Descendants...'),
@@ -1406,7 +1403,7 @@ class RepoWidget(QWidget):
             entry(submenu, None, isrev, pname).setData(pnum)
         entry(menu)
 
-        entry(menu, None, fixed, _('&Graft to Local...'), 'hg-transplant',
+        entry(menu, None, isrev, _('&Graft to Local...'), 'hg-transplant',
               self.graftRevisions)
 
         if 'mq' in exs or 'rebase' in exs:
@@ -1420,7 +1417,7 @@ class RepoWidget(QWidget):
             entry(submenu, 'mq', applied, _('Re&name Patch...'), None,
                   self.qrename)
             entry(submenu, 'mq')
-            entry(submenu, 'rebase', fixed, _('&Rebase...'), 'hg-rebase',
+            entry(submenu, 'rebase', isrev, _('&Rebase...'), 'hg-rebase',
                   self.rebaseRevision)
             entry(submenu, 'rebase')
             entry(submenu, 'mq', fixed, _('&Strip...'), 'menudelete',
@@ -1527,11 +1524,11 @@ class RepoWidget(QWidget):
             if dlg:
                 dlg.exec_()
         def emailPair():
-            run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
+            self._emailRevisions(self.menuselection)
         def emailDagRange():
             l = dagrange()
             if l:
-                run.email(self.repo.ui, rev=l, repo=self.repo)
+                self._emailRevisions(l)
         def bundleDagRange():
             l = dagrange()
             if l:
@@ -1560,7 +1557,6 @@ class RepoWidget(QWidget):
                            _('Selected changeset pair not related'))
                 return
             dlg = compress.CompressDialog(self.repo, revs, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
 
         menu = QMenu(self)
@@ -1605,7 +1601,6 @@ class RepoWidget(QWidget):
         def qdeleteact():
             """Delete unapplied patch(es)"""
             dlg = qdelete.QDeleteDialog(self.repo, self.menuselection, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.output.connect(self.output)
             dlg.makeLogVisible.connect(self.makeLogVisible)
             dlg.exec_()
@@ -1655,7 +1650,7 @@ class RepoWidget(QWidget):
         def exportSel():
             self.exportRevisions(self.menuselection)
         def emailSel():
-            run.email(self.repo.ui, rev=self.menuselection, repo=self.repo)
+            self._emailRevisions(self.menuselection)
         menu = QMenu(self)
         for name, cb, icon in (
                 (_('Export Selected...'), exportSel, 'hg-export'),
@@ -1810,7 +1805,6 @@ class RepoWidget(QWidget):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
     def visualDiffToLocal(self):
         if self.rev is None:
@@ -1819,29 +1813,14 @@ class RepoWidget(QWidget):
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
         if dlg:
             dlg.exec_()
-            dlg.deleteLater()
 
+    @pyqtSlot()
     def updateToRevision(self):
-        ctx = self.repo[self.rev]
-        bookmarks = ctx.bookmarks()
-        if ctx in self.repo.parents():
-            # keep bookmark unchanged when updating to current rev
-            if self.repo._bookmarkcurrent in bookmarks:
-                rev = self.repo._bookmarkcurrent
-            else:
-                rev = self.rev
-        else:
-            # more common switching bookmark, rather than deselecting it
-            if bookmarks:
-                rev = bookmarks[0]
-            else:
-                rev = self.rev
-
+        rev = hglib.getrevisionlabel(self.repo, self.rev)
         dlg = update.UpdateDialog(self.repo, rev, self)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def matchRevision(self):
@@ -1865,7 +1844,14 @@ class RepoWidget(QWidget):
             branch=self.repo[self.rev].branch())
 
     def manifestRevision(self):
-        run.manifest(self.repo.ui, repo=self.repo, rev=self.rev)
+        if QApplication.keyboardModifiers() & Qt.ShiftModifier:
+            self._dialogs.openNew(RepoWidget._createManifestDialog)
+        else:
+            dlg = self._dialogs.open(RepoWidget._createManifestDialog)
+            dlg.setRev(self.rev)
+
+    def _createManifestDialog(self):
+        return ManifestDialog(self.repo, self.rev)
 
     def mergeWithRevision(self):
         pctx = self.repo['.']
@@ -1874,9 +1860,10 @@ class RepoWidget(QWidget):
             QMessageBox.warning(self, _('Unable to merge'),
                 _('You cannot merge a revision with itself'))
             return
-        dlg = merge.MergeDialog(self.rev, self.repo, self)
-        dlg.exec_()
-        dlg.deleteLater()
+        self._dialogs.open(RepoWidget._createMergeDialog, self.rev)
+
+    def _createMergeDialog(self, rev):
+        return merge.MergeDialog(rev, self.repo, self)
 
     def tagToRevision(self):
         dlg = tag.TagDialog(self.repo, rev=str(self.rev), parent=self)
@@ -1892,6 +1879,13 @@ class RepoWidget(QWidget):
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
+
+    def signRevision(self):
+        dlg = sign.SignDialog(self.repo, self.rev, self)
+        dlg.showMessage.connect(self.showMessage)
+        dlg.output.connect(self.output)
+        dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.exec_()
 
     def graftRevisions(self):
@@ -1920,8 +1914,11 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def sendToReviewBoard(self):
-        run.postreview(self.repo.ui, rev=self.repoview.selectedRevisions(),
-          repo=self.repo)
+        self._dialogs.open(RepoWidget._createPostReviewDialog,
+                           tuple(self.repoview.selectedRevisions()))
+
+    def _createPostReviewDialog(self, revs):
+        return postreview.PostReviewDialog(self.repo.ui, self.repo, revs)
 
     def rupdate(self):
         import rupdate
@@ -1929,15 +1926,21 @@ class RepoWidget(QWidget):
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.progress.connect(self.progress)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
-    def emailRevision(self):
-        run.email(self.repo.ui, rev=self.repoview.selectedRevisions(),
-                  repo=self.repo)
+    @pyqtSlot()
+    def emailSelectedRevisions(self):
+        self._emailRevisions(self.repoview.selectedRevisions())
+
+    def _emailRevisions(self, revs):
+        self._dialogs.open(RepoWidget._createEmailDialog, tuple(revs))
+
+    def _createEmailDialog(self, revs):
+        return hgemail.EmailDialog(self.repo, revs)
 
     def archiveRevision(self):
-        dlg = archive.ArchiveDialog(self.repo.ui, self.repo, self.rev, self)
+        rev = hglib.getrevisionlabel(self.repo, self.rev)
+        dlg = archive.ArchiveDialog(self.repo, rev, self)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.output.connect(self.output)
         dlg.progress.connect(self.progress)
@@ -2148,52 +2151,29 @@ class RepoWidget(QWidget):
                    '--repository', self.repo.root]
         self.runCommand(cmdline)
 
+    @pyqtSlot()
     def qgotoParentRevision(self):
         """Apply an unapplied patch, or qgoto the parent of an applied patch"""
-        self.qgotoRevision(self.rev, unapplySelected=True)
+        self.qgotoRevision(self.repo[self.rev].p1().rev())
 
+    @pyqtSlot()
     def qgotoSelectedRevision(self):
-        self.qgotoRevision(self.rev, unapplySelected=False)
+        self.qgotoRevision(self.rev)
 
-    def qgotoRevision(self, rev, unapplySelected=True):
+    def qgotoRevision(self, rev):
         """Make REV the top applied patch"""
-        # If unapplySelected is true and rev is an applied patch
-        # it will be unapplied (qgoto its parent)
-        # Otherwise, qgoto the selected revision
-        def qpopAll(repo):
-            cmdline = ['qpop', '--all', '--repository', repo.root]
-            self.runCommand(cmdline)
-
-        ctx = self.repo.changectx(self.rev)
+        mqw = self.mqDemand.get()
+        ctx = self.repo.changectx(rev)
         if 'qparent'in ctx.tags():
-            return qpopAll(self.repo)
-        try:
-            applied = ctx.thgmqappliedpatch()
-            mqpatch = True
-        except:
-            applied = True
-            mqpatch = False
-
-        if unapplySelected and mqpatch and applied and 'qparent' in ctx.p1().tags():
-            return qpopAll(self.repo)
-
-        if not applied:
-            patchname = self.repo.changectx(self.rev).thgmqpatchname()
+            mqw.popAll()
         else:
-            if unapplySelected:
-                thgp = self.repo.changectx(self.repo.changectx(self.rev).p1().node())
-            else:
-                thgp = self.repo.changectx(self.repo.changectx(self.rev).node())
-            patchname = thgp.thgmqpatchname()
-        self.taskTabsWidget.setCurrentIndex(self.mqTabIndex)
-        self.mqDemand.forward('qgotoRevision', patchname)
+            mqw.qgotoRevision(ctx.thgmqpatchname())
 
     def qrename(self):
         sel = self.menuselection[0]
         if not isinstance(sel, str):
             sel = self.repo.changectx(sel).thgmqpatchname()
         dlg = qrename.QRenameDialog(self.repo, sel, self)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.output.connect(self.output)
         dlg.makeLogVisible.connect(self.makeLogVisible)
         dlg.exec_()

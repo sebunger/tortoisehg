@@ -29,7 +29,6 @@ class HgFileListView(QTableView):
     """
 
     fileSelected = pyqtSignal(QString, QString)
-    linkActivated = pyqtSignal(QString)
     clearDisplay = pyqtSignal()
 
     def __init__(self, repo, parent, multiselectable):
@@ -46,12 +45,12 @@ class HgFileListView(QTableView):
             self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.setTextElideMode(Qt.ElideLeft)
+        self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
     def setModel(self, model):
         QTableView.setModel(self, model)
         model.layoutChanged.connect(self.layoutChanged)
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
-        self.horizontalHeader().setResizeMode(1, QHeaderView.Stretch)
 
     def setRepo(self, repo):
         self.repo = repo
@@ -105,6 +104,9 @@ class HgFileListView(QTableView):
             col_width = max(col_width, 50)
             self.setColumnWidth(0, col_width)
         QTableView.resizeEvent(self, event)
+
+    def enablefilterpalette(self, enable):
+        self._paletteswitcher.enablefilterpalette(enable)
 
     #
     ## Mouse drag

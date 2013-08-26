@@ -214,8 +214,11 @@ class RejectsDialog(QDialog):
 
         if acceptresolution:
             f = QFile(hglib.tounicode(self.path))
-            f.open(QIODevice.WriteOnly)
-            self.editor.write(f)
+            saved = f.open(QIODevice.WriteOnly) and self.editor.write(f)
+            if not saved:
+                qtlib.ErrorMsgBox(_('Unable to save file'),
+                                  f.errorString(), parent=self)
+                return
             self.saveSettings()
             super(RejectsDialog, self).accept()
 
@@ -275,14 +278,3 @@ class RejectBrowser(qscilib.Scintilla):
         for i in removed:
             self.markerAdd(i, self.removedMark)
             self.markerAdd(i, self.removedColor)
-
-def run(ui, *pats, **opts):
-    if len(pats) != 1:
-        qtlib.ErrorMsgBox(_('Filename required'),
-                          _('You must provide the path to a file'))
-        import sys; sys.exit()
-    path = pats[0]
-    if path.endswith('.rej'):
-        path = path[:-4]
-    dlg = RejectsDialog(path, None)
-    return dlg

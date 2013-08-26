@@ -9,7 +9,7 @@ import os
 
 from mercurial import hg, util, error, context, merge, scmutil
 
-from tortoisehg.util import paths, hglib
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, wctxactions, visdiff, cmdui, fileview, thgrepo
 
@@ -51,7 +51,7 @@ class StatusWidget(QWidget):
     runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, pats, opts, parent=None, checkable=True,
-                 defcheck='MAR!S'):
+                 defcheck='commit'):
         QWidget.__init__(self, parent)
 
         self.opts = dict(modified=True, added=True, removed=True, deleted=True,
@@ -140,6 +140,7 @@ class StatusWidget(QWidget):
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
         self.actions = wctxactions.WctxActions(self.repo, self, checkable)
+        self.actions.refreshNeeded.connect(self.refreshWctx)
         self.actions.runCustomCommandRequested.connect(
             self.runCustomCommandRequested)
         tv = WctxFileTree(self.repo, checkable=checkable)
@@ -192,6 +193,20 @@ class StatusWidget(QWidget):
         self.split = split
         self.diffvbox = vbox
 
+    def __get_defcheck(self):
+        if self._defcheck is None:
+            return 'MAR!S'
+        return self._defcheck
+
+    def __set_defcheck(self, newdefcheck):
+        if newdefcheck.lower() == 'amend':
+            newdefcheck = 'MAS'
+        elif newdefcheck.lower() in ('commit', 'qnew', 'qrefresh'):
+            newdefcheck = 'MAR!S'
+        self._defcheck = newdefcheck
+
+    defcheck = property(__get_defcheck, __set_defcheck)
+
     def checkAllNone(self):
         if self.manualCheckAllUpdate:
             return
@@ -235,12 +250,13 @@ class StatusWidget(QWidget):
         for file in dels:
             del self.partials[file]
 
+        wfile = hglib.fromunicode(wfile)
         if changes is None:
             if wfile in self.partials:
                 del self.partials[wfile]
+                self.chunkSelectionChanged()
             return
 
-        wfile = hglib.fromunicode(wfile)
         if wfile in self.partials:
             # merge selection state from old hunk list to new hunk list
             oldhunks = self.partials[wfile].hunks
@@ -270,8 +286,7 @@ class StatusWidget(QWidget):
     @pyqtSlot(QPoint, object)
     def onMenuRequest(self, point, selected):
         menu = self.actions.makeMenu(selected)
-        if menu.exec_(point):
-            self.refreshWctx()
+        menu.exec_(point)
 
     def setPatchContext(self, pctx):
         if pctx != self.pctx:
@@ -1033,7 +1048,7 @@ class StatusDialog(QDialog):
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
         toplayout = QVBoxLayout()
-        toplayout.setContentsMargins(10, 10, 10, 0);
+        toplayout.setContentsMargins(10, 10, 10, 0)
         self.stwidget = StatusWidget(repo, pats, opts, self, checkable=False)
         toplayout.addWidget(self.stwidget, 1)
         layout.addLayout(toplayout)
@@ -1045,6 +1060,9 @@ class StatusDialog(QDialog):
         self.stwidget.titleTextChanged.connect(self.setWindowTitle)
         self.stwidget.linkActivated.connect(self.linkActivated)
 
+        self._subdialogs = qtlib.DialogKeeper(StatusDialog._createSubDialog,
+                                              parent=self)
+
         self.setWindowTitle(self.stwidget.getTitle())
         self.setWindowFlags(Qt.Window)
         self.loadSettings()
@@ -1054,11 +1072,13 @@ class StatusDialog(QDialog):
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def linkActivated(self, link):
-        link = hglib.fromunicode(link)
+        link = unicode(link)
         if link.startswith('repo:'):
-            from tortoisehg.hgqt.run import qtrun
-            from tortoisehg.hgqt import commit
-            qtrun(commit.run, self.stwidget.repo.ui, root=link[len('repo:'):])
+            self._subdialogs.open(link[len('repo:'):])
+
+    def _createSubDialog(self, uroot):
+        repo = thgrepo.repository(None, hglib.fromunicode(uroot))
+        return StatusDialog(repo, [], {}, parent=self)
 
     def loadSettings(self):
         s = QSettings()
@@ -1081,9 +1101,3 @@ class StatusDialog(QDialog):
             return
         self.saveSettings()
         QDialog.reject(self)
-
-def run(ui, *pats, **opts):
-    repo = thgrepo.repository(ui, path=paths.find_root())
-    pats = hglib.canonpaths(pats)
-    os.chdir(repo.root)
-    return StatusDialog(repo, pats, opts)

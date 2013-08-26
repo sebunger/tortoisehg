@@ -8,7 +8,8 @@
 import os
 
 from mercurial import util, error, merge, commands, extensions
-from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt
+from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt, customtools
+from tortoisehg.hgqt import filedialogs
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
@@ -17,6 +18,8 @@ from PyQt4.QtGui import *
 
 class WctxActions(QObject):
     'container class for working context actions'
+
+    refreshNeeded = pyqtSignal()
     runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repo, parent, checkable=True):
@@ -24,9 +27,11 @@ class WctxActions(QObject):
 
         self.menu = QMenu(parent)
         self.repo = repo
+        self._filedialogs = qtlib.DialogKeeper(WctxActions._createFileDialog,
+                                               parent=self)
         allactions = []
 
-        def make(text, func, types, icon=None, keys=None):
+        def make(text, func, types, icon=None, keys=None, slot=self.runAction):
             action = QAction(text, parent)
             action._filetypes = types
             action._runfunc = func
@@ -34,7 +39,7 @@ class WctxActions(QObject):
                 action.setIcon(qtlib.geticon(icon))
             if keys:
                 action.setShortcut(QKeySequence(keys))
-            action.triggered.connect(self.runAction)
+            action.triggered.connect(slot)
             parent.addAction(action)
             allactions.append(action)
 
@@ -56,8 +61,8 @@ class WctxActions(QObject):
         make(_('&Revert...'), revert, frozenset('SMAR!'), 'hg-revert')
         make(_('&Add'), add, frozenset('R'), 'fileadd')
         allactions.append(None)
-        make(_('File &History'), log, frozenset('MARC!'), 'hg-log')
-        make(_('&Annotate'), annotate, frozenset('MARC!'), 'hg-annotate')
+        make(_('File &History'), None, frozenset('MARC!'), 'hg-log',
+             slot=self.log)
         allactions.append(None)
         make(_('&Forget'), forget, frozenset('MC!'), 'filedelete')
         make(_('&Add'), add, frozenset('I?'), 'fileadd')
@@ -107,7 +112,7 @@ class WctxActions(QObject):
                 menu.addAction(action)
                 addedActions = True
 
-        def make(text, func, types, icon=None, inmenu=None):
+        def make(text, func, types=None, icon=None, inmenu=None):
             if not types & alltypes:
                 return
             if inmenu is None:
@@ -129,37 +134,11 @@ class WctxActions(QObject):
             make(_('&Copy...'), copy, frozenset('MC'), 'edit-copy')
             make(_('Re&name...'), rename, frozenset('MC'), 'hg-rename')
 
-        def _setupCustomSubmenu(menu):
-            tools, toollist = hglib.tortoisehgtools(self.repo.ui,
-                selectedlocation='workbench.commit.custom-menu')
-            if not tools:
-                return
-            menu.addSeparator()
-            submenu = menu.addMenu(_('Custom Tools'))
-            submenu.triggered.connect(self._runCustomCommandByMenu)
-            emptysubmenu = True
-            for name in toollist:
-                if name == '|':
-                    submenu.addSeparator()
-                    continue
-                info = tools.get(name, None)
-                if info is None:
-                    continue
-                command = info.get('command', None)
-                if not command:
-                    continue
-                label = info.get('label', name)
-                icon = info.get('icon', 'tools-spanner-hammer')
-                status = info.get('status', 'MAR!C?S')
-                a = make(label, None, frozenset(status),
-                    icon=icon, inmenu=submenu)
-                if a is not None:
-                    a.setData(name)
-                    emptysubmenu = False
-            if emptysubmenu:
-                menu.removeAction(submenu.menuAction())
-
-        _setupCustomSubmenu(menu)
+        menu.addSeparator()
+        customtools.addCustomToolsSubmenu(menu, repo.ui,
+            location='workbench.commit.custom-menu',
+            make=make,
+            slot=self._runCustomCommandByMenu)
 
         # Add 'was renamed from' actions for unknown files
         t, path = selrows[0]
@@ -188,9 +167,12 @@ class WctxActions(QObject):
             menu.addMenu(rmenu)
         return menu
 
+    def _filesForAction(self, action):
+        return [wfile for t, wfile in self.selrows if t & action._filetypes]
+
     @pyqtSlot(QAction)
     def _runCustomCommandByMenu(self, action):
-        files = [wfile for t, wfile in self.selrows if t & action._filetypes]
+        files = self._filesForAction(action)
         self.runCustomCommandRequested.emit(
             str(action.data().toString()), files)
 
@@ -199,7 +181,7 @@ class WctxActions(QObject):
 
         repo, action, parent = self.repo, self.sender(), self.parent()
         func = action._runfunc
-        files = [wfile for t, wfile in self.selrows if t & action._filetypes]
+        files = self._filesForAction(action)
 
         hu = htmlui.htmlui()
         name = hglib.tounicode(func.__name__.title())
@@ -236,7 +218,17 @@ class WctxActions(QObject):
                 QMessageBox.critical(parent, name + _(' Aborted'), err)
         finally:
             os.chdir(cwd)
-        return notify
+
+        if notify:
+            self.refreshNeeded.emit()
+
+    #@pyqtSlot()
+    def log(self):
+        for path in self._filesForAction(self.sender()):
+            self._filedialogs.open(path)
+
+    def _createFileDialog(self, path):
+        return filedialogs.FileLogDialog(self.repo, path)
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
@@ -338,20 +330,6 @@ def revert(parent, ui, repo, files):
         commands.revert(ui, repo, *files, **revertopts)
         return True
 
-def log(parent, ui, repo, files):
-    from tortoisehg.hgqt.workbench import run
-    from tortoisehg.hgqt.run import qtrun
-    opts = {'root': repo.root}
-    qtrun(run, repo.ui, *files, **opts)
-    return False
-
-def annotate(parent, ui, repo, files):
-    from tortoisehg.hgqt.manifestdialog import run
-    from tortoisehg.hgqt.run import qtrun
-    opts = {'repo': repo, 'canonpath' : files[0], 'rev' : repo['.'].rev()}
-    qtrun(run, repo.ui, **opts)
-    return False
-
 def forget(parent, ui, repo, files):
     commands.forget(ui, repo, *files)
     return True
@@ -409,7 +387,7 @@ def delete(parent, ui, repo, files):
 def copy(parent, ui, repo, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(ui, files, parent, iscopy=True)
+    dlg = RenameDialog(repo, files, parent, iscopy=True)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
     return True
@@ -417,7 +395,7 @@ def copy(parent, ui, repo, files):
 def rename(parent, ui, repo, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(ui, files, parent)
+    dlg = RenameDialog(repo, files, parent)
     dlg.finished.connect(dlg.deleteLater)
     dlg.exec_()
     return True
