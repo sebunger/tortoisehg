@@ -1,9 +1,13 @@
-tortoisehg (2.9-1) UNRELEASED; urgency=low
+tortoisehg (2.9-1) unstable; urgency=low
 
+  [ Andrew Shadura ]
   * Imported Upstream version 2.9.
   * Update mercurial version dependency.
 
- -- Andrew Shadura <andrewsh@debian.org>  Mon, 26 Aug 2013 23:06:24 +0200
+  [ Ludovico Cavedon ]
+  * Update debian/copyright.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Wed, 28 Aug 2013 18:41:40 +0200
 
 tortoisehg (2.8-1) unstable; urgency=low
 
