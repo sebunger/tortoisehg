@@ -6,5 +6,5 @@ debian/hgtk usr/bin/
 etc
 debian/thg_logo.xpm usr/share/pixmaps/
 debian/thg_logo.png usr/share/icons/hicolor/48x48/apps/
-contrib/tortoisehg.desktop usr/share/applications/
+contrib/thg.desktop usr/share/applications/
 
