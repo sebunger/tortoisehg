@@ -645,7 +645,7 @@ class CustomConfigDialog(QDialog):
         index = 0
         if selecteditem:
             try:
-                index = items.index(selecteditem)
+                index = list(items).index(selecteditem)
             except ValueError:
                 pass
         combo = QComboBox()

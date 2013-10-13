@@ -126,13 +126,8 @@ def getmaxdiffsize(ui):
     _maxdiff = maxdiff * 1024
     return _maxdiff
 
-def getrevisionlabel(repo, rev):
-    """Return symbolic name for the specified revision or stringfy it"""
-    if rev is None:
-        return None  # no symbol for working revision
-
+def _getfirstrevisionlabel(repo, ctx):
     # see context.changectx for look-up order of labels
-    ctx = repo[rev]
 
     bookmarks = ctx.bookmarks()
     if ctx in repo.parents():
@@ -151,6 +146,16 @@ def getrevisionlabel(repo, rev):
     branch = ctx.branch()
     if repo.branchtip(branch) == ctx.node():
         return branch
+
+def getrevisionlabel(repo, rev):
+    """Return symbolic name for the specified revision or stringfy it"""
+    if rev is None:
+        return None  # no symbol for working revision
+
+    ctx = repo[rev]
+    label = _getfirstrevisionlabel(repo, ctx)
+    if label and ctx == repo[label]:
+        return label
 
     return str(rev)
 

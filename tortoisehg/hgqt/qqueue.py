@@ -191,7 +191,7 @@ class QQueueDialog(QDialog):
         self.updateUI()
 
     def showQueues(self, output):
-        queues = output.rstrip('\n').split('\n')
+        queues = hglib.tounicode(output).rstrip('\n').split('\n')
         self.ql.clear()
         self.pl.clear()
         row_activeq = 0
@@ -203,7 +203,7 @@ class QQueueDialog(QDialog):
                 self.itemfont = item.font()
                 self.itemfontbold = self.itemfont
                 self.itemfontbold.setBold(True)
-            if q == self.repo.thgactivemqname:
+            if q == hglib.tounicode(self.repo.thgactivemqname):
                 row_activeq = i
                 item.setFont(self.itemfontbold)
         self.ql.setCurrentRow(row_activeq)
