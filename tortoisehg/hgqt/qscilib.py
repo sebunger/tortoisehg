@@ -308,7 +308,8 @@ class Scintilla(QsciScintilla):
         self.setEolVisibility(qs.value(prefix+'/eol').toBool())
         self.setIndentationsUseTabs(qs.value(prefix+'/usetabs').toInt()[0])
         self.setDefaultEolMode()
-        self.setAutoCompletionThreshold(qs.value(prefix+'/autocomplete').toInt()[0])
+        self.setAutoCompletionThreshold(
+            qs.value(prefix+'/autocomplete', -1).toInt()[0])
 
 
     @pyqtSlot(unicode, bool, bool, bool)
@@ -390,7 +391,7 @@ class Scintilla(QsciScintilla):
 
     def setDefaultEolMode(self):
         if self.lines():
-            mode = qsciEolModeFromLine(hglib.fromunicode(self.text(0)))
+            mode = qsciEolModeFromLine(unicode(self.text(0)))
         else:
             mode = qsciEolModeFromOs()
         self.setEolMode(mode)
@@ -407,7 +408,9 @@ class Scintilla(QsciScintilla):
         but returns valid line number even if no character fount at point"""
         # lineAt() uses the strict request, SCI_POSITIONFROMPOINTCLOSE
         chpos = self.SendScintilla(self.SCI_POSITIONFROMPOINT,
-                                   point.x(), point.y())
+                                   # no implicit cast to ulong in old QScintilla
+                                   # unsigned long wParam, long lParam
+                                   max(point.x(), 0), point.y())
         return self.SendScintilla(self.SCI_LINEFROMPOSITION, chpos)
 
     # compability mode with QScintilla from Ubuntu 10.04

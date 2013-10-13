@@ -121,7 +121,16 @@ class BookmarkDialog(QDialog):
         if cur:
             self.bookmarkCombo.setEditText(cur)
         else:
-            self.bookmarkTextChanged()
+            ctx = self.repo[self.rev]
+            cs_bookmarks = ctx.bookmarks()
+            if self.repo._bookmarkcurrent in cs_bookmarks:
+                bm = hglib.tounicode(self.repo._bookmarkcurrent)
+                self.bookmarkCombo.setEditText(bm)
+            elif cs_bookmarks:
+                bm = hglib.tounicode(cs_bookmarks[0])
+                self.bookmarkCombo.setEditText(bm)
+            else:
+                self.bookmarkTextChanged()
 
     @pyqtSlot()
     def bookmarkTextChanged(self):

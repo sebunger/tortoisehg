@@ -246,14 +246,9 @@ class FontEntry(QWidget):
         self.setMinimumWidth(ENTRY_WIDTH)
 
     def onSetClicked(self, checked):
-        def newFont(font):
-            self.setText(font.toString())
-            thgf.setFont(font)
         thgf = qtlib.getfont(self.fname)
         origfont = self.currentFont() or thgf.font()
-        dlg = QFontDialog(self)
-        dlg.currentFontChanged.connect(newFont)
-        font, isok = dlg.getFont(origfont, self)
+        font, isok = QFontDialog.getFont(origfont, self)
         if not isok:
             return
         self.label.setText(font.toString())
@@ -268,7 +263,7 @@ class FontEntry(QWidget):
             return None
 
         f = QFont()
-        f.fromString(self.value())
+        f.fromString(hglib.tounicode(self.value()))
         return f
 
     ## common APIs for all edit widgets
@@ -658,7 +653,7 @@ INFO = (
           'and in which order.<br>Type a list of the task button names. '
           'Add separators by putting "|" between task button names.<br>'
           'Valid names are: log commit mq sync manifest grep and pbranch.<br>'
-          'Default: log commit mq sync manifest grep pbranch'),
+          'Default: log commit mq manifest grep pbranch | sync'),
         restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
@@ -1172,13 +1167,13 @@ class SettingsDialog(QDialog):
                                         readonly=True)
                     self.conftabs.addTab(rtab, qtlib.geticon('settings_projrc'),
                                          _('%s project settings (.hg/projrc)')
-                                         % os.path.basename(repo.displayname))
+                                         % repo.shortname)
                     rtab.restartRequested.connect(self._pushRestartRequest)
 
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             rtab = SettingsForm(rcpath=reporcpath, focus=focus)
             self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
-                                 _('%s repository settings') % repo.displayname)
+                                 _('%s repository settings') % repo.shortname)
             rtab.restartRequested.connect(self._pushRestartRequest)
 
         BB = QDialogButtonBox
@@ -1201,14 +1196,15 @@ class SettingsDialog(QDialog):
         self._restartreqs.add(unicode(key))
 
     def applyChanges(self):
-        for i in xrange(self.conftabs.count()):
-            self.conftabs.widget(i).applyChanges()
+        results = [self.conftabs.widget(i).applyChanges()
+                   for i in xrange(self.conftabs.count())]
         if self._restartreqs:
             qtlib.InfoMsgBox(_('Settings'),
                              _('Restart all TortoiseHg applications '
                                'for the following changes to take effect:'),
                              ', '.join(sorted(self._restartreqs)))
             self._restartreqs.clear()
+        return util.all(results)
 
     def canExit(self):
         if self.isDirty():
@@ -1219,12 +1215,12 @@ class SettingsDialog(QDialog):
             if ret == 2:
                 return False
             elif ret == 0:
-                self.applyChanges()
-                return True
+                return self.applyChanges()
         return True
 
     def accept(self):
-        self.applyChanges()
+        if not self.applyChanges():
+            return
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
         s.setValue('settings/lastpage', self._getactivepagename())
@@ -1370,9 +1366,8 @@ class SettingsForm(QWidget):
                 self.applyChanges()
             elif ret == 2:
                 return
-        if (qscilib.fileEditor(hglib.tounicode(self.fn), foldable=True)
-            == QDialog.Accepted):
-            self.refresh()
+        qscilib.fileEditor(hglib.tounicode(self.fn), foldable=True)
+        self.refresh()
 
     def refresh(self, *args):
         # refresh config values
@@ -1603,7 +1598,7 @@ class SettingsForm(QWidget):
 
     def applyChanges(self):
         if self.readonly:
-            return
+            return True  # safely skipped because all fields are disabled
 
         for name, info, widgets in self.pages.values():
             if name == 'extensions':
@@ -1623,9 +1618,11 @@ class SettingsForm(QWidget):
 
         try:
             wconfig.writefile(self.ini, self.fn)
-        except IOError, e:
+            return True
+        except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                str(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
+            return False
 
     def applyChangesForExtensions(self):
         emitChanged = False

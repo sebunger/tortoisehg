@@ -180,15 +180,22 @@ class _wconfig(object):
     def _readini(self):
         """Create iniparse object by reading every file"""
         if len(self._readfiles) > 1:
-            raise NotImplementedError("wconfig does not support read() more than once")
+            raise NotImplementedError("wconfig does not support read() more "
+                                      "than once")
 
         def newini(fp=None):
             try:
                 # TODO: optionxformvalue isn't used by INIConfig ?
                 return INIConfig(fp=fp, optionxformvalue=None)
-            except ConfigParser.ParsingError, err:
+            except ConfigParser.MissingSectionHeaderError, err:
                 raise error.ParseError(err.message.splitlines()[0],
                                        '%s:%d' % (err.filename, err.lineno))
+            except ConfigParser.ParsingError, err:
+                if err.errors:
+                    loc = '%s:%d' % (err.filename, err.errors[0][0])
+                else:
+                    loc = err.filename
+                raise error.ParseError(err.message.splitlines()[0], loc)
 
         if not self._readfiles:
             return newini()

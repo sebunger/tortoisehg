@@ -71,8 +71,7 @@ class QReorderDialog(QDialog):
         self.ulw = PatchListWidget(self)
         self.ulw.setDragDropMode(QListView.InternalMove)
         ugb.layout().addWidget(self.ulw)
-        self.ulw.currentItemChanged.connect(lambda:
-                self.showSummary(self.ulw.item(self.ulw.currentRow())))
+        self.ulw.currentItemChanged.connect(self.showSummary)
         self.ulw.menuRequested.connect(self.patchlistMenuRequest)
         layout.addWidget(ugb)
 
@@ -81,8 +80,7 @@ class QReorderDialog(QDialog):
         agb.layout().setContentsMargins(*(0,)*4)
         self.alw = PatchListWidget(self)
         agb.layout().addWidget(self.alw)
-        self.alw.currentItemChanged.connect(lambda:
-                self.showSummary(self.alw.item(self.alw.currentRow())))
+        self.alw.currentItemChanged.connect(self.showSummary)
         self.alw.menuRequested.connect(self.patchlistMenuRequest)
         layout.addWidget(agb)
 
@@ -116,10 +114,9 @@ class QReorderDialog(QDialog):
     def patchlistMenuRequest(self, point, selection):
         self.menuselection = selection
         menu = QMenu(self)
-        act = QAction(_('Rename patch'), self)
-        act.triggered.connect(self.qrenamePatch)
-        menu.addAction(act)
+        menu.addAction(_('Rename patch'), self.qrenamePatch)
         menu.exec_(point)
+        menu.setParent(None)
 
     def qrenamePatch(self):
         patchname = self.menuselection
@@ -176,6 +173,7 @@ class QReorderDialog(QDialog):
             alw.setCurrentRow(ar)
             self.alw.setFocus()
 
+    #@pyqtSlot(QListWidgetItem)
     def showSummary(self, item):
         if item is None:
             self.summ.clear()

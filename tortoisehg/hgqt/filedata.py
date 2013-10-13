@@ -305,7 +305,7 @@ class FileData(object):
 
                 sstatedesc = 'changed'
                 if ctx.rev() is not None:
-                    sparent = ctx.p1().substate.get(wfile, subrepo.nullstate)[1]
+                    sparent = ctx2.substate.get(wfile, subrepo.nullstate)[1]
                     subrepochange, sstatedesc = \
                         genSubrepoRevChangedDescription(wfile,
                             sparent, srev, ctx._repo)

@@ -226,6 +226,9 @@ class BlockMatch(BlockList):
         self._blocks.add((typ, alo, ahi, blo, bhi))
 
     def paintEvent(self, event):
+        if self._pagestep['left'] == 0 or self._pagestep['right'] == 0:
+            return
+
         w = self.width()
         h = self.height()
         p = QPainter(self)
@@ -305,12 +308,10 @@ class BlockMatch(BlockList):
             self.update()
             self.pageStepChanged.emit(pagestep, side)
 
+    @pyqtSlot()
     def syncPageStep(self):
         for side in ['left', 'right']:
             self.setPageStep(self._sbar[side].pageStep(), side)
-
-    def resizeEvent(self, event):
-        self.syncPageStep()
 
     def linkScrollBar(self, sb, side):
         """

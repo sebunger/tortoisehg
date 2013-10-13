@@ -328,11 +328,11 @@ class Workbench(QMainWindow):
         self.actionCurrentRev = \
         newaction(_("Go to current revision"), self._repofwd('gotoParent'),
                   icon='go-home', tooltip=_('Go to current revision'),
-                  enabled=True, toolbar='edit', shortcut='Ctrl+.')
+                  enabled='repoopen', toolbar='edit', shortcut='Ctrl+.')
         self.actionGoTo = \
         newaction(_("Go to a specific revision"), self.gotorev,
                   icon='go-to-rev', tooltip=_('Go to a specific revision'),
-                  enabled=True, toolbar='edit')
+                  enabled='repoopen', toolbar='edit')
         self.actionBack = \
         newaction(_("Back"), self._repofwd('back'), icon='go-previous',
                   enabled=False, toolbar='edit')
@@ -593,6 +593,15 @@ class Workbench(QMainWindow):
             if cb:
                 act.triggered.connect(cb)
             self.addAction(act)
+
+    def createPopupMenu(self):
+        """Create new popup menu for toolbars and dock widgets"""
+        menu = super(Workbench, self).createPopupMenu()
+        assert menu  # should have toolbar/dock menu
+        menu.addSeparator()
+        menu.addAction(_('Custom Toolbar &Settings'),
+                       self._editCustomToolsSettings)
+        return menu
 
     @pyqtSlot(QPoint)
     def tabBarContextMenuRequest(self, point):
@@ -970,7 +979,12 @@ class Workbench(QMainWindow):
             getattr(w, 'reload')()
             self._setupUrlCombo(w.repo)
 
-    @pyqtSlot(QAction)
+        if not self.mqpatches.isHidden():
+            self.mqpatches.reload()
+
+    # no @pyqtSlot(QAction) to avoid wrong self.sender() at
+    # _appendRepoWidgetOutput, _updateRepoTabTitle and _updateRepoTabIcon
+    # during QMessageBox.exec at SyncWidget.pushclicked. See #3320.
     def _runSyncAction(self, action):
         w = self.repoTabsWidget.currentWidget()
         if w:
@@ -1243,10 +1257,15 @@ class Workbench(QMainWindow):
         if w:
             qtlib.openshell(w.repo.root, w.repo.displayname, w.repo.ui)
 
-    def editSettings(self):
+    @pyqtSlot()
+    def editSettings(self, focus=None):
         tw = self.repoTabsWidget
         w = tw.currentWidget()
         twrepo = (w and w.repo.root or '')
-        sd = SettingsDialog(configrepo=False,
+        sd = SettingsDialog(configrepo=False, focus=focus,
                             parent=self, root=twrepo)
         sd.exec_()
+
+    @pyqtSlot()
+    def _editCustomToolsSettings(self):
+        self.editSettings('tools')

@@ -11,6 +11,23 @@ import re
 from PyQt4 import Qsci, QtGui
 from tortoisehg.hgqt import qtlib
 
+if hasattr(QtGui.QColor, 'getHslF'):
+    def _fixdarkcolors(lexer):
+        """Invert lightness of low-contrast colors on dark theme"""
+        if not qtlib.isdarktheme():
+            return  # fast path
+
+        # QsciLexer defines 128 styles by default
+        for style in xrange(128):
+            h, s, l, a = lexer.color(style).getHslF()
+            pl = lexer.paper(style).lightnessF()
+            if abs(l - pl) < 0.2:
+                lexer.setColor(QtGui.QColor.fromHslF(h, s, 1.0 - l, a), style)
+else:
+    # no support for PyQt 4.6.x
+    def _fixdarkcolors(lexer):
+        pass
+
 class _LexerSelector(object):
     _lexer = None
     def match(self, filename, filedata):
@@ -25,6 +42,7 @@ class _LexerSelector(object):
     def cfg_lexer(self, lexer):
         font = qtlib.getfont('fontlog').font()
         lexer.setFont(font, -1)
+        _fixdarkcolors(lexer)
         return lexer
 
 class _FilenameLexerSelector(_LexerSelector):
@@ -79,10 +97,17 @@ class LuaLexerSelector(_ScriptLexerSelector):
     _lexer = Qsci.QsciLexerLua
     regex = None
 
+class _LexerCPP(Qsci.QsciLexerCPP):
+    def refreshProperties(self):
+        super(_LexerCPP, self).refreshProperties()
+        # disable grey-out of inactive block, which is hard to read.
+        # as of QScintilla 2.7.2, this property isn't mapped to wrapper.
+        self.propertyChanged.emit('lexer.cpp.track.preprocessor', '0')
+
 class CppLexerSelector(_FilenameLexerSelector):
     extensions = ('.c', '.cpp', '.cc', '.cxx', '.cl', '.cu',
                   '.h', '.hpp', '.hh', '.hxx')
-    _lexer = Qsci.QsciLexerCPP
+    _lexer = _LexerCPP
 
 class DLexerSelector(_FilenameLexerSelector):
     extensions = ('.d',)
@@ -201,6 +226,7 @@ class DiffLexerSelector(_ScriptLexerSelector):
                     lexer.setPaper(QtGui.QColor(e[18:]), i)
         font = qtlib.getfont('fontdiff').font()
         lexer.setFont(font, -1)
+        _fixdarkcolors(lexer)
         return lexer
 
 

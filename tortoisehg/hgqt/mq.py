@@ -230,7 +230,6 @@ class MQPatchesWidget(QDockWidget):
             return cont
         if checkGuardsOrComments():
             dlg = qreorder.QReorderDialog(self.repo, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
 
     @pyqtSlot()
@@ -352,6 +351,7 @@ class MQPatchesWidget(QDockWidget):
         self.queueListWidget.clear()
 
         if self.repo is None:
+            self.guardSelBtn.setEnabled(False)
             self.qpushAllAct.setEnabled(False)
             self.qpushAct.setEnabled(False)
             self.qdeleteAct.setEnabled(False)

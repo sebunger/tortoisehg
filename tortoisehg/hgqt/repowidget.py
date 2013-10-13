@@ -835,7 +835,7 @@ class RepoWidget(QWidget):
         cmdline = ['--repository', self.repo.root, 'verify', '--verbose']
         dlg = cmdui.Dialog(cmdline, self)
         dlg.setWindowIcon(qtlib.geticon('hg-verify'))
-        dlg.setWindowTitle(_('%s - verify repository') % self.repo.shortname)
+        dlg.setWindowTitle(_('%s - verify repository') % self.repo.displayname)
         dlg.setWindowFlags(dlg.windowFlags()
             & ~Qt.WindowContextHelpButtonHint
             | Qt.WindowMaximizeButtonHint)
@@ -846,7 +846,7 @@ class RepoWidget(QWidget):
         cmdline = ['--repository', self.repo.root, 'recover', '--verbose']
         dlg = cmdui.Dialog(cmdline, self)
         dlg.setWindowIcon(qtlib.geticon('hg-recover'))
-        dlg.setWindowTitle(_('%s - recover repository') % self.repo.shortname)
+        dlg.setWindowTitle(_('%s - recover repository') % self.repo.displayname)
         dlg.setWindowFlags(dlg.windowFlags()
             & ~Qt.WindowContextHelpButtonHint
             | Qt.WindowMaximizeButtonHint)
@@ -1408,7 +1408,7 @@ class RepoWidget(QWidget):
 
         if 'mq' in exs or 'rebase' in exs:
             submenu = menu.addMenu(_('Modi&fy History'))
-            entry(submenu, 'mq', qgoto, _('&Unapply Patch (qgoto parent)'), 'hg-qgoto',
+            entry(submenu, 'mq', applied, _('&Unapply Patch (qgoto parent)'), 'hg-qgoto',
                   self.qgotoParentRevision)
             entry(submenu, 'mq', fixed, _('Import to &MQ'), 'qimport',
                   self.qimportRevision)
@@ -1619,7 +1619,6 @@ class RepoWidget(QWidget):
                 return cont
             if checkGuardsOrComments():
                 dlg = qreorder.QReorderDialog(self.repo, self)
-                dlg.finished.connect(dlg.deleteLater)
                 dlg.exec_()
         def qfoldact():
             dlg = qfold.QFoldDialog(self.repo, self.menuselection, self)

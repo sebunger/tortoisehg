@@ -205,13 +205,17 @@ def savefiles(repo, files, rev, parent=None):
     for curfile in files:
         wfile = util.localpath(curfile)
         wfile, ext = os.path.splitext(os.path.basename(wfile))
+        extfilter = [_("All files (*)")]
         if wfile:
             filename = "%s@%d%s" % (wfile, rev, ext)
+            if ext:
+                extfilter.insert(0, "*%s" % ext)
         else:
             filename = "%s@%d" % (ext, rev)
-        result = QFileDialog.getSaveFileName(
-            parent=parent, caption=_("Save file to"),
-            directory=hglib.tounicode(filename))
+
+        result = QFileDialog.getSaveFileName(parent, _("Save file to"),
+                                             hglib.tounicode(filename),
+                                             ";;".join(extfilter))
         if not result:
             continue
         cwd = os.getcwd()
@@ -256,6 +260,13 @@ def openshell(root, reponame, ui=None):
     else:
         InfoMsgBox(_('No shell configured'),
                    _('A terminal shell must be configured'))
+
+
+def isdarktheme(palette=None):
+    """True if white-on-black color scheme is preferable"""
+    if not palette:
+        palette = QApplication.palette()
+    return palette.color(QPalette.Base).black() >= 0x80
 
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
@@ -606,7 +617,7 @@ _fontcache = {}
 def initfontcache(ui):
     for name in _fontdefaults:
         fname = ui.config('tortoisehg', name, _fontdefaults[name])
-        _fontcache[name] = ThgFont(fname)
+        _fontcache[name] = ThgFont(hglib.tounicode(fname))
 
 def getfont(name):
     assert name in _fontdefaults
@@ -1474,12 +1485,9 @@ class PaletteSwitcher(object):
     def __init__(self, targetwidget):
         self._targetwref = weakref.ref(targetwidget)  # avoid circular ref
         self._defaultpalette = targetwidget.palette()
-        bgcolor = self._defaultpalette.color(QPalette.Base)
-        if bgcolor.black() <= 128:
-            # Light theme
+        if not isdarktheme(self._defaultpalette):
             filterbgcolor = QColor('#FFFFB7')
         else:
-            # Dark theme
             filterbgcolor = QColor('darkgrey')
         self._filterpalette = QPalette()
         self._filterpalette.setColor(QPalette.Base, filterbgcolor)

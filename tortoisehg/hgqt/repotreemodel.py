@@ -14,6 +14,25 @@ from PyQt4.QtGui import QFont
 
 import os
 
+if PYQT_VERSION < 0x40700:
+    class LocalQXmlStreamReader(QXmlStreamReader):
+        def readNextStartElement(self):
+            while self.readNext() != QXmlStreamReader.Invalid:
+                if self.isEndElement():
+                    return False
+                elif self.isStartElement():
+                    return True
+            return False
+
+        def skipCurrentElement(self):
+            depth = 1
+            while depth > 0 and self.readNext() != QXmlStreamReader.Invalid:
+                if self.isEndElement():
+                    depth -= 1
+                elif self.isStartElement():
+                    depth += 1
+
+    QXmlStreamReader = LocalQXmlStreamReader
 
 extractXmlElementName = 'reporegextract'
 reporegistryXmlElementName = 'reporegistry'
@@ -33,8 +52,6 @@ def writeXml(target, item, rootElementName):
     xw.writeEndDocument()
 
 def readXml(source, rootElementName):
-    if PYQT_VERSION < 0x40700:
-        return
     itemread = None
     xr = QXmlStreamReader(source)
     if xr.readNextStartElement():

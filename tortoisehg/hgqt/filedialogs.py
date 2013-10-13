@@ -487,6 +487,7 @@ class FileDiffDialog(_AbstractFileDialog):
 
         for side, idx  in (('left', 0), ('right', 3)):
             sci = Scintilla(self.frame)
+            sci.installEventFilter(self)
             sci.verticalScrollBar().setFocusPolicy(Qt.StrongFocus)
             sci.setFocusProxy(sci.verticalScrollBar())
             sci.verticalScrollBar().installEventFilter(self)
@@ -548,6 +549,10 @@ class FileDiffDialog(_AbstractFileDialog):
         self.setTabOrder(table, self.viewers['left'])
         self.setTabOrder(self.viewers['left'], self.viewers['right'])
 
+        # timer used to merge requests of syncPageStep on ResizeEvent
+        self._delayedSyncPageStep = QTimer(self, interval=0, singleShot=True)
+        self._delayedSyncPageStep.timeout.connect(self.diffblock.syncPageStep)
+
         # timer used to fill viewers with diff block markers during GUI idle time
         self.timer = QTimer()
         self.timer.setSingleShot(False)
@@ -598,6 +603,16 @@ class FileDiffDialog(_AbstractFileDialog):
             return  # already set by goto()
         elif len(self.filerevmodel.graph):
             self.goto(self.filerevmodel.graph[0].rev)
+
+    def eventFilter(self, watched, event):
+        if watched in self.viewers.values():
+            # copy page steps to diffblock _after_ viewers are resized; resize
+            # events will be posted in arbitrary order.
+            if event.type() == QEvent.Resize:
+                self._delayedSyncPageStep.start()
+            return False
+        else:
+            return super(FileDiffDialog, self).eventFilter(watched, event)
 
     def onRevisionSelected(self, rev):
         if rev is None or rev not in self.filerevmodel.graph.nodesdict:

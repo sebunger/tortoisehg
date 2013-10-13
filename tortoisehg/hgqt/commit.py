@@ -85,7 +85,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.repo = repo
         self._rev = rev
         self.lastAction = None
-        self.lastCommitMsg = ''
+        # Dictionary storing the last "commit messages"
+        # 'commit' is used for 'commit' and 'qnew', while
+        # 'amend' is used for 'amend' and 'qrefresh'
+        self.lastCommitMsgs = {'commit': '', 'amend': ''}
         self.currentAction = None
         self.currentProgress = None
 
@@ -400,12 +403,17 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 allowcs = len(self.repo.parents()) == 1
         if curraction._name in ('qref', 'amend'):
             if self.lastAction not in ('qref', 'amend'):
-                self.lastCommitMsg = self.msgte.text()
-            self.setMessage(hglib.tounicode(pctx.description()))
+                self.lastCommitMsgs['commit'] = self.msgte.text()
+            if self.lastCommitMsgs['amend']:
+                msg = self.lastCommitMsgs['amend']
+            else:
+                msg = hglib.tounicode(pctx.description())
+            self.setMessage(msg)
         else:
             if self.lastAction in ('qref', 'amend'):
-                self.setMessage(self.lastCommitMsg)
-        if curraction == 'amend':
+                self.lastCommitMsgs['amend'] = self.msgte.text()
+                self.setMessage(self.lastCommitMsgs['commit'])
+        if curraction._name == 'amend':
             self.stwidget.defcheck = 'amend'
         else:
             self.stwidget.defcheck = 'commit'
@@ -577,6 +585,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
+        # clear the last 'amend' message
+        # do not clear the last 'commit' message because there are many cases
+        # in which we may write a commit message first, modify the repository
+        # (e.g. amend or update and merge uncommitted changes) and then do the
+        # actual commit
+        self.lastCommitMsgs['amend'] = ''
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
 
@@ -674,6 +688,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                  QMessageBox.Ok | QMessageBox.Cancel)
         if d != QMessageBox.Ok:
             return
+        self.repo.incrementBusyCount()
         self.currentAction = 'rollback'
         self.currentProgress = _('Rollback', 'start progress')
         self.progress.emit(*cmdui.startProgress(self.currentProgress, ''))
@@ -732,7 +747,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.msghistory = list(s.value(gpref+'history-'+repoid).toStringList())
         self.msghistory = [unicode(m) for m in self.msghistory if m]
         self.updateRecentMessages()
-        self.userhist = s.value(gpref+'userhist').toStringList()
+        self.userhist = map(unicode, s.value(gpref+'userhist').toStringList())
         self.userhist = [u for u in self.userhist if u]
         try:
             curmsg = self.repo.opener('cur-message.txt').read()
@@ -990,7 +1005,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.branchop = None
             umsg = self.msgte.text()
             if self.currentAction not in ('qref', 'amend'):
-                self.lastCommitMsg = ''
+                self.lastCommitMsgs['commit'] = ''
                 if self.currentAction == 'commit':
                     # capture last message for BugTraq plugin
                     self.lastmessage = self.getMessage(True)
