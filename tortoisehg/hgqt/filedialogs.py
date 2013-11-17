@@ -33,12 +33,50 @@ from PyQt4.Qsci import QsciScintilla
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
+_MARKERPLUSLINE = 31
+_MARKERMINUSLINE = 30
+_MARKERPLUSUNDERLINE = 29
+_MARKERMINUSUNDERLINE = 28
+
+_colormap = {
+             '+': QColor(0xA0, 0xFF, 0xB0),
+             '-': QColor(0xFF, 0xA0, 0xA0),
+             'x': QColor(0xA0, 0xA0, 0xFF)
+             }
+
+class _FileDiffScintilla(Scintilla):
+    def paintEvent(self, event):
+        super(_FileDiffScintilla, self).paintEvent(event)
+        viewport = self.viewport()
+
+        start = self.firstVisibleLine()
+        scale = self.textHeight(0)  # Currently all lines are the same height
+        n = min(viewport.height() / scale + 1, self.lines() - start)
+        lines = []
+        for i in xrange(0, n):
+            m = self.markersAtLine(start + i)
+            if m & (1 << _MARKERPLUSLINE):
+                lines.append((i, _colormap['+'], ))
+            if m & (1 << _MARKERPLUSUNDERLINE):
+                lines.append((i + 1, _colormap['+'], ))
+            if m & (1 << _MARKERMINUSLINE):
+                lines.append((i, _colormap['-'], ))
+            if m & (1 << _MARKERMINUSUNDERLINE):
+                lines.append((i + 1, _colormap['-'], ))
+
+        p = QPainter(viewport)
+        p.setRenderHint(QPainter.Antialiasing)
+        for (line, color) in lines:
+            p.setPen(QPen(color, 3.0))
+            y = line * scale
+            p.drawLine(0, y, viewport.width(), y)
+
 class _AbstractFileDialog(QMainWindow):
     finished = pyqtSignal(int)
 
-    def __init__(self, repo, filename):
+    def __init__(self, repoagent, filename):
         QMainWindow.__init__(self)
-        self.repo = repo
+        self._repoagent = repoagent
 
         self.setupUi(self)
         self._show_rev = None
@@ -46,6 +84,7 @@ class _AbstractFileDialog(QMainWindow):
         assert not isinstance(filename, (unicode, QString))
         self.filename = filename
 
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Hg file log viewer [%s] - %s')
                             % (repo.displayname, hglib.tounicode(filename)))
         self.setWindowIcon(qtlib.geticon('hg-log'))
@@ -59,6 +98,10 @@ class _AbstractFileDialog(QMainWindow):
     def closeEvent(self, event):
         super(_AbstractFileDialog, self).closeEvent(event)
         self.finished.emit(0)  # mimic QDialog exit
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def reload(self):
         'Reload toolbar action handler'
@@ -77,8 +120,8 @@ class FileLogDialog(_AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
-    def __init__(self, repo, filename):
-        super(FileLogDialog, self).__init__(repo, filename)
+    def __init__(self, repoagent, filename):
+        super(FileLogDialog, self).__init__(repoagent, filename)
         self._readSettings()
         self.menu = None
         self.dualmenu = None
@@ -139,7 +182,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.revpanel.linkActivated.connect(self.onLinkActivated)
         vbox.addWidget(self.revpanel, 0)
 
-        self.textView = fileview.HgFileView(self.repo, self)
+        self.textView = fileview.HgFileView(self._repoagent, self)
         self.textView.revisionSelected.connect(self.goto)
         vbox.addWidget(self.textView, 1)
 
@@ -306,7 +349,7 @@ class FileLogDialog(_AbstractFileDialog):
         fileSelection = [self.filerevmodel.graph.filename(rev)]
         if len(fileSelection) == 0:
             return
-        dlg = revert.RevertDialog(self.repo, fileSelection, rev, self)
+        dlg = revert.RevertDialog(self._repoagent, fileSelection, rev, self)
         if dlg:
             dlg.exec_()
             dlg.deleteLater()
@@ -336,7 +379,7 @@ class FileLogDialog(_AbstractFileDialog):
         rev = self.selection[0]
         if not self.revdetails:
             from tortoisehg.hgqt.revdetails import RevDetailsDialog
-            self.revdetails = RevDetailsDialog(self.repo, rev=rev)
+            self.revdetails = RevDetailsDialog(self._repoagent, rev=rev)
         else:
             self.revdetails.setRev(rev)
         self.revdetails.show()
@@ -400,8 +443,8 @@ class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
-    def __init__(self, repo, filename):
-        super(FileDiffDialog, self).__init__(repo, filename)
+    def __init__(self, repoagent, filename):
+        super(FileDiffDialog, self).__init__(repoagent, filename)
         self._readSettings()
         self.menu = None
 
@@ -460,13 +503,6 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter.addWidget(layouttowidget(self.horizontalLayout))
         self.splitter.addWidget(self.frame)
 
-    #@pyqtSlot(QPoint)
-    def fileViewMenuRequest(self, point):
-        sci = self.sender()
-        menu = sci.createStandardContextMenu()
-        point = sci.viewport().mapToGlobal(point)
-        menu.exec_(point)
-
     def setupViews(self):
         self.tableViews = {'left': self.tableView_revisions_left,
                            'right': self.tableView_revisions_right}
@@ -486,14 +522,11 @@ class FileDiffDialog(_AbstractFileDialog):
             lexer = None
 
         for side, idx  in (('left', 0), ('right', 3)):
-            sci = Scintilla(self.frame)
+            sci = _FileDiffScintilla(self.frame)
             sci.installEventFilter(self)
             sci.verticalScrollBar().setFocusPolicy(Qt.StrongFocus)
             sci.setFocusProxy(sci.verticalScrollBar())
             sci.verticalScrollBar().installEventFilter(self)
-
-            sci.setContextMenuPolicy(Qt.CustomContextMenu)
-            sci.customContextMenuRequested.connect(self.fileViewMenuRequest)
 
             sci.setFrameShape(QFrame.NoFrame)
             sci.setMarginLineNumbers(1, True)
@@ -517,11 +550,20 @@ class FileDiffDialog(_AbstractFileDialog):
 
             # define markers for colorize zones of diff
             self.markerplus = sci.markerDefine(QsciScintilla.Background)
-            sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markerplus, 0xB0FFA0)
+            sci.setMarkerBackgroundColor(_colormap['+'], self.markerplus)
             self.markerminus = sci.markerDefine(QsciScintilla.Background)
-            sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markerminus, 0xA0A0FF)
+            sci.setMarkerBackgroundColor(_colormap['-'], self.markerminus)
             self.markertriangle = sci.markerDefine(QsciScintilla.Background)
-            sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markertriangle, 0xFFA0A0)
+            sci.setMarkerBackgroundColor(_colormap['x'], self.markertriangle)
+
+            self.markerplusline = sci.markerDefine(QsciScintilla.Invisible,
+                                                   _MARKERPLUSLINE)
+            self.markerminusline = sci.markerDefine(QsciScintilla.Invisible,
+                                                    _MARKERMINUSLINE)
+            self.markerplusunderline = sci.markerDefine(QsciScintilla.Invisible,
+                                                        _MARKERPLUSUNDERLINE)
+            self.markerminusunderline = sci.markerDefine(QsciScintilla.Invisible,
+                                                         _MARKERMINUSUNDERLINE)
 
             self.viewers[side] = sci
             blk = blockmatcher.BlockList(self.frame)
@@ -700,9 +742,21 @@ class FileDiffDialog(_AbstractFileDialog):
                 for i in range(alo, ahi):
                     w.markerAdd(i, self.markerminus)
 
+                w = self.viewers['right']
+                if blo < w.lines():
+                    w.markerAdd(blo, self.markerminusline)
+                else:
+                    w.markerAdd(blo - 1, self.markerminusunderline)
+
             elif tag == 'insert':
                 self.block['right'].addBlock('+', blo, bhi)
                 self.diffblock.addBlock('+', alo, ahi, blo, bhi)
+
+                w = self.viewers['left']
+                if alo < w.lines():
+                    w.markerAdd(alo, self.markerplusline)
+                else:
+                    w.markerAdd(alo - 1, self.markerplusunderline)
 
                 w = self.viewers['right']
                 for i in range(blo, bhi):
@@ -866,7 +920,7 @@ class FileDiffDialog(_AbstractFileDialog):
         fileSelection = [self.filerevmodel.graph.filename(rev)]
         if len(fileSelection) == 0:
             return
-        dlg = revert.RevertDialog(self.repo, fileSelection, rev, self)
+        dlg = revert.RevertDialog(self._repoagent, fileSelection, rev, self)
         if dlg:
             dlg.exec_()
             dlg.deleteLater()

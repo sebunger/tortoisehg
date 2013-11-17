@@ -1,18 +1,10 @@
+# colormap.py - color scheme for annotation
+#
 # Copyright (C) 2005 Dan Loda <danloda@gmail.com>
+#
+# This software may be used and distributed according to the terms of the
+# GNU General Public License version 2 or any later version.
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 import sys, math
 
 def _days(ctx, now):
@@ -23,49 +15,6 @@ def _rescale(val, step):
 
 def _rescaleceil(val, step):
     return float(step) * math.ceil(float(val) / step)
-
-class AnnotateColorMap:
-
-    really_old_color = "#0046FF"
-
-    colors = {
-        20.: "#FF0000",
-        40.: "#FF3800",
-        60.: "#FF7000",
-        80.: "#FFA800",
-        100.:"#FFE000",
-        120.:"#E7FF00",
-        140.:"#AFFF00",
-        160.:"#77FF00",
-        180.:"#3FFF00",
-        200.:"#07FF00",
-        220.:"#00FF31",
-        240.:"#00FF69",
-        260.:"#00FFA1",
-        280.:"#00FFD9",
-        300.:"#00EEFF",
-        320.:"#00B6FF",
-        340.:"#007EFF"
-    }
-
-    def __init__(self, span=340.):
-        self.set_span(span)
-
-    def set_span(self, span):
-        self._span = span
-        self._scale = span / max(self.colors.keys())
-
-    def get_color(self, ctx, now):
-        color = self.really_old_color
-        days = self.colors.keys()
-        days.sort()
-        days_old = _days(ctx, now)
-        for day in days:
-            if (days_old <= day * self._scale):
-                color = self.colors[day]
-                break
-
-        return color
 
 class AnnotateColorSaturation(object):
     def __init__(self, maxhues=None, maxsaturations=None):

@@ -11,6 +11,9 @@ except ImportError:
     icon_path, bin_path, license_path, locale_path = None, None, None, None
 
 import os, sys
+import mercurial
+
+_hg_command = None
 
 def find_root(path=None):
     p = path or os.getcwd()
@@ -44,10 +47,19 @@ def get_locale_path():
     global locale_path
     return locale_path or os.path.join(get_prog_root(), 'locale')
 
+def _get_hg_path():
+    return os.path.abspath(os.path.join(mercurial.__file__, '..', '..'))
+
+def get_hg_command():
+    """List of command to execute hg (equivalent to mercurial.util.hgcmd)"""
+    global _hg_command
+    if _hg_command is None:
+        _hg_command = _find_hg_command()
+    return _hg_command
+
 if os.name == 'nt':
     import _winreg
     import win32net
-    import win32api
     import win32file
 
     def find_in_path(pgmname):
@@ -63,6 +75,31 @@ if os.name == 'nt':
                 if os.path.exists(ppath + ext):
                     return ppath + ext
         return None
+
+    def _find_hg_command():
+        if hasattr(sys, 'frozen'):
+            progdir = get_prog_root()
+            exe = os.path.join(progdir, 'hg.exe')
+            if os.path.exists(exe):
+                return [exe]
+
+        # look for in-place build, i.e. "make local"
+        exe = os.path.join(_get_hg_path(), 'hg.exe')
+        if os.path.exists(exe):
+            return [exe]
+
+        exe = find_in_path('hg')
+        if not exe:
+            return ['hg.exe']
+        if exe.endswith('.bat'):
+            # assumes Python script exists in the same directory.  .bat file
+            # has problems like "Terminate Batch job?" prompt on Ctrl-C.
+            if hasattr(sys, 'frozen'):
+                python = find_in_path('python') or 'python'
+            else:
+                python = sys.executable
+            return [python, exe[:-4]]
+        return [exe]
 
     def get_prog_root():
         if getattr(sys, 'frozen', False):
@@ -118,6 +155,17 @@ else: # Not Windows
             if os.access(ppath, os.X_OK):
                 return ppath
         return None
+
+    def _find_hg_command():
+        # look for in-place build, i.e. "make local"
+        exe = os.path.join(_get_hg_path(), 'hg')
+        if os.path.exists(exe):
+            return [exe]
+
+        exe = find_in_path('hg')
+        if not exe:
+            return ['hg']
+        return [exe]
 
     def get_prog_root():
         path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))

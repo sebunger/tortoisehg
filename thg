@@ -87,7 +87,8 @@ if errmsg:
     qtrun(run, ui.ui(), **opts)
     sys.exit(1)
 
-if 'THGDEBUG' in os.environ or '--profile' in sys.argv:
+if ('THGDEBUG' in os.environ or '--profile' in sys.argv
+    or getattr(sys, 'frozen', None) != 'windows_exe'):
     sys.exit(tortoisehg.hgqt.run.dispatch(argv))
 else:
     import cStringIO
@@ -115,10 +116,10 @@ else:
                 qtrun(run, ui.ui(), **opts)
                 break
         sys.exit(ret)
+    except KeyboardInterrupt:
+        sys.exit(-1)
+    except SystemExit:
+        raise
     except:
-        if sys.exc_info()[0] not in [SystemExit, KeyboardInterrupt]:
-            import traceback
-            sys.stderr = origstderr
-            traceback.print_exc()
-        else:
-            raise SystemExit(ret)
+        sys.__stderr__ = sys.stderr = origstderr
+        raise

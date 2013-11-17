@@ -21,9 +21,11 @@ from mercurial import hg, util, error, bundlerepo, extensions, filemerge, node
 from mercurial import merge, subrepo
 from mercurial import ui as uimod
 from mercurial.util import propertycache
+from hgext import mq
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.util.patchctx import patchctx
+from tortoisehg.hgqt import cmdcore
 
 _repocache = {}
 _kbfregex = re.compile(r'^\.kbf/')
@@ -133,7 +135,7 @@ class RepoWatcher(QObject):
 
     def addMissingPaths(self):
         'Add files to watcher that may have been added or replaced'
-        existing = [f for f in self._getwatchedfiles() if os.path.isfile(f)]
+        existing = [f for f in self._getwatchedfiles() if os.path.exists(f)]
         files = [unicode(f) for f in self._fswatcher.files()]
         for f in existing:
             if hglib.tounicode(f) not in files:
@@ -187,29 +189,35 @@ class RepoWatcher(QObject):
             return None
 
     def _getwatchedfiles(self):
+        'Repository files which may be modified without locking'
+        watchedfiles = []
+        if hasattr(self.repo, 'mq'):
+            watchedfiles.append(self.repo.mq.join('series'))
+            watchedfiles.append(self.repo.mq.join('status'))
+            watchedfiles.append(self.repo.mq.join('guards'))
+            watchedfiles.append(self.repo.join('patches.queue'))
+            watchedfiles.append(self.repo.join('patches.queues'))
+        return watchedfiles
+
+    def _getrepofiles(self):
         watchedfiles = [self.repo.sjoin('00changelog.i')]
         watchedfiles.append(self.repo.sjoin('phaseroots'))
         watchedfiles.append(self.repo.join('localtags'))
         # no need to watch 'bookmarks' because repo._bookmarks.write touches
         # 00changelog.i (see bookmarks.bmstore.write)
         watchedfiles.append(self.repo.join('bookmarks.current'))
-        if hasattr(self.repo, 'mq'):
-            watchedfiles.append(self.repo.mq.path)
-            watchedfiles.append(self.repo.mq.join('series'))
-            watchedfiles.append(self.repo.mq.join('guards'))
-            watchedfiles.append(self.repo.join('patches.queue'))
-            watchedfiles.append(self.repo.join('patches.queues'))
-        return watchedfiles
+        return watchedfiles + self._getwatchedfiles()
 
     def _getrepomtime(self):
         'Return the last modification time for the repo'
-        try:
-            existing = [f for f in self._getwatchedfiles() if os.path.isfile(f)]
-            mtime = [os.path.getmtime(wf) for wf in existing]
-            if mtime:
-                return max(mtime)
-        except EnvironmentError:
-            return None
+        mtime = []
+        for f in self._getrepofiles():
+            try:
+                mtime.append(os.path.getmtime(f))
+            except EnvironmentError:
+                pass
+        if mtime:
+            return max(mtime)
 
     def _checkrepotime(self):
         'Check for new changelog entries, or MQ status changes'
@@ -290,24 +298,28 @@ class RepoAgent(QObject):
     workingBranchChanged = pyqtSignal()
 
     busyChanged = pyqtSignal(bool)
+    outputReceived = pyqtSignal(unicode, unicode)
+    progressReceived = pyqtSignal(unicode, object, unicode, unicode, object)
 
     def __init__(self, repo):
         QObject.__init__(self)
         self._repo = repo
-        self._busycount = 0
         # TODO: remove repo-to-agent references later; all widgets should own
         # RepoAgent instead of thgrepository.
         repo._pyqtobj = self
-        repo.configChanged = self.configChanged
-        repo.repositoryChanged = self.repositoryChanged
-        repo.repositoryDestroyed = self.repositoryDestroyed
-        repo.workingBranchChanged = self.workingBranchChanged
 
         self._watcher = watcher = RepoWatcher(repo, self)
         watcher.configChanged.connect(self._onConfigChanged)
         watcher.repositoryChanged.connect(self._onRepositoryChanged)
         watcher.repositoryDestroyed.connect(self._onRepositoryDestroyed)
         watcher.workingBranchChanged.connect(self._onWorkingBranchChanged)
+
+        self._cmdagent = cmdagent = cmdcore.CmdAgent(self)
+        cmdagent.setWorkingDirectory(self.rootPath())
+        cmdagent.outputReceived.connect(self.outputReceived)
+        cmdagent.progressReceived.connect(self.progressReceived)
+        cmdagent.busyChanged.connect(self._onBusyChanged)
+        self._busystubsess = cmdcore.runningCmdSession()
 
     def startMonitoringIfEnabled(self):
         """Start filesystem monitoring on repository open by RepoManager or
@@ -338,6 +350,8 @@ class RepoAgent(QObject):
 
     def pollStatus(self):
         """Force checking changes to emit corresponding signals"""
+        if self._cmdagent.isBusy():
+            return  # delayed until _onBusyChanged(False)
         self._watcher.pollStatus()
 
     @pyqtSlot()
@@ -363,25 +377,43 @@ class RepoAgent(QObject):
         self.workingBranchChanged.emit()
 
     def isBusy(self):
-        return self._busycount > 0
+        return self._cmdagent.isBusy()
 
+    # TODO: remove _increment/decrementBusyCount
     def _incrementBusyCount(self):
-        self._busycount += 1
-        if self._busycount == 1:
-            self.stopMonitoring()
-            self.busyChanged.emit(self.isBusy())
+        self._cmdagent._enqueueSession(self._busystubsess)
 
     def _decrementBusyCount(self):
-        self._busycount -= 1
-        if self._busycount == 0:
-            self.pollStatus()
-            self.startMonitoringIfEnabled()
-            self.busyChanged.emit(self.isBusy())
-        else:
+        self._cmdagent._dequeueSession(self._busystubsess)
+        if self._cmdagent.isBusy():
+            # TODO: maybe this is necessary on each commandFinished
             # A lot of logic will depend on invalidation happening within
             # the context of this call. Signals will not be emitted till later,
             # but we at least invalidate cached data in the repository
             self._repo.thginvalidate()
+
+    @pyqtSlot(bool)
+    def _onBusyChanged(self, busy):
+        if busy:
+            self.stopMonitoring()
+        else:
+            self._watcher.pollStatus()
+            self.startMonitoringIfEnabled()
+        self.busyChanged.emit(busy)
+
+    def runCommand(self, cmdline, parent=None, display=None, worker=None):
+        """Executes a single command asynchronously in this repository"""
+        return self._cmdagent.runCommand(cmdline, parent, display, worker)
+
+    def runCommandSequence(self, cmdlines, parent=None, display=None,
+                           worker=None):
+        """Executes a series of commands asynchronously in this repository"""
+        return self._cmdagent.runCommandSequence(cmdlines, parent, display,
+                                                 worker)
+
+    def abortCommands(self):
+        """Abort running and queued commands"""
+        self._cmdagent.abortCommands()
 
 
 def _normreporoot(path):
@@ -401,10 +433,26 @@ class RepoManager(QObject):
     repositoryChanged = pyqtSignal(unicode)
     repositoryDestroyed = pyqtSignal(unicode)
 
+    _SIGNALMAP = [
+        # source, dest
+        (SIGNAL('configChanged()'),
+         SIGNAL('configChanged(QString)')),
+        (SIGNAL('repositoryChanged()'),
+         SIGNAL('repositoryChanged(QString)')),
+        (SIGNAL('repositoryDestroyed()'),
+         SIGNAL('repositoryDestroyed(QString)')),
+        ]
+
     def __init__(self, ui, parent=None):
         super(RepoManager, self).__init__(parent)
         self._ui = ui
         self._openagents = {}  # path: (agent, refcount)
+
+        self._sigmappers = []
+        for _sig, slot in self._SIGNALMAP:
+            mapper = QSignalMapper(self)
+            self._sigmappers.append(mapper)
+            QObject.connect(mapper, SIGNAL('mapped(QString)'), self, slot)
 
     def openRepoAgent(self, path):
         """Return RepoAgent for the specified path and increment refcount"""
@@ -419,8 +467,9 @@ class RepoManager(QObject):
         agent = repository(self._ui, hglib.fromunicode(path))._pyqtobj
         assert agent.parent() is None
         agent.setParent(self)
-        for sig, slot in self._mappedSignals(agent):
-            sig.connect(slot)
+        for (sig, _slot), mapper in zip(self._SIGNALMAP, self._sigmappers):
+            QObject.connect(agent, sig, mapper, SLOT('map()'))
+            mapper.setMapping(agent, agent.rootPath())
         agent.startMonitoringIfEnabled()
 
         assert agent.rootPath() == path
@@ -439,8 +488,10 @@ class RepoManager(QObject):
         self._ui.debug('closing repo: %s\n' % hglib.fromunicode(path))
         agent, _refcount = self._openagents.pop(path)
         agent.stopMonitoring()
-        for sig, slot in self._mappedSignals(agent):
-            sig.disconnect(slot)
+        # TODO: disconnected automatically if _repocache does not exist
+        for (sig, _slot), mapper in zip(self._SIGNALMAP, self._sigmappers):
+            QObject.disconnect(agent, sig, mapper, SLOT('map()'))
+            mapper.removeMappings(agent)
         agent.setParent(None)
         self.repositoryClosed.emit(path)
 
@@ -453,28 +504,6 @@ class RepoManager(QObject):
     def repoRootPaths(self):
         """Return list of root paths of open repositories"""
         return self._openagents.keys()
-
-    def _mappedSignals(self, agent):
-        return [
-            (agent.configChanged,           self._mapConfigChanged),
-            (agent.repositoryChanged,       self._mapRepositoryChanged),
-            (agent.repositoryDestroyed,     self._mapRepositoryDestroyed),
-            ]
-
-    #@pyqtSlot()
-    def _mapConfigChanged(self):
-        agent = self.sender()
-        self.configChanged.emit(agent.rootPath())
-
-    #@pyqtSlot()
-    def _mapRepositoryChanged(self):
-        agent = self.sender()
-        self.repositoryChanged.emit(agent.rootPath())
-
-    #@pyqtSlot()
-    def _mapRepositoryDestroyed(self):
-        agent = self.sender()
-        self.repositoryDestroyed.emit(agent.rootPath())
 
 
 _uiprops = '''_uifiles postpull tabwidth maxdiff
@@ -510,6 +539,13 @@ def _extendrepo(repo):
             changectx.__class__ = _extendchangectx(changectx)
             return changectx
 
+        def hgchangectx(self, changeid):
+            '''Returns unwrapped changectx or workingctx object'''
+            # This provides temporary workaround for troubles caused by class
+            # extension: e.g. changectx(n) != thgchangectx(n).
+            # thgrepository and thgchangectx should be removed in some way.
+            return super(thgrepository, self).__getitem__(changeid)
+
         @propertycache
         def _thghiddentags(self):
             ht = self.ui.config('tortoisehg', 'hidetags', '')
@@ -531,21 +567,12 @@ def _extendrepo(repo):
         def _thgmqpatchnames(self):
             '''Returns all tag names used by MQ patches. Returns []
             if MQ not in use.'''
-            if not hasattr(self, 'mq'): return []
-
-            self.mq.parseseries()
-            return self.mq.series[:]
+            return hglib.getmqpatchtags(self)
 
         @property
         def thgactivemqname(self):
             '''Currenty-active qqueue name (see hgext/mq.py:qqueue)'''
-            if not hasattr(self, 'mq'):
-                return
-            n = os.path.basename(self.mq.path)
-            if n.startswith('patches-'):
-                return n[8:]
-            else:
-                return n
+            return hglib.getcurrentqqueue(self)
 
         @propertycache
         def _uifiles(self):
@@ -671,15 +698,6 @@ def _extendrepo(repo):
         def thgmqtag(self, tag):
             'Returns true if `tag` marks an applied MQ patch'
             return tag in self._thgmqpatchnames
-
-        def getcurrentqqueue(self):
-            'Returns the name of the current MQ queue'
-            if 'mq' not in self._exts:
-                return None
-            cur = os.path.basename(self.mq.path)
-            if cur.startswith('patches-'):
-                cur = cur[8:]
-            return cur
 
         def thgshelves(self):
             self.shelfdir = sdir = self.join('shelves')
@@ -836,6 +854,17 @@ def _createchangectxcls(parentcls):
             '''True if self is a branch head'''
             return self.node() in self._repo._branchheads
 
+        def thgmqoriginalparent(self):
+            '''The revisionid of the original patch parent'''
+            if not self.thgmqunappliedpatch() and not self.thgmqappliedpatch():
+                return ''
+            try:
+                patchpath = self._repo.mq.join(self.thgmqpatchname())
+                mqoriginalparent = mq.patchheader(patchpath).parent
+            except EnvironmentError:
+                return ''
+            return mqoriginalparent
+
         def changesToParent(self, whichparent):
             parent = self.parents()[whichparent]
             return self._repo.status(parent.node(), self.node())[:3]
@@ -911,7 +940,8 @@ def relatedRepositories(repoid):
     try:
         for e in repotreemodel.iterRepoItemFromXml(f):
             if e.basenode() == repoid:
-                yield e.rootpath(), e.shortname()
+                # TODO: both in unicode because this is Qt-layer function?
+                yield e.rootpath(), hglib.fromunicode(e.shortname())
     except:
         f.close()
         raise

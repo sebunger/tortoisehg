@@ -25,7 +25,6 @@ from tortoisehg.hgqt.graph import Graph
 from tortoisehg.hgqt.graph import revision_grapher
 from tortoisehg.hgqt.graph import LINE_TYPE_GRAFT
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.qreorder import writeSeries
 
 from tortoisehg.hgqt.i18n import _
 
@@ -143,7 +142,7 @@ class HgRepoListModel(QAbstractTableModel):
     _mqtags = ('qbase', 'qtip', 'qparent')
 
     def __init__(self, repo, cfgname, branch, revset, rfilter, parent,
-            showhidden=False, allparents=False):
+            showhidden=False, allparents=False, showgraftsource=True):
         """
         repo is a hg repo instance
         """
@@ -165,6 +164,7 @@ class HgRepoListModel(QAbstractTableModel):
         self.filterbranch = branch  # unicode
         self.showhidden = showhidden
         self.allparents = allparents
+        self.showgraftsource = showgraftsource
 
         # To be deleted
         self._user_colors = {}
@@ -202,22 +202,29 @@ class HgRepoListModel(QAbstractTableModel):
         self.showhidden = visible
         self._initGraph()
 
+    def setShowGraftSource(self, visible):
+        self.showgraftsource = visible
+        self._initGraph()
+
     def _initGraph(self):
         branch = self.filterbranch
         allparents = self.allparents
         showhidden = self.showhidden
+        showgraftsource = self.showgraftsource
         self.invalidateCache()
         if self.revset and self.filterbyrevset:
             grapher = revision_grapher(self.repo,
                                        branch=hglib.fromunicode(branch),
                                        revset=self.revset,
-                                       showhidden=showhidden)
+                                       showhidden=showhidden,
+                                       showgraftsource=showgraftsource)
             self.graph = Graph(self.repo, grapher, include_mq=False)
         else:
             grapher = revision_grapher(self.repo,
                                        branch=hglib.fromunicode(branch),
                                        allparents=allparents,
-                                       showhidden=showhidden)
+                                       showhidden=showhidden,
+                                       showgraftsource=showgraftsource)
             self.graph = Graph(self.repo, grapher, include_mq=True)
         self.rowcount = 0
         self.layoutChanged.emit()
@@ -641,7 +648,7 @@ class HgRepoListModel(QAbstractTableModel):
         if mqpatchmimetype not in data.formats():
             return False
         dragrows = [int(r) for r in str(data.data(mqpatchmimetype)).split(',')]
-        destrow = parent.row() - len([r for r in dragrows if r < parent.row()])
+        destrow = parent.row()
         if destrow < 0:
             return False
         unapplied = self.repo.thgmqunappliedpatches[::-1]
@@ -649,11 +656,17 @@ class HgRepoListModel(QAbstractTableModel):
         if max(dragrows) >= len(unapplied):
             return False
         dragpatches = [unapplied[d] for d in dragrows]
-        for i in dragrows:
-            unapplied.pop(i)
-        for p in dragpatches:
-            unapplied.insert(destrow, p)
-        writeSeries(self.repo, applied, unapplied)
+        allpatches = unapplied + applied
+        if destrow < len(allpatches):
+            destpatch = allpatches[destrow]
+        else:
+            destpatch = None  # next to working rev
+
+        self.repo.incrementBusyCount()
+        try:
+            hglib.movemqpatches(self.repo, destpatch, dragpatches)
+        finally:
+            self.repo.decrementBusyCount()
         return True
 
     def headerData(self, section, orientation, role):

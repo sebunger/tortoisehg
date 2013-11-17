@@ -26,12 +26,6 @@ from hgext.color import _styles
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-if PYQT_VERSION < 0x40600 or QT_VERSION < 0x40600:
-    sys.stderr.write('TortoiseHg requires at least Qt 4.6 and PyQt 4.6\n')
-    sys.stderr.write('You have Qt %s and PyQt %s\n' %
-                     (QT_VERSION_STR, PYQT_VERSION_STR))
-    sys.exit()
-
 try:
     import win32con
     openflags = win32con.CREATE_NO_WINDOW
@@ -623,13 +617,6 @@ def getfont(name):
     assert name in _fontdefaults
     return _fontcache[name]
 
-def gettranslationpath():
-    """Return path to Qt's translation file (.qm)"""
-    if getattr(sys, 'frozen', False):
-        return ':/translations'
-    else:
-        return QLibraryInfo.location(QLibraryInfo.TranslationsPath)
-
 def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Ok,
                  labels=[], parent=None, defaultbutton=None):
     msg = QMessageBox(parent)
@@ -736,30 +723,6 @@ class ChoicePrompt(QDialog):
             return self.choices[self.choice_combo.currentIndex()]
         return None
 
-def setup_font_substitutions():
-    QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
-
-def fix_application_font():
-    if os.name != 'nt':
-        return
-    try:
-        import win32gui, win32con
-    except ImportError:
-        return
-
-    # use configurable font like GTK, Mozilla XUL or Eclipse SWT
-    ncm = win32gui.SystemParametersInfo(win32con.SPI_GETNONCLIENTMETRICS)
-    lf = ncm['lfMessageFont']
-    f = QFont(hglib.tounicode(lf.lfFaceName))
-    f.setItalic(lf.lfItalic)
-    if lf.lfWeight != win32con.FW_DONTCARE:
-        weights = [(0, QFont.Light), (400, QFont.Normal), (600, QFont.DemiBold),
-                   (700, QFont.Bold), (800, QFont.Black)]
-        n, w = filter(lambda e: e[0] <= lf.lfWeight, weights)[-1]
-        f.setWeight(w)
-    f.setPixelSize(abs(lf.lfHeight))
-    QApplication.setFont(f, 'QWidget')
-
 def allowCaseChangingInput(combo):
     """Allow case-changing input of known combobox item
 
@@ -837,7 +800,7 @@ class ExpanderLabel(QWidget):
         self.button.clicked.connect(self.pm_clicked)
         box.addWidget(self.button)
         self.label = ClickableLabel(label, self)
-        self.label.clicked.connect(lambda: self.button.click())
+        self.label.clicked.connect(self.button.click)
         box.addWidget(self.label)
         if not stretch:
             box.addStretch(0)

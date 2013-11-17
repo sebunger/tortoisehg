@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-09-23 19:25-0300\n"
-"PO-Revision-Date: 2013-09-25 12:52+0000\n"
+"POT-Creation-Date: 2013-10-31 00:28-0200\n"
+"PO-Revision-Date: 2013-10-31 02:40+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2013-09-26 05:40+0000\n"
-"X-Generator: Launchpad (build 16771)\n"
+"X-Launchpad-Export-Date: 2013-10-31 05:28+0000\n"
+"X-Generator: Launchpad (build 16820)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servidor de Ícones Sobrepostos do TortoiseHg"
@@ -30,8 +30,8 @@ msgstr "Sobre"
 msgid "Copyright 2008-2013 Steve Borho and others"
 msgstr "Copyright 2008-2013 Steve Borho e outros"
 
-msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr "Vários ícones são cortesia do projeto TortoiseSVN"
+msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
+msgstr "Vários ícones são cortesia dos projetos TortoiseSVN e Tango"
 
 msgid "You can visit our site here"
 msgstr "Você pode visitar nossa página aqui"
@@ -50,8 +50,9 @@ msgstr "versão %s"
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 msgstr "com Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
-msgid "A new version of TortoiseHg is ready for download!"
-msgstr "Uma nova versão do TortoiseHg está disponível para download!"
+#, python-format
+msgid "A new version of TortoiseHg (%s) is ready for download!"
+msgstr "Uma nova versão do TortoiseHg (%s) está disponível para download!"
 
 msgid "= Working Directory Parent ="
 msgstr "= Pai do Diretório de Trabalho ="
@@ -255,15 +256,6 @@ msgstr "<b>Detectadas mudanças locais não consolidadas</b>"
 msgid "Clean"
 msgstr "Limpo"
 
-msgid "&Discard"
-msgstr "&Descartar"
-
-msgid "Confirm Discard"
-msgstr "Confirmação de Descarte"
-
-msgid "Discard outstanding changes to working directory?"
-msgstr "Descartar mudanças pendentes do diretório de trabalho?"
-
 msgid "Backing out, then merging..."
 msgstr "Anulando, e em seguida mesclando..."
 
@@ -380,7 +372,7 @@ msgid "Revision"
 msgstr "Revisão"
 
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr "Teste esta revisão e informe o reultado. (boa/ruim/desconsiderada)"
+msgstr "Teste esta revisão e informe o resultado. (boa/ruim/desconsiderada)"
 
 #, python-format
 msgid "%s (hint: %s)"
@@ -663,6 +655,23 @@ msgstr "Selecione repositório de destino"
 msgid "Select patch folder"
 msgstr "Selecionar pasta de patches"
 
+msgid "failed to start command\n"
+msgstr "falha ao iniciar comando\n"
+
+msgid "error while running command\n"
+msgstr "erro ao executar comando\n"
+
+msgid "Terminated by user"
+msgstr "Terminado pelo usuário"
+
+#, python-format
+msgid "[command terminated by user %s]"
+msgstr "[comando terminado pelo usuário %s]"
+
+#, python-format
+msgid "[command interrupted %s]"
+msgstr "[comando interrompido %s]"
+
 #, python-format
 msgid "[command returned code %d %%s]"
 msgstr "[o comando devolveu o código %d %%s]"
@@ -671,23 +680,14 @@ msgstr "[o comando devolveu o código %d %%s]"
 msgid "[command completed successfully %s]"
 msgstr "[o comando completou com sucesso %s]"
 
-msgid "failed to start command\n"
-msgstr "falha ao iniciar comando\n"
-
-msgid "error while running command\n"
-msgstr "erro ao executar comando\n"
-
 msgid "Running..."
 msgstr "Executando..."
 
-msgid "Terminated by user"
-msgstr "Terminado pelo usuário"
-
-msgid "Terminated"
-msgstr "Terminado"
-
 msgid "Failed!"
 msgstr "Falhou!"
+
+msgid "Clea&r Log"
+msgstr "Limpa&r Log"
 
 msgid "TortoiseHg Command Dialog"
 msgstr "Janela de Comandos do TortoiseHg"
@@ -702,12 +702,24 @@ msgstr ""
 "Um comando do Mercurial ainda está em execução.\n"
 "Tem certeza de que deseja encerrar?"
 
-msgid "TortoiseHg"
-msgstr "TortoiseHg"
+msgid "Command Error"
+msgstr "Erro no Comando"
 
-msgctxt "window title"
+#, python-format
+msgid "[Code: %d]"
+msgstr "[Código: %d]"
+
+msgctxt "start progress"
 msgid "Commit"
-msgstr "Consolidação"
+msgstr "Commit"
+
+msgctxt "start progress"
+msgid "MQ Action"
+msgstr "Ação MQ"
+
+msgctxt "start progress"
+msgid "Rollback"
+msgstr "Rollback"
 
 msgid "Commit Dialog Toolbar"
 msgstr "Barra de Diálogo de Commit"
@@ -788,10 +800,6 @@ msgstr "Criar novo ramo nomeado \"%s\" nesta revisão?\n"
 msgid "Create &Branch"
 msgstr "Criar &Ramo"
 
-msgctxt "start progress"
-msgid "MQ Action"
-msgstr "Ação MQ"
-
 msgid "Close Branch: "
 msgstr "Fechar Ramo: "
 
@@ -818,10 +826,6 @@ msgstr "Desfaz último commit e volta à revisão %d"
 
 msgid "Confirm Undo"
 msgstr "Confirmar Desfazimento"
-
-msgctxt "start progress"
-msgid "Rollback"
-msgstr "Rollback"
 
 msgid "Discard current commit message?"
 msgstr "Descartar mensagem de consolidação atual?"
@@ -874,9 +878,9 @@ msgstr "Confirmar Remoção"
 msgid "Remove selected deleted files?"
 msgstr "Remover os arquivos apagados marcados?"
 
-msgctxt "start progress"
+msgctxt "window title"
 msgid "Commit"
-msgstr "Commit"
+msgstr "Consolidação"
 
 #, python-format
 msgid "%s - commit options"
@@ -1017,6 +1021,9 @@ msgstr "Subversion:"
 
 msgid "Converted From:"
 msgstr "Convertida De:"
+
+msgid "Original Parent:"
+msgstr "Pai Original:"
 
 msgid "No items to display"
 msgstr "Nenhum item para mostrar"
@@ -1265,12 +1272,6 @@ msgstr ""
 msgid "Custom Tools"
 msgstr "Ferramentas Personalizadas"
 
-msgid "failed to run command\n"
-msgstr "a execução do comando falhou\n"
-
-msgid "crashed\n"
-msgstr "quebrou\n"
-
 #, python-format
 msgid "command parse error: %s"
 msgstr "erro de análise de comando: %s"
@@ -1414,6 +1415,13 @@ msgid "Diff not displayed: "
 msgstr "Diff não exibido: "
 
 #, python-format
+msgid "changeset: %s"
+msgstr "revisão: %s"
+
+msgid "Initial revision"
+msgstr "Revisão inicial"
+
+#, python-format
 msgid ""
 "[WARNING] Invalid subrepo revision ID:\n"
 "\t%s\n"
@@ -1432,42 +1440,50 @@ msgstr "Sub-repositório atualizado para a revisão:"
 msgid "Subrepo removed from repository."
 msgstr "Sub-repositório removido do repositório."
 
+msgid "Previously the subrepository was at the following revision:"
+msgstr "Anteriormente o sub-repositório estava na seguinte revisão:"
+
 msgid "Subrepo was not changed."
 msgstr "O sub-repositório não foi modificado."
+
+msgid "[WARNING] Missing subrepo. Update to this revision to clone it."
+msgstr ""
+"[AVISO] O sub-repositório está faltando. Para cloná-lo, atualize para esta "
+"revisão."
+
+msgid "[WARNING] Incomplete subrepo. Update to this revision to pull it."
+msgstr ""
+"[AVISO] O sub-repositório está incompleto. Para completá-lo, atualize para "
+"esta revisão."
 
 msgid "Subrepo state is:"
 msgstr "O estado do sub-repositório é:"
 
-#, python-format
-msgid "changeset: %s"
-msgstr "revisão: %s"
-
 msgid "Revision has changed to:"
 msgstr "A revisão mudou para:"
+
+#, python-format
+msgid "changeset: %s (not found on subrepository)"
+msgstr "revisão: %s (não encontrada no sub-repositório)"
 
 msgid "From:"
 msgstr "De:"
 
+msgid ""
+"[WARNING] Missing changed subrepository. Update to this revision to clone it."
+msgstr ""
+"[AVISO] O sub-repositório modificado está faltando. Para cloná-lo, atualize "
+"para esta revisão."
+
 msgid "Subrepository not found in the working directory."
 msgstr "Sub-repositório não encontrado no diretório de trabalho"
 
-msgid "Further subrepository revision information cannot be retrieved."
-msgstr ""
-"Não podem ser obtidas informações adicionais de revisão do sub-repositório."
-
-msgid "Subrepository is either damaged or missing some revisions"
-msgstr ""
-"O sub-repositório está danificado, ou algumas de suas revisões estão faltando"
-
 msgid ""
-"You may need to open the missing subrepository and manually\n"
-"pull the missing revisions from its source repository."
+"[WARNING] Incomplete changed subrepository. Update to this revision to pull "
+"it."
 msgstr ""
-"Pode ser necessário abrir o sub-repositório e manualmente\n"
-"fazer o pull das revisões ausentes de seu repositório de origem."
-
-msgid "Initial revision"
-msgstr "Revisão inicial"
+"[AVISO] O sub-repositório modificado está incompleto. Para completá-lo, "
+"atualize para esta revisão."
 
 msgid "Not a Mercurial subrepo, not previewable"
 msgstr "Não é um sub-repositório do Mercurial, não pode ser pré-visualizado"
@@ -1475,6 +1491,9 @@ msgstr "Não é um sub-repositório do Mercurial, não pode ser pré-visualizado
 #, python-format
 msgid "Error previewing subrepo: %s"
 msgstr "Erro ao pré-visualizar sub-repositório: %s"
+
+msgid "Subrepo may be damaged or inaccessible."
+msgstr "O sub-repositório pode estar danificado ou inacessível."
 
 msgid "The subrepository is dirty."
 msgstr "O sub-repositório está sujo."
@@ -1637,8 +1656,14 @@ msgstr "Ir para"
 msgid "View File at"
 msgstr "Ver Arquivo na"
 
+msgid "Diff File to"
+msgstr "Diff do Arquivo com"
+
 msgid "&Originating Revision"
 msgstr "Revisão de &Origem"
+
+msgid "&Local"
+msgstr "&Local"
 
 #, python-format
 msgid "&Parent Revision (%d)"
@@ -2360,6 +2385,9 @@ msgstr "Forçar mesclagem com mudanças pendentes (-f/--force)"
 msgid "Discard all changes from merge target (other) revision"
 msgstr "Descartar todas as mudanças da revisão alvo da mesclagem (outra)"
 
+msgid "&Discard"
+msgstr "&Descartar"
+
 msgid "Confirm Discard Changes"
 msgstr "Confirma o Descarte de Mudanças"
 
@@ -2439,6 +2467,65 @@ msgstr "Ap&licar Formato"
 msgid "C&onfigure Format"
 msgstr "C&onfigurar Formato"
 
+msgid "&Commit to Queue..."
+msgstr "&Consolida para a Fila..."
+
+msgid "Create &New Queue..."
+msgstr "Cria &Nova Fila..."
+
+msgid "&Rename Active Queue..."
+msgstr "&Renomeia Fila Ativa..."
+
+msgid "&Delete Queue..."
+msgstr "Apa&ga Fila..."
+
+msgid "&Purge Queue..."
+msgstr "Ex&purga Fila..."
+
+msgid "Create Patch Queue"
+msgstr "Criar Fila de Patches"
+
+msgid "New patch queue name"
+msgstr "Nome da nova fila de patches"
+
+msgid "Rename Patch Queue"
+msgstr "Renomear Fila de Patches"
+
+#, python-format
+msgid "Rename patch queue '%s' to"
+msgstr "Renomear fila de patches '%s' para"
+
+msgid "Rename"
+msgstr "Renomear"
+
+msgid "Delete Patch Queue"
+msgstr "Apagar Fila de Patches"
+
+msgid "Delete reference to"
+msgstr "Apagar a referência para"
+
+msgid "Delete"
+msgstr "Apagar"
+
+msgid "Purge Patch Queue"
+msgstr "Expurgar Fila de Patches"
+
+msgid "Remove patch directory of"
+msgstr "Remover diretório de patches de"
+
+msgid "Purge"
+msgstr "Remover Completamente"
+
+msgid "Rename Patch"
+msgstr "Renomear Patch"
+
+#, python-format
+msgid "Rename patch <b>%s</b> to:"
+msgstr "Renomear patch <b>%s</b> para:"
+
+msgid "no guards"
+msgstr "nenhuma guarda"
+
 msgid "Patch Queue"
 msgstr "Fila de Patches"
 
@@ -2456,17 +2543,14 @@ msgstr "Empilhar (qpush)"
 msgid "Apply one patch"
 msgstr "Aplicar um patch"
 
-msgid "Guards"
-msgstr "Guardas"
+msgid "Set &Guards..."
+msgstr "Definir &Guardas..."
 
 msgid "Configure guards for selected patch"
 msgstr "Configura guardas para o patch selecionado"
 
-msgid "Reorder patches"
-msgstr "Reordenar patches"
-
-msgid "Delete"
-msgstr "Apagar"
+msgid "&Delete Patches..."
+msgstr "Apa&gar Patches..."
 
 msgid "Delete selected patches"
 msgstr "Apagar patches selecionados"
@@ -2483,15 +2567,11 @@ msgstr "Desempilhar todos"
 msgid "Unapply all patches"
 msgstr "Desaplica todos os patches"
 
+msgid "Re&name Patch..."
+msgstr "Re&nomear Patch..."
+
 msgid "Patch Queue Actions Toolbar"
 msgstr "Barra de Ações da Fila de Patches"
-
-msgid ""
-"<p>ATTENTION!<br>Guard or comment found.<br>Reordering patches will destroy "
-"them.<br><br>Continue?</p>"
-msgstr ""
-"<p>ATENÇÃO!<br>Guarda ou comentário encontrados.<br>Reordenar patches irá "
-"destruí-los. <br><br>Continuar?</p>"
 
 msgid "Configure guards"
 msgstr "Configurar guardas"
@@ -2500,57 +2580,25 @@ msgstr "Configurar guardas"
 msgid "Input new guards for %s:"
 msgstr "Entre com novas guardas para %s:"
 
-msgid "Guards must begin with \"+\" or \"-\""
-msgstr "Guardas devem começar por \"+\" ou \"-\""
+msgid "Confirm patch queue switch"
+msgstr "Confirmar troca de fila de patches"
 
-msgid "no guards"
-msgstr "nenhuma guarda"
+#, python-format
+msgid "Do you really want to activate patch queue '%s' ?"
+msgstr "Você realmente deseja ativar a fila de patches '%s'?"
 
 #, python-format
 msgid "Guards: %d/%d"
 msgstr "Guardas: %d/%d"
 
-msgid "Queues"
-msgstr "Filas"
-
-msgid "New Patch"
-msgstr "Novo Patch"
-
-msgid "TortoiseHg Patch Queue"
-msgstr "Fila de Patches do TortoiseHg"
-
-msgid "QCommit"
-msgstr "QCommit"
-
-msgid "Create MQ repo"
-msgstr "Criar Repositório MQ"
-
-msgid "Patch commit messages..."
-msgstr "Mensagens de consolidação do patch..."
-
 msgid "MQ options"
 msgstr "Opções MQ"
-
-msgid "Force use of git extended diff format (--git)"
-msgstr "Forçar uso do formato git extended diff (--git)"
 
 msgid "Force push or pop (--force)"
 msgstr "Força push ou pop (--force)"
 
-msgid "Apply patch to its recorded parent (--exact)"
-msgstr "Aplica o patch em seu pai armazenado (--exact)"
-
-msgid "Update date field with current date (--currentdate)"
-msgstr "Atualizar campo data com a data atual (--currentdate)"
-
-msgid "Specify an explicit date:"
-msgstr "Especificar uma data:"
-
-msgid "Update author field with current user (--currentuser)"
-msgstr "Atualizar campo autor com o usuário atual (--currentuser)"
-
-msgid "Specify an explicit author:"
-msgstr "Especificar um autor:"
+msgid "Tolerate non-conflicting local changes (--keep-changes)"
+msgstr "Tolerar mudanças locais não conflitantes (--keep-changes)"
 
 msgid "### patch name ###"
 msgstr "### nome do patch ###"
@@ -2798,9 +2846,8 @@ msgstr "Apagados %d arquivos"
 msgid "Deleted %d files and %d folders"
 msgstr "Apagados %d arquivos e %d pastas"
 
-#, python-format
-msgid "Patch remove - %s"
-msgstr "Remoção de patch - %s"
+msgid "Delete Patches"
+msgstr "Apagar Patches"
 
 msgid "Remove patches from queue?"
 msgstr "Remover patches da fila?"
@@ -2817,76 +2864,6 @@ msgstr "Nova mensagem de patch:"
 
 msgid "Patches to fold"
 msgstr "Patches a combinar"
-
-msgid "Manage MQ patch queues"
-msgstr "Gerencia filas de patches MQ"
-
-msgid "Repository:"
-msgstr "Repositório:"
-
-msgid "Patch queues:"
-msgstr "Filas de patches:"
-
-msgid "Reload"
-msgstr "Reler"
-
-msgid "Activate"
-msgstr "Ativar"
-
-msgid "Rename"
-msgstr "Renomear"
-
-msgid "Purge"
-msgstr "Remover Completamente"
-
-msgid "Patches:"
-msgstr "Patches:"
-
-msgid "QQueue"
-msgstr "QQueue"
-
-msgid "Confirm patch queue switch"
-msgstr "Confirmar troca de fila de patches"
-
-#, python-format
-msgid "Do you really want to activate patch queue '%s' ?"
-msgstr "Você realmente deseja ativar a fila de patches '%s'?"
-
-msgid "TortoiseHg Prompt"
-msgstr "Prompt do TortoiseHg"
-
-msgid "New patch queue name"
-msgstr "Nome da nova fila de patches"
-
-#, python-format
-msgid "Rename patch queue '%s' to"
-msgstr "Renomear fila de patches '%s' para"
-
-msgid "Confirm patch queue delete"
-msgstr "Confirmar remoção da fila de patches"
-
-#, python-format
-msgid "Do you really want to delete patch queue '%s' ?"
-msgstr "Você realmente deseja remover a fila de patches '%s'?"
-
-msgid "Confirm patch queue purge"
-msgstr "Confirmar remoção completa da fila de patches"
-
-#, python-format
-msgid ""
-"<p>This will also erase the patchfiles on disk!</p><p>Do you really want to "
-"purge patch queue '%s' ?</p>"
-msgstr ""
-"<p>Isto também apagará os arquivos de patch do sistema de arquivos!</"
-"p><p>Você realmente deseja remover completamente a fila de patches '%s' ?</p>"
-
-#, python-format
-msgid "Patch rename - %s"
-msgstr "Renomear patch - %s"
-
-#, python-format
-msgid "Rename patch <b>%s</b> to:"
-msgstr "Renomear patch <b>%s</b> para:"
 
 msgid "Rename Error"
 msgstr "Erro de Renomeação"
@@ -2913,18 +2890,6 @@ msgstr "Sobrescrever arquivo de patch existente"
 msgid "Go back and change new patchname"
 msgstr "Voltar e mudar o novo nome do patch"
 
-msgid "Reorder Unapplied Patches"
-msgstr "Reordenar Patches Não-Aplicados"
-
-msgid "Unapplied Patches - drag to reorder"
-msgstr "Patches Não-Aplicados - arraste para reordenar"
-
-msgid "Applied Patches"
-msgstr "Patches Aplicados"
-
-msgid "Rename patch"
-msgstr "Renomear patch"
-
 msgid "&Undo"
 msgstr "&Desfazer"
 
@@ -2942,6 +2907,9 @@ msgstr "Co&lar"
 
 msgid "&Delete"
 msgstr "E&xcluir"
+
+msgid "&Editor Options"
+msgstr "Opções do &Editor"
 
 msgid "&Wrap"
 msgstr "&Separação de Linhas"
@@ -2968,6 +2936,18 @@ msgstr "&Invisível"
 msgid "&AfterIndent"
 msgstr "&Após Indentação"
 
+msgid "&TAB Inserts"
+msgstr "&TAB Insere"
+
+msgid "&Auto"
+msgstr "&Auto"
+
+msgid "&TAB"
+msgstr "&TAB"
+
+msgid "&Spaces"
+msgstr "E&spaços"
+
 msgid "EOL &Visibility"
 msgstr "&Visibilidade de Quebras de Linha"
 
@@ -2983,29 +2963,8 @@ msgstr "&Unix"
 msgid "&Mac"
 msgstr "&Mac"
 
-msgid "&TAB Inserts"
-msgstr "&TAB Insere"
-
-msgid "&Auto"
-msgstr "&Auto"
-
-msgid "&TAB"
-msgstr "&TAB"
-
-msgid "&Spaces"
-msgstr "E&spaços"
-
 msgid "&Auto-Complete"
 msgstr "&Auto-Completação"
-
-msgid "&Enable"
-msgstr "&Habilitar"
-
-msgid "&Disable"
-msgstr "&Desabilitar"
-
-msgid "&Editor Options"
-msgstr "Opções do &Editor"
 
 msgid "### regular expression ###"
 msgstr "### expressão regular ###"
@@ -3054,8 +3013,8 @@ msgstr "O repositório está bloqueado"
 msgid "hint:"
 msgstr "dica:"
 
-msgid "Keyboard interrupt"
-msgstr "Interrupção de teclado"
+msgid "Keyboard Interrupt"
+msgstr "Interrupção de Teclado"
 
 msgid "Close this application?"
 msgstr "Fechar esta aplicação?"
@@ -3108,12 +3067,6 @@ msgstr "Falha na Tradução do Texto"
 
 msgid "Unable to translate input to local encoding."
 msgstr "Incapaz de traduzir a entrada para a codificação local."
-
-msgid "Goto"
-msgstr "Ir para"
-
-msgid "Go"
-msgstr "Ir"
 
 msgid "Checkmark files to add"
 msgstr "Marque arquivos para adicionar"
@@ -3174,6 +3127,9 @@ msgstr "Rebasear revisão e seus descendentes"
 msgid "To rebase destination"
 msgstr "Para o destino do rebaseamento"
 
+msgid "Swap source and destination"
+msgstr "Trocar origem com destino"
+
 msgid "Keep original changesets"
 msgstr "Manter revisões originais"
 
@@ -3182,6 +3138,9 @@ msgstr "Manter nomes de ramo originais"
 
 msgid "Collapse the rebased changesets "
 msgstr "Colapsa as revisões rebaseadas "
+
+msgid "Rebase entire source branch"
+msgstr "Rebasear todo o ramo de origem"
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3349,6 +3308,9 @@ msgstr "Alterna a filtragem de revisões não correspondentes"
 
 msgid "Show/Hide hidden changesets"
 msgstr "Mostra/Oculta revisões ocultas"
+
+msgid "Toggle graft relations visibility"
+msgstr "Alterna visibilidade de relações de enxerto"
 
 msgid "Keyword Search"
 msgstr "Busca por Palavra Chave"
@@ -3532,6 +3494,12 @@ msgstr "A&dicionar Sub-Repositório..."
 msgid "Convert an existing repository into a subrepository"
 msgstr "Converte um repositório existente em um sub-repositório"
 
+msgid "Remo&ve Subrepository..."
+msgstr "Remo&ver Sub-repositório..."
+
+msgid "Remove this subrepository from the current revision"
+msgstr "Remove este sub-repositório da revisão atual"
+
 msgid "Copy the root path of the repository to the clipboard"
 msgstr "Copia o caminho raiz do repositório para a área de transferência"
 
@@ -3638,6 +3606,60 @@ msgstr ""
 msgid "Cannot update the .hgsub file in:<br><br>%s"
 msgstr "Não é possível atualizar o arquivo .hgsub em:<br><br>%s"
 
+msgid "Could not open .hgsub file"
+msgstr "Não foi possível abrir arquivo .hgsub"
+
+msgid "Cannot read the .hgsub file.<p>Subrepository removal failed."
+msgstr ""
+"Não foi possível ler o arquivo .hgsub.<p>A remoção do sub-repositório falhou."
+
+msgid "Subrepository not found"
+msgstr "Sub-repositório não encontrado"
+
+msgid ""
+"The selected subrepository was not found on the .hgsub file.<p>Perhaps it "
+"has already been removed?"
+msgstr ""
+"O sub-repositório selecionado não foi encontrado no arquivo .hgsub.<p>Talvez "
+"ele já tenha sido removido?"
+
+msgid "&Yes"
+msgstr "&Sim"
+
+msgid "&No"
+msgstr "&Não"
+
+msgid "Remove the selected repository?"
+msgstr "Remover o sub-repositório selecionado?"
+
+#, python-format
+msgid ""
+"Do you really want to remove the repository \"<i>%s</i>\" from its parent "
+"repository \"<i>%s</i>\""
+msgstr ""
+"Você realmente deseja remover o sub-repositório \"<i>%s</i>\" de seu "
+"repositório pai \"<i>%s</i>\""
+
+msgid "Subrepository removed from .hgsub"
+msgstr "Sub-repositório removido do .hgsub"
+
+msgid ""
+"The selected subrepository has been removed from the .hgsub file.<p>Remember "
+"that you must commit this .hgsub change in order to complete the removal of "
+"the subrepository!"
+msgstr ""
+"O sub-repositório selecionado foi removido do arquivo .hgsub.<p>Lembre-se de "
+"consolidar esta mudança no .hgsub para completar a remoção do sub-"
+"repositório!"
+
+msgid "Could not update .hgsub file"
+msgstr "Não foi possível atualizar o arquivo .hgsub"
+
+msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
+msgstr ""
+"Não foi possível atualizar o arquivo .hgsub.<p>A remoção do sub-repositório "
+"falhou."
+
 msgid "New Group"
 msgstr "Novo Grupo"
 
@@ -3733,10 +3755,6 @@ msgstr "Detalhes da revisão"
 msgctxt "tab tooltip"
 msgid "Commit"
 msgstr "Consolidação"
-
-msgctxt "tab tooltip"
-msgid "MQ Patch"
-msgstr "Patch MQ"
 
 msgctxt "tab tooltip"
 msgid "Synchronize"
@@ -3880,9 +3898,6 @@ msgstr "Aba de commit não pode sair"
 msgid "Sync tab cannot exit"
 msgstr "Aba de sync não pode sair"
 
-msgid "MQ tab cannot exit"
-msgstr "Aba MQ não pode sair"
-
 msgid "Search tab cannot exit"
 msgstr "Aba de busca não pode sair"
 
@@ -3955,8 +3970,8 @@ msgstr "En&xertar na Local..."
 msgid "Modi&fy History"
 msgstr "Modi&ficar Histórico"
 
-msgid "&Unapply Patch (qgoto parent)"
-msgstr "&Desaplicar o Patch (qgoto para o pai)"
+msgid "&Unapply Patch"
+msgstr "&Desaplicar Patch"
 
 msgid "Import to &MQ"
 msgstr "Importar para &MQ"
@@ -3964,8 +3979,8 @@ msgstr "Importar para &MQ"
 msgid "&Finish Patch"
 msgstr "&Finalizar Patch (qfinish)"
 
-msgid "Re&name Patch..."
-msgstr "Re&nomear Patch..."
+msgid "MQ &Options"
+msgstr "&Opções da MQ"
 
 msgid "&Rebase..."
 msgstr "&Rebasear..."
@@ -4024,6 +4039,9 @@ msgstr "Biseccionar - Ruim, Boa..."
 msgid "Compress History..."
 msgstr "Comprimir Histórico..."
 
+msgid "Rebase..."
+msgstr "Rebasear..."
+
 msgid "Goto common ancestor"
 msgstr "Ir para ancestral comum"
 
@@ -4036,20 +4054,20 @@ msgstr "Enxertar Selecionadas na revisão local..."
 msgid "Post Selected to Review Board..."
 msgstr "Postar Selecionados para a Review Board..."
 
-msgid "Apply patch (QGoto)"
-msgstr "Aplicar patch (QGoto)"
+msgid "Apply patch"
+msgstr "Aplicar patch"
 
-msgid "QPush --move"
-msgstr "QPush --move"
+msgid "Apply onto original parent"
+msgstr "Aplicar no pai original"
+
+msgid "Apply only this patch"
+msgstr "Aplicar somente este patch"
 
 msgid "Fold patches..."
 msgstr "Combinar patches..."
 
 msgid "Delete patches..."
 msgstr "Apagar patches..."
-
-msgid "Reorder patches..."
-msgstr "Reordenar patches..."
 
 msgid "Rename patch..."
 msgstr "Renomear patch..."
@@ -4226,6 +4244,32 @@ msgstr "Comando inválido"
 msgid "The selected command is empty"
 msgstr "O comando selecionado é vazio"
 
+#, python-format
+msgid ""
+"The following error message was returned:\n"
+"\n"
+"<b>%s</b>"
+msgstr ""
+"A seguinte mensagem de erro foi devolvida:\n"
+"\n"
+"<b>%s</b>"
+
+msgid ""
+"\n"
+"\n"
+"Please check that the \"thg\" command is valid."
+msgstr ""
+"\n"
+"\n"
+"Por favor verifique se o comando \"thg\" é válido."
+
+msgid "Failed to execute custom TortoiseHg command"
+msgstr "Falha ao executar comando personalizado do TortoiseHg"
+
+#, python-format
+msgid "The command \"%s\" failed (code %d)."
+msgstr "O comando \"%s\" falhou (código %d)."
+
 msgid "Failed to execute custom command"
 msgstr "Falha ao executar comando personalizado"
 
@@ -4248,12 +4292,6 @@ msgstr ""
 "\n"
 "Por favor certifique-se de que o caminho para o comando seja válido e que "
 "seja uma aplicação válida"
-
-msgid "Unable to start"
-msgstr "Incapaz de iniciar"
-
-msgid "Previous command is still running"
-msgstr "O comando anterior ainda está em execução"
 
 #, python-format
 msgid "Resolve Conflicts - %s"
@@ -4394,26 +4432,31 @@ msgstr ""
 msgid "%s - Revision Details (%s)"
 msgstr "%s - Detalhes da Revisão (%s)"
 
-msgid "Cannot revert to working directory"
-msgstr "Não é possível reverter para o diretório de trabalho"
-
-msgid "Reverting to the working directory revision does not make sense"
-msgstr "Reverter para a revisão do diretório de trabalho não faz sentido"
-
 #, python-format
 msgid "Revert - %s"
 msgstr "Reverter - %s"
 
 #, python-format
-msgid "<b>Revert %s to its contents at revision %d?</b>"
-msgstr "<b>Reverter %s para seu conteúdo da revisão %d?</b>"
+msgid "<b>Revert %s to its contents at the following revision?</b>"
+msgstr "<b>Reverter %s para seu conteúdo na seguinte revisão?</b>"
 
 #, python-format
-msgid "<b>Revert %d files to their contents at revision %d?</b>"
-msgstr "<b>Reverter %d arquivos para seus conteúdos como na revisão %d?</b>"
+msgid "<b>Revert %d files to their contents at the following revision?</b>"
+msgstr "<b>Reverter %d arquivos para seus conteúdos na seguinte revisão?</b>"
 
 msgid "Revert all files to this revision"
 msgstr "Reverter todos os arquivos para esta revisão"
+
+#, python-format
+msgid "revision %d's first parent (i.e. revision %d)"
+msgstr "primeiro pai da revisão %d (ou seja, a revisão %d)"
+
+#, python-format
+msgid "revision %d's second parent (i.e. revision %d)"
+msgstr "segundo pai da revisão %d (ou seja, a revisão %d)"
+
+msgid "null revision (i.e. remove file(s))"
+msgstr "revisão nula (ou seja, remove os arquivos)"
 
 msgid "Confirm Revert"
 msgstr "Confirmar Reversão"
@@ -4915,9 +4958,6 @@ msgstr "revisão a ser mesclada"
 msgid "thg merge [[-r] REV]"
 msgstr "thg merge [[-r] REV]"
 
-msgid "thg mq"
-msgstr "thg mq"
-
 msgid "a revision to post"
 msgstr "uma revisão a ser postada"
 
@@ -4929,15 +4969,6 @@ msgstr "nenhuma revisão especificada"
 
 msgid "thg purge"
 msgstr "thg purge"
-
-msgid "thg qqueue"
-msgstr "thg qqueue"
-
-msgid "Please enable the MQ extension first."
-msgstr "Por favor habilite primeiro a extensão MQ."
-
-msgid "thg qreorder"
-msgstr "thg qreorder"
 
 msgid "keep original changesets"
 msgstr "mantém revisões originais"
@@ -5015,6 +5046,27 @@ msgstr "thg shellconfig"
 msgid "thg shelve"
 msgstr "thg shelve"
 
+msgid "sign even if the sigfile is modified"
+msgstr "assina mesmo se o arquivo sigfile estiver modificado"
+
+msgid "make the signature local"
+msgstr "faz uma assinatura local"
+
+msgid "the key id to sign with"
+msgstr "o id da chave com a qual assinar"
+
+msgid "do not commit the sigfile after signing"
+msgstr "não consolidar o arquivo sigfile após assinar"
+
+msgid "use <text> as commit message"
+msgstr "usa <text> como mensagem de consolidação"
+
+msgid "thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]"
+msgstr "thg sign [-f] [-l] [-k CHAVE] [-m TEXTO] [REV]"
+
+msgid "Please enable the Gpg extension first."
+msgstr "Por favor habilite a extensão Gpg."
+
 msgid "show files without changes"
 msgstr "mostra arquivos sem mudanças"
 
@@ -5050,9 +5102,6 @@ msgstr "revisão a ser etiquetada"
 
 msgid "remove a tag"
 msgstr "remove uma etiqueta"
-
-msgid "use <text> as commit message"
-msgstr "usa <text> como mensagem de consolidação"
 
 msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
 msgstr "thg tag [-f] [-l] [-m TEXTO] [-r REV] [NOME]"
@@ -5160,6 +5209,22 @@ msgstr "&Falso"
 
 msgid "&Unspecified"
 msgstr "&Não especificado"
+
+#, python-format
+msgid "%dpt"
+msgstr "%dpt"
+
+msgid "Bold"
+msgstr "Negrito"
+
+msgid "Italic"
+msgstr "Itálico"
+
+msgid "Strike"
+msgstr "Riscado"
+
+msgid "Underline"
+msgstr "Sublinhado"
 
 msgid "&Set..."
 msgstr "&Definir..."
@@ -5423,13 +5488,14 @@ msgid ""
 "Specify which task buttons you want to show on the task toolbar and in which "
 "order.<br>Type a list of the task button names. Add separators by putting \"|"
 "\" between task button names.<br>Valid names are: log commit mq sync "
-"manifest grep and pbranch.<br>Default: log commit mq manifest grep pbranch | "
+"manifest grep and pbranch.<br>Default: log commit manifest grep pbranch | "
 "sync"
 msgstr ""
 "Especifica quais botões de tarefas serão exibidos na barra de ferramentas de "
-"tarefas, e em qual ordem.<br>Digite uma lista de nomes de botões de tarefas "
-"separados por \"|\".<br>Nomes válidos são: log commit mq sync manifest grep "
-"pbranch.<br>Padrão: log commit mq manifest grep pbranch | sync"
+"tarefas, e em qual ordem.<br>Digite uma lista de nomes de botões de tarefas. "
+"Separadores podem ser adicionados usando o caractere \"|\".<br>Os nomes "
+"válidos são: log, commit, mq, sync, manifest, grep e pbranch.<br>Valor "
+"padrão: log commit manifest grep pbranch | sync"
 
 msgid "Long Summary"
 msgstr "Sumário longo"
@@ -5491,47 +5557,6 @@ msgstr ""
 "padronizadas inseridas pela extensão Mercurial Queues (MQ). Padrão: nenhuma "
 "(em branco)"
 
-msgid "After Pull Operation"
-msgstr "Após a Operação Pull"
-
-msgid ""
-"Operation which is performed directly after a successful pull. update "
-"equates to pull --update, fetch equates to the fetch extension, rebase "
-"equates to pull --rebase, updateorrebase equates to pull -u --rebase.  "
-"Default: none"
-msgstr ""
-"Operação realizada diretamente após um pull realizado com sucesso. update "
-"equivale a pull --update, fetch equivale à extensão fetch, rebase equivale a "
-"pull --rebase, updateorrebase equivale a pull -u --rebase.  Padrão: nenhuma"
-
-msgid "Default Push"
-msgstr "Push Default"
-
-msgid ""
-"Select the revisions that will be pushed by default, whenever you click the "
-"Push button.<ul><li><b>all</b>: The default. Push all changes in <i>all "
-"branches</i>.<li><b>branch</b>: Push all changes in the <i>current branch</"
-"i>.<li><b>revision</b>: Push the changes in the current branch <i><u>up to</"
-"u> the current revision</i>.</ul><p>Default: all"
-msgstr ""
-"Selecione as revisões que serão por default enviadas em um push, sempre que "
-"você clicar no botão Push.<ul><li><b>all</b>: O padrão. Envia todas as "
-"mudanças em <i>todos os ramos</i>.<li><b>branch</b>: Envia todas as mudanças "
-"no <i>ramo atual</i>.<li><b>revision</b>: Envia as mudanças no ramo atual, "
-"<i><u>até</u> a revisão atual</i>.</ul><p>Padrão: all"
-
-msgid "Confirm Push"
-msgstr "Confirmação de Push"
-
-msgid ""
-"Determines if TortoiseHg should show a confirmation dialog before pushing "
-"changesets. If False, push will be performed without any confirmation "
-"dialog. Default: True"
-msgstr ""
-"Determina se o TortoiseHg deve mostrar uma caixa de diálogo de "
-"confirmaçãoantes de enviar revisões em uma operação push. Se False, o push "
-"será realizado sem qualquer diálogo de confirmação. O padrão é True"
-
 msgid "Activate Bookmarks"
 msgstr "Ativar Marcadores"
 
@@ -5553,19 +5578,6 @@ msgstr ""
 "b>: O padrão. Mostra a janela de seleção ao atualizar para uma revisão que "
 "contenha um ou mais marcadores.<li><b>never</b>: Nunca exibe a janela de "
 "seleção para ativar marcadores.</ul><p>Padrão: prompt"
-
-msgid "Target combo"
-msgstr "Combo de alvo"
-
-msgid ""
-"Select if TortoiseHg will show a target combo in the sync toolbar."
-"<ul><li><b>auto</b>: The default. Show the combo if more than one target "
-"configured.<li><b>always</b>: Always show the combo.</ul><p>Default: auto"
-msgstr ""
-"Determina se o TortoiseHg mostrará uma combo de alvo na barra de "
-"sincronização.<ul><li><b>auto</b>: O padrão. Mostra a combo se mais de um "
-"alvo estiver configurado.<li><b>always</b>: Sempre mostra a combo.</"
-"ul><p>Padrão: auto"
 
 msgctxt "config item"
 msgid "Commit"
@@ -5713,6 +5725,73 @@ msgstr ""
 "antes de remover arquivos em uma consolidação. Se True, a janela de "
 "confirmação será exibida. Se False, arquivos apagados selecionados serão "
 "removidos na consolidação sem confirmação. O padrão é True."
+
+msgid "Sync"
+msgstr "Sync"
+
+msgid "After Pull Operation"
+msgstr "Após a Operação Pull"
+
+msgid ""
+"Operation which is performed directly after a successful pull. update "
+"equates to pull --update, fetch equates to the fetch extension, rebase "
+"equates to pull --rebase, updateorrebase equates to pull -u --rebase.  "
+"Default: none"
+msgstr ""
+"Operação realizada diretamente após um pull realizado com sucesso. update "
+"equivale a pull --update, fetch equivale à extensão fetch, rebase equivale a "
+"pull --rebase, updateorrebase equivale a pull -u --rebase.  Padrão: nenhuma"
+
+msgid "Default Push"
+msgstr "Push Default"
+
+msgid ""
+"Select the revisions that will be pushed by default, whenever you click the "
+"Push button.<ul><li><b>all</b>: The default. Push all changes in <i>all "
+"branches</i>.<li><b>branch</b>: Push all changes in the <i>current branch</"
+"i>.<li><b>revision</b>: Push the changes in the current branch <i><u>up to</"
+"u> the current revision</i>.</ul><p>Default: all"
+msgstr ""
+"Selecione as revisões que serão por default enviadas em um push, sempre que "
+"você clicar no botão Push.<ul><li><b>all</b>: O padrão. Envia todas as "
+"mudanças em <i>todos os ramos</i>.<li><b>branch</b>: Envia todas as mudanças "
+"no <i>ramo atual</i>.<li><b>revision</b>: Envia as mudanças no ramo atual, "
+"<i><u>até</u> a revisão atual</i>.</ul><p>Padrão: all"
+
+msgid "Confirm Push"
+msgstr "Confirmação de Push"
+
+msgid ""
+"Determines if TortoiseHg should show a confirmation dialog before pushing "
+"changesets. If False, push will be performed without any confirmation "
+"dialog. Default: True"
+msgstr ""
+"Determina se o TortoiseHg deve mostrar uma caixa de diálogo de "
+"confirmaçãoantes de enviar revisões em uma operação push. Se False, o push "
+"será realizado sem qualquer diálogo de confirmação. O padrão é True"
+
+msgid "Target Combo"
+msgstr "Combo de Alvos"
+
+msgid ""
+"Select if TortoiseHg will show a target combo in the sync toolbar."
+"<ul><li><b>auto</b>: The default. Show the combo if more than one target "
+"configured.<li><b>always</b>: Always show the combo.</ul><p>Default: auto"
+msgstr ""
+"Determina se o TortoiseHg mostrará uma combo de alvo na barra de "
+"sincronização.<ul><li><b>auto</b>: O padrão. Mostra a combo se mais de um "
+"alvo estiver configurado.<li><b>always</b>: Sempre mostra a combo.</"
+"ul><p>Padrão: auto"
+
+msgid "SSH Command"
+msgstr "Comando SSH"
+
+msgid ""
+"Command to use for SSH connections.<p>Default: \"ssh\" or \"TortoisePlink."
+"exe -ssh -2\" (Windows)"
+msgstr ""
+"Comando a ser usado em conexões SSH.<p>Padrão: \"ssh\" ou \"TortoisePlink."
+"exe -ssh -2\" (Windows)"
 
 msgid "Server"
 msgstr "Servidor"
@@ -6172,6 +6251,29 @@ msgstr ""
 "rastreador de tíquetes após um commit realizado com sucesso.</ul><p>Padrão: "
 "never"
 
+msgid "Changeset Link"
+msgstr "Link para Revisão"
+
+msgid ""
+"A \"template string\" that, when set, turns the revision number and short "
+"hashes that are shown on the revision panels into links.<br>The \"template "
+"string\" uses a \"mercurial template\"-like syntax that currently accepts "
+"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
+"revision id (note that {node} on its own is currently unsupported).<li>"
+"{rev} : replaced by the revision number.</ul>For example, in order to link "
+"to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
+"tortoisehg/thg/commits/{node|short}"
+msgstr ""
+"Uma \"string modelo\" que, se definida, transforma em links os números de "
+"revisão e hashes curtos mostrados em painéis de revisão.<br>A \"string modelo"
+"\" usa uma sintaxe semelhante à de modelos de saída de log do Mercurial, e "
+"no momento aceita duas expressões de modelo:<ul><li>{node|short} : "
+"substituída pelo id de revisão de 12 dígitos (note que {node} apenas não é "
+"suportado no momento).<li>{rev} : substituída pelo número de revisão.</"
+"ul>Por exemplo, para criar um link para páginas do TortoiseHg no Bitbucket "
+"você poderia usar:<br>https://bitbucket.org/tortoisehg/thg/commits/{node|"
+"short}"
+
 msgid "Path to review board example \"http://demo.reviewboard.org\""
 msgstr "Caminho para exemplo da review board \"http://demo.reviewboard.org\""
 
@@ -6388,11 +6490,11 @@ msgstr ""
 msgid "Apply changes before exit?"
 msgstr "Aplicar mudanças antes de sair?"
 
-msgid "&Yes"
-msgstr "&Sim"
-
 msgid "&No (discard changes)"
 msgstr "&Não (descartar mudanças)"
+
+msgid "Reload"
+msgstr "Reler"
 
 msgid "Settings File:"
 msgstr "Arquivo de Configurações:"
@@ -7352,9 +7454,6 @@ msgstr "Você deseja descartá-las e continuar?"
 msgid "&Yes (--force)"
 msgstr "&Sim (--force)"
 
-msgid "&No"
-msgstr "&Não"
-
 msgid "Confirm Strip"
 msgstr "Confirma Remoção de Revisões"
 
@@ -7363,6 +7462,9 @@ msgstr "resposta esperada"
 
 msgid "password: "
 msgstr "senha: "
+
+msgid "TortoiseHg Prompt"
+msgstr "Prompt do TortoiseHg"
 
 msgid "abort: "
 msgstr "abortado: "
@@ -7453,14 +7555,6 @@ msgstr "abortado: erro: %s\n"
 
 msgid "broken pipe\n"
 msgstr "pipe quebrado\n"
-
-#, python-format
-msgid "[command terminated by user %s]"
-msgstr "[comando terminado pelo usuário %s]"
-
-#, python-format
-msgid "[command interrupted %s]"
-msgstr "[comando interrompido %s]"
 
 msgid "Update to:"
 msgstr "Atualizar para:"
@@ -7698,9 +7792,6 @@ msgstr "Mesclagem não consolidada - por favor selecione uma revisão pai"
 msgid "Revert files to local or other parent?"
 msgstr "Reverter arquivos para a revisão local ou para o outro pai?"
 
-msgid "&Local"
-msgstr "&Local"
-
 msgid "&Other"
 msgstr "&Outro"
 
@@ -7724,6 +7815,12 @@ msgstr "Confirmar Remoção de Não-Versionados"
 
 msgid "Delete the following unversioned files?"
 msgstr "Remover os seguintes arquivos não-versionados?"
+
+msgid "Confirm Discard"
+msgstr "Confirmação de Descarte"
+
+msgid "Discard outstanding changes to working directory?"
+msgstr "Descartar mudanças pendentes do diretório de trabalho?"
 
 msgid "Config files (*.conf *.config *.ini)"
 msgstr "Arquivos de configuração (*.conf *.config *.ini)"
@@ -7761,9 +7858,6 @@ msgstr "Arquivo de Configuração:"
 msgid "Open"
 msgstr "Abrir"
 
-msgid "TortoiseHg Workbench"
-msgstr "Workbench do TortoiseHg"
-
 msgid "New &Workbench"
 msgstr "Nova &Workbench"
 
@@ -7781,9 +7875,6 @@ msgstr "&Arquivo"
 
 msgid "&View"
 msgstr "&Visualizar"
-
-msgid "Workbench Toolbars"
-msgstr "Barras de Ferramentas da Workbench"
 
 msgid "&Repository"
 msgstr "&Repositório"
@@ -7827,9 +7918,6 @@ msgstr "&Gravar Repositórios Abertos ao Sair"
 msgid "&Commit"
 msgstr "&Commit (consolidar)"
 
-msgid "M&Q Patch"
-msgstr "Patch M&Q"
-
 msgid "&Patch Branch"
 msgstr "Ramo de &Patches"
 
@@ -7862,6 +7950,9 @@ msgstr "Carregar Tod&as as Revisões"
 
 msgid "Load all revisions into graph"
 msgstr "Carrega todas as revisões para o grafo"
+
+msgid "Go to current revision"
+msgstr "Ir para revisão atual"
 
 msgid "&Goto Revision..."
 msgstr "&Ir para Revisão..."
@@ -7907,9 +7998,6 @@ msgstr "Sobre o &Qt"
 
 msgid "&About TortoiseHg"
 msgstr "Sobre o &TortoiseHg"
-
-msgid "Go to current revision"
-msgstr "Ir para revisão atual"
 
 msgid "&Filter Toolbar"
 msgstr "Barra de &Filtragem"
@@ -8018,6 +8106,9 @@ msgstr "Configurações da Barra &Personalizada"
 
 msgid "Failed to open repository"
 msgstr "Falha ao abrir o repositório"
+
+msgid "TortoiseHg Workbench"
+msgstr "Workbench do TortoiseHg"
 
 #, python-format
 msgid "%s - TortoiseHg Workbench - %s"
@@ -8300,6 +8391,9 @@ msgstr "Sincronizar com o repositório arrastado"
 #, python-format
 msgid "repository %s not found"
 msgstr "repositório %s não encontrado"
+
+#~ msgid "Several icons are courtesy of the TortoiseSVN project"
+#~ msgstr "Vários ícones são cortesia do projeto TortoiseSVN"
 
 #~ msgid "Backout"
 #~ msgstr "Backout"
@@ -9342,15 +9436,6 @@ msgstr "repositório %s não encontrado"
 
 #~ msgid "proceed even if patches do not unshelve cleanly"
 #~ msgstr "proceder mesmo que os patches não saiam do adiamento de modo limpo"
-
-#~ msgid ""
-#~ "Operation which is performed directly after a successful pull. update "
-#~ "equates to pull --update, fetch equates to the fetch extension, rebase "
-#~ "equates to pull --rebase.  Default: none"
-#~ msgstr ""
-#~ "Operação realizada logo após um pull feito com sucesso. \"update\" "
-#~ "equivale a \"pull --update\", \"fetch\" equivale à extensão \"fetch\", "
-#~ "\"rebase\" equivale a \"pull --rebase\". Padrão: \"none\" (nenhuma)"
 
 #~ msgid "No changes to shelve"
 #~ msgstr "Nenhuma mudança para adiar"
@@ -10451,6 +10536,9 @@ msgstr "repositório %s não encontrado"
 #~ msgid "TortoiseHg Init"
 #~ msgstr "TortoiseHg - Criação de Repositório"
 
+#~ msgid "A new version of TortoiseHg is ready for download!"
+#~ msgstr "Uma nova versão do TortoiseHg está disponível para download!"
+
 #~ msgid "Copyright 2008-2010 Steve Borho and others"
 #~ msgstr "Copyright 2008-2010 Steve Borho e outros"
 
@@ -11450,25 +11538,41 @@ msgstr "repositório %s não encontrado"
 #~ msgid "Merge "
 #~ msgstr "Mesclagem "
 
-#~ msgid "Hg file log viewer - %s"
-#~ msgstr "Visualizador de arquivo de log do hg - %s"
+#~ msgid "Activate"
+#~ msgstr "Ativar"
 
-#~ msgid "Failed to open Email dialog"
-#~ msgstr "Falha ao abrir caixa de diálogo E-mail"
+#~ msgid "Patch queues:"
+#~ msgstr "Filas de patches:"
 
-#~ msgid "Could not find or initialize the repository from folder<p>%s</p>"
-#~ msgstr ""
-#~ "Não foi possível encontrar ou inicializar o repositório da pasta<p>%s</p>"
+#~ msgid "Repository:"
+#~ msgstr "Repositório:"
 
-#~ msgid "Filename required"
-#~ msgstr "Exigido nome de arquivo"
+#~ msgid "Patches:"
+#~ msgstr "Patches:"
 
-#~ msgid "thg sync"
-#~ msgstr "thg sync"
+#~ msgid "Reorder Unapplied Patches"
+#~ msgstr "Reordenar Patches Não-Aplicados"
 
-#~ msgid "Config files (*.conf *.config *.ini);;Any files (*)"
-#~ msgstr ""
-#~ "Arquivos de configuração (*.conf *.config *.ini);;Quaisquer arquivos (*)"
+#~ msgid "Rename patch"
+#~ msgstr "Renomear patch"
+
+#~ msgid "Applied Patches"
+#~ msgstr "Patches Aplicados"
+
+#~ msgid "Unapplied Patches - drag to reorder"
+#~ msgstr "Patches Não-Aplicados - arraste para reordenar"
+
+#~ msgid "Goto"
+#~ msgstr "Ir para"
+
+#~ msgid "Go"
+#~ msgstr "Ir"
+
+#~ msgid "Do you really want to delete patch queue '%s' ?"
+#~ msgstr "Você realmente deseja remover a fila de patches '%s'?"
+
+#~ msgid "Confirm patch queue delete"
+#~ msgstr "Confirmar remoção da fila de patches"
 
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "trecho %d já aplicado na linha %d (indistinção %d)\n"
@@ -11479,21 +11583,29 @@ msgstr "repositório %s não encontrado"
 #~ msgid "_Commit (+1 head)"
 #~ msgstr "_Commit (consolidar) (+1 cabeça)"
 
-#~ msgid "Failed to open Review Board dialog"
-#~ msgstr "Falha ao abrir o diálogo da Review Board"
+#~ msgid "Manage MQ patch queues"
+#~ msgstr "Gerencia filas de patches MQ"
 
-#~ msgid "&Annotate"
-#~ msgstr "&Annotate (anotar)"
+#~ msgid "QQueue"
+#~ msgstr "QQueue"
+
+#~ msgid "Confirm patch queue purge"
+#~ msgstr "Confirmar remoção completa da fila de patches"
+
+#~ msgid "Please enable the MQ extension first."
+#~ msgstr "Por favor habilite primeiro a extensão MQ."
 
 #~ msgctxt "changesets"
 #~ msgid "All"
 #~ msgstr "Todas"
 
-#~ msgid "<p>But could not run Workbench for it.</p><p>%s</p>"
-#~ msgstr "<p>Mas não foi possível executar a Workbench nele.</p><p>%s</p>"
-
-#~ msgid "annotate requires a single filename\n"
-#~ msgstr "annotate exige um único nome de arquivo\n"
+#~ msgid ""
+#~ "<p>This will also erase the patchfiles on disk!</p><p>Do you really want "
+#~ "to purge patch queue '%s' ?</p>"
+#~ msgstr ""
+#~ "<p>Isto também apagará os arquivos de patch do sistema de arquivos!</"
+#~ "p><p>Você realmente deseja remover completamente a fila de patches '%s' ?"
+#~ "</p>"
 
 #~ msgid "Diff to Local"
 #~ msgstr "Diff com Local"
@@ -11624,25 +11736,8 @@ msgstr "repositório %s não encontrado"
 #~ msgid "%d out of %d hunks FAILED -- saving rejects to file %s\n"
 #~ msgstr "%d de %d trechos FALHARAM -- gravando rejeitos no arquivo %s\n"
 
-#~ msgid ""
-#~ "Invalid reviewboard plugin. Please download the mercurial reviewboard "
-#~ "plugin version 3.5 or higher from the website below.\n"
-#~ "\n"
-#~ " %s"
-#~ msgstr ""
-#~ "Plugin reviewboard inválido. Por favor obtenha a versão 3.5 ou superior "
-#~ "do plugin reviewboard para o Mercurial no website abaixo.\n"
-#~ "\n"
-#~ " %s"
-
 #~ msgid "Checking outgoing changesets..."
 #~ msgstr "Verificando revisões a serem enviadas..."
-
-#~ msgid "Cannot open non mercurial repositories or subrepositories"
-#~ msgstr "Só é possível abrir repositórios e sub-repositórios do Mercurial"
-
-#~ msgid "\"%s\" is not a valid repository inside \"%s\""
-#~ msgstr "\"%s\" não é um repositório válido dentro de \"%s\""
 
 #~ msgid "Bug Traq"
 #~ msgstr "Rastreador de Tíquetes"
@@ -11675,75 +11770,3 @@ msgstr "repositório %s não encontrado"
 #~ "Nenhum link para um tíquete foi encontrado na mensagem de consolidação. A "
 #~ "mensagem deve conter um link para um tíquete. Configure isto na seção de "
 #~ "configuração 'Issue'."
-
-#~ msgid "Failed to open Manifest dialog"
-#~ msgstr "Falha ao abrir janela do Manifesto"
-
-#~ msgid ""
-#~ "When committing, require that a reference to an issue be specified.  If "
-#~ "enabled, the regex configured in 'Issue Regex' must find a match in the "
-#~ "commit message."
-#~ msgstr ""
-#~ "Ao consolidar, exige que uma referência para um tíquete seja "
-#~ "especificada. Se habilitado, a expressão regular configurada em "
-#~ "'Expressão Regular do Tíquete' deve encontrar um texto correspondente na "
-#~ "mensagem de consolidação."
-
-#~ msgid ""
-#~ "Invalid default push revision: %s.Please check your mercurial "
-#~ "configuration (tortoisehg.defaultpush)"
-#~ msgstr ""
-#~ "Revisão de push default inválida: %s.Por favor verifique sua configuração "
-#~ "do Mercurial (tortoisehg.defaultpush)"
-
-#~ msgid "A shelf name cannot contain :#/\\<>|"
-#~ msgstr "O nome de um arquivo de adiamento não pode conter :#/\\<>|"
-
-#~ msgid ""
-#~ "Select whether you want to have a single workbench window. If you disable "
-#~ "this setting you will get a new workbench window everytime that you use "
-#~ "the \"Hg Workbench\"command on the explorer context menu. Default: True"
-#~ msgstr ""
-#~ "Especifica se deve ser usada uma única janela Workbench. Se esta opção "
-#~ "for desabilitada, uma nova janela do TortoiseHg será aberta a cada vez "
-#~ "que o comando \"Hg Workbench\" do menu de contexto do Windows Explorer "
-#~ "for ativado. Padrão: True"
-
-#~ msgid ""
-#~ "Specify which task buttons you want to show on the task toolbar and in "
-#~ "which order.<br>Type a list of the task button names. Add separators by "
-#~ "putting \"|\" between task button names.<br>Valid names are: log commit "
-#~ "mq sync manifest grep and pbranch.<br>Default: log commit mq sync "
-#~ "manifest grep pbranch"
-#~ msgstr ""
-#~ "Especifica quais botões de tarefas serão exibidos na barra de ferramentas "
-#~ "de tarefas, e em qual ordem.<br>Digite uma lista de nomes de botões de "
-#~ "tarefas separados por \"|\".<br>Nomes válidos são: log commit mq sync "
-#~ "manifest grep and pbranch.<br>Padrão: log|commit|mq|sync|manifest|grep|"
-#~ "pbranch"
-
-#~ msgid "Resuming graft already in progress"
-#~ msgstr "Retomando enxerto em progresso"
-
-#~ msgid "Graft already in progress"
-#~ msgstr "Enxerto já está em progresso"
-
-#~ msgid ""
-#~ "When set to 'auto', mq will automatically use git patches when required "
-#~ "to avoid losing changes to file modes, copy records or binary files. If "
-#~ "set to 'keep', mq will obey the [diff] section configuration while "
-#~ "preserving existing git patches upon qrefresh. If set to 'yes' or 'no', "
-#~ "mq will override the [diff] section and always generate git or regular "
-#~ "patches, possibly losing data in the second case. Default: auto"
-#~ msgstr ""
-#~ "Se configurada como 'auto', a mq irá automaticamente usar patches git se "
-#~ "necessário para evitar perder mudanças de modo de arquivo, registros de "
-#~ "cópia, arquivos binários ou criação e remoção de arquivos vazios. Se "
-#~ "configurada como 'keep', a mq irá obedecer a seção [diff] do arquivo de "
-#~ "configuração ao preservar patches git existentes durante um comando "
-#~ "qrefresh. Se configurada como 'yes' ou 'no', a mq irá sobrepor a seção "
-#~ "[diff] e sempre gerar patches git ou comuns, respectivamente, "
-#~ "possivelmente perdendo dados no segundo caso. O padrão é 'auto'."
-
-#~ msgid "The specified line number \"%s\" is invalid."
-#~ msgstr "O número de linha \"%s\" especificado é inválido."

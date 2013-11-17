@@ -6,12 +6,10 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import sys
 import shlex
 import time
-import urllib
 
-from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
+from mercurial import ui, util, extensions, match
 from mercurial import encoding, templatefilters, filemerge, error, scmutil
 from mercurial import dispatch as hgdispatch
 
@@ -96,36 +94,6 @@ def fromutf(s):
         # can't round-trip
         return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
-_tabwidth = None
-def gettabwidth(ui):
-    global _tabwidth
-    if _tabwidth is not None:
-        return _tabwidth
-    tabwidth = ui.config('tortoisehg', 'tabwidth')
-    try:
-        tabwidth = int(tabwidth)
-        if tabwidth < 1 or tabwidth > 16:
-            tabwidth = 0
-    except (ValueError, TypeError):
-        tabwidth = 0
-    _tabwidth = tabwidth
-    return tabwidth
-
-_maxdiff = None
-def getmaxdiffsize(ui):
-    global _maxdiff
-    if _maxdiff is not None:
-        return _maxdiff
-    maxdiff = ui.config('tortoisehg', 'maxdiff')
-    try:
-        maxdiff = int(maxdiff)
-        if maxdiff < 1:
-            maxdiff = sys.maxint
-    except (ValueError, TypeError):
-        maxdiff = 1024 # 1MB by default
-    _maxdiff = maxdiff * 1024
-    return _maxdiff
-
 def _getfirstrevisionlabel(repo, ctx):
     # see context.changectx for look-up order of labels
 
@@ -159,43 +127,6 @@ def getrevisionlabel(repo, rev):
 
     return str(rev)
 
-_deadbranch = None
-def getdeadbranch(ui):
-    '''return a list of dead branch names in UTF-8'''
-    global _deadbranch
-    if _deadbranch is None:
-        db = toutf(ui.config('tortoisehg', 'deadbranch', ''))
-        dblist = [b.strip() for b in db.split(',')]
-        _deadbranch = dblist
-    return _deadbranch
-
-def getlivebranch(repo):
-    '''return a list of live branch names in UTF-8'''
-    lives = []
-    deads = getdeadbranch(repo.ui)
-    cl = repo.changelog
-    for branch, heads in repo.branchmap().iteritems():
-        # branch encoded in UTF-8
-        if branch in deads:
-            # ignore branch names in tortoisehg.deadbranch
-            continue
-        bheads = [h for h in heads if ('close' not in cl.read(h)[5])]
-        if not bheads:
-            # ignore branches with all heads closed
-            continue
-        lives.append(branch.replace('\0', ''))
-    return lives
-
-def getlivebheads(repo):
-    '''return a list of revs of live branch heads'''
-    bheads = []
-    for b, ls in repo.branchmap().iteritems():
-        bheads += [repo[x] for x in ls]
-    heads = [x.rev() for x in bheads if not x.extra().get('close')]
-    heads.sort()
-    heads.reverse()
-    return heads
-
 _hidetags = None
 def gethidetags(ui):
     global _hidetags
@@ -204,14 +135,6 @@ def gethidetags(ui):
         taglist = [t.strip() for t in tags.split()]
         _hidetags = taglist
     return _hidetags
-
-def getfilteredtags(repo):
-    filtered = []
-    hides = gethidetags(repo.ui)
-    for tag in list(repo.tags()):
-        if tag not in hides:
-            filtered.append(tag)
-    return filtered
 
 def getrawctxtags(changectx):
     '''Returns the tags for changectx, converted to UTF-8 but
@@ -235,7 +158,7 @@ def getctxtags(changectx):
 def getmqpatchtags(repo):
     '''Returns all tag names used by MQ patches, or []'''
     if hasattr(repo, 'mq'):
-        repo.mq.parse_series()
+        repo.mq.parseseries()
         return repo.mq.series[:]
     else:
         return []
@@ -249,65 +172,69 @@ def getcurrentqqueue(repo):
         cur = cur[8:]
     return cur
 
-def diffexpand(line):
-    'Expand tabs in a line of diff/patch text'
-    if _tabwidth is None:
-        gettabwidth(ui.ui())
-    if not _tabwidth or len(line) < 2:
-        return line
-    return line[0] + line[1:].expandtabs(_tabwidth)
+def _applymovemqpatches(q, after, patches):
+    fullindexes = dict((q.guard_re.split(rpn, 1)[0], i)
+                       for i, rpn in enumerate(q.fullseries))
+    fullmap = {}  # patch: line in series file
+    for i, n in sorted([(fullindexes[n], n) for n in patches], reverse=True):
+        fullmap[n] = q.fullseries.pop(i)
+    del fullindexes  # invalid
 
-_fontconfig = None
-def getfontconfig(_ui=None):
-    global _fontconfig
-    if _fontconfig is None:
-        if _ui is None:
-            _ui = ui.ui()
-        # defaults
-        _fontconfig = {'fontcomment': 'monospace 10',
-                       'fontdiff': 'monospace 10',
-                       'fontlist': 'sans 9',
-                       'fontlog': 'monospace 10'}
-        # overwrite defaults with configured values
-        for name, val in _ui.configitems('gtools'):
-            if val and name.startswith('font'):
-                _fontconfig[name] = val
-    return _fontconfig
+    if after is None:
+        fullat = 0
+    else:
+        for i, rpn in enumerate(q.fullseries):
+            if q.guard_re.split(rpn, 1)[0] == after:
+                fullat = i + 1
+                break
+        else:
+            fullat = len(q.fullseries)  # last ditch (should not happen)
+    q.fullseries[fullat:fullat] = (fullmap[n] for n in patches)
+    q.parseseries()
+    q.seriesdirty = True
 
-def invalidaterepo(repo):
-    repo.dirstate.invalidate()
-    for attr in ('_bookmarks', '_bookmarkcurrent'):
-        if attr in repo.__dict__:
-            delattr(repo, attr)
-    if isinstance(repo, bundlerepo.bundlerepository):
-        # Work around a bug in hg-1.3.  repo.invalidate() breaks
-        # overlay bundlerepos
-        return
-    repo.invalidate()
-    if 'mq' in repo.__dict__: #do not create if it does not exist
-        repo.mq.invalidate()
+# maybe this can be implemented as hg extension
+def movemqpatches(repo, after, patches):
+    """Move the given patches after the specified patch, or to the beginning
+    of the series if after is None"""
+    q = repo.mq
+    if util.any(n not in q.series for n in patches):
+        raise ValueError('unknown patch to move specified')
+    if after in patches:
+        raise ValueError('invalid patch position specified')
+    if util.any(q.isapplied(n) for n in patches):
+        raise ValueError('cannot move applied patches')
+
+    if after is None:
+        at = 0
+    else:
+        at = q.series.index(after) + 1
+    if at < q.seriesend(True):
+        raise ValueError('cannot move into applied patches')
+
+    try:
+        wlock = repo.wlock(False)  # no wait to avoid blocking GUI thread
+    except error.LockHeld:
+        return False
+    try:
+        _applymovemqpatches(q, after, patches)
+        try:
+            q.savedirty()
+            return True
+        except EnvironmentError:
+            return False
+    finally:
+        wlock.release()
 
 def enabledextensions():
     """Return the {name: shortdesc} dict of enabled extensions
 
     shortdesc is in local encoding.
     """
-    ret = extensions.enabled()
-    if type(ret) is tuple:
-        # hg <= 1.8
-        return ret[0]
-    else:
-        # hg <= 1.9
-        return ret
+    return extensions.enabled()
 
 def disabledextensions():
-    ret = extensions.disabled()
-    if type(ret) is tuple:
-        # hg <= 1.8
-        return ret[0] or {}
-    else:
-        # hg <= 1.9
-        return ret or {}
+    return extensions.disabled()
 
 def allextensions():
     """Return the {name: shortdesc} dict of known extensions
@@ -632,46 +559,6 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         toollist.append(name)
     return selectedtools, toollist
 
-def hgcmd_toq(q, label, args):
-    '''
-    Run an hg command in a background thread, pipe all output to a Queue
-    object.  Assumes command is completely noninteractive.
-    '''
-    class Qui(ui.ui):
-        def __init__(self, src=None):
-            super(Qui, self).__init__(src)
-            self.setconfig('ui', 'interactive', 'off')
-
-        def write(self, *args, **opts):
-            if self._buffers:
-                self._buffers[-1].extend([str(a) for a in args])
-            else:
-                for a in args:
-                    if label:
-                        q.put((str(a), opts.get('label', '')))
-                    else:
-                        q.put(str(a))
-
-        def plain(self):
-            return True
-
-    u = Qui()
-    oldterm = os.environ.get('TERM')
-    os.environ['TERM'] = 'dumb'
-    ret = dispatch(u, list(args))
-    if oldterm:
-        os.environ['TERM'] = oldterm
-    return ret
-
-def get_reponame(repo):
-    if repo.ui.config('tortoisehg', 'fullpath', False):
-        name = repo.root
-    elif repo.ui.config('web', 'name', False):
-        name = repo.ui.config('web', 'name')
-    else:
-        name = os.path.basename(repo.root)
-    return toutf(name)
-
 def displaytime(date):
     return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
 
@@ -767,51 +654,6 @@ def longsummary(description, limit=None):
         summary += u' \u2026' # ellipsis ...
     return summary
 
-def validate_synch_path(path, repo):
-    '''
-    Validate the path that must be used to sync operations (pull,
-    push, outgoing and incoming)
-    '''
-    return_path = path
-    for alias, path_aux in repo.ui.configitems('paths'):
-        if path == alias:
-            return_path = path_aux
-        elif path == util.hidepassword(path_aux):
-            return_path = path_aux
-    return return_path
-
-def is_rev_current(repo, rev):
-    '''
-    Returns True if the revision indicated by 'rev' is the current
-    working directory parent.
-
-    If rev is '' or None, it is assumed to mean 'tip'.
-    '''
-    if rev in ('', None):
-        rev = 'tip'
-    rev = repo.lookup(rev)
-    parents = repo.parents()
-
-    if len(parents) > 1:
-        return False
-
-    return rev == parents[0].node()
-
-def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
-           opts=None):
-    '''
-    export changesets as hg patches.
-
-    Mercurial moved patch.export to cmdutil.export after version 1.5
-    (change e764f24a45ee in mercurial).
-    '''
-
-    try:
-        return cmdutil.export(repo, revs, template, fp, switch_parent, opts)
-    except AttributeError:
-        from mercurial import patch
-        return patch.export(repo, revs, template, fp, switch_parent, opts)
-
 def getDeepestSubrepoContainingFile(wfile, ctx):
     """
     Given a filename and context, get the deepest subrepo that contains the file
@@ -847,27 +689,6 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
                     return os.path.join(wsub, wsubsub), wfileinsub, sctx
     return None, wfile, ctx
 
-def netlocsplit(netloc):
-    '''split [user[:passwd]@]host[:port] into 4-tuple.'''
-
-    a = netloc.find('@')
-    if a == -1:
-        user, passwd = None, None
-    else:
-        userpass, netloc = netloc[:a], netloc[a + 1:]
-        c = userpass.find(':')
-        if c == -1:
-            user, passwd = urllib.unquote(userpass), None
-        else:
-            user = urllib.unquote(userpass[:c])
-            passwd = urllib.unquote(userpass[c + 1:])
-    c = netloc.find(':')
-    if c == -1:
-        host, port = netloc, None
-    else:
-        host, port = netloc[:c], netloc[c + 1:]
-    return host, port, user, passwd
-
 def getLineSeparator(line):
     """Get the line separator used on a given line"""
     # By default assume the default OS line separator
@@ -881,6 +702,9 @@ def getLineSeparator(line):
 
 def dispatch(ui, args):
     req = hgdispatch.request(args, ui)
+    # since hg 2.8 (09573ad59f7b), --config is parsed prior to _dispatch()
+    hgdispatch._parseconfig(req.ui,
+                            hgdispatch._earlygetopt(['--config'], req.args))
     return hgdispatch._dispatch(req)
 
 def buildcmdargs(name, *args, **opts):
@@ -901,6 +725,10 @@ def buildcmdargs(name, *args, **opts):
     ['add', 'foo', 'bar']
     >>> buildcmdargs('cat', '-foo', rev='0')
     ['cat', '--rev', '0', '--', '-foo']
+    >>> buildcmdargs('qpush', None)
+    ['qpush']
+    >>> buildcmdargs('update', '')
+    ['update', '']
 
     type conversion to string:
 
@@ -936,7 +764,7 @@ def buildcmdargs(name, *args, **opts):
             fullargs.append(aname)
             fullargs.append(stringfy(v))
 
-    args = map(stringfy, args)
+    args = [stringfy(v) for v in args if v is not None]
     if util.any(e.startswith('-') for e in args):
         fullargs.append('--')
     fullargs.extend(args)

@@ -42,7 +42,7 @@ class HgFileView(QFrame):
     grepRequested = pyqtSignal(unicode, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent):
         QFrame.__init__(self, parent)
         framelayout = QVBoxLayout(self)
         framelayout.setContentsMargins(0,0,0,0)
@@ -51,6 +51,9 @@ class HgFileView(QFrame):
         l.setContentsMargins(0,0,0,0)
         l.setSpacing(0)
 
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        # TODO: replace by repoagent if setRepo(bundlerepo) can be removed
         self.repo = repo
         self._diffs = []
         self.changes = None
@@ -93,7 +96,7 @@ class HgFileView(QFrame):
 
         self.blk = blockmatcher.BlockList(self)
         self.blksearch = blockmatcher.BlockList(self)
-        self.sci = AnnotateView(repo, self)
+        self.sci = AnnotateView(repoagent, self)
         self._forceviewindicator = None
         hbox.addWidget(self.blk)
         hbox.addWidget(self.sci, 1)
@@ -113,7 +116,8 @@ class HgFileView(QFrame):
 
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
-        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
+        keys = set((Qt.Key_Space,))
+        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self, keys))
         self.sci.setCaretLineVisible(False)
 
         # define markers for colorize zones of diff
@@ -242,7 +246,7 @@ class HgFileView(QFrame):
     def launchShelve(self):
         from tortoisehg.hgqt import shelve
         # TODO: pass self._filename
-        dlg = shelve.ShelveDialog(self.repo, self)
+        dlg = shelve.ShelveDialog(self._repoagent, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.shelveToolExited.emit()
@@ -843,11 +847,21 @@ class HgFileView(QFrame):
         pattern = hglib.fromunicode(self._lastSearch[0])
         qtlib.editfiles(self.repo, files, line, pattern, self)
 
+    def vdiff(self, path, **opts):
+        path = hglib.fromunicode(path)
+        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [path], opts)
+        if dlg:
+            dlg.exec_()
+
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
-        menu = self.sci.createStandardContextMenu()
+        menu = self._createContextMenu(point)
+        menu.exec_(self.sci.viewport().mapToGlobal(point))
+        menu.setParent(None)
+
+    def _createContextMenu(self, point):
+        menu = self.sci.createEditorContextMenu()
         line = self.sci.lineNearPoint(point)
-        point = self.sci.viewport().mapToGlobal(point)
 
         selection = self.sci.selectedText()
         def sreq(**opts):
@@ -869,21 +883,16 @@ class HgFileView(QFrame):
                 actmarkexcluded.triggered.connect(toggleMarkExcluded)
             if selection:
                 menu.addSeparator()
-                for name, func in [(_('&Search in Current File'), sann),
-                        (_('Search in All &History'), sreq(all=True))]:
-                    def add(name, func):
-                        action = menu.addAction(name)
-                        action.triggered.connect(func)
-                    add(name, func)
-            return menu.exec_(point)
+                menu.addAction(_('&Search in Current File'), sann)
+                menu.addAction(_('Search in All &History'), sreq(all=True))
+            return menu
 
         menu.addSeparator()
-        annoptsmenu = QMenu(_('Annotate Op&tions'), self)
+        annoptsmenu = menu.addMenu(_('Annotate Op&tions'))
         annoptsmenu.addActions(self.sci.annotateOptionActions())
-        menu.addMenu(annoptsmenu)
 
         if line < 0 or line >= len(self.sci._links):
-            return menu.exec_(point)
+            return menu
 
         menu.addSeparator()
 
@@ -895,18 +904,12 @@ class HgFileView(QFrame):
                 self.searchbar.search(selection)
                 self.searchbar.show()
             menu.addSeparator()
-            annsearchmenu = QMenu(_('Search Selected Text'), self)
-            for name, func in [(_('In Current &File'), sann),
-                               (_('In &Current Revision'),
-                                sreq(rev='.')),
-                               (_('In &Original Revision'),
-                                sreq(rev=fctx.rev())),
-                               (_('In All &History'), sreq(all=True))]:
-                def add(name, func):
-                    action = annsearchmenu.addAction(name)
-                    action.triggered.connect(func)
-                add(name, func)
-            menu.addMenu(annsearchmenu)
+            annsearchmenu = menu.addMenu(_('Search Selected Text'))
+            annsearchmenu.addAction(_('In Current &File'), sann)
+            annsearchmenu.addAction(_('In &Current Revision'), sreq(rev='.'))
+            annsearchmenu.addAction(_('In &Original Revision'),
+                                    sreq(rev=fctx.rev()))
+            annsearchmenu.addAction(_('In All &History'), sreq(all=True))
 
         data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
 
@@ -914,16 +917,17 @@ class HgFileView(QFrame):
             self.setSource(*data)
         def editorig():
             self.editSelected(*data)
+        def difflocal():
+            self.vdiff(data[0], rev=['rev(%d)' % data[1]])
+
         menu.addSeparator()
         origrev = fctx.rev()
-        anngotomenu = QMenu(_('Go to'), self)
-        annviewmenu = QMenu(_('View File at'), self)
-        for name, func, smenu in [(_('&Originating Revision'), annorig, anngotomenu),
-                           (_('&Originating Revision'), editorig, annviewmenu)]:
-            def add(name, func):
-                action = smenu.addAction(name)
-                action.triggered.connect(func)
-            add(name, func)
+        anngotomenu = menu.addMenu(_('Go to'))
+        annviewmenu = menu.addMenu(_('View File at'))
+        anndiffmenu = menu.addMenu(_('Diff File to'))
+        anngotomenu.addAction(_('&Originating Revision'), annorig)
+        annviewmenu.addAction(_('&Originating Revision'), editorig)
+        anndiffmenu.addAction(_('&Local'), difflocal)
         for pfctx in fctx.parents():
             pdata = [hglib.tounicode(pfctx.path()), pfctx.changectx().rev(),
                      line]
@@ -931,23 +935,43 @@ class HgFileView(QFrame):
                 self.setSource(*data)
             def editparent(data):
                 self.editSelected(*data)
+            def diffparent(pdata, cdata=data):
+                self.vdiff(cdata[0], rev=['rev(%d)' % d[1] for d in (pdata, cdata)])
             for name, func, smenu in [(_('&Parent Revision (%d)') % pdata[1],
                                   annparent, anngotomenu),
                                (_('&Parent Revision (%d)') % pdata[1],
-                                  editparent, annviewmenu)]:
+                                  editparent, annviewmenu),
+                               (_('&Parent Revision (%d)') % pdata[1],
+                                  diffparent, anndiffmenu)]:
                 def add(name, func):
                     action = smenu.addAction(name)
                     action.data = pdata
                     action.run = lambda: func(action.data)
                     action.triggered.connect(action.run)
                 add(name, func)
-        menu.addMenu(anngotomenu)
-        menu.addMenu(annviewmenu)
-        menu.exec_(point)
+        return menu
 
     def resizeEvent(self, event):
         super(HgFileView, self).resizeEvent(event)
         self.updateScrollBar()
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Space:
+            if self.changeselection:
+                x, y = self.sci.getCursorPosition()
+                chunk = self.chunkContainsLine(x)
+                if self.updateChunk(chunk, not chunk.excluded):
+                    self.chunkSelectionChanged.emit()
+            return
+        return super(HgFileView, self).keyPressEvent(event)
+
+    def chunkContainsLine(self, line):
+        chunks = self.chunkatline
+        if line in chunks:
+            return chunks[line]
+
+        line = max(i for i in chunks.keys() if i < line)
+        return chunks[line]
 
     def updateScrollBar(self):
         sbWidth = self.sci.verticalScrollBar().width()
@@ -960,12 +984,17 @@ class AnnotateView(qscilib.Scintilla):
 
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         super(AnnotateView, self).__init__(parent)
         self.setReadOnly(True)
         self.setMarginLineNumbers(1, True)
         self.setMarginType(2, qsci.TextMarginRightJustified)
         self.setMouseTracking(False)
+
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        # TODO: replace by repoagent if sci.repo = bundlerepo can be removed
+        self.repo = repo
 
         self._annotation_enabled = False
         self._links = []  # by line
@@ -977,10 +1006,9 @@ class AnnotateView(qscilib.Scintilla):
         self._thread = AnnotateThread(self, diffopts=diffopts)
         self._thread.finished.connect(self.fillModel)
 
-        self.repo = repo
         self._initAnnotateOptionActions()
 
-        self.repo.configChanged.connect(self.configChanged)
+        self._repoagent.configChanged.connect(self.configChanged)
         self.configChanged()
         self._loadAnnotateSettings()
 

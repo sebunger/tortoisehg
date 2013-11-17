@@ -8,20 +8,22 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+from mercurial import util
+
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.hgqt import cmdcore, qtlib
 
 class SignDialog(QDialog):
-    showMessage = pyqtSignal(QString)
-    output = pyqtSignal(QString, QString)
-    makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev, parent=None):
+    def __init__(self, repoagent, rev='tip', parent=None, opts={}):
         super(SignDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        self._cmdsession = cmdcore.nullCmdSession()
         self.rev = rev
 
         # base layout box
@@ -40,13 +42,10 @@ class SignDialog(QDialog):
         form = QFormLayout(fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow)
         box.addLayout(form)
 
-        form.addRow(_('Revision:'), QLabel('%d (%s)' % (rev, repo[rev])))
+        form.addRow(_('Revision:'), QLabel('%s (%s)' % (rev, repo[rev])))
 
         ### key line edit
-        key = repo.ui.config("gpg", "key", None)
         self.keyLineEdit = QLineEdit()
-        if key:
-            self.keyLineEdit.setText(key)
         form.addRow(_('Key:'), self.keyLineEdit)
 
         ### options
@@ -103,19 +102,41 @@ class SignDialog(QDialog):
         self.status.setContentsMargins(4, 2, 4, 4)
         self.layout().addWidget(self.status)
 
-        self.cmd = cmdui.Runner(False, self)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.commandFinished.connect(self.commandFinished)
-
         # prepare to show
         self.setWindowTitle(_('Sign - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-sign'))
 
         self.clear_status()
-        self.show_options(False)
-        self.customMessageToggle(False)
+        key = opts.get('key', '')
+        if not key:
+            key = repo.ui.config("gpg", "key", '')
+        self.keyLineEdit.setText(hglib.tounicode(key))
+        self.replaceCheckBox.setChecked(bool(opts.get('force')))
+        self.localCheckBox.setChecked(bool(opts.get('local')))
+        self.nocommitCheckBox.setChecked(bool(opts.get('no_commit')))
+        msg = opts.get('message', '')
+        self.customTextLineEdit.setText(hglib.tounicode(msg))
+        if msg:
+            self.customCheckBox.setChecked(True)
+            self.customMessageToggle(True)
+        else:
+            self.customCheckBox.setChecked(False)
+            self.customMessageToggle(False)
         self.keyLineEdit.setFocus()
+
+        expanded = util.any([self.replaceCheckBox.isChecked(),
+                  self.localCheckBox.isChecked(),
+                  self.nocommitCheckBox.isChecked(),
+                  self.customCheckBox.isChecked()
+                  ])
+        expander.set_expanded(expanded)
+        self.show_options(expanded)
+
+        self.updateStates()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def show_options(self, visible):
         self.localCheckBox.setVisible(visible)
@@ -127,6 +148,8 @@ class SignDialog(QDialog):
     def commandFinished(self, ret):
         if ret == 0:
             self.set_status(_("Signature has been added"))
+        else:
+            self.set_status(self._cmdsession.errorString(), False)
 
     @pyqtSlot()
     def updateStates(self):
@@ -136,44 +159,28 @@ class SignDialog(QDialog):
         self.customTextLineEdit.setEnabled(not nocommit and custom)
 
     def onSign(self):
-        if self.cmd.core.running():
+        if not self._cmdsession.isFinished():
             self.set_status(_('Repository command still running'), False)
             return
 
-        keyu = self.keyLineEdit.text()
-        key = hglib.fromunicode(keyu)
-        local = self.localCheckBox.isChecked()
-        force = self.replaceCheckBox.isChecked()
-        nocommit = self.nocommitCheckBox.isChecked()
-        if self.customCheckBox.isChecked():
-            msgu = self.customTextLineEdit.text()
-            msg = hglib.fromunicode(msgu)
-        else:
-            msg = None
+        opts = {
+            'key': self.keyLineEdit.text() or None,
+            'local': self.localCheckBox.isChecked(),
+            'force': self.replaceCheckBox.isChecked(),
+            'no_commit': self.nocommitCheckBox.isChecked(),
+            }
+        if self.customCheckBox.isChecked() and not opts['no_commit']:
+            opts['message'] = self.customTextLineEdit.text() or None
 
         user = qtlib.getCurrentUsername(self, self.repo)
         if not user:
             return
+        opts['user'] = hglib.tounicode(user)
 
-        cmd = ['sign', '--repository', self.repo.root, '--user', user]
-
-        if key:
-            cmd.append('--key=%s' % key)
-
-        if force:
-            cmd.append('--force')
-
-        if local:
-            cmd.append('--local')
-
-        if nocommit:
-            cmd.append('--no-commit')
-        else:
-            if msg:
-                cmd.append('--message=%s' % msg)
-
-        cmd.append(str(self.rev))
-        self.cmd.run(cmd)
+        cmdline = hglib.buildcmdargs('sign', self.rev, **opts)
+        sess = self._repoagent.runCommand(cmdline, self)
+        self._cmdsession = sess
+        sess.commandFinished.connect(self.commandFinished)
 
     def customMessageToggle(self, checked):
         self.customTextLineEdit.setEnabled(checked)
@@ -184,7 +191,6 @@ class SignDialog(QDialog):
         self.status.setShown(True)
         self.sep.setShown(True)
         self.status.set_status(text, icon)
-        self.showMessage.emit(text)
 
     def clear_status(self):
         self.status.setHidden(True)

@@ -7,11 +7,9 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import Queue
-import time
 import urllib2, urllib
 import socket
 import errno
-import inspect
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -119,17 +117,11 @@ class QtUi(uimod.ui):
         return self.sig.prompt(msg, default)
 
     def promptchoice(self, prompt, default=0):
+        if not self.interactive(): return default
         parts = prompt.split('$$')
         msg = parts[0].rstrip(' ')
         choices = [p.strip(' ') for p in parts[1:]]
-        return self._promptchoice(msg, choices, default)
-
-    def _promptchoice(self, msg, choices, default=0):
-        if not self.interactive(): return default
         return self.sig.promptchoice(msg, choices, default)
-
-    if len(inspect.getargspec(uimod.ui.promptchoice)[0]) > 3:
-        promptchoice = _promptchoice  # hg<2.7
 
     def getpass(self, prompt=None, default=None):
         return self.sig.getpass(prompt or _('password: '), default)
@@ -156,15 +148,12 @@ class CmdThread(QThread):
     #          others - return code of command
     commandFinished = pyqtSignal(int)
 
-    def __init__(self, cmdline, display, parent=None):
+    def __init__(self, cmdline, parent=None):
         super(CmdThread, self).__init__(parent)
 
         self.cmdline = cmdline
-        self.display = display
         self.ret = -1
-        self.abortbyuser = False
         self.responseq = Queue.Queue()
-        self.rawoutput = QStringList()
         self.topics = {}
         self.curstrs = QStringList()
         self.curlabel = None
@@ -175,7 +164,6 @@ class CmdThread(QThread):
 
     def abort(self):
         if self.isRunning() and hasattr(self, 'thread_id'):
-            self.abortbyuser = True
             try:
                 thread2._async_raise(self.thread_id, KeyboardInterrupt)
             except ValueError:
@@ -205,9 +193,6 @@ class CmdThread(QThread):
 
     @pyqtSlot(QString, QString)
     def output_handler(self, msg, label):
-        if label != 'control':
-            self.rawoutput.append(msg)
-
         if label == self.curlabel:
             self.curstrs.append(msg)
         else:
@@ -226,7 +211,8 @@ class CmdThread(QThread):
         prompt = hglib.tounicode(prompt)
         if choices:
             dlg = QMessageBox(QMessageBox.Question,
-                        _('TortoiseHg Prompt'), prompt, parent=self.parent())
+                              _('TortoiseHg Prompt'), prompt,
+                              parent=self._parentWidget())
             dlg.setWindowFlags(Qt.Sheet)
             dlg.setWindowModality(Qt.WindowModal)
             for index, choice in enumerate(choices):
@@ -244,7 +230,7 @@ class CmdThread(QThread):
         else:
             mode = password and QLineEdit.Password \
                              or QLineEdit.Normal
-            text, ok = qtlib.getTextInput(self.parent(),
+            text, ok = qtlib.getTextInput(self._parentWidget(),
                          _('TortoiseHg Prompt'),
                          prompt.title(),
                          mode=mode)
@@ -254,6 +240,12 @@ class CmdThread(QThread):
                 text = None
             self.responseq.put(text)
 
+    def _parentWidget(self):
+        p = self.parent()
+        while p and not p.isWidgetType():
+            p = p.parent()
+        return p
+
     def run(self):
         ui = QtUi(responseq=self.responseq)
         ui.sig.writeSignal.connect(self.output_handler,
@@ -262,12 +254,6 @@ class CmdThread(QThread):
                 Qt.QueuedConnection)
         ui.sig.interactSignal.connect(self.interact_handler,
                 Qt.QueuedConnection)
-
-        if self.display:
-            cmd = '%% hg %s\n' % self.display
-        else:
-            cmd = '%% hg %s\n' % ' '.join(self.cmdline)
-        ui.write(cmd, label='control')
 
         try:
             # save thread id in order to terminate by KeyboardInterrupt
@@ -389,14 +375,3 @@ class CmdThread(QThread):
             raise
         except KeyboardInterrupt:
             self.ret = -1
-
-        if self.ret == -1:
-            if self.abortbyuser:
-                msg = _('[command terminated by user %s]')
-            else:
-                msg = _('[command interrupted %s]')
-        elif self.ret:
-            msg = _('[command returned code %d %%s]') % int(self.ret)
-        else:
-            msg = _('[command completed successfully %s]')
-        ui.write(msg % time.asctime() + '\n', label='control')

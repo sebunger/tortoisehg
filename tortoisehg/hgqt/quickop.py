@@ -5,14 +5,13 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
 import sys
 
 from mercurial import util
 
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, status, cmdui, lfprompt
+from tortoisehg.hgqt import qtlib, status, cmdcore, cmdui, lfprompt
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -29,12 +28,14 @@ ICONS = { 'add': 'fileadd',
 
 class QuickOpDialog(QDialog):
     """ Dialog for performing quick dirstate operations """
-    def __init__(self, repo, command, pats, parent):
+    def __init__(self, repoagent, command, pats, parent):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.pats = pats
-        self.repo = repo
-        os.chdir(repo.root)
+        self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
+        self._cmddialog = cmdui.CmdSessionDialog(self)
+        repo = repoagent.rawRepo()
 
         # Handle rm alias
         if command == 'rm':
@@ -80,7 +81,7 @@ class QuickOpDialog(QDialog):
             opts[val.name] = s in filetypes
 
         opts['checkall'] = True # pre-check all matching files
-        stwidget = status.StatusWidget(repo, pats, opts, self,
+        stwidget = status.StatusWidget(repoagent, pats, opts, self,
                                        defcheck=defcheck)
         toplayout.addWidget(stwidget, 1)
 
@@ -99,11 +100,6 @@ class QuickOpDialog(QDialog):
 
         self.statusbar = cmdui.ThgStatusBar(self)
         stwidget.showMessage.connect(self.statusbar.showMessage)
-
-        self.cmd = cmd = cmdui.Runner(True, self)
-        cmd.commandStarted.connect(self.commandStarted)
-        cmd.commandFinished.connect(self.commandFinished)
-        cmd.progress.connect(self.statusbar.progress)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Close)
@@ -144,7 +140,27 @@ class QuickOpDialog(QDialog):
                                     self.stwidget.refreshWctx)
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
-    def commandStarted(self):
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
+    def _runCommand(self, files, lfiles, opts):
+        cmdlines = []
+        if files:
+            cmdlines.append(hglib.buildcmdargs(self.command, *files, **opts))
+        if lfiles:
+            assert self.command == 'add'
+            lopts = opts.copy()
+            lopts['large'] = True
+            cmdlines.append(hglib.buildcmdargs(self.command, *lfiles, **lopts))
+        self.files = files + lfiles
+
+        ucmdlines = [map(hglib.tounicode, xs) for xs in cmdlines]
+        self._cmdsession = sess = self._repoagent.runCommandSequence(ucmdlines,
+                                                                     self)
+        sess.commandFinished.connect(self.commandFinished)
+        sess.progressReceived.connect(self.statusbar.progress)
+        self._cmddialog.setSession(sess)
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
 
     def commandFinished(self, ret):
@@ -152,6 +168,8 @@ class QuickOpDialog(QDialog):
         if ret == 0:
             shlib.shell_notify(self.files)
             self.reject()
+        else:
+            self._cmddialog.show()
 
     def accept(self):
         cmdopts = {}
@@ -207,15 +225,13 @@ class QuickOpDialog(QDialog):
                 self.addWithPrompt(files)
                 return
         if files:
-            cmdline = hglib.buildcmdargs(self.command, *files, **cmdopts)
-            self.files = files
-            self.cmd.run(cmdline)
+            self._runCommand(files, [], cmdopts)
         else:
             self.reject()
 
     def reject(self):
-        if self.cmd.core.running():
-            self.cmd.core.cancel()
+        if not self._cmdsession.isFinished():
+            self._cmdsession.abort()
         elif not self.stwidget.canExit():
             return
         else:
@@ -230,48 +246,36 @@ class QuickOpDialog(QDialog):
             QDialog.reject(self)
 
     def addLfiles(self):
-        if 'largefiles' in self.repo.extensions():
-            cmdline = ['add', '--large']
         files = self.stwidget.getChecked()
         if not files:
             qtlib.WarningMsgBox(_('No files selected'),
                                 _('No operation to perform'),
                                 parent=self)
             return
-        cmdline.extend(files)
-        self.files = files
-        self.cmd.run(cmdline)
+        self._runCommand([], files, {})
 
     def addWithPrompt(self, files):
         result = lfprompt.promptForLfiles(self, self.repo.ui, self.repo, files)
         if not result:
             return
         files, lfiles = result
-        if files:
-            cmdline = ['add']
-            cmdline.extend(files)
-            self.files = files
-            self.cmd.run(cmdline)
-        if lfiles:
-            if 'largefiles' in self.repo.extensions():
-                cmdline = ['add', '--large']
-            cmdline.extend(lfiles)
-            self.files = lfiles
-            self.cmd.run(cmdline)
+        self._runCommand(files, lfiles, {})
 
 class HeadlessQuickop(QObject):
-    def __init__(self, repo, cmdline):
+    def __init__(self, repoagent, cmdline):
         QObject.__init__(self)
         self.files = cmdline[1:]
-        os.chdir(repo.root)
-        self.cmd = cmdui.Runner(True, None)  # parent must be QWidget or None
-        self.cmd.commandFinished.connect(self.commandFinished)
-        self.cmd.run(cmdline)
+        self._cmddialog = cmdui.CmdSessionDialog()
+        sess = repoagent.runCommand(map(hglib.tounicode, cmdline))
+        sess.commandFinished.connect(self.commandFinished)
+        self._cmddialog.setSession(sess)
 
     def commandFinished(self, ret):
         if ret == 0:
             shlib.shell_notify(self.files)
             sys.exit(0)
+        else:
+            self._cmddialog.show()
 
     # dummy methods to act as QWidget (see run.qtrun)
     def show(self):
@@ -286,6 +290,6 @@ def run(ui, repoagent, *pats, **opts):
     imm = repo.ui.config('tortoisehg', 'immediate', '')
     if opts.get('headless') or command in imm.lower():
         cmdline = [command] + pats
-        return HeadlessQuickop(repo, cmdline)
+        return HeadlessQuickop(repoagent, cmdline)
     else:
-        return QuickOpDialog(repo, command, pats, None)
+        return QuickOpDialog(repoagent, command, pats, None)

@@ -35,7 +35,7 @@ from PyQt4 import QtCore, QtGui
 #        self.modeltest = ModelTest(model, self)
 
 class ModelTest(QtCore.QObject):
-    def __init__(self, _model, parent):
+    def __init__(self, _model, parent=None):
         """
         Connect to all of the models signals, Whenever anything happens recheck everything.
         """

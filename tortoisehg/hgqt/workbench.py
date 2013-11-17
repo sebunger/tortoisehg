@@ -45,14 +45,10 @@ class Workbench(QMainWindow):
         self.ui = ui
         self._repomanager = repomanager
         self._repomanager.configChanged.connect(self._setupUrlComboIfCurrent)
-        self._repomanager.configChanged.connect(self._updateRepoShortName)
-        self._repomanager.repositoryChanged.connect(self._updateRepoBaseNode)
         self._repomanager.repositoryDestroyed.connect(self.closeRepo)
-        self._repomanager.repositoryOpened.connect(self._updateRepoRegItem)
 
         self.setupUi()
-        self.setWindowTitle(_('TortoiseHg Workbench'))
-        self.reporegistry = rr = RepoRegistryView(self)
+        self.reporegistry = rr = RepoRegistryView(repomanager, self)
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
         rr.openRepo.connect(self.openRepo)
@@ -64,7 +60,7 @@ class Workbench(QMainWindow):
 
         self.mqpatches = p = mq.MQPatchesWidget(self)
         p.setObjectName('MQPatchesWidget')
-        p.showMessage.connect(self.showMessage)
+        p.patchSelected.connect(self.gotorev)
         p.hide()
         self.addDockWidget(Qt.LeftDockWidgetArea, p)
 
@@ -75,6 +71,11 @@ class Workbench(QMainWindow):
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log)
 
         self._setupActions()
+
+        self._repoTabTitleChangedMapper = mapper = QSignalMapper(self)
+        mapper.mapped[QWidget].connect(self._updateRepoTabTitle)
+        self._repoTabBusyIconChangedMapper = mapper = QSignalMapper(self)
+        mapper.mapped[QWidget].connect(self._updateRepoTabIcon)
 
         self.restoreSettings()
         self.repoTabChanged()
@@ -141,7 +142,6 @@ class Workbench(QMainWindow):
 
         self.menuFile = self.menubar.addMenu(_("&File"))
         self.menuView = self.menubar.addMenu(_("&View"))
-        self.menuViewregistryopts = QMenu(_('Workbench Toolbars'), self)
         self.menuRepository = self.menubar.addMenu(_("&Repository"))
         self.menuHelp = self.menubar.addMenu(_("&Help"))
 
@@ -204,9 +204,8 @@ class Workbench(QMainWindow):
         self.menuView.addAction(a)
 
         newseparator(menu='view')
-        self.menuViewregistryopts = self.menuView.addMenu(
-            _('R&epository Registry Options'))
-        self.menuViewregistryopts.addActions(self.reporegistry.settingActions())
+        menu = self.menuView.addMenu(_('R&epository Registry Options'))
+        menu.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
         newaction(_("C&hoose Log Columns..."), self.setHistoryColumns,
@@ -231,7 +230,6 @@ class Workbench(QMainWindow):
         # note that 'grep' and 'search' are equivalent
         taskdefs = {
             'commit': ('hg-commit', _('&Commit')),
-            'mq': ('thg-qrefresh', _('M&Q Patch')),
             'pbranch': ('branch', _('&Patch Branch')),
             'log': ('hg-log', _("Revision &Details")),
             'manifest': ('hg-annotate', _('&Manifest')),
@@ -241,10 +239,9 @@ class Workbench(QMainWindow):
         tasklist = self.ui.configlist(
             'tortoisehg', 'workbench.task-toolbar', [])
         if tasklist == []:
-            tasklist = ['log', 'commit', 'mq', 'manifest',
+            tasklist = ['log', 'commit', 'manifest',
                 'grep', 'pbranch', '|', 'sync']
 
-        self.actionSelectTaskMQ = None
         self.actionSelectTaskPbranch = None
 
         for i, taskname in enumerate(tasklist):
@@ -255,9 +252,7 @@ class Workbench(QMainWindow):
                 continue
             tbar = addtaskview(taskinfo[0], taskinfo[1], taskname,
                                "Alt+%d" % (i + 1))
-            if taskname == 'mq':
-                self.actionSelectTaskMQ = tbar
-            elif taskname == 'pbranch':
+            if taskname == 'pbranch':
                 self.actionSelectTaskPbranch = tbar
 
         newseparator(menu='view')
@@ -274,9 +269,15 @@ class Workbench(QMainWindow):
         newaction(_("Load &All Revisions"), self.loadall,
                   enabled='repoopen', menu='view', shortcut='Shift+Ctrl+A',
                   tooltip=_('Load all revisions into graph'))
-        newaction(_("&Goto Revision..."), self.gotorev,
-                  enabled='repoopen', menu='view', shortcut='Ctrl+/',
-                  tooltip=_('Go to a specific revision'))
+
+        newseparator(toolbar='edit')
+        newaction(_("Go to current revision"), self._repofwd('gotoParent'),
+                  icon='go-home', tooltip=_('Go to current revision'),
+                  enabled='repoopen', toolbar='edit', shortcut='Ctrl+.')
+        newaction(_("&Goto Revision..."), self._gotorev, icon='go-to-rev',
+                  shortcut='Ctrl+/', enabled='repoopen',
+                  tooltip=_('Go to a specific revision'),
+                  menu='view', toolbar='edit')
 
         menuSync = self.menuRepository.addMenu(_('S&ynchronize'))
         newseparator(menu='repository')
@@ -324,15 +325,6 @@ class Workbench(QMainWindow):
         newaction(_("&About TortoiseHg"), self.onAbout, menu='help',
                   icon='thg-logo')
 
-        newseparator(toolbar='edit')
-        self.actionCurrentRev = \
-        newaction(_("Go to current revision"), self._repofwd('gotoParent'),
-                  icon='go-home', tooltip=_('Go to current revision'),
-                  enabled='repoopen', toolbar='edit', shortcut='Ctrl+.')
-        self.actionGoTo = \
-        newaction(_("Go to a specific revision"), self.gotorev,
-                  icon='go-to-rev', tooltip=_('Go to a specific revision'),
-                  enabled='repoopen', toolbar='edit')
         self.actionBack = \
         newaction(_("Back"), self._repofwd('back'), icon='go-previous',
                   enabled=False, toolbar='edit')
@@ -640,7 +632,8 @@ class Workbench(QMainWindow):
                 contextmenu.addSeparator()
 
         if actionlist:
-            contextmenu.exec_(self.repoTabsWidget.mapToGlobal(point))
+            contextmenu.setAttribute(Qt.WA_DeleteOnClose)
+            contextmenu.popup(self.repoTabsWidget.mapToGlobal(point))
 
     @pyqtSlot()
     def closeLastClickedTab(self):
@@ -773,9 +766,9 @@ class Workbench(QMainWindow):
         w = tw.currentWidget()
         if tw.count() == 0:
             self.setWindowTitle(_('TortoiseHg Workbench'))
-        elif w.repo.shortname != w.repo.displayname:
+        elif w.repo.ui.configbool('tortoisehg', 'fullpath'):
             self.setWindowTitle(_('%s - TortoiseHg Workbench - %s') %
-                                (w.title(), w.repo.displayname))
+                                (w.title(), w.repoRootPath()))
         else:
             self.setWindowTitle(_('%s - TortoiseHg Workbench') % w.title())
 
@@ -789,15 +782,11 @@ class Workbench(QMainWindow):
         if self.repoTabsWidget.count() == 0:
             for a in self.actionGroupTaskView.actions():
                 a.setChecked(False)
-            if self.actionSelectTaskMQ is not None:
-                self.actionSelectTaskMQ.setVisible(False)
             if self.actionSelectTaskPbranch is not None:
                 self.actionSelectTaskPbranch.setVisible(False)
         else:
             repoWidget = self.repoTabsWidget.currentWidget()
             exts = repoWidget.repo.extensions()
-            if self.actionSelectTaskMQ is not None:
-                self.actionSelectTaskMQ.setVisible('mq' in exts)
             if self.actionSelectTaskPbranch is not None:
                 self.actionSelectTaskPbranch.setVisible('pbranch' in exts)
             taskIndex = repoWidget.taskTabsWidget.currentIndex()
@@ -816,22 +805,6 @@ class Workbench(QMainWindow):
             return
         self.actionBack.setEnabled(rw.canGoBack())
         self.actionForward.setEnabled(rw.canGoForward())
-
-    # might be better to move them to RepoRegistry
-    @pyqtSlot(unicode)
-    def _updateRepoRegItem(self, root):
-        self._updateRepoShortName(root)
-        self._updateRepoBaseNode(root)
-
-    @pyqtSlot(unicode)
-    def _updateRepoShortName(self, root):
-        repo = self._repomanager.repoAgent(root).rawRepo()
-        self.reporegistry.setShortName(root, repo.shortname)
-
-    @pyqtSlot(unicode)
-    def _updateRepoBaseNode(self, root):
-        repo = self._repomanager.repoAgent(root).rawRepo()
-        self.reporegistry.setBaseNode(root, repo[0].node())
 
     @pyqtSlot(int)
     def repoTabCloseRequested(self, index):
@@ -864,26 +837,27 @@ class Workbench(QMainWindow):
             self.updateHistoryActions()
             self.updateMenu()
             self.log.setCurrentRepoRoot(w.repoRootPath())
+            repoagent = self._repomanager.repoAgent(w.repoRootPath())
+            self.mqpatches.setRepoAgent(repoagent)
             self.reporegistry.setActiveTabRepo(w.repoRootPath())
             self._setupCustomTools(w.repo.ui)
             self._setupUrlCombo(w.repo)
         else:
             self.log.setCurrentRepoRoot(None)
+            self.mqpatches.setRepoAgent(None)
             self.reporegistry.setActiveTabRepo('')
-        repo = w and w.repo or None
-        self.mqpatches.setrepo(repo)
 
-    #@pyqtSlot(unicode)
-    def _updateRepoTabTitle(self, title):
-        index = self.repoTabsWidget.indexOf(self.sender())
-        self.repoTabsWidget.setTabText(index, title)
+    @pyqtSlot(QWidget)
+    def _updateRepoTabTitle(self, rw):
+        index = self.repoTabsWidget.indexOf(rw)
+        self.repoTabsWidget.setTabText(index, rw.title())
         if index == self.repoTabsWidget.currentIndex():
             self._updateWindowTitle()
 
-    #@pyqtSlot(QIcon)
-    def _updateRepoTabIcon(self, icon):
-        index = self.repoTabsWidget.indexOf(self.sender())
-        self.repoTabsWidget.setTabIcon(index, icon)
+    @pyqtSlot(QWidget)
+    def _updateRepoTabIcon(self, rw):
+        index = self.repoTabsWidget.indexOf(rw)
+        self.repoTabsWidget.setTabIcon(index, rw.busyIcon())
 
     def addRepoTab(self, repoagent, bundle):
         '''opens the given repo in a new tab'''
@@ -909,8 +883,13 @@ class Workbench(QMainWindow):
             index = self.repoTabsWidget.addTab(rw, rw.title())
         tw.setTabToolTip(index, repoagent.rootPath())
         tw.setCurrentIndex(index)
-        rw.titleChanged.connect(self._updateRepoTabTitle)
-        rw.showIcon.connect(self._updateRepoTabIcon)
+        # PyQt 4.6 cannot find compatible signal by new-style connection
+        QObject.connect(rw, SIGNAL('titleChanged(QString)'),
+                        self._repoTabTitleChangedMapper, SLOT('map()'))
+        self._repoTabTitleChangedMapper.setMapping(rw, rw)
+        QObject.connect(rw, SIGNAL('busyIconChanged()'),
+                        self._repoTabBusyIconChangedMapper, SLOT('map()'))
+        self._repoTabBusyIconChangedMapper.setMapping(rw, rw)
         self.reporegistry.addRepo(repoagent.rootPath())
 
         self.updateMenu()
@@ -970,12 +949,15 @@ class Workbench(QMainWindow):
 
         return forwarder
 
-    # no @pyqtSlot(); as of PyQt 4.9.3, it makes self.sender() wrong through
-    # the following path: reload -> titleChanged -> _updateRepoTabTitle,
-    # if _updateRepoTabTitle is not decorated as @pyqtSlot.
+    @pyqtSlot()
     def refresh(self):
         w = self.repoTabsWidget.currentWidget()
         if w:
+            # check unnoticed changes to emit corresponding signals
+            repoagent = self._repomanager.repoAgent(w.repoRootPath())
+            repoagent.pollStatus()
+            # TODO if all objects are responsive to repository signals, some
+            # of the following actions are not necessary
             getattr(w, 'reload')()
             self._setupUrlCombo(w.repo)
 
@@ -983,7 +965,7 @@ class Workbench(QMainWindow):
             self.mqpatches.reload()
 
     # no @pyqtSlot(QAction) to avoid wrong self.sender() at
-    # _appendRepoWidgetOutput, _updateRepoTabTitle and _updateRepoTabIcon
+    # _appendRepoWidgetOutput
     # during QMessageBox.exec at SyncWidget.pushclicked. See #3320.
     def _runSyncAction(self, action):
         w = self.repoTabsWidget.currentWidget()
@@ -1007,12 +989,17 @@ class Workbench(QMainWindow):
         if w:
             w.repoview.model().loadall()
 
-    def gotorev(self):
+    def _gotorev(self):
         rev, ok = qtlib.getTextInput(self,
                                      _("Goto revision"),
                                      _("Enter revision identifier"))
+        if ok:
+            self.gotorev(rev)
+
+    @pyqtSlot(unicode)
+    def gotorev(self, rev):
         w = self.repoTabsWidget.currentWidget()
-        if ok and w:
+        if w:
             w.repoview.goto(rev)
 
     def newWorkbench(self):

@@ -109,11 +109,13 @@ class SummaryInfo(object):
               'dateage': _('Date:'), 'branch': _('Branch:'),
               'close': _('Close:'),
               'tags': _('Tags:'), 'rawbranch': _('Branch:'),
-              'rawtags': _('Tags:'), 'graft': _('Graft:'),
+              'graft': _('Graft:'),
               'transplant': _('Transplant:'),
               'obsolete': _('Obsolete state:'),
               'p4': _('Perforce:'), 'svn': _('Subversion:'),
-              'converted': _('Converted From:'), 'shortuser': _('User:')}
+              'converted': _('Converted From:'), 'shortuser': _('User:'),
+              'mqoriginalparent': _('Original Parent:')
+    }
 
     def __init__(self):
         pass
@@ -178,8 +180,6 @@ class SummaryInfo(object):
                 return None
             elif item == 'close':
                 return ctx.extra().get('close')
-            elif item == 'rawtags':
-                return hglib.getrawctxtags(ctx)
             elif item == 'tags':
                 return hglib.getctxtags(ctx)
             elif item == 'graft':
@@ -232,6 +232,16 @@ class SummaryInfo(object):
             elif item == 'ishead':
                 childbranches = [cctx.branch() for cctx in ctx.children()]
                 return ctx.branch() not in childbranches
+            elif item == 'mqoriginalparent':
+                target = ctx.thgmqoriginalparent()
+                if not target:
+                    return None
+                p1 = ctx.p1()
+                if p1 is not None and p1.hex() == target:
+                    return None
+                if target not in ctx._repo:
+                    return None
+                return target
             raise UnknownItem(item)
         if 'data' in custom and not kargs.get('usepreset', False):
             try:
@@ -275,7 +285,7 @@ class SummaryInfo(object):
                 if revnum is not None and revid is not None:
                     return '%s (%s)' % (revnum, revid)
                 return '%s' % revid
-            elif item in ('revid', 'graft', 'transplant'):
+            elif item in ('revid', 'graft', 'transplant', 'mqoriginalparent'):
                 return qtlib.markup(value, **mono)
             elif item in ('revnum', 'p4', 'close', 'converted'):
                 return str(value)
@@ -285,7 +295,7 @@ class SummaryInfo(object):
             elif item in ('rawbranch', 'branch'):
                 opts = dict(fg='black', bg='#aaffaa')
                 return qtlib.markup(' %s ' % value, **opts)
-            elif item in ('rawtags', 'tags'):
+            elif item == 'tags':
                 opts = dict(fg='black', bg='#ffffaa')
                 tags = [qtlib.markup(' %s ' % tag, **opts) for tag in value]
                 return ' '.join(tags)

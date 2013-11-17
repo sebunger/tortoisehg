@@ -13,75 +13,11 @@ from PyQt4.QtGui import *
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib
+from tortoisehg.hgqt import qtlib
 
-class QRenameDialog(QDialog):
-
-    output = pyqtSignal(QString, QString)
-    makeLogVisible = pyqtSignal(bool)
-
-    def __init__(self, repo, patchname, parent):
-        super(QRenameDialog, self).__init__(parent)
-        self.setWindowTitle(_('Patch rename - %s') % repo.displayname)
-
-        f = self.windowFlags()
-        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.setMinimumWidth(400)
-        self.repo = repo
-        self.oldpatchname = patchname
-        self.newpatchname = ''
-
-        self.setLayout(QVBoxLayout())
-
-        lbl = QLabel(_('Rename patch <b>%s</b> to:') %
-                     hglib.tounicode(self.oldpatchname))
-        self.layout().addWidget(lbl)
-
-        self.le = QLineEdit(hglib.tounicode(self.oldpatchname))
-        self.layout().addWidget(self.le)
-
-        self.cmd = cmdui.Runner(True, self)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.commandFinished.connect(self.onCommandFinished)
-
-        BB = QDialogButtonBox
-        bbox = QDialogButtonBox(BB.Ok|BB.Cancel)
-        bbox.accepted.connect(self.accept)
-        bbox.rejected.connect(self.reject)
-        self.layout().addWidget(bbox)
-        self.bbox = bbox
-
-        self.le.setFocus()
-        self.le.selectAll()
-
-    @pyqtSlot(int)
-    def onCommandFinished(self, ret):
-        self.repo.decrementBusyCount()
-        self.reject()
-
-    def accept(self):
-        self.newpatchname = hglib.fromunicode(self.le.text())
-        if self.newpatchname != self.oldpatchname:
-            res = checkPatchname(self.repo.root, self.repo.thgactivemqname,
-                                    self.newpatchname, self)
-            if not res:
-                return
-            cmdline = ['qrename', '--repository', self.repo.root, '--',
-                       self.oldpatchname, self.newpatchname]
-            self.repo.incrementBusyCount()
-            self.cmd.run(cmdline)
-        else:
-            self.close()
-
-def checkPatchname(reporoot, activequeue, newpatchname, parent):
-    if activequeue == 'patches':
-        pn = 'patches'
-    else:
-        pn = 'patches-%s' % activequeue
-    patchfile = os.sep.join([reporoot, ".hg", pn, newpatchname])
+def checkPatchname(patchfile, parent):
     if os.path.exists(patchfile):
-        dlg = CheckPatchnameDialog(newpatchname, parent)
+        dlg = CheckPatchnameDialog(os.path.basename(patchfile), parent)
         choice = dlg.exec_()
         if choice == 1:
             # add .OLD to existing patchfile

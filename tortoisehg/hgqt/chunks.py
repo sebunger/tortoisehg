@@ -8,14 +8,14 @@
 import cStringIO
 import os, re
 
-from mercurial import hg, util, patch, commands, cmdutil
-from mercurial import match as matchmod, ui as uimod
+from mercurial import util, patch, commands
+from mercurial import match as matchmod
 from hgext import record
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, visdiff, revert
+from tortoisehg.hgqt import qtlib, qscilib, lexers, visdiff, revert, rejects
 from tortoisehg.hgqt import filelistmodel, filelistview, filedata, blockmatcher
 
 from PyQt4.QtCore import *
@@ -38,10 +38,10 @@ class ChunksWidget(QWidget):
 
     contextmenu = None
 
-    def __init__(self, repo, parent, multiselectable):
+    def __init__(self, repoagent, parent, multiselectable):
         QWidget.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.multiselectable = multiselectable
         self.currentFile = None
 
@@ -56,6 +56,7 @@ class ChunksWidget(QWidget):
         self.splitter.setChildrenCollapsible(False)
         self.layout().addWidget(self.splitter)
 
+        repo = self._repoagent.rawRepo()
         self.filelist = filelistview.HgFileListView(repo, self, multiselectable)
         self.filelistmodel = filelistmodel.HgFileListModel(self)
         self.filelist.setModel(self.filelistmodel)
@@ -106,6 +107,10 @@ class ChunksWidget(QWidget):
             self._actions[name] = act
             self.addAction(act)
 
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
         actionlist = ['diff', 'edit', 'revert']
@@ -132,7 +137,7 @@ class ChunksWidget(QWidget):
         rev = self.ctx.rev()
         if rev is None:
             rev = self.ctx.p1().rev()
-        dlg = revert.RevertDialog(self.repo, filenames, rev, self)
+        dlg = revert.RevertDialog(self._repoagent, filenames, rev, self)
         dlg.exec_()
         dlg.deleteLater()
 
@@ -195,8 +200,8 @@ class ChunksWidget(QWidget):
                                         hglib.tounicode(line) + u'<br><br>' +
                                         _('Edit patched file and rejects?'),
                                        parent=self):
-                    from tortoisehg.hgqt import rejects
-                    dlg = rejects.RejectsDialog(repo.wjoin(wfile), self)
+                    dlg = rejects.RejectsDialog(repo.ui, repo.wjoin(wfile),
+                                                self)
                     if dlg.exec_() == QDialog.Accepted:
                         ok = True
                     break
@@ -569,8 +574,6 @@ class DiffBrowser(QFrame):
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
-        self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.sci.customContextMenuRequested.connect(self.menuRequested)
         self.sci.setCaretLineVisible(False)
 
         self.sci.setMarginType(1, qsci.SymbolMargin)
@@ -611,10 +614,6 @@ class DiffBrowser(QFrame):
         self.layout().addWidget(self.searchbar)
 
         self.clearDisplay()
-
-    def menuRequested(self, point):
-        point = self.sci.viewport().mapToGlobal(point)
-        return self.sci.createStandardContextMenu().exec_(point)
 
     def loadSettings(self, qs, prefix):
         self.sci.loadSettings(qs, prefix)

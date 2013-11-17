@@ -7,7 +7,7 @@
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, i18n
+from tortoisehg.hgqt import cmdcore, qtlib, i18n
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -16,16 +16,14 @@ keep = i18n.keepgettext()
 
 class TagDialog(QDialog):
 
-    showMessage = pyqtSignal(QString)
-    output = pyqtSignal(QString, QString)
-    makeLogVisible = pyqtSignal(bool)
-
-    def __init__(self, repo, tag='', rev='tip', parent=None, opts={}):
+    def __init__(self, repoagent, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        self._cmdsession = cmdcore.nullCmdSession()
         self.setWindowTitle(_('Tag - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-tag'))
 
@@ -113,13 +111,9 @@ class TagDialog(QDialog):
         self.status = qtlib.StatusLabel()
         self.status.setContentsMargins(4, 2, 4, 4)
         base.addWidget(self.status)
+        self._finishmsg = None
 
-        self.cmd = cmdui.Runner(False, self)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.commandFinished.connect(self.onCommandFinished)
-
-        repo.repositoryChanged.connect(self.refresh)
+        repoagent.repositoryChanged.connect(self.refresh)
         self.customTextLineEdit.setDisabled(True)
         self.replaceCheckBox.setChecked(bool(opts.get('force')))
         self.localCheckBox.setChecked(bool(opts.get('local')))
@@ -127,10 +121,14 @@ class TagDialog(QDialog):
             msg = hglib.tounicode(opts['message'])
             self.customCheckBox.setChecked(True)
             self.customTextLineEdit.setText(msg)
-        self.clear_statue()
+        self.clear_status()
         self.show_options(False)
         self.tagCombo.setFocus()
         self.refresh()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def refresh(self):
@@ -214,27 +212,35 @@ class TagDialog(QDialog):
         self.status.setShown(True)
         self.sep.setShown(True)
         self.status.set_status(text, icon)
-        self.showMessage.emit(text)
 
-    def clear_statue(self):
+    def clear_status(self):
         self.status.setHidden(True)
         self.sep.setHidden(True)
 
-    def onCommandFinished(self, ret):
-        if ret == 0:
-            self.finishfunc()
-
-    def onAddTag(self):
-        if self.cmd.core.running():
+    def _runTag(self, tagname, **opts):
+        if not self._cmdsession.isFinished():
             self.set_status(_('Repository command still running'), False)
             return
 
+        self._finishmsg = opts.pop('finishmsg')
+        cmdline = hglib.buildcmdargs('tag', tagname, **opts)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self._onTagFinished)
+
+    @pyqtSlot(int)
+    def _onTagFinished(self, ret):
+        if ret == 0:
+            self.set_status(self._finishmsg, True)
+        else:
+            self.set_status(self._cmdsession.errorString(), False)
+
+    def onAddTag(self):
         tagu = self.tagCombo.currentText()
         tag = hglib.fromunicode(tagu)
         local = self.localCheckBox.isChecked()
         force = self.replaceCheckBox.isChecked()
         english = self.englishCheckBox.isChecked()
-        if self.customCheckBox.isChecked():
+        if self.customCheckBox.isChecked() and not local:
             message = self.customTextLineEdit.text()
         else:
             message = None
@@ -264,40 +270,26 @@ class TagDialog(QDialog):
                     msgset = keep._('Added tag %s for changeset %s')
                     message = (english and msgset['id'] or msgset['str']) \
                                % (tagu, str(ctx))
-            message = hglib.fromunicode(message)
 
-        def finished():
-            if exists:
-                self.set_status(_("Tag '%s' has been moved") % tagu, True)
-            else:
-                self.set_status(_("Tag '%s' has been added") % tagu, True)
+        if exists:
+            finishmsg = _("Tag '%s' has been moved") % tagu
+        else:
+            finishmsg = _("Tag '%s' has been added") % tagu
 
         user = qtlib.getCurrentUsername(self, self.repo)
         if not user:
             return
-        cmd = ['tag', '--repository', self.repo.root, '--rev', str(self.rev),
-               '--user', user]
-        if local:
-            cmd.append('--local')
-        else:
-            cmd.append('--message=%s' % message)
-        if force:
-            cmd.append('--force')
-        cmd.append(tag)
-        self.finishfunc = finished
-        self.cmd.run(cmd)
+        self._runTag(tagu, rev=self.rev, user=hglib.tounicode(user),
+                     local=local, force=force, message=message,
+                     finishmsg=finishmsg)
 
     def onRemoveTag(self):
-        if self.cmd.core.running():
-            self.set_status(_('Repository command still running'), False)
-            return
-
         tagu = self.tagCombo.currentText()
         tag = hglib.fromunicode(tagu)
         local = self.localCheckBox.isChecked()
         force = self.replaceCheckBox.isChecked()
         english = self.englishCheckBox.isChecked()
-        if self.customCheckBox.isChecked():
+        if self.customCheckBox.isChecked() and not local:
             message = self.customTextLineEdit.text()
         else:
             message = None
@@ -322,22 +314,13 @@ class TagDialog(QDialog):
             if not message:
                 msgset = keep._('Removed tag %s')
                 message = (english and msgset['id'] or msgset['str']) % tagu
-            message = hglib.fromunicode(message)
 
-        def finished():
-            self.set_status(_("Tag '%s' has been removed") % tagu, True)
-
-        cmd = ['tag', '--repository', self.repo.root, '--remove']
-        if local:
-            cmd.append('--local')
-        else:
-            cmd.append('--message=%s' % message)
-        cmd.append(tag)
-        self.finishfunc = finished
-        self.cmd.run(cmd)
+        finishmsg = _("Tag '%s' has been removed") % tagu
+        self._runTag(tagu, remove=True, local=local, message=message,
+                     finishmsg=finishmsg)
 
     def reject(self):
-        if self.cmd.core.running():
+        if not self._cmdsession.isFinished():
             self.set_status(_('Repository command still running'), False)
             return
 

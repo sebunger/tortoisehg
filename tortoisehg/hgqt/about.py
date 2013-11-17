@@ -58,7 +58,7 @@ class AboutDialog(QDialog):
         self.courtesy_lbl = QLabel()
         self.courtesy_lbl.setAlignment(Qt.AlignCenter)
         self.courtesy_lbl.setText(
-              _('Several icons are courtesy of the TortoiseSVN project') + '\n')
+              _('Several icons are courtesy of the TortoiseSVN and Tango projects') + '\n')
         self.vbox.addWidget(self.courtesy_lbl)
 
         self.download_url_lbl = QLabel()
@@ -126,11 +126,14 @@ class AboutDialog(QDialog):
     @pyqtSlot()
     def uFinished(self):
         newver = (0,0,0)
+        newverstr = '0.0.0'
+        upgradeurl = ''
         try:
             f = self._newverreply.readAll().data().splitlines()
             self._newverreply.close()
             self._newverreply = None
-            newver = tuple([int(p) for p in f[0].split('.')])
+            newverstr = f[0]
+            newver = tuple([int(p) for p in newverstr.split('.')])
             upgradeurl = f[1] # generic download URL
             platform = sys.platform
             if platform == 'win32':
@@ -152,7 +155,8 @@ class AboutDialog(QDialog):
         except ValueError:
             curver = (0,0,0)
         if newver > curver:
-            url_lbl = _('A new version of TortoiseHg is ready for download!')
+            url_lbl = _('A new version of TortoiseHg (%s) '
+                        'is ready for download!') % newverstr
             urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
             self.download_url_lbl.setText(urldata)
 

@@ -10,23 +10,22 @@ from PyQt4.QtGui import *
 
 import os
 
-from mercurial import util, merge as mergemod
-
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, cmdui, resolve, commit, thgrepo
+from tortoisehg.hgqt import qtlib, csinfo, cmdui, resolve, thgrepo, wctxcleaner
 
 BB = QDialogButtonBox
 
 class RebaseDialog(QDialog):
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         super(RebaseDialog, self).__init__(parent)
         self.setWindowIcon(qtlib.geticon('hg-rebase'))
-        f = self.windowFlags()
-        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint)
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.opts = opts
         self.aborted = False
 
@@ -43,6 +42,7 @@ class RebaseDialog(QDialog):
         s = opts.get('source', '.')
         source = csinfo.create(self.repo, s, style, withupdate=True)
         srcb.layout().addWidget(source)
+        self.sourcecsinfo = source
         self.layout().addWidget(srcb)
 
         destb = QGroupBox( _('To rebase destination'))
@@ -53,6 +53,11 @@ class RebaseDialog(QDialog):
         destb.layout().addWidget(dest)
         self.destcsinfo = dest
         self.layout().addWidget(destb)
+
+        swaplabel = QLabel('<a href="X">%s</a>'  # don't care href
+                           % _('Swap source and destination'))
+        swaplabel.linkActivated.connect(self.swap)
+        self.layout().addWidget(swaplabel)
 
         sep = qtlib.LabeledSeparator(_('Options'))
         self.layout().addWidget(sep)
@@ -69,8 +74,11 @@ class RebaseDialog(QDialog):
         self.collapsechk.setChecked(opts.get('collapse', False))
         self.layout().addWidget(self.collapsechk)
 
-        self.autoresolvechk = QCheckBox(_('Automatically resolve merge conflicts '
-                                           'where possible'))
+        self.basechk = QCheckBox(_('Rebase entire source branch'))
+        self.layout().addWidget(self.basechk)
+
+        self.autoresolvechk = QCheckBox(_('Automatically resolve merge '
+                                          'conflicts where possible'))
         self.autoresolvechk.setChecked(
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
         self.layout().addWidget(self.autoresolvechk)
@@ -92,14 +100,16 @@ class RebaseDialog(QDialog):
         self.cancelbtn = bbox.addButton(QDialogButtonBox.Cancel)
         self.cancelbtn.clicked.connect(self.reject)
         self.rebasebtn = bbox.addButton(_('Rebase'),
-                                            QDialogButtonBox.ActionRole)
+                                        QDialogButtonBox.ActionRole)
         self.rebasebtn.clicked.connect(self.rebase)
         self.abortbtn = bbox.addButton(_('Abort'),
-                                            QDialogButtonBox.ActionRole)
+                                       QDialogButtonBox.ActionRole)
         self.abortbtn.clicked.connect(self.abort)
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
+        self._wctxcleaner = wctxcleaner.WctxCleaner(repoagent, self)
+        self._wctxcleaner.checkFinished.connect(self._onCheckFinished)
         if self.checkResolve() or not (s or d):
             for w in (srcb, destb, sep, self.keepchk,
                       self.collapsechk, self.keepbrancheschk):
@@ -109,51 +119,35 @@ class RebaseDialog(QDialog):
             self.showMessage.emit(_('Checking...'))
             self.abortbtn.setEnabled(False)
             self.rebasebtn.setEnabled(False)
-            QTimer.singleShot(0, self.checkStatus)
+            QTimer.singleShot(0, self._wctxcleaner.check)
 
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
         self.resize(0, 340)
         self.setWindowTitle(_('Rebase - %s') % self.repo.displayname)
 
-    def checkStatus(self):
-        repo = self.repo
-        class CheckThread(QThread):
-            def __init__(self, parent):
-                QThread.__init__(self, parent)
-                self.dirty = False
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
-            def run(self):
-                wctx = repo[None]
-                if len(wctx.parents()) > 1:
-                    self.dirty = True
-                elif wctx.dirty():
-                    self.dirty = True
-                else:
-                    for r, p, status in thgrepo.recursiveMergeStatus(repo):
-                        if status == 'u':
-                            self.dirty = True
-                            break
-        def completed():
-            self.th.wait()
-            if self.th.dirty:
-                self.rebasebtn.setEnabled(False)
-                txt = _('Before rebase, you must <a href="commit">'
-                        '<b>commit</b></a> or <a href="discard">'
-                        '<b>discard</b></a> changes.')
-            else:
-                self.rebasebtn.setEnabled(True)
-                txt = _('You may continue the rebase')
-            self.showMessage.emit(txt)
-        self.th = CheckThread(self)
-        self.th.finished.connect(completed)
-        self.th.start()
+    @pyqtSlot(bool)
+    def _onCheckFinished(self, clean):
+        if not clean:
+            self.rebasebtn.setEnabled(False)
+            txt = _('Before rebase, you must <a href="commit">'
+                    '<b>commit</b></a> or <a href="discard">'
+                    '<b>discard</b></a> changes.')
+        else:
+            self.rebasebtn.setEnabled(True)
+            txt = _('You may continue the rebase')
+        self.showMessage.emit(txt)
 
     def rebase(self):
         self.rebasebtn.setEnabled(False)
         self.cancelbtn.setShown(False)
         self.keepchk.setEnabled(False)
         self.keepbrancheschk.setEnabled(False)
+        self.basechk.setEnabled(False)
         self.collapsechk.setEnabled(False)
         cmdline = ['rebase', '--repository', self.repo.root]
         cmdline += ['--config', 'ui.merge=internal:' +
@@ -172,9 +166,22 @@ class RebaseDialog(QDialog):
             else:
                 source = self.opts.get('source')
                 dest = self.opts.get('dest')
-                cmdline += ['--source', str(source), '--dest', str(dest)]
+                sourcearg = '--source'
+                if self.basechk.isChecked():
+                    sourcearg = '--base'
+                cmdline += [sourcearg, str(source), '--dest', str(dest)]
         self.repo.incrementBusyCount()
         self.cmd.run(cmdline)
+
+    def swap(self):
+        oldsource = self.opts.get('source', '.')
+        olddest = self.opts.get('dest', '.')
+
+        self.sourcecsinfo.update(target=olddest)
+        self.destcsinfo.update(target=oldsource)
+
+        self.opts['source'] = olddest
+        self.opts['dest'] = oldsource
 
     def abort(self):
         cmdline = ['rebase', '--repository', self.repo.root, '--abort']
@@ -221,32 +228,11 @@ class RebaseDialog(QDialog):
 
     def linkActivated(self, cmd):
         if cmd == 'resolve':
-            dlg = resolve.ResolveDialog(self.repo, self)
+            dlg = resolve.ResolveDialog(self._repoagent, self)
             dlg.exec_()
             self.checkResolve()
-        elif cmd == 'commit':
-            dlg = commit.CommitDialog(self.repo, [], {}, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.destcsinfo.update(self.repo['.'])
-            self.checkStatus()
-        elif cmd == 'discard':
-            labels = [(QMessageBox.Yes, _('&Discard')),
-                      (QMessageBox.No, _('Cancel'))]
-            if not qtlib.QuestionMsgBox(_('Confirm Discard'),
-                     _('Discard outstanding changes to working directory?'),
-                     labels=labels, parent=self):
-                return
-            def finished(ret):
-                self.repo.decrementBusyCount()
-                if ret == 0:
-                    self.checkStatus()
-            cmdline = ['update', '--clean', '--repository', self.repo.root,
-                       '--rev', '.']
-            self.runner = cmdui.Runner(True, self)
-            self.runner.commandFinished.connect(finished)
-            self.repo.incrementBusyCount()
-            self.runner.run(cmdline)
+        else:
+            self._wctxcleaner.runCleaner(cmd)
 
     def reject(self):
         if os.path.exists(self.repo.join('rebasestate')):

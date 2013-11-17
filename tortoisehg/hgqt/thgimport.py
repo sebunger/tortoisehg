@@ -26,7 +26,7 @@ class ImportDialog(QDialog):
     """Dialog to import patches"""
     patchImported = pyqtSignal()
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         super(ImportDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint
@@ -34,7 +34,7 @@ class ImportDialog(QDialog):
         self.setWindowIcon(qtlib.geticon('hg-import'))
 
         self.tempfiles = []
-        self.repo = repo
+        self._repoagent = repoagent
 
         # base layout box
         box = QVBoxLayout()
@@ -83,7 +83,7 @@ class ImportDialog(QDialog):
         self.targetcombo.addItem(_('Shelf'), ('copy',))
         self.targetcombo.addItem(_('Working Directory'),
                                  ('import', '--no-commit'))
-        cur = self.repo.getcurrentqqueue()
+        cur = self.repo.thgactivemqname
         if cur:
             self.targetcombo.addItem(hglib.tounicode(cur), ('qimport',))
         self.targetcombo.currentIndexChanged.connect(self._updatep0chk)
@@ -142,8 +142,12 @@ class ImportDialog(QDialog):
 
     ### Private Methods ###
 
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     def commitActivated(self):
-        dlg = commit.CommitDialog(self.repo, [], {}, self)
+        dlg = commit.CommitDialog(self._repoagent, [], {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.checkStatus()
@@ -322,7 +326,7 @@ class ImportDialog(QDialog):
         self.repo.decrementBusyCount()
         if ret == 0:
             self.patchImported.emit()
-        if ret is not 0 or self.cmd.outputShown():
+        if ret != 0 or self.cmd.outputShown():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)

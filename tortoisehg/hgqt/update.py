@@ -22,12 +22,13 @@ class UpdateDialog(QDialog):
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts={}):
         super(UpdateDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
 
         # base layout box
         box = QVBoxLayout()
@@ -189,6 +190,11 @@ class UpdateDialog(QDialog):
         expander.set_expanded(hiddenOptionsChecked)
 
     ### Private Methods ###
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     def hiddenSettingIsChecked(self):
         if self.merge_chk.isChecked() or self.autoresolve_chk.isChecked() or self.showlog_chk.isChecked():
             return True
@@ -293,9 +299,9 @@ class UpdateDialog(QDialog):
         if self.discard_chk.isChecked():
             cmdline.append('--clean')
         else:
-            cur = self.repo['.']
+            cur = self.repo.hgchangectx('.')
             try:
-                node = self.repo[rev]
+                node = self.repo.hgchangectx(rev)
             except (error.LookupError, error.RepoLookupError, error.RepoError):
                 return
             def isclean():
@@ -314,10 +320,6 @@ class UpdateDialog(QDialog):
                 '''whether the local changes are merged (have 2 parents)'''
                 wc = self.repo[None]
                 return len(wc.parents()) == 2
-            def iscrossbranch(p1, p2):
-                '''whether p1 -> p2 crosses branch'''
-                pa = p1.ancestor(p2)
-                return p1.branch() != p2.branch() or (p1 != pa and p2 != pa)
             def islocalmerge(p1, p2, clean=None):
                 if clean is None:
                     clean = isclean()
@@ -369,7 +371,7 @@ class UpdateDialog(QDialog):
                     cmdline.append('--clean')
                 elif clicked == 'shelve':
                     from tortoisehg.hgqt import shelve
-                    dlg = shelve.ShelveDialog(self.repo, self)
+                    dlg = shelve.ShelveDialog(self._repoagent, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
@@ -421,7 +423,7 @@ class UpdateDialog(QDialog):
             if status == 'u':
                 qtlib.InfoMsgBox(_('Merge caused file conflicts'),
                                  _('File conflicts need to be resolved'))
-                dlg = resolve.ResolveDialog(self.repo, self)
+                dlg = resolve.ResolveDialog(self._repoagent, self)
                 dlg.finished.connect(dlg.deleteLater)
                 dlg.exec_()
                 break

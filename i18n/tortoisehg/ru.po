@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
-"POT-Creation-Date: 2013-09-23 19:25-0300\n"
+"POT-Creation-Date: 2013-10-31 00:28-0200\n"
 "PO-Revision-Date: 2013-09-03 08:11+0000\n"
 "Last-Translator: Stanislav Mikhalevich <msio57@ya.ru>\n"
 "Language-Team: Russian\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2013-09-24 06:07+0000\n"
-"X-Generator: Launchpad (build 16771)\n"
+"X-Launchpad-Export-Date: 2013-10-31 05:27+0000\n"
+"X-Generator: Launchpad (build 16820)\n"
 "Language: ru\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -32,8 +32,8 @@ msgstr "О программе"
 msgid "Copyright 2008-2013 Steve Borho and others"
 msgstr "Copyright 2008-2013 Steve Borho и другие"
 
-msgid "Several icons are courtesy of the TortoiseSVN project"
-msgstr "Некоторые значки взяты из проекта TortoiseSVN"
+msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
+msgstr ""
 
 msgid "You can visit our site here"
 msgstr "Посетите наш сайт"
@@ -52,8 +52,9 @@ msgstr "версия %s"
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 msgstr "включает Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
-msgid "A new version of TortoiseHg is ready for download!"
-msgstr "Новая версия TortoiseHg доступна для загрузки!"
+#, python-format
+msgid "A new version of TortoiseHg (%s) is ready for download!"
+msgstr ""
 
 msgid "= Working Directory Parent ="
 msgstr "= Родитель для рабочего каталога ="
@@ -250,15 +251,6 @@ msgstr "<b>Обнаружены незафиксированные локаль�
 
 msgid "Clean"
 msgstr "Чистый"
-
-msgid "&Discard"
-msgstr "Отбросить"
-
-msgid "Confirm Discard"
-msgstr "Подтвердите отбрасывание"
-
-msgid "Discard outstanding changes to working directory?"
-msgstr "Отбросить имеющиеся изменения в рабочем каталоге?"
 
 msgid "Backing out, then merging..."
 msgstr "Обращаем изменения, потом сливаем..."
@@ -659,6 +651,23 @@ msgstr "Выберите хранилище назначения"
 msgid "Select patch folder"
 msgstr "Выберите папку заплатки"
 
+msgid "failed to start command\n"
+msgstr "не удалось запустить команду\n"
+
+msgid "error while running command\n"
+msgstr "ошибка при выполнении команды\n"
+
+msgid "Terminated by user"
+msgstr "Прервано пользователем"
+
+#, python-format
+msgid "[command terminated by user %s]"
+msgstr "[команда завершена пользователем %s]"
+
+#, python-format
+msgid "[command interrupted %s]"
+msgstr "[команда прервана %s]"
+
 #, python-format
 msgid "[command returned code %d %%s]"
 msgstr "[команда вернула код %d %%s]"
@@ -667,23 +676,14 @@ msgstr "[команда вернула код %d %%s]"
 msgid "[command completed successfully %s]"
 msgstr "[команда завершилась успешно %s]"
 
-msgid "failed to start command\n"
-msgstr "не удалось запустить команду\n"
-
-msgid "error while running command\n"
-msgstr "ошибка при выполнении команды\n"
-
 msgid "Running..."
 msgstr "Выполняется..."
 
-msgid "Terminated by user"
-msgstr "Прервано пользователем"
-
-msgid "Terminated"
-msgstr "Прервано"
-
 msgid "Failed!"
 msgstr "Неудача!"
+
+msgid "Clea&r Log"
+msgstr ""
 
 msgid "TortoiseHg Command Dialog"
 msgstr "Диалог команды TortoiseHg"
@@ -698,12 +698,24 @@ msgstr ""
 "Команда Mercurial всё ещё выполняется.\n"
 "Вы правда хотите завершить её?"
 
-msgid "TortoiseHg"
-msgstr "TortoiseHg"
+msgid "Command Error"
+msgstr ""
 
-msgctxt "window title"
+#, python-format
+msgid "[Code: %d]"
+msgstr ""
+
+msgctxt "start progress"
 msgid "Commit"
 msgstr "Фиксация"
+
+msgctxt "start progress"
+msgid "MQ Action"
+msgstr "Действие MQ"
+
+msgctxt "start progress"
+msgid "Rollback"
+msgstr "Откатить"
 
 msgid "Commit Dialog Toolbar"
 msgstr "Панель диалога фиксации"
@@ -783,10 +795,6 @@ msgstr "Создать новую ветку «%s» с этой фиксацие
 msgid "Create &Branch"
 msgstr "Создать &ветку"
 
-msgctxt "start progress"
-msgid "MQ Action"
-msgstr "Действие MQ"
-
 msgid "Close Branch: "
 msgstr "Закрыть ветку: "
 
@@ -813,10 +821,6 @@ msgstr "Откатить фиксацию к ревизии %d"
 
 msgid "Confirm Undo"
 msgstr "Подтвердите отмену"
-
-msgctxt "start progress"
-msgid "Rollback"
-msgstr "Откатить"
 
 msgid "Discard current commit message?"
 msgstr "Отказаться от текущего сообщения фиксации?"
@@ -869,7 +873,7 @@ msgstr "Подтвердите изъятие"
 msgid "Remove selected deleted files?"
 msgstr "Изъять указанные уничтоженные файлы из-под контроля версий?"
 
-msgctxt "start progress"
+msgctxt "window title"
 msgid "Commit"
 msgstr "Фиксация"
 
@@ -1012,6 +1016,9 @@ msgstr "Subversion:"
 
 msgid "Converted From:"
 msgstr "Преобразовано из:"
+
+msgid "Original Parent:"
+msgstr ""
 
 msgid "No items to display"
 msgstr "Нет данных для отображения"
@@ -1254,12 +1261,6 @@ msgstr "Имя ловушки не может содержать пробелы,
 msgid "Custom Tools"
 msgstr "Дополнительные инструменты"
 
-msgid "failed to run command\n"
-msgstr "не удалось выполнить команду\n"
-
-msgid "crashed\n"
-msgstr "аварийное завершение\n"
-
 #, python-format
 msgid "command parse error: %s"
 msgstr "ошибка разбора команды: %s"
@@ -1404,6 +1405,13 @@ msgid "Diff not displayed: "
 msgstr "Различия не отображены: "
 
 #, python-format
+msgid "changeset: %s"
+msgstr "набор изменений: %s"
+
+msgid "Initial revision"
+msgstr "Начальная ревизия"
+
+#, python-format
 msgid ""
 "[WARNING] Invalid subrepo revision ID:\n"
 "\t%s\n"
@@ -1422,40 +1430,42 @@ msgstr "Подхранилище инициализировано к ревиз�
 msgid "Subrepo removed from repository."
 msgstr "Подхранилище изъято из хранилища."
 
+msgid "Previously the subrepository was at the following revision:"
+msgstr ""
+
 msgid "Subrepo was not changed."
 msgstr "Подхранилище не изменялось"
+
+msgid "[WARNING] Missing subrepo. Update to this revision to clone it."
+msgstr ""
+
+msgid "[WARNING] Incomplete subrepo. Update to this revision to pull it."
+msgstr ""
 
 msgid "Subrepo state is:"
 msgstr "Состояние подхранилища:"
 
-#, python-format
-msgid "changeset: %s"
-msgstr "набор изменений: %s"
-
 msgid "Revision has changed to:"
 msgstr "Ревизия изменена на:"
+
+#, python-format
+msgid "changeset: %s (not found on subrepository)"
+msgstr ""
 
 msgid "From:"
 msgstr "От:"
 
+msgid ""
+"[WARNING] Missing changed subrepository. Update to this revision to clone it."
+msgstr ""
+
 msgid "Subrepository not found in the working directory."
 msgstr "Подхранилище не не найдено в рабочем каталоге."
 
-msgid "Further subrepository revision information cannot be retrieved."
-msgstr "Невозможно получить больше информации о ревизии подхранилища."
-
-msgid "Subrepository is either damaged or missing some revisions"
-msgstr "Подхранилище повреждено, или в нём каких-то ревизий не хватает"
-
 msgid ""
-"You may need to open the missing subrepository and manually\n"
-"pull the missing revisions from its source repository."
+"[WARNING] Incomplete changed subrepository. Update to this revision to pull "
+"it."
 msgstr ""
-"Возможно, вам нужно открыть отсутствующее подхранилище и вручную\n"
-"затянуть отсутствующие ревизии из его исходного хранилища."
-
-msgid "Initial revision"
-msgstr "Начальная ревизия"
 
 msgid "Not a Mercurial subrepo, not previewable"
 msgstr ""
@@ -1464,6 +1474,9 @@ msgstr ""
 #, python-format
 msgid "Error previewing subrepo: %s"
 msgstr "Ошибка предварительного просмотра подхранилища: %s"
+
+msgid "Subrepo may be damaged or inaccessible."
+msgstr ""
 
 msgid "The subrepository is dirty."
 msgstr "Подхранилище не является «чистым»."
@@ -1626,8 +1639,14 @@ msgstr "Перейти  к"
 msgid "View File at"
 msgstr "Посмотреть файл в"
 
+msgid "Diff File to"
+msgstr ""
+
 msgid "&Originating Revision"
 msgstr ""
+
+msgid "&Local"
+msgstr "&Локальные"
 
 #, python-format
 msgid "&Parent Revision (%d)"
@@ -2338,6 +2357,9 @@ msgstr "Принудительно слить с ожидающими измен
 msgid "Discard all changes from merge target (other) revision"
 msgstr "Отбросить все изменения вплоть до целевой (другой) ревизии слияния"
 
+msgid "&Discard"
+msgstr "Отбросить"
+
 msgid "Confirm Discard Changes"
 msgstr "Подтвердите отбрасывание изменений"
 
@@ -2412,6 +2434,65 @@ msgstr "Пр&именить формат"
 msgid "C&onfigure Format"
 msgstr "К&онфигурировать формат"
 
+msgid "&Commit to Queue..."
+msgstr ""
+
+msgid "Create &New Queue..."
+msgstr ""
+
+msgid "&Rename Active Queue..."
+msgstr ""
+
+msgid "&Delete Queue..."
+msgstr ""
+
+msgid "&Purge Queue..."
+msgstr ""
+
+msgid "Create Patch Queue"
+msgstr ""
+
+msgid "New patch queue name"
+msgstr "Новое имя очереди заплаток"
+
+msgid "Rename Patch Queue"
+msgstr ""
+
+#, python-format
+msgid "Rename patch queue '%s' to"
+msgstr "Переименовать очередь заплаток '%s' в"
+
+msgid "Rename"
+msgstr "Переименовать"
+
+msgid "Delete Patch Queue"
+msgstr ""
+
+msgid "Delete reference to"
+msgstr ""
+
+msgid "Delete"
+msgstr "Уничтожить"
+
+msgid "Purge Patch Queue"
+msgstr ""
+
+msgid "Remove patch directory of"
+msgstr ""
+
+msgid "Purge"
+msgstr "Зачистить"
+
+msgid "Rename Patch"
+msgstr ""
+
+#, python-format
+msgid "Rename patch <b>%s</b> to:"
+msgstr "Переименовать заплатку <b>%s</b> в:"
+
+msgid "no guards"
+msgstr "нет стражей"
+
 msgid "Patch Queue"
 msgstr "Очередь заплаток"
 
@@ -2429,17 +2510,14 @@ msgstr "Затолкнуть"
 msgid "Apply one patch"
 msgstr "Наложить одну заплатку"
 
-msgid "Guards"
-msgstr "Стражи"
+msgid "Set &Guards..."
+msgstr ""
 
 msgid "Configure guards for selected patch"
 msgstr "Настроить стражей для выбранной заплатки"
 
-msgid "Reorder patches"
-msgstr "Переупорядочить заплатки"
-
-msgid "Delete"
-msgstr "Уничтожить"
+msgid "&Delete Patches..."
+msgstr ""
 
 msgid "Delete selected patches"
 msgstr "Уничтожить выбранные заплатки"
@@ -2456,15 +2534,11 @@ msgstr "Вытолкнуть все"
 msgid "Unapply all patches"
 msgstr "Отпороть все заплатки"
 
+msgid "Re&name Patch..."
+msgstr ""
+
 msgid "Patch Queue Actions Toolbar"
 msgstr "Панель действий очереди заплаток"
-
-msgid ""
-"<p>ATTENTION!<br>Guard or comment found.<br>Reordering patches will destroy "
-"them.<br><br>Continue?</p>"
-msgstr ""
-"<p>ВНИМАНИЕ!<br>Найден страж или комментарий.<br>Переупорядочение заплаток "
-"разрушит их.<br><br>Продолжить?</p>"
 
 msgid "Configure guards"
 msgstr "Настроить стражей"
@@ -2473,57 +2547,25 @@ msgstr "Настроить стражей"
 msgid "Input new guards for %s:"
 msgstr "Укажите новых стражей для %s:"
 
-msgid "Guards must begin with \"+\" or \"-\""
-msgstr "Имена стражей должны начинаться с «+» или «-»"
+msgid "Confirm patch queue switch"
+msgstr "Подтвердите переключение очереди заплаток"
 
-msgid "no guards"
-msgstr "нет стражей"
+#, python-format
+msgid "Do you really want to activate patch queue '%s' ?"
+msgstr "Вы правда хотите активировать очередь заплаток '%s' ?"
 
 #, python-format
 msgid "Guards: %d/%d"
 msgstr "Стражи: %d/%d"
 
-msgid "Queues"
-msgstr "Очереди"
-
-msgid "New Patch"
-msgstr "Новая заплатка"
-
-msgid "TortoiseHg Patch Queue"
-msgstr "Очередь заплаток TortoiseHg"
-
-msgid "QCommit"
-msgstr "Фиксировать очередь MQ"
-
-msgid "Create MQ repo"
-msgstr "Создать хранилище MQ"
-
-msgid "Patch commit messages..."
-msgstr "Сообщения фиксации заплаток..."
-
 msgid "MQ options"
 msgstr "Параметры MQ"
-
-msgid "Force use of git extended diff format (--git)"
-msgstr "Использовать формат Git для различий (--git)"
 
 msgid "Force push or pop (--force)"
 msgstr "Проталкивать или затягивать принудительно (--force)"
 
-msgid "Apply patch to its recorded parent (--exact)"
-msgstr "Накладывать заплатку на указанного в ней родителя (--exact)"
-
-msgid "Update date field with current date (--currentdate)"
-msgstr "Изменить дату на текущую дату (--currentdate)"
-
-msgid "Specify an explicit date:"
-msgstr "Явно указать дату:"
-
-msgid "Update author field with current user (--currentuser)"
-msgstr "Изменить автора на текущего автора (--currentuser)"
-
-msgid "Specify an explicit author:"
-msgstr "Явно указать автора:"
+msgid "Tolerate non-conflicting local changes (--keep-changes)"
+msgstr ""
 
 msgid "### patch name ###"
 msgstr "### имя заплатки ###"
@@ -2772,9 +2814,8 @@ msgstr "Уничтожено файлов: %d"
 msgid "Deleted %d files and %d folders"
 msgstr "Уничтожено файлов: %d, папок: %d"
 
-#, python-format
-msgid "Patch remove - %s"
-msgstr "Изъятие заплатки - %s"
+msgid "Delete Patches"
+msgstr ""
 
 msgid "Remove patches from queue?"
 msgstr "Изъять заплатки из очереди?"
@@ -2791,76 +2832,6 @@ msgstr "Новое сообщение заплатки:"
 
 msgid "Patches to fold"
 msgstr "Заплатки для подшивания"
-
-msgid "Manage MQ patch queues"
-msgstr "Управления очередями заплаток MQ"
-
-msgid "Repository:"
-msgstr "Хранилище:"
-
-msgid "Patch queues:"
-msgstr "Очереди заплаток:"
-
-msgid "Reload"
-msgstr "Загрузить заново"
-
-msgid "Activate"
-msgstr "Активировать"
-
-msgid "Rename"
-msgstr "Переименовать"
-
-msgid "Purge"
-msgstr "Зачистить"
-
-msgid "Patches:"
-msgstr "Заплатки:"
-
-msgid "QQueue"
-msgstr "QQueue"
-
-msgid "Confirm patch queue switch"
-msgstr "Подтвердите переключение очереди заплаток"
-
-#, python-format
-msgid "Do you really want to activate patch queue '%s' ?"
-msgstr "Вы правда хотите активировать очередь заплаток '%s' ?"
-
-msgid "TortoiseHg Prompt"
-msgstr "Приглашение TortoiseHg"
-
-msgid "New patch queue name"
-msgstr "Новое имя очереди заплаток"
-
-#, python-format
-msgid "Rename patch queue '%s' to"
-msgstr "Переименовать очередь заплаток '%s' в"
-
-msgid "Confirm patch queue delete"
-msgstr "Подтвердите уничтожение очереди заплаток"
-
-#, python-format
-msgid "Do you really want to delete patch queue '%s' ?"
-msgstr "Вы правда хотите уничтожить очередь заплаток '%s' ?"
-
-msgid "Confirm patch queue purge"
-msgstr "Подтвердите зачистку очереди заплаток"
-
-#, python-format
-msgid ""
-"<p>This will also erase the patchfiles on disk!</p><p>Do you really want to "
-"purge patch queue '%s' ?</p>"
-msgstr ""
-"<p>А ещё, эта операция удалит файлы заплаток на диске!</p><p>Вы правда "
-"хотите зачистить очередь заплаток '%s' </p>"
-
-#, python-format
-msgid "Patch rename - %s"
-msgstr "Переименование заплатки - %s"
-
-#, python-format
-msgid "Rename patch <b>%s</b> to:"
-msgstr "Переименовать заплатку <b>%s</b> в:"
 
 msgid "Rename Error"
 msgstr "Ошибка переименования"
@@ -2887,18 +2858,6 @@ msgstr "Перезаписать существующий файл заплат�
 msgid "Go back and change new patchname"
 msgstr "Вернуться и изменить новое имя файла заплатки"
 
-msgid "Reorder Unapplied Patches"
-msgstr "Переупорядочить неналоженные заплатки"
-
-msgid "Unapplied Patches - drag to reorder"
-msgstr "Неналоженные заплатки - перетащите, чтобы изменить порядок"
-
-msgid "Applied Patches"
-msgstr "Наложенные заплатки"
-
-msgid "Rename patch"
-msgstr "Переименовать заплатку"
-
 msgid "&Undo"
 msgstr "&Отменить"
 
@@ -2916,6 +2875,9 @@ msgstr "В&ставить"
 
 msgid "&Delete"
 msgstr "&Удалить"
+
+msgid "&Editor Options"
+msgstr "&Настройки редактора"
 
 msgid "&Wrap"
 msgstr ""
@@ -2942,6 +2904,18 @@ msgstr "&Невидимый"
 msgid "&AfterIndent"
 msgstr ""
 
+msgid "&TAB Inserts"
+msgstr "Вставки &Табуляторов"
+
+msgid "&Auto"
+msgstr "&Автоматически"
+
+msgid "&TAB"
+msgstr "&Табулятор"
+
+msgid "&Spaces"
+msgstr "&Пробелы"
+
 msgid "EOL &Visibility"
 msgstr "&Видимость конца строчки"
 
@@ -2957,29 +2931,8 @@ msgstr "&Unix"
 msgid "&Mac"
 msgstr "&Mac"
 
-msgid "&TAB Inserts"
-msgstr "Вставки &Табуляторов"
-
-msgid "&Auto"
-msgstr "&Автоматически"
-
-msgid "&TAB"
-msgstr "&Табулятор"
-
-msgid "&Spaces"
-msgstr "&Пробелы"
-
 msgid "&Auto-Complete"
 msgstr "&Автозавершение"
-
-msgid "&Enable"
-msgstr "&Включить"
-
-msgid "&Disable"
-msgstr "&Отключить"
-
-msgid "&Editor Options"
-msgstr "&Настройки редактора"
 
 msgid "### regular expression ###"
 msgstr "### регулярное выражение ###"
@@ -3028,8 +2981,8 @@ msgstr "Хранилище заблокировано"
 msgid "hint:"
 msgstr "подсказка:"
 
-msgid "Keyboard interrupt"
-msgstr "Прерывание с клавиатуры"
+msgid "Keyboard Interrupt"
+msgstr ""
 
 msgid "Close this application?"
 msgstr "Закрыть это приложение?"
@@ -3082,12 +3035,6 @@ msgstr "Перевод текста не удался"
 
 msgid "Unable to translate input to local encoding."
 msgstr "Невозможно транслировать ввод в локальную кодировку"
-
-msgid "Goto"
-msgstr "Перейти на"
-
-msgid "Go"
-msgstr "Перейти"
 
 msgid "Checkmark files to add"
 msgstr "Отметьте файлы для добавления"
@@ -3148,6 +3095,9 @@ msgstr "Перебазировать набор изменений и его п�
 msgid "To rebase destination"
 msgstr "Перебазировать поверх места назначения"
 
+msgid "Swap source and destination"
+msgstr ""
+
 msgid "Keep original changesets"
 msgstr "Сохранять исходные наборы изменений"
 
@@ -3156,6 +3106,9 @@ msgstr "Сохранять исходные имена веток"
 
 msgid "Collapse the rebased changesets "
 msgstr "Свернуть перебазируемые наборы изменений (--collapse) "
+
+msgid "Rebase entire source branch"
+msgstr ""
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3323,6 +3276,9 @@ msgstr "Включить/выключить фильтрацию исключё�
 
 msgid "Show/Hide hidden changesets"
 msgstr "Показать/скрыть скрытые наборы изменений"
+
+msgid "Toggle graft relations visibility"
+msgstr ""
 
 msgid "Keyword Search"
 msgstr "Поиск по ключевым словам"
@@ -3505,6 +3461,12 @@ msgstr "Добавить подхранилище..."
 msgid "Convert an existing repository into a subrepository"
 msgstr "Преобразовать существующее хранилище в подхранилище"
 
+msgid "Remo&ve Subrepository..."
+msgstr ""
+
+msgid "Remove this subrepository from the current revision"
+msgstr ""
+
 msgid "Copy the root path of the repository to the clipboard"
 msgstr "Копировать корневой путь к хранилищу в буфер обмена"
 
@@ -3611,6 +3573,50 @@ msgstr ""
 msgid "Cannot update the .hgsub file in:<br><br>%s"
 msgstr "Не удаётся обновить файл .hgsub из:<br><br>%s"
 
+msgid "Could not open .hgsub file"
+msgstr ""
+
+msgid "Cannot read the .hgsub file.<p>Subrepository removal failed."
+msgstr ""
+
+msgid "Subrepository not found"
+msgstr ""
+
+msgid ""
+"The selected subrepository was not found on the .hgsub file.<p>Perhaps it "
+"has already been removed?"
+msgstr ""
+
+msgid "&Yes"
+msgstr "&Да"
+
+msgid "&No"
+msgstr "&Нет"
+
+msgid "Remove the selected repository?"
+msgstr ""
+
+#, python-format
+msgid ""
+"Do you really want to remove the repository \"<i>%s</i>\" from its parent "
+"repository \"<i>%s</i>\""
+msgstr ""
+
+msgid "Subrepository removed from .hgsub"
+msgstr ""
+
+msgid ""
+"The selected subrepository has been removed from the .hgsub file.<p>Remember "
+"that you must commit this .hgsub change in order to complete the removal of "
+"the subrepository!"
+msgstr ""
+
+msgid "Could not update .hgsub file"
+msgstr ""
+
+msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
+msgstr ""
+
 msgid "New Group"
 msgstr "Новая группа"
 
@@ -3706,10 +3712,6 @@ msgstr "Подробности ревизии"
 msgctxt "tab tooltip"
 msgid "Commit"
 msgstr "Фиксация"
-
-msgctxt "tab tooltip"
-msgid "MQ Patch"
-msgstr "Заплатка MQ"
 
 msgctxt "tab tooltip"
 msgid "Synchronize"
@@ -3849,9 +3851,6 @@ msgstr "Вкладка фиксации не может завершить ра�
 msgid "Sync tab cannot exit"
 msgstr "Вкладка синхронизации не может завершить работу"
 
-msgid "MQ tab cannot exit"
-msgstr "Вкладка MQ не может завершить работу"
-
 msgid "Search tab cannot exit"
 msgstr "Вкладка поиска не может завершить работу"
 
@@ -3924,7 +3923,7 @@ msgstr ""
 msgid "Modi&fy History"
 msgstr ""
 
-msgid "&Unapply Patch (qgoto parent)"
+msgid "&Unapply Patch"
 msgstr ""
 
 msgid "Import to &MQ"
@@ -3933,7 +3932,7 @@ msgstr ""
 msgid "&Finish Patch"
 msgstr ""
 
-msgid "Re&name Patch..."
+msgid "MQ &Options"
 msgstr ""
 
 msgid "&Rebase..."
@@ -3993,6 +3992,9 @@ msgstr "Бисекция - плохая, хорошая..."
 msgid "Compress History..."
 msgstr "Сжать историю"
 
+msgid "Rebase..."
+msgstr ""
+
 msgid "Goto common ancestor"
 msgstr "Перейти к общему предку"
 
@@ -4005,20 +4007,20 @@ msgstr ""
 msgid "Post Selected to Review Board..."
 msgstr "Отправить выбранное в рецензионную коллегию"
 
-msgid "Apply patch (QGoto)"
-msgstr "Наложить заплатку (QGoto)"
+msgid "Apply patch"
+msgstr ""
 
-msgid "QPush --move"
-msgstr "QPush --move"
+msgid "Apply onto original parent"
+msgstr ""
+
+msgid "Apply only this patch"
+msgstr ""
 
 msgid "Fold patches..."
 msgstr "Подшить заплатки..."
 
 msgid "Delete patches..."
 msgstr "Уничтожить заплатки..."
-
-msgid "Reorder patches..."
-msgstr "Переупорядочить заплатки..."
 
 msgid "Rename patch..."
 msgstr "Переименовать заплатку..."
@@ -4184,6 +4186,26 @@ msgstr "Неверная команда"
 msgid "The selected command is empty"
 msgstr "Выбранная команда пуста"
 
+#, python-format
+msgid ""
+"The following error message was returned:\n"
+"\n"
+"<b>%s</b>"
+msgstr ""
+
+msgid ""
+"\n"
+"\n"
+"Please check that the \"thg\" command is valid."
+msgstr ""
+
+msgid "Failed to execute custom TortoiseHg command"
+msgstr ""
+
+#, python-format
+msgid "The command \"%s\" failed (code %d)."
+msgstr ""
+
 msgid "Failed to execute custom command"
 msgstr "Ошибка выполнения заданной команды"
 
@@ -4205,12 +4227,6 @@ msgstr ""
 "\"%s\"\n"
 "\n"
 "Проверьте, что это правильное приложение и путь к нему"
-
-msgid "Unable to start"
-msgstr "Не удалось запуститься"
-
-msgid "Previous command is still running"
-msgstr "Предыдущая команда всё ещё выполняется"
 
 #, python-format
 msgid "Resolve Conflicts - %s"
@@ -4351,26 +4367,31 @@ msgstr ""
 msgid "%s - Revision Details (%s)"
 msgstr ""
 
-msgid "Cannot revert to working directory"
-msgstr "Невозможно вернуть к рабочему каталогу"
-
-msgid "Reverting to the working directory revision does not make sense"
-msgstr "Возвращение к ревизии рабочего каталога не имеет смысла"
-
 #, python-format
 msgid "Revert - %s"
 msgstr "Вернуть - %s"
 
 #, python-format
-msgid "<b>Revert %s to its contents at revision %d?</b>"
-msgstr "<b>Вернуть %s к его содержимому в ревизии %d?</b>"
+msgid "<b>Revert %s to its contents at the following revision?</b>"
+msgstr ""
 
 #, python-format
-msgid "<b>Revert %d files to their contents at revision %d?</b>"
-msgstr "<b>Вернуть %d файл(ов) к их содержимому из ревизии %d?</b>"
+msgid "<b>Revert %d files to their contents at the following revision?</b>"
+msgstr ""
 
 msgid "Revert all files to this revision"
 msgstr "Вернуть все файлы к этой ревизии"
+
+#, python-format
+msgid "revision %d's first parent (i.e. revision %d)"
+msgstr ""
+
+#, python-format
+msgid "revision %d's second parent (i.e. revision %d)"
+msgstr ""
+
+msgid "null revision (i.e. remove file(s))"
+msgstr ""
 
 msgid "Confirm Revert"
 msgstr "Подтвердите возвращение"
@@ -4867,9 +4888,6 @@ msgstr "ревизия, которую нужно слить"
 msgid "thg merge [[-r] REV]"
 msgstr "thg merge [[-r] РЕВИЗИЯ]"
 
-msgid "thg mq"
-msgstr "thg mq"
-
 msgid "a revision to post"
 msgstr ""
 
@@ -4881,15 +4899,6 @@ msgstr ""
 
 msgid "thg purge"
 msgstr "thg purge"
-
-msgid "thg qqueue"
-msgstr "thg qqueue"
-
-msgid "Please enable the MQ extension first."
-msgstr "Пожалуйста, сначала включите расширение MQ."
-
-msgid "thg qreorder"
-msgstr "thg qreorder"
 
 msgid "keep original changesets"
 msgstr "сохранять исходные наборы изменений"
@@ -4967,6 +4976,27 @@ msgstr "thg shellconfig"
 msgid "thg shelve"
 msgstr "thg shelve"
 
+msgid "sign even if the sigfile is modified"
+msgstr ""
+
+msgid "make the signature local"
+msgstr ""
+
+msgid "the key id to sign with"
+msgstr ""
+
+msgid "do not commit the sigfile after signing"
+msgstr ""
+
+msgid "use <text> as commit message"
+msgstr "Использовать <текст> в качестве сообщения фиксации"
+
+msgid "thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]"
+msgstr ""
+
+msgid "Please enable the Gpg extension first."
+msgstr ""
+
 msgid "show files without changes"
 msgstr "показать файлы без изменений"
 
@@ -5002,9 +5032,6 @@ msgstr "ревизия, которую нужно отметить"
 
 msgid "remove a tag"
 msgstr "удалить метку"
-
-msgid "use <text> as commit message"
-msgstr "Использовать <текст> в качестве сообщения фиксации"
 
 msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
 msgstr "thg tag [-f] [-l] [-m ТЕКСТ] [-r РЕВИЗИЯ] [ИМЯ]"
@@ -5113,6 +5140,22 @@ msgstr "&Нет"
 
 msgid "&Unspecified"
 msgstr "&Не указано"
+
+#, python-format
+msgid "%dpt"
+msgstr ""
+
+msgid "Bold"
+msgstr ""
+
+msgid "Italic"
+msgstr ""
+
+msgid "Strike"
+msgstr ""
+
+msgid "Underline"
+msgstr ""
 
 msgid "&Set..."
 msgstr "&Установить..."
@@ -5364,7 +5407,7 @@ msgid ""
 "Specify which task buttons you want to show on the task toolbar and in which "
 "order.<br>Type a list of the task button names. Add separators by putting \"|"
 "\" between task button names.<br>Valid names are: log commit mq sync "
-"manifest grep and pbranch.<br>Default: log commit mq manifest grep pbranch | "
+"manifest grep and pbranch.<br>Default: log commit manifest grep pbranch | "
 "sync"
 msgstr ""
 
@@ -5425,42 +5468,6 @@ msgstr ""
 "пример: укажите «qbase qparent qtip» чтобы скрыть стандартные метки, "
 "вставляемые расширением MQ. По умолчанию: Пусто"
 
-msgid "After Pull Operation"
-msgstr "Что делать после затягивания"
-
-msgid ""
-"Operation which is performed directly after a successful pull. update "
-"equates to pull --update, fetch equates to the fetch extension, rebase "
-"equates to pull --rebase, updateorrebase equates to pull -u --rebase.  "
-"Default: none"
-msgstr ""
-
-msgid "Default Push"
-msgstr "Место для проталкивания по умолчанию"
-
-msgid ""
-"Select the revisions that will be pushed by default, whenever you click the "
-"Push button.<ul><li><b>all</b>: The default. Push all changes in <i>all "
-"branches</i>.<li><b>branch</b>: Push all changes in the <i>current branch</"
-"i>.<li><b>revision</b>: Push the changes in the current branch <i><u>up to</"
-"u> the current revision</i>.</ul><p>Default: all"
-msgstr ""
-"Выберите ревизии, которые будут проталкиваться по умолчанию, когда вы "
-"наживаете кнопку Протолкнуть.<ul><li><b>all</b>: По умолчанию. Проталкивать "
-"все изменения <i>из всех веток</i>.<li><b>branch</b>: Проталкивать все "
-"изменения <i>из текущей ветки</i>.<li><b>revision</b>: Проталкивать все "
-"изменения из текущей ветки <i><u>вплоть до</u> текущей ревизии</i>.</"
-"ul><p>По умолчанию: все"
-
-msgid "Confirm Push"
-msgstr ""
-
-msgid ""
-"Determines if TortoiseHg should show a confirmation dialog before pushing "
-"changesets. If False, push will be performed without any confirmation "
-"dialog. Default: True"
-msgstr ""
-
 msgid "Activate Bookmarks"
 msgstr "Включить закладки"
 
@@ -5473,15 +5480,6 @@ msgid ""
 "<li><b>prompt</b>: The default. Show a prompt when updating to a revision "
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
-msgstr ""
-
-msgid "Target combo"
-msgstr ""
-
-msgid ""
-"Select if TortoiseHg will show a target combo in the sync toolbar."
-"<ul><li><b>auto</b>: The default. Show the combo if more than one target "
-"configured.<li><b>always</b>: Always show the combo.</ul><p>Default: auto"
 msgstr ""
 
 msgctxt "config item"
@@ -5620,6 +5618,62 @@ msgid ""
 "files in a commit. If True, a confirmation dialog will be showed. If False, "
 "selected deleted files will be included in the commit with no confirmation "
 "dialog.  Default: True"
+msgstr ""
+
+msgid "Sync"
+msgstr ""
+
+msgid "After Pull Operation"
+msgstr "Что делать после затягивания"
+
+msgid ""
+"Operation which is performed directly after a successful pull. update "
+"equates to pull --update, fetch equates to the fetch extension, rebase "
+"equates to pull --rebase, updateorrebase equates to pull -u --rebase.  "
+"Default: none"
+msgstr ""
+
+msgid "Default Push"
+msgstr "Место для проталкивания по умолчанию"
+
+msgid ""
+"Select the revisions that will be pushed by default, whenever you click the "
+"Push button.<ul><li><b>all</b>: The default. Push all changes in <i>all "
+"branches</i>.<li><b>branch</b>: Push all changes in the <i>current branch</"
+"i>.<li><b>revision</b>: Push the changes in the current branch <i><u>up to</"
+"u> the current revision</i>.</ul><p>Default: all"
+msgstr ""
+"Выберите ревизии, которые будут проталкиваться по умолчанию, когда вы "
+"наживаете кнопку Протолкнуть.<ul><li><b>all</b>: По умолчанию. Проталкивать "
+"все изменения <i>из всех веток</i>.<li><b>branch</b>: Проталкивать все "
+"изменения <i>из текущей ветки</i>.<li><b>revision</b>: Проталкивать все "
+"изменения из текущей ветки <i><u>вплоть до</u> текущей ревизии</i>.</"
+"ul><p>По умолчанию: все"
+
+msgid "Confirm Push"
+msgstr ""
+
+msgid ""
+"Determines if TortoiseHg should show a confirmation dialog before pushing "
+"changesets. If False, push will be performed without any confirmation "
+"dialog. Default: True"
+msgstr ""
+
+msgid "Target Combo"
+msgstr ""
+
+msgid ""
+"Select if TortoiseHg will show a target combo in the sync toolbar."
+"<ul><li><b>auto</b>: The default. Show the combo if more than one target "
+"configured.<li><b>always</b>: Always show the combo.</ul><p>Default: auto"
+msgstr ""
+
+msgid "SSH Command"
+msgstr ""
+
+msgid ""
+"Command to use for SSH connections.<p>Default: \"ssh\" or \"TortoisePlink."
+"exe -ssh -2\" (Windows)"
 msgstr ""
 
 msgid "Server"
@@ -6064,6 +6118,20 @@ msgstr ""
 "<li><b>commit</b> (фиксация): Обновлять  состояние системы отслеживания "
 "проблем после успешной фиксации. </ul><p>По умолчанию: never"
 
+msgid "Changeset Link"
+msgstr ""
+
+msgid ""
+"A \"template string\" that, when set, turns the revision number and short "
+"hashes that are shown on the revision panels into links.<br>The \"template "
+"string\" uses a \"mercurial template\"-like syntax that currently accepts "
+"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
+"revision id (note that {node} on its own is currently unsupported).<li>"
+"{rev} : replaced by the revision number.</ul>For example, in order to link "
+"to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
+"tortoisehg/thg/commits/{node|short}"
+msgstr ""
+
 msgid "Path to review board example \"http://demo.reviewboard.org\""
 msgstr ""
 "Путь к примерам работы рецензионной коллегии \"http://demo.reviewboard.org\""
@@ -6261,11 +6329,11 @@ msgstr ""
 msgid "Apply changes before exit?"
 msgstr "Применить изменения перед выходом?"
 
-msgid "&Yes"
-msgstr "&Да"
-
 msgid "&No (discard changes)"
 msgstr "&Нет (отбросить изменения)"
+
+msgid "Reload"
+msgstr "Загрузить заново"
 
 msgid "Settings File:"
 msgstr "Файл настроек:"
@@ -7222,9 +7290,6 @@ msgstr "Хотите отбросить их и продолжить?"
 msgid "&Yes (--force)"
 msgstr "&Да (--force)"
 
-msgid "&No"
-msgstr "&Нет"
-
 msgid "Confirm Strip"
 msgstr "Подтвердите срезание"
 
@@ -7233,6 +7298,9 @@ msgstr "ожидается ответ"
 
 msgid "password: "
 msgstr "пароль: "
+
+msgid "TortoiseHg Prompt"
+msgstr "Приглашение TortoiseHg"
 
 msgid "abort: "
 msgstr "прервано: "
@@ -7323,14 +7391,6 @@ msgstr "прервано: ошибка: %s\n"
 
 msgid "broken pipe\n"
 msgstr "канал ввода-вывода повреждён\n"
-
-#, python-format
-msgid "[command terminated by user %s]"
-msgstr "[команда завершена пользователем %s]"
-
-#, python-format
-msgid "[command interrupted %s]"
-msgstr "[команда прервана %s]"
 
 msgid "Update to:"
 msgstr "Обновить до:"
@@ -7563,9 +7623,6 @@ msgstr "Незафиксированное слияние - пожалуйста
 msgid "Revert files to local or other parent?"
 msgstr "Вернуть файлы к локальному или другому родителю?"
 
-msgid "&Local"
-msgstr "&Локальные"
-
 msgid "&Other"
 msgstr "&Другие"
 
@@ -7589,6 +7646,12 @@ msgstr "Подтвердите уничтожение неверсионных �
 
 msgid "Delete the following unversioned files?"
 msgstr "Удалить эти неверсионные файлы?"
+
+msgid "Confirm Discard"
+msgstr "Подтвердите отбрасывание"
+
+msgid "Discard outstanding changes to working directory?"
+msgstr "Отбросить имеющиеся изменения в рабочем каталоге?"
 
 msgid "Config files (*.conf *.config *.ini)"
 msgstr ""
@@ -7626,9 +7689,6 @@ msgstr "Файл конфигурации"
 msgid "Open"
 msgstr "Открыть"
 
-msgid "TortoiseHg Workbench"
-msgstr "Рабочая среда TortoiseHg"
-
 msgid "New &Workbench"
 msgstr "Новая рабочая среда"
 
@@ -7646,9 +7706,6 @@ msgstr "&Файл"
 
 msgid "&View"
 msgstr "&Вид"
-
-msgid "Workbench Toolbars"
-msgstr "Панели рабочей среды"
 
 msgid "&Repository"
 msgstr "&Хранилище"
@@ -7692,9 +7749,6 @@ msgstr "Сохранять открытые хранилища при выход
 msgid "&Commit"
 msgstr "&Фиксация"
 
-msgid "M&Q Patch"
-msgstr ""
-
 msgid "&Patch Branch"
 msgstr "&Ветка заплаток"
 
@@ -7727,6 +7781,9 @@ msgstr "Загрузить &все ревизии"
 
 msgid "Load all revisions into graph"
 msgstr "Загрузить все ревизии в граф"
+
+msgid "Go to current revision"
+msgstr "Перейти к текущей ревизии"
 
 msgid "&Goto Revision..."
 msgstr "&Перейти к ревизии"
@@ -7772,9 +7829,6 @@ msgstr "О &Qt"
 
 msgid "&About TortoiseHg"
 msgstr "О &TortoiseHg"
-
-msgid "Go to current revision"
-msgstr "Перейти к текущей ревизии"
 
 msgid "&Filter Toolbar"
 msgstr "Панель &фильтра"
@@ -7883,6 +7937,9 @@ msgstr ""
 
 msgid "Failed to open repository"
 msgstr "Не удалось открыть хранилище"
+
+msgid "TortoiseHg Workbench"
+msgstr "Рабочая среда TortoiseHg"
 
 #, python-format
 msgid "%s - TortoiseHg Workbench - %s"
@@ -8168,6 +8225,9 @@ msgstr "Синхронизировать с привнесённым храни�
 #, python-format
 msgid "repository %s not found"
 msgstr "хранилище %s не найдено"
+
+#~ msgid "Several icons are courtesy of the TortoiseSVN project"
+#~ msgstr "Некоторые значки взяты из проекта TortoiseSVN"
 
 #~ msgid "undo recent commit"
 #~ msgstr "отменить последнюю фиксацию"
@@ -9805,6 +9865,9 @@ msgstr "хранилище %s не найдено"
 #~ msgid "revision number, changeset ID, branch or tag"
 #~ msgstr "номер ревизии, ID набора изменений, ветка или метка"
 
+#~ msgid "A new version of TortoiseHg is ready for download!"
+#~ msgstr "Новая версия TortoiseHg доступна для загрузки!"
+
 #~ msgid "Bookmark \"%s\" has been added"
 #~ msgstr "Закладка \"%s\" была добавлена"
 
@@ -10190,15 +10253,6 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Toolbar Style"
 #~ msgstr "Стиль Панели Инструментов"
 
-#~ msgid ""
-#~ "Operation which is performed directly after a successful pull. update "
-#~ "equates to pull --update, fetch equates to the fetch extension, rebase "
-#~ "equates to pull --rebase.  Default: none"
-#~ msgstr ""
-#~ "Действие выполняемое сразу после успешного затягивания. update "
-#~ "равносильно pull --update, fetch равносильно использованию расширения "
-#~ "fetch, rebase равносильно pull --rebase. По умолчанию: Ничего"
-
 #~ msgid "Coloring Style"
 #~ msgstr "Стиль Расцветки"
 
@@ -10564,11 +10618,33 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Finished committing and pushing"
 #~ msgstr "Фиксация и проталкивание завершены"
 
-#~ msgid "<p>But could not run Workbench for it.</p><p>%s</p>"
-#~ msgstr "<p>Но не удалось запустить рабочую среду для него.</p><p>%s</p>"
-
 #~ msgid "New Patch Name"
 #~ msgstr "Название новой заплатки"
+
+#~ msgid "Repository:"
+#~ msgstr "Хранилище:"
+
+#~ msgid "Patch queues:"
+#~ msgstr "Очереди заплаток:"
+
+#~ msgid "Activate"
+#~ msgstr "Активировать"
+
+#~ msgid "Patches:"
+#~ msgstr "Заплатки:"
+
+#~ msgid "Confirm patch queue purge"
+#~ msgstr "Подтвердите зачистку очереди заплаток"
+
+#~ msgid ""
+#~ "<p>This will also erase the patchfiles on disk!</p><p>Do you really want "
+#~ "to purge patch queue '%s' ?</p>"
+#~ msgstr ""
+#~ "<p>А ещё, эта операция удалит файлы заплаток на диске!</p><p>Вы правда "
+#~ "хотите зачистить очередь заплаток '%s' </p>"
+
+#~ msgid "Please enable the MQ extension first."
+#~ msgstr "Пожалуйста, сначала включите расширение MQ."
 
 #~ msgid "Patch Branch"
 #~ msgstr "Ветка заплатки"
@@ -10582,9 +10658,6 @@ msgstr "хранилище %s не найдено"
 #~ "Пожалуйста, выберите один из вариантов продолжения:\n"
 #~ "\n"
 
-#~ msgid "Config files (*.conf *.config *.ini);;Any files (*)"
-#~ msgstr "Файлы конфигурации (*.conf *.config *.ini);;Любые файлы (*)"
-
 #~ msgid "Verify"
 #~ msgstr "Проверить целостность"
 
@@ -10593,6 +10666,12 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "Changeset Description"
 #~ msgstr "Описание набора изменений"
+
+#~ msgid "Manage MQ patch queues"
+#~ msgstr "Управления очередями заплаток MQ"
+
+#~ msgid "Rename patch"
+#~ msgstr "Переименовать заплатку"
 
 #~ msgid "Mark unresolved"
 #~ msgstr "Отметить неулаженным"
@@ -10741,20 +10820,11 @@ msgstr "хранилище %s не найдено"
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "удаление резервного файла : %r\n"
 
-#~ msgid "Failed to open Email dialog"
-#~ msgstr "Не удалось открыть диалог электронной почты"
-
 #~ msgid "Diff to Local"
 #~ msgstr "Сравнить с локальным"
 
 #~ msgid "Refresh required"
 #~ msgstr "Требуется обновить изображение"
-
-#~ msgid "Filename required"
-#~ msgstr "Требуется имя файла"
-
-#~ msgid "Could not find or initialize the repository from folder<p>%s</p>"
-#~ msgstr "Не могу найти или инициализировать хранилище в папке<p>%s</p>"
 
 #~ msgid "unknown hunk type: %s"
 #~ msgstr "неизвестный тип лоскута: %s"
@@ -10903,9 +10973,6 @@ msgstr "хранилище %s не найдено"
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "лоскут %d уже наложен в строке %d (степень схожести %d)\n"
 
-#~ msgid "thg sync"
-#~ msgstr "thg sync"
-
 #~ msgid ""
 #~ "Comma separated list of inclusion patterns.  By default, the entire "
 #~ "repository is searched."
@@ -10935,9 +11002,6 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Use Expander"
 #~ msgstr "Использовать расширитель"
 
-#~ msgid "annotate requires a single filename\n"
-#~ msgstr "для аннотирования требуется имя файла\n"
-
 #~ msgid "Annotate"
 #~ msgstr "Аннотировать"
 
@@ -10952,12 +11016,6 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "_Annotate Parent"
 #~ msgstr "_Аннотировать родителя"
-
-#~ msgid "&Annotate"
-#~ msgstr "&Аннотировать"
-
-#~ msgid "Hg file log viewer - %s"
-#~ msgstr "Просмотр файла журнала hg - %s"
 
 #~ msgid "_Revert File Contents"
 #~ msgstr "_Вернуть содержимое файла"
@@ -11039,6 +11097,21 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "Universal Date"
 #~ msgstr "Время по Гринвичу"
+
+#~ msgid "Confirm patch queue delete"
+#~ msgstr "Подтвердите уничтожение очереди заплаток"
+
+#~ msgid "Do you really want to delete patch queue '%s' ?"
+#~ msgstr "Вы правда хотите уничтожить очередь заплаток '%s' ?"
+
+#~ msgid "Reorder Unapplied Patches"
+#~ msgstr "Переупорядочить неналоженные заплатки"
+
+#~ msgid "Unapplied Patches - drag to reorder"
+#~ msgstr "Неналоженные заплатки - перетащите, чтобы изменить порядок"
+
+#~ msgid "Applied Patches"
+#~ msgstr "Наложенные заплатки"
 
 #~ msgid "Bundle..."
 #~ msgstr "Комплект..."
@@ -11211,9 +11284,6 @@ msgstr "хранилище %s не найдено"
 #~ msgid "applying shelved patch\n"
 #~ msgstr "накладывается отложенная заплатка\n"
 
-#~ msgid "Failed to open Review Board dialog"
-#~ msgstr "Не удалось открыть диалог рецензионной коллегии"
-
 #~ msgid "Starting Revision:"
 #~ msgstr "Начальная ревизия:"
 
@@ -11223,26 +11293,14 @@ msgstr "хранилище %s не найдено"
 #~ msgid "Subversion"
 #~ msgstr "Subversion"
 
-#~ msgid ""
-#~ "Invalid reviewboard plugin. Please download the mercurial reviewboard "
-#~ "plugin version 3.5 or higher from the website below.\n"
-#~ "\n"
-#~ " %s"
-#~ msgstr ""
-#~ "Неверный плагин рецензионной коллегии. Пожалуйста, скачайте плагин "
-#~ "mercurial для рецензионной коллегии версии 3.5 или выше с нижеуказанного "
-#~ "сайта.\n"
-#~ "\n"
-#~ " %s"
+#~ msgid "QQueue"
+#~ msgstr "QQueue"
 
-#~ msgid "Cannot open non mercurial repositories or subrepositories"
-#~ msgstr "Не удаётся открыть не-mercurial хранилища или подхранилища"
+#~ msgid "Goto"
+#~ msgstr "Перейти на"
 
-#~ msgid "\"%s\" is not a valid repository inside \"%s\""
-#~ msgstr "\"%s\" не является допустимым хранилищем внутри \"%s\""
-
-#~ msgid "Failed to open Manifest dialog"
-#~ msgstr "Неудача при открытии окна обзора изменений"
+#~ msgid "Go"
+#~ msgstr "Перейти"
 
 #~ msgid "Backout..."
 #~ msgstr "Обратить изменения..."
@@ -11364,15 +11422,6 @@ msgstr "хранилище %s не найдено"
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "прервано: восстановление резервной копии не удалось, %s\n"
 
-#~ msgid ""
-#~ "When committing, require that a reference to an issue be specified.  If "
-#~ "enabled, the regex configured in 'Issue Regex' must find a match in the "
-#~ "commit message."
-#~ msgstr ""
-#~ "Требовать или нет указания ссылки на проблему во время фиксации. Если "
-#~ "включено, то «Регулярное выражение для проблемы» должно находить "
-#~ "совпадение в сообщении фиксации."
-
 #~ msgid "unshelve backup aborted\n"
 #~ msgstr "восстановление отложенных изменений из резервной копии прервано\n"
 
@@ -11397,16 +11446,6 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "Use merge tool:"
 #~ msgstr "Использовать средство слияния"
-
-#~ msgid "A shelf name cannot contain :#/\\<>|"
-#~ msgstr "Имя долгого ящика не может содержать :#/\\<>|"
-
-#~ msgid ""
-#~ "Invalid default push revision: %s.Please check your mercurial "
-#~ "configuration (tortoisehg.defaultpush)"
-#~ msgstr ""
-#~ "Неверная ревизия для проталкивания по умолчанию: %s. Проверьте вашу "
-#~ "конфигурацию Mercurial (tortoisehg.defaultpush)"
 
 #~ msgid "name of the webdir config file (DEPRECATED)"
 #~ msgstr "название конфигурационного файла webdir (УСТАРЕЛО)"
@@ -11479,6 +11518,3 @@ msgstr "хранилище %s не найдено"
 
 #~ msgid "abandon shelved changes"
 #~ msgstr "Отказаться от отложенных изменений"
-
-#~ msgid "The specified line number \"%s\" is invalid."
-#~ msgstr "Указанный номер строки \"%s\" недопустим."

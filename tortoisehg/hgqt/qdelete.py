@@ -11,53 +11,32 @@ from PyQt4.QtGui import *
 from tortoisehg.util import hglib
 from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui
 
 class QDeleteDialog(QDialog):
-    output = pyqtSignal(QString, QString)
-    makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, patches, parent):
+    def __init__(self, patches, parent):
         super(QDeleteDialog, self).__init__(parent)
-        self.setWindowTitle(_('Patch remove - %s') % repo.displayname)
+        self.setWindowTitle(_('Delete Patches'))
         self.setWindowIcon(qtlib.geticon('hg-qdelete'))
-        f = self.windowFlags()
-        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
-        self.patches = patches
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint)
 
         self.setLayout(QVBoxLayout())
 
         msg = _('Remove patches from queue?')
-        patchesu = u'<li>'.join([hglib.tounicode(p) for p in patches])
+        patchesu = u'<li>'.join(patches)
         lbl = QLabel(u'<b>%s<ul><li>%s</ul></b>' % (msg, patchesu))
         self.layout().addWidget(lbl)
 
-        self.keepchk = QCheckBox(_('Keep patch files'))
-        self.keepchk.setChecked(True)
-        self.layout().addWidget(self.keepchk)
-
-        self.cmd = cmdui.Runner(False, self)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
+        self._keepchk = QCheckBox(_('Keep patch files'))
+        self._keepchk.setChecked(True)
+        self.layout().addWidget(self._keepchk)
 
         BB = QDialogButtonBox
         bbox = QDialogButtonBox(BB.Ok|BB.Cancel)
         bbox.accepted.connect(self.accept)
         bbox.rejected.connect(self.reject)
         self.layout().addWidget(bbox)
-        self.bbox = bbox
 
-    def accept(self):
-        cmdline = ['qdelete', '--repository', self.repo.root]
-        if self.keepchk.isChecked():
-            cmdline += ['--keep']
-        cmdline += self.patches
-        self.repo.incrementBusyCount()
-        self.cmd.commandFinished.connect(self._finishOff)
-        self.cmd.run(cmdline)
-
-    @pyqtSlot()
-    def _finishOff(self):
-        self.repo.decrementBusyCount()
-        self.reject()
+    def options(self):
+        return {'keep': self._keepchk.isChecked()}

@@ -5,15 +5,13 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, sys, time
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
 
-from tortoisehg.util import hglib, paths
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, localgettext
-from tortoisehg.hgqt import qtlib, qscilib, thread
+from tortoisehg.hgqt import cmdcore, qtlib, qscilib
 
 local = localgettext()
 
@@ -133,39 +131,17 @@ class ThgStatusBar(QStatusBar):
             pm.status.setText('%s %s' % (unicode(pos), item))
             pm.unknown()
 
-
-def _quotecmdarg(arg):
-    # only for display; no use to construct command string for os.system()
-    if not arg or ' ' in arg or '\\' in arg or '"' in arg:
-        return '"%s"' % arg.replace('"', '\\"')
+def updateStatusMessage(stbar, session):
+    """Update status bar to show the status of the given session"""
+    if not session.isFinished():
+        stbar.showMessage(_('Running...'))
+    elif session.isAborted():
+        stbar.showMessage(_('Terminated by user'))
+    elif session.exitCode() == 0:
+        stbar.showMessage(_('Finished'))
     else:
-        return arg
+        stbar.showMessage(_('Failed!'), True)
 
-def _prettifycmdline(cmdline):
-    r"""Build pretty command-line string for display
-
-    >>> _prettifycmdline(['--repository', 'foo', 'status'])
-    'status'
-    >>> _prettifycmdline(['--cwd', 'foo', 'resolve', '--', '--repository'])
-    'resolve -- --repository'
-    >>> _prettifycmdline(['log', 'foo\\bar', '', 'foo bar', 'foo"bar'])
-    'log "foo\\bar" "" "foo bar" "foo\\"bar"'
-    """
-    try:
-        argcount = cmdline.index('--')
-    except ValueError:
-        argcount = len(cmdline)
-    printables = []
-    pos = 0
-    while pos < argcount:
-        if cmdline[pos] in ('-R', '--repository', '--cwd'):
-            pos += 2
-        else:
-            printables.append(cmdline[pos])
-            pos += 1
-    printables.extend(cmdline[argcount:])
-
-    return ' '.join(_quotecmdarg(e) for e in printables)
 
 class Core(QObject):
     """Core functionality for running Mercurial command.
@@ -182,13 +158,10 @@ class Core(QObject):
     def __init__(self, logWindow, parent):
         super(Core, self).__init__(parent)
 
-        self.thread = None
-        self.extproc = None
-        self.stbar = None
-        self.queue = []
+        self._agent = cmdcore.CmdAgent(self)
+        self._session = cmdcore.nullCmdSession()
         self.rawoutlines = []
-        self.display = None
-        self.useproc = False
+        self.stbar = None
         if logWindow:
             self.outputLog = LogWidget()
             self.outputLog.installEventFilter(qscilib.KeyPressInterceptor(self))
@@ -198,175 +171,69 @@ class Core(QObject):
 
     def run(self, cmdline, *cmdlines, **opts):
         '''Execute or queue Mercurial command'''
-        self.display = opts.get('display')
-        self.useproc = opts.get('useproc', False)
-        self.queue.append(cmdline)
-        if len(cmdlines):
-            self.queue.extend(cmdlines)
-        if self.useproc:
-            self.runproc()
-        elif not self.running():
-            self.runNext()
+        display = opts.get('display')
+        worker = opts.get('useproc', False) and 'proc' or None
+        ucmdlines = [map(hglib.tounicode, xs) for xs in (cmdline,) + cmdlines]
+        udisplay = hglib.tounicode(display)
+        sess = self._agent.runCommandSequence(ucmdlines, self,
+                                              display=udisplay, worker=worker)
+        sess.commandFinished.connect(self.onCommandFinished)
+        sess.outputReceived.connect(self.onOutputReceived)
+        sess.progressReceived.connect(self.onProgressReceived)
+        self._session = sess
+        # client widget assumes that the command starts immediately
+        self.onCommandStarted()
 
     def cancel(self):
         '''Cancel running Mercurial command'''
         if self.running():
-            try:
-                if self.extproc:
-                    self.extproc.close()
-                elif self.thread:
-                    self.thread.abort()
-            except AttributeError:
-                pass
+            self._session.abort()
             self.commandCanceling.emit()
 
-    def setStbar(self, stbar):
-        self.stbar = stbar
-
     def running(self):
-        try:
-            if self.extproc:
-                return self.extproc.state() != QProcess.NotRunning
-            elif self.thread:
-                # keep "running" until just before emitting commandFinished.
-                # thread.isRunning() is cleared earlier than onThreadFinished,
-                # because inter-thread signal is queued.
-                return True
-        except AttributeError:
-            pass
-        return False
+        # pending session is "running" in cmdui world
+        return not self._session.isFinished()
 
     def rawoutput(self):
         return ''.join(self.rawoutlines)
 
+    def setStbar(self, stbar):
+        self.stbar = stbar
+
     ### Private Method ###
-
-    def runproc(self):
-        'Run mercurial command in separate process'
-
-        exepath = None
-        if hasattr(sys, 'frozen'):
-            progdir = paths.get_prog_root()
-            exe = os.path.join(progdir, 'hg.exe')
-            if os.path.exists(exe):
-                exepath = exe
-        if not exepath:
-            exepath = paths.find_in_path('hg')
-
-        def start(cmdline, display):
-            self.rawoutlines = []
-            if display:
-                cmd = '%% hg %s\n' % display
-            else:
-                cmd = '%% hg %s\n' % _prettifycmdline(cmdline)
-            self.output.emit(cmd, 'control')
-            proc.start(exepath, cmdline, QIODevice.ReadOnly)
-
-        @pyqtSlot(int)
-        def finished(ret):
-            if ret:
-                msg = _('[command returned code %d %%s]') % int(ret)
-            else:
-                msg = _('[command completed successfully %s]')
-            msg = msg % time.asctime() + '\n'
-            self.output.emit(msg, 'control')
-            if ret == 0 and self.queue:
-                start(self.queue.pop(0), '')
-            else:
-                self.queue = []
-                self.extproc = None
-                self.commandFinished.emit(ret)
-
-        def handleerror(error):
-            if error == QProcess.FailedToStart:
-                self.output.emit(_('failed to start command\n'),
-                                 'ui.error')
-                finished(-1)
-            elif error != QProcess.Crashed:
-                self.output.emit(_('error while running command\n'),
-                                 'ui.error')
-
-        def stdout():
-            data = proc.readAllStandardOutput().data()
-            self.rawoutlines.append(data)
-            self.output.emit(hglib.tounicode(data), '')
-
-        def stderr():
-            data = proc.readAllStandardError().data()
-            self.output.emit(hglib.tounicode(data), 'ui.error')
-
-        self.extproc = proc = QProcess(self)
-        proc.started.connect(self.onCommandStarted)
-        proc.finished.connect(finished)
-        proc.readyReadStandardOutput.connect(stdout)
-        proc.readyReadStandardError.connect(stderr)
-        proc.error.connect(handleerror)
-        start(self.queue.pop(0), self.display)
-
-
-    def runNext(self):
-        if not self.queue:
-            return False
-
-        cmdline = self.queue.pop(0)
-
-        display = self.display or _prettifycmdline(cmdline)
-        self.thread = thread.CmdThread(cmdline, display, self.parent())
-        self.thread.started.connect(self.onCommandStarted)
-        self.thread.commandFinished.connect(self.onThreadFinished)
-
-        self.thread.outputReceived.connect(self.output)
-        self.thread.progressReceived.connect(self.progress)
-        if self.stbar:
-            self.thread.progressReceived.connect(self.stbar.progress)
-
-        self.thread.start()
-        return True
 
     def clearOutput(self):
         if hasattr(self, 'outputLog'):
-            self.outputLog.clear()
+            self.outputLog.clearLog()
 
     ### Signal Handlers ###
 
-    @pyqtSlot()
     def onCommandStarted(self):
-        if self.stbar:
-            self.stbar.showMessage(_('Running...'))
-
+        self.rawoutlines = []
         self.commandStarted.emit()
+        if self.stbar:
+            updateStatusMessage(self.stbar, self._session)
 
     @pyqtSlot(int)
-    def onThreadFinished(self, ret):
+    def onCommandFinished(self, ret):
         if self.stbar:
-            error = False
-            if ret is None:
-                self.stbar.clear()
-                if self.thread.abortbyuser:
-                    status = _('Terminated by user')
-                else:
-                    status = _('Terminated')
-            elif ret == 0:
-                status = _('Finished')
-            else:
-                status = _('Failed!')
-                error = True
-            self.stbar.showMessage(status, error)
-
-        self.display = None
-        self.thread.setParent(None)  # assist gc
-        if ret == 0 and self.runNext():
-            return # run next command
-        else:
-            self.queue = []
-            text = self.thread.rawoutput.join('')
-            self.thread = None
-            self.rawoutlines = [hglib.fromunicode(text, 'replace')]
-
+            updateStatusMessage(self.stbar, self._session)
         self.commandFinished.emit(ret)
 
+    @pyqtSlot(QString, QString)
+    def onOutputReceived(self, msg, label):
+        if label != 'control':
+            self.rawoutlines.append(hglib.fromunicode(msg, 'replace'))
+        self.output.emit(msg, label)
 
-class LogWidget(QsciScintilla):
+    @pyqtSlot(QString, object, QString, QString, object)
+    def onProgressReceived(self, topic, pos, item, unit, total):
+        self.progress.emit(topic, pos, item, unit, total)
+        if self.stbar:
+            self.stbar.progress(topic, pos, item, unit, total)
+
+
+class LogWidget(qscilib.ScintillaCompat):
     """Output log viewer"""
 
     def __init__(self, parent=None):
@@ -415,6 +282,17 @@ class LogWidget(QsciScintilla):
         return iter(self._markers[l] for l in str(label).split()
                     if l in self._markers)
 
+    @pyqtSlot()
+    def clearLog(self):
+        """This slot can be overridden by subclass to do more actions"""
+        self.clear()
+
+    def contextMenuEvent(self, event):
+        menu = self.createStandardContextMenu()
+        menu.addSeparator()
+        menu.addAction(_('Clea&r Log'), self.clearLog)
+        menu.exec_(event.globalPos())
+        menu.setParent(None)
 
 class Widget(QWidget):
     """An embeddable widget for running Mercurial command"""
@@ -482,158 +360,109 @@ class Widget(QWidget):
             self.setShowOutput(True)
         self.commandFinished.emit(ret)
 
-class Dialog(QDialog):
-    """A dialog for running random Mercurial command"""
+class CmdSessionDialog(QDialog):
+    """Dialog to monitor running Mercurial commands"""
 
-    def __init__(self, cmdline, parent=None):
-        super(Dialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-
-        self.core = Core(True, self)
-        self.core.commandFinished.connect(self.onCommandFinished)
+    def __init__(self, parent=None):
+        super(CmdSessionDialog, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint)
 
         vbox = QVBoxLayout()
         vbox.setSpacing(4)
         vbox.setContentsMargins(5, 5, 5, 5)
 
         # command output area
-        vbox.addWidget(self.core.outputLog, 1)
+        self._outputLog = LogWidget(self)
+        self._outputLog.installEventFilter(qscilib.KeyPressInterceptor(self))
+        vbox.addWidget(self._outputLog, 1)
 
         ## status and progress labels
-        self.stbar = ThgStatusBar()
-        self.stbar.setSizeGripEnabled(False)
-        self.core.setStbar(self.stbar)
-        vbox.addWidget(self.stbar)
+        self._stbar = ThgStatusBar()
+        self._stbar.setSizeGripEnabled(False)
+        vbox.addWidget(self._stbar)
 
         # bottom buttons
         buttons = QDialogButtonBox()
-        self.cancelBtn = buttons.addButton(QDialogButtonBox.Cancel)
-        self.cancelBtn.clicked.connect(self.core.cancel)
-        self.core.commandCanceling.connect(self.commandCanceling)
+        self._cancelBtn = buttons.addButton(QDialogButtonBox.Cancel)
+        self._cancelBtn.clicked.connect(self.abortCommand)
 
-        self.closeBtn = buttons.addButton(QDialogButtonBox.Close)
-        self.closeBtn.setHidden(True)
-        self.closeBtn.clicked.connect(self.reject)
+        self._closeBtn = buttons.addButton(QDialogButtonBox.Close)
+        self._closeBtn.clicked.connect(self.reject)
 
-        self.detailBtn = buttons.addButton(_('Detail'),
+        self._detailBtn = buttons.addButton(_('Detail'),
                                             QDialogButtonBox.ResetRole)
-        self.detailBtn.setAutoDefault(False)
-        self.detailBtn.setCheckable(True)
-        self.detailBtn.setChecked(True)
-        self.detailBtn.toggled.connect(self.setShowOutput)
+        self._detailBtn.setAutoDefault(False)
+        self._detailBtn.setCheckable(True)
+        self._detailBtn.setChecked(True)
+        self._detailBtn.toggled.connect(self.setLogVisible)
         vbox.addWidget(buttons)
 
         self.setLayout(vbox)
         self.setWindowTitle(_('TortoiseHg Command Dialog'))
         self.resize(540, 420)
 
-        # start command
-        self.core.run(cmdline)
+        self._session = cmdcore.nullCmdSession()
+        self._updateUi()
 
-    def setShowOutput(self, visible):
+    def setSession(self, sess):
+        """Start watching the given command session"""
+        assert self._session.isFinished()
+        self._session = sess
+        sess.commandFinished.connect(self._updateUi)
+        sess.outputReceived.connect(self._outputLog.appendLog)
+        sess.progressReceived.connect(self._stbar.progress)
+        self._updateUi()
+
+    @pyqtSlot()
+    def abortCommand(self):
+        self._session.abort()
+        self._cancelBtn.setDisabled(True)
+
+    def setLogVisible(self, visible):
         """show/hide command output"""
-        self.core.outputLog.setVisible(visible)
-        self.detailBtn.setChecked(visible)
+        self._outputLog.setVisible(visible)
+        self._detailBtn.setChecked(visible)
 
         # workaround to adjust only window height
         self.setMinimumWidth(self.width())
         self.adjustSize()
         self.setMinimumWidth(0)
 
-    ### Private Method ###
-
     def reject(self):
-        if self.core.running():
+        if not self._session.isFinished():
             ret = QMessageBox.question(self, _('Confirm Exit'),
                         _('Mercurial command is still running.\n'
                           'Are you sure you want to terminate?'),
                         QMessageBox.Yes | QMessageBox.No,
                         QMessageBox.No)
             if ret == QMessageBox.Yes:
-                self.core.cancel()
+                self.abortCommand()
             # don't close dialog
             return
 
         # close dialog
-        if self.returnCode == 0:
+        if self._session.exitCode() == 0:
             self.accept()  # means command successfully finished
         else:
-            super(Dialog, self).reject()
+            super(CmdSessionDialog, self).reject()
 
     @pyqtSlot()
-    def commandCanceling(self):
-        self.cancelBtn.setDisabled(True)
+    def _updateUi(self):
+        updateStatusMessage(self._stbar, self._session)
+        self._cancelBtn.setVisible(not self._session.isFinished())
+        self._closeBtn.setVisible(self._session.isFinished())
+        if self._session.isFinished():
+            self._closeBtn.setFocus()
 
-    @pyqtSlot(int)
-    def onCommandFinished(self, ret):
-        self.returnCode = ret
-        self.cancelBtn.setHidden(True)
-        self.closeBtn.setShown(True)
-        self.closeBtn.setFocus()
 
-class Runner(QObject):
-    """A component for running Mercurial command without UI
-
-    This command runner doesn't show any UI element unless it gets a warning
-    or an error while the command is running.  Once an error or a warning is
-    received, it pops-up a small dialog which contains the command log.
-    """
-
-    commandStarted = pyqtSignal()
-    commandFinished = pyqtSignal(int)
-    commandCanceling = pyqtSignal()
-
-    output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    makeLogVisible = pyqtSignal(bool)
-
-    def __init__(self, logWindow, parent):
-        super(Runner, self).__init__(parent)
-        self.title = _('TortoiseHg')
-        self.core = Core(logWindow, parent)
-        self.core.commandStarted.connect(self.commandStarted)
-        self.core.commandFinished.connect(self.onCommandFinished)
-        self.core.commandCanceling.connect(self.commandCanceling)
-        self.core.output.connect(self.output)
-        self.core.progress.connect(self.progress)
-
-    ### Public Methods ###
-
-    def setTitle(self, title):
-        self.title = title
-
-    def run(self, cmdline, *args, **opts):
-        self.core.run(cmdline, *args, **opts)
-
-    def running(self):
-        return self.core.running()
-
-    def cancel(self):
-        self.core.cancel()
-
-    def outputShown(self):
-        if hasattr(self, 'dlg'):
-            return self.dlg.isVisible()
-        else:
-            return False
-
-    def setShowOutput(self, visible=True):
-        if not hasattr(self.core, 'outputLog'):
-            return
-        if not hasattr(self, 'dlg'):
-            self.dlg = dlg = QDialog(self.parent())
-            dlg.setWindowTitle(self.title)
-            dlg.setWindowFlags(Qt.Dialog)
-            dlg.setLayout(QVBoxLayout())
-            dlg.layout().addWidget(self.core.outputLog)
-            self.core.outputLog.setMinimumSize(460, 320)
-        self.dlg.setVisible(visible)
-
-    ### Signal Handler ###
-
-    @pyqtSlot(int)
-    def onCommandFinished(self, ret):
-        if ret != 0:
-            self.makeLogVisible.emit(True)
-            self.setShowOutput(True)
-        self.commandFinished.emit(ret)
+def errorMessageBox(session, parent=None, title=None):
+    """Open a message box to report the error of the given session"""
+    if not title:
+        title = _('Command Error')
+    reason = session.errorString()
+    text = session.warningString()
+    if text:
+        text += '\n\n'
+    text += _('[Code: %d]') % session.exitCode()
+    return qtlib.WarningMsgBox(title, reason, text, parent=parent)

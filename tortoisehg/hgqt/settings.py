@@ -53,7 +53,7 @@ class SettingsCombo(QComboBox):
         else:
             settings = opts['settings']
             slist = settings.value('settings/'+opts['cpath']).toStringList()
-            self.previous = [s for s in slist if s]
+            self.previous = [unicode(s) for s in slist if s]
         self.setMinimumWidth(ENTRY_WIDTH)
 
     def resetList(self):
@@ -101,7 +101,7 @@ class SettingsCombo(QComboBox):
         self.resetList()
 
     def value(self):
-        utext = self.currentText()
+        utext = unicode(self.currentText())
         if utext == _unspecstr:
             return None
         if ('nohist' in self.opts or utext in self.defaults + self.previous
@@ -219,11 +219,28 @@ class TextEntry(QTextEdit):
         return os.linesep.join(lines)
 
 
+def _describeFont(font):
+    if not font:
+        return _unspecstr
+
+    s = unicode(font.family())
+    s += ", "  + _("%dpt") % font.pointSize()
+    if font.bold():
+        s += ", " + _("Bold")
+    if font.italic():
+        s += ", " + _("Italic")
+    if font.strikeOut():
+        s += ", " + _("Strike")
+    if font.underline():
+        s += ", " + _("Underline")
+    return s
+
 class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
         QWidget.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
+        self.font = None
 
         self.label = QLabel()
         self.setButton = QPushButton(_('&Set...'))
@@ -245,45 +262,41 @@ class FontEntry(QWidget):
         self.fname = cpath[11:]
         self.setMinimumWidth(ENTRY_WIDTH)
 
-    def onSetClicked(self, checked):
+    def onSetClicked(self):
         thgf = qtlib.getfont(self.fname)
-        origfont = self.currentFont() or thgf.font()
+        origfont = self.font or thgf.font()
         font, isok = QFontDialog.getFont(origfont, self)
         if not isok:
             return
-        self.label.setText(font.toString())
+        self.setCurrentFont(font)
         thgf.setFont(font)
 
-    def onClearClicked(self, checked):
-        self.label.setText(_unspecstr)
+    def onClearClicked(self):
+        self.setCurrentFont(None)
 
-    def currentFont(self):
-        """currently selected QFont if specified"""
-        if not self.value():
-            return None
-
-        f = QFont()
-        f.fromString(hglib.tounicode(self.value()))
-        return f
+    def setCurrentFont(self, font):
+        self.font = font
+        self.label.setText(_describeFont(self.font))
 
     ## common APIs for all edit widgets
 
     def setValue(self, curvalue):
-        self.curvalue = curvalue
         if curvalue:
-            self.label.setText(hglib.tounicode(curvalue))
+            self.curvalue = QFont()
+            self.curvalue.fromString(hglib.tounicode(curvalue))
         else:
-            self.label.setText(_unspecstr)
+            self.curvalue = None
+        self.setCurrentFont(self.curvalue)
 
     def value(self):
-        utext = self.label.text()
-        if utext == _unspecstr:
+        if not self.font:
             return None
-        else:
-            return hglib.fromunicode(utext)
+
+        utext = self.font.toString()
+        return hglib.fromunicode(utext)
 
     def isDirty(self):
-        return self.value() != self.curvalue
+        return self.font != self.curvalue
 
 class SettingsCheckBox(QCheckBox):
     def __init__(self, parent=None, **opts):
@@ -291,8 +304,6 @@ class SettingsCheckBox(QCheckBox):
         self.opts = opts
         self.curvalue = None
         self.setText(opts['label'])
-        self.valfunc = self.opts['valfunc']
-        self.toggled.connect(self.valfunc)
 
     def setValue(self, curvalue):
         if self.curvalue == None:
@@ -617,7 +628,7 @@ INFO = (
           'context menu. Default: True'),
         restartneeded=True, globalonly=True),
     _fi(_('Default widget'), 'tortoisehg.defaultwidget', (genDefaultCombo,
-        ['revdetails', 'commit', 'mq', 'sync', 'manifest', 'search']),
+        ['revdetails', 'commit', 'sync', 'manifest', 'search']),
         _('Select the initial widget that will be shown when opening a '
           'repository. '
           'Default: revdetails')),
@@ -653,7 +664,7 @@ INFO = (
           'and in which order.<br>Type a list of the task button names. '
           'Add separators by putting "|" between task button names.<br>'
           'Valid names are: log commit mq sync manifest grep and pbranch.<br>'
-          'Default: log commit mq manifest grep pbranch | sync'),
+          'Default: log commit manifest grep pbranch | sync'),
         restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
@@ -679,27 +690,6 @@ INFO = (
           'Useful example: Specify "qbase qparent qtip" to hide the '
           'standard tags inserted by the Mercurial Queues Extension. '
           'Default: None (leave blank)')),
-    _fi(_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
-        ['none', 'update', 'fetch', 'rebase', 'updateorrebase']),
-        _('Operation which is performed directly after a successful pull. '
-          'update equates to pull --update, fetch equates to the fetch '
-          'extension, rebase equates to pull --rebase, '
-          'updateorrebase equates to pull -u --rebase.  Default: none')),
-    _fi(_('Default Push'), 'tortoisehg.defaultpush',
-        (genDefaultCombo, ['all', 'branch', 'revision']),
-        _('Select the revisions that will be pushed by default, '
-          'whenever you click the Push button.'
-          '<ul><li><b>all</b>: The default. Push all changes in '
-          '<i>all branches</i>.'
-          '<li><b>branch</b>: Push all changes in the <i>current branch</i>.'
-          '<li><b>revision</b>: Push the changes in the current branch '
-          '<i><u>up to</u> the current revision</i>.</ul><p>'
-          'Default: all')),
-    _fi(_('Confirm Push'), 'tortoisehg.confirmpush', genBoolRBGroup,
-        _('Determines if TortoiseHg should show a confirmation dialog '
-          'before pushing changesets. '
-          'If False, push will be performed without any confirmation dialog. '
-          'Default: True')),
     _fi(_('Activate Bookmarks'), 'tortoisehg.activatebookmarks',
         (genDefaultCombo, ['auto', 'prompt', 'never']),
         _('Select when TortoiseHg will show a prompt to activate a bookmark '
@@ -713,14 +703,6 @@ INFO = (
           '<li><b>never</b>: Never show any prompt to activate any bookmarks.'
           '</ul><p>'
           'Default: prompt')),
-    _fi(_('Target combo'), 'tortoisehg.workbench.target-combo',
-        (genDefaultCombo, ['auto', 'always']),
-        _('Select if TortoiseHg will show a target combo in the sync toolbar.'
-          '<ul><li><b>auto</b>: The default. Show the combo if more than one '
-          'target configured.'
-          '<li><b>always</b>: Always show the combo.'
-          '</ul><p>'
-          'Default: auto')),
     )),
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'},
  (
@@ -787,6 +769,41 @@ INFO = (
           'If True, a confirmation dialog will be showed. '
           'If False, selected deleted files will be included in the '
           'commit with no confirmation dialog.  Default: True')),
+    )),
+
+({'name': 'sync', 'label': _('Sync'), 'icon': 'thg-sync'}, (
+    _fi(_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
+        ['none', 'update', 'fetch', 'rebase', 'updateorrebase']),
+        _('Operation which is performed directly after a successful pull. '
+          'update equates to pull --update, fetch equates to the fetch '
+          'extension, rebase equates to pull --rebase, '
+          'updateorrebase equates to pull -u --rebase.  Default: none')),
+    _fi(_('Default Push'), 'tortoisehg.defaultpush',
+        (genDefaultCombo, ['all', 'branch', 'revision']),
+        _('Select the revisions that will be pushed by default, '
+          'whenever you click the Push button.'
+          '<ul><li><b>all</b>: The default. Push all changes in '
+          '<i>all branches</i>.'
+          '<li><b>branch</b>: Push all changes in the <i>current branch</i>.'
+          '<li><b>revision</b>: Push the changes in the current branch '
+          '<i><u>up to</u> the current revision</i>.</ul><p>'
+          'Default: all')),
+    _fi(_('Confirm Push'), 'tortoisehg.confirmpush', genBoolRBGroup,
+        _('Determines if TortoiseHg should show a confirmation dialog '
+          'before pushing changesets. '
+          'If False, push will be performed without any confirmation dialog. '
+          'Default: True')),
+    _fi(_('Target Combo'), 'tortoisehg.workbench.target-combo',
+        (genDefaultCombo, ['auto', 'always']),
+        _('Select if TortoiseHg will show a target combo in the sync toolbar.'
+          '<ul><li><b>auto</b>: The default. Show the combo if more than one '
+          'target configured.'
+          '<li><b>always</b>: Always show the combo.'
+          '</ul><p>'
+          'Default: auto')),
+    _fi(_('SSH Command'), 'ui.ssh', genEditCombo,
+        _('Command to use for SSH connections.<p>'
+          'Default: "ssh" or "TortoisePlink.exe -ssh -2" (Windows)')),
     )),
 
 ({'name': 'web', 'label': _('Server'), 'icon': 'proxy'}, (
@@ -1003,6 +1020,20 @@ INFO = (
           'successful commit.</ul><p>'
           'Default: never'),
         master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
+    _fi(_('Changeset Link'), 'tortoisehg.changeset.link', genEditCombo,
+        _('A "template string" that, when set, turns the revision number and '
+          'short hashes that are shown on the revision panels into links.<br>'
+          'The "template string" uses a "mercurial template"-like syntax that '
+          'currently accepts two template expressions:'
+          '<ul>'
+          '<li>{node|short} : replaced by the 12 digit revision id (note that '
+          '{node} on its own is currently unsupported).'
+          '<li>{rev} : replaced by the revision number.'
+          '</ul>'
+          'For example, in order to link to bitbucket commit pages you can '
+          'set this to:<br>'
+          'https://bitbucket.org/tortoisehg/thg/commits/{node|short}'
+        )),
     )),
 
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
@@ -1382,7 +1413,6 @@ class SettingsForm(QWidget):
     def refreshPage(self, page):
         name, info, widgets = page
         if name == 'extensions':
-            extsmentioned = False
             for row, w in enumerate(widgets):
                 key = w.opts['label']
                 for fullkey in (key, 'hgext.%s' % key, 'hgext/%s' % key):
@@ -1393,19 +1423,14 @@ class SettingsForm(QWidget):
                     curvalue = False
                 elif len(val) and val[0] == '!':
                     curvalue = False
-                    extsmentioned = True
                 else:
                     curvalue = True
-                    extsmentioned = True
                 w.setValue(curvalue)
                 if val == None:
                     w.opts['cpath'] = 'extensions.' + key
                 else:
                     w.opts['cpath'] = 'extensions.' + fullkey
-            if not extsmentioned:
-                # make sure widgets are shown properly,
-                # even when no extensions mentioned in the config file
-                self.validateextensions()
+            self.validateextensions()
         elif name == 'tools':
             self.toolsFrame.refresh()
         elif name == 'hooks':
@@ -1477,14 +1502,14 @@ class SettingsForm(QWidget):
             else:
                 func = e.values
                 w = func(opts)
-            w.installEventFilter(self)
             if e.globalonly:
                 w.setEnabled(self.rcpath == scmutil.userrcpath())
             lbl = QLabel(e.label)
-            lbl.installEventFilter(self)
             lbl.setToolTip(e.tooltip)
             widgets.append(w)
             if e.isVisible():
+                lbl.installEventFilter(self)
+                w.installEventFilter(self)
                 form.addRow(lbl, w)
 
         # assign the master to widgets that have a master
@@ -1510,10 +1535,11 @@ class SettingsForm(QWidget):
         extsinfo = ()
         for i, name in enumerate(sorted(allexts)):
             tt = hglib.tounicode(allexts[name])
-            opts = {'label':name, 'cpath':'extensions.' + name, 'tooltip':tt,
-                    'valfunc':self.validateextensions}
+            opts = {'label':name, 'cpath':'extensions.' + name, 'tooltip':tt}
             w = genCheckBox(opts)
             w.installEventFilter(self)
+            w.clicked.connect(self.validateextensions)
+
             row, col = i / maxrows, i % maxrows
             grid.addWidget(w, col, row)
             widgets.append(w)
