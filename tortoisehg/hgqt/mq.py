@@ -10,31 +10,502 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import patch
-from hgext import mq as mqmod
+from mercurial import error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, qscilib, thgrepo, status
-from tortoisehg.hgqt import qqueue, qreorder, thgimport, messageentry, mqutil
+from tortoisehg.hgqt import cmdcore, qtlib, cmdui, thgrepo
+from tortoisehg.hgqt import commit, qdelete, qfold, qrename, mqutil
 from tortoisehg.hgqt.qtlib import geticon
 
-# TODO
-# keep original file name in file list item
-# more wctx functions
+class QueueManagementActions(QObject):
+    """Container for patch queue management actions"""
+
+    def __init__(self, parent=None):
+        super(QueueManagementActions, self).__init__(parent)
+        assert parent is None or isinstance(parent, QWidget)
+        self._repoagent = None
+        self._cmdsession = cmdcore.nullCmdSession()
+
+        self._actions = {
+            'commitQueue': QAction(_('&Commit to Queue...'), self),
+            'createQueue': QAction(_('Create &New Queue...'), self),
+            'renameQueue': QAction(_('&Rename Active Queue...'), self),
+            'deleteQueue': QAction(_('&Delete Queue...'), self),
+            'purgeQueue':  QAction(_('&Purge Queue...'), self),
+            }
+        for name, action in self._actions.iteritems():
+            action.triggered.connect(getattr(self, '_' + name))
+        self._updateActions()
+
+    def setRepoAgent(self, repoagent):
+        self._repoagent = repoagent
+        self._updateActions()
+
+    def _updateActions(self):
+        enabled = bool(self._repoagent) and self._cmdsession.isFinished()
+        for action in self._actions.itervalues():
+            action.setEnabled(enabled)
+
+    def createMenu(self, parent=None):
+        menu = QMenu(parent)
+        menu.addAction(self._actions['commitQueue'])
+        menu.addSeparator()
+        for name in ['createQueue', 'renameQueue', 'deleteQueue', 'purgeQueue']:
+            menu.addAction(self._actions[name])
+        return menu
+
+    @pyqtSlot()
+    def _commitQueue(self):
+        assert self._repoagent
+        repo = self._repoagent.rawRepo()
+        if os.path.isdir(repo.mq.join('.hg')):
+            self._launchCommitDialog()
+            return
+        if not self._cmdsession.isFinished():
+            return
+
+        cmdline = hglib.buildcmdargs('init', mq=True)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self._onQueueRepoInitialized)
+        self._updateActions()
+
+    @pyqtSlot(int)
+    def _onQueueRepoInitialized(self, ret):
+        if ret == 0:
+            self._launchCommitDialog()
+        self._onCommandFinished(ret)
+
+    def _launchCommitDialog(self):
+        if not self._repoagent:
+            return
+        repo = self._repoagent.rawRepo()
+        # TODO: do not instantiate mqrepo here
+        mqrepo = thgrepo.repository(None, repo.mq.path)
+        repoagent = mqrepo._pyqtobj
+        dlg = commit.CommitDialog(repoagent, [], {}, self.parent())
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.exec_()
+
+    def switchQueue(self, name):
+        return self._runQqueue(None, name)
+
+    @pyqtSlot()
+    def _createQueue(self):
+        name = self._getNewName(_('Create Patch Queue'),
+                                _('New patch queue name'),
+                                _('Create'))
+        if name:
+            self._runQqueue('create', name)
+
+    @pyqtSlot()
+    def _renameQueue(self):
+        curname = self._activeName()
+        newname = self._getNewName(_('Rename Patch Queue'),
+                                   _("Rename patch queue '%s' to") % curname,
+                                   _('Rename'))
+        if newname and curname != newname:
+            self._runQqueue('rename', newname)
+
+    @pyqtSlot()
+    def _deleteQueue(self):
+        name = self._getExistingName(_('Delete Patch Queue'),
+                                     _('Delete reference to'),
+                                     _('Delete'))
+        if name:
+            self._runQqueueInactive('delete', name)
+
+    @pyqtSlot()
+    def _purgeQueue(self):
+        name = self._getExistingName(_('Purge Patch Queue'),
+                                     _('Remove patch directory of'),
+                                     _('Purge'))
+        if name:
+            self._runQqueueInactive('purge', name)
+
+    def _activeName(self):
+        assert self._repoagent
+        repo = self._repoagent.rawRepo()
+        return hglib.tounicode(repo.thgactivemqname)
+
+    def _existingNames(self):
+        assert self._repoagent
+        return mqutil.getQQueues(self._repoagent.rawRepo())
+
+    def _getNewName(self, title, labeltext, oktext):
+        dlg = QInputDialog(self.parent())
+        dlg.setWindowTitle(title)
+        dlg.setLabelText(labeltext)
+        dlg.setOkButtonText(oktext)
+        if dlg.exec_():
+            return dlg.textValue()
+
+    def _getExistingName(self, title, labeltext, oktext):
+        dlg = QInputDialog(self.parent())
+        dlg.setWindowTitle(title)
+        dlg.setLabelText(labeltext)
+        dlg.setOkButtonText(oktext)
+        dlg.setComboBoxEditable(False)
+        dlg.setComboBoxItems(self._existingNames())
+        dlg.setTextValue(self._activeName())
+        if dlg.exec_():
+            return dlg.textValue()
+
+    def abort(self):
+        self._cmdsession.abort()
+
+    def _runQqueue(self, op, name):
+        """Execute qqueue operation against the specified queue"""
+        assert self._repoagent
+        if not self._cmdsession.isFinished():
+            return cmdcore.nullCmdSession()
+
+        opts = {}
+        if op:
+            opts[op] = True
+        cmdline = hglib.buildcmdargs('qqueue', name, **opts)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self._onCommandFinished)
+        self._updateActions()
+        return sess
+
+    def _runQqueueInactive(self, op, name):
+        """Execute qqueue operation after inactivating the specified queue"""
+        assert self._repoagent
+        if not self._cmdsession.isFinished():
+            return cmdcore.nullCmdSession()
+
+        if name != self._activeName():
+            return self._runQqueue(op, name)
+
+        sacrifices = [n for n in self._existingNames() if n != name]
+        if not sacrifices:
+            return self._runQqueue(op, name)  # will exit with error
+
+        opts = {}
+        if op:
+            opts[op] = True
+        cmdlines = [hglib.buildcmdargs('qqueue', sacrifices[0]),
+                    hglib.buildcmdargs('qqueue', name, **opts)]
+        self._cmdsession = sess = self._repoagent.runCommandSequence(cmdlines,
+                                                                     self)
+        sess.commandFinished.connect(self._onCommandFinished)
+        self._updateActions()
+        return sess
+
+    @pyqtSlot(int)
+    def _onCommandFinished(self, ret):
+        if ret != 0:
+            cmdui.errorMessageBox(self._cmdsession, self.parent())
+        self._updateActions()
+
+
+class PatchQueueActions(QObject):
+    """Container for MQ patch actions except for queue management"""
+
+    def __init__(self, parent=None):
+        super(PatchQueueActions, self).__init__(parent)
+        assert parent is None or isinstance(parent, QWidget)
+        self._repoagent = None
+        self._cmdsession = cmdcore.nullCmdSession()
+        self._opts = {'force': False, 'keep_changes': False}
+
+    def setRepoAgent(self, repoagent):
+        self._repoagent = repoagent
+
+    def gotoPatch(self, patch):
+        opts = {'force': self._opts['force'],
+                'keep_changes': self._opts['keep_changes']}
+        return self._runCommand('qgoto', [patch], opts, self._onPushFinished)
+
+    @pyqtSlot()
+    def pushPatch(self, patch=None, move=False, exact=False):
+        return self._runPush(patch, move=move, exact=exact)
+
+    @pyqtSlot()
+    def pushAllPatches(self):
+        return self._runPush(None, all=True)
+
+    def _runPush(self, patch, **opts):
+        opts['force'] = self._opts['force']
+        if not opts.get('exact'):
+            # --exact and --keep-changes cannot be used simultaneously
+            # thus we ignore the "default" setting for --keep-changes
+            # when --exact is explicitly set
+            opts['keep_changes'] = self._opts['keep_changes']
+        return self._runCommand('qpush', [patch], opts, self._onPushFinished)
+
+    @pyqtSlot()
+    def popPatch(self, patch=None):
+        return self._runPop(patch)
+
+    @pyqtSlot()
+    def popAllPatches(self):
+        return self._runPop(None, all=True)
+
+    def _runPop(self, patch, **opts):
+        opts['force'] = self._opts['force']
+        opts['keep_changes'] = self._opts['keep_changes']
+        return self._runCommand('qpop', [patch], opts)
+
+    def deletePatches(self, patches):
+        dlg = qdelete.QDeleteDialog(patches, self.parent())
+        if not dlg.exec_():
+            return cmdcore.nullCmdSession()
+        return self._runCommand('qdelete', patches, dlg.options())
+
+    def foldPatches(self, patches):
+        lpatches = map(hglib.fromunicode, patches)
+        dlg = qfold.QFoldDialog(self._repoagent, lpatches, self.parent())
+        dlg.finished.connect(dlg.deleteLater)
+        if not dlg.exec_():
+            return cmdcore.nullCmdSession()
+        return self._runCommand('qfold', dlg.patches(), dlg.options())
+
+    def renamePatch(self, patch):
+        newname = patch
+        while True:
+            newname = self._getNewName(_('Rename Patch'),
+                                       _('Rename patch <b>%s</b> to:') % patch,
+                                       newname, _('Rename'))
+            if not newname or patch == newname:
+                return cmdcore.nullCmdSession()
+            repo = self._repoagent.rawRepo()
+            newfilename = hglib.tounicode(
+                repo.mq.join(hglib.fromunicode(newname)))
+            ok = qrename.checkPatchname(newfilename, self.parent())
+            if ok:
+                break
+        return self._runCommand('qrename', [patch, newname], {})
+
+    def guardPatch(self, patch, guards):
+        args = [patch]
+        args.extend(guards)
+        opts = {'none': not guards}
+        return self._runCommand('qguard', args, opts)
+
+    def selectGuards(self, guards):
+        opts = {'none': not guards}
+        return self._runCommand('qselect', guards, opts)
+
+    def _getNewName(self, title, labeltext, curvalue, oktext):
+        dlg = QInputDialog(self.parent())
+        dlg.setWindowTitle(title)
+        dlg.setLabelText(labeltext)
+        dlg.setTextValue(curvalue)
+        dlg.setOkButtonText(oktext)
+        if dlg.exec_():
+            return unicode(dlg.textValue())
+
+    def abort(self):
+        self._cmdsession.abort()
+
+    def _runCommand(self, name, args, opts, finishslot=None):
+        assert self._repoagent
+        if not self._cmdsession.isFinished():
+            return cmdcore.nullCmdSession()
+        cmdline = hglib.buildcmdargs(name, *args, **opts)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(finishslot or self._onCommandFinished)
+        return sess
+
+    @pyqtSlot(int)
+    def _onPushFinished(self, ret):
+        if ret != 0 and self._repoagent:
+            repo = self._repoagent.rawRepo()
+            output = hglib.fromunicode(self._cmdsession.warningString())
+            if mqutil.checkForRejects(repo, output, self.parent()) > 0:
+                ret = 0  # no further error dialog
+        if ret != 0:
+            cmdui.errorMessageBox(self._cmdsession, self.parent())
+
+    @pyqtSlot(int)
+    def _onCommandFinished(self, ret):
+        if ret != 0:
+            cmdui.errorMessageBox(self._cmdsession, self.parent())
+
+    @pyqtSlot()
+    def launchOptionsDialog(self):
+        dlg = OptionsDialog(self._opts, self.parent())
+        dlg.finished.connect(dlg.deleteLater)
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        if dlg.exec_() == QDialog.Accepted:
+            self._opts.update(dlg.outopts)
+
+
+class PatchQueueModel(QAbstractListModel):
+    """List of all patches in active queue"""
+
+    def __init__(self, repoagent, parent=None):
+        super(PatchQueueModel, self).__init__(parent)
+        self._repoagent = repoagent
+        self._repoagent.repositoryChanged.connect(self._updateCache)
+        self._series = []
+        self._seriesguards = []
+        self._statusmap = {}  # patch: applied/guarded/unguarded
+        self._buildCache()
+
+    @pyqtSlot()
+    def _updateCache(self):
+        # optimize range of changed signals if necessary
+        repo = self._repoagent.rawRepo()
+        if self._series == repo.mq.series[::-1]:
+            self._buildCache()
+        else:
+            self._updateCacheAndLayout()
+        self.dataChanged.emit(self.index(0), self.index(self.rowCount() - 1))
+
+    def _updateCacheAndLayout(self):
+        self.layoutAboutToBeChanged.emit()
+        oldindexes = [(oi, self._series[oi.row()])
+                      for oi in self.persistentIndexList()]
+        self._buildCache()
+        for oi, patch in oldindexes:
+            try:
+                ni = self.index(self._series.index(patch), oi.column())
+            except ValueError:
+                ni = QModelIndex()
+            self.changePersistentIndex(oi, ni)
+        self.layoutChanged.emit()
+
+    def _buildCache(self):
+        repo = self._repoagent.rawRepo()
+        self._series = repo.mq.series[::-1]
+        self._seriesguards = [list(xs) for xs in reversed(repo.mq.seriesguards)]
+
+        self._statusmap.clear()
+        self._statusmap.update((p.name, 'applied') for p in repo.mq.applied)
+        for i, patch in enumerate(repo.mq.series):
+            if patch in self._statusmap:
+                continue  # applied
+            pushable, why = repo.mq.pushable(i)
+            if not pushable:
+                self._statusmap[patch] = 'guarded'
+            elif why is not None:
+                self._statusmap[patch] = 'unguarded'
+
+    def data(self, index, role=Qt.DisplayRole):
+        if not index.isValid():
+            return
+        if role in (Qt.DisplayRole, Qt.EditRole):
+            return self.patchName(index)
+        if role == Qt.DecorationRole:
+            return self._statusIcon(index)
+        if role == Qt.FontRole:
+            return self._statusFont(index)
+        if role == Qt.ToolTipRole:
+            return self._toolTip(index)
+
+    def flags(self, index):
+        flags = super(PatchQueueModel, self).flags(index)
+        if not index.isValid():
+            return flags | Qt.ItemIsDropEnabled  # insertion point
+        patch = self._series[index.row()]
+        if self._statusmap.get(patch) != 'applied':
+            flags |= Qt.ItemIsDragEnabled
+        return flags
+
+    def rowCount(self, parent=QModelIndex()):
+        if parent.isValid():
+            return 0
+        return len(self._series)
+
+    def appliedCount(self):
+        return sum(s == 'applied' for s in self._statusmap.itervalues())
+
+    def patchName(self, index):
+        if not index.isValid():
+            return ''
+        return hglib.tounicode(self._series[index.row()])
+
+    def patchGuards(self, index):
+        if not index.isValid():
+            return []
+        return map(hglib.tounicode, self._seriesguards[index.row()])
+
+    def isApplied(self, index):
+        if not index.isValid():
+            return False
+        patch = self._series[index.row()]
+        return self._statusmap.get(patch) == 'applied'
+
+    def _statusIcon(self, index):
+        assert index.isValid()
+        patch = self._series[index.row()]
+        status = self._statusmap.get(patch)
+        if status:
+            return qtlib.geticon('hg-patch-%s' % status)
+
+    def _statusFont(self, index):
+        assert index.isValid()
+        patch = self._series[index.row()]
+        status = self._statusmap.get(patch)
+        if status not in ('applied', 'guarded'):
+            return
+        f = QFont()
+        f.setBold(status == 'applied')
+        f.setItalic(status == 'guarded')
+        return f
+
+    def _toolTip(self, index):
+        assert index.isValid()
+        repo = self._repoagent.rawRepo()
+        patch = self._series[index.row()]
+        try:
+            ctx = repo.changectx(patch)
+        except error.RepoLookupError:
+            # cache not updated after qdelete or qfinish
+            return
+        guards = self.patchGuards(index)
+        return '%s: %s\n%s' % (self.patchName(index),
+                               guards and ', '.join(guards) or _('no guards'),
+                               ctx.longsummary())
+
+    def mimeTypes(self):
+        return ['application/vnd.thg.mq.series', 'text/uri-list']
+
+    def mimeData(self, indexes):
+        repo = self._repoagent.rawRepo()
+        # in the same order as series file
+        patches = [self._series[i.row()]
+                   for i in sorted(indexes, reverse=True)]
+        data = QMimeData()
+        data.setData('application/vnd.thg.mq.series',
+                     QByteArray('\n'.join(patches) + '\n'))
+        data.setUrls([QUrl.fromLocalFile(hglib.tounicode(repo.mq.join(p)))
+                      for p in patches])
+        return data
+
+    def dropMimeData(self, data, action, row, column, parent):
+        if (action != Qt.MoveAction
+            or not data.hasFormat('application/vnd.thg.mq.series')
+            or row < 0 or parent.isValid()):
+            return False
+
+        repo = self._repoagent.rawRepo()
+        qtiprow = len(self._series) - repo.mq.seriesend(True)
+        if row > qtiprow:
+            return False
+        if row < len(self._series):
+            after = self._series[row]
+        else:
+            after = None  # next to working rev
+        patches = str(data.data('application/vnd.thg.mq.series')).splitlines()
+        if hglib.movemqpatches(repo, after, patches):
+            self._repoagent.pollStatus()
+        return True
+
+    def supportedDropActions(self):
+        return Qt.MoveAction
+
 
 class MQPatchesWidget(QDockWidget):
-    showMessage = pyqtSignal(unicode)
-    output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    makeLogVisible = pyqtSignal(bool)
+    patchSelected = pyqtSignal(unicode)
 
-    def __init__(self, parent, **opts):
+    def __init__(self, parent):
         QDockWidget.__init__(self, parent)
-        self.repo = None
-        self.opts = opts
-        self.refreshing = False
-        self.finishfunc = None
+        self._repoagent = None
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
@@ -47,6 +518,8 @@ class MQPatchesWidget(QDockWidget):
         w.setLayout(mainlayout)
         self.setWidget(w)
 
+        self.patchActions = PatchQueueActions(self)
+
         # top toolbar
         w = QWidget()
         tbarhbox = QHBoxLayout()
@@ -54,6 +527,7 @@ class MQPatchesWidget(QDockWidget):
         w.setLayout(tbarhbox)
         mainlayout.addWidget(w)
 
+        # TODO: move QAction instances to PatchQueueActions
         self.qpushAllAct = a = QAction(
             geticon('hg-qpush-all'), _('Push all', 'MQ QPush'), self)
         a.setToolTip(_('Apply all patches'))
@@ -61,13 +535,10 @@ class MQPatchesWidget(QDockWidget):
             geticon('hg-qpush'), _('Push', 'MQ QPush'), self)
         a.setToolTip(_('Apply one patch'))
         self.setGuardsAct = a = QAction(
-            geticon('hg-qguard'), _('Guards'), self)
+            geticon('hg-qguard'), _('Set &Guards...'), self)
         a.setToolTip(_('Configure guards for selected patch'))
-        self.qreorderAct = a = QAction(
-            geticon('hg-qreorder'), _('Reorder patches'), self)
-        a.setToolTip(_('Reorder patches'))
         self.qdeleteAct = a = QAction(
-            geticon('hg-qdelete'), _('Delete'), self)
+            geticon('hg-qdelete'), _('&Delete Patches...'), self)
         a.setToolTip(_('Delete selected patches'))
         self.qpopAct = a = QAction(
             geticon('hg-qpop'), _('Pop'), self)
@@ -75,6 +546,7 @@ class MQPatchesWidget(QDockWidget):
         self.qpopAllAct = a = QAction(
             geticon('hg-qpop-all'), _('Pop all'), self)
         a.setToolTip(_('Unapply all patches'))
+        self.qrenameAct = QAction(_('Re&name Patch...'), self)
         self.qtbar = tbar = QToolBar(_('Patch Queue Actions Toolbar'))
         tbar.setIconSize(QSize(18, 18))
         tbarhbox.addWidget(tbar)
@@ -83,8 +555,6 @@ class MQPatchesWidget(QDockWidget):
         tbar.addSeparator()
         tbar.addAction(self.qpopAct)
         tbar.addAction(self.qpopAllAct)
-        tbar.addSeparator()
-        tbar.addAction(self.qreorderAct)
         tbar.addSeparator()
         tbar.addAction(self.qdeleteAct)
         tbar.addSeparator()
@@ -99,33 +569,51 @@ class MQPatchesWidget(QDockWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         self.queueFrame.setLayout(layout)
 
-        self.queueListWidget = QListWidget(self)
+        qqueuehbox = QHBoxLayout()
+        qqueuehbox.setSpacing(5)
+        layout.addLayout(qqueuehbox)
+        self.qqueueComboWidget = QComboBox(self)
+        qqueuehbox.addWidget(self.qqueueComboWidget, 1)
+        self.qqueueConfigBtn = QToolButton(self)
+        self.qqueueConfigBtn.setText('...')
+        self.qqueueConfigBtn.setPopupMode(QToolButton.InstantPopup)
+        qqueuehbox.addWidget(self.qqueueConfigBtn)
+
+        self.qqueueActions = QueueManagementActions(self)
+        self.qqueueConfigBtn.setMenu(self.qqueueActions.createMenu(self))
+
+        self.queueListWidget = QListView(self)
+        self.queueListWidget.setDragDropMode(QAbstractItemView.InternalMove)
+        self.queueListWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.queueListWidget.setIconSize(QSize(12, 12))
+        self.queueListWidget.setSelectionMode(
+            QAbstractItemView.ExtendedSelection)
+        self.queueListWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.queueListWidget.customContextMenuRequested.connect(
+            self.onMenuRequested)
         layout.addWidget(self.queueListWidget, 1)
 
         bbarhbox = QHBoxLayout()
         bbarhbox.setSpacing(5)
         layout.addLayout(bbarhbox)
         self.guardSelBtn = QPushButton()
+        menu = QMenu(self)
+        menu.triggered.connect(self.onGuardSelectionChange)
+        self.guardSelBtn.setMenu(menu)
         bbarhbox.addWidget(self.guardSelBtn)
 
-        # Command runner and connections...
-        self.cmd = cmdui.Runner(not parent, self)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.progress.connect(self.progress)
-        self.cmd.commandFinished.connect(self.onCommandFinished)
+        self.qqueueComboWidget.activated[QString].connect(
+            self.onQQueueActivated)
 
-        self.queueListWidget.currentRowChanged.connect(self.onPatchSelected)
-        self.queueListWidget.itemActivated.connect(self.onGotoPatch)
-        self.queueListWidget.itemChanged.connect(self.onRenamePatch)
+        self.queueListWidget.activated.connect(self.onGotoPatch)
 
-        self.qpushAllAct.triggered.connect(self.onPushAll)
-        self.qpushAct.triggered.connect(self.onPush)
-        self.qreorderAct.triggered.connect(self.onQreorder)
-        self.qpopAllAct.triggered.connect(self.onPopAll)
-        self.qpopAct.triggered.connect(self.onPop)
+        self.qpushAllAct.triggered.connect(self.patchActions.pushAllPatches)
+        self.qpushAct.triggered[()].connect(self.patchActions.pushPatch)
+        self.qpopAllAct.triggered.connect(self.patchActions.popAllPatches)
+        self.qpopAct.triggered[()].connect(self.patchActions.popPatch)
         self.setGuardsAct.triggered.connect(self.onGuardConfigure)
         self.qdeleteAct.triggered.connect(self.onDelete)
+        self.qrenameAct.triggered.connect(self.onRenamePatch)
 
         self.setAcceptDrops(True)
 
@@ -133,826 +621,206 @@ class MQPatchesWidget(QDockWidget):
 
         QTimer.singleShot(0, self.reload)
 
-    def setrepo(self, repo):
-        if self.repo:
-            self.repo.repositoryChanged.disconnect(self.reload)
-        self.repo = None
-        if repo and 'mq' in repo.extensions():
-            self.repo = repo
-            self.repo.repositoryChanged.connect(self.reload)
+    @property
+    def repo(self):
+        if self._repoagent:
+            return self._repoagent.rawRepo()
+
+    def setRepoAgent(self, repoagent):
+        if self._repoagent:
+            self._repoagent.repositoryChanged.disconnect(self.reload)
+        self._repoagent = None
+        if repoagent and 'mq' in repoagent.rawRepo().extensions():
+            self._repoagent = repoagent
+            self._repoagent.repositoryChanged.connect(self.reload)
+        self._changePatchQueueModel()
+        self.patchActions.setRepoAgent(repoagent)
+        self.qqueueActions.setRepoAgent(repoagent)
         QTimer.singleShot(0, self.reload)
 
-    def getUserOptions(self, *optionlist):
-        out = []
-        for opt in optionlist:
-            if opt not in self.opts:
-                continue
-            val = self.opts[opt]
-            if val is False:
-                continue
-            elif val is True:
-                out.append('--' + opt)
-            else:
-                out.append('--' + opt)
-                out.append(val)
-        return out
-
-    @pyqtSlot(int)
-    def onCommandFinished(self, ret):
-        self.qtbar.setEnabled(True)
-        self.repo.decrementBusyCount()
-        if self.finishfunc:
-            self.finishfunc(ret)
-            self.finishfunc = None
-
-    def checkForRejects(self, ret):
-        if ret != 0:
-            mqutil.checkForRejects(self.repo, self.cmd.core.rawoutput(), self)
-        self.refreshStatus()
+    def _changePatchQueueModel(self):
+        oldmodel = self.queueListWidget.model()
+        if self._repoagent:
+            newmodel = PatchQueueModel(self._repoagent, self)
+            self.queueListWidget.setModel(newmodel)
+            newmodel.dataChanged.connect(self._updatePatchActions)
+            selmodel = self.queueListWidget.selectionModel()
+            selmodel.currentRowChanged.connect(self.onPatchSelected)
+            selmodel.selectionChanged.connect(self._updatePatchActions)
+            self._updatePatchActions()
+        else:
+            self.queueListWidget.setModel(None)
+        if oldmodel:
+            oldmodel.setParent(None)
 
     @pyqtSlot()
-    def onPushAll(self):
-        if self.cmd.running():
-            return
-        self.repo.incrementBusyCount()
-        cmdline = ['qpush', '-R', self.repo.root, '--all']
-        cmdline += self.getUserOptions('force', 'exact')
-        self.qtbar.setEnabled(False)
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
+    def showActiveQueue(self):
+        combo = self.qqueueComboWidget
+        q = hglib.tounicode(self.repo.thgactivemqname)
+        index = combo.findText(q)
+        combo.setCurrentIndex(index)
 
-    @pyqtSlot()
-    def onPush(self):
-        if self.cmd.running():
-            return
-        self.repo.incrementBusyCount()
-        cmdline = ['qpush', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force', 'exact')
-        self.qtbar.setEnabled(False)
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
-
-    @pyqtSlot()
-    def onPopAll(self):
-        if self.cmd.running():
-            return
-        self.repo.incrementBusyCount()
-        cmdline = ['qpop', '-R', self.repo.root, '--all']
-        cmdline += self.getUserOptions('force')
-        self.qtbar.setEnabled(False)
-        self.cmd.run(cmdline)
-
-    @pyqtSlot()
-    def onPop(self):
-        if self.cmd.running():
-            return
-        self.repo.incrementBusyCount()
-        cmdline = ['qpop', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force')
-        self.qtbar.setEnabled(False)
-        self.cmd.run(cmdline)
-
-    @pyqtSlot()
-    def onQreorder(self):
-        if self.cmd.running():
-            return
-        def checkGuardsOrComments():
-            cont = True
-            for p in self.repo.mq.fullseries:
-                if '#' in p:
-                    cont = qtlib.QuestionMsgBox('Confirm qreorder',
-                            _('<p>ATTENTION!<br>'
-                              'Guard or comment found.<br>'
-                              'Reordering patches will destroy them.<br>'
-                              '<br>Continue?</p>'), parent=self,
-                              defaultbutton=QMessageBox.No)
-                    break
-            return cont
-        if checkGuardsOrComments():
-            dlg = qreorder.QReorderDialog(self.repo, self)
-            dlg.exec_()
+    @pyqtSlot(QPoint)
+    def onMenuRequested(self, pos):
+        menu = QMenu(self)
+        menu.addAction(self.qdeleteAct)
+        menu.addAction(self.qrenameAct)
+        menu.addAction(self.setGuardsAct)
+        menu.exec_(self.queueListWidget.viewport().mapToGlobal(pos))
+        menu.setParent(None)
 
     @pyqtSlot()
     def onGuardConfigure(self):
-        item = self.queueListWidget.currentItem()
-        patch = item._thgpatch
-        if item._thgguards:
-            uguards = hglib.tounicode(' '.join(item._thgguards))
-        else:
-            uguards = ''
+        model = self.queueListWidget.model()
+        index = self.queueListWidget.currentIndex()
+        patch = model.patchName(index)
+        uguards = ' '.join(model.patchGuards(index))
         new, ok = qtlib.getTextInput(self,
                       _('Configure guards'),
-                      _('Input new guards for %s:') % hglib.tounicode(patch),
+                      _('Input new guards for %s:') % patch,
                       text=uguards)
         if not ok or new == uguards:
             return
-        guards = []
-        for guard in hglib.fromunicode(new).split(' '):
-            guard = guard.strip()
-            if not guard:
-                continue
-            if not (guard[0] == '+' or guard[0] == '-'):
-                self.showMessage.emit(_('Guards must begin with "+" or "-"'))
-                continue
-            guards.append(guard)
-        cmdline = ['qguard', '-R', self.repo.root, '--', patch]
-        if guards:
-            cmdline += guards
-        else:
-            cmdline.insert(3, '--none')
-        if self.cmd.running():
-            return
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        self.cmd.run(cmdline)
+        self.patchActions.guardPatch(patch, unicode(new).split())
 
     @pyqtSlot()
     def onDelete(self):
-        from tortoisehg.hgqt import qdelete
-        patch = self.queueListWidget.currentItem()._thgpatch
-        dlg = qdelete.QDeleteDialog(self.repo, [patch], self)
-        if dlg.exec_() == QDialog.Accepted:
-            self.reload()
+        model = self.queueListWidget.model()
+        selmodel = self.queueListWidget.selectionModel()
+        patches = map(model.patchName, selmodel.selectedRows())
+        self.patchActions.deletePatches(patches)
 
-    #@pyqtSlot(QListWidgetItem)
-    def onGotoPatch(self, item):
+    #@pyqtSlot(QModelIndex)
+    def onGotoPatch(self, index):
         'Patch has been activated (return), issue qgoto'
-        if self.cmd.running():
-            return
-        cmdline = ['qgoto', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force')
-        cmdline += ['--', item._thgpatch]
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
+        patch = self.queueListWidget.model().patchName(index)
+        self.patchActions.gotoPatch(patch)
 
-    #@pyqtSlot(QListWidgetItem)
-    def onRenamePatch(self, item):
-        'Patch has been renamed, issue qrename'
-        if self.cmd.running():
+    @pyqtSlot()
+    def onRenamePatch(self):
+        index = self.queueListWidget.currentIndex()
+        patch = self.queueListWidget.model().patchName(index)
+        self.patchActions.renamePatch(patch)
+
+    #@pyqtSlot(QModelIndex)
+    def onPatchSelected(self, index):
+        if index.isValid():
+            model = self.queueListWidget.model()
+            self.patchSelected.emit(model.patchName(index))
+
+    @pyqtSlot()
+    def _updatePatchActions(self):
+        model = self.queueListWidget.model()
+        selmodel = self.queueListWidget.selectionModel()
+
+        appliedcnt = model.appliedCount()
+        seriescnt = model.rowCount()
+        self.qpushAllAct.setEnabled(seriescnt > appliedcnt)
+        self.qpushAct.setEnabled(seriescnt > appliedcnt)
+        self.qpopAct.setEnabled(appliedcnt > 0)
+        self.qpopAllAct.setEnabled(appliedcnt > 0)
+
+        indexes = selmodel.selectedRows()
+        anyapplied = util.any(model.isApplied(i) for i in indexes)
+        self.qdeleteAct.setEnabled(len(indexes) > 0 and not anyapplied)
+        self.setGuardsAct.setEnabled(len(indexes) == 1)
+        self.qrenameAct.setEnabled(len(indexes) == 1)
+
+    @pyqtSlot(QString)
+    def onQQueueActivated(self, text):
+        if text == hglib.tounicode(self.repo.thgactivemqname):
             return
-        from tortoisehg.hgqt import qrename
-        newpatchname = hglib.fromunicode(item.text())
-        if newpatchname == item._thgpatch:
-            return
+
+        if qtlib.QuestionMsgBox(_('Confirm patch queue switch'),
+                _("Do you really want to activate patch queue '%s' ?") % text,
+                parent=self, defaultbutton=QMessageBox.No):
+            sess = self.qqueueActions.switchQueue(text)
+            sess.commandFinished.connect(self.showActiveQueue)
         else:
-            res = qrename.checkPatchname(self.repo.root,
-                        self.repo.thgactivemqname, newpatchname, self)
-            if not res:
-                item.setText(item._thgpatch)
-                return
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        self.cmd.run(['qrename', '-R', self.repo.root, '--',
-                      item._thgpatch, newpatchname])
-
-    @pyqtSlot(int)
-    def onPatchSelected(self, row):
-        'Patch has been selected, update buttons'
-        if self.refreshing:
-            return
-        if row >= 0:
-            patch = self.queueListWidget.item(row)._thgpatch
-            applied = set([p.name for p in self.repo.mq.applied])
-            self.qdeleteAct.setEnabled(patch not in applied)
-            self.setGuardsAct.setEnabled(True)
-        else:
-            self.qdeleteAct.setEnabled(False)
-            self.setGuardsAct.setEnabled(False)
-
-    def refreshStatus(self):
-        self.refreshing = False
+            self.showActiveQueue()
 
     @pyqtSlot()
     def reload(self):
-        self.refreshing = True
-        self.reselectPatchItem = None
-        try:
-            try:
-                self._reload()
-            except Exception, e:
-                self.showMessage.emit(hglib.tounicode(str(e)))
-                if 'THGDEBUG' in os.environ:
-                    import traceback
-                    traceback.print_exc()
-        finally:
-            self.refreshing = False
-        if self.reselectPatchItem:
-            self.queueListWidget.setCurrentItem(self.reselectPatchItem)
-        self.refreshStatus()
-
-    def _reload(self):
-        item = self.queueListWidget.currentItem()
-        if item:
-            wasselected = item._thgpatch
-        else:
-            wasselected = None
-        self.queueListWidget.clear()
-
-        if self.repo is None:
-            self.guardSelBtn.setEnabled(False)
-            self.qpushAllAct.setEnabled(False)
-            self.qpushAct.setEnabled(False)
-            self.qdeleteAct.setEnabled(False)
-            self.setGuardsAct.setEnabled(False)
-            self.qpopAct.setEnabled(False)
-            self.qpopAllAct.setEnabled(False)
-            self.qreorderAct.setEnabled(False)
+        self.widget().setEnabled(bool(self._repoagent))
+        if not self._repoagent:
             return
 
-        ui, repo = self.repo.ui.copy(), self.repo
+        self.loadQQueues()
+        self.showActiveQueue()
 
-        applied = set([p.name for p in repo.mq.applied])
+        repo = self.repo
+
         self.allguards = set()
-        items = []
         for idx, patch in enumerate(repo.mq.series):
-            ctx = repo.changectx(patch)
-            desc = ctx.longsummary()
-            item = QListWidgetItem(hglib.tounicode(patch))
-            if patch in applied: # applied
-                f = item.font()
-                f.setBold(True)
-                item.setFont(f)
-            elif not repo.mq.pushable(idx)[0]: # guarded
-                f = item.font()
-                f.setItalic(True)
-                item.setFont(f)
             patchguards = repo.mq.seriesguards[idx]
             if patchguards:
                 for guard in patchguards:
                     self.allguards.add(guard[1:])
-                uguards = hglib.tounicode(', '.join(patchguards))
-            else:
-                uguards = _('no guards')
-            uname = hglib.tounicode(patch)
-            item._thgpatch = patch
-            item._thgguards = patchguards
-            item.setToolTip(u'%s: %s\n%s' % (uname, uguards, desc))
-            item.setFlags(Qt.ItemIsSelectable |
-                          Qt.ItemIsEditable |
-                          Qt.ItemIsEnabled)
-            items.append(item)
-
-        for item in reversed(items):
-            self.queueListWidget.addItem(item)
-            if item._thgpatch == wasselected:
-                self.reselectPatchItem = item
 
         for guard in repo.mq.active():
             self.allguards.add(guard)
         self.refreshSelectedGuards()
 
-        self.qpushAllAct.setEnabled(bool(repo.thgmqunappliedpatches))
-        self.qpushAct.setEnabled(bool(repo.thgmqunappliedpatches))
-        self.qdeleteAct.setEnabled(False)
-        self.setGuardsAct.setEnabled(False)
-        self.qpopAct.setEnabled(bool(applied))
-        self.qpopAllAct.setEnabled(bool(applied))
-        self.qreorderAct.setEnabled(bool(repo.thgmqunappliedpatches))
+        self.qqueueComboWidget.setEnabled(self.qqueueComboWidget.count() > 1)
+
+    def loadQQueues(self):
+        repo = self.repo
+        combo = self.qqueueComboWidget
+        combo.clear()
+        combo.addItems(mqutil.getQQueues(repo))
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)
         count = len(self.repo.mq.active())
-        oldmenu = self.guardSelBtn.menu()
-        if oldmenu:
-            oldmenu.setParent(None)
-        menu = QMenu(self)
+        menu = self.guardSelBtn.menu()
+        menu.clear()
         for guard in self.allguards:
             a = menu.addAction(hglib.tounicode(guard))
             a.setCheckable(True)
             a.setChecked(guard in self.repo.mq.active())
-            a.triggered.connect(self.onGuardSelectionChange)
-        self.guardSelBtn.setMenu(menu)
         self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
         self.guardSelBtn.setEnabled(bool(total))
 
-    def onGuardSelectionChange(self, isChecked):
-        guard = hglib.fromunicode(self.sender().text())
+    @pyqtSlot(QAction)
+    def onGuardSelectionChange(self, action):
+        guard = hglib.fromunicode(action.text())
         newguards = self.repo.mq.active()[:]
-        if isChecked:
+        if action.isChecked():
             newguards.append(guard)
         elif guard in newguards:
             newguards.remove(guard)
-        cmdline = ['qselect', '-R', self.repo.root]
-        cmdline += newguards or ['--none']
-        self.repo.incrementBusyCount()
-        self.qtbar.setEnabled(False)
-        self.cmd.run(cmdline)
+        self.patchActions.selectGuards(map(hglib.tounicode, newguards))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            if self.cmd.core.running():
-                self.cmd.cancel()
+            self.patchActions.abort()
+            self.qqueueActions.abort()
         else:
             return super(MQPatchesWidget, self).keyPressEvent(event)
 
 
-class MQWidget(QWidget, qtlib.TaskWidget):
-    showMessage = pyqtSignal(unicode)
-    output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    makeLogVisible = pyqtSignal(bool)
-    runCustomCommandRequested = pyqtSignal(str, list)
-
-    def __init__(self, repo, parent, **opts):
-        QWidget.__init__(self, parent)
-
-        self.repo = repo
-        self.opts = opts
-        self.refreshing = False
-        self.finishfunc = None
-
-        layout = QVBoxLayout()
-        layout.setSpacing(4)
-        self.setLayout(layout)
-
-        b = QPushButton(_('QRefresh'))
-        f = b.font()
-        f.setWeight(QFont.Bold)
-        b.setFont(f)
-        self.qnewOrRefreshBtn = b
-
-        self.qqueueBtn = QPushButton(_('Queues'))
-
-        # top toolbar
-        tbarhbox = QHBoxLayout()
-        tbarhbox.setSpacing(5)
-        self.layout().addLayout(tbarhbox, 0)
-
-        self.revisionOrCommitBtn = QPushButton()
-
-        self.queueCombo = QComboBox()
-        self.queueCombo.activated['QString'].connect(self.qqueueActivate)
-        self.optionsBtn = QPushButton(_('Options'))
-        self.msgSelectCombo = PatchMessageCombo(self)
-        tbarhbox.addWidget(self.revisionOrCommitBtn)
-        tbarhbox.addWidget(self.queueCombo)
-        tbarhbox.addWidget(self.optionsBtn)
-        tbarhbox.addWidget(self.qqueueBtn)
-        tbarhbox.addWidget(self.msgSelectCombo, 1)
-        tbarhbox.addWidget(self.qnewOrRefreshBtn)
-
-        # main area consists of a two-way horizontal splitter
-        self.splitter = splitter = QSplitter()
-        self.layout().addWidget(splitter, 1)
-        splitter.setOrientation(Qt.Horizontal)
-        splitter.setChildrenCollapsible(True)
-        splitter.setObjectName('splitter')
-
-        self.filesFrame = QFrame(splitter)
-
-        # Files Frame
-        layout = QVBoxLayout()
-        layout.setSpacing(5)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.filesFrame.setLayout(layout)
-
-        mtbarhbox = QHBoxLayout()
-        mtbarhbox.setSpacing(8)
-        layout.addLayout(mtbarhbox, 0)
-        mtbarhbox.setContentsMargins(0, 0, 0, 0)
-        self.newCheckBox = QCheckBox(_('New Patch'))
-        self.patchNameLE = mqutil.getPatchNameLineEdit()
-        mtbarhbox.addWidget(self.newCheckBox)
-        mtbarhbox.addWidget(self.patchNameLE, 1)
-
-        self.messageEditor = messageentry.MessageEntry(self)
-        self.messageEditor.installEventFilter(qscilib.KeyPressInterceptor(self))
-        self.messageEditor.refresh(repo)
-
-        self.stwidget = status.StatusWidget(repo, None, opts, self)
-        self.stwidget.runCustomCommandRequested.connect(
-            self.runCustomCommandRequested)
-
-        self.fileview = self.stwidget.fileview
-        self.fileview.showMessage.connect(self.showMessage)
-        self.fileview.setContext(repo[None])
-        self.fileview.shelveToolExited.connect(self.reload)
-        layout.addWidget(self.stwidget)
-
-        # Message and diff
-        vb2 = QVBoxLayout()
-        vb2.setSpacing(0)
-        vb2.setContentsMargins(0, 0, 0, 0)
-        w = QWidget()
-        w.setLayout(vb2)
-        splitter.addWidget(w)
-        self.vsplitter = vsplitter = QSplitter()
-        vsplitter.setOrientation(Qt.Vertical)
-        vb2.addWidget(vsplitter)
-        vsplitter.addWidget(self.messageEditor)
-        vsplitter.addWidget(self.stwidget.docf)
-
-        # Command runner and connections...
-        self.cmd = cmdui.Runner(not parent, self)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.progress.connect(self.progress)
-        self.cmd.commandFinished.connect(self.onCommandFinished)
-
-        self.qqueueBtn.clicked.connect(self.launchQQueueTool)
-        self.optionsBtn.clicked.connect(self.launchOptionsDialog)
-        self.revisionOrCommitBtn.clicked.connect(self.qinitOrCommit)
-        self.msgSelectCombo.activated.connect(self.onMessageSelected)
-        self.newCheckBox.toggled.connect(self.onNewModeToggled)
-        self.qnewOrRefreshBtn.clicked.connect(self.onQNewOrQRefresh)
-        QShortcut(QKeySequence('Ctrl+Return'), self, self.onQNewOrQRefresh)
-        QShortcut(QKeySequence('Ctrl+Enter'), self, self.onQNewOrQRefresh)
-
-        self.repo.configChanged.connect(self.onConfigChanged)
-        self.repo.repositoryChanged.connect(self.reload)
-        self.setAcceptDrops(True)
-
-        if parent:
-            self.layout().setContentsMargins(2, 2, 2, 2)
-        else:
-            self.layout().setContentsMargins(0, 0, 0, 0)
-            self.setWindowTitle(_('TortoiseHg Patch Queue'))
-            self.statusbar = cmdui.ThgStatusBar(self)
-            self.layout().addWidget(self.statusbar)
-            self.progress.connect(self.statusbar.progress)
-            self.showMessage.connect(self.statusbar.showMessage)
-            qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self,
-                                        self.reload)
-            self.resize(850, 550)
-
-        self.loadConfigs()
-        QTimer.singleShot(0, self.reload)
-
-    def getUserOptions(self, *optionlist):
-        return mqutil.getUserOptions(self.opts, *optionlist)
-
-    @pyqtSlot()
-    def onConfigChanged(self):
-        'Repository is reporting its config files have changed'
-        self.messageEditor.refresh(self.repo)
-
-    @pyqtSlot(int)
-    def onCommandFinished(self, ret):
-        self.repo.decrementBusyCount()
-        if self.finishfunc:
-            self.finishfunc(ret)
-            self.finishfunc = None
-
-    def checkForRejects(self, ret):
-        if ret != 0:
-            mqutil.checkForRejects(self.repo, self.cmd.core.rawoutput(), self)
-        self.refreshStatus()
-
-    @pyqtSlot(QString)
-    def qqueueActivate(self, uqueue):
-        if self.refreshing or self.stwidget.isRefreshingWctx():
-            return
-        queue = hglib.fromunicode(uqueue)
-        if queue == self.repo.thgactivemqname:
-            return
-        self.repo.incrementBusyCount()
-        cmdline = ['qqueue', '-R', self.repo.root, queue]
-        def finished(ret):
-            if ret:
-                for i in xrange(self.queueCombo.count()):
-                    if (hglib.fromunicode(self.queueCombo.itemText(i))
-                            == self.repo.thgactivemqname):
-                        self.queueCombo.setCurrentIndex(i)
-                        break
-        self.finishfunc = finished
-        self.cmd.run(cmdline)
-
-    def qgotoRevision(self, rev):
-        if self.cmd.running():
-            return
-        cmdline = ['qgoto', '-R', self.repo.root]
-        cmdline += self.getUserOptions('force')
-        cmdline += ['--', str(rev)]
-        self.repo.incrementBusyCount()
-        self.finishfunc = self.checkForRejects
-        self.cmd.run(cmdline)
-
-    def popAll(self):
-        if self.cmd.running():
-            return
-        self.repo.incrementBusyCount()
-        cmdline = ['qpop', '-R', self.repo.root, '--all']
-        cmdline += self.getUserOptions('force')
-        self.cmd.run(cmdline)
-
-    @pyqtSlot(int)
-    def onMessageSelected(self, row):
-        if self.messageEditor.text() and self.messageEditor.isModified():
-            d = QMessageBox.question(self, _('Confirm Discard Message'),
-                        _('Discard current commit message?'),
-                        QMessageBox.Ok | QMessageBox.Cancel)
-            if d != QMessageBox.Ok:
-                return
-        self.setMessage(self.messages[row][1])
-        self.messageEditor.setFocus()
-
-    def setMessage(self, message):
-        self.messageEditor.setText(message)  # message: unicode
-        lines = self.messageEditor.lines()
-        if lines:
-            lines -= 1
-            pos = self.messageEditor.lineLength(lines)
-            self.messageEditor.setCursorPosition(lines, pos)
-            self.messageEditor.ensureLineVisible(lines)
-            hs = self.messageEditor.horizontalScrollBar()
-            hs.setSliderPosition(0)
-        self.messageEditor.setModified(False)
-
-    @pyqtSlot()
-    def onQNewOrQRefresh(self):
-        if self.newCheckBox.isChecked():
-            self.finishfunc = lambda ret: self.newCheckBox.setChecked(False)
-        optionlist = ('user', 'currentuser', 'git', 'date', 'currentdate')
-        cmdlines = mqutil.mqNewRefreshCommand(self.repo, self.newCheckBox.isChecked(),
-                                              self.stwidget, self.patchNameLE,
-                                              self.messageEditor.text(), self.opts,
-                                              optionlist)
-        self.repo.incrementBusyCount()
-        self.cmd.run(*cmdlines)
-
-    @pyqtSlot()
-    def qinitOrCommit(self):
-        if os.path.isdir(self.repo.mq.join('.hg')):
-            from tortoisehg.hgqt import commit
-            mqrepo = thgrepo.repository(None, self.repo.mq.path)
-            dlg = commit.CommitDialog(mqrepo, [], {}, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.reload()
-        else:
-            self.repo.incrementBusyCount()
-            self.cmd.run(['qinit', '-c', '-R', self.repo.root])
-
-    @pyqtSlot()
-    def launchQQueueTool(self):
-        dlg = qqueue.QQueueDialog(self.repo, True, self)
-        dlg.finished.connect(dlg.deleteLater)
-        dlg.output.connect(self.output)
-        dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.exec_()
-        self.reload()
-
-    @pyqtSlot()
-    def launchOptionsDialog(self):
-        dlg = OptionsDialog(self)
-        dlg.finished.connect(dlg.deleteLater)
-        dlg.setWindowFlags(Qt.Sheet)
-        dlg.setWindowModality(Qt.WindowModal)
-        if dlg.exec_() == QDialog.Accepted:
-            self.opts.update(dlg.outopts)
-
-    def refreshStatus(self):
-        pctx = self.repo.changectx('.')
-        if 'qtip' in pctx.tags() and not self.newCheckBox.isChecked():
-            # qrefresh (qdiff) diffs
-            self.stwidget.setPatchContext(pctx)
-            self.stwidget.refreshWctx()
-        elif self.newCheckBox.isChecked():
-            # qnew (working) diffs
-            self.stwidget.setPatchContext(None)
-            self.stwidget.refreshWctx()
-
-    @pyqtSlot()
-    def reload(self):
-        self.refreshing = True
-        try:
-            try:
-                self._reload()
-            except Exception, e:
-                self.showMessage.emit(hglib.tounicode(str(e)))
-                if 'THGDEBUG' in os.environ:
-                    import traceback
-                    traceback.print_exc()
-        finally:
-            self.refreshing = False
-        self.refreshStatus()
-
-    def _reload(self):
-        ui, repo = self.repo.ui.copy(), self.repo
-
-        self.queueCombo.clear()
-
-        ui.quiet = True  # don't append "(active)"
-        ui.pushbuffer()
-        mqmod.qqueue(ui, repo, list=True)
-        out = ui.popbuffer()
-        for i, qname in enumerate(out.splitlines()):
-            if qname == repo.thgactivemqname:
-                current = i
-            self.queueCombo.addItem(hglib.tounicode(qname))
-        self.queueCombo.setCurrentIndex(current)
-        self.queueCombo.setEnabled(self.queueCombo.count() > 1)
-
-        self.messages = []
-        for patch in repo.mq.series:
-            ctx = repo.changectx(patch)
-            msg = hglib.tounicode(ctx.description())
-            if msg:
-                self.messages.append((patch, msg))
-        self.msgSelectCombo.reset(self.messages)
-
-        if os.path.isdir(repo.mq.join('.hg')):
-            self.revisionOrCommitBtn.setText(_('QCommit'))
-        else:
-            self.revisionOrCommitBtn.setText(_('Create MQ repo'))
-
-        pctx = repo.changectx('.')
-        newmode = self.newCheckBox.isChecked()
-        if 'qtip' in pctx.tags():
-            self.stwidget.tv.setEnabled(True)
-            self.messageEditor.setEnabled(True)
-            self.msgSelectCombo.setEnabled(True)
-            self.qnewOrRefreshBtn.setEnabled(True)
-            if not newmode:
-                self.setMessage(hglib.tounicode(pctx.description()))
-                name = repo.mq.applied[-1].name
-                self.patchNameLE.setText(hglib.tounicode(name))
-        else:
-            self.stwidget.tv.setEnabled(newmode)
-            self.messageEditor.setEnabled(newmode)
-            self.msgSelectCombo.setEnabled(newmode)
-            self.qnewOrRefreshBtn.setEnabled(newmode)
-            if not newmode:
-                self.setMessage('')
-                self.patchNameLE.setText('')
-        self.patchNameLE.setEnabled(newmode)
-
-    def onNewModeToggled(self, isChecked):
-        if isChecked:
-            self.stwidget.tv.setEnabled(True)
-            self.qnewOrRefreshBtn.setText(_('QNew'))
-            self.qnewOrRefreshBtn.setEnabled(True)
-            self.messageEditor.setEnabled(True)
-            self.patchNameLE.setEnabled(True)
-            self.patchNameLE.setFocus()
-            self.patchNameLE.setText(mqutil.defaultNewPatchName(self.repo))
-            self.patchNameLE.selectAll()
-            self.setMessage('')
-        else:
-            self.qnewOrRefreshBtn.setText(_('QRefresh'))
-            pctx = self.repo.changectx('.')
-            if 'qtip' in pctx.tags():
-                self.messageEditor.setEnabled(True)
-                self.setMessage(hglib.tounicode(pctx.description()))
-                name = self.repo.mq.applied[-1].name
-                self.patchNameLE.setText(hglib.tounicode(name))
-                self.qnewOrRefreshBtn.setEnabled(True)
-                self.stwidget.tv.setEnabled(True)
-            else:
-                self.messageEditor.setEnabled(False)
-                self.qnewOrRefreshBtn.setEnabled(False)
-                self.stwidget.tv.setEnabled(False)
-                self.patchNameLE.setText('')
-                self.setMessage('')
-            self.patchNameLE.setEnabled(False)
-        self.refreshStatus()
-
-    # Capture drop events, try to import into current patch queue
-
-    def detectPatches(self, paths):
-        filepaths = []
-        for p in paths:
-            if not os.path.isfile(p):
-                continue
-            try:
-                pf = open(p, 'rb')
-                filename, message, user, date, branch, node, p1, p2 = \
-                        patch.extract(self.repo.ui, pf)
-                if filename:
-                    filepaths.append(p)
-                    os.unlink(filename)
-            except Exception, e:
-                pass
-        return filepaths
-
-    def dragEnterEvent(self, event):
-        paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
-        if self.detectPatches(paths):
-            event.setDropAction(Qt.CopyAction)
-            event.accept()
-
-    def dropEvent(self, event):
-        paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
-        patches = self.detectPatches(paths)
-        if patches:
-            event.setDropAction(Qt.CopyAction)
-            event.accept()
-        else:
-            super(MQWidget, self).dropEvent(event)
-            return
-        dlg = thgimport.ImportDialog(self.repo, self, mq=True)
-        dlg.setfilepaths(patches)
-        dlg.exec_()
-
-    # End drop events
-
-    def loadConfigs(self):
-        'Load history, etc, from QSettings instance'
-        s = QSettings()
-        self.splitter.restoreState(s.value('mq/splitter').toByteArray())
-        self.vsplitter.restoreState(s.value('mq/vsplitter').toByteArray())
-        userhist = s.value('commit/userhist').toStringList()
-        self.opts['userhist'] = [hglib.fromunicode(u) for u in userhist if u]
-        self.messageEditor.loadSettings(s, 'mq/editor')
-        self.fileview.loadSettings(s, 'mq/fileview')
-        if not self.parent():
-            self.restoreGeometry(s.value('mq/geom').toByteArray())
-
-    def storeConfigs(self):
-        'Save history, etc, in QSettings instance'
-        s = QSettings()
-        s.setValue('mq/splitter', self.splitter.saveState())
-        s.setValue('mq/vsplitter', self.vsplitter.saveState())
-        self.messageEditor.saveSettings(s, 'mq/editor')
-        self.fileview.saveSettings(s, 'mq/fileview')
-        if not self.parent():
-            s.setValue('mq/geom', self.saveGeometry())
-
-    def canExit(self):
-        self.storeConfigs()
-        return not self.cmd.core.running()
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            if self.cmd.core.running():
-                self.cmd.cancel()
-            elif not self.parent() and self.canExit():
-                self.close()
-        else:
-            return super(MQWidget, self).keyPressEvent(event)
-
-
-
-class PatchMessageCombo(QComboBox):
-    def __init__(self, parent):
-        super(PatchMessageCombo, self).__init__(parent)
-        self.reset([])
-
-    def reset(self, msglist):
-        self.clear()
-        self.addItem(_('Patch commit messages...'))
-        self.loaded = False
-        self.msglist = msglist
-
-    def showPopup(self):
-        if not self.loaded and self.msglist:
-            self.clear()
-            for patch, message in self.msglist:
-                sum = message.split('\n', 1)[0][:70]
-                self.addItem(hglib.tounicode('%s: %s' % (patch, sum)))
-            self.loaded = True
-        if self.loaded:
-            super(PatchMessageCombo, self).showPopup()
-
-
-
 class OptionsDialog(QDialog):
     'Utility dialog for configuring uncommon options'
-    def __init__(self, parent):
+    def __init__(self, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('MQ options'))
 
-        layout = QFormLayout()
+        layout = QVBoxLayout()
         self.setLayout(layout)
-
-        self.gitcb = QCheckBox(
-            _('Force use of git extended diff format (--git)'))
-        layout.addRow(self.gitcb, None)
 
         self.forcecb = QCheckBox(
             _('Force push or pop (--force)'))
-        layout.addRow(self.forcecb, None)
+        layout.addWidget(self.forcecb)
 
-        self.exactcb = QCheckBox(
-            _('Apply patch to its recorded parent (--exact)'))
-        layout.addRow(self.exactcb, None)
+        self.keepcb = QCheckBox(
+            _('Tolerate non-conflicting local changes (--keep-changes)'))
+        layout.addWidget(self.keepcb)
 
-        self.currentdatecb = QCheckBox(
-            _('Update date field with current date (--currentdate)'))
-        layout.addRow(self.currentdatecb, None)
+        self.forcecb.setChecked(opts.get('force', False))
+        self.keepcb.setChecked(opts.get('keep_changes', False))
 
-        self.datele = QLineEdit()
-        layout.addRow(QLabel(_('Specify an explicit date:')), self.datele)
-
-        self.currentusercb = QCheckBox(
-            _('Update author field with current user (--currentuser)'))
-        layout.addRow(self.currentusercb, None)
-
-        self.userle = QLineEdit()
-        layout.addRow(QLabel(_('Specify an explicit author:')), self.userle)
-
-        self.currentdatecb.toggled.connect(self.datele.setDisabled)
-        self.currentusercb.toggled.connect(self.userle.setDisabled)
-
-        self.gitcb.setChecked(parent.opts.get('git', False))
-        self.forcecb.setChecked(parent.opts.get('force', False))
-        self.exactcb.setChecked(parent.opts.get('exact', False))
-        self.currentdatecb.setChecked(parent.opts.get('currentdate', False))
-        self.currentusercb.setChecked(parent.opts.get('currentuser', False))
-        self.datele.setText(hglib.tounicode(parent.opts.get('date', '')))
-        self.userle.setText(hglib.tounicode(parent.opts.get('user', '')))
+        for cb in [self.forcecb, self.keepcb]:
+            cb.clicked.connect(self._resolveopts)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel)
@@ -961,21 +829,20 @@ class OptionsDialog(QDialog):
         self.bb = bb
         layout.addWidget(bb)
 
+    #@pyqtSlot()
+    def _resolveopts(self):
+        # cannot use both --force and --keep-changes
+        exclmap = {self.forcecb: [self.keepcb],
+                   self.keepcb: [self.forcecb],
+                   }
+        sendercb = self.sender()
+        if sendercb.isChecked():
+            for cb in exclmap[sendercb]:
+                cb.setChecked(False)
+
     def accept(self):
         outopts = {}
-        outopts['git'] = self.gitcb.isChecked()
         outopts['force'] = self.forcecb.isChecked()
-        outopts['exact'] = self.exactcb.isChecked()
-        outopts['currentdate'] = self.currentdatecb.isChecked()
-        outopts['currentuser'] = self.currentusercb.isChecked()
-        if self.currentdatecb.isChecked():
-            outopts['date'] = ''
-        else:
-            outopts['date'] = hglib.fromunicode(self.datele.text())
-        if self.currentusercb.isChecked():
-            outopts['user'] = ''
-        else:
-            outopts['user'] = hglib.fromunicode(self.userle.text())
-
+        outopts['keep_changes'] = self.keepcb.isChecked()
         self.outopts = outopts
         QDialog.accept(self)

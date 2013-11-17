@@ -152,6 +152,7 @@ class RepoItem(RepoTreeItem):
     def isRepo(self):
         return True
 
+    # TODO: return unicode instead of localstr because shortname() is unicode
     def rootpath(self):
         return self._root
 
@@ -367,8 +368,8 @@ class SubrepoItem(RepoItem):
             return super(SubrepoItem, self).data(column, role)
 
     def menulist(self):
-        acts = ['open', 'clone', 'addsubrepo', None, 'explore',
-                'terminal', 'copypath']
+        acts = ['open', 'clone', None, 'addsubrepo', 'removesubrepo',
+                None, 'explore', 'terminal', 'copypath']
         if self.childCount() > 0:
             acts.extend([None, (_('&Sort'), ['sortbyname', 'sortbyhgsub'])])
         acts.extend([None, 'settings'])

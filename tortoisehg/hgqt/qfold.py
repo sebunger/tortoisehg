@@ -13,15 +13,14 @@ from hgext import mq
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qscilib, qtlib, messageentry
+from tortoisehg.hgqt import qscilib, qtlib, messageentry
 
 class QFoldDialog(QDialog):
 
-    output = pyqtSignal(QString, QString)
-    makeLogVisible = pyqtSignal(bool)
-
-    def __init__(self, repo, patches, parent):
+    def __init__(self, repoagent, patches, parent):
         super(QFoldDialog, self).__init__(parent)
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Patch fold - %s') % repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-qfold'))
 
@@ -41,10 +40,9 @@ class QFoldDialog(QDialog):
         self.keepchk.setChecked(True)
         self.layout().addWidget(self.keepchk)
 
-        self.repo = repo
         q = self.repo.mq
         q.parseseries()
-        self.patches = [p for p in q.series if p in patches]
+        patches = [p for p in q.series if p in patches]
 
         class PatchListWidget(QListWidget):
             def __init__(self, parent):
@@ -73,7 +71,7 @@ class QFoldDialog(QDialog):
                 self.showSummary(self.ulw.item(self.ulw.currentRow())))
         self.layout().addWidget(ugb)
 
-        for p in self.patches:
+        for p in patches:
             item = QListWidgetItem(hglib.tounicode(p))
             item.setFlags(Qt.ItemIsSelectable |
                           Qt.ItemIsEnabled |
@@ -89,10 +87,6 @@ class QFoldDialog(QDialog):
         self.summ.setFocusPolicy(Qt.NoFocus)
         self.layout().addWidget(self.summ)
 
-        self.cmd = cmdui.Runner(False, self)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
-
         BB = QDialogButtonBox
         bbox = QDialogButtonBox(BB.Ok|BB.Cancel)
         bbox.accepted.connect(self.accept)
@@ -100,12 +94,16 @@ class QFoldDialog(QDialog):
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
-        self.repo.configChanged.connect(self.configChanged)
+        self._repoagent.configChanged.connect(self.configChanged)
 
         self._readsettings()
 
-        self.msgte.setText(self.composeMsg(self.patches))
+        self.msgte.setText(self.composeMsg(patches))
         self.msgte.refresh(self.repo)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def showSummary(self, item):
         patchname = hglib.fromunicode(item.text())
@@ -122,22 +120,16 @@ class QFoldDialog(QDialog):
         '''Repository is reporting its config files have changed'''
         self.msgte.refresh(self.repo)
 
+    def options(self):
+        return {'keep': self.keepchk.isChecked(),
+                'message': unicode(self.msgte.text())}
+
+    def patches(self):
+        return map(hglib.tounicode, self.ulw.getPatchList())
+
     def accept(self):
         self._writesettings()
-        self.bbox.setDisabled(True)
-        cmdline = ['qfold', '--repository', self.repo.root]
-        if self.keepchk.isChecked():
-            cmdline += ['--keep']
-        msg = hglib.fromunicode(self.msgte.text(), 'replace')
-        cmdline += ['--message', msg]
-        cmdline += ['--']
-        cmdline += self.ulw.getPatchList()
-        def finished():
-            self.repo.decrementBusyCount()
-            QDialog.accept(self)
-        self.repo.incrementBusyCount()
-        self.cmd.commandFinished.connect(finished)
-        self.cmd.run(cmdline)
+        QDialog.accept(self)
 
     def closeEvent(self, event):
         self._writesettings()

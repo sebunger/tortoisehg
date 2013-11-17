@@ -23,7 +23,7 @@ from PyQt4.QtGui import *
 
 nullvariant = QVariant()
 
-def getSubrepoIcoDict():
+def getSubrepoIcoDict(baseicon='thg-subrepo'):
     'Return a dictionary mapping each subrepo type to the corresponding icon'
     _subrepoType2IcoMap = {
       'hg': 'hg',
@@ -32,7 +32,7 @@ def getSubrepoIcoDict():
       'hgsubversion': 'thg-svn-subrepo',
       'empty': 'hg'
     }
-    icOverlay = geticon('thg-subrepo')
+    icOverlay = geticon(baseicon)
     subrepoIcoDict = {}
     for stype in _subrepoType2IcoMap:
         ic = geticon(_subrepoType2IcoMap[stype])
@@ -54,7 +54,11 @@ class HgFileListModel(QAbstractTableModel):
         self._files = []
         self._filesdict = {}
         self._fulllist = False
-        self._subrepoIcoDict = getSubrepoIcoDict()
+        self._subrepoIcoDict = {
+            'M': getSubrepoIcoDict(),
+            'A': getSubrepoIcoDict('thg-added-subrepo'),
+            'R': getSubrepoIcoDict('thg-removed-subrepo'),
+        }
 
     @pyqtSlot(bool)
     def toggleFullFileList(self, value):
@@ -139,8 +143,14 @@ class HgFileListModel(QAbstractTableModel):
                         sp2rev = self._ctx.p2().substate.get(s, subrepo.nullstate)[1]
                     if srev != sp1rev or (sp2rev != '' and srev != sp2rev):
                         wasmerged = ismerge and s in ctxfiles
-                        files.append({'path': s, 'status': 'S', 'parent': parent,
-                          'wasmerged': wasmerged, 'stype': stype})
+                        substatus = 'M'
+                        if sp1rev == '':
+                            substatus = 'A'
+                        files.append({
+                            'path': s, 'status': 'S', 'parent': parent,
+                            'stype': stype, 'wasmerged': wasmerged,
+                            'substatus': substatus,
+                        })
                 # Add the list of missing subrepos
                 subreposet = set(self._ctx.substate.keys())
                 subrepoparent1set = set(self._ctx.p1().substate.keys())
@@ -148,8 +158,11 @@ class HgFileListModel(QAbstractTableModel):
                 for s in missingsubreposet:
                     wasmerged = ismerge and s in ctxfiles
                     stype = self._ctx.p1().substate.get(s, subrepo.nullstate)[2]
-                    files.append({'path': s, 'status': 'S', 'parent': parent,
-                      'wasmerged': wasmerged, 'stype': stype})
+                    files.append({
+                        'path': s, 'status': 'S', 'parent': parent,
+                        'stype': stype, 'wasmerged': wasmerged,
+                        'substatus': 'R',
+                    })
 
         if self._fulllist and ismerge:
             func = lambda x: True
@@ -208,7 +221,8 @@ class HgFileListModel(QAbstractTableModel):
                 return QVariant(geticon('filedelete'))
             elif current_file_desc['status'] == 'S':
                 stype = current_file_desc.get('stype', 'hg')
-                return QVariant(self._subrepoIcoDict[stype])
+                substatus = current_file_desc['substatus']
+                return QVariant(self._subrepoIcoDict[substatus][stype])
             #else:
             #    return QVariant(geticon('filemodify'))
         elif role == Qt.FontRole:

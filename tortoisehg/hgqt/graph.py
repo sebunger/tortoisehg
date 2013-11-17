@@ -66,6 +66,7 @@ def revision_grapher(repo, **opts):
     revset = opts.get('revset', None)
     branch = opts.get('branch', None)
     showhidden = opts.get('showhidden', None)
+    showgraftsource = opts.get('showgraftsource', None)
     if showhidden:
         revhidden = []
     else:
@@ -131,7 +132,7 @@ def revision_grapher(repo, **opts):
         # Add parents to next_revs.
         parents = [(p.rev(), LINE_TYPE_PARENT) for p in getparents(ctx)
                    if not hidden(p.rev())]
-        if 'source' in ctx.extra():
+        if showgraftsource and 'source' in ctx.extra():
             src_rev_str = ctx.extra()['source']
             if src_rev_str in repo:
                 src_rev = repo[src_rev_str].rev()
@@ -406,7 +407,8 @@ class Graph(object):
             self.nodesdict[gnode.rev] = gnode
             mcol = mcol.union(set([gnode.x]))
             mcol = mcol.union(set([max(x[:2]) for x in gnode.bottomlines]))
-            if rev is not None and gnode.rev <= rev:
+            if (rev is not None and isinstance(gnode.rev, int)
+                and gnode.rev <= rev):
                 rev = None # we reached rev, switching to nnode counter
             if rev is None:
                 if nnodes is not None:
@@ -428,9 +430,12 @@ class Graph(object):
         return self.grapher is None
 
     def index(self, rev):
-        if len(self) == 0: # graph is empty, let's build some nodes
-            self.build_nodes(10)
-        if rev is not None and len(self) > 0 and rev < self.nodes[-1].rev:
+        if len(self) == 0:
+            # graph is empty, let's build some nodes.  nodes for unapplied
+            # patches are built at once because they don't have comparable
+            # revision numbers, which makes build_nodes() go wrong.
+            self.build_nodes(10, len(self.repo) - 1)
+        if isinstance(rev, int) and len(self) > 0 and rev < self.nodes[-1].rev:
             self.build_nodes(self.nodes[-1].rev - rev)
         if rev in self.nodesdict:
             return self.nodes.index(self.nodesdict[rev])

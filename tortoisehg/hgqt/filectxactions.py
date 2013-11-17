@@ -278,20 +278,23 @@ class FilectxActions(QObject):
             return
         if rev is None:
             rev = repo[rev].p1().rev()
-        dlg = revert.RevertDialog(repo, fileSelection, rev,
+        repoagent = repo._pyqtobj  # TODO
+        dlg = revert.RevertDialog(repoagent, fileSelection, rev,
                                   parent=self.parent())
         dlg.exec_()
 
     def _navigate(self, dlgclass):
         repo, filename, rev = self._findsubsingle(self._currentfile)
         if filename and len(repo.file(filename)) > 0:
-            dlg = self._nav_dialogs.open(dlgclass, repo, filename)
+            repoagent = repo._pyqtobj  # TODO
+            dlg = self._nav_dialogs.open(dlgclass, repoagent, filename)
             dlg.goto(rev)
 
-    def _createnavdialog(self, dlgclass, repo, filename):
-        return dlgclass(repo, filename)
+    def _createnavdialog(self, dlgclass, repoagent, filename):
+        return dlgclass(repoagent, filename)
 
-    def _gennavdialogkey(self, dlgclass, repo, filename):
+    def _gennavdialogkey(self, dlgclass, repoagent, filename):
+        repo = repoagent.rawRepo()
         return dlgclass, repo.wjoin(filename)
 
     def _findsub(self, paths):
@@ -321,8 +324,8 @@ class FilectxActions(QObject):
 
     def opensubrepo(self):
         path = os.path.join(self.repo.root, self._currentfile)
-        if os.path.isdir(path):
-            spath = path[len(self.repo.root)+1:]
+        spath = path[len(self.repo.root)+1:]
+        if spath in self.ctx.substate and os.path.isdir(path):
             source, revid, stype = self.ctx.substate[spath]
             link = u'repo:' + hglib.tounicode(path)
             if stype == 'hg':

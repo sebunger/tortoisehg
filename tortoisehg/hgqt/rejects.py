@@ -6,13 +6,11 @@
 # of the GNU General Public License, incorporated herein by reference.
 
 import cStringIO
-import os
 
-from mercurial import hg, util, patch, commands, ui
+from mercurial import patch
 from hgext import record
 
 from tortoisehg.util import hglib
-from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, lexers
 
@@ -23,7 +21,7 @@ from PyQt4 import Qsci
 qsci = Qsci.QsciScintilla
 
 class RejectsDialog(QDialog):
-    def __init__(self, path, parent):
+    def __init__(self, ui, path, parent=None):
         super(RejectsDialog, self).__init__(parent)
         self.setWindowTitle(_('Merge rejected patch chunks into %s') %
                             hglib.tounicode(path))
@@ -35,8 +33,6 @@ class RejectsDialog(QDialog):
         editor.setBraceMatching(qsci.SloppyBraceMatch)
         editor.setFolding(qsci.BoxedTreeFoldStyle)
         editor.installEventFilter(qscilib.KeyPressInterceptor(self))
-        editor.setContextMenuPolicy(Qt.CustomContextMenu)
-        editor.customContextMenuRequested.connect(self.menuRequested)
         self.baseLineColor = editor.markerDefine(qsci.Background, -1)
         editor.setMarkerBackgroundColor(QColor('lightblue'), self.baseLineColor)
         self.layout().addWidget(editor, 3)
@@ -109,7 +105,7 @@ class RejectsDialog(QDialog):
         f.seek(0)
         editor.read(f)
         editor.setModified(False)
-        lexer = lexers.getlexer(ui.ui(), path, earlybytes, self)
+        lexer = lexers.getlexer(ui, path, earlybytes, self)
         editor.setLexer(lexer)
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
@@ -134,10 +130,6 @@ class RejectsDialog(QDialog):
         self.resolved.setDisabled(True)
         self.unresolved.setDisabled(True)
         QTimer.singleShot(0, lambda: self.chunklist.setCurrentRow(0))
-
-    def menuRequested(self, point):
-        point = self.editor.viewport().mapToGlobal(point)
-        return self.editor.createStandardContextMenu().exec_(point)
 
     def updateChunkList(self):
         self.updating = True
@@ -236,8 +228,6 @@ class RejectBrowser(qscilib.Scintilla):
         self.setUtf8(True)
 
         self.installEventFilter(qscilib.KeyPressInterceptor(self))
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.menuRequested)
         self.setCaretLineVisible(False)
 
         self.setMarginType(1, qsci.SymbolMargin)
@@ -255,10 +245,6 @@ class RejectBrowser(qscilib.Scintilla):
         self.setMarginMarkerMask(1, mask)
         lexer = lexers.difflexer(self)
         self.setLexer(lexer)
-
-    def menuRequested(self, point):
-        point = self.viewport().mapToGlobal(point)
-        return self.createStandardContextMenu().exec_(point)
 
     def showChunk(self, lines):
         utext = []

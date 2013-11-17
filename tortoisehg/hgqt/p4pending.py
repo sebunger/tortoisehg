@@ -5,8 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -14,19 +12,19 @@ from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cslist, cmdui
+from tortoisehg.hgqt import cslist, cmdcore, cmdui
 
 
 class PerforcePending(QDialog):
     'Dialog for selecting a revision'
 
-    output = pyqtSignal(QString, QString)
-    makeLogVisible = pyqtSignal(bool)
     showMessage = pyqtSignal(unicode)
 
-    def __init__(self, repo, pending, url, parent):
+    def __init__(self, repoagent, pending, url, parent):
         QDialog.__init__(self, parent)
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        self._cmdsession = cmdcore.nullCmdSession()
         self.url = url
         self.pending = pending # dict of changelist -> hash tuple
 
@@ -36,13 +34,8 @@ class PerforcePending(QDialog):
         clcombo = QComboBox()
         layout.addWidget(clcombo)
 
-        self.cslist = cslist.ChangesetList(self.repo)
+        self.cslist = cslist.ChangesetList(repo)
         layout.addWidget(self.cslist)
-
-        self.cmd = cmdui.Runner(False, self)
-        self.cmd.commandFinished.connect(self.commandFinished)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Discard)
@@ -71,10 +64,11 @@ class PerforcePending(QDialog):
     @pyqtSlot(QString)
     def p4clActivated(self, curcl):
         'User has selected a changelist, fill cslist'
+        repo = self._repoagent.rawRepo()
         curcl = hglib.fromunicode(curcl)
         try:
             hashes = self.pending[curcl]
-            revs = [self.repo[hash] for hash in hashes]
+            revs = [repo[hash] for hash in hashes]
         except (error.Abort, error.RepoLookupError), e:
             revs = []
         self.cslist.clear()
@@ -88,38 +82,42 @@ class PerforcePending(QDialog):
         assert(self.curcl.endswith('(pending)'))
         cmdline = ['p4submit', '--verbose',
                    '--config', 'extensions.perfarce=',
-                   '--repository', self.url,
-                   self.curcl[:-10]]
-        self.repo.incrementBusyCount()
+                   '--repository', hglib.tounicode(self.url),
+                   hglib.tounicode(self.curcl[:-10])]
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.showMessage.emit(_('Submitting p4 changelist...'))
-        self.cmd.run(cmdline, useproc=True)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self,
+                                                             worker='proc')
+        sess.commandFinished.connect(self.commandFinished)
 
     def revert(self):
         assert(self.curcl.endswith('(pending)'))
         cmdline = ['p4revert', '--verbose',
                    '--config', 'extensions.perfarce=',
-                   '--repository', self.url,
-                   self.curcl[:-10]]
-        self.repo.incrementBusyCount()
+                   '--repository', hglib.tounicode(self.url),
+                   hglib.tounicode(self.curcl[:-10])]
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.showMessage.emit(_('Reverting p4 changelist...'))
-        self.cmd.run(cmdline, useproc=True)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self,
+                                                             worker='proc')
+        sess.commandFinished.connect(self.commandFinished)
 
+    @pyqtSlot(int)
     def commandFinished(self, ret):
         self.showMessage.emit('')
-        self.repo.decrementBusyCount()
         self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(True)
         if ret == 0:
             self.reject()
+        else:
+            cmdui.errorMessageBox(self._cmdsession, self)
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            if self.cmd.isRunning():
-                self.cmd.cancel()
+            if not self._cmdsession.isFinished():
+                self._cmdsession.abort()
             else:
                 self.reject()
         else:

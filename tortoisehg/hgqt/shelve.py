@@ -22,13 +22,14 @@ class ShelveDialog(QDialog):
 
     wdir = _('Working Directory')
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
 
         self.setWindowIcon(qtlib.geticon('shelve'))
 
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
         self.shelves = []
         self.patches = []
 
@@ -72,7 +73,7 @@ class ShelveDialog(QDialog):
         ahbox.addWidget(self.clearShelfButtonA)
         ahbox.addWidget(self.delShelfButtonA)
 
-        self.browsea = chunks.ChunksWidget(repo, self, True)
+        self.browsea = chunks.ChunksWidget(self._repoagent, self, True)
         self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
         self.browsea.linkActivated.connect(self.linkActivated)
         self.browsea.showMessage.connect(self.showMessage)
@@ -102,7 +103,7 @@ class ShelveDialog(QDialog):
         bhbox.addWidget(self.clearShelfButtonB)
         bhbox.addWidget(self.delShelfButtonB)
 
-        self.browseb = chunks.ChunksWidget(repo, self, True)
+        self.browseb = chunks.ChunksWidget(self._repoagent, self, True)
         self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
         self.browseb.linkActivated.connect(self.linkActivated)
         self.browseb.showMessage.connect(self.showMessage)
@@ -191,10 +192,14 @@ class ShelveDialog(QDialog):
                            'in .hg/Trashcan/'))
 
         self.refreshCombos()
-        repo.repositoryChanged.connect(self.refreshCombos)
+        repoagent.repositoryChanged.connect(self.refreshCombos)
 
         self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
         self.restoreSettings()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def moveFileRight(self):
@@ -431,6 +436,7 @@ class ShelveDialog(QDialog):
     def comboAChanged(self, index):
         if self.comboRefreshInProgress:
             return
+        assert index >= 0  # side A should always have "Working Directory"
         if index == 0:
             rev = None
             self.delShelfButtonA.setEnabled(False)
@@ -440,15 +446,27 @@ class ShelveDialog(QDialog):
             self.delShelfButtonA.setEnabled(index <= len(self.shelves))
             self.clearShelfButtonA.setEnabled(index <= len(self.shelves))
         self.browsea.setContext(self.repo.changectx(rev))
+        self._deselectSamePatch(self.combob)
 
     @pyqtSlot(int)
     def comboBChanged(self, index):
         if self.comboRefreshInProgress:
             return
         rev = self.currentPatchB()
-        self.delShelfButtonB.setEnabled(index < len(self.shelves))
-        self.clearShelfButtonB.setEnabled(index < len(self.shelves))
+        self.delShelfButtonB.setEnabled(0 <= index < len(self.shelves))
+        self.clearShelfButtonB.setEnabled(0 <= index < len(self.shelves))
         self.browseb.setContext(self.repo.changectx(rev))
+        self._deselectSamePatch(self.comboa)
+
+    def _deselectSamePatch(self, combo):
+        # if the same patch or shelve is selected by both sides, "move" action
+        # will corrupt patch content.
+        if self.currentPatchA() != self.currentPatchB():
+            return
+        if combo.count() > 1:
+            combo.setCurrentIndex((combo.currentIndex() + 1) % combo.count())
+        else:
+            combo.setCurrentIndex(-1)
 
     @pyqtSlot(int, int)
     def linkSplitters(self, pos, index):

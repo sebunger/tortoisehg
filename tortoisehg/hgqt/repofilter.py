@@ -77,6 +77,7 @@ class RepoFilterBar(QToolBar):
     """Emitted (branch, allparents) when branch selection changed"""
 
     showHiddenChanged = pyqtSignal(bool)
+    showGraftSourceChanged = pyqtSignal(bool)
 
     _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
@@ -166,6 +167,14 @@ class RepoFilterBar(QToolBar):
         self.showHiddenBtn.setToolTip(_('Show/Hide hidden changesets'))
         self.showHiddenBtn.clicked.connect(self.showHiddenChanged)
         self.addWidget(self.showHiddenBtn)
+
+        self.showGraftSourceBtn = QToolButton()
+        self.showGraftSourceBtn.setIcon(qtlib.geticon('hg-transplant'))
+        self.showGraftSourceBtn.setCheckable(True)
+        self.showGraftSourceBtn.setChecked(True)
+        self.showGraftSourceBtn.setToolTip(_('Toggle graft relations visibility'))
+        self.showGraftSourceBtn.clicked.connect(self.showGraftSourceChanged)
+        self.addWidget(self.showGraftSourceBtn)
         self.addSeparator()
 
         self._initBranchFilter()
@@ -189,6 +198,7 @@ class RepoFilterBar(QToolBar):
         self._branchLabel.setEnabled(enabled)
         self.filterEnabled = enabled
         self.showHiddenBtn.setEnabled(enabled)
+        self.showGraftSourceBtn.setEnabled(enabled)
 
     def selectionChanged(self):
         selection = self.revsetcombo.lineEdit().selectedText()
@@ -311,6 +321,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.setCurrentIndex(-1)
         self.setVisible(s.value('showrepofilterbar').toBool())
         self.showHiddenBtn.setChecked(s.value('showhidden').toBool())
+        self.showGraftSourceBtn.setChecked(s.value('showgraftsource', True).toBool())
         self._loadBranchFilterSettings(s)
         s.endGroup()
 
@@ -326,6 +337,7 @@ class RepoFilterBar(QToolBar):
         s.setValue('showrepofilterbar', not self.isHidden())
         self._saveBranchFilterSettings(s)
         s.setValue('showhidden', self.showHiddenBtn.isChecked())
+        s.setValue('showgraftsource', self.showGraftSourceBtn.isChecked())
         s.endGroup()
 
     def _initBranchFilter(self):
@@ -429,6 +441,9 @@ class RepoFilterBar(QToolBar):
 
     def getShowHidden(self):
         return self.showHiddenBtn.isChecked()
+
+    def getShowGraftSource(self):
+        return self.showGraftSourceBtn.isChecked()
 
     @pyqtSlot()
     def _emitBranchChanged(self):

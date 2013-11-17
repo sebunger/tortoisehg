@@ -74,7 +74,8 @@ def iterRepoItemFromXml(source):
     xr = QXmlStreamReader(source)
     while not xr.atEnd():
         t = xr.readNext()
-        if t == QXmlStreamReader.StartElement and xr.name() in ('repo', 'subrepo'):
+        if (t == QXmlStreamReader.StartElement
+            and xr.name() in ('repo', 'subrepo')):
             yield repotreeitem.undumpObject(xr)
 
 def getRepoItemList(root, standalone=False):
@@ -87,8 +88,15 @@ def getRepoItemList(root, standalone=False):
 
 
 class RepoTreeModel(QAbstractItemModel):
-    def __init__(self, filename, parent=None, showShortPaths=False):
+    def __init__(self, filename, repomanager, parent=None,
+                 showShortPaths=False):
         QAbstractItemModel.__init__(self, parent)
+
+        self._repomanager = repomanager
+        self._repomanager.configChanged.connect(self._updateShortName)
+        self._repomanager.repositoryChanged.connect(self._updateBaseNode)
+        self._repomanager.repositoryOpened.connect(self._updateItem)
+
         self.showShortPaths = showShortPaths
         self._activeRepoItem = None
 
@@ -143,7 +151,7 @@ class RepoTreeModel(QAbstractItemModel):
         if parent.column() > 0:
             return 0
         if not parent.isValid():
-            parentItem = self.rootItem;
+            parentItem = self.rootItem
         else:
             parentItem = parent.internalPointer()
         return parentItem.childCount()
@@ -331,14 +339,6 @@ class RepoTreeModel(QAbstractItemModel):
         writeXml(f, self.rootItem, reporegistryXmlElementName)
         f.close()
 
-    def depth(self, index):
-        count = 1
-        while True:
-            index = index.parent()
-            if index.row() < 0:
-                return count
-            count += 1
-
     def _emitItemDataChanged(self, item):
         self.dataChanged.emit(self._indexFromItem(item, 0),
                               self._indexFromItem(item, self.columnCount()))
@@ -388,6 +388,26 @@ class RepoTreeModel(QAbstractItemModel):
                     grp.updateCommonPath()
                 else:
                     grp.updateCommonPath('')
+
+    @pyqtSlot(unicode)
+    def _updateShortName(self, uroot):
+        repo = self._repomanager.repoAgent(uroot).rawRepo()
+        it = self.getRepoItem(hglib.fromunicode(uroot))
+        if it:
+            it.setShortName(repo.shortname)
+            self._emitItemDataChanged(it)
+
+    @pyqtSlot(unicode)
+    def _updateBaseNode(self, uroot):
+        repo = self._repomanager.repoAgent(uroot).rawRepo()
+        it = self.getRepoItem(hglib.fromunicode(uroot))
+        if it:
+            it.setBaseNode(repo[0].node())
+
+    @pyqtSlot(unicode)
+    def _updateItem(self, uroot):
+        self._updateShortName(uroot)
+        self._updateBaseNode(uroot)
 
     def sortchilds(self, childs, keyfunc):
         self.layoutAboutToBeChanged.emit()

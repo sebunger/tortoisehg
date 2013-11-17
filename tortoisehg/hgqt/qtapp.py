@@ -9,8 +9,14 @@
 import gc, os, sys, traceback
 
 from PyQt4.QtCore import *
-from PyQt4.QtGui import QApplication
+from PyQt4.QtGui import QApplication, QFont
 from PyQt4.QtNetwork import QLocalServer, QLocalSocket
+
+if PYQT_VERSION < 0x40600 or QT_VERSION < 0x40600:
+    sys.stderr.write('TortoiseHg requires at least Qt 4.6 and PyQt 4.6\n')
+    sys.stderr.write('You have Qt %s and PyQt %s\n' %
+                     (QT_VERSION_STR, PYQT_VERSION_STR))
+    sys.exit(-1)
 
 from mercurial import error, util
 
@@ -122,6 +128,7 @@ class ExceptionCatcher(QObject):
         opts['error'] = ''.join(''.join(traceback.format_exception(*args))
                                 for args in self.errors)
         etype, evalue = self.errors[0][:2]
+        parent = self._mainapp.activeWindow()
         if (len(set(e[0] for e in self.errors)) == 1
             and etype in _recoverableexc):
             opts['values'] = evalue
@@ -131,18 +138,17 @@ class ExceptionCatcher(QObject):
                                    u'</b> %(arg1)s'])
                 opts['values'] = [str(evalue), evalue.hint]
             dlg = bugreport.ExceptionMsgBox(hglib.tounicode(str(evalue)),
-                                            errstr, opts,
-                                            parent=self._mainapp.activeWindow())
+                                            errstr, opts, parent=parent)
+            dlg.exec_()
         elif etype is KeyboardInterrupt:
-            if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
-                                    _('Close this application?')):
-                QApplication.exit(-1)
-
             self.errors = []
-            return
+            if qtlib.QuestionMsgBox(_('Keyboard Interrupt'),
+                                    _('Close this application?'),
+                                    parent=parent):
+                self._mainapp.exit(-1)
         else:
-            dlg = bugreport.BugReport(opts, parent=self._mainapp.activeWindow())
-        dlg.exec_()
+            dlg = bugreport.BugReport(opts, parent=parent)
+            dlg.exec_()
 
     def _printexception(self):
         for args in self.errors:
@@ -204,7 +210,7 @@ def allowSetForegroundWindow(processid=-1):
         except ImportError:
             pass
 
-def connectToExistingWorkbench(root=None):
+def connectToExistingWorkbench(root, revset=None):
     """
     Connect and send data to an existing workbench server
 
@@ -215,10 +221,10 @@ def connectToExistingWorkbench(root=None):
     also send "echo" to check that the connection works (i.e. that there is a
     server)
     """
-    if root:
-        data = root
+    if revset:
+        data = '\0'.join([root, revset])
     else:
-        data = '[echo]'
+        data = root
     servername = QApplication.applicationName() + '-' + util.getuser()
     socket = QLocalSocket()
     socket.connectToServer(servername, QIODevice.ReadWrite)
@@ -238,6 +244,34 @@ def connectToExistingWorkbench(root=None):
         QLocalServer.removeServer(servername)
     return False
 
+
+def _fixapplicationfont():
+    if os.name != 'nt':
+        return
+    try:
+        import win32gui, win32con
+    except ImportError:
+        return
+
+    # use configurable font like GTK, Mozilla XUL or Eclipse SWT
+    ncm = win32gui.SystemParametersInfo(win32con.SPI_GETNONCLIENTMETRICS)
+    lf = ncm['lfMessageFont']
+    f = QFont(hglib.tounicode(lf.lfFaceName))
+    f.setItalic(lf.lfItalic)
+    if lf.lfWeight != win32con.FW_DONTCARE:
+        weights = [(0, QFont.Light), (400, QFont.Normal), (600, QFont.DemiBold),
+                   (700, QFont.Bold), (800, QFont.Black)]
+        n, w = filter(lambda e: e[0] <= lf.lfWeight, weights)[-1]
+        f.setWeight(w)
+    f.setPixelSize(abs(lf.lfHeight))
+    QApplication.setFont(f, 'QWidget')
+
+def _gettranslationpath():
+    """Return path to Qt's translation file (.qm)"""
+    if getattr(sys, 'frozen', False):
+        return ':/translations'
+    else:
+        return QLibraryInfo.location(QLibraryInfo.TranslationsPath)
 
 class QtRunner(QObject):
     """Run Qt app and hold its windows
@@ -275,8 +309,8 @@ class QtRunner(QObject):
         self._mainapp.setApplicationVersion(thgversion.version())
         self._fixlibrarypaths()
         self._installtranslator()
-        qtlib.setup_font_substitutions()
-        qtlib.fix_application_font()
+        QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
+        _fixapplicationfont()
         qtlib.configstyles(ui)
         qtlib.initfontcache(ui)
         self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
@@ -313,7 +347,7 @@ class QtRunner(QObject):
         if not i18n.language:
             return
         t = QTranslator(self._mainapp)
-        t.load('qt_' + i18n.language, qtlib.gettranslationpath())
+        t.load('qt_' + i18n.language, _gettranslationpath())
         self._mainapp.installTranslator(t)
 
     def _createdialog(self, dlgfunc, args, opts):
@@ -392,15 +426,24 @@ class QtRunner(QObject):
         socket = self._server.nextPendingConnection()
         if socket:
             socket.waitForReadyRead(10000)
-            root = str(socket.readAll())
-            if root and root != '[echo]':
-                self.showRepoInWorkbench(hglib.tounicode(root))
+            data = str(socket.readAll())
+            if data and data != '[echo]':
+                args = data.split('\0', 1)
+                if len(args) > 1:
+                    uroot, urevset = map(hglib.tounicode, args)
+                else:
+                    uroot = hglib.tounicode(args[0])
+                    urevset = None
+                self.showRepoInWorkbench(uroot)
+
+                wb = self._workbench
+                if urevset:
+                    wb.setRevsetFilter(uroot, urevset)
 
                 # Bring the workbench window to the front
                 # This assumes that the client process has
                 # called allowSetForegroundWindow(-1) right before
                 # sending the request
-                wb = self._workbench
                 wb.setWindowState(wb.windowState() & ~Qt.WindowMinimized
                                   | Qt.WindowActive)
                 wb.show()
@@ -409,5 +452,5 @@ class QtRunner(QObject):
                 # Revoke the blanket permission to set the foreground window
                 allowSetForegroundWindow(os.getpid())
 
-            socket.write(QByteArray(root))
+            socket.write(QByteArray(data))
             socket.flush()

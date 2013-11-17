@@ -105,6 +105,8 @@ class CloneDialog(QDialog):
             optbox.addLayout(hbox)
             chk = QCheckBox(chklabel)
             text = QLineEdit(enabled=False)
+            chk.toggled.connect(text.setEnabled)
+            chk.toggled.connect(text.setFocus)
             hbox.addWidget(chk)
             hbox.addWidget(text)
             if stretch is not None:
@@ -114,13 +116,11 @@ class CloneDialog(QDialog):
                 btn.setEnabled(False)
                 btn.setAutoDefault(False)
                 btn.clicked.connect(btnslot)
+                chk.toggled.connect(btn.setEnabled)
                 hbox.addSpacing(6)
                 hbox.addWidget(btn)
-                chk.toggled.connect(
-                    lambda e: self.toggle_enabled(e, text, target2=btn))
                 return chk, text, btn
             else:
-                chk.toggled.connect(lambda e: self.toggle_enabled(e, text))
                 return chk, text
 
         self.rev_chk, self.rev_text = chktext(_('Clone to revision:'),
@@ -395,14 +395,6 @@ class CloneDialog(QDialog):
 
     ### Signal Handlers ###
 
-    def toggle_enabled(self, checked, target, target2=None):
-        target.setEnabled(checked)
-        if checked:
-            target.setFocus()
-        if target2:
-            target2.setEnabled(checked)
-        self.composeCommand()
-
     def detail_toggled(self, checked):
         self.cmd.setShowOutput(checked)
 
@@ -452,15 +444,13 @@ class CloneDialog(QDialog):
 
     def command_finished(self, ret):
         self.ret = ret
-        if ret is not 0 or self.cmd.outputShown():
+        if ret != 0 or self.cmd.outputShown():
             self.detail_btn.setChecked(True)
             self.clone_btn.setShown(True)
             self.close_btn.setShown(True)
             self.close_btn.setDefault(True)
             self.close_btn.setFocus()
             self.cancel_btn.setHidden(True)
-        else:
-            self.accept()
         self.setChoicesActive(True)
 
         if not ret:
@@ -469,8 +459,11 @@ class CloneDialog(QDialog):
             self.clonedRepository.emit(self.dest_combo.currentText(),
                 self.src_combo.currentText())
 
+        if ret == 0 and not self.cmd.outputShown():
+            self.accept()
+
     def onCloseClicked(self):
-        if self.ret is 0:
+        if self.ret == 0:
             self.accept()
         else:
             self.reject()

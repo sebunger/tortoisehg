@@ -169,6 +169,10 @@ class patchctx(object):
         else:
             return [], [], []
 
+    def thgmqoriginalparent(self):
+        '''The revision id of the original patch parent'''
+        return self._ph.parent
+
     def thgmqpatchdata(self, wfile):
         'called by fileview to get diff data'
         if wfile == self._parseErrorFileName:

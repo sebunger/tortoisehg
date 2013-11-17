@@ -21,12 +21,12 @@ class StripDialog(QDialog):
     showBusyIcon = pyqtSignal(QString)
     hideBusyIcon = pyqtSignal(QString)
 
-    def __init__(self, repo, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts={}):
         super(StripDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint)
         self.setWindowIcon(qtlib.geticon('menudelete'))
-        self.repo = repo
+        self._repoagent = repoagent
 
         # base layout box
         box = QVBoxLayout()
@@ -110,9 +110,9 @@ class StripDialog(QDialog):
         box.addWidget(buttons)
 
         # signal handlers
-        self.rev_combo.editTextChanged.connect(lambda *a: self.preview())
+        self.rev_combo.editTextChanged.connect(self.preview)
         self.rev_combo.lineEdit().returnPressed.connect(self.strip)
-        self.discard_chk.toggled.connect(lambda *a: self.preview())
+        self.discard_chk.toggled.connect(self.preview)
 
         # dialog setting
         self.setLayout(box)
@@ -130,6 +130,10 @@ class StripDialog(QDialog):
         self.preview()
 
     ### Private Methods ###
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def get_rev(self):
         """Return the integer revision number of the input or None"""
@@ -154,6 +158,7 @@ class StripDialog(QDialog):
         self.cslist.update(striprevs)
         return True
 
+    @pyqtSlot()
     def preview(self):
         if self.updatecslist():
             striprevs = self.cslist.curitems
@@ -188,10 +193,6 @@ class StripDialog(QDialog):
         if self.discard_chk.isChecked():
             cmdline.append('--force')
         else:
-            try:
-                node = self.repo[rev]
-            except (error.LookupError, error.RepoLookupError, error.RepoError):
-                return
             def isclean():
                 """return whether WD is changed"""
                 wc = self.repo[None]
@@ -238,7 +239,7 @@ class StripDialog(QDialog):
     def command_finished(self, ret):
         self.hideBusyIcon.emit('hg-remove')
         self.repo.decrementBusyCount()
-        if ret is not 0 or self.cmd.outputShown():
+        if ret != 0 or self.cmd.outputShown():
             self.detail_btn.setChecked(True)
             self.close_btn.setShown(True)
             self.close_btn.setAutoDefault(True)

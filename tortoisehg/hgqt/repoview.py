@@ -209,6 +209,9 @@ class HgRepoView(QTableView):
 
     def revClicked(self, index):
         rev = self.revFromindex(index)
+        if rev is not None:
+            clip = QApplication.clipboard()
+            clip.setText(str(self.repo[rev]), QClipboard.Selection)
         if QApplication.keyboardModifiers() & Qt.AltModifier:
             self.revisionAltClicked.emit(rev)
         else:

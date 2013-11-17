@@ -11,7 +11,7 @@ from PyQt4.QtGui import *
 import os
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, resolve, commit, thgrepo
+from tortoisehg.hgqt import qtlib, cmdui, resolve, thgrepo, wctxcleaner
 from tortoisehg.hgqt import csinfo, cslist
 
 BB = QDialogButtonBox
@@ -19,12 +19,13 @@ BB = QDialogButtonBox
 class GraftDialog(QDialog):
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         super(GraftDialog, self).__init__(parent)
         self.setWindowIcon(qtlib.geticon('hg-transplant'))
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+
+        self._repoagent = repoagent
         self._graftstatefile = self.repo.join('graftstate')
         self.aborted = False
         self.valid = True
@@ -88,12 +89,6 @@ class GraftDialog(QDialog):
         sep = qtlib.LabeledSeparator(_('Options'))
         self.layout().addWidget(sep)
 
-        self.autoresolvechk = QCheckBox(_('Automatically resolve merge conflicts '
-                                           'where possible'))
-        self.autoresolvechk.setChecked(
-            repo.ui.configbool('tortoisehg', 'autoresolve', False))
-        self.layout().addWidget(self.autoresolvechk)
-
         self.currentuservechk = QCheckBox(_('Use my user name instead of graft '
                                             'committer user name'))
         self.layout().addWidget(self.currentuservechk)
@@ -103,6 +98,12 @@ class GraftDialog(QDialog):
 
         self.logvechk = QCheckBox(_('Append graft info to log message'))
         self.layout().addWidget(self.logvechk)
+
+        self.autoresolvechk = QCheckBox(_('Automatically resolve merge conflicts '
+                                           'where possible'))
+        self.autoresolvechk.setChecked(
+            self.repo.ui.configbool('tortoisehg', 'autoresolve', False))
+        self.layout().addWidget(self.autoresolvechk)
 
         self.cmd = cmdui.Widget(True, True, self)
         self.cmd.commandFinished.connect(self.commandFinished)
@@ -122,19 +123,24 @@ class GraftDialog(QDialog):
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
-        self.th = None
+        self._wctxcleaner = wctxcleaner.WctxCleaner(repoagent, self)
+        self._wctxcleaner.checkFinished.connect(self._onCheckFinished)
         if self.checkResolve():
             self.abortbtn.setEnabled(True)
         else:
             self.showMessage.emit(_('Checking...'))
             self.abortbtn.setEnabled(False)
             self.graftbtn.setEnabled(False)
-            QTimer.singleShot(0, self.checkStatus)
+            QTimer.singleShot(0, self._wctxcleaner.check)
 
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
         self.resize(0, 340)
         self.setWindowTitle(_('Graft - %s') % self.repo.displayname)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def _updateSourceTitle(self, idx):
         numrevs = len(self.sourcelist)
@@ -148,38 +154,17 @@ class GraftDialog(QDialog):
         self._updateSourceTitle(idx)
         self.source.update(self.repo[self.sourcelist[idx]])
 
-    def checkStatus(self):
-        repo = self.repo
-        class CheckThread(QThread):
-            def __init__(self, parent):
-                QThread.__init__(self, parent)
-                self.dirty = False
-
-            def run(self):
-                wctx = repo[None]
-                if len(wctx.parents()) > 1:
-                    self.dirty = True
-                elif wctx.dirty():
-                    self.dirty = True
-                else:
-                    for r, p, status in thgrepo.recursiveMergeStatus(repo):
-                        if status == 'u':
-                            self.dirty = True
-                            break
-        def completed():
-            self.th.wait()
-            if self.th.dirty:
-                self.graftbtn.setEnabled(False)
-                txt = _('Before graft, you must <a href="commit">'
-                        '<b>commit</b></a> or <a href="discard">'
-                        '<b>discard</b></a> changes.')
-            else:
-                self.graftbtn.setEnabled(True)
-                txt = _('You may continue or start the graft')
-            self.showMessage.emit(txt)
-        self.th = CheckThread(self)
-        self.th.finished.connect(completed)
-        self.th.start()
+    @pyqtSlot(bool)
+    def _onCheckFinished(self, clean):
+        if not clean:
+            self.graftbtn.setEnabled(False)
+            txt = _('Before graft, you must <a href="commit">'
+                    '<b>commit</b></a> or <a href="discard">'
+                    '<b>discard</b></a> changes.')
+        else:
+            self.graftbtn.setEnabled(True)
+            txt = _('You may continue or start the graft')
+        self.showMessage.emit(txt)
 
     def graft(self):
         self.graftbtn.setEnabled(False)
@@ -274,35 +259,14 @@ class GraftDialog(QDialog):
 
     def linkActivated(self, cmd):
         if cmd == 'resolve':
-            dlg = resolve.ResolveDialog(self.repo, self)
+            dlg = resolve.ResolveDialog(self._repoagent, self)
             dlg.exec_()
             self.checkResolve()
-        elif cmd == 'commit':
-            dlg = commit.CommitDialog(self.repo, [], {}, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.destcsinfo.update(self.repo['.'])
-            self.checkStatus()
-        elif cmd == 'discard':
-            labels = [(QMessageBox.Yes, _('&Discard')),
-                      (QMessageBox.No, _('Cancel'))]
-            if not qtlib.QuestionMsgBox(_('Confirm Discard'),
-                     _('Discard outstanding changes to working directory?'),
-                     labels=labels, parent=self):
-                return
-            def finished(ret):
-                self.repo.decrementBusyCount()
-                if ret == 0:
-                    self.checkStatus()
-            cmdline = ['update', '--clean', '--repository', self.repo.root,
-                       '--rev', '.']
-            self.runner = cmdui.Runner(True, self)
-            self.runner.commandFinished.connect(finished)
-            self.repo.incrementBusyCount()
-            self.runner.run(cmdline)
+        else:
+            self._wctxcleaner.runCleaner(cmd)
 
     def reject(self):
-        if self.th and self.th.isRunning():
+        if self._wctxcleaner.isChecking():
             return
         if os.path.exists(self._graftstatefile):
             main = _('Exiting with an unfinished graft is not recommended.')

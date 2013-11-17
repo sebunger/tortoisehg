@@ -218,17 +218,6 @@ Work with the various task tabs.
 
 ..
 
-	:guilabel:`Patch Queue`
-		This widget implements the MQ extension functionality.
-		See _`Patch Queue` for more detail.
-
-..		.. figure:: figures/mq-tasktab.png
-			:alt: Patch Queue Task Tab
-			
-			Patch Queue Task Tab
-
-..
-
 There is some relation between the revision or patch selected in the graph pane,
 and the task tabs.
 
@@ -384,6 +373,12 @@ With only one revision selected:
 	
 	:guilabel:`Copy hash`
 			Copy current revision's full hash to the clipboard.
+
+			Under X11, the short changeset hash is automatically
+			copied to the primary selection when the revision is
+			clicked, you paste it by pressing the middle mouse
+			button.
+
 	:guilabel:`Modify history`
 		:guilabel:`QGoto`
 			Push/pop patches upto this one

@@ -11,18 +11,18 @@ from PyQt4.QtGui import *
 from mercurial import revset
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, cmdui, commit, thgrepo
+from tortoisehg.hgqt import csinfo, cmdui, commit, wctxcleaner
 
 BB = QDialogButtonBox
 
 class CompressDialog(QDialog):
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, revs, parent):
+    def __init__(self, repoagent, revs, parent):
         super(CompressDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+        self._repoagent = repoagent
         self.revs = revs
 
         box = QVBoxLayout()
@@ -51,7 +51,6 @@ class CompressDialog(QDialog):
         self.cmd.commandFinished.connect(self.commandFinished)
         self.cmd.setShowOutput(True)
         self.showMessage.connect(self.cmd.stbar.showMessage)
-        self.cmd.stbar.linkActivated.connect(self.linkActivated)
         self.layout().addWidget(self.cmd, 2)
 
         bbox = QDialogButtonBox()
@@ -64,42 +63,26 @@ class CompressDialog(QDialog):
         self.bbox = bbox
 
         self.showMessage.emit(_('Checking...'))
-        QTimer.singleShot(0, self.checkStatus)
+        self._wctxcleaner = wctxcleaner.WctxCleaner(repoagent, self)
+        self._wctxcleaner.checkFinished.connect(self._checkCompleted)
+        self.cmd.stbar.linkActivated.connect(self._wctxcleaner.runCleaner)
+        QTimer.singleShot(0, self._wctxcleaner.check)
 
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
         self.resize(0, 340)
+        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Compress - %s') % repo.displayname)
 
         self.restoreSettings()
 
-    def checkStatus(self):
-        repo = self.repo
-        class CheckThread(QThread):
-            def __init__(self, parent):
-                QThread.__init__(self, parent)
-                self.dirty = False
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
-            def run(self):
-                wctx = repo[None]
-                if len(wctx.parents()) > 1:
-                    self.dirty = True
-                elif wctx.dirty():
-                    self.dirty = True
-                else:
-                    for root, path, status in thgrepo.recursiveMergeStatus(repo):
-                        if status == 'u':
-                            self.dirty = True
-                            break
-
-        self.th = CheckThread(self)
-        self.th.finished.connect(self._checkCompleted)
-        self.th.start()
-
-    @pyqtSlot()
-    def _checkCompleted(self):
-        self.th.wait()
-        if self.th.dirty:
+    @pyqtSlot(bool)
+    def _checkCompleted(self, clean):
+        if not clean:
             self.compressbtn.setEnabled(False)
             txt = _('Before compress, you must <a href="commit">'
                     '<b>commit</b></a> or <a href="discard">'
@@ -133,37 +116,13 @@ class CompressDialog(QDialog):
         descs = [self.repo[c].description() for c in revs]
         self.repo.opener('cur-message.txt', 'w').write('\n* * *\n'.join(descs))
 
-        dlg = commit.CommitDialog(self.repo, [], {}, self)
+        dlg = commit.CommitDialog(self._repoagent, [], {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.showMessage.emit(_('Compress is complete, old history untouched'))
         self.compressbtn.setText(_('Close'))
         self.compressbtn.clicked.disconnect(self.commit)
         self.compressbtn.clicked.connect(self.accept)
-
-    def linkActivated(self, cmd):
-        if cmd == 'commit':
-            dlg = commit.CommitDialog(self.repo, [], {}, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.checkStatus()
-        elif cmd == 'discard':
-            labels = [(QMessageBox.Yes, _('&Discard')),
-                      (QMessageBox.No, _('Cancel'))]
-            if not qtlib.QuestionMsgBox(_('Confirm Discard'),
-                     _('Discard outstanding changes to working directory?'),
-                     labels=labels, parent=self):
-                return
-            def finished(ret):
-                self.repo.decrementBusyCount()
-                if ret == 0:
-                    self.checkStatus()
-            cmdline = ['update', '--clean', '--repository', self.repo.root,
-                       '--rev', '.']
-            self.runner = cmdui.Runner(False, self)
-            self.runner.commandFinished.connect(finished)
-            self.repo.incrementBusyCount()
-            self.runner.run(cmdline)
 
     def storeSettings(self):
         s = QSettings()

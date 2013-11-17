@@ -24,8 +24,6 @@ def label_func(widget, item, ctx):
         return _('Parent:')
     elif item == 'children':
         return _('Child:')
-    elif item == 'patch':
-        return _('Patch:')
     elif item == 'precursors':
         return _('Precursors:')
     elif item == 'successors':
@@ -75,7 +73,8 @@ def data_func(widget, item, ctx):
                 branch = cctx.branch()
             children.append(revline_data(cctx, branch=branch))
         return children
-    elif item in ('graft', 'transplant', 'p4', 'svn', 'converted'):
+    elif item in ('graft', 'transplant', 'mqoriginalparent',
+                  'p4', 'svn', 'converted',):
         ts = widget.get_data(item, usepreset=True)
         if not ts:
             return None
@@ -84,11 +83,6 @@ def data_func(widget, item, ctx):
             return revline_data(tctx)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             return ts
-    elif item == 'patch':
-        if hasattr(ctx, '_patchname'):
-            desc = ctx.description()
-            return (ctx._patchname, str(ctx), summary_line(desc))
-        return None
     elif item == 'ishead':
         if ctx.rev() is None:
             ctx = ctx.p1()
@@ -107,15 +101,15 @@ def data_func(widget, item, ctx):
 
     raise csinfo.UnknownItem(item)
 
-def markup_func(widget, item, value):
-    def link_markup(revnum, revid, enable=True):
+def create_markup_func(ui):
+    def link_markup(revnum, revid, linkpattern=None):
         mrevid = revid_markup('%s (%s)' % (revnum, revid))
-        if not enable:
+        if linkpattern is None:
             return mrevid
-        link = 'cset:%s' % revid
+        link = linkpattern.replace('{node|short}', revid).replace('{rev}', revnum)
         return '<a href="%s">%s</a>' % (link, mrevid)
     def revline_markup(revnum, revid, summary, highlight=None,
-                       branch=None, link=True):
+                       branch=None, linkpattern='cset:{node|short}'):
         def branch_markup(branch):
             opts = dict(fg='black', bg='#aaffaa')
             return qtlib.markup(' %s ' % branch, **opts)
@@ -123,7 +117,7 @@ def markup_func(widget, item, value):
         if branch:
             branch = branch_markup(branch)
         if revid:
-            rev = link_markup(revnum, revid, link)
+            rev = link_markup(revnum, revid, linkpattern=linkpattern)
             if branch:
                 return '%s %s %s' % (rev, branch, summary)
             return '%s %s' % (rev, summary)
@@ -132,27 +126,34 @@ def markup_func(widget, item, value):
             if branch:
                 return '%s - %s %s' % (revnum, branch, summary)
             return '%s - %s' % (revnum, summary)
-    if item in ('cset', 'graft', 'transplant', 'patch', 'p4', 'svn', 'converted'):
-        link = item != 'cset'
-        if isinstance(value, basestring):
-            return revid_markup(value)
-        return revline_markup(link=link, *value)
-    elif item in ('parents', 'children', 'precursors', 'successors'):
-        csets = []
-        for cset in value:
-            if isinstance(cset, basestring):
-                csets.append(revid_markup(cset))
+    def markup_func(widget, item, value):
+        if item in ('cset', 'graft', 'transplant', 'mqoriginalparent',
+                    'p4', 'svn', 'converted'):
+            if item == 'cset':
+                linkpattern = ui.config('tortoisehg', 'changeset.link', None)
             else:
-                csets.append(revline_markup(*cset))
-        return csets
-    raise csinfo.UnknownItem(item)
+                linkpattern = 'cset:{node|short}'
+            if isinstance(value, basestring):
+                return revid_markup(value)
+            return revline_markup(linkpattern=linkpattern, *value)
+        elif item in ('parents', 'children', 'precursors', 'successors'):
+            csets = []
+            for cset in value:
+                if isinstance(cset, basestring):
+                    csets.append(revid_markup(cset))
+                else:
+                    csets.append(revline_markup(*cset))
+            return csets
+        raise csinfo.UnknownItem(item)
+    return markup_func
 
 def RevPanelWidget(repo):
     '''creates a rev panel widget and returns it'''
     custom = csinfo.custom(data=data_func, label=label_func,
-                           markup=markup_func)
+                           markup=create_markup_func(repo.ui))
     style = csinfo.panelstyle(contents=('cset', 'branch', 'obsolete', 'close', 'user',
                    'dateage', 'parents', 'children', 'tags', 'graft', 'transplant',
+                   'mqoriginalparent',
                    'precursors', 'successors',
                    'p4', 'svn', 'converted'), selectable=True,
                    expandable=True)

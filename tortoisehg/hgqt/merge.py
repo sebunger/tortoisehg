@@ -6,12 +6,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from mercurial import hg, error, util
+from mercurial import error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
-from tortoisehg.hgqt import qscilib, thgrepo, messageentry, commit
+from tortoisehg.hgqt import qscilib, thgrepo, messageentry, commit, wctxcleaner
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -20,11 +20,12 @@ MARGINS = (8, 0, 0, 0)
 
 class MergeDialog(QWizard):
 
-    def __init__(self, otherrev, repo, parent):
+    def __init__(self, repoagent, otherrev, parent=None):
         super(MergeDialog, self).__init__(parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
 
+        repo = repoagent.rawRepo()
         self.otherrev = str(otherrev)
         self.localrev = str(repo['.'].rev())
 
@@ -35,11 +36,11 @@ class MergeDialog(QWizard):
         self.setOption(QWizard.IndependentPages, True)
 
         # set pages
-        summarypage = SummaryPage(repo, self)
+        summarypage = SummaryPage(repoagent, self)
         self.addPage(summarypage)
-        self.addPage(MergePage(repo, self))
-        self.addPage(CommitPage(repo, self))
-        self.addPage(ResultPage(repo, self))
+        self.addPage(MergePage(repoagent, self))
+        self.addPage(CommitPage(repoagent, self))
+        self.addPage(ResultPage(repoagent, self))
         self.currentIdChanged.connect(self.pageChanged)
 
         # move focus to "Next" button so that "Cancel" doesn't eat Enter key
@@ -48,9 +49,8 @@ class MergeDialog(QWizard):
 
         self.resize(QSize(700, 489).expandedTo(self.minimumSizeHint()))
 
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.configChanged.connect(self.configChanged)
-        self.repo = repo
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.configChanged.connect(self.configChanged)
 
     @pyqtSlot()
     def repositoryChanged(self):
@@ -72,9 +72,13 @@ class MergeDialog(QWizard):
 
 
 class BasePage(QWizardPage):
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent):
         super(BasePage, self).__init__(parent)
-        self.repo = repo
+        self._repoagent = repoagent
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def validatePage(self):
         'user pressed NEXT button, can we proceed?'
@@ -112,10 +116,11 @@ class BasePage(QWizardPage):
 class SummaryPage(BasePage):
     refreshFinished = pyqtSignal()
 
-    def __init__(self, repo, parent):
-        super(SummaryPage, self).__init__(repo, parent)
-        self.clean = None
-        self.th = None
+    def __init__(self, repoagent, parent):
+        super(SummaryPage, self).__init__(repoagent, parent)
+        self._wctxcleaner = wctxcleaner.WctxCleaner(repoagent, self)
+        self._wctxcleaner.checkStarted.connect(self._onCheckStarted)
+        self._wctxcleaner.checkFinished.connect(self._onCheckFinished)
 
     ### Override Methods ###
 
@@ -188,7 +193,7 @@ class SummaryPage(BasePage):
                  'or <a href="discard"><b>discard</b></a> changes.')
         wd_text = QLabel(text)
         wd_text.setWordWrap(True)
-        wd_text.linkActivated.connect(self.onLinkActivated)
+        wd_text.linkActivated.connect(self._wctxcleaner.runCleaner)
         self.wd_text = wd_text
         self.groups.add(wd_text, 'dirty')
         self.layout().addWidget(wd_text)
@@ -233,7 +238,7 @@ class SummaryPage(BasePage):
 
     def isComplete(self):
         'should Next button be sensitive?'
-        return self.clean or self.field('force').toBool()
+        return self._wctxcleaner.isClean() or self.field('force').toBool()
 
     def validatePage(self):
         'validate that we can continue with the merge'
@@ -263,9 +268,8 @@ class SummaryPage(BasePage):
 
     def canExit(self):
         'can merge tool be closed?'
-        if self.th is not None and self.th.isRunning():
-            self.th.cancel()
-            self.th.wait()
+        if self._wctxcleaner.isChecking():
+            self._wctxcleaner.cancelCheck()
         return True
 
     def currentPage(self):
@@ -273,21 +277,18 @@ class SummaryPage(BasePage):
         self.refresh()
 
     def refresh(self):
-        if self.th is None:
-            self.th = CheckThread(self.repo, self)
-            self.th.finished.connect(self.threadFinished)
-        if self.th.isRunning():
-            return
-        self.groups.set_visible(True, 'prog')
-        self.th.start()
+        self._wctxcleaner.check()
 
-    def threadFinished(self):
+    @pyqtSlot()
+    def _onCheckStarted(self):
+        self.groups.set_visible(True, 'prog')
+
+    @pyqtSlot(bool, int)
+    def _onCheckFinished(self, clean, parents):
         self.groups.set_visible(False, 'prog')
-        if self.th.canceled:
+        if self._wctxcleaner.isCheckCanceled():
             return
-        dirty, parents = self.th.results
-        self.clean = not dirty
-        if dirty:
+        if not clean:
             self.groups.set_visible(parents == 2, 'merged')
             self.groups.set_visible(parents == 1, 'dirty')
             self.wd_status.set_status(_('<b>Uncommitted local changes '
@@ -301,50 +302,15 @@ class SummaryPage(BasePage):
 
     @pyqtSlot(QString)
     def onLinkActivated(self, cmd):
-        cmd = hglib.fromunicode(cmd)
-        repo = self.repo
-        if cmd == 'commit':
-            from tortoisehg.hgqt import commit
-            dlg = commit.CommitDialog(repo, [], {}, self)
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.refresh()
-        elif cmd == 'shelve':
-            from tortoisehg.hgqt import shelve
-            dlg = shelve.ShelveDialog(repo, self.wizard())
-            dlg.finished.connect(dlg.deleteLater)
-            dlg.exec_()
-            self.refresh()
-        elif cmd.startswith('discard'):
-            if cmd != 'discard:noconfirm':
-                labels = [(QMessageBox.Yes, _('&Discard')),
-                          (QMessageBox.No, _('Cancel'))]
-                if not qtlib.QuestionMsgBox(_('Confirm Discard'),
-                         _('Discard outstanding changes to working directory?'),
-                         labels=labels, parent=self):
-                    return
-            def finished(ret):
-                repo.decrementBusyCount()
-                self.refresh()
-            cmdline = ['update', '--clean', '--repository', repo.root,
-                       '--rev', '.']
-            self.runner = cmdui.Runner(True, self)
-            self.runner.commandFinished.connect(finished)
-            repo.incrementBusyCount()
-            self.runner.run(cmdline)
-        elif cmd == 'view':
-            dlg = status.StatusDialog(repo, [], {}, self)
-            dlg.exec_()
-            self.refresh()
-        elif cmd == 'skip':
+        if cmd == 'skip':
             self.wizard().next()
         else:
-            raise 'unknown command: %s' % cmd
+            self._wctxcleaner.runCleaner(cmd)
 
 
 class MergePage(BasePage):
-    def __init__(self, repo, parent):
-        super(MergePage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(MergePage, self).__init__(repoagent, parent)
         self.mergecomplete = False
 
         self.setTitle(_('Merging...'))
@@ -433,7 +399,7 @@ class MergePage(BasePage):
     @pyqtSlot(QString)
     def onLinkActivated(self, cmd):
         if cmd == 'resolve':
-            dlg = resolve.ResolveDialog(self.repo, self)
+            dlg = resolve.ResolveDialog(self._repoagent, self)
             dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             if self.autonext.isChecked():
@@ -443,13 +409,15 @@ class MergePage(BasePage):
 
 class CommitPage(BasePage):
 
-    def __init__(self, repo, parent):
-        super(CommitPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(CommitPage, self).__init__(repoagent, parent)
 
         self.setTitle(_('Commit merge results'))
         self.setSubTitle(' ')
         self.setLayout(QVBoxLayout())
         self.setCommitPage(True)
+
+        repo = repoagent.rawRepo()
 
         # csinfo
         def label_func(widget, item, ctx):
@@ -539,7 +507,7 @@ class CommitPage(BasePage):
         self.layout().addWidget(self.skiplast)
 
         hblayout = QHBoxLayout()
-        self.opts = commit.readrepoopts(self.repo)
+        self.opts = commit.readopts(self.repo.ui)
         self.optionsbtn = QPushButton(_('Commit Options'))
         self.optionsbtn.clicked.connect(self.details)
         hblayout.addWidget(self.optionsbtn)
@@ -588,7 +556,7 @@ class CommitPage(BasePage):
     @pyqtSlot(QString)
     def onLinkActivated(self, cmd):
         if cmd == 'view':
-            dlg = status.StatusDialog(self.repo, [], {}, self)
+            dlg = status.StatusDialog(self._repoagent, [], {}, self)
             dlg.exec_()
             self.refresh()
 
@@ -682,8 +650,8 @@ class CommitPage(BasePage):
             self.refresh()
 
 class ResultPage(BasePage):
-    def __init__(self, repo, parent):
-        super(ResultPage, self).__init__(repo, parent)
+    def __init__(self, repoagent, parent):
+        super(ResultPage, self).__init__(repoagent, parent)
         self.setTitle(_('Finished'))
         self.setSubTitle(' ')
         self.setFinalPage(True)
@@ -700,30 +668,3 @@ class ResultPage(BasePage):
         super(ResultPage, self).currentPage()
         self.mergeCsInfo.update(self.repo['tip'])
         self.wizard().setOption(QWizard.NoCancelButton, True)
-
-
-class CheckThread(QThread):
-    def __init__(self, repo, parent):
-        QThread.__init__(self, parent)
-        self.repo = hg.repository(repo.ui, repo.root)
-        self.results = (False, 1)
-        self.canceled = False
-
-    def run(self):
-        self.repo.dirstate.invalidate()
-        unresolved = False
-        for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
-            if self.canceled:
-                return
-            if status == 'u':
-                unresolved = True
-                break
-        wctx = self.repo[None]
-        try:
-            dirty = bool(wctx.dirty()) or unresolved
-            self.results = (dirty, len(wctx.parents()))
-        except EnvironmentError:
-            self.results = (True, len(wctx.parents()))
-
-    def cancel(self):
-        self.canceled = True

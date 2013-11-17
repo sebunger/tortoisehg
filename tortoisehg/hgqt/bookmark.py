@@ -10,18 +10,17 @@ from PyQt4.QtGui import *
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.hgqt import cmdcore, qtlib
 
 class BookmarkDialog(QDialog):
-    showMessage = pyqtSignal(QString)
-    output = pyqtSignal(QString, QString)
-    makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, rev, parent=None):
+    def __init__(self, repoagent, rev, parent=None):
         super(BookmarkDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
-        self.repo = repo
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        self._cmdsession = cmdcore.nullCmdSession()
         self.rev = rev
         self.node = repo[rev].node()
 
@@ -91,33 +90,33 @@ class BookmarkDialog(QDialog):
         self.status = qtlib.StatusLabel()
         self.status.setContentsMargins(4, 2, 4, 4)
         self.layout().addWidget(self.status)
+        self._finishmsg = None
 
         # dialog setting
         self.setWindowTitle(_('Bookmark - %s') % self.repo.displayname)
         self.setWindowIcon(qtlib.geticon('hg-bookmarks'))
 
-        self.cmd = cmdui.Runner(False, self)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.commandFinished.connect(self.commandFinished)
-
         # prepare to show
         self.clear_status()
         self.refresh()
-        self.repo.repositoryChanged.connect(self.refresh)
+        self._repoagent.repositoryChanged.connect(self.refresh)
         self.bookmarkCombo.setFocus()
         self.bookmarkTextChanged()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
+    def _allBookmarks(self):
+        return map(hglib.tounicode, self.repo._bookmarks)
 
     @pyqtSlot()
     def refresh(self):
         """ update display on dialog with recent repo data """
         # add bookmarks to drop-down list
-        marks = self.repo._bookmarks.keys()[:]
-        marks.sort()
         cur = self.bookmarkCombo.currentText()
         self.bookmarkCombo.clear()
-        for bookmark in marks:
-            self.bookmarkCombo.addItem(hglib.tounicode(bookmark))
+        self.bookmarkCombo.addItems(sorted(self._allBookmarks()))
         if cur:
             self.bookmarkCombo.setEditText(cur)
         else:
@@ -157,89 +156,77 @@ class BookmarkDialog(QDialog):
         self.status.setShown(True)
         self.sep.setShown(True)
         self.status.set_status(text, icon)
-        self.showMessage.emit(text)
 
     def clear_status(self):
         self.status.setHidden(True)
         self.sep.setHidden(True)
 
-    def commandFinished(self, ret):
-        if ret is 0:
+    def _runBookmark(self, *args, **opts):
+        self._finishmsg = opts.pop('finishmsg')
+        cmdline = hglib.buildcmdargs('bookmarks', *args, **opts)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self._onBookmarkFinished)
+
+    @pyqtSlot(int)
+    def _onBookmarkFinished(self, ret):
+        if ret == 0:
             self.bookmarkCombo.clearEditText()
             self.newNameEdit.setText('')
-            self.finishfunc()
+            self.set_status(self._finishmsg, True)
+        else:
+            self.set_status(self._cmdsession.errorString(), False)
 
+    @pyqtSlot()
     def add_bookmark(self):
-        bookmark = self.bookmarkCombo.currentText()
-        bookmarklocal = hglib.fromunicode(bookmark)
-        if bookmarklocal in self.repo._bookmarks:
+        bookmark = unicode(self.bookmarkCombo.currentText())
+        if bookmark in self._allBookmarks():
             self.set_status(_('A bookmark named "%s" already exists') %
                             bookmark, False)
             return
 
-        def finished():
-            self.set_status(_("Bookmark '%s' has been added") % bookmark, True)
-
-        cmdline = ['bookmarks', '--repository', self.repo.root]
+        finishmsg = _("Bookmark '%s' has been added") % bookmark
+        rev = None
         if not self.activateCheckBox.isChecked():
-            cmdline.extend(['--rev', str(self.rev)])
-        cmdline.append(bookmarklocal)
-        self.cmd.run(cmdline)
-        self.finishfunc = finished
+            rev = self.rev
+        self._runBookmark(bookmark, rev=rev, finishmsg=finishmsg)
 
+    @pyqtSlot()
     def move_bookmark(self):
-        bookmark = self.bookmarkCombo.currentText()
-        bookmarklocal = hglib.fromunicode(bookmark)
-        if bookmarklocal not in self.repo._bookmarks:
+        bookmark = unicode(self.bookmarkCombo.currentText())
+        if bookmark not in self._allBookmarks():
             self.set_status(_('Bookmark named "%s" does not exist') %
                             bookmark, False)
             return
 
-        def finished():
-            self.set_status(_("Bookmark '%s' has been moved") % bookmark, True)
-
-        cmdline = ['bookmarks', '--repository', self.repo.root]
+        finishmsg = _("Bookmark '%s' has been moved") % bookmark
+        rev = None
         if not self.activateCheckBox.isChecked():
-            cmdline.extend(['--rev', str(self.rev)])
-        cmdline.extend(['--force', bookmarklocal])
-        self.cmd.run(cmdline)
-        self.finishfunc = finished
+            rev = self.rev
+        self._runBookmark(bookmark, rev=rev, force=True, finishmsg=finishmsg)
 
+    @pyqtSlot()
     def remove_bookmark(self):
-        bookmark = self.bookmarkCombo.currentText()
-        bookmarklocal = hglib.fromunicode(bookmark)
-        if bookmarklocal not in self.repo._bookmarks:
+        bookmark = unicode(self.bookmarkCombo.currentText())
+        if bookmark not in self._allBookmarks():
             self.set_status(_("Bookmark '%s' does not exist") % bookmark, False)
             return
 
-        def finished():
-            self.set_status(_("Bookmark '%s' has been removed") % bookmark, True)
+        finishmsg = _("Bookmark '%s' has been removed") % bookmark
+        self._runBookmark(bookmark, delete=True, finishmsg=finishmsg)
 
-        cmdline = ['bookmarks', '--repository', self.repo.root,
-                   '--delete', bookmarklocal]
-        self.cmd.run(cmdline)
-        self.finishfunc = finished
-
+    @pyqtSlot()
     def rename_bookmark(self):
-        name = self.bookmarkCombo.currentText()
-        namelocal = hglib.fromunicode(name)
-
-        newname = self.newNameEdit.text()
-        newnamelocal = hglib.fromunicode(newname)
-        if namelocal not in self.repo._bookmarks:
+        name = unicode(self.bookmarkCombo.currentText())
+        if name not in self._allBookmarks():
             self.set_status(_("Bookmark '%s' does not exist") % name, False)
             return
 
-        if newnamelocal in self.repo._bookmarks:
+        newname = unicode(self.newNameEdit.text())
+        if newname in self._allBookmarks():
             self.set_status(_('A bookmark named "%s" already exists') %
                             newname, False)
             return
 
-        def finished():
-            self.set_status(_("Bookmark '%s' has been renamed to '%s'") %
-                            (name, newname), True)
-
-        cmdline = ['bookmarks', '--repository', self.repo.root,
-                   '--rename', namelocal, newnamelocal]
-        self.cmd.run(cmdline)
-        self.finishfunc = finished
+        finishmsg = (_("Bookmark '%s' has been renamed to '%s'")
+                     % (name, newname))
+        self._runBookmark(name, newname, rename=True, finishmsg=finishmsg)

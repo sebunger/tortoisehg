@@ -47,7 +47,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     hideBusyIcon = pyqtSignal(QString)
     switchToRequest = pyqtSignal(QString)
 
-    def __init__(self, repo, parent, **opts):
+    def __init__(self, repoagent, parent, **opts):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
@@ -56,7 +56,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.setLayout(layout)
         self.setAcceptDrops(True)
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.finishfunc = None
         self.opts = {}
         self.cmenu = None
@@ -73,7 +73,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             if val:
                 self.opts[opt] = val
 
-        self.repo.configChanged.connect(self.reload)
+        self._repoagent.configChanged.connect(self.reload)
 
         if self.embedded:
             layout.setContentsMargins(2, 2, 2, 2)
@@ -252,6 +252,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.setUrl('default')
         else:
             self.setEditUrl('')
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def canswitch(self):
         return not self.targetcheckbox.isChecked()
@@ -764,8 +768,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             # handle file conflicts during rebase
             if self.opts.get('rebase') or self.opts.get('updateorrebase'):
                 if os.path.exists(self.repo.join('rebasestate')):
-                    dlg = rebase.RebaseDialog(self.repo, self)
-                    dlg.finished.connect(dlg.deleteLater)
+                    dlg = rebase.RebaseDialog(self._repoagent, self)
                     dlg.exec_()
                     return
             # handle file conflicts during update
@@ -773,7 +776,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 if status == 'u':
                     qtlib.InfoMsgBox(_('Merge caused file conflicts'),
                                     _('File conflicts need to be resolved'))
-                    dlg = resolve.ResolveDialog(self.repo, self)
+                    dlg = resolve.ResolveDialog(self._repoagent, self)
                     dlg.finished.connect(dlg.deleteLater)
                     dlg.exec_()
                     return
@@ -867,10 +870,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.showMessage.emit(text)
             if pending:
                 from tortoisehg.hgqt.p4pending import PerforcePending
-                dlg = PerforcePending(self.repo, pending, p4url, self)
+                dlg = PerforcePending(self._repoagent, pending, p4url, self)
                 dlg.showMessage.connect(self.showMessage)
-                dlg.output.connect(self.output)
-                dlg.makeLogVisible.connect(self.makeLogVisible)
                 dlg.exec_()
         self.finishfunc = finished
         self.showMessage.emit(_('Perforce pending...'))
@@ -962,14 +963,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.showMessage.emit(_('Determining outgoing changesets to email...'))
         def outputnodes(ret, data):
             if ret == 0:
-                nodes = tuple(n for n in data.splitlines() if len(n) == 40)
-                self.showMessage.emit(_('%d outgoing changesets') %
-                                        len(nodes))
+                revs = tuple(self.repo[n].rev() for n in data.splitlines()
+                             if len(n) == 40)
+                self.showMessage.emit(_('%d outgoing changesets') % len(revs))
                 try:
                     outgoingrevs = (cmdline[cmdline.index('--rev') + 1],)
                 except ValueError:
                     outgoingrevs = None
-                self._dialogs.open(SyncWidget._createEmailDialog, nodes,
+                self._dialogs.open(SyncWidget._createEmailDialog, revs,
                                    outgoingrevs)
             elif ret == 1:
                 self.showMessage.emit(_('No outgoing changesets'))
@@ -981,7 +982,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.run(cmdline, ('force', 'branch', 'rev'))
 
     def _createEmailDialog(self, revs, outgoingrevs):
-        return hgemail.EmailDialog(self.repo, revs, outgoing=True,
+        return hgemail.EmailDialog(self._repoagent, revs, outgoing=True,
                                    outgoingrevs=outgoingrevs)
 
     def unbundle(self):
