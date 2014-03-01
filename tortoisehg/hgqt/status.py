@@ -11,7 +11,7 @@ from mercurial import hg, util, error, context, merge, scmutil
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, wctxactions, visdiff, cmdui, fileview, thgrepo
+from tortoisehg.hgqt import qtlib, wctxactions, cmdui, filedata, fileview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -115,7 +115,7 @@ class StatusWidget(QWidget):
             val = statusTypes[s]
             if self.opts[val.name]:
                 st = st + s
-        self.statusfilter = StatusFilterButton(
+        self.statusfilter = StatusFilterActionGroup(
             statustext=st, types=StatusType.preferredOrder)
 
         if self.checkable:
@@ -135,7 +135,8 @@ class StatusWidget(QWidget):
             self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(le)
         self.filelistToolbar.addSeparator()
-        self.filelistToolbar.addWidget(self.statusfilter)
+        self.filelistToolbar.addWidget(
+            createStatusFilterMenuButton(self.statusfilter, self))
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
         self.actions = wctxactions.WctxActions(self._repoagent, self, checkable)
@@ -178,6 +179,8 @@ class StatusWidget(QWidget):
         self.docf = docf
 
         self.fileview = fileview.HgFileView(self._repoagent, self)
+        self.fileview.setModeVisible(fileview.AnnMode, False)
+        self.fileview.setShelveButtonVisible(True)
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.linkActivated.connect(self.linkActivated)
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
@@ -185,7 +188,6 @@ class StatusWidget(QWidget):
         self.fileview.newChunkList.connect(self.updatePartials)
         self.fileview.chunkSelectionChanged.connect(self.chunkSelectionChanged)
         self.fileview.grepRequested.connect(self.grepRequested)
-        self.fileview.setContext(self.repo[None])
         self.fileview.setMinimumSize(QSize(16, 16))
         vbox.addWidget(self.fileview, 1)
 
@@ -224,10 +226,11 @@ class StatusWidget(QWidget):
             self.checkAllNoneBtn.setTristate(False)
 
     def getTitle(self):
+        name = self._repoagent.displayName()
         if self.pats:
-            return _('%s - status (selection filtered)') % self.repo.displayname
+            return _('%s - status (selection filtered)') % name
         else:
-            return _('%s - status') % self.repo.displayname
+            return _('%s - status') % name
 
     def loadSettings(self, qs, prefix):
         self.fileview.loadSettings(qs, prefix+'/fileview')
@@ -477,7 +480,7 @@ class StatusWidget(QWidget):
         'user has toggled a checkbox, update partial chunk selection status'
         wfile = hglib.fromunicode(wfile)
         if wfile in self.partials:
-            if wfile == self.fileview._filename:
+            if wfile == hglib.fromunicode(self.fileview.filePath()):
                 for chunk in self.partials[wfile].hunks:
                     self.fileview.updateChunk(chunk, not checked)
             else:
@@ -540,9 +543,13 @@ class StatusWidget(QWidget):
             return
         path, status, mst, upath, ext, sz = row
         wfile = util.pconvert(path)
-        pctx = self.pctx and self.pctx.p1() or None
-        self.fileview.setContext(self.repo[None], pctx)
-        self.fileview.displayFile(wfile, status)
+        ctx = self.repo[None]
+        pctx = self.pctx and self.pctx.p1() or ctx.p1()
+        if status == 'S':
+            fd = filedata.createSubrepoData(ctx, pctx, wfile)
+        else:
+            fd = filedata.createFileData(ctx, pctx, wfile, status)
+        self.fileview.display(fd)
 
 
 class StatusThread(QThread):
@@ -774,7 +781,7 @@ class WctxModel(QAbstractTableModel):
 
     def check(self, files, state):
         for f in files:
-            assert f in checked
+            assert f in self.checked
             self.checked[f] = state
             self.checkToggled.emit(f, state)
         self.layoutChanged.emit()
@@ -1007,39 +1014,38 @@ statusTypes = {
 }
 
 
-class StatusFilterButton(QToolButton):
-    """Button with drop-down menu for status filter"""
+class StatusFilterActionGroup(QObject):
+    """Actions to switch status filter"""
+
     statusChanged = pyqtSignal(str)
 
-    def __init__(self, statustext, types=None, parent=None, **kwargs):
+    def __init__(self, statustext, types=None, parent=None):
+        super(StatusFilterActionGroup, self).__init__(parent)
         self._TYPES = 'MARSC'
         if types is not None:
             self._TYPES = types
-        #if 'text' not in kwargs:
-        #    kwargs['text'] = _('Status')
-        super(StatusFilterButton, self).__init__(
-            parent, popupMode=QToolButton.MenuButtonPopup,
-            icon=qtlib.geticon('hg-status'),
-            toolButtonStyle=Qt.ToolButtonTextBesideIcon, **kwargs)
 
-        self.clicked.connect(self.showMenu)
-        self._initactions(statustext)
-
-    def _initactions(self, text):
         self._actions = {}
-        menu = QMenu(self)
         for c in self._TYPES:
             st = statusTypes[c]
-            a = menu.addAction('%s %s' % (c, st.trname))
+            a = QAction('&%s %s' % (c, st.trname), self)
             a.setCheckable(True)
-            a.setChecked(c in text)
+            a.setChecked(c in statustext)
             a.toggled.connect(self._update)
             self._actions[c] = a
-        self.setMenu(menu)
 
     @pyqtSlot()
     def _update(self):
         self.statusChanged.emit(self.status())
+
+    def actions(self):
+        return [self._actions[c] for c in self._TYPES]
+
+    def isChecked(self, c):
+        return self._actions[c].isChecked()
+
+    def setChecked(self, c, checked):
+        self._actions[c].setChecked(checked)
 
     def status(self):
         """Return the text for status filter"""
@@ -1053,11 +1059,25 @@ class StatusFilterButton(QToolButton):
         for c in self._TYPES:
             self._actions[c].setChecked(c in text)
 
+
+def createStatusFilterMenuButton(actiongroup, parent=None):
+    """Create button with drop-down menu for status filter"""
+    button = QToolButton(parent)
+    button.setIcon(qtlib.geticon('hg-status'))
+    button.setPopupMode(QToolButton.InstantPopup)
+    menu = QMenu(button)
+    menu.addActions(actiongroup.actions())
+    button.setMenu(menu)
+    return button
+
+
 class StatusDialog(QDialog):
     'Standalone status browser'
     def __init__(self, repoagent, pats, opts, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowIcon(qtlib.geticon('hg-status'))
+        self._repoagent = repoagent
+
         layout = QVBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(layout)
@@ -1092,9 +1112,7 @@ class StatusDialog(QDialog):
             self._subdialogs.open(link[len('repo:'):])
 
     def _createSubDialog(self, uroot):
-        # TODO: do not instantiate repo here
-        repo = thgrepo.repository(None, hglib.fromunicode(uroot))
-        repoagent = repo._pyqtobj
+        repoagent = self._repoagent.subRepoAgent(uroot)
         return StatusDialog(repoagent, [], {}, parent=self)
 
     def loadSettings(self):

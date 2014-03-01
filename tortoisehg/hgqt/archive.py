@@ -15,118 +15,75 @@ from mercurial import error
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib
-from tortoisehg.hgqt import cmdui, qtlib
+from tortoisehg.hgqt import cmdcore, cmdui, qtlib
 
 WD_PARENT = _('= Working Directory Parent =')
 
-class ArchiveDialog(QDialog):
-    """ Dialog to archive a particular Mercurial revision """
+_ARCHIVE_TYPES = [
+    {'type': 'files', 'ext': '', 'label': _('Directory of files'),
+     'desc': _('Directory of files')},
+    {'type': 'tar', 'ext': '.tar', 'label': _('Tar archives'),
+     'desc': _('Uncompressed tar archive')},
+    {'type': 'tbz2', 'ext': '.tar.bz2', 'label': _('Bzip2 tar archives'),
+     'desc': _('Tar archive compressed using bzip2')},
+    {'type': 'tgz', 'ext': '.tar.gz', 'label': _('Gzip tar archives'),
+     'desc': _('Tar archive compressed using gzip')},
+    {'type': 'uzip', 'ext': '.zip', 'label': _('Zip archives'),
+     'desc': _('Uncompressed zip archive')},
+    {'type': 'zip', 'ext': '.zip', 'label': _('Zip archives'),
+     'desc': _('Zip archive compressed using deflate')},
+    ]
 
-    output = pyqtSignal(QString, QString)
-    makeLogVisible = pyqtSignal(bool)
-    progress = pyqtSignal(QString, object, QString, QString, object)
+class ArchiveWidget(cmdui.AbstractCmdWidget):
+    """Command widget to archive a particular Mercurial revision"""
 
     def __init__(self, repoagent, rev=None, parent=None):
-        super(ArchiveDialog, self).__init__(parent)
+        super(ArchiveWidget, self).__init__(parent)
         self._repoagent = repoagent
 
-        # main layout
-        self.vbox = QVBoxLayout()
-        self.vbox.setSpacing(6)
-        self.grid = QGridLayout()
-        self.grid.setSpacing(6)
-        self.vbox.addLayout(self.grid)
+        form = QFormLayout()
+        form.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(form)
 
         # content selection
-        self.rev_lbl = QLabel(_('Revision:'))
-        self.rev_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.rev_combo = QComboBox()
         self.rev_combo.setEditable(True)
         self.rev_combo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self.files_in_rev_chk = QCheckBox(
                 _('Only files modified/created in this revision'))
         self.subrepos_chk = QCheckBox(_('Recurse into subrepositories'))
-        self.grid.addWidget(self.rev_lbl, 0, 0)
-        self.grid.addWidget(self.rev_combo, 0, 1)
-        self.grid.addWidget(self.files_in_rev_chk, 1, 1)
-        self.grid.addWidget(self.subrepos_chk, 2, 1)
+        form.addRow(_('Revision:'), self.rev_combo)
+        form.addRow('', self.files_in_rev_chk)
+        form.addRow('', self.subrepos_chk)
 
         # selecting a destination
-        self.dest_lbl = QLabel(_('Destination path:'))
-        self.dest_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.dest_edit = QLineEdit()
         self.dest_edit.setMinimumWidth(300)
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
-        self.grid.addWidget(self.dest_lbl, 3, 0)
-        self.grid.addWidget(self.dest_edit, 3, 1)
-        self.grid.addWidget(self.dest_btn, 3, 2)
+        box = QHBoxLayout()
+        box.addWidget(self.dest_edit)
+        box.addWidget(self.dest_btn)
+        form.addRow(_('Destination path:'), box)
 
         # archive type selection
-        self.types_lbl = QLabel(_('Archive types:'))
-        self.types_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
-        def radio(label):
-            return QRadioButton(label, None)
-        self.filesradio = radio(_('Directory of files'))
-        self.tarradio = radio(_('Uncompressed tar archive'))
-        self.tbz2radio = radio(_('Tar archive compressed using bzip2'))
-        self.tgzradio = radio(_('Tar archive compressed using gzip'))
-        self.uzipradio = radio(_('Uncompressed zip archive'))
-        self.zipradio = radio(_('Zip archive compressed using deflate'))
-        self.grid.addWidget(self.types_lbl, 4, 0)
-        self.grid.addWidget(self.filesradio, 4, 1)
-        self.grid.addWidget(self.tarradio, 5, 1)
-        self.grid.addWidget(self.tbz2radio, 6, 1)
-        self.grid.addWidget(self.tgzradio, 7, 1)
-        self.grid.addWidget(self.uzipradio, 8, 1)
-        self.grid.addWidget(self.zipradio, 9, 1)
+        self._typesradios = QButtonGroup(self)
+        box = QVBoxLayout()
+        for i, spec in enumerate(_ARCHIVE_TYPES):
+            w = QRadioButton(spec['desc'], self)
+            self._typesradios.addButton(w, i)
+            box.addWidget(w)
+        form.addRow(_('Archive types:'), box)
 
         # some extras
-        self.hgcmd_lbl = QLabel(_('Hg command:'))
-        self.hgcmd_lbl.setAlignment(Qt.AlignRight|Qt.AlignVCenter)
         self.hgcmd_txt = QLineEdit()
         self.hgcmd_txt.setReadOnly(True)
-        self.keep_open_chk = QCheckBox(_('Always show output'))
-        self.grid.addWidget(self.hgcmd_lbl, 10, 0)
-        self.grid.addWidget(self.hgcmd_txt, 10, 1)
-        self.grid.addWidget(self.keep_open_chk, 11, 1)
-
-        # command widget
-        self.cmd = cmdui.Widget(True, True, self)
-        self.cmd.commandStarted.connect(self.command_started)
-        self.cmd.commandFinished.connect(self.command_finished)
-        self.cmd.commandCanceling.connect(self.command_canceling)
-        self.cmd.output.connect(self.output)
-        self.cmd.makeLogVisible.connect(self.makeLogVisible)
-        self.cmd.progress.connect(self.progress)
-        self.cmd.setHidden(True)
-        self.vbox.addWidget(self.cmd)
-
-        # bottom buttons
-        self.hbox = QHBoxLayout()
-        self.arch_btn = QPushButton(_('&Archive'))
-        self.arch_btn.setDefault(True)
-        self.close_btn = QPushButton(_('&Close'))
-        self.close_btn.setAutoDefault(False)
-        self.close_btn.setFocus()
-        self.detail_btn = QPushButton(_('&Detail'))
-        self.detail_btn.setAutoDefault(False)
-        self.detail_btn.setHidden(True)
-        self.cancel_btn = QPushButton(_('Cancel'))
-        self.cancel_btn.setAutoDefault(False)
-        self.cancel_btn.setHidden(True)
-        self.hbox.addWidget(self.detail_btn)
-        self.hbox.addStretch(0)
-        self.hbox.addWidget(self.arch_btn)
-        self.hbox.addWidget(self.close_btn)
-        self.hbox.addWidget(self.cancel_btn)
-        self.vbox.addLayout(self.hbox)
+        form.addRow(_('Hg command:'), self.hgcmd_txt)
 
         # set default values
         self.prevtarget = None
         self.rev_combo.addItem(WD_PARENT)
-        for b in self.repo.branchtags():
-            self.rev_combo.addItem(hglib.tounicode(b))
+        self.rev_combo.addItems(map(hglib.tounicode, self.repo.namedbranches))
         tags = list(self.repo.tags())
         tags.sort(reverse=True)
         for t in tags:
@@ -142,34 +99,16 @@ class ArchiveDialog(QDialog):
         self.rev_combo.setMaxVisibleItems(self.rev_combo.count())
         self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.dest_edit.setText(hglib.tounicode(self.repo.root))
-        self.filesradio.setChecked(True)
+        self._typesradios.button(0).setChecked(True)
         self.update_path()
 
         # connecting slots
-        self.dest_edit.textEdited.connect(self.dest_edited)
+        self.dest_edit.textEdited.connect(self.compose_command)
         self.rev_combo.editTextChanged.connect(self.rev_combo_changed)
         self.dest_btn.clicked.connect(self.browse_clicked)
-        self.files_in_rev_chk.stateChanged.connect(self.dest_edited)
-        self.subrepos_chk.toggled.connect(self.onSubreposToggled)
-        self.filesradio.toggled.connect(self.update_path)
-        self.tarradio.toggled.connect(self.update_path)
-        self.tbz2radio.toggled.connect(self.update_path)
-        self.tgzradio.toggled.connect(self.update_path)
-        self.uzipradio.toggled.connect(self.update_path)
-        self.zipradio.toggled.connect(self.update_path)
-        self.arch_btn.clicked.connect(self.archive)
-        self.detail_btn.clicked.connect(self.detail_clicked)
-        self.close_btn.clicked.connect(self.close)
-        self.cancel_btn.clicked.connect(self.cancel_clicked)
-
-        # dialog setting
-        self.setWindowTitle(_('Archive - %s') % self.repo.displayname)
-        self.setWindowIcon(qtlib.geticon('hg-archive'))
-        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
-        self.setLayout(self.vbox)
-        self.layout().setSizeConstraint(QLayout.SetFixedSize)
-        self.rev_combo.setFocus()
-        self._readsettings()
+        self.files_in_rev_chk.stateChanged.connect(self.compose_command)
+        self.subrepos_chk.toggled.connect(self.compose_command)
+        self._typesradios.buttonClicked.connect(self.update_path)
 
     @property
     def repo(self):
@@ -178,11 +117,6 @@ class ArchiveDialog(QDialog):
     def rev_combo_changed(self):
         self.subrepos_chk.setChecked(self.get_subrepos_present())
         self.update_path()
-
-    def dest_edited(self):
-        path = hglib.fromunicode(self.dest_edit.text())
-        type = self.get_selected_archive_type()['type']
-        self.compose_command(path, type)
 
     def browse_clicked(self):
         """Select the destination directory or file"""
@@ -205,11 +139,6 @@ class ArchiveDialog(QDialog):
             self.dest_edit.setText(response)
             self.update_path()
 
-    def onSubreposToggled(self):
-        path = hglib.fromunicode(self.dest_edit.text())
-        type = self.get_selected_archive_type()['type']
-        self.compose_command(path, type)
-
     def get_subrepos_present(self):
         rev = self.get_selected_rev()
         try:
@@ -228,21 +157,7 @@ class ArchiveDialog(QDialog):
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
-        if self.tarradio.isChecked():
-            return {'type': 'tar', 'ext': '.tar', 'label': _('Tar archives')}
-        elif self.tbz2radio.isChecked():
-            return {'type': 'tbz2', 'ext': '.tar.bz2',
-                    'label': _('Bzip2 tar archives')}
-        elif self.tgzradio.isChecked():
-            return {'type': 'tgz', 'ext': '.tar.gz',
-                    'label': _('Gzip tar archives')}
-        elif self.uzipradio.isChecked():
-            return {'type': 'uzip', 'ext': '.zip',
-                    'label': _('Zip archives')}
-        elif self.zipradio.isChecked():
-            return {'type': 'zip', 'ext': '.zip',
-                    'label': _('Zip archives')}
-        return {'type': 'files', 'ext': '', 'label': _('Directory of files')}
+        return _ARCHIVE_TYPES[self._typesradios.checkedId()]
 
     def update_path(self):
         def remove_ext(path):
@@ -271,6 +186,7 @@ class ArchiveDialog(QDialog):
             return path
         text = unicode(self.rev_combo.currentText())
         if len(text) == 0:
+            self.commandChanged.emit()
             return
         wdrev = str(self.repo['.'].rev())
         if text == WD_PARENT:
@@ -279,6 +195,7 @@ class ArchiveDialog(QDialog):
             try:
                 self.repo[hglib.fromunicode(text)]
             except (error.RepoError, error.LookupError):
+                self.commandChanged.emit()
                 return
         path = unicode(self.dest_edit.text())
         path = remove_ext(path)
@@ -287,29 +204,33 @@ class ArchiveDialog(QDialog):
         path = add_ext(path)
         self.dest_edit.setText(path)
         self.prevtarget = text
-        type = self.get_selected_archive_type()['type']
-        self.compose_command(hglib.fromunicode(path), type)
+        self.compose_command()
 
-    def compose_command(self, dest, type):
-        cmdline = ['archive', '--repository', self.repo.root]
-        rev = self.get_selected_rev()
-        cmdline.append('-r')
-        cmdline.append(rev)
-        if self.subrepos_chk.isChecked():
-            cmdline.append('-S')
-        cmdline.append('-t')
-        cmdline.append(type)
+    @pyqtSlot()
+    def compose_command(self):
         if self.files_in_rev_chk.isChecked():
-            ctx = self.repo[rev]
-            for f in ctx.files():
-                cmdline.append('-I')
-                cmdline.append(f)
-        cmdline.append('--')
-        cmdline.append(dest)  # dest: local str
-        self.hgcmd_txt.setText(hglib.tounicode('hg ' + ' '.join(cmdline)))
+            incl = 'set:added() or modified()'
+        else:
+            incl = None
+        cmdline = hglib.buildcmdargs('archive', self.dest_edit.text(),
+                                     r=hglib.tounicode(self.get_selected_rev()),
+                                     S=self.subrepos_chk.isChecked(), I=incl,
+                                     t=self.get_selected_archive_type()['type'])
+        self.hgcmd_txt.setText('hg ' + ' '.join(cmdline))
+        self.commandChanged.emit()
         return cmdline
 
-    def archive(self):
+    def canRunCommand(self):
+        rev = self.get_selected_rev()
+        if not rev or not self.dest_edit.text():
+            return False
+        try:
+            return rev in self.repo
+        except error.LookupError:
+            # ambiguous changeid
+            return False
+
+    def runCommand(self):
         # verify input
         type = self.get_selected_archive_type()['type']
         dest = unicode(self.dest_edit.text())
@@ -319,87 +240,36 @@ class ArchiveDialog(QDialog):
                     qtlib.WarningMsgBox(_('Duplicate Name'),
                             _('The destination "%s" already exists as '
                               'a file!') % dest)
-                    return False
+                    return cmdcore.nullCmdSession()
                 elif os.listdir(dest):
                     if not qtlib.QuestionMsgBox(_('Confirm Overwrite'),
                                  _('The directory "%s" is not empty!\n\n'
                                    'Do you want to overwrite it?') % dest,
                                  parent=self):
-                        return False
+                        return cmdcore.nullCmdSession()
             else:
                 if os.path.isfile(dest):
                     if not qtlib.QuestionMsgBox(_('Confirm Overwrite'),
                                  _('The file "%s" already exists!\n\n'
                                    'Do you want to overwrite it?') % dest,
                                  parent=self):
-                        return False
+                        return cmdcore.nullCmdSession()
                 else:
                     qtlib.WarningMsgBox(_('Duplicate Name'),
                           _('The destination "%s" already exists as '
                             'a folder!') % dest)
-                    return False
+                    return cmdcore.nullCmdSession()
 
-        # prepare command line
-        cmdline = self.compose_command(hglib.fromunicode(dest), type)
+        cmdline = self.compose_command()
+        return self._repoagent.runCommand(cmdline, self)
 
-        if self.files_in_rev_chk.isChecked():
-            self.savedcwd = os.getcwd()
-            os.chdir(self.repo.root)
 
-        # start archiving
-        self.cmd.run(cmdline)
-
-    def detail_clicked(self):
-        if self.cmd.outputShown():
-            self.cmd.setShowOutput(False)
-        else:
-            self.cmd.setShowOutput(True)
-
-    def cancel_clicked(self):
-        self.cmd.cancel()
-
-    def command_started(self):
-        self.dest_edit.setEnabled(False)
-        self.rev_combo.setEnabled(False)
-        self.dest_btn.setEnabled(False)
-        self.files_in_rev_chk.setEnabled(False)
-        self.filesradio.setEnabled(False)
-        self.tarradio.setEnabled(False)
-        self.tbz2radio.setEnabled(False)
-        self.tgzradio.setEnabled(False)
-        self.uzipradio.setEnabled(False)
-        self.zipradio.setEnabled(False)
-        self.cmd.setShown(True)
-        self.arch_btn.setHidden(True)
-        self.close_btn.setHidden(True)
-        self.cancel_btn.setShown(True)
-        self.detail_btn.setShown(True)
-
-    def command_finished(self, ret):
-        if self.files_in_rev_chk.isChecked():
-            os.chdir(self.savedcwd)
-        if ret != 0 or self.cmd.outputShown()\
-                or self.keep_open_chk.isChecked():
-            if not self.cmd.outputShown():
-                self.detail_btn.click()
-            self.cancel_btn.setHidden(True)
-            self.close_btn.setShown(True)
-            self.close_btn.setAutoDefault(True)
-            self.close_btn.setFocus()
-        else:
-            self.reject()
-
-    def command_canceling(self):
-        self.cancel_btn.setDisabled(True)
-
-    def closeEvent(self, event):
-        self._writesettings()
-        super(ArchiveDialog, self).closeEvent(event)
-
-    def _readsettings(self):
-        s = QSettings()
-        self.restoreGeometry(s.value('archive/geom').toByteArray())
-
-    def _writesettings(self):
-        s = QSettings()
-        s.setValue('archive/geom', self.saveGeometry())
+def createArchiveDialog(repoagent, rev=None, parent=None):
+    dlg = cmdui.CmdControlDialog(parent)
+    dlg.setWindowTitle(_('Archive - %s') % repoagent.displayName())
+    dlg.setWindowIcon(qtlib.geticon('hg-archive'))
+    dlg.layout().setSizeConstraint(QLayout.SetFixedSize)
+    dlg.setObjectName('archive')
+    dlg.setRunButtonText(_('&Archive'))
+    dlg.setCommandWidget(ArchiveWidget(repoagent, rev, dlg))
+    return dlg

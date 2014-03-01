@@ -153,7 +153,6 @@ class patchctx(object):
     # largefiles/kbfiles methods
     def hasStandin(self, file):     return False
     def isStandin(self, path):      return False
-    def removeStandin(self, path):  return path
 
     def longsummary(self):
         if self._repo.ui.configbool('tortoisehg', 'longsummary'):
@@ -171,6 +170,8 @@ class patchctx(object):
 
     def thgmqoriginalparent(self):
         '''The revision id of the original patch parent'''
+        if not util.safehasattr(self, '_ph'):
+            return ''
         return self._ph.parent
 
     def thgmqpatchdata(self, wfile):

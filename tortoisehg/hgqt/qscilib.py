@@ -264,11 +264,6 @@ class Scintilla(ScintillaCompat):
             self.SendScintilla(QsciScintilla.SCI_SETVIRTUALSPACEOPTIONS,
                                QsciScintilla.SCVS_RECTANGULARSELECTION)
 
-    def read(self, f):
-        result = super(Scintilla, self).read(f)
-        self.setDefaultEolMode()
-        return result
-
     def contextMenuEvent(self, event):
         menu = self.createEditorContextMenu()
         menu.exec_(event.globalPos())
@@ -695,6 +690,72 @@ def findTabIndentsInLines(lines, linestocheck=100):
             return True
     return False # Use spaces for indents default
 
+def readFile(editor, filename, encoding=None):
+    f = QFile(filename)
+    if not f.open(QIODevice.ReadOnly):
+        qtlib.WarningMsgBox(_('Unable to read file'),
+                            _('Could not open the specified file for reading.'),
+                            f.errorString(), parent=editor)
+        return False
+    earlybytes = f.read(4096)
+    if '\0' in earlybytes:
+        qtlib.WarningMsgBox(_('Unable to read file'),
+                            _('This appears to be a binary file.'),
+                            parent=editor)
+        return False
+
+    f.seek(0)
+    data = str(f.readAll())
+    if f.error():
+        qtlib.WarningMsgBox(_('Unable to read file'),
+                            _('An error occurred while reading the file.'),
+                            f.errorString(), parent=editor)
+        return False
+    if encoding:
+        try:
+            text = data.decode(encoding)
+        except UnicodeDecodeError, inst:
+            qtlib.WarningMsgBox(_('Text Translation Failure'),
+                                _('Could not translate the file content from '
+                                  'native encoding.'),
+                                (_('Several characters would be lost.')
+                                 + '\n\n' + hglib.tounicode(str(inst))),
+                                parent=editor)
+            text = data.decode(encoding, 'replace')
+    else:
+        text = hglib.tounicode(data)
+    editor.setText(text)
+    editor.setDefaultEolMode()
+    editor.setModified(False)
+    return True
+
+def writeFile(editor, filename, encoding=None):
+    text = editor.text()
+    try:
+        if encoding:
+            data = unicode(text).encode(encoding)
+        else:
+            data = hglib.fromunicode(text)
+    except UnicodeEncodeError, inst:
+        qtlib.WarningMsgBox(_('Unable to write file'),
+                            _('Could not translate the file content to '
+                              'native encoding.'),
+                            hglib.tounicode(str(inst)), parent=editor)
+        return False
+
+    f = QFile(filename)
+    if not f.open(QIODevice.WriteOnly):
+        qtlib.WarningMsgBox(_('Unable to write file'),
+                            _('Could not open the specified file for writing.'),
+                            f.errorString(), parent=editor)
+        return False
+    if f.write(data) < 0:
+        qtlib.WarningMsgBox(_('Unable to write file'),
+                            _('An error occurred while writing the file.'),
+                            f.errorString(), parent=editor)
+        return False
+    return True
+
 def fileEditor(filename, **opts):
     'Open a simple modal file editing dialog'
     dialog = QDialog()
@@ -738,20 +799,12 @@ def fileEditor(filename, **opts):
     dialog.resize(desktopgeom.size() * 0.5)
     dialog.restoreGeometry(s.value(geomname).toByteArray())
 
-    ret = QDialog.Rejected
-    try:
-        f = QFile(filename)
-        f.open(QIODevice.ReadOnly)
-        editor.read(f)
-        editor.setModified(False)
-
-        ret = dialog.exec_()
-        if ret == QDialog.Accepted:
-            f = QFile(filename)
-            f.open(QIODevice.WriteOnly)
-            editor.write(f)
-        s.setValue(geomname, dialog.saveGeometry())
-    except EnvironmentError, e:
-        qtlib.WarningMsgBox(_('Unable to read/write config file'),
-                            hglib.tounicode(str(e)), parent=dialog)
+    if not readFile(editor, filename):
+        return QDialog.Rejected
+    ret = dialog.exec_()
+    if ret != QDialog.Accepted:
+        return ret
+    if not writeFile(editor, filename):
+        return QDialog.Rejected
+    s.setValue(geomname, dialog.saveGeometry())
     return ret

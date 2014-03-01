@@ -6,7 +6,8 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 try:
-    from config import icon_path, bin_path, license_path, locale_path
+    from tortoisehg.util.config import (icon_path, bin_path, license_path,
+                                        locale_path)
 except ImportError:
     icon_path, bin_path, license_path, locale_path = None, None, None, None
 
@@ -59,7 +60,6 @@ def get_hg_command():
 
 if os.name == 'nt':
     import _winreg
-    import win32net
     import win32file
 
     def find_in_path(pgmname):
@@ -124,25 +124,6 @@ if os.name == 'nt':
         else:
             return False
 
-    USE_OK  = 0     # network drive status
-
-    def netdrive_status(drive):
-        """
-        return True if a network drive is accessible (connected, ...),
-        or False if <drive> is not a network drive
-        """
-        if hasattr(os.path, 'splitunc'):
-            unc, rest = os.path.splitunc(drive)
-            if unc: # All UNC paths (\\host\mount) are considered nonlocal
-                return True
-        letter = os.path.splitdrive(drive)[0].upper()
-        _drives, total, _ = win32net.NetUseEnum(None, 1, 0)
-        for drv in _drives:
-            if drv['local'] == letter:
-                info = win32net.NetUseGetInfo(None, letter, 1)
-                return info['status'] == USE_OK
-        return False
-
 else: # Not Windows
 
     def find_in_path(pgmname):
@@ -170,13 +151,6 @@ else: # Not Windows
     def get_prog_root():
         path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         return path
-
-    def netdrive_status(drive):
-        """
-        return True if a network drive is accessible (connected, ...),
-        or False if <drive> is not a network drive
-        """
-        return False
 
     def is_unc_path(path):
         return False

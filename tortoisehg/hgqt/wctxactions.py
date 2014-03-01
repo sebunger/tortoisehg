@@ -409,18 +409,15 @@ def delete(parent, ui, repo, files):
 def copy(parent, repoagent, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(repoagent, files, parent, iscopy=True)
-    dlg.finished.connect(dlg.deleteLater)
-    dlg.exec_()
-    return True
+    dlg = RenameDialog(repoagent, parent, hglib.tounicode(files[0]),
+                       iscopy=True)
+    return dlg.exec_() == 0
 
 def rename(parent, repoagent, files):
     from tortoisehg.hgqt.rename import RenameDialog
     assert len(files) == 1
-    dlg = RenameDialog(repoagent, files, parent)
-    dlg.finished.connect(dlg.deleteLater)
-    dlg.exec_()
-    return True
+    dlg = RenameDialog(repoagent, parent, hglib.tounicode(files[0]))
+    return dlg.exec_() == 0
 
 def unmark(parent, ui, repo, files):
     ms = merge.mergestate(repo)

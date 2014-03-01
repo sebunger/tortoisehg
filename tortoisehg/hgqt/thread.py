@@ -10,6 +10,7 @@ import Queue
 import urllib2, urllib
 import socket
 import errno
+import weakref
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -130,6 +131,9 @@ class QtUi(uimod.ui):
         return self.sig.progress(topic, pos, item, unit, total)
 
 
+# QThread.finished is raised before running and finished attributes are set
+HAVE_QTBUG_30251 = 0x40800 <= QT_VERSION < 0x40805
+
 class CmdThread(QThread):
     """Run an Mercurial command in a background thread, implies output
     is being sent to a rendered text buffer interactively and requests
@@ -148,19 +152,28 @@ class CmdThread(QThread):
     #          others - return code of command
     commandFinished = pyqtSignal(int)
 
-    def __init__(self, cmdline, parent=None):
+    def __init__(self, parent=None, cwd=None):
         super(CmdThread, self).__init__(parent)
 
-        self.cmdline = cmdline
+        self.cmdline = None
+        self._cwd = hglib.fromunicode(cwd)
+        self._uiparentref = None
         self.ret = -1
         self.responseq = Queue.Queue()
         self.topics = {}
         self.curstrs = QStringList()
         self.curlabel = None
-        self.timer = QTimer(self)
+        self.timer = QTimer(self, interval=100)
         self.timer.timeout.connect(self.flush)
-        self.timer.start(100)
+        self.started.connect(self.timer.start)
         self.finished.connect(self.thread_finished)
+
+    def startCommand(self, cmdline):
+        assert not self.isRunning() or HAVE_QTBUG_30251
+        self.cmdline = map(hglib.fromunicode, cmdline)
+        if self._cwd:
+            self.cmdline[0:0] = ['--cwd', self._cwd]
+        self.start()
 
     def abort(self):
         if self.isRunning() and hasattr(self, 'thread_id'):
@@ -169,6 +182,7 @@ class CmdThread(QThread):
             except ValueError:
                 pass
 
+    @pyqtSlot()
     def thread_finished(self):
         self.timer.stop()
         self.flush()
@@ -240,8 +254,12 @@ class CmdThread(QThread):
                 text = None
             self.responseq.put(text)
 
+    def setUiParent(self, parent):
+        assert not self.isRunning() or HAVE_QTBUG_30251
+        self._uiparentref = parent and weakref.ref(parent)
+
     def _parentWidget(self):
-        p = self.parent()
+        p = self._uiparentref and self._uiparentref()
         while p and not p.isWidgetType():
             p = p.parent()
         return p

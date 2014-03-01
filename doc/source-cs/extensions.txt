@@ -51,13 +51,6 @@ page.
 
 Tato extenze je dokumentována v odstavci :ref:`perfarce-perforce` kapitoly :doc:`nonhg`.
  
-HGEOL
-=====
-
-Extenze hgeol je případným nástupcem extenze win32text. Pokouší se řešit kompabilitní problémy EOLN kompletnějším a robustnějším způsobem. Místo popisu na tomto místě uvedeme odkazy na online-ovou dokumentaci, která se neustále vyvíjí.
-
-* `EOLTranslationPlan <http://mercurial.selenic.com/wiki/EOLTranslationPlan>`_
-* `Source code <http://bitbucket.org/mg/hg-eol/>`_
 
 Mercurial-Keyring
 =================
@@ -212,12 +205,14 @@ Podrobnější údaje o používání a konfiguraci z přikazového řádku, jak
 pbranch
 =======
 
-Patch Branches (větve oprávek- `pbranch <http://mercurial.selenic.com/wiki/PatchBranchExtension>`_) 
-je postup pro vytváření oprávkových řad pro předávání do hlavního repozitáře. Je založen na tematických větvích (pro každou oprávku jedna) a je proto velmi vhodný pro dlouhodobý vývoj a údržbu, zejména při kolektivní spolupráci.
+Extenze `pbranch
+<http://mercurial.selenic.com/wiki/PatchBranchExtension>`_ (patch brances) slouží ke správě oprávek coby tematických větví (alternativa k mq).
+
+Takto spravované oprávky lze rozvíjet kolektivně ve speciálních tematických větvích v dočasných klonech hlavního repozitáře. 
 
 `Podrobný návod <http://arrenbrecht.ch/mercurial/pbranch/>`_ je na webu.
 
-Přidává se řada příkazů, které lze zobrazit příkazem :command:`hg help pbranch`::
+Následující seznam lze vyvolat příkazem :command:`hg help pbranch`::
 
  pbackout       - backs out the current patch branch (undoes all its changes)
  pdiff          - prints the final diff for the current or given patch branch
@@ -232,7 +227,7 @@ Přidává se řada příkazů, které lze zobrazit příkazem :command:`hg help
  pstatus        - print status of current (or given) patch branch
  reapply        - reverts the working copy of all files touched by REV to REV
  
-TortoiseHg nabídne novou kartu se zobrazením grafu závislosti oprávek.
+TortoiseHg poskytne novou úkonovou kartu se zobrazením grafu závislosti oprávek.
 
  .. figure:: figures/pbranch.png
 	:alt: Pbranch task tab
@@ -241,16 +236,19 @@ TortoiseHg nabídne novou kartu se zobrazením grafu závislosti oprávek.
 
 **Instalace**
 
-Protože tato extenze není v TortoiseHg implicitně nainstalována, musíte si ji stáhnout z `<http://bitbucket.org/parren/hg-pbranch>`_. Ujistěte se, že stahujete správnou verzi s ohledem na verzi Mercurialu, spojeného s TortoiseHg (viz stránku wiki zdrojového situ). 
-Stažený plugin otestujete zadáním následujícího příkazu::
+Protože tato extenze není v TortoiseHg implicitně nainstalována, musíte si stáhnout plugin `pbranch.py` z `<http://bitbucket.org/parren/hg-pbranch>`_. Ujistěte se, že stahujete správnou verzi s ohledem na verzi Mercurialu, spojeného s TortoiseHg (viz stránku wiki zdrojového situ).
+ 
+Abyste mohli stažený plugin používat, musíte jej někam umístit příkazem::
 
 	hg --config "extensions.pbranch=C:\path\to\pbranch.py" pstatus
 
-Můžete jej přidat do konfiguračního souboru Mercurial.ini nebo repozitářového souboru .hgrc následovně::
+Případně jej můžete do vhodného místa (např. C:\Program Files/TortoiseHg/contrib/pbranch.py) vložit ručně.
+
+Do konfiguračního souboru Mercurial.ini nebo repozitářového souboru .hgrc jej můžete zařadit následovně::
 
 	[extensions]
 	pbranch = C:\path\to\pbranch.py
  
-Pokud tak učiníte, můžete vypouštět opci --config.
+Pokud tak učiníte, můžete vypustit příkaz s opcí --config.
  
 .. vim: noet ts=4

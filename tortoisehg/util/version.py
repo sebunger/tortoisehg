@@ -17,6 +17,9 @@ def liveversion():
         raise error.RepoError(_('repository %s not found') % thgpath)
 
     u = ui.ui()
+    # prevent loading additional extensions
+    for k, _v in u.configitems('extensions'):
+        u.setconfig('extensions', k, '!')
     repo = hg.repository(u, path=thgpath)
 
     u.pushbuffer()

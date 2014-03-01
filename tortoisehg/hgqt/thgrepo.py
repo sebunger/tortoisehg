@@ -298,6 +298,7 @@ class RepoAgent(QObject):
     workingBranchChanged = pyqtSignal()
 
     busyChanged = pyqtSignal(bool)
+    commandFinished = pyqtSignal(cmdcore.CmdSession)
     outputReceived = pyqtSignal(unicode, unicode)
     progressReceived = pyqtSignal(unicode, object, unicode, unicode, object)
 
@@ -314,23 +315,26 @@ class RepoAgent(QObject):
         watcher.repositoryDestroyed.connect(self._onRepositoryDestroyed)
         watcher.workingBranchChanged.connect(self._onWorkingBranchChanged)
 
-        self._cmdagent = cmdagent = cmdcore.CmdAgent(self)
+        self._cmdagent = cmdagent = cmdcore.CmdAgent(repo.ui, self)
         cmdagent.setWorkingDirectory(self.rootPath())
         cmdagent.outputReceived.connect(self.outputReceived)
         cmdagent.progressReceived.connect(self.progressReceived)
         cmdagent.busyChanged.connect(self._onBusyChanged)
-        self._busystubsess = cmdcore.runningCmdSession()
+        cmdagent.commandFinished.connect(self._onCommandFinished)
+
+        self._subrepoagents = {}  # path: agent
 
     def startMonitoringIfEnabled(self):
         """Start filesystem monitoring on repository open by RepoManager or
         running command finished"""
         repo = self._repo
-        monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'always')
+        monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'localonly')
         if monitorrepo == 'never':
             dbgoutput('watching of F/S events is disabled by configuration')
         elif isinstance(repo, bundlerepo.bundlerepository):
             dbgoutput('not watching F/S events for bundle repository')
-        elif monitorrepo == 'localonly' and paths.netdrive_status(repo.path):
+        elif (monitorrepo == 'localonly'
+              and not paths.is_on_fixed_drive(repo.path)):
             dbgoutput('not watching F/S events for network drive')
         elif self.isBusy():
             dbgoutput('not watching F/S events while busy')
@@ -347,6 +351,21 @@ class RepoAgent(QObject):
 
     def rootPath(self):
         return hglib.tounicode(self._repo.root)
+
+    def displayName(self):
+        """Name for window titles and similar"""
+        if self._repo.ui.configbool('tortoisehg', 'fullpath'):
+            return self.rootPath()
+        else:
+            return self.shortName()
+
+    def shortName(self):
+        """Name for tables, tabs, and sentences"""
+        webname = hglib.shortreponame(self._repo.ui)
+        if webname:
+            return hglib.tounicode(webname)
+        else:
+            return os.path.basename(self.rootPath())
 
     def pollStatus(self):
         """Force checking changes to emit corresponding signals"""
@@ -379,14 +398,8 @@ class RepoAgent(QObject):
     def isBusy(self):
         return self._cmdagent.isBusy()
 
-    # TODO: remove _increment/decrementBusyCount
-    def _incrementBusyCount(self):
-        self._cmdagent._enqueueSession(self._busystubsess)
-
-    def _decrementBusyCount(self):
-        self._cmdagent._dequeueSession(self._busystubsess)
+    def _preinvalidateCache(self):
         if self._cmdagent.isBusy():
-            # TODO: maybe this is necessary on each commandFinished
             # A lot of logic will depend on invalidation happening within
             # the context of this call. Signals will not be emitted till later,
             # but we at least invalidate cached data in the repository
@@ -401,19 +414,54 @@ class RepoAgent(QObject):
             self.startMonitoringIfEnabled()
         self.busyChanged.emit(busy)
 
-    def runCommand(self, cmdline, parent=None, display=None, worker=None):
+    def runCommand(self, cmdline, parent=None, worker=None):
         """Executes a single command asynchronously in this repository"""
-        return self._cmdagent.runCommand(cmdline, parent, display, worker)
+        return self._cmdagent.runCommand(cmdline, parent, worker)
 
-    def runCommandSequence(self, cmdlines, parent=None, display=None,
-                           worker=None):
+    def runCommandSequence(self, cmdlines, parent=None, worker=None):
         """Executes a series of commands asynchronously in this repository"""
-        return self._cmdagent.runCommandSequence(cmdlines, parent, display,
-                                                 worker)
+        return self._cmdagent.runCommandSequence(cmdlines, parent, worker)
 
     def abortCommands(self):
         """Abort running and queued commands"""
         self._cmdagent.abortCommands()
+
+    @pyqtSlot(cmdcore.CmdSession)
+    def _onCommandFinished(self, sess):
+        self._preinvalidateCache()
+        self.commandFinished.emit(sess)
+
+    def subRepoAgent(self, path):
+        """Return RepoAgent of sub or patch repository"""
+        root = self.rootPath()
+        path = _normreporoot(os.path.join(root, path))
+        if path == root or not path.startswith(root + os.sep):
+            # only sub path is allowed to avoid circular references
+            raise ValueError('invalid sub path: %s' % path)
+        try:
+            return self._subrepoagents[path]
+        except KeyError:
+            pass
+
+        manager = self.parent()
+        if not manager:
+            raise RuntimeError('cannot open sub agent of unmanaged repo')
+        assert isinstance(manager, RepoManager)
+        self._subrepoagents[path] = agent = manager.openRepoAgent(path)
+        return agent
+
+    def releaseSubRepoAgents(self):
+        """Release RepoAgents referenced by this when repository closed by
+        RepoManager"""
+        if not self._subrepoagents:
+            return
+        manager = self.parent()
+        if not manager:
+            raise RuntimeError('cannot release sub agents of unmanaged repo')
+        assert isinstance(manager, RepoManager)
+        for path in self._subrepoagents:
+            manager.releaseRepoAgent(path)
+        self._subrepoagents.clear()
 
 
 def _normreporoot(path):
@@ -477,6 +525,7 @@ class RepoManager(QObject):
         self.repositoryOpened.emit(path)
         return agent
 
+    @pyqtSlot(unicode)
     def releaseRepoAgent(self, path):
         """Decrement refcount of RepoAgent and close it if possible"""
         path = _normreporoot(path)
@@ -484,6 +533,9 @@ class RepoManager(QObject):
         if refcount > 1:
             self._openagents[path] = (agent, refcount - 1)
             return
+
+        # close child agents first, which may reenter to releaseRepoAgent()
+        agent.releaseSubRepoAgents()
 
         self._ui.debug('closing repo: %s\n' % hglib.fromunicode(path))
         agent, _refcount = self._openagents.pop(path)
@@ -507,8 +559,8 @@ class RepoManager(QObject):
 
 
 _uiprops = '''_uifiles postpull tabwidth maxdiff
-              deadbranches _exts _thghiddentags displayname summarylen
-              shortname mergetools namedbranches'''.split()
+              deadbranches _exts _thghiddentags summarylen
+              mergetools namedbranches'''.split()
 _thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
                    _branchheads'''.split()
 
@@ -535,7 +587,12 @@ def _extendrepo(repo):
                     os.path.isabs(changeid) and os.path.isfile(changeid):
                 return genPatchContext(repo, changeid)
 
+            # If changeid is a basectx, repo[changeid] returns the same object.
+            # We assumes changectx is already wrapped in that case; otherwise,
+            # changectx would be double wrapped by thgchangectx.
             changectx = super(thgrepository, self).__getitem__(changeid)
+            if changectx is changeid:
+                return changectx
             changectx.__class__ = _extendchangectx(changectx)
             return changectx
 
@@ -640,26 +697,6 @@ def _extendrepo(repo):
             return [b.strip() for b in db.split(',')]
 
         @propertycache
-        def displayname(self):
-            'Display name is for window titles and similar'
-            if self.ui.configbool('tortoisehg', 'fullpath'):
-                name = self.root
-            elif self.ui.config('web', 'name', False):
-                name = self.ui.config('web', 'name')
-            else:
-                name = os.path.basename(self.root)
-            return hglib.tounicode(name)
-
-        @propertycache
-        def shortname(self):
-            'Short name is for tables, tabs, and sentences'
-            if self.ui.config('web', 'name', False):
-                name = self.ui.config('web', 'name')
-            else:
-                name = os.path.basename(self.root)
-            return hglib.tounicode(name)
-
-        @propertycache
         def mergetools(self):
             seen, installed = [], []
             for key, value in self.ui.configitems('merge-tools'):
@@ -672,6 +709,16 @@ def _extendrepo(repo):
 
         @propertycache
         def namedbranches(self):
+            branchmap = self.branchmap()
+            if not util.safehasattr(branchmap, 'iterbranches'):
+                return self._namedbranches()
+            dead = self.deadbranches
+            return sorted(br for br, _heads, _tip, isclosed
+                          in branchmap.iterbranches()
+                          if not isclosed and br not in dead)
+
+        # hg<2.9 has repo.branchtags, but no branchmap.iterbranches
+        def _namedbranches(self):
             allbranches = self.branchtags()
             openbrnodes = []
             for br in allbranches.iterkeys():
@@ -740,15 +787,6 @@ def _extendrepo(repo):
                 if a in self.__dict__:
                     delattr(self, a)
 
-        # TODO: replace manual busycount handling by RepoAgent's
-        def incrementBusyCount(self):
-            'A GUI widget is starting a transaction'
-            self._pyqtobj._incrementBusyCount()
-
-        def decrementBusyCount(self):
-            'A GUI widget has finished a transaction'
-            self._pyqtobj._decrementBusyCount()
-
         def thgbackup(self, path):
             'Make a backup of the given file in the repository "trashcan"'
             # The backup name will be the same as the orginal file plus '.bak'
@@ -771,13 +809,6 @@ def _extendrepo(repo):
                     return True
             return False
 
-        def removeStandin(self, path):
-            if 'largefiles' in self.extensions():
-                path = _lfregex.sub('', path)
-            if 'largefiles' in self.extensions() or 'kbfiles' in self.extensions():
-                path = _kbfregex.sub('', path)
-            return path
-
         def bfStandin(self, path):
             return '.kbf/' + path
 
@@ -786,7 +817,6 @@ def _extendrepo(repo):
 
     return thgrepository
 
-_maxchangectxclscache = 10
 _changectxclscache = {}  # parentcls: extendedcls
 
 def _extendchangectx(changectx):
@@ -797,11 +827,7 @@ def _extendchangectx(changectx):
     except KeyError:
         pass
 
-    # in case each changectx instance is wrapped by some extension, there's
-    # limit on cache size. it may be possible to use weakref.WeakKeyDictionary
-    # on Python 2.5 or later.
-    if len(_changectxclscache) >= _maxchangectxclscache:
-        _changectxclscache.clear()
+    assert parentcls not in _changectxclscache.values(), 'double thgchangectx'
     _changectxclscache[parentcls] = cls = _createchangectxcls(parentcls)
     return cls
 
@@ -887,9 +913,6 @@ def _createchangectxcls(parentcls):
 
         def isStandin(self, path):
             return self._repo.isStandin(path)
-
-        def removeStandin(self, path):
-            return self._repo.removeStandin(path)
 
         def findStandin(self, file):
             if 'largefiles' in self._repo.extensions():

@@ -30,10 +30,13 @@ import itertools
 
 from mercurial import repoview
 
+from tortoisehg.util import obsoleteutil
+
 LINE_TYPE_PARENT = 0
 LINE_TYPE_GRAFT = 1
+LINE_TYPE_OBSOLETE = 2
 
-def revision_grapher(repo, **opts):
+def revision_grapher(repo, opts):
     """incremental revision grapher
 
     param repo       The repository
@@ -132,12 +135,16 @@ def revision_grapher(repo, **opts):
         # Add parents to next_revs.
         parents = [(p.rev(), LINE_TYPE_PARENT) for p in getparents(ctx)
                    if not hidden(p.rev())]
-        if showgraftsource and 'source' in ctx.extra():
-            src_rev_str = ctx.extra()['source']
-            if src_rev_str in repo:
+        if showgraftsource:
+            src_rev_str = ctx.extra().get('source')
+            if src_rev_str is not None and src_rev_str in repo:
                 src_rev = repo[src_rev_str].rev()
                 if stop_rev <= src_rev < curr_rev and not hidden(src_rev):
                     parents.append((src_rev, LINE_TYPE_GRAFT))
+            for octx in obsoleteutil.first_known_precursors(ctx):
+                src_rev = octx.rev()
+                if stop_rev <= src_rev < curr_rev and not hidden(src_rev):
+                    parents.append((src_rev, LINE_TYPE_OBSOLETE))
         parents_to_add = []
         links_to_add = []
         children_to_add = []
@@ -147,6 +154,12 @@ def revision_grapher(repo, **opts):
             preferred_color = curcolor
         for parent, link_type in parents:
             if parent not in next_revs:
+                # Because the parents originate from multiple sources, it is
+                # theoretically possible that several point to the same
+                # revision.  Only take the first of this (which is graftsource
+                # because it is added before).
+                if parent in parents_to_add:
+                    continue
                 parents_to_add.append(parent)
                 links_to_add.append(link_type)
                 children_to_add.append((curr_rev,))
@@ -345,7 +358,7 @@ class Graph(object):
     instantiate a `revision_grapher` generator, and provide a `fill`
     method to build the graph progressively.
     """
-    #@timeit
+
     def __init__(self, repo, grapher, include_mq=False):
         self.repo = repo
         self.maxlog = len(repo)

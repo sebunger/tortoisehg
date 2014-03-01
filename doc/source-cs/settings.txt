@@ -20,7 +20,7 @@ Konfigurace Mercurialu ve Windows má tři úrovně.
 2) Nastavení pro uživatele v souboru
    :file:`C:\\Documents and Settings\\username\\mercurial.ini`
    Tento soubor je čten jako druhý a může přepsat parametry nastavení pro počítač.
-3) Nastavení pro repozitář v souboru   :file:`repo-root\\.hg\\hgrc`.
+3) Nastavení pro repozitář v souboru   :file:`repozitórium\\.hg\\hgrc`.
    Tento soubor je čten jako poslední a má tudíž nejvyšší prioritu.
 
 Nastavení pro počítač může být přepsáno při aktualizaci programu, takže se doporučuje provádět změny jen v souborech :file:`..username\\mercurial.ini` a/nebo :file:`.hg\\hgrc`.  
@@ -36,17 +36,17 @@ Mezi těmito režimy lze přepínat ve výběrovém tlačítku vlevo nahoře. Vl
 Většina uživatelů TortoiseHg si všechny nastavitelné parametry uloží v globálním nastavení a soubor hgrc v repozitáři použije pro uložení cest (aliasy pro vzdálené repozitáře) a konfiguraci webu. Vězme, že soubory pro tato nastavení neexistují dříve, než poprvé použijeme dialog Nastavení.
 
 
-Záložky
-=======
+Karty
+=====
 
-Nástroj pro konfiguraci programu se skládá ze záložek.
+Nástroj pro konfiguraci programu se skládá z přehledně uspořádaných karet.
 
-Každá záložka přibližně odpovídá jedné sekci vašeho konfiguračního souboru :file:`Mercurial.ini`. Některé sekce však byly kvůli přehlednosti rozděleny do více záložek. 
+Každá karta přibližně odpovídá jedné sekci vašeho konfiguračního souboru :file:`Mercurial.ini`. Některé sekce však byly kvůli přehlednosti rozděleny do více karet. 
 
-Všechny záložky kromě :guilabel:`Sync` mají stejný formát - sloupec nastavitelných parametrů s rozbalovacími seznamy možných hodnot. Názvy parametrů jsou doplněny skrytými popisy parametru a jeho možných hodnot.
+Všechny kartyy kromě :guilabel:`Extenze, Nástroje, Hooks` mají stejný formát - sloupec nastavitelných parametrů s rozbalovacími seznamy možných hodnot. Názvy parametrů jsou doplněny skrytými popisy parametru a jeho možných hodnot.
 Popis aktuálně editovaného parametru se rovněž objeví v textovém rámečku dole.
 
-Podrobnější informaci o nastavitelných parametrech nalezneme na stránkách wiki pro Mercurial, kromě těch záložek, které jsou specifické pro TortoiseHg:
+Podrobnější informaci o nastavitelných parametrech nalezneme na stránkách wiki pro Mercurial, kromě těch karet, které jsou specifické pro TortoiseHg:
 :guilabel:`TortoiseHg`, :guilabel:`Commit`, :guilabel:`Changelog`.
 
 .. module:: TortoiseHg.settings
@@ -55,74 +55,89 @@ Podrobnější informaci o nastavitelných parametrech nalezneme na stránkách 
 TortoiseHg
 ----------
 
-:guilabel:`Nástroj pro slučování:`
-	Grafický program pro řešení konfliktů při slučování. Pokud není určen, vybere Mercurial první použitelný nástroj, který nalezne v našem systému, nebo použije vlastní nástroj, který konflikty jenom označí. Tuto poslední možnost lze přikázat výběrem :guilabel:`internal:merge`. Volba :guilabel:`internal:prompt` vždy vybere lokální nástroj a volba :guilabel:`internal:dump` ponechá soubory v pracovním adresáři pro ruční sloučení. 
+:guilabel:`Jazyk aplikace:`
+	Slouží k určení preferovaného jazyka uživatelského rozhraní.
+	 
+:guilabel:`Nástroj pro sloučení:`
+    Grafický program pro řešení konfliktů při slučování. Pokud není určen, vybere Mercurial první použitelný nástroj, který nalezne v našem systému, nebo použije vlastní nástroj, který konflikty jenom označí. Tuto poslední možnost lze přikázat výběrem :guilabel:`internal:merge`. Volba :guilabel:`internal:prompt` vždy vybere lokální nástroj a volba :guilabel:`internal:dump` ponechá soubory v pracovním adresáři pro ruční sloučení. 
 
 :guilabel:`Nástroj Visual Diff:`
 	Určit externí program pro porovnávání diffů (příkaz extdiff)
 
-:guilabel:`Přeskočit úvodní okno VDiff:`
-	Vypustit úvodní okno se seznamem souborů a přímo použít prvky našeho 'VDiff' programu. Tuto volbu povolíme jen tehdy, pokud víme, že náš nástroj má platnou konfiguraci příkazu extdiff. Implicitní nastavení je False.
-
-:guilabel:`Vizuální editor:`
+:guilabel:`Textový editor:`
 	Editor pro zobrazování souborů, atp.
 
-:guilabel:`Editor CLI:`
+:guilabel:`Terminál:`
 	Editor pro komunikaci z příkazového řádku.
+	
+:guilabel:`Následné operace:`
+	Seznam operací terminálu, které se mají použít bez součinnosti uživatele.
 
-:guilabel:`Šířka záložky:`
-	Určit počet míst na která se roztáhnou záložky v různých oknech TortoiseHg. Implicitně je 'neurčeno'.
+:guilabel:`Šířka ouška karty:`
+	Určit počet míst na která se roztáhnou ouška karet v různých oknech TortoiseHg. Implicitně je 'neurčeno'.
+
+:guilabel:`Zobrazit karty:`
+	Zobrazit repozitář v kartě, i když je jediný. Implicitně je False.
+
+:guilabel:`Sledovat změny repozitáře:`
+	Určit kategorii souborů, u kterých TortoiseHg monitoruje změny. Implicitně je vždy.
 
 :guilabel:`Max velikost diffu:`
 	Maximální velikost souboru (v KB) pro zobrazení změn v oknech pro changelog, status a commit. Nulová hodnota je pro nastavení bez limitu. Implicitně je 1024 (1MB).
 
-:guilabel:`Diff panel dole:`
-	Umístit diffový panel pod seznamem souborů v oknech pro status, shelve a commit. Implicitně je False (panel je vpravo vedle seznamu souborů).
-
-:guilabel:`Zachytit stderr:`
-	Přesměrovat stderr do bufferu, který je na konci procesu analyzován pro chyby za běhu. Implicitně je True.
-
-:guilabel:`Dělit hgtk:`
-	Při zadání hgtk z přikazového řádku rozdělit proces na pozadí tak, aby spouštěl grafické dialogy. Implicitně je True.
-
-:guilabel:`Úplný název cesty:`
+:guilabel:`Rozdělit GUI:`
+	Při spuštění příkazu z příkazového řádku spustit proces na pozadí pro zobrazení grafických nástrojů.
+	
+:guilabel:`Název úplné cesty:`
 	Zobrazit celou cestu k adresáři repozitáře v záhlaví okna místo pouhého jména adresáře. Implicitně je False.
 
-:guilabel:`Kontrola pravopisu:`
-	Implicitní jazyk pro kontrolu pravopisu. Není-li specifikováno, použije se jazyk systému. Příklady: en, en_GB, en_US. Kontrola pravopisu vyžaduje aplikaci gtkspell, která je přístupná jen na počítačích 'Gnome'.
-
+:guilabel:`Automatické sloučení:`
+	Určuje, zda se má TortoiseHg pokusit automaticky řešit změny téhož souboru a hlásit slučovací konflikty  jen tehdy, pokud si sám neví rady. Implicitně je False.
 
 
 
 .. module:: workbench.settings
 	:synopsis: Dialog used to set workbench specific preferences
 
-Workbench
----------
+Workbench neboli Verpánek
+-------------------------
 
+:guilabel:`Jediné okno Verpánku:`
+	Není-li tato volba povolena, otevře se nový Verpánek pokaždé, když z kontextového menu vyberete "Hg Verpánek".
+:guilabel:`Počáteční widget:`
+	Nastavený widget se ukáže při otevření repozitáře.
+:guilabel:`Počáteční revize:`
+	Volba nastavené revize při otevření Verpánku (current, tip, working directory)
+:guilabel:`Otevřít nové karty vedle stávajících:`
+	Při volbě False se nová karta otevře za poslední kartou.	
 :guilabel:`Zabarvení podle autora:`
 	Zabarvení changesetů podle jména autora. Není-li umožněno, jsou změny zabarveny zeleně pro sloučení, červeně pro netriviální rodiče a černě pro běžné případy. Implicitně je False.
-
+:guilabel:`Celé jméno autora:`
+	Není-li povoleno, zobrazí se ve zkrácené verzi.
+:guilabel:`Úkonová lišta:`
+	Orientace úkonové lišty (east, west, off).
+:guilabel:`Pořadí úloh úkonové lišty:`
+	Výpisem názvů, oddělených separátorem "|" lze určit počet a pořadí nástrojů lišty. Platné názvy jsou: log, commit, mq, manifest, grep, pbranch a sync.	
 :guilabel:`Dlouhý souhrn:`
 	Zadáno-li true, spojují se řádky zpráv až do délky 80 znaků. Implicitně je False
-
-:guilabel:`Velikost dávky logu:`
-	Počet revizí načtených a zobrazených v jedné dávce. Implicitně je 500.
-
+:guilabel:`Počet načtených revizí:`
+	Počet současně zobrazitelných changesetů v protokolu.
 :guilabel:`Mrtvé větve:`
 	Seznam čárkami oddělených jmen větví, které mají být ignorovány při sestavování seznamu jmen větví pro repozitář. Implicitní nastavení je None.
-
 :guilabel:`Barvy větví:`
 	Seznam mezerami oddělených jmen větví a barev ve formě 'branch:#XXXXXX'. Mezery a dvojtečky ve jménu větve musí být předznamenány zpětnými lomítky (\\). Podobně mohou být předznamenány i některé další znaky, např. \\u0040 bude dekódováno na znak @ a \\n na 'linefeed'. Implicitní nastavení je None.
-
 :guilabel:`Skrýt tagy:`
 	Seznam mezerami oddělených tagů, které se nebudou zobrazovat. Užitečný příklad: zadejte 'qbase qparent qtip' pro skrytí standardních tagů, vkládaných extenzí MQ. Implicitní nastavení je None.
- 
 :guilabel:`Operace po akci pull` 
 	Operace, které se provedou přímo po úspěšném provedení akce pull. Hodnota 'update' odpovídá pull --update, 'fetch' je extenze fetch, 'rebase' odpovídá pull --rebase. Implicitní nastavení je None.
-	
-
-
+:guilabel:`Připojit k push:`
+	Uvedení typu revizí (all, branch, revision), které se implicitně vyberou pro akci Push.
+:guilabel:`Potvrzovat push:`
+	Nastaveno-li False, provede se push bez potvrzovacího dialogu. Implicitně True.
+:guilabel:`Aktivovat záložky:`
+	Nastavením auto, prompt, never se ovlivní aktivace záložek při aktualizaci k revizi, která má jednu či více záložek.
+:guilabel:`Target combo:`
+	Zadává se zobrazení či nezobrazení výběrové roletky v nástrojové liště Synchronizovat. Roletka obsahuje výpis vzdálených repozitářů.	
 
 .. module:: commit.settings
 	:synopsis: Dialog used to set commit specific preferences
@@ -147,6 +162,16 @@ Commit
 	Čárkami rozdělený seznam souborů, které jsou automaticky vypuštěny z výběru při otevření dialogů status, commit a shelve. Implicitní nastavení je None.
 :guilabel:`Průvodní texty anglicky`
     Generovat anglickou zprávu, i když jsou proměnné prostředí LANGUAGE nebo LANG nastaveny na neanglický jazyk. Toto nastavení je používáno procedurami Merge, Tag a Backout. Implicitní nastavení je False.
+:guilabel:`Fáze nových komitů:`
+    Lze zadat vlastnost public, draft, secret
+:guilabel:`Oprávky MQ-secret:`
+	Určit fázi oprávek MQ-secret místo draft. Implicitně je False.
+:guilabel:`Monitorovat změny pracovního adresáře:`
+	Určit frekvenci opětovného načítání (refresh) stavového výpisu pracovního adresáře - auto, allways, allwayslocal - viz	
+:guilabel:`Potvrdit přidání neznámých souborů:`
+	Vyvolat stvrzovací dialog při komitu. Implicitně True.
+:guilabel:`Potvrdit mazání souborů:`
+	Zobrazit stvrzovací dialog před odstraněním souborů při komitu.	   
 
 
 
@@ -154,8 +179,11 @@ Commit
 .. module:: web.settings
 	:synopsis: Dialog used to set web server specific preferences
 	
-Web
----
+Server
+------
+
+:guilabel:`Publikující repozitář:`
+	Chování fáze draft při práci coby server. Implicitně je pro push i pull nastavena fáze public.
 
 :guilabel:`Název:`
 	Název repozitáře pro použití ve webovém rozhraní. Implicitní hodnota je název pracovního adresáře.
@@ -188,7 +216,7 @@ Web
 	Maximální počet změn uváděných v changelogu.
 
 :guilabel:`Povolit push:`
-	Zda povolit vyslání do repozitáře. Není-li nic zadáno, 'push' není dovolen. Je-li zadána hodnota "*", může push provést libovolný i neověřený uživatel. Vzdálení uživatelé musí jinak být ověřeni a jejich ověřená jména musí být přítomna v tomto seznamu (oddělená mezerou nebo ","). Obsah seznamu allow_push je zkoumán po seznamu deny_push.
+	Zda povolit vzdálený push do lokálního repozitáře. Není-li určeno, push není dovolen. Je-li zadána hodnota "*", může push provést libovolný i neověřený uživatel. Vzdálení uživatelé musí jinak být ověřeni a jejich ověřená jména musí být přítomna v tomto seznamu (oddělená mezerou nebo ","). Obsah seznamu allow_push je zkoumán po seznamu deny_push.
 
 :guilabel:`Odmítnout push:`
 	Zda odmítnout vyslání do repozitáře. Není-li nic zadáno, 'push' není odmítnuto. Je-li zadána hodnota "*", mají  'push' zamítnut všichni uživatelé, ověření či neověření. Případný seznam deny_push je zkoumán před seznamem allow_push.
@@ -259,8 +287,8 @@ Email
 .. module:: diff.settings
 	:synopsis: Dialog used to set diff specific preferences
 
-Diff
-----
+Diffy a anotace
+---------------
 
 :guilabel:`Oprávka EOL:`
 	Normalizovat ukončení řádků v souboru na lf nebo crlf během a po akci patch. Implicitní nastavení 'strict' normalizaci neprovádí. 
@@ -268,8 +296,8 @@ Diff
 :guilabel:`Formát Git:`
 	Použít rozšířený git formát záhlaví diffu. Implicitně je False.
 
-:guilabel:`MQ Git Format`
-    If set to 'keep', mq will obey the (diff) section configuration while preserving existing git patches upon qrefresh. If set to 'yes' ot 'no', mq will override the (diff) section and always generate git or regular patches, possibly losing data in the second case.
+:guilabel:`Formát MQ Git`
+    Nastaveno-li na 'keep', použije mq konfiguraci sekce (diff), přičemž při qrefresh zachová existující oprávky (patches). Nastaveno-li 'yes' nebo 'no', mq potlačí sekci (diff) a vždy generuje gitové nebo regulerní oprávky, přičemž je ve druhém případě možná ztráta dat. 
 
 :guilabel:`Bez datumu:`
 	Do záhlaví diffů nezahrnovat data modifikací. Implicitně je False.
@@ -286,26 +314,24 @@ Diff
 :guilabel:`Ignorovat prázdné řádky:`
 	Ignorovat změny, jejichž řádky jsou všechny prázdné. Implicitně je False.
 	
-:guilabel:`Styl zabarvení:`
-	Úprava stylu zabarvení diffových řádků v prohlížeči changesetů. Implicitně: foreground.
 
 
 Fonty
 -----
 
-:guilabel:`Message Font:`
+:guilabel:`Font sdělení:`
 	Font průvodních zpráv komitu. Implicitně: monospace 10
 
-:guilabel:`Diff Font:`
+:guilabel:`Font diffu:`
 	Font pro zobrazení textových rozdílů. Implicitně: monospace 10.
 	
-:guilabel:`List Font:`
-	Font seznamu souborů . Implicitně: sans 9.
+:guilabel:`Font seznamu:`
+	Font použitý vseznamu souborů . Implicitně: sans 9.
 	
-:guilabel:`ChangeLog Font`
-	Font pro zobrazení dat v changelogu. Implicitně: monospace 10.
+:guilabel:`Font přehledu`
+	Font použitý v přehledu revizí. Implicitně: monospace 10.
 	
-:guilabel:`Output Font:`
+:guilabel:`Font výstupu:`
 	Font textu v panelu Output Log. Implicitně: sans 8.
 	
 
@@ -314,36 +340,64 @@ Extenze
 
 Aktivační seznam extenzí.
 
-Sledování problémů
-------------------
+
+	
+Nástroje
+--------
+
+Prostředí pro konfiguraci vlastního ovládacího prvku a jeho zařazení do uživatelské nástrojové lišty.
+
+
+Hooks
+-----
+
+Prostředí pro konfiguraci vlastního hooku.
+
+Issue Tracking
+--------------
 
 :guilabel:`Regex problému`
 	Definuje regex shody pro vyhledávání čísel problému.
 
 :guilabel:`Přípojení k problému`
 	Definuje příkaz, který má být spuštěn po zjištění čísla problému.
-
+	
+:guilabel:`Úvodní tagy`
+	Zobrazit tagy na počátku sdělení komitu.
+	
+:guilabel:`Povinný odkaz na problém`
+	Konfigurovat vybraný plugin COM Bug Tracker.
+	
+:guilabel:`Issue Tracker Plugin`
+	Konfiguruje plugin COM pro sledování chyb.
+	
+:guilabel:`Konfigurovat IT`
+	Konfigurovat Issue Tracker.
+	
+:guilabel:`Aktualizovat Issue Tracker`
+	Definuje příkaz, který má být spuštěn po zjištění čísla problému.
+					
 	
 Review Board
 ------------
 
 :guilabel:`Server`
-	Path to review board example "http://demo.reviewboard.org"
+	Cesta k příkladu pro RB:  "http://demo.reviewboard.org"
 
 :guilabel:`Uživatel`
-	User name to authenticate with review board.	
+	Jméno uživatele pro ověření přístupu na RB.
 	
 :guilabel:`Heslo`
-	Password to authenticate with review board.
-
-:guilabel:`Server Repository ID`
-	The default repository id for this repo on the review board server	
+	Heslo pro ověření přístupu na RB.
+	
+:guilabel:`Server repository ID`
+	Implicitní ID repozitáře na serveru RB	
 
 :guilabel:`Target Groups`
-	A comma separated list of target groups.
+	Seznam čárkami oddělených cílových skupin
 
 :guilabel:`Target People`
-	A comma separated list of target people.
+	Seznam čárkami oddělených cílových osob
 
 	
 Klávesová navigace

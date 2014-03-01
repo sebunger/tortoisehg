@@ -78,8 +78,7 @@ class PurgeDialog(QDialog):
         self.showMessage.connect(self.stbar.showMessage)
         layout.addWidget(self.stbar)
 
-        repo = repoagent.rawRepo()
-        self.setWindowTitle(_('%s - purge') % repo.displayname)
+        self.setWindowTitle(_('%s - purge') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-purge'))
 
         self.bb.setEnabled(False)

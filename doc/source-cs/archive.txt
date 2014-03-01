@@ -5,18 +5,18 @@ Archivace
 	:synopsis: Dialog used to make an archive of a repository
 
 Při tvorbě archivu repozitáře lze vybírat z řady formátů.
-Jsou to obvyklé komprimované formáty ale také možné vytvořit složku nekomprimovaných souborů v jiném místě než v pracovním adresáři (jako klon ale bez složky .hg). Takové archivy mohou být užitečné například při tvorbě sestav (builds - podobně jako při 'svn export'). Archivy s vybraným obsahem mohou být také užitečné při posílání změn extením osobám bez přístupu k repozitáři
+Jsou to obvyklé komprimované formáty ale je také možné vytvořit složku nekomprimovaných souborů v jiném místě než v pracovním adresáři (jako klon ale bez složky .hg). Takové archivy mohou být užitečné například při tvorbě sestav (builds - podobně jako při 'svn export'). Archivy s vybraným obsahem mohou být také užitečné při posílání změn externím osobám bez přístupu k repozitáři
 
 
 Spuštění z Verpánku
 -------------------
 
-V kontextovém menu vybraného changesetu ve Verpánku volíte :menuselection:`Exportovat > Archivovat`.
+V kontextovém menu vybraného changesetu ve Verpánku volíte :menuselection:`Export > Archive...`.
 
 .. figure:: figures/archive.png
 	:alt: Archive dialog
 
-	Repository Archive Dialog
+Dialogové okno pro archiv repozitáře
 
 :guilabel:`Revize`
 	Zadání revize, kterou chcete archivovat nebo exportovat.
@@ -26,11 +26,11 @@ V kontextovém menu vybraného changesetu ve Verpánku volíte :menuselection:`E
 	Umožňuje přístup do subrepozitářů.	
 :guilabel:`Destinace`
 	Jméno souboru nebo složky, kde bude archiv vytvořen. Jméno se skládá z názvu aktuálního repozitáře s připojeným číslem vybrané revize, případně s příponou vybraného formátu archivního souboru.
-	:guilabel:`Typy archivů`
+:guilabel:`Typy archivů`
 	Zde můžete zvolit typ vytvářeného archivu od prosté složky se soubory až k řadě standardních archivních typů.
-	:guilabel:`Příkaz Hg`
+:guilabel:`Příkaz Hg`
 	Toto pole zobrazuje příkaz, který bude proveden.
-	:guilabel:`Vždy zobrazit výstup`
+:guilabel:`Vždy zobrazit výstup`
 	Pro zobrazení záznamového panelu s výsledky prováděného příkazu.
 	
 Archivovat repozitář znamená vytvořit archivní soubor nebo podadresář s obsahem vybrané revize.

@@ -19,12 +19,12 @@ class RevertDialog(QDialog):
         super(RevertDialog, self).__init__(parent)
 
         self._repoagent = repoagent
-        repo = repoagent.rawRepo()
         self._cmdsession = cmdcore.nullCmdSession()
-        self.setWindowTitle(_('Revert - %s') % repo.displayname)
+        self.setWindowTitle(_('Revert - %s') % repoagent.displayName())
 
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        repo = repoagent.rawRepo()
         self.wfiles = [repo.wjoin(wfile) for wfile in wfiles]
 
         self.setLayout(QVBoxLayout())

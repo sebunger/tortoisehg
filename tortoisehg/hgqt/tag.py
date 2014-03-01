@@ -22,9 +22,8 @@ class TagDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         self._repoagent = repoagent
-        repo = repoagent.rawRepo()
         self._cmdsession = cmdcore.nullCmdSession()
-        self.setWindowTitle(_('Tag - %s') % repo.displayname)
+        self.setWindowTitle(_('Tag - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-tag'))
 
         # base layout box
@@ -43,6 +42,7 @@ class TagDialog(QDialog):
         form = QFormLayout(fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow)
         box.addLayout(form)
 
+        repo = repoagent.rawRepo()
         ctx = repo[rev]
         form.addRow(_('Revision:'), QLabel('%d (%s)' % (ctx.rev(), ctx)))
         self.rev = ctx.rev()

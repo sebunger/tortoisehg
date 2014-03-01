@@ -12,7 +12,7 @@ from mercurial import ui, util, error, extensions, scmutil, phases
 from tortoisehg.util import hglib, paths, wconfig, i18n, editor
 from tortoisehg.util import terminal, gpg
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
+from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools, fileencoding
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -527,11 +527,11 @@ def genCheckBox(opts):
 class _fi(object):
     """Information of each field"""
     __slots__ = ('label', 'cpath', 'values', 'tooltip',
-                 'restartneeded', 'globalonly',
+                 'restartneeded', 'globalonly', 'noglobal',
                  'master', 'visible')
 
     def __init__(self, label, cpath, values, tooltip,
-                 restartneeded=False, globalonly=False,
+                 restartneeded=False, globalonly=False, noglobal=False,
                  master=None, visible=None):
         self.label = label
         self.cpath = cpath
@@ -539,6 +539,7 @@ class _fi(object):
         self.tooltip = tooltip
         self.restartneeded = restartneeded
         self.globalonly = globalonly
+        self.noglobal = noglobal
         self.master = master
         self.visible = visible
 
@@ -594,18 +595,20 @@ INFO = (
           'TortoiseHg windows. '
           'Default: 8')),
     _fi(_('Force Repo Tab'), 'tortoisehg.forcerepotab', genBoolRBGroup,
-        _('Always show repo tabs, even for a single repo. Default: False')),
+        _('Always show repo tabs, even for a single repo. Default: False'),
+        globalonly=True),
     _fi(_('Monitor Repo Changes'), 'tortoisehg.monitorrepo',
         (genDefaultCombo, ['always', 'localonly', 'never']),
         _('Specify the target filesystem where TortoiseHg monitors changes. '
-          'Default: always')),
+          'Default: localonly')),
     _fi(_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,
         _('The maximum size file (in KB) that TortoiseHg will '
           'show changes for in the changelog, status, and commit windows. '
           'A value of zero implies no limit.  Default: 1024 (1MB)')),
     _fi(_('Fork GUI'), 'tortoisehg.guifork', genBoolRBGroup,
         _('When running from the command line, fork a background '
-          'process to run graphical dialogs.  Default: True')),
+          'process to run graphical dialogs.  Default: True'),
+        globalonly=True),
     _fi(_('Full Path Title'), 'tortoisehg.fullpath', genBoolRBGroup,
         _('Show a full directory path of the repository in the dialog title '
           'instead of just the root directory name.  Default: False')),
@@ -628,7 +631,7 @@ INFO = (
           'context menu. Default: True'),
         restartneeded=True, globalonly=True),
     _fi(_('Default widget'), 'tortoisehg.defaultwidget', (genDefaultCombo,
-        ['revdetails', 'commit', 'sync', 'manifest', 'search']),
+        ['revdetails', 'commit', 'sync', 'search']),
         _('Select the initial widget that will be shown when opening a '
           'repository. '
           'Default: revdetails')),
@@ -643,7 +646,8 @@ INFO = (
         'tortoisehg.opentabsaftercurrent', genBoolRBGroup,
         _('Should new tabs be open next to the current tab? '
           'If False new tabs will be open after the last tab. '
-          'Default: True')),
+          'Default: True'),
+        globalonly=True),
     _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolRBGroup,
         _('Color changesets by author name.  If not enabled, '
           'the changes are colored green for merge, red for '
@@ -663,8 +667,8 @@ INFO = (
         _('Specify which task buttons you want to show on the task toolbar '
           'and in which order.<br>Type a list of the task button names. '
           'Add separators by putting "|" between task button names.<br>'
-          'Valid names are: log commit mq sync manifest grep and pbranch.<br>'
-          'Default: log commit manifest grep pbranch | sync'),
+          'Valid names are: log commit sync grep and pbranch.<br>'
+          'Default: log commit grep pbranch | sync'),
         restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
@@ -739,6 +743,13 @@ INFO = (
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
         _('Make MQ patches secret (instead of draft). '
           'Default: False')),
+    _fi(_('Check Subrepo Phase'), 'phases.checksubrepos',
+        (genDefaultCombo, ['ignore', 'follow', 'abort']),
+        _('Check the phase of the current revision of each subrepository.  '
+          'For settings other than "ignore", the phase of the current '
+          'revision of each subrepository is checked before committing the '
+          'parent repository.  '
+          'Default: follow')),
     _fi(_('Monitor working<br>directory changes'),
         'tortoisehg.refreshwdstatus',
         (genDefaultCombo, ['auto', 'always', 'alwayslocal']),
@@ -807,16 +818,21 @@ INFO = (
     )),
 
 ({'name': 'web', 'label': _('Server'), 'icon': 'proxy'}, (
-    _fi(_('<b>Behavior:</b>'), None, genSpacer, ''),
+    _fi(_('<b>Repository Details:</b>'), None, genSpacer, ''),
+    _fi(_('Name'), 'web.name', genEditCombo,
+        _('Repository name to use in the web interface, and by TortoiseHg '
+          'as a shorthand name.  Default is the working directory.'),
+        noglobal=True),
+    _fi(_('Encoding'), 'web.encoding',
+        (genEditCombo, fileencoding.knownencodings()),
+        _('Character encoding of files in the repository, used by the web '
+          'interface and TortoiseHg.')),
     _fi(_("'Publishing' repository"), 'phases.publish', genBoolRBGroup,
         _('Controls draft phase behavior when working as a server. When true, '
           'pushed changesets are set to public in both client and server and '
           'pulled or cloned changesets are set to public in the client. '
           'Default: True')),
     _fi(_('<b>Web Server:</b>'), None, genSpacer, ''),
-    _fi(_('Name'), 'web.name', genEditCombo,
-        _('Repository name to use in the web interface, and by TortoiseHg '
-          'as a shorthand name.  Default is the working directory.')),
     _fi(_('Description'), 'web.description', genEditCombo,
         _("Textual description of the repository's purpose or "
           'contents.')),
@@ -857,8 +873,6 @@ INFO = (
           'denied, and any authenticated user name present in this list '
           '(separated by whitespace or ",") is also denied. The contents '
           'of the deny_push list are examined before the allow_push list.')),
-    _fi(_('Encoding'), 'web.encoding', (genEditCombo, ['UTF-8']),
-        _('Character encoding name')),
     )),
 
 ({'name': 'proxy', 'label': _('Proxy'), 'icon': QStyle.SP_DriveNetIcon}, (
@@ -897,9 +911,10 @@ INFO = (
     _fi(_('SMTP Port'), 'smtp.port', genIntEditCombo,
         _('Port to connect to on mail server. '
           'Default: 25')),
-    _fi(_('SMTP TLS'), 'smtp.tls', genBoolRBGroup,
-        _('Connect to mail server using TLS. '
-          'Default: False')),
+    _fi(_('SMTP TLS'), 'smtp.tls',
+        (genDefaultCombo, ['starttls', 'smtps', 'none']),
+        _('Method to enable TLS when connecting to mail server. '
+          'Default: none')),
     _fi(_('SMTP Username'), 'smtp.username', genEditCombo,
         _('Username to authenticate to mail server with')),
     _fi(_('SMTP Password'), 'smtp.password', genPasswordEntry,
@@ -1191,6 +1206,7 @@ class SettingsDialog(QDialog):
                                   _('no repo at ') + uroot, parent=self)
 
         if repo:
+            repoagent = repo._pyqtobj  # TODO
             if 'projrc' in repo.extensions():
                 projrcpath = os.sep.join([repo.root, '.hg', 'projrc'])
                 if os.path.exists(projrcpath):
@@ -1198,13 +1214,14 @@ class SettingsDialog(QDialog):
                                         readonly=True)
                     self.conftabs.addTab(rtab, qtlib.geticon('settings_projrc'),
                                          _('%s project settings (.hg/projrc)')
-                                         % repo.shortname)
+                                         % repoagent.shortName())
                     rtab.restartRequested.connect(self._pushRestartRequest)
 
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             rtab = SettingsForm(rcpath=reporcpath, focus=focus)
             self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
-                                 _('%s repository settings') % repo.shortname)
+                                 _('%s repository settings')
+                                 % repoagent.shortName())
             rtab.restartRequested.connect(self._pushRestartRequest)
 
         BB = QDialogButtonBox
@@ -1504,6 +1521,8 @@ class SettingsForm(QWidget):
                 w = func(opts)
             if e.globalonly:
                 w.setEnabled(self.rcpath == scmutil.userrcpath())
+            elif e.noglobal:
+                w.setEnabled(self.rcpath != scmutil.userrcpath())
             lbl = QLabel(e.label)
             lbl.setToolTip(e.tooltip)
             widgets.append(w)

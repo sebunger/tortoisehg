@@ -8,7 +8,7 @@ Oprávky
 Definice oprávky
 ================
 
-Pro pochopení historie a povahy oprávek (patches) a jejich použití v Mercurialu je důležitá četba následujících odkazů.
+Pro pochopení historie a povahy oprávek (patches) a jejich použití v Mercurialu je důležitá četba následujících odkazů (žel, v angličtině).
 
 
 * `Problém správy oprávek <http://tortoisehg.bitbucket.org/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
@@ -18,25 +18,25 @@ Pro pochopení historie a povahy oprávek (patches) a jejich použití v Mercuri
 Úskalí
 ======
 
-Standardní formát oprávky neumí popsat binární soubory, změnu jmen souborů nebo změnu povolení. Potřebujete-li cokoliv z uvedeného zachytit, musíme povolit oprávky **git**  zadáním:: 
+Standardní formát oprávky neumí popsat binární soubory, přejmenování souborů nebo změnu povolení. Potřebujete-li cokoliv z uvedeného zachytit, musíme povolit oprávky **git**  zadáním:: 
 
 	[diff]
 	git=True
 
-Mercurial 1.5 své chování v tomto směru vylepšuje. Vydá varování, když jsou potřebné git diffy nebo se někdy do formágu git nastaví automaticky - `diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_.
+Mercurial 1.5 své chování v tomto směru vylepšuje. Vydá upozornění, když jsou potřebné diffy git nebo se někdy do formágu git nastaví automaticky - `diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_.
 
-Oprávkové rutiny Mercurialu nezacházejí dobře s různými EOLN mezi zdrojovými kódy a oprávkami. Pro zlepšení situace bylo v 1.3 zavedeno nastavení **patch.eol**::
+Oprávkové rutiny Mercurialu nezacházejí dobře s různými EOLN u zdrojových kódů a u oprávek. Pro zlepšení situace bylo v 1.3 zavedeno nastavení **patch.eol**::
 
 	[patch]
 	eol = auto #strict, lf, or crlf
 
 .. note::
-	Je-li EOL nastaveno na *auto*, zachová procedura oprávek původní  konce řádků bez ohledu na jejich ukončení v oprávce samé. Nastavení na *auto* použijeme ve většině případů. Nevýhodou tohoto nastavení je, že nemůžete provést oprávku, která mění ukončení řádků oproti zdrojovému souboru.
+	Je-li EOL nastaveno na *auto*, zachová oprávková rutina konce řádků zdrojového kódu bez ohledu na jejich ukončení v oprávce samé. Nastavení na *auto* použijeme ve většině případů. Nevýhodou tohoto nastavení je, že nemůžete provést oprávku, která mění ukončení řádků oproti zdrojovému souboru.
 
 Viz také `patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_
 dokumentace hgrc.
 	
-Použití oprávky není blbuvzdorná operace. Pokud se zdrojový soubor odchýlil od souboru, použitého pro vytvoření oprávky, mohou při jejím použití vzniknout konflikty. Tyto se zapisují do souboru s příponou .rej. TortoiseHg obsahuje příkaz :command:`thg rejects`, který může pomoci při včleňování odmítnutých porcí (chunks) do zdrojového souboru.
+Aplikace oprávky není 'omyluvzdorná' operace. Pokud se zdrojový soubor odchýlil od souboru, použitého pro vytvoření oprávky, mohou při její aplikaci vzniknout konflikty. Tyto se pak zapisují do souboru s příponou .rej. TortoiseHg obsahuje příkaz :command:`thg rejects`, který může pomoci při slučování odmítnutých porcí (chunks) do zdrojového souboru.
 
 Export oprávek
 ==============
@@ -52,7 +52,7 @@ Rozsahy changesetů
 
 Vyberte začátek a konec rozsahu changesetů ve Verpánku a otevřete speciální kontextové menu pro rozsah revizí. Z tohoto menu můžete generovat oprávky, svazky, poslat email nebo zobrazit diffy nahromaděných změn. 
 
-Toto je velmi účinná procedura bez omezení pro bázové a cílové changesety.
+Toto je velmi účinná procedura bez omezení pro vybírané bázové a cílové changesety.
 
 
 Email
@@ -61,13 +61,13 @@ Email
 .. figure:: figures/email.png
 	:alt: Email dialog
 	
-	E-mailová pošta v Průzkumníku repozitáře
 
-Pro odeslání changesetu jako emailu použijete kontextové menu ve Verpánku :menuselection:`Exportovat > Email oprávky...`.  Volba otevře okno pro odeslání vybraného changesetu.
 
-Pro odeslání rozsahu changesetů použijete výše popsaný způsob výběru a zvolíme :menuselection:`Email selected...` nebo :menuselection:`Email DAG range...`
+Pro odeslání vybraného changesetu ve Verpánku jako emailu použijete kontextové menu :menuselection:`Exportovat > Email oprávky...`.  Volba otevře okno pro odeslání vybraného changesetu.
 
-Konečně lze pro odeslání všech odchozích změn do vybraného vzdáleného repozitáře použít tlačítko :guilabel:`Email` v synchronizační liště Verpánku .
+Pro odeslání rozsahu changesetů použijete výše popsaný způsob výběru a zvolíte :menuselection:`Email selected...` nebo :menuselection:`Email DAG range...`
+
+Konečně lze pro odeslání všech odchozích změn do vybraného vzdáleného repozitáře použít tlačítko :guilabel:`Email` v synchronizační liště úkonové karty Synchronizovat.
 
 .. note::
 	Pro posílání oprávek emailem nutno nastavit
@@ -80,11 +80,10 @@ Import oprávek
 .. figure:: figures/import.png
 	:alt: Import tool
 	
-	Dialog pro import v Průzkumníku repozitáře
 
-Dialog pro import oprávky lze otevřít v menu Verpánku :guilabel:`Repozitory`  nebo porostřednictvím příkazu :command:`thg import`. Dialog podporuje přemisťování souborů a adresářů metodou drag and drop. 
+Dialog pro import oprávky lze otevřít v menu :guilabel:`Repoziář`  nebo prostřednictvím příkazu :command:`thg import`. Dialog podporuje přemisťování souborů a adresářů metodou drag and drop. 
 
-Můžete importovat přímo do repozitáře, pracovního adresáře, almárkového (shelf) souboru nebo do své fronty oprávek. 
+Můžete importovat přímo do repozitáře, pracovního adresáře, shelfového souboru nebo do své fronty oprávek. 
 
 .. note::
 	Import oprávky vyžaduje čistý stav pracovního adresáře. Před importem oprávky musíte provést commit, revert, nebo odložení (shelve) změn.
@@ -93,29 +92,27 @@ Můžete importovat přímo do repozitáře, pracovního adresáře, almárkové
 	Když se nedaří importovat oprávku čistě do repozitáře, doporučuje se importovat oprávku do fronty oprávek (qimport) a potom provést qpush. Tato procedura používá "patch rejection" dialog a zachovává meta-date v záhlaví oprávky. Nezapomeňte provést qrefresh po rozřešení odmítnutých porcí (chunks).
 
 .. warning::
-	Pokud importovaná oprávka nemá komentář komitu, pokusí se Mercurial spustit váš editor, stejně jako kdyby jste se pokoušel importovat oprávku z příkazového řádku. Pro zdárný průběh akce je zapotřebí, aby váš UI editor byla GUI aplikace.
+	Pokud importovaná oprávka nemá zprávu komitu, pokusí se Mercurial spustit váš editor, stejně jako kdyby jste se pokoušel importovat oprávku z příkazového řádku. Pro zdárný průběh akce je zapotřebí, aby váš UI editor byla aplikace GUI.
 
 
 Fronty oprávek
 ==============
 
-.. figure:: figures/patchqueue.png
+Je-li povolena extenze MQ, aktivuje se několik dalších procedur Verpánku. Je k dispozici rozšířená nabídka kontextového menu v přehledu revizí, kde je přítomnost oprávek graficky vyjádřena tvarem uzlů grafu DAG.
+
+.. figure:: figures/patch-repograph.png
 	:alt: Patch Queue
 	
-	Fronta oprávek v grafu repozitáře
+	Fronta oprávek v Přehledu revizí
 
-Je-li povolena extenze MQ, aktivuje se několik dalších procedur Verpánku. Je k dispozici rozšířená nabídka kontextového menu v seznamu changesetů, fronta oprávek je zobrazena spolu s historií repozitáře a je aktivována zadávací karta Patch Queue
-	
-.. figure:: figures/mq-tasktab.png
-	:alt: Patch Queue Task Tab
+Lze otevřít přemistitelný panel Fronta oprávek (Patch Queue), kde lze nastavit či zrušit 'aplikovanost' oprávky, smazat vybranou oprávku nebo zadat guard. 
 
-	MQ tool or task tab
-	
-Zadávací kartu (okno) :guilabel:`Patch Queue` můžeme také aktivovat příkazem :command:`thg mq` z příkazového řádku. Většina procedur MQ je přístupná ze zadávacího okna Patch Queue. Několik málo procedur (qimport -r/qfinish) je dostupných pouze z kontextového menu ve Verpánku.
+.. figure:: figures/patchqueue.png
+	:alt: Patch Queue
+
 
 Dvojí poklep na neaplikované oprávce, aplikované oprávce jiné než qtip nebo qparent spouští příkaz *qgoto*; poklepnutá revize se stává aktuální oprávkou. Dvojí poklep na kterékoliv jiné revizi spustí zobrazení jejího diffu.
 
-V předchozích vydáních byl nástroj Commit ústřední procedurou při použití MQ. V TortoiseHg 2.0 si nástroj Commit téměř vůbec MQ nevšímá. Pouze ví, že komit není dovolen, je-li rodič aktuální revize aplikovanou oprávkou. Místo toho je fukcionalita MQ soustředěna do Verpánku, zadávacího okna Patch Queue a do odkládacího (shelve) nástroje.
 
 .. note::
 	Po povolení nebo zapovězení extenze MQ v repozitáři je nutné restartovat Workbench. To platí pro většinu extenzí.
@@ -123,7 +120,10 @@ V předchozích vydáních byl nástroj Commit ústřední procedurou při použ
 .. note::
 	Je vřele doporučováno seznámit se s extenzí MQ před jejím používáním ve Verpánku.
 
-
+.. versionchanged:: 2.10
+   Karta :guilabel:`Patch Queue` byla nahrazena kartou 
+   :guilabel:`Commit` a přemistitelným panelem :guilabel:`Patch Queue`.
+	
 Odmítnuté oprávky
 =================
 
@@ -137,7 +137,7 @@ TortoiseHg 2.0 zavádí dialog, který tuto činnost trochu ulehčuje. Když odk
 
 	Resolve rejected patch chunks
 
-Editor odmítnutých porcí je poměrně primitivní. Zdrojový soubor je otevřen pro editování v okně QScintilla2. Pod zdrojovým souborem je seznam porcí, které se nepodařilo na tento soubor aplikovat. Poklepete-li na porci v seznamu, přeskočí editor na řádek, kde se očekává shoda kontextu porce. Uživatel musí určit proč se porce nepoužila a řešit to (možná i ignorováním porce). Stavy resolved / unresolved jsou evidovány, takže lze kdykoliv zjistit, kdy se s porcemi pracovalo. Jakmile označíte všechny porce jako rozřešené (resolved), stane se tlačítko :guilabel: `Save` sensitivní.
+Editor odmítnutých porcí je poměrně primitivní. Zdrojový soubor je otevřen pro editování v okně QScintilla2. Pod zdrojovým souborem je seznam porcí, které se nepodařilo na tento soubor aplikovat. Poklepete-li na porci v seznamu, přeskočí editor na řádek, kde se očekává shoda kontextu porce. Uživatel musí určit proč se porce nepoužila a řešit to (možná i ignorováním porce). Stavy resolved / unresolved jsou evidovány, takže lze kdykoliv zjistit, kdy se s porcemi pracovalo. Jakmile označíte všechny porce jako rozřešené (resolved), stane se tlačítko :guilabel:`Save` sensitivní.
 
 	
 .. vim: noet ts=4

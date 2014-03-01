@@ -189,21 +189,6 @@ Work with the various task tabs.
 
 ..
 
-	:guilabel:`Manifest`
-		Shows information about the complete content of the repository as it
-		was for the current revision. Here you can view the raw content of
-		files or an Annotate view.  There is a context menu on the filelist
-		to do further digging into the history data.  You can even compare a
-		file between different revision from there.
-		See _`Manifest` for more detail.
-
-..		.. figure:: figures/manifest-tasktab.png
-			:alt: Manifest Task Tab
-			
-			Manifest Task Tab
-
-..
-
 	:guilabel:`Search`
 		For performing text searches through file content.
 		
@@ -355,7 +340,6 @@ With only one revision selected:
 		Allows to manage tags to the selected revision.
 	:guilabel:`Bookmark...`
 		Allows to manage bookmarks for the selected revision.
-		*This option requires the boomarks extension to be enabled.*
 	:guilabel:`Backout...`
 		Create a backout changeset for selected revision.
 	:guilabel:`Export`
@@ -433,7 +417,7 @@ File Context Menus
 ------------------
 
 Right-clicking on filenames in the file list pane (bottom left of the RevDetails
-and Manifest task tabs) will bring up a context menu for the selected file:
+task tab) will bring up a context menu for the selected file:
 
 	:guilabel:`Visual Diff`
 		Open this revision of the file in your visual diff tool.

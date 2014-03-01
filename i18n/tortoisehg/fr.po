@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-10-31 00:28-0200\n"
-"PO-Revision-Date: 2013-11-01 09:20+0000\n"
+"POT-Creation-Date: 2014-02-03 11:14-0200\n"
+"PO-Revision-Date: 2014-02-03 14:18+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2013-11-01 11:12+0000\n"
-"X-Generator: Launchpad (build 16820)\n"
+"X-Launchpad-Export-Date: 2014-02-04 06:03+0000\n"
+"X-Generator: Launchpad (build 16916)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -59,35 +59,29 @@ msgstr "Une nouvelle version de TortoiseHg (%s) est disponible."
 msgid "= Working Directory Parent ="
 msgstr "= Parent du répertoire de travail ="
 
-msgid "Revision:"
-msgstr "Révision :"
-
-msgid "Only files modified/created in this revision"
-msgstr "Seulement les fichiers modifiés/créés dans cette révision"
-
-msgid "Recurse into subrepositories"
-msgstr "Parcourir les sous-dépôts"
-
-msgid "Destination path:"
-msgstr "Chemin de destination :"
-
-msgid "Browse..."
-msgstr "Parcourir..."
-
-msgid "Archive types:"
-msgstr "Types d'archives :"
-
 msgid "Directory of files"
 msgstr "Répertoire de fichiers"
+
+msgid "Tar archives"
+msgstr "Archives tar"
 
 msgid "Uncompressed tar archive"
 msgstr "Archive tar décompressée"
 
+msgid "Bzip2 tar archives"
+msgstr "Archives tar Bzip2"
+
 msgid "Tar archive compressed using bzip2"
 msgstr "Archive tar compressée en utilisant bzip2"
 
+msgid "Gzip tar archives"
+msgstr "Archives Gzip tar"
+
 msgid "Tar archive compressed using gzip"
 msgstr "Archive tar compressée en utilisant gzip"
+
+msgid "Zip archives"
+msgstr "Archives zip"
 
 msgid "Uncompressed zip archive"
 msgstr "Archive zip décompressée"
@@ -95,24 +89,26 @@ msgstr "Archive zip décompressée"
 msgid "Zip archive compressed using deflate"
 msgstr "Archive zip compressée utilisant deflate"
 
+msgid "Only files modified/created in this revision"
+msgstr "Seulement les fichiers modifiés/créés dans cette révision"
+
+msgid "Recurse into subrepositories"
+msgstr "Parcourir les sous-dépôts"
+
+msgid "Revision:"
+msgstr "Révision :"
+
+msgid "Browse..."
+msgstr "Parcourir..."
+
+msgid "Destination path:"
+msgstr "Chemin de destination :"
+
+msgid "Archive types:"
+msgstr "Types d'archives :"
+
 msgid "Hg command:"
 msgstr "Commande de Hg :"
-
-msgid "Always show output"
-msgstr "Toujours afficher les résultats"
-
-msgid "&Archive"
-msgstr "&Archiver"
-
-msgid "&Detail"
-msgstr "&Détail"
-
-msgid "Cancel"
-msgstr "Annuler"
-
-#, python-format
-msgid "Archive - %s"
-msgstr "Archive - %s"
 
 msgid "Select Destination Folder"
 msgstr "Sélectionnez un dossier de destination"
@@ -122,18 +118,6 @@ msgstr "Sélectionnez un fichier de destination"
 
 msgid "All files (*)"
 msgstr "Tous les fichiers (*)"
-
-msgid "Tar archives"
-msgstr "Archives tar"
-
-msgid "Bzip2 tar archives"
-msgstr "Archives tar Bzip2"
-
-msgid "Gzip tar archives"
-msgstr "Archives Gzip tar"
-
-msgid "Zip archives"
-msgstr "Archives zip"
 
 msgid "Duplicate Name"
 msgstr "Nom déjà existant"
@@ -168,6 +152,13 @@ msgstr ""
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
 msgstr "\"%s\" existe déjà comme dossier destination."
+
+#, python-format
+msgid "Archive - %s"
+msgstr "Archive - %s"
+
+msgid "&Archive"
+msgstr "&Archiver"
 
 #, python-format
 msgid "Backout - %s"
@@ -343,23 +334,26 @@ msgstr "Révision de backout"
 msgid "Bisect - %s"
 msgstr "Bisect - %s"
 
-msgid "Known good revision:"
-msgstr "Révision connue comme bonne :"
-
 msgid "Accept"
 msgstr "Accepter"
+
+msgid "Known good revision:"
+msgstr "Révision connue comme bonne :"
 
 msgid "Known bad revision:"
 msgstr "Révision connue comme mauvaise :"
 
-msgid "Revision is Good"
-msgstr "La révision est bonne"
+msgid "Discard local changes (revert --all)"
+msgstr "Abandonner les changements locaux (revert --all)"
 
-msgid "Revision is Bad"
-msgstr "La révision est mauvaise"
+msgid "Revision is &Good"
+msgstr "La révision est b&onne"
 
-msgid "Skip this Revision"
-msgstr "Sauter cette révision"
+msgid "Revision is &Bad"
+msgstr "La révision est &mauvaise"
+
+msgid "&Skip this Revision"
+msgstr "&Sauter cette révision"
 
 msgid "Close"
 msgstr "Fermer"
@@ -616,16 +610,6 @@ msgstr "Commande distante :"
 msgid "Start revision:"
 msgstr "Révision de début :"
 
-msgid "&Clone"
-msgstr "&Cloner"
-
-msgid "Detail"
-msgstr "Détail"
-
-#, python-format
-msgid "Clone - %s"
-msgstr "Clonage - %s"
-
 msgid "TortoiseHg Clone"
 msgstr "Clonage TortoiseHg"
 
@@ -635,21 +619,6 @@ msgstr "Erreur à la création du dossier destination"
 msgid "Please specify a different path."
 msgstr "Veuillez préciser un chemin différent."
 
-msgid "Source path is empty"
-msgstr "Le chemin source est vide"
-
-msgid "Please enter a valid source path."
-msgstr "Veuillez préciser un chemin source valide."
-
-msgid "Source and destination are the same"
-msgstr "Source et destination sont les mêmes"
-
-msgid "Please specify different paths."
-msgstr "Veuillez préciser des chemins différents."
-
-msgid "Please enter a new destination path."
-msgstr "Veuillez préciser un nouveau chemin destination."
-
 msgid "Select source repository"
 msgstr "Sélectionner un dépôt d'origine"
 
@@ -658,6 +627,13 @@ msgstr "Sélectionner un dépôt de destination"
 
 msgid "Select patch folder"
 msgstr "Sélectionner le dossier de patch"
+
+#, python-format
+msgid "Clone - %s"
+msgstr "Clonage - %s"
+
+msgid "&Clone"
+msgstr "&Cloner"
 
 msgid "failed to start command\n"
 msgstr "impossible de démarrer la commande\n"
@@ -684,6 +660,10 @@ msgstr "[la commande a retourné le code %d %%s]"
 msgid "[command completed successfully %s]"
 msgstr "[la commande s'est terminée avec succès %s]"
 
+#, python-format
+msgid "ignoring invalid cmdworker '%s'\n"
+msgstr "ignorant le cmdworker '%s' invalide\n"
+
 msgid "Running..."
 msgstr "En cours d'exécution..."
 
@@ -693,8 +673,8 @@ msgstr "Échec !"
 msgid "Clea&r Log"
 msgstr "Efface&r le journal de sortie"
 
-msgid "TortoiseHg Command Dialog"
-msgstr "Dialogue de commande TortoiseHg"
+msgid "Detail"
+msgstr "Détail"
 
 msgid "Confirm Exit"
 msgstr "Confirmer la fermeture"
@@ -705,6 +685,12 @@ msgid ""
 msgstr ""
 "La commande Mercurial est toujours en cours d'exécution.\n"
 "Voulez-vous la terminer ?"
+
+msgid "&Run"
+msgstr "Exécute&r"
+
+msgid "TortoiseHg Command Dialog"
+msgstr "Dialogue de commande TortoiseHg"
 
 msgid "Command Error"
 msgstr "Erreur de commande"
@@ -793,6 +779,9 @@ msgstr "Redémarrer la &branche"
 
 msgid "&Commit to current branch"
 msgstr "Committer dans la branche actuelle"
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "Confirm New Branch"
 msgstr "Confirmer la création de nouvelle branche"
@@ -1371,17 +1360,11 @@ msgstr "Ne peut pas afficher le diff visuel"
 msgid "Visual diffs are not supported for unapplied patches"
 msgstr "Les diffs visuels ne sont pas gérés pour les patchs non appliqués"
 
-msgid "Cannot open subrepository"
-msgstr "Impossible d'ouvrir le sous-dépôt"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "Le sous-dépôt sélectionné n'existe pas dans le répertoire de travail"
-
 msgid "Display the file anyway"
 msgstr "Afficher le fichier de toute façon"
 
-msgid "File or diffs not displayed: "
-msgstr "Le fichier ou les différences ne sont pas affichées : "
+msgid "Diff not displayed: "
+msgstr "Différences non affichées : "
 
 #, python-format
 msgid ""
@@ -1397,6 +1380,12 @@ msgstr "Le fichier est binaire"
 msgid "File may be binary (maximum line length exceeded)"
 msgstr "Le fichier peut être binaire (longueur maximale de ligne dépassée)"
 
+msgid "File or diffs not displayed: "
+msgstr "Le fichier ou les différences ne sont pas affichées : "
+
+msgid " <i>(was added)</i>"
+msgstr " <i>(a été ajouté)</i>"
+
 #, python-format
 msgid " <i>(copied from %s)</i>"
 msgstr " <i>(copié de %s)</i>"
@@ -1405,20 +1394,32 @@ msgstr " <i>(copié de %s)</i>"
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(renommé depuis %s)</i>"
 
-msgid " <i>(was added)</i>"
-msgstr " <i>(a été ajouté)</i>"
+msgid " <i>(is a symlink)</i>"
+msgstr " <i>(est un lien symbolique)</i>"
+
+#, python-format
+msgid ""
+"File or diffs not displayed: File is larger than the specified max size.\n"
+"maxdiff = %s KB"
+msgstr ""
+"Fichier ou différences non affiché : le fichier est plus grand que la taille "
+"maximum spécifiée.\n"
+"maxdiff = %s KB"
+
+msgid " <i>(was deleted)</i>"
+msgstr " <i>(a été supprimé)</i>"
+
+msgid " <i>(was added, now missing)</i>"
+msgstr " <i>(a été ajouté, maintenant manquant)</i>"
+
+msgid " <i>(is unversioned)</i>"
+msgstr " <i>(n'est pas versionné)</i>"
 
 msgid "exec mode has been <font color='red'>set</font>"
 msgstr "mode exécutable a été <font color='red'>activé</font>"
 
 msgid "exec mode has been <font color='red'>unset</font>"
 msgstr "mode exécutable a été <font color='red'>désactivé</font>"
-
-msgid " <i>(is a symlink)</i>"
-msgstr " <i>(est un lien symbolique)</i>"
-
-msgid "Diff not displayed: "
-msgstr "Différences non affichées : "
 
 #, python-format
 msgid "changeset: %s"
@@ -1532,24 +1533,6 @@ msgid "open..."
 msgstr "ouvrir..."
 
 #, python-format
-msgid ""
-"File or diffs not displayed: File is larger than the specified max size.\n"
-"maxdiff = %s KB"
-msgstr ""
-"Fichier ou différences non affiché : le fichier est plus grand que la taille "
-"maximum spécifiée.\n"
-"maxdiff = %s KB"
-
-msgid " <i>(was deleted)</i>"
-msgstr " <i>(a été supprimé)</i>"
-
-msgid " <i>(was added, now missing)</i>"
-msgstr " <i>(a été ajouté, maintenant manquant)</i>"
-
-msgid " <i>(is unversioned)</i>"
-msgstr " <i>(n'est pas versionné)</i>"
-
-#, python-format
 msgid "Hg file log viewer [%s] - %s"
 msgstr "Affichage d'historique Hg de fichier [%s] - %s"
 
@@ -1598,12 +1581,84 @@ msgstr "Différence suivante"
 msgid "Previous diff"
 msgstr "Différence précédente"
 
+msgid "Unicode"
+msgstr "Unicode"
+
+msgid "Western Europe"
+msgstr "Europe de l'Ouest"
+
+msgid "Unified Chinese"
+msgstr "Chinois unifié"
+
+msgid "Traditional Chinese"
+msgstr "Chinois traditionnel"
+
+msgid "Korean"
+msgstr "Coréen"
+
+msgid "Japanese"
+msgstr "Japonais"
+
+msgid "Thai"
+msgstr "Thaï"
+
+msgid "Central and Eastern Europe"
+msgstr "Europe centrale et de l'Est"
+
+msgid "Cyrillic"
+msgstr "Cyrillique"
+
+msgid "Russian"
+msgstr "Russe"
+
+msgid "Ukrainian"
+msgstr "Ukrainien"
+
+msgid "Greek"
+msgstr "Grec"
+
+msgid "Turkish"
+msgstr "Turc"
+
+msgid "Arabic"
+msgstr "Arabe"
+
+msgid "Hebrew"
+msgstr "Hébreu"
+
+msgid "Vietnamese"
+msgstr "Vietnamien"
+
+msgid "Baltic"
+msgstr "Balte"
+
+msgid "Southern Europe"
+msgstr "Europe du Sud"
+
+msgid "Nordic"
+msgstr "Nordique"
+
+msgid "Celtic"
+msgstr "Celtique"
+
+msgid "South-Eastern Europe"
+msgstr "Europe du Sud-Est"
+
+#. i18n: comma-separated list of common encoding names in your locale, e.g.
+#. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
+#.
+#. pick from the following encodings:
+#. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
+#. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
+#. cp1251, koi8-r, koi8-u, iso8859-7, cp1253, cp1254, cp1256, iso8859-6,
+#. cp1255, iso8859-8, cp1258, iso8859-4, iso8859-13, cp1257, iso8859-3,
+#. iso8859-10, iso8859-14, iso8859-16
+msgid "$FILE_ENCODINGS"
+msgstr "utf-8, iso8859-1, cp1252"
+
 msgctxt "column header"
 msgid "Filename"
 msgstr "Nom de fichier"
-
-msgid " (excluded from the next commit)"
-msgstr " (exclu du prochain commit)"
 
 msgid "View change as unified diff output"
 msgstr "Voir le changement comme sortie unifiée de diff"
@@ -1611,14 +1666,17 @@ msgstr "Voir le changement comme sortie unifiée de diff"
 msgid "View change in context of file"
 msgstr "Voir le changement dans le contexte du fichier"
 
-msgid "annotate with revision numbers"
-msgstr "annoter avec les numéros de révision"
+msgid "Annotate with revision numbers"
+msgstr "Annoter avec les numéros de révision"
 
-msgid "Next diff (alt+down)"
-msgstr "Différence suivante (alt+bas)"
+msgid "Next Diff"
+msgstr "Différence suivante"
 
-msgid "Previous diff (alt+up)"
-msgstr "Différence précédente (alt+haut)"
+msgid "Previous Diff"
+msgstr "Différence précédente"
+
+msgid "Open shelve tool"
+msgstr "Ouvrir l'outil de \"shelve\""
 
 msgid "Show changes from first parent"
 msgstr "Afficher les changements depuis le premier parent"
@@ -1626,17 +1684,30 @@ msgstr "Afficher les changements depuis le premier parent"
 msgid "Show changes from second parent"
 msgstr "Afficher les changements depuis le deuxième parent"
 
-msgid "Open shelve tool"
-msgstr "Ouvrir l'outil de \"shelve\""
-
-msgid "Mark excluded changes"
-msgstr "Marquer les changements exclus"
+msgid "E&ncoding"
+msgstr "E&ncodage"
 
 msgid "&Search in Current File"
 msgstr "Rechercher dans le fichier actuel"
 
 msgid "Search in All &History"
 msgstr "Rechercher dans tout l'&historique"
+
+msgid "Go to Line"
+msgstr "Aller à la ligne"
+
+#, python-format
+msgid "Enter line number (1 - %d)"
+msgstr "Entrer un numéro de ligne (1 - %d)"
+
+msgid "Show &Author"
+msgstr "&Afficher l'auteur"
+
+msgid "Show &Date"
+msgstr "Afficher la &date"
+
+msgid "Show &Revision"
+msgstr "Afficher la &révision"
 
 msgid "Annotate Op&tions"
 msgstr "Op&tions d'annotation"
@@ -1671,18 +1742,18 @@ msgstr "Révision d'&origine"
 msgid "&Local"
 msgstr "&Local"
 
+msgid "&Parent Revision"
+msgstr "Révision &parente"
+
 #, python-format
 msgid "&Parent Revision (%d)"
 msgstr "Révision parente (%d)"
 
-msgid "Show &Author"
-msgstr "&Afficher l'auteur"
+msgid "&Mark Excluded Changes"
+msgstr "&Marquer les changements exclus"
 
-msgid "Show &Date"
-msgstr "Afficher la &date"
-
-msgid "Show &Revision"
-msgstr "Afficher la &révision"
+msgid "(excluded from the next commit)"
+msgstr "(exclu du prochain commit)"
 
 msgid "Interrupted graft operation found"
 msgstr "Greffe interrompue trouvée"
@@ -1747,11 +1818,11 @@ msgstr "Vous pouvez continuer ou démarrer la greffe"
 msgid "Graft is complete"
 msgstr "La greffe est terminée"
 
-msgid "Graft aborted"
-msgstr "Greffe abandonnée"
-
 msgid "Graft failed"
 msgstr "Échec de la greffe"
+
+msgid "Graft aborted"
+msgstr "Greffe abandonnée"
 
 msgid ""
 "Graft generated merge <b>conflicts</b> that must be <a href=\"resolve"
@@ -1816,9 +1887,6 @@ msgstr ""
 "Liste de motifs de fichier à inclure séparés par une virgule. Par défaut, "
 "l'ensemble du dépôt est parcouru."
 
-msgid "TortoiseHg Search"
-msgstr "Recherche TortoiseHg"
-
 #, python-format
 msgid "\"%s\" removed from search history"
 msgstr "\"%s\" est enlevé de l'historique de recherche"
@@ -1881,6 +1949,9 @@ msgstr "Utilisateur"
 
 msgid "Match Text"
 msgstr "Correspondance de texte"
+
+msgid "TortoiseHg Search"
+msgstr "Recherche TortoiseHg"
 
 #, python-format
 msgid "Detect Copies/Renames in %s"
@@ -2251,19 +2322,6 @@ msgstr "Glisser pour changer l'ordre"
 msgid "Workbench"
 msgstr "Workbench"
 
-#, python-format
-msgid "Manifest %s@%s"
-msgstr "Manifeste %s@%s"
-
-msgid "### filter text ###"
-msgstr "### texte du filtre ###"
-
-msgid "Filter:"
-msgstr "Filtre :"
-
-msgid "Status"
-msgstr "État"
-
 msgid "Find revisions matching fields of:"
 msgstr "Trouver les révisions correspondant aux champs de :"
 
@@ -2625,9 +2683,6 @@ msgstr "Soumettant une changelist p4..."
 msgid "Reverting p4 changelist..."
 msgstr "Rétablissant une changelist p4..."
 
-msgid "Edit Repository URL"
-msgstr "Éditer l'URL du dépôt"
-
 msgid "Patch Branch Toolbar"
 msgstr "Barre d'outil de Patch Branch"
 
@@ -2686,6 +2741,9 @@ msgstr ""
 
 msgid "Graph"
 msgstr "Graphe"
+
+msgid "Status"
+msgstr "État"
 
 msgid "Title"
 msgstr "Titre"
@@ -2980,8 +3038,38 @@ msgstr "Précédent"
 msgid "Next"
 msgstr "Suivant"
 
-msgid "Unable to read/write config file"
-msgstr "Impossible de lire/écrire le fichier de configuration"
+msgid "Unable to read file"
+msgstr "Impossible de lire le fichier"
+
+msgid "Could not open the specified file for reading."
+msgstr "Ne peut pas ouvrir le fichier spécifié en lecture."
+
+msgid "This appears to be a binary file."
+msgstr "Cela semble être un fichier binaire."
+
+msgid "An error occurred while reading the file."
+msgstr "Une erreur s'est produite en lisant le fichier."
+
+msgid "Text Translation Failure"
+msgstr "Erreur de transposition de texte"
+
+msgid "Could not translate the file content from native encoding."
+msgstr "Ne peut pas traduire le contenu du fichier depuis l'encodage natif."
+
+msgid "Several characters would be lost."
+msgstr "Plusieurs caractères seront perdus."
+
+msgid "Unable to write file"
+msgstr "Impossible d'écrire le fichier"
+
+msgid "Could not translate the file content to native encoding."
+msgstr "Ne peut pas traduire le contenu du fichier dans l'encodage natif."
+
+msgid "Could not open the specified file for writing."
+msgstr "Ne peut pas ouvrir le fichier spécifié en écriture."
+
+msgid "An error occurred while writing the file."
+msgstr "Une erreur s'est produite en écrivant fichier."
 
 msgid "Try refreshing your repository."
 msgstr "Essayer de rafraîchir votre dépôt."
@@ -3043,6 +3131,10 @@ msgstr "Impossible d'ouvrir le chemin dans le terminal"
 msgid "\"%s\" is not a valid directory"
 msgstr "« %s » n'est pas un répertoire valide"
 
+#, python-format
+msgid "Invalid configuration: %s"
+msgstr "Configuration invalide : %s"
+
 msgid "Unable to start the following command:"
 msgstr "Impossible de démarrer la commande suivante :"
 
@@ -3060,9 +3152,6 @@ msgstr "Veuillez entrer un nom d'utilisateur"
 
 msgid "You must identify yourself to Mercurial"
 msgstr "Vous devez vous identifier à Mercurial"
-
-msgid "Text Translation Failure"
-msgstr "Erreur de transposition de texte"
 
 msgid "Unable to translate input to local encoding."
 msgstr "Impossible de transposer l'entrée dans l'encodage local."
@@ -3166,11 +3255,11 @@ msgstr "Vous pouvez continuer de \"rebaser\""
 msgid "Rebase is complete"
 msgstr "Le \"rebase\" est fini"
 
-msgid "Rebase aborted"
-msgstr "\"Rebase\" abandonné"
-
 msgid "Rebase failed"
 msgstr "Échec du \"rebase\""
+
+msgid "Rebase aborted"
+msgstr "\"Rebase\" abandonné"
 
 msgid ""
 "Rebase generated merge <b>conflicts</b> that must be <a href=\"resolve"
@@ -3195,14 +3284,14 @@ msgstr "Marquer ce morceau comme résolu, aller au non résolu suivant"
 msgid "Mark this chunk as unresolved"
 msgstr "Marquer ce morceau comme non résolu"
 
-msgid "Unable to merge rejects"
-msgstr "Impossible de fusionner les rejets"
+msgid "Reload File"
+msgstr "Recharger le fichier"
 
-msgid "Can't read this file (maybe deleted)"
-msgstr "Ne peut pas lire ce fichier (peut-être supprimé)"
+msgid "Are you sure you want to reload this file?"
+msgstr "Voulez-vous recharger ce fichier ?"
 
-msgid "This appears to be a binary file"
-msgstr "Ceci semble être un fichier binaire"
+msgid "All unsaved changes will be lost."
+msgstr "Tous les changements non enregistrés seront perdus."
 
 msgid "Warning"
 msgstr "Attention"
@@ -3241,16 +3330,8 @@ msgstr ""
 msgid "Copy source -> destination"
 msgstr "Copier source -> destination"
 
-#, python-format
-msgid "Copy - %s"
-msgstr "Copie - %s"
-
 msgid "Copy Error"
 msgstr "Erreur de copie"
-
-#, python-format
-msgid "Rename - %s"
-msgstr "Renommer - %s"
 
 msgid "Select Source File"
 msgstr "Sélectionnez un fichier source"
@@ -3267,17 +3348,19 @@ msgstr "La source doit être dans le dépôt."
 msgid "The destination must be within the repository tree."
 msgstr "La destination doit être dans le dépôt."
 
-msgid "Please give a destination that differs from the source"
-msgstr "Donnez une destination différente de la source"
-
 msgid "Destination file already exists."
 msgstr "Le fichier destination existe déjà."
 
 msgid "Are you sure you want to overwrite it ?"
 msgstr "Voulez-vous le remplacer ?"
 
-msgid "Cannot do a pure casefolding copy on Windows"
-msgstr "Ne peut pas faire une copie changeant uniquement la casse dans Windows"
+#, python-format
+msgid "Copy - %s"
+msgstr "Copie - %s"
+
+#, python-format
+msgid "Rename - %s"
+msgstr "Renommer - %s"
 
 msgid "Show all"
 msgstr "Tout afficher"
@@ -3756,10 +3839,6 @@ msgstr "Commit"
 msgctxt "tab tooltip"
 msgid "Synchronize"
 msgstr "Synchroniser"
-
-msgctxt "tab tooltip"
-msgid "Manifest"
-msgstr "Manifeste"
 
 msgctxt "tab tooltip"
 msgid "Search"
@@ -4418,14 +4497,35 @@ msgstr "<par défaut>"
 msgid "File List Toolbar"
 msgstr "Barre d'outils de liste de fichiers"
 
-msgid "Update to this revision"
-msgstr "Mettre à jour à cette révision"
+msgid "Manifest Mode"
+msgstr "Mode manifeste"
 
-msgid "Show All"
-msgstr "Tout afficher"
+msgid "Show the full manifest in tree view"
+msgstr "Afficher le manifeste complet en mode arborescent"
 
-msgid "Toggle display of all files and the direction they were merged"
-msgstr "Afficher tous les fichiers et la direction de la fusion"
+msgid "Fl&at List View"
+msgstr "Afficher la liste plate"
+
+msgid "### filter text ###"
+msgstr "### texte du filtre ###"
+
+msgid "&Changed by This Commit"
+msgstr "&Changés par ce commit"
+
+msgid "Show files changed by this commit"
+msgstr "Afficher les fichiers modifiés dans ce commit"
+
+msgid "Compare to &1st Parent"
+msgstr "Comparé au &1er parent"
+
+msgid "Compare to &2nd Parent"
+msgstr "Comparé au &2e parent"
+
+msgid "Toggle parent to be used as the base revision"
+msgstr "Alterner entre les parents comme révision de base"
+
+msgid "&Filter by Status"
+msgstr "&Filtrer par statut"
 
 #, python-format
 msgid "%s - Revision Details (%s)"
@@ -4699,6 +4799,17 @@ msgstr "thg : %s\n"
 msgid "abort: %s!\n"
 msgstr "abandon : %s !\n"
 
+#, python-format
+msgid "abort: %s\n"
+msgstr "abandon : %s\n"
+
+#, python-format
+msgid "(%s)\n"
+msgstr "(%s)\n"
+
+msgid "option --config may not be abbreviated!"
+msgstr "option --config ne peut pas être raccourcie !"
+
 msgid "invalid arguments"
 msgstr "arguments invalides"
 
@@ -4724,6 +4835,10 @@ msgstr "supprimer la sortie"
 
 msgid "display help and exit"
 msgstr "afficher l'aide et quitter"
+
+msgid "set/override config option (use 'section.name=value')"
+msgstr ""
+"définir/redéfinr l'option de configuration (utiliser 'section.nom=valeur')"
 
 msgid "start debugger"
 msgstr "démarrer le débogueur"
@@ -4819,8 +4934,8 @@ msgstr "utiliser le protocole 'pull' pour copier les métadonnées"
 msgid "use uncompressed transfer (fast over LAN)"
 msgstr "utiliser le transfert non compressé (rapide sur réseau local)"
 
-msgid "thg clone [OPTION]... SOURCE [DEST]"
-msgstr "thg clone [OPTION]... SOURCE [DEST]"
+msgid "thg clone [OPTION]... [SOURCE] [DEST]"
+msgstr "thg clone [OPTION]... [SOURCE] [DEST]"
 
 msgid "record user as committer"
 msgstr "enregistrer l'utilisateur comme committeur"
@@ -5007,8 +5122,8 @@ msgstr "Vous devez donner le chemin vers un fichier"
 msgid "thg remove [FILE]..."
 msgstr "thg remove [FILE]..."
 
-msgid "thg rename SOURCE [DEST]..."
-msgstr "thg rename SOURCE [DEST]..."
+msgid "thg rename [SOURCE] [DEST]"
+msgstr "thg rename [SOURCE] [DEST]"
 
 msgid "field to give initial focus"
 msgstr "champ prenant la saisie initiale"
@@ -5159,6 +5274,15 @@ msgstr "Interface TortoiseHg (version %s), Mercurial (version %s)\n"
 msgid "Location:"
 msgstr "Emplacement :"
 
+msgid "Update to:"
+msgstr "Mettre à jour vers :"
+
+msgid "Target:"
+msgstr "Cible :"
+
+msgid "Options:"
+msgstr "Options :"
+
 msgid "Discard remote changes, no backup (-C/--clean)"
 msgstr "Abandonner les changements distants, pas de sauvegarde (-C/--clean)"
 
@@ -5170,6 +5294,19 @@ msgstr "Autoriser de pousser de nouvelles branches (--new-branch)"
 
 msgid "Force push to remote location (-f/--force)"
 msgstr "Forcer de pousser vers un distant (-f/--force)"
+
+msgid "remove working directory"
+msgstr "supprimer le répertoire de travail"
+
+msgid "unknown revision!"
+msgstr "révision inconnue !"
+
+#, python-format
+msgid "Remote Update - %s"
+msgstr "Mise à jour distante - %s"
+
+msgid "&Update"
+msgstr "Mettre à jour"
 
 msgid "Log"
 msgstr "Journal"
@@ -5345,11 +5482,12 @@ msgstr "Surveiller les changements du dépôt"
 
 msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
-"always"
+"localonly"
 msgstr ""
 "Spécifier les systèmes de fichiers dans lesquels TortoiseHg surveille les "
-"modifications : always (toujours), localonly (local uniquement à l'exclusion "
-"des disques sur le réseau). Par défaut : always"
+"modifications. : always (toujours), localonly (local uniquement à "
+"l'exclusion des disques sur le réseau), never (jamais). Par défaut : "
+"localonly"
 
 msgid "Max Diff Size"
 msgstr "Taille max de diff"
@@ -5361,7 +5499,7 @@ msgid ""
 msgstr ""
 "La taille maximum du fichier (en KB) dont TortoiseHg affichera les "
 "changements dans les fenêtres de changelog, de statut et de commit. Une "
-"valeur de zéro signifie aucune limit. Par défaut : 1024 (1 MB)"
+"valeur de zéro signifie aucune limite. Par défaut : 1024 (1 MB)"
 
 msgid "Fork GUI"
 msgstr "Créer un processus pour l'interface graphique"
@@ -5400,7 +5538,7 @@ msgstr ""
 "fichiers avec des changements des deux côtés de la fusion seront indiqués en "
 "conflit, même si les modifications sont à des endroits différents du "
 "fichier. Dans les deux cas, quand un conflit se produit, l'utilisateur sera "
-"invité de revoir et de résoudre les changements manuellement. Par défaut : "
+"invité à revoir et à résoudre les changements manuellement. Par défaut : "
 "Faux."
 
 msgid "Single Workbench Window"
@@ -5491,15 +5629,14 @@ msgstr "Ordre de la barre d'outils de tâches"
 msgid ""
 "Specify which task buttons you want to show on the task toolbar and in which "
 "order.<br>Type a list of the task button names. Add separators by putting \"|"
-"\" between task button names.<br>Valid names are: log commit mq sync "
-"manifest grep and pbranch.<br>Default: log commit manifest grep pbranch | "
-"sync"
+"\" between task button names.<br>Valid names are: log commit sync grep and "
+"pbranch.<br>Default: log commit grep pbranch | sync"
 msgstr ""
-"Spécifier quels boutons de tâche vous voulez afficher sur la barre d'outils "
-"et dans quel ordre.<br>Taper une liste de noms de bouton de tâche. Ajouter "
-"des séparateurs en mettant \"|\" entre les noms de bouton de tâche.<br>Les "
-"noms valides sont : log commit mq sync manifest grep and pbranch.<br>Par "
-"défaut : log commit manifest grep pbranch | sync"
+"Spécifier les boutons de tâche que vous voulez afficher sur la barre "
+"d'outils de tâches ainsi que leur ordre.<br>Taper une liste de noms de "
+"bouton de tâche. Ajouter des séparateurs avec \"|\" entre les noms de bouton "
+"de tâche.<br>Les noms valides sont : log commit sync grep et pbranch.<br>Par "
+"défaut : log commit grep pbranch | sync"
 
 msgid "Long Summary"
 msgstr "Long résumé"
@@ -5673,6 +5810,19 @@ msgstr "Patches MQ secrets"
 msgid "Make MQ patches secret (instead of draft). Default: False"
 msgstr "Rendre les patches MQ secret (au lieu de draft). Par défaut : Faux"
 
+msgid "Check Subrepo Phase"
+msgstr "Vérifier la phase des sous-dépôts"
+
+msgid ""
+"Check the phase of the current revision of each subrepository.  For settings "
+"other than \"ignore\", the phase of the current revision of each "
+"subrepository is checked before committing the parent repository.  Default: "
+"follow"
+msgstr ""
+"Vérifier la phase de la révision actuelle de chaque sous-dépôt. Si une autre "
+"valeur que \"ignore\", la phase de la révision actuelle de chaque sous-dépôt "
+"est vérifiée avant de committer le dépôt parent. Par défaut : follow"
+
 msgid "Monitor working<br>directory changes"
 msgstr "Surveiller les changements<br>du répertoire de travail"
 
@@ -5800,8 +5950,25 @@ msgstr ""
 msgid "Server"
 msgstr "Serveur"
 
-msgid "<b>Behavior:</b>"
-msgstr "<b>Comportement :</b>"
+msgid "<b>Repository Details:</b>"
+msgstr "<b>Détails de dépôt :</b>"
+
+msgid ""
+"Repository name to use in the web interface, and by TortoiseHg as a "
+"shorthand name.  Default is the working directory."
+msgstr ""
+"Nom du dépôt à utiliser dans l'interface web et par TortoiseHg comme nom "
+"raccourci. Par défaut : nom du répertoire de travail"
+
+msgid "Encoding"
+msgstr "Encodage"
+
+msgid ""
+"Character encoding of files in the repository, used by the web interface and "
+"TortoiseHg."
+msgstr ""
+"Encodage de caractère des fichiers dans le dépôt, utilisé par l'interface "
+"web et TortoiseHg."
 
 msgid "'Publishing' repository"
 msgstr "Dépôt 'publiant'"
@@ -5818,13 +5985,6 @@ msgstr ""
 
 msgid "<b>Web Server:</b>"
 msgstr "<b>Serveur Web :</b>"
-
-msgid ""
-"Repository name to use in the web interface, and by TortoiseHg as a "
-"shorthand name.  Default is the working directory."
-msgstr ""
-"Nom du dépôt à utiliser dans l'interface web et par TortoiseHg comme nom "
-"raccourci. Par défaut : nom du répertoire de travail"
 
 msgid "Textual description of the repository's purpose or contents."
 msgstr "Description du but ou du contenu du dépôt"
@@ -5924,12 +6084,6 @@ msgstr ""
 "par des espaces ou \",') sont aussi interdits. Le contenu de la liste "
 "deny_push est examinée avant la liste allow_push."
 
-msgid "Encoding"
-msgstr "Encodage"
-
-msgid "Character encoding name"
-msgstr "Nom de l'encodage des caractères"
-
 msgid "Proxy"
 msgstr "Proxy"
 
@@ -6024,8 +6178,10 @@ msgstr "Port du serveur de courriel. Par défaut : 25"
 msgid "SMTP TLS"
 msgstr "SMTP TLS"
 
-msgid "Connect to mail server using TLS. Default: False"
-msgstr "Connecter au serveur de courrier en utilisant TLS. Par défaut : Faux"
+msgid "Method to enable TLS when connecting to mail server. Default: none"
+msgstr ""
+"Méthode pour activer TLS lors d'une connexion à un serveur de courrier. Par "
+"défaut : aucune"
 
 msgid "SMTP Username"
 msgstr "Nom d'utilisateur SMTP"
@@ -6749,6 +6905,9 @@ msgstr "Signer - %s"
 msgid "Signature has been added"
 msgstr "La signature a été ajoutée"
 
+msgid "Filter:"
+msgstr "Filtre :"
+
 msgid "Check all files"
 msgstr "Cocher tous les fichiers"
 
@@ -6859,9 +7018,6 @@ msgstr "%s est un sous-dépôt sale"
 msgid "subrepo"
 msgstr "sous-dépôt"
 
-msgid "TortoiseHg Sync"
-msgstr "TortoiseHg Sync"
-
 msgid "Check for incoming changes from selected URL"
 msgstr "Chercher les révisions entrantes de l'URL sélectionnée"
 
@@ -6885,9 +7041,6 @@ msgstr "Dépaqueter (unbundle)"
 
 msgid "Stop current operation"
 msgstr "Arrêter l'opération en cours"
-
-msgid "Target:"
-msgstr "Cible :"
 
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Options sélectionnées :</b>"
@@ -6945,9 +7098,6 @@ msgstr "Confirmer la suppression du chemin"
 msgid "Delete %s from your repo configuration file?"
 msgstr "Supprimer %s du fichier de configuration de votre dépôt ?"
 
-msgid "Are you sure that you want to cancel synchronization?"
-msgstr "Êtes-vous sûr de vouloir annuler la synchronisation ?"
-
 msgid "No host specified"
 msgstr "Aucun hôte spécifié"
 
@@ -6997,6 +7147,10 @@ msgid "Incoming from %s aborted, ret %d"
 msgstr "Recherche des révisions entrantes de %s interrompue, ret %d"
 
 #, python-format
+msgid "Pulling from %s..."
+msgstr "Tirant de %s..."
+
+#, python-format
 msgid "Pull from %s completed"
 msgstr "\"Pull\" de %s terminé"
 
@@ -7011,16 +7165,16 @@ msgid "File conflicts need to be resolved"
 msgstr "Les conflits de fichiers doivent être résolus"
 
 #, python-format
-msgid "Pulling from %s..."
-msgstr "Tirant de %s..."
-
-#, python-format
 msgid "Finding outgoing changesets to %s..."
 msgstr "Recherche des révisions sortantes vers %s"
 
 #, python-format
 msgid "%d outgoing changesets to %s"
 msgstr "%d révisions sortantes vers %s"
+
+#, python-format
+msgid "outgoing changesets to %s found"
+msgstr "révisions sortantes vers %s trouvées"
 
 #, python-format
 msgid "No outgoing changesets to %s"
@@ -7030,9 +7184,8 @@ msgstr "Aucune révision sortante vers %s"
 msgid "Outgoing to %s aborted, ret %d"
 msgstr "Recherche des révisions sortantes vers %s interrompue, ret %d"
 
-#, python-format
-msgid "outgoing changesets to %s found"
-msgstr "révisions sortantes vers %s trouvées"
+msgid "Perforce pending..."
+msgstr "Perforce en attente..."
 
 #, python-format
 msgid "%s (submitted)"
@@ -7058,9 +7211,6 @@ msgstr "Abandon de p4pending"
 msgid "Unable to determine pending changesets"
 msgstr "Impossible de déterminer les révisions en attente"
 
-msgid "Perforce pending..."
-msgstr "Perforce en attente..."
-
 msgid "Confirm Push to remote Repository"
 msgstr "Confirmer l'opération de pousse vers un dépôt distant"
 
@@ -7077,6 +7227,14 @@ msgstr ""
 #, python-format
 msgid "Push to %s aborted"
 msgstr "Opération de pousser vers %s abandonnée"
+
+#, python-format
+msgid ""
+"Invalid default push revision: %s. Please check your Mercurial configuration "
+"(tortoisehg.defaultpush)"
+msgstr ""
+"Révision de pousse par défaut invalide : %s. Vérifiez votre configuration "
+"Mercurial (tortoisehg.defaultpush)"
 
 #, python-format
 msgid "Pushing to %s..."
@@ -7099,14 +7257,6 @@ msgstr ""
 "d'une nouvelle branche. Voulez-vous créer une nouvelle branche dans le dépôt "
 "distant ?"
 
-#, python-format
-msgid ""
-"Invalid default push revision: %s. Please check your Mercurial configuration "
-"(tortoisehg.defaultpush)"
-msgstr ""
-"Révision de pousse par défaut invalide : %s. Vérifiez votre configuration "
-"Mercurial (tortoisehg.defaultpush)"
-
 msgid "Determining outgoing changesets to email..."
 msgstr "Recherche des révisions sortantes à envoyer par courriel..."
 
@@ -7125,6 +7275,12 @@ msgstr "Fichiers paquets (bundle) (*.hg)"
 
 msgid "Unable to remove URL"
 msgstr "Impossible de retirer l'URL"
+
+msgid "TortoiseHg Sync"
+msgstr "TortoiseHg Sync"
+
+msgid "Are you sure that you want to cancel synchronization?"
+msgstr "Êtes-vous sûr de vouloir annuler la synchronisation ?"
 
 msgid "Post Pull Behavior"
 msgstr "Opération après avoir tiré"
@@ -7390,6 +7546,10 @@ msgstr "l'étiquette '%s' a été enlevée"
 msgid "Patch files (*.diff *.patch)"
 msgstr "Fichiers patch (*.diff *.patch)"
 
+#, python-format
+msgid "Import - %s"
+msgstr "Importation - %s"
+
 msgid "Browse Directory..."
 msgstr "Parcourir le répertoire..."
 
@@ -7410,10 +7570,6 @@ msgstr "Vérifiant l'état du répertoire de travail..."
 
 msgid "&Import"
 msgstr "&Importer"
-
-#, python-format
-msgid "Import - %s"
-msgstr "Importation - %s"
 
 msgid "Working directory is not clean!  <a href=\"view\">View changes...</a>"
 msgstr ""
@@ -7440,21 +7596,11 @@ msgstr "Rien à importer"
 msgid "Strip:"
 msgstr "Strip :"
 
-msgid "Options:"
-msgstr "Options :"
-
 msgid "Discard local changes, no backup (-f/--force)"
 msgstr "Abandonner les changements locaux, pas de sauvegarde (-f/--force)"
 
 msgid "No backup (-n/--nobackup)"
 msgstr "Pas de sauvegarde (-n/--nobackup)"
-
-msgid "&Strip"
-msgstr "&Strip"
-
-#, python-format
-msgid "Strip - %s"
-msgstr "Strip - %s"
 
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
@@ -7468,14 +7614,24 @@ msgstr "Révision inconnue !"
 msgid "Detected uncommitted local changes."
 msgstr "Changements locaux non committés détectés"
 
-msgid "Do you want to discard them and continue?"
-msgstr "Voulez-vous les abandonner et continuer ?"
+msgid "Do you want to keep them or discard them?"
+msgstr "Voulez-vous les garder ou les abandonner ?"
 
-msgid "&Yes (--force)"
-msgstr "Oui (--force)"
+msgid "&Keep (--keep)"
+msgstr "&Garder (--keep)"
+
+msgid "&Discard (--force)"
+msgstr "&Abandonner (--force)"
 
 msgid "Confirm Strip"
 msgstr "Confirmer la suppression des révisions"
+
+#, python-format
+msgid "Strip - %s"
+msgstr "Strip - %s"
+
+msgid "&Strip"
+msgstr "&Strip"
 
 msgid "response expected"
 msgstr "réponse attendue"
@@ -7566,18 +7722,11 @@ msgid "hg: unknown command '%s'\n"
 msgstr "hg : commande inconnue '%s'\n"
 
 #, python-format
-msgid "abort: %s\n"
-msgstr "abandon : %s\n"
-
-#, python-format
 msgid "abort: error: %s\n"
 msgstr "abandon : erreur : %s\n"
 
 msgid "broken pipe\n"
 msgstr "pipe cassé\n"
-
-msgid "Update to:"
-msgstr "Mettre à jour vers :"
 
 msgid "Parent 1:"
 msgstr "Parent 1 :"
@@ -7594,24 +7743,8 @@ msgstr "Abandonner les changements locaux, pas de sauvegarde (-C/--clean)"
 msgid "Always merge (when possible)"
 msgstr "Toujours fusionner (si possible)"
 
-msgid "Always show command log"
-msgstr "Toujours afficher le journal de commande"
-
-msgid "&Update"
-msgstr "Mettre à jour"
-
-#, python-format
-msgid "Update - %s"
-msgstr "Mise à jour - %s"
-
-msgid "remove working directory"
-msgstr "supprimer le répertoire de travail"
-
 msgid "(same as parent)"
 msgstr "(comme le parent)"
-
-msgid "unknown revision!"
-msgstr "révision inconnue !"
 
 msgid "Activate bookmark?"
 msgstr "Activer un signet ?"
@@ -7668,6 +7801,10 @@ msgstr "Fusionner - permettre la fusion avec les changements locaux"
 
 msgid "Confirm Update"
 msgstr "Confirmer la mise à jour"
+
+#, python-format
+msgid "Update - %s"
+msgstr "Mise à jour - %s"
 
 msgid "[non-existant]"
 msgstr "[inexistent]"
@@ -7809,6 +7946,12 @@ msgstr " sortie"
 msgid " Aborted"
 msgstr " annulé(e)"
 
+msgid "Cannot open subrepository"
+msgstr "Impossible d'ouvrir le sous-dépôt"
+
+msgid "The selected subrepository does not exist on the working directory"
+msgstr "Le sous-dépôt sélectionné n'existe pas dans le répertoire de travail"
+
 msgid "Uncommited merge - please select a parent revision"
 msgstr "Fusion non committée - veuillez sélectionner une révision parente"
 
@@ -7947,9 +8090,6 @@ msgstr "Branche de &patch"
 msgid "Revision &Details"
 msgstr "&Détails de révision"
 
-msgid "&Manifest"
-msgstr "&Manifeste"
-
 msgid "&Search"
 msgstr "Rechercher"
 
@@ -7983,8 +8123,17 @@ msgstr "Aller à la révision..."
 msgid "Go to a specific revision"
 msgstr "Aller à une révision précise"
 
-msgid "Start &Web Server"
-msgstr "Démarrer le serveur &Web"
+msgid "&Filter Toolbar"
+msgstr "Barre d'outils de &filtre"
+
+msgid "Filter graph with revision sets or branches"
+msgstr "Filtrer le graphe avec des ensembles de révisions ou des branches"
+
+msgid "&Workbench Toolbars"
+msgstr "Barres d'outils du &Workbench"
+
+msgid "Update working directory or switch revisions"
+msgstr "Mettre à jour le répertoire de travail ou changer de révisions"
 
 msgid "&Shelve..."
 msgstr "&Shelve..."
@@ -7992,23 +8141,26 @@ msgstr "&Shelve..."
 msgid "&Import..."
 msgstr "&Importer…"
 
-msgid "&Verify"
-msgstr "&Vérifier"
-
-msgid "Re&cover"
-msgstr "Ré&cupérer"
-
 msgid "&Resolve..."
 msgstr "&Résoudre..."
 
-msgid "Rollback/&Undo..."
-msgstr "Rollback/Défaire..."
+msgid "R&ollback/Undo..."
+msgstr "R&ollback/Défaire..."
 
 msgid "&Purge..."
 msgstr "&Purger..."
 
 msgid "&Bisect..."
 msgstr "&Bisect..."
+
+msgid "&Verify"
+msgstr "&Vérifier"
+
+msgid "Re&cover"
+msgstr "Ré&cupérer"
+
+msgid "&Web Server"
+msgstr "Serveur &Web"
 
 msgid "E&xplorer Help"
 msgstr "Aide d'E&xplorer"
@@ -8021,15 +8173,6 @@ msgstr "À propos de &Qt"
 
 msgid "&About TortoiseHg"
 msgstr "À propos de TortoiseHg"
-
-msgid "&Filter Toolbar"
-msgstr "Barre d'outils de &filtre"
-
-msgid "Filter graph with revision sets or branches"
-msgstr "Filtrer le graphe avec des ensembles de révisions ou des branches"
-
-msgid "&Workbench Toolbars"
-msgstr "Barres d'outils du &Workbench"
 
 msgid "&Incoming"
 msgstr "Entrant"
@@ -8531,6 +8674,9 @@ msgstr "Dépôt %s non trouvé"
 
 #~ msgid "Unable to create "
 #~ msgstr "Impossible de créer "
+
+#~ msgid "Source path is empty"
+#~ msgstr "Le chemin source est vide"
 
 #~ msgid "_Undo"
 #~ msgstr "Ann_uler"
@@ -9072,6 +9218,9 @@ msgstr "Dépôt %s non trouvé"
 
 #~ msgid "Advanced options"
 #~ msgstr "Options avancées"
+
+#~ msgid "Source and destination are the same"
+#~ msgstr "Source et destination sont les mêmes"
 
 #~ msgid "Please specify different paths"
 #~ msgstr "Veuillez spécifier des chemins différents"
@@ -10238,60 +10387,8 @@ msgstr "Dépôt %s non trouvé"
 #~ msgid "Annotate"
 #~ msgstr "Annoter"
 
-#~ msgid "Reorder Unapplied Patches"
-#~ msgstr "Réorganiser les patches non appliqués"
-
-#~ msgid "Unapplied Patches - drag to reorder"
-#~ msgstr "Patches non appliqués - glisser pour réorganiser"
-
 #~ msgid "Unapply last patch"
 #~ msgstr "Dé-appliquer le dernier patch"
-
-#~ msgid "Manage MQ patch queues"
-#~ msgstr "Gérer les queues de patch MQ"
-
-#~ msgid "Activate"
-#~ msgstr "Activer"
-
-#~ msgid "Patch queues:"
-#~ msgstr "Queues de patch :"
-
-#~ msgid "Repository:"
-#~ msgstr "Dépôt :"
-
-#~ msgid "Patches:"
-#~ msgstr "Patches :"
-
-#~ msgid "Do you really want to delete patch queue '%s' ?"
-#~ msgstr "Voulez-vous vraiment supprimer la queue de patch '%s' ?"
-
-#~ msgid ""
-#~ "<p>This will also erase the patchfiles on disk!</p><p>Do you really want "
-#~ "to purge patch queue '%s' ?</p>"
-#~ msgstr ""
-#~ "<p>Ceci supprimera aussi les fichiers patch sur le disque !</p><p>Voulez-"
-#~ "vous vraiment purger la queue de patch '%s' ?</p>"
-
-#~ msgid "Please enable the MQ extension first."
-#~ msgstr "Activer d'abord l'extension MQ."
-
-#~ msgid "Confirm patch queue purge"
-#~ msgstr "Confirmer la purge de la queue de patch"
-
-#~ msgid "Confirm patch queue delete"
-#~ msgstr "Confirmer la suppression de queue de patch"
-
-#~ msgid "Applied Patches"
-#~ msgstr "Patches appliqués"
-
-#~ msgid "Rename patch"
-#~ msgstr "Renommer un patch"
-
-#~ msgid "Goto"
-#~ msgstr "Aller à"
-
-#~ msgid "Go"
-#~ msgstr "Aller"
 
 #~ msgid "Please select bookmark name to remove"
 #~ msgstr "Veuillez sélectionner le nom du signet à enlever"
@@ -10345,11 +10442,18 @@ msgstr "Dépôt %s non trouvé"
 #~ msgstr ""
 #~ "Ignorer les changements des lignes qui sont vierges. Par défaut : Faux"
 
+#~ msgid "Connect to mail server using TLS. Default: False"
+#~ msgstr ""
+#~ "Connecter au serveur de courrier en utilisant TLS. Par défaut : Faux"
+
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "Ignorer les espaces lors des comparaisons. Par défaut : Faux"
 
 #~ msgid "Ignore changes in the amount of white space. Default: False"
 #~ msgstr "Ignorer les changements dans le nombre d'espaces. Par défaut : Faux"
+
+#~ msgid "Character encoding name"
+#~ msgstr "Nom de l'encodage des caractères"
 
 #~ msgid "Recover"
 #~ msgstr "Récupérer"
@@ -10359,9 +10463,6 @@ msgstr "Dépôt %s non trouvé"
 
 #~ msgid "Mark unresolved"
 #~ msgstr "Marquer comme non résolu"
-
-#~ msgid "QQueue"
-#~ msgstr "QQueue"
 
 #~ msgid "Hunk #%d FAILED at %d\n"
 #~ msgstr "Morceau #%d échoué à %d\n"
@@ -10395,6 +10496,9 @@ msgstr "Dépôt %s non trouvé"
 #~ msgid "View missing"
 #~ msgstr "Afficher les fichiers manquants"
 
+#~ msgid "&Yes (--force)"
+#~ msgstr "Oui (--force)"
+
 #~ msgid "View other"
 #~ msgstr "Voir l'autre"
 
@@ -10403,6 +10507,3 @@ msgstr "Dépôt %s non trouvé"
 
 #~ msgid "Backout..."
 #~ msgstr "Backout..."
-
-#~ msgid "Subrepository removed form .hgsub"
-#~ msgstr "Sous-dépôt enlevé de .hgsub"

@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-10-31 00:28-0200\n"
-"PO-Revision-Date: 2013-02-27 15:12+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2014-02-03 11:14-0200\n"
+"PO-Revision-Date: 2013-12-11 14:59+0000\n"
+"Last-Translator: NetCobra <netcobra@gmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2013-10-31 05:29+0000\n"
-"X-Generator: Launchpad (build 16820)\n"
+"X-Launchpad-Export-Date: 2014-02-04 06:09+0000\n"
+"X-Generator: Launchpad (build 16916)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg 层叠图标服务"
@@ -31,7 +31,7 @@ msgid "Copyright 2008-2013 Steve Borho and others"
 msgstr "版权所有 2008-2013 Steve Borho和其他开发者"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
-msgstr ""
+msgstr "某些图标来自TortoiseSVN和Tango项目"
 
 msgid "You can visit our site here"
 msgstr "这里可以访问我们的网站"
@@ -52,40 +52,34 @@ msgstr "附 Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr ""
+msgstr "TortoiseHg有一个新版本（%s）可以下载！"
 
 msgid "= Working Directory Parent ="
 msgstr "= 工作目录的上层目录 ="
 
-msgid "Revision:"
-msgstr "修订版本:"
-
-msgid "Only files modified/created in this revision"
-msgstr "仅修订版本中被修改/创建的文件"
-
-msgid "Recurse into subrepositories"
-msgstr "进入子仓库"
-
-msgid "Destination path:"
-msgstr "目标路径:"
-
-msgid "Browse..."
-msgstr "浏览..."
-
-msgid "Archive types:"
-msgstr "文档类型:"
-
 msgid "Directory of files"
 msgstr "文件所在目录"
+
+msgid "Tar archives"
+msgstr "Tar 文档集"
 
 msgid "Uncompressed tar archive"
 msgstr "未压缩的 tar 文件"
 
+msgid "Bzip2 tar archives"
+msgstr "bzip2 压缩过的 tar 文档集"
+
 msgid "Tar archive compressed using bzip2"
 msgstr "使用 bzip2 压缩的 tar 文件"
 
+msgid "Gzip tar archives"
+msgstr "gzip 压缩过的 tar 文档集"
+
 msgid "Tar archive compressed using gzip"
 msgstr "使用 gzip 压缩的 tar 文件"
+
+msgid "Zip archives"
+msgstr "zip压缩包"
 
 msgid "Uncompressed zip archive"
 msgstr "未压缩的 zip 文件"
@@ -93,24 +87,26 @@ msgstr "未压缩的 zip 文件"
 msgid "Zip archive compressed using deflate"
 msgstr "使用 deflate 压缩的 zip 文件"
 
+msgid "Only files modified/created in this revision"
+msgstr "仅修订版本中被修改/创建的文件"
+
+msgid "Recurse into subrepositories"
+msgstr "进入子仓库"
+
+msgid "Revision:"
+msgstr "修订版本:"
+
+msgid "Browse..."
+msgstr "浏览..."
+
+msgid "Destination path:"
+msgstr "目标路径:"
+
+msgid "Archive types:"
+msgstr "文档类型:"
+
 msgid "Hg command:"
 msgstr "Hg 命令:"
-
-msgid "Always show output"
-msgstr "总显示输出内容"
-
-msgid "&Archive"
-msgstr "存档(&A)"
-
-msgid "&Detail"
-msgstr "详细(&D)"
-
-msgid "Cancel"
-msgstr "取消"
-
-#, python-format
-msgid "Archive - %s"
-msgstr "存档 - %s"
 
 msgid "Select Destination Folder"
 msgstr "选择目标文件夹"
@@ -120,18 +116,6 @@ msgstr "选择目标文件"
 
 msgid "All files (*)"
 msgstr "所有文件 (*.*)"
-
-msgid "Tar archives"
-msgstr "Tar 文档集"
-
-msgid "Bzip2 tar archives"
-msgstr "bzip2 压缩过的 tar 文档集"
-
-msgid "Gzip tar archives"
-msgstr "gzip 压缩过的 tar 文档集"
-
-msgid "Zip archives"
-msgstr "zip压缩包"
 
 msgid "Duplicate Name"
 msgstr "重复的名称"
@@ -166,6 +150,13 @@ msgstr ""
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
 msgstr "目标文件夹 \"%s\" 已经存在！"
+
+#, python-format
+msgid "Archive - %s"
+msgstr "存档 - %s"
+
+msgid "&Archive"
+msgstr "存档(&A)"
 
 #, python-format
 msgid "Backout - %s"
@@ -328,23 +319,26 @@ msgstr "回退修订集"
 msgid "Bisect - %s"
 msgstr "二分检测 - %s"
 
-msgid "Known good revision:"
-msgstr "已知无bug版:"
-
 msgid "Accept"
 msgstr "接受"
+
+msgid "Known good revision:"
+msgstr "已知无bug版:"
 
 msgid "Known bad revision:"
 msgstr "已知有bug版:"
 
-msgid "Revision is Good"
-msgstr "修订版本无bug"
+msgid "Discard local changes (revert --all)"
+msgstr ""
 
-msgid "Revision is Bad"
-msgstr "修订版本有bug"
+msgid "Revision is &Good"
+msgstr ""
 
-msgid "Skip this Revision"
-msgstr "跳过此修订版本"
+msgid "Revision is &Bad"
+msgstr ""
+
+msgid "&Skip this Revision"
+msgstr ""
 
 msgid "Close"
 msgstr "关闭"
@@ -372,7 +366,7 @@ msgid "New Name:"
 msgstr "新名称:"
 
 msgid "Activate:"
-msgstr ""
+msgstr "激活："
 
 msgid "&Add"
 msgstr "添加(&A)"
@@ -442,7 +436,7 @@ msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 msgstr "请将本bug上报到我们的<a href=\"%s\">bug记录器</a>"
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr "正在检查更新..."
 
 msgid "Copy"
 msgstr "复制"
@@ -454,10 +448,10 @@ msgid "TortoiseHg Bug Report"
 msgstr "报告 TortoiseHg 错误"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr ""
+msgstr "建议更新到最新的TortoiseHg"
 
 msgid "Your TortoiseHg is up to date."
-msgstr ""
+msgstr "当前的TortoiseHg版本已是最新版本"
 
 msgid "Save error report to"
 msgstr "保存错误报告至"
@@ -507,10 +501,10 @@ msgid "No deletable chunks"
 msgstr "不可删除的部分"
 
 msgid "Completely remove file from patch?"
-msgstr ""
+msgstr "要从Patch中完全移除文件吗？"
 
 msgid "Revert all file changes?"
-msgstr ""
+msgstr "要还原所有文件的修改吗？"
 
 msgid "No chunks remain"
 msgstr "无剩余部分"
@@ -595,16 +589,6 @@ msgstr "远程命令:"
 msgid "Start revision:"
 msgstr "开始版本:"
 
-msgid "&Clone"
-msgstr "克隆(&C)"
-
-msgid "Detail"
-msgstr "详细资料"
-
-#, python-format
-msgid "Clone - %s"
-msgstr "克隆 - %s"
-
 msgid "TortoiseHg Clone"
 msgstr "TortoiseHg 克隆"
 
@@ -614,21 +598,6 @@ msgstr "错误 创建目标文件夹"
 msgid "Please specify a different path."
 msgstr "请选择一个不同的路径"
 
-msgid "Source path is empty"
-msgstr "源路径为空"
-
-msgid "Please enter a valid source path."
-msgstr "请输入一个正确的的路径"
-
-msgid "Source and destination are the same"
-msgstr "源和目标相同"
-
-msgid "Please specify different paths."
-msgstr "请指定不同的路径。"
-
-msgid "Please enter a new destination path."
-msgstr "请输入一个新的目标路径"
-
 msgid "Select source repository"
 msgstr "选择源目录"
 
@@ -637,6 +606,13 @@ msgstr "选择目标目录"
 
 msgid "Select patch folder"
 msgstr "选择补丁目录"
+
+#, python-format
+msgid "Clone - %s"
+msgstr "克隆 - %s"
+
+msgid "&Clone"
+msgstr "克隆(&C)"
 
 msgid "failed to start command\n"
 msgstr "无法执行命令\n"
@@ -663,6 +639,10 @@ msgstr "[命令返回代码%d %%s]"
 msgid "[command completed successfully %s]"
 msgstr "[命令成功完成 %s]"
 
+#, python-format
+msgid "ignoring invalid cmdworker '%s'\n"
+msgstr ""
+
 msgid "Running..."
 msgstr "正在运行..."
 
@@ -672,8 +652,8 @@ msgstr "失败！"
 msgid "Clea&r Log"
 msgstr ""
 
-msgid "TortoiseHg Command Dialog"
-msgstr "TortoiseHg 命令对话"
+msgid "Detail"
+msgstr "详细资料"
 
 msgid "Confirm Exit"
 msgstr "确认退出"
@@ -685,12 +665,18 @@ msgstr ""
 "Mercurial 命令正在执行。\n"
 "是否终止？"
 
-msgid "Command Error"
+msgid "&Run"
 msgstr ""
+
+msgid "TortoiseHg Command Dialog"
+msgstr "TortoiseHg 命令对话"
+
+msgid "Command Error"
+msgstr "命令错误"
 
 #, python-format
 msgid "[Code: %d]"
-msgstr ""
+msgstr "[代码：%d]"
 
 msgctxt "start progress"
 msgid "Commit"
@@ -742,10 +728,10 @@ msgid "Commit"
 msgstr "提交"
 
 msgid "Amend current revision"
-msgstr ""
+msgstr "修正当前版本"
 
 msgid "Amend"
-msgstr ""
+msgstr "修正"
 
 msgid "Create a new patch"
 msgstr "创建新的补丁"
@@ -772,6 +758,9 @@ msgstr "重新打开分支(&B)"
 msgid "&Commit to current branch"
 msgstr "提交到当前分支(&C)"
 
+msgid "Cancel"
+msgstr "取消"
+
 msgid "Confirm New Branch"
 msgstr "确认新分支"
 
@@ -790,7 +779,7 @@ msgstr "新建分支: "
 
 #, python-format
 msgid "<b>Selected Options:</b> %s"
-msgstr ""
+msgstr "<b>选中选项：</b> %s"
 
 msgid "Parent:"
 msgstr "父版本:"
@@ -800,7 +789,7 @@ msgstr "补丁名称:"
 
 #, python-format
 msgid "Close %s branch"
-msgstr ""
+msgstr "关闭 %s 分支"
 
 #, python-format
 msgid "Rollback commit to revision %d"
@@ -918,7 +907,7 @@ msgid "%s - commit"
 msgstr "%s - 提交"
 
 msgid "TortoiseHg Commit"
-msgstr ""
+msgstr "TortoiseHg 提交"
 
 msgid "Are you sure that you want to cancel the commit operation?"
 msgstr ""
@@ -1307,16 +1296,10 @@ msgstr ""
 msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
-msgid "Cannot open subrepository"
-msgstr "无法打开子仓库"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "工作目录中不存在选中的子仓库"
-
 msgid "Display the file anyway"
 msgstr ""
 
-msgid "File or diffs not displayed: "
+msgid "Diff not displayed: "
 msgstr ""
 
 #, python-format
@@ -1333,6 +1316,12 @@ msgstr "文件是二进制的"
 msgid "File may be binary (maximum line length exceeded)"
 msgstr ""
 
+msgid "File or diffs not displayed: "
+msgstr ""
+
+msgid " <i>(was added)</i>"
+msgstr " <i>(已添加)</i>"
+
 #, python-format
 msgid " <i>(copied from %s)</i>"
 msgstr ""
@@ -1341,19 +1330,28 @@ msgstr ""
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(原名 %s)</i>"
 
-msgid " <i>(was added)</i>"
-msgstr " <i>(已添加)</i>"
+msgid " <i>(is a symlink)</i>"
+msgstr " <i>(是符号链接)</i>"
+
+#, python-format
+msgid ""
+"File or diffs not displayed: File is larger than the specified max size.\n"
+"maxdiff = %s KB"
+msgstr ""
+
+msgid " <i>(was deleted)</i>"
+msgstr " <i>(已被删除)</i>"
+
+msgid " <i>(was added, now missing)</i>"
+msgstr " <i>(已添加，但丢失)</i>"
+
+msgid " <i>(is unversioned)</i>"
+msgstr " <i>(未跟踪)</i>"
 
 msgid "exec mode has been <font color='red'>set</font>"
 msgstr ""
 
 msgid "exec mode has been <font color='red'>unset</font>"
-msgstr ""
-
-msgid " <i>(is a symlink)</i>"
-msgstr " <i>(是符号链接)</i>"
-
-msgid "Diff not displayed: "
 msgstr ""
 
 #, python-format
@@ -1460,21 +1458,6 @@ msgid "open..."
 msgstr ""
 
 #, python-format
-msgid ""
-"File or diffs not displayed: File is larger than the specified max size.\n"
-"maxdiff = %s KB"
-msgstr ""
-
-msgid " <i>(was deleted)</i>"
-msgstr " <i>(已被删除)</i>"
-
-msgid " <i>(was added, now missing)</i>"
-msgstr " <i>(已添加，但丢失)</i>"
-
-msgid " <i>(is unversioned)</i>"
-msgstr " <i>(未跟踪)</i>"
-
-#, python-format
 msgid "Hg file log viewer [%s] - %s"
 msgstr "Hg文件日志查看器 [%s] - %s"
 
@@ -1523,12 +1506,84 @@ msgstr "下一个差异"
 msgid "Previous diff"
 msgstr "上一个差异"
 
+msgid "Unicode"
+msgstr ""
+
+msgid "Western Europe"
+msgstr ""
+
+msgid "Unified Chinese"
+msgstr ""
+
+msgid "Traditional Chinese"
+msgstr ""
+
+msgid "Korean"
+msgstr ""
+
+msgid "Japanese"
+msgstr ""
+
+msgid "Thai"
+msgstr ""
+
+msgid "Central and Eastern Europe"
+msgstr ""
+
+msgid "Cyrillic"
+msgstr ""
+
+msgid "Russian"
+msgstr ""
+
+msgid "Ukrainian"
+msgstr ""
+
+msgid "Greek"
+msgstr ""
+
+msgid "Turkish"
+msgstr ""
+
+msgid "Arabic"
+msgstr ""
+
+msgid "Hebrew"
+msgstr ""
+
+msgid "Vietnamese"
+msgstr ""
+
+msgid "Baltic"
+msgstr ""
+
+msgid "Southern Europe"
+msgstr ""
+
+msgid "Nordic"
+msgstr ""
+
+msgid "Celtic"
+msgstr ""
+
+msgid "South-Eastern Europe"
+msgstr ""
+
+#. i18n: comma-separated list of common encoding names in your locale, e.g.
+#. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
+#.
+#. pick from the following encodings:
+#. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
+#. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
+#. cp1251, koi8-r, koi8-u, iso8859-7, cp1253, cp1254, cp1256, iso8859-6,
+#. cp1255, iso8859-8, cp1258, iso8859-4, iso8859-13, cp1257, iso8859-3,
+#. iso8859-10, iso8859-14, iso8859-16
+msgid "$FILE_ENCODINGS"
+msgstr ""
+
 msgctxt "column header"
 msgid "Filename"
 msgstr "文件名"
-
-msgid " (excluded from the next commit)"
-msgstr ""
 
 msgid "View change as unified diff output"
 msgstr ""
@@ -1536,14 +1591,17 @@ msgstr ""
 msgid "View change in context of file"
 msgstr ""
 
-msgid "annotate with revision numbers"
-msgstr "用版本编号标注"
+msgid "Annotate with revision numbers"
+msgstr ""
 
-msgid "Next diff (alt+down)"
-msgstr "下一个差异(Alt+下)"
+msgid "Next Diff"
+msgstr ""
 
-msgid "Previous diff (alt+up)"
-msgstr "上一个差异(Alt+上)"
+msgid "Previous Diff"
+msgstr ""
+
+msgid "Open shelve tool"
+msgstr "打开shelve工具"
 
 msgid "Show changes from first parent"
 msgstr "查看自第一个父版本的修订"
@@ -1551,16 +1609,29 @@ msgstr "查看自第一个父版本的修订"
 msgid "Show changes from second parent"
 msgstr "查看自第二个父版本的修订"
 
-msgid "Open shelve tool"
-msgstr "打开shelve工具"
-
-msgid "Mark excluded changes"
+msgid "E&ncoding"
 msgstr ""
 
 msgid "&Search in Current File"
 msgstr ""
 
 msgid "Search in All &History"
+msgstr ""
+
+msgid "Go to Line"
+msgstr ""
+
+#, python-format
+msgid "Enter line number (1 - %d)"
+msgstr ""
+
+msgid "Show &Author"
+msgstr ""
+
+msgid "Show &Date"
+msgstr ""
+
+msgid "Show &Revision"
 msgstr ""
 
 msgid "Annotate Op&tions"
@@ -1596,17 +1667,17 @@ msgstr ""
 msgid "&Local"
 msgstr "本地(&L)"
 
+msgid "&Parent Revision"
+msgstr ""
+
 #, python-format
 msgid "&Parent Revision (%d)"
 msgstr ""
 
-msgid "Show &Author"
+msgid "&Mark Excluded Changes"
 msgstr ""
 
-msgid "Show &Date"
-msgstr ""
-
-msgid "Show &Revision"
+msgid "(excluded from the next commit)"
 msgstr ""
 
 msgid "Interrupted graft operation found"
@@ -1666,10 +1737,10 @@ msgstr ""
 msgid "Graft is complete"
 msgstr ""
 
-msgid "Graft aborted"
+msgid "Graft failed"
 msgstr ""
 
-msgid "Graft failed"
+msgid "Graft aborted"
 msgstr ""
 
 msgid ""
@@ -1728,9 +1799,6 @@ msgid ""
 "Comma separated list of inclusion file patterns. By default, the entire "
 "repository is searched."
 msgstr ""
-
-msgid "TortoiseHg Search"
-msgstr "TortoiseHg 搜索"
 
 #, python-format
 msgid "\"%s\" removed from search history"
@@ -1794,6 +1862,9 @@ msgstr "用户"
 
 msgid "Match Text"
 msgstr "匹配文字"
+
+msgid "TortoiseHg Search"
+msgstr "TortoiseHg 搜索"
 
 #, python-format
 msgid "Detect Copies/Renames in %s"
@@ -2140,19 +2211,6 @@ msgstr "拖动以更改顺序"
 
 msgid "Workbench"
 msgstr "Workbench"
-
-#, python-format
-msgid "Manifest %s@%s"
-msgstr "修订清单 %s@%s"
-
-msgid "### filter text ###"
-msgstr "### 过滤文本 ###"
-
-msgid "Filter:"
-msgstr "过滤器:"
-
-msgid "Status"
-msgstr "状态"
 
 msgid "Find revisions matching fields of:"
 msgstr ""
@@ -2502,9 +2560,6 @@ msgstr ""
 msgid "Reverting p4 changelist..."
 msgstr ""
 
-msgid "Edit Repository URL"
-msgstr ""
-
 msgid "Patch Branch Toolbar"
 msgstr ""
 
@@ -2562,6 +2617,9 @@ msgstr ""
 
 msgid "Graph"
 msgstr "图表"
+
+msgid "Status"
+msgstr "状态"
 
 msgid "Title"
 msgstr ""
@@ -2848,8 +2906,38 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-msgid "Unable to read/write config file"
-msgstr "无法读取或写入配置文件"
+msgid "Unable to read file"
+msgstr ""
+
+msgid "Could not open the specified file for reading."
+msgstr ""
+
+msgid "This appears to be a binary file."
+msgstr ""
+
+msgid "An error occurred while reading the file."
+msgstr ""
+
+msgid "Text Translation Failure"
+msgstr ""
+
+msgid "Could not translate the file content from native encoding."
+msgstr ""
+
+msgid "Several characters would be lost."
+msgstr ""
+
+msgid "Unable to write file"
+msgstr ""
+
+msgid "Could not translate the file content to native encoding."
+msgstr ""
+
+msgid "Could not open the specified file for writing."
+msgstr ""
+
+msgid "An error occurred while writing the file."
+msgstr ""
 
 msgid "Try refreshing your repository."
 msgstr "正在尝试刷新您的仓库。"
@@ -2910,6 +2998,10 @@ msgstr "在终端打开路径失败"
 msgid "\"%s\" is not a valid directory"
 msgstr ""
 
+#, python-format
+msgid "Invalid configuration: %s"
+msgstr ""
+
 msgid "Unable to start the following command:"
 msgstr ""
 
@@ -2926,9 +3018,6 @@ msgid "Please enter a username"
 msgstr ""
 
 msgid "You must identify yourself to Mercurial"
-msgstr ""
-
-msgid "Text Translation Failure"
 msgstr ""
 
 msgid "Unable to translate input to local encoding."
@@ -3027,10 +3116,10 @@ msgstr ""
 msgid "Rebase is complete"
 msgstr ""
 
-msgid "Rebase aborted"
+msgid "Rebase failed"
 msgstr ""
 
-msgid "Rebase failed"
+msgid "Rebase aborted"
 msgstr ""
 
 msgid ""
@@ -3054,13 +3143,13 @@ msgstr ""
 msgid "Mark this chunk as unresolved"
 msgstr ""
 
-msgid "Unable to merge rejects"
+msgid "Reload File"
 msgstr ""
 
-msgid "Can't read this file (maybe deleted)"
+msgid "Are you sure you want to reload this file?"
 msgstr ""
 
-msgid "This appears to be a binary file"
+msgid "All unsaved changes will be lost."
 msgstr ""
 
 msgid "Warning"
@@ -3086,15 +3175,7 @@ msgstr ""
 msgid "Copy source -> destination"
 msgstr ""
 
-#, python-format
-msgid "Copy - %s"
-msgstr ""
-
 msgid "Copy Error"
-msgstr ""
-
-#, python-format
-msgid "Rename - %s"
 msgstr ""
 
 msgid "Select Source File"
@@ -3112,16 +3193,18 @@ msgstr ""
 msgid "The destination must be within the repository tree."
 msgstr ""
 
-msgid "Please give a destination that differs from the source"
-msgstr ""
-
 msgid "Destination file already exists."
 msgstr ""
 
 msgid "Are you sure you want to overwrite it ?"
 msgstr ""
 
-msgid "Cannot do a pure casefolding copy on Windows"
+#, python-format
+msgid "Copy - %s"
+msgstr ""
+
+#, python-format
+msgid "Rename - %s"
 msgstr ""
 
 msgid "Show all"
@@ -3578,10 +3661,6 @@ msgstr "提交"
 msgctxt "tab tooltip"
 msgid "Synchronize"
 msgstr "同步"
-
-msgctxt "tab tooltip"
-msgid "Manifest"
-msgstr "文件清单"
 
 msgctxt "tab tooltip"
 msgid "Search"
@@ -4188,14 +4267,35 @@ msgstr "<默认>"
 msgid "File List Toolbar"
 msgstr "文件列表工具栏"
 
-msgid "Update to this revision"
-msgstr "更新到这个修订版本"
+msgid "Manifest Mode"
+msgstr ""
 
-msgid "Show All"
-msgstr "显示全部"
+msgid "Show the full manifest in tree view"
+msgstr ""
 
-msgid "Toggle display of all files and the direction they were merged"
-msgstr "切换所有文件的显示和合并方向"
+msgid "Fl&at List View"
+msgstr ""
+
+msgid "### filter text ###"
+msgstr "### 过滤文本 ###"
+
+msgid "&Changed by This Commit"
+msgstr ""
+
+msgid "Show files changed by this commit"
+msgstr ""
+
+msgid "Compare to &1st Parent"
+msgstr ""
+
+msgid "Compare to &2nd Parent"
+msgstr ""
+
+msgid "Toggle parent to be used as the base revision"
+msgstr ""
+
+msgid "&Filter by Status"
+msgstr ""
 
 #, python-format
 msgid "%s - Revision Details (%s)"
@@ -4442,6 +4542,17 @@ msgstr "thg: %s\n"
 msgid "abort: %s!\n"
 msgstr "中止: %s!\n"
 
+#, python-format
+msgid "abort: %s\n"
+msgstr "终止: %s\n"
+
+#, python-format
+msgid "(%s)\n"
+msgstr ""
+
+msgid "option --config may not be abbreviated!"
+msgstr ""
+
 msgid "invalid arguments"
 msgstr "无效参数"
 
@@ -4466,6 +4577,9 @@ msgstr "简略化输出"
 
 msgid "display help and exit"
 msgstr "显示帮助并退出"
+
+msgid "set/override config option (use 'section.name=value')"
+msgstr ""
 
 msgid "start debugger"
 msgstr "启动调试器"
@@ -4561,8 +4675,8 @@ msgstr "使用拉协议(pull)来复制元数据"
 msgid "use uncompressed transfer (fast over LAN)"
 msgstr ""
 
-msgid "thg clone [OPTION]... SOURCE [DEST]"
-msgstr "thg clone [OPTION]... SOURCE [DEST]"
+msgid "thg clone [OPTION]... [SOURCE] [DEST]"
+msgstr ""
 
 msgid "record user as committer"
 msgstr "记录用户为提交者"
@@ -4746,8 +4860,8 @@ msgstr ""
 msgid "thg remove [FILE]..."
 msgstr "thg remove [FILE]..."
 
-msgid "thg rename SOURCE [DEST]..."
-msgstr "thg rename SOURCE [DEST]..."
+msgid "thg rename [SOURCE] [DEST]"
+msgstr ""
 
 msgid "field to give initial focus"
 msgstr "将获有初始焦点的字段"
@@ -4897,6 +5011,15 @@ msgstr "TortoiseHg 对话框 (版本 %s), Mercurial (版本 %s)\n"
 msgid "Location:"
 msgstr "路径:"
 
+msgid "Update to:"
+msgstr "更新到:"
+
+msgid "Target:"
+msgstr "目标:"
+
+msgid "Options:"
+msgstr "选项:"
+
 msgid "Discard remote changes, no backup (-C/--clean)"
 msgstr "放弃远程修订，不备份 (-C/--clean)"
 
@@ -4908,6 +5031,19 @@ msgstr "允许推送新分支 (--new-branch)"
 
 msgid "Force push to remote location (-f/--force)"
 msgstr ""
+
+msgid "remove working directory"
+msgstr ""
+
+msgid "unknown revision!"
+msgstr "未知版本!"
+
+#, python-format
+msgid "Remote Update - %s"
+msgstr ""
+
+msgid "&Update"
+msgstr "更新(&U)"
 
 msgid "Log"
 msgstr "日志"
@@ -5062,8 +5198,8 @@ msgstr "监视仓库变更"
 
 msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
-"always"
-msgstr "指定 TortoiseHg 监视变更的目标文件系统。默认: always"
+"localonly"
+msgstr ""
 
 msgid "Max Diff Size"
 msgstr "最大差分大小"
@@ -5182,9 +5318,8 @@ msgstr ""
 msgid ""
 "Specify which task buttons you want to show on the task toolbar and in which "
 "order.<br>Type a list of the task button names. Add separators by putting \"|"
-"\" between task button names.<br>Valid names are: log commit mq sync "
-"manifest grep and pbranch.<br>Default: log commit manifest grep pbranch | "
-"sync"
+"\" between task button names.<br>Valid names are: log commit sync grep and "
+"pbranch.<br>Default: log commit grep pbranch | sync"
 msgstr ""
 
 msgid "Long Summary"
@@ -5331,6 +5466,16 @@ msgstr "秘密MQ补丁"
 msgid "Make MQ patches secret (instead of draft). Default: False"
 msgstr "将MQ补丁设为 secret (而不是 draft). 默认: 否"
 
+msgid "Check Subrepo Phase"
+msgstr ""
+
+msgid ""
+"Check the phase of the current revision of each subrepository.  For settings "
+"other than \"ignore\", the phase of the current revision of each "
+"subrepository is checked before committing the parent repository.  Default: "
+"follow"
+msgstr ""
+
 msgid "Monitor working<br>directory changes"
 msgstr "监视工作目录变更"
 
@@ -5430,7 +5575,20 @@ msgstr ""
 msgid "Server"
 msgstr ""
 
-msgid "<b>Behavior:</b>"
+msgid "<b>Repository Details:</b>"
+msgstr ""
+
+msgid ""
+"Repository name to use in the web interface, and by TortoiseHg as a "
+"shorthand name.  Default is the working directory."
+msgstr ""
+
+msgid "Encoding"
+msgstr "编码"
+
+msgid ""
+"Character encoding of files in the repository, used by the web interface and "
+"TortoiseHg."
 msgstr ""
 
 msgid "'Publishing' repository"
@@ -5443,11 +5601,6 @@ msgid ""
 msgstr ""
 
 msgid "<b>Web Server:</b>"
-msgstr ""
-
-msgid ""
-"Repository name to use in the web interface, and by TortoiseHg as a "
-"shorthand name.  Default is the working directory."
 msgstr ""
 
 msgid "Textual description of the repository's purpose or contents."
@@ -5536,12 +5689,6 @@ msgstr ""
 "权用户(空格符或\",\"分隔)也都被禁止. 禁止推送列表内容是在允许推送列表内容之前"
 "被检查."
 
-msgid "Encoding"
-msgstr "编码"
-
-msgid "Character encoding name"
-msgstr "字符编码名称"
-
 msgid "Proxy"
 msgstr "代理服务器"
 
@@ -5623,8 +5770,8 @@ msgstr "邮件服务器连接端口. 默认: 25"
 msgid "SMTP TLS"
 msgstr "SMTP TLS"
 
-msgid "Connect to mail server using TLS. Default: False"
-msgstr "用TLS方式连接邮件服务器. 默认: 否"
+msgid "Method to enable TLS when connecting to mail server. Default: none"
+msgstr ""
 
 msgid "SMTP Username"
 msgstr "SMTP 用户名"
@@ -6246,6 +6393,9 @@ msgstr ""
 msgid "Signature has been added"
 msgstr ""
 
+msgid "Filter:"
+msgstr "过滤器:"
+
 msgid "Check all files"
 msgstr "全选"
 
@@ -6356,9 +6506,6 @@ msgstr ""
 msgid "subrepo"
 msgstr "子仓库"
 
-msgid "TortoiseHg Sync"
-msgstr "TortoiseHg 同步"
-
 msgid "Check for incoming changes from selected URL"
 msgstr "检查可从指定URL拉取的更改"
 
@@ -6382,9 +6529,6 @@ msgstr ""
 
 msgid "Stop current operation"
 msgstr "停止当前操作"
-
-msgid "Target:"
-msgstr "目标:"
 
 msgid "<b>Selected Options:</b>"
 msgstr "<b>选中的选项:</b>"
@@ -6442,9 +6586,6 @@ msgstr "确认删除路径"
 msgid "Delete %s from your repo configuration file?"
 msgstr "是否要从仓库配置文件中删除 %s ?"
 
-msgid "Are you sure that you want to cancel synchronization?"
-msgstr ""
-
 msgid "No host specified"
 msgstr ""
 
@@ -6490,6 +6631,10 @@ msgid "Incoming from %s aborted, ret %d"
 msgstr "检查可从 %s 拉取操作失败，返回值 %d"
 
 #, python-format
+msgid "Pulling from %s..."
+msgstr "正在从 %s 拉取..."
+
+#, python-format
 msgid "Pull from %s completed"
 msgstr "从 %s 拉取操作完成"
 
@@ -6504,16 +6649,16 @@ msgid "File conflicts need to be resolved"
 msgstr "需要解决的文件冲突"
 
 #, python-format
-msgid "Pulling from %s..."
-msgstr "正在从 %s 拉取..."
-
-#, python-format
 msgid "Finding outgoing changesets to %s..."
 msgstr "正在查找可推送到 %s 的修订集..."
 
 #, python-format
 msgid "%d outgoing changesets to %s"
 msgstr "%d 个可推送到 %s 的修订集"
+
+#, python-format
+msgid "outgoing changesets to %s found"
+msgstr "发现可推送到 %s 的修订集"
 
 #, python-format
 msgid "No outgoing changesets to %s"
@@ -6523,9 +6668,8 @@ msgstr "没有可推送到 %s 的修订集"
 msgid "Outgoing to %s aborted, ret %d"
 msgstr "检查可推送到 %s 操作失败，返回值 %d"
 
-#, python-format
-msgid "outgoing changesets to %s found"
-msgstr "发现可推送到 %s 的修订集"
+msgid "Perforce pending..."
+msgstr ""
 
 #, python-format
 msgid "%s (submitted)"
@@ -6551,9 +6695,6 @@ msgstr ""
 msgid "Unable to determine pending changesets"
 msgstr ""
 
-msgid "Perforce pending..."
-msgstr ""
-
 msgid "Confirm Push to remote Repository"
 msgstr "确认推送到远程仓库"
 
@@ -6570,6 +6711,12 @@ msgstr ""
 #, python-format
 msgid "Push to %s aborted"
 msgstr "推送到 %s 操作失败"
+
+#, python-format
+msgid ""
+"Invalid default push revision: %s. Please check your Mercurial configuration "
+"(tortoisehg.defaultpush)"
+msgstr ""
 
 #, python-format
 msgid "Pushing to %s..."
@@ -6589,12 +6736,6 @@ msgid ""
 "repository?"
 msgstr "您要推送的修订集中包含新创建的分支。您要在远程仓库建立新的分支吗？"
 
-#, python-format
-msgid ""
-"Invalid default push revision: %s. Please check your Mercurial configuration "
-"(tortoisehg.defaultpush)"
-msgstr ""
-
 msgid "Determining outgoing changesets to email..."
 msgstr ""
 
@@ -6613,6 +6754,12 @@ msgstr ""
 
 msgid "Unable to remove URL"
 msgstr "无法删除URL"
+
+msgid "TortoiseHg Sync"
+msgstr "TortoiseHg 同步"
+
+msgid "Are you sure that you want to cancel synchronization?"
+msgstr ""
 
 msgid "Post Pull Behavior"
 msgstr "拉取完成后的行为"
@@ -6853,6 +7000,10 @@ msgstr "标签 '%s' 已被移除"
 msgid "Patch files (*.diff *.patch)"
 msgstr "补丁文件 (*.diff *.patch)"
 
+#, python-format
+msgid "Import - %s"
+msgstr "导入 - %s"
+
 msgid "Browse Directory..."
 msgstr "浏览目录..."
 
@@ -6873,10 +7024,6 @@ msgstr "正在检查工作目录状态"
 
 msgid "&Import"
 msgstr ""
-
-#, python-format
-msgid "Import - %s"
-msgstr "导入 - %s"
 
 msgid "Working directory is not clean!  <a href=\"view\">View changes...</a>"
 msgstr "工作目录中有更改尚未提交！<a href=\"view\">查看更改...</a>"
@@ -6901,21 +7048,11 @@ msgstr ""
 msgid "Strip:"
 msgstr "截去:"
 
-msgid "Options:"
-msgstr "选项:"
-
 msgid "Discard local changes, no backup (-f/--force)"
 msgstr "废弃本地改动, 无备份(-f/--force)"
 
 msgid "No backup (-n/--nobackup)"
 msgstr "无备份(-n/--nobackup)"
-
-msgid "&Strip"
-msgstr ""
-
-#, python-format
-msgid "Strip - %s"
-msgstr "截去 - %s"
 
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
@@ -6929,14 +7066,24 @@ msgstr "未知的版本!"
 msgid "Detected uncommitted local changes."
 msgstr "检测到未提交的本地更改。"
 
-msgid "Do you want to discard them and continue?"
-msgstr "您希望丢弃这些更改吗？"
+msgid "Do you want to keep them or discard them?"
+msgstr ""
 
-msgid "&Yes (--force)"
-msgstr "是(&Y) (--force)"
+msgid "&Keep (--keep)"
+msgstr ""
+
+msgid "&Discard (--force)"
+msgstr ""
 
 msgid "Confirm Strip"
 msgstr "确认截去"
+
+#, python-format
+msgid "Strip - %s"
+msgstr "截去 - %s"
+
+msgid "&Strip"
+msgstr ""
 
 msgid "response expected"
 msgstr "期待回复"
@@ -7027,18 +7174,11 @@ msgid "hg: unknown command '%s'\n"
 msgstr ""
 
 #, python-format
-msgid "abort: %s\n"
-msgstr "终止: %s\n"
-
-#, python-format
 msgid "abort: error: %s\n"
 msgstr "终止: 错误: %s\n"
 
 msgid "broken pipe\n"
 msgstr ""
-
-msgid "Update to:"
-msgstr "更新到:"
 
 msgid "Parent 1:"
 msgstr "父版本 1:"
@@ -7055,24 +7195,8 @@ msgstr "放弃本地改动，无备份 (-C/--clean)"
 msgid "Always merge (when possible)"
 msgstr "总是合并（如果可以）"
 
-msgid "Always show command log"
-msgstr "总是显示命令日志"
-
-msgid "&Update"
-msgstr "更新(&U)"
-
-#, python-format
-msgid "Update - %s"
-msgstr "更新 - %s"
-
-msgid "remove working directory"
-msgstr ""
-
 msgid "(same as parent)"
 msgstr "(和父版本一致)"
-
-msgid "unknown revision!"
-msgstr "未知版本!"
 
 msgid "Activate bookmark?"
 msgstr ""
@@ -7121,6 +7245,10 @@ msgstr "合并 - 允许与本地版本合并"
 
 msgid "Confirm Update"
 msgstr "确认更新"
+
+#, python-format
+msgid "Update - %s"
+msgstr "更新 - %s"
 
 msgid "[non-existant]"
 msgstr "[不存在]"
@@ -7260,6 +7388,12 @@ msgstr ""
 msgid " Aborted"
 msgstr " 中止"
 
+msgid "Cannot open subrepository"
+msgstr "无法打开子仓库"
+
+msgid "The selected subrepository does not exist on the working directory"
+msgstr "工作目录中不存在选中的子仓库"
+
 msgid "Uncommited merge - please select a parent revision"
 msgstr "未提交合并 - 请选择一个父版本"
 
@@ -7398,9 +7532,6 @@ msgstr ""
 msgid "Revision &Details"
 msgstr "修订版本详细信息(&D)"
 
-msgid "&Manifest"
-msgstr "文件清单(&M)"
-
 msgid "&Search"
 msgstr "搜索(&S)"
 
@@ -7434,7 +7565,16 @@ msgstr ""
 msgid "Go to a specific revision"
 msgstr "转到指定的修订版本"
 
-msgid "Start &Web Server"
+msgid "&Filter Toolbar"
+msgstr ""
+
+msgid "Filter graph with revision sets or branches"
+msgstr "在修订历史图上过滤修订集或分支"
+
+msgid "&Workbench Toolbars"
+msgstr ""
+
+msgid "Update working directory or switch revisions"
 msgstr ""
 
 msgid "&Shelve..."
@@ -7443,22 +7583,25 @@ msgstr ""
 msgid "&Import..."
 msgstr ""
 
-msgid "&Verify"
-msgstr ""
-
-msgid "Re&cover"
-msgstr ""
-
 msgid "&Resolve..."
 msgstr ""
 
-msgid "Rollback/&Undo..."
+msgid "R&ollback/Undo..."
 msgstr ""
 
 msgid "&Purge..."
 msgstr ""
 
 msgid "&Bisect..."
+msgstr ""
+
+msgid "&Verify"
+msgstr ""
+
+msgid "Re&cover"
+msgstr ""
+
+msgid "&Web Server"
 msgstr ""
 
 msgid "E&xplorer Help"
@@ -7471,15 +7614,6 @@ msgid "About &Qt"
 msgstr ""
 
 msgid "&About TortoiseHg"
-msgstr ""
-
-msgid "&Filter Toolbar"
-msgstr ""
-
-msgid "Filter graph with revision sets or branches"
-msgstr "在修订历史图上过滤修订集或分支"
-
-msgid "&Workbench Toolbars"
 msgstr ""
 
 msgid "&Incoming"
@@ -7837,6 +7971,9 @@ msgstr "和拖入的仓库进行同步"
 msgid "repository %s not found"
 msgstr "仓库 %s 未找到"
 
+#~ msgid "Source path is empty"
+#~ msgstr "源路径为空"
+
 #~ msgid "commit"
 #~ msgstr "提交"
 
@@ -8063,6 +8200,9 @@ msgstr "仓库 %s 未找到"
 
 #~ msgid "Maximum number of files to list per changeset."
 #~ msgstr "列出每次修改时显示的最大文件数"
+
+#~ msgid "Character encoding name"
+#~ msgstr "字符编码名称"
 
 #~ msgid "Fetch"
 #~ msgstr "获取"
@@ -9237,6 +9377,9 @@ msgstr "仓库 %s 未找到"
 
 #~ msgid "Save as.."
 #~ msgstr "另存为.."
+
+#~ msgid "Source and destination are the same"
+#~ msgstr "源和目标相同"
 
 #~ msgid "Please specify different paths"
 #~ msgstr "请指定不同的路径"
@@ -10518,6 +10661,9 @@ msgstr "仓库 %s 未找到"
 #~ msgid "There is no Mercurial repository here (.hg not found)"
 #~ msgstr "这里没有 Mercurial 仓库(未找到.hg目录)"
 
+#~ msgid "&Yes (--force)"
+#~ msgstr "是(&Y) (--force)"
+
 #~ msgid "Verify"
 #~ msgstr "验证"
 
@@ -10529,6 +10675,9 @@ msgstr "仓库 %s 未找到"
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "终止: 恢复备份失败, %s\n"
+
+#~ msgid "Connect to mail server using TLS. Default: False"
+#~ msgstr "用TLS方式连接邮件服务器. 默认: 否"
 
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "比较代码行时忽略空格. 默认: 否"

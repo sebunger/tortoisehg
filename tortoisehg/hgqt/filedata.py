@@ -5,14 +5,16 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
+import os, posixpath
 import cStringIO
 
-from mercurial import error, match, patch, util, mdiff
+from mercurial import commands, error, match, patch, subrepo, util, mdiff
 from mercurial import ui as uimod
+from mercurial.node import nullrev
 from hgext import record
 
 from tortoisehg.util import hglib, patchctx
+from tortoisehg.hgqt import fileencoding
 from tortoisehg.hgqt.i18n import _
 
 forcedisplaymsg = _('Display the file anyway')
@@ -25,9 +27,39 @@ def _exceedsMaxLineLength(data, maxlength=100000):
             return True
     return False
 
-class FileData(object):
-    def __init__(self, ctx, ctx2, wfile, status=None, changeselect=False,
-                 force=False):
+def _checkdifferror(data, maxdiff):
+    p = _('Diff not displayed: ')
+    size = len(data)
+    if size > maxdiff:
+        return p + _('File is larger than the specified max size.\n'
+                     'maxdiff = %s KB') % (maxdiff // 1024)
+    elif '\0' in data:
+        return p + _('File is binary')
+    elif _exceedsMaxLineLength(data):
+        # it's incredibly slow to render long line by QScintilla
+        return p + _('File may be binary (maximum line length exceeded)')
+
+def _trimdiffheader(diff):
+    # trim first three lines, for example:
+    # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/mq.py
+    # --- a/tortoisehg/hgqt/mq.py
+    # +++ b/tortoisehg/hgqt/mq.py
+    out = diff.split('\n', 3)
+    if len(out) == 4:
+        return out[3]
+    else:
+        # there was an error or rename without diffs
+        return diff
+
+
+class _AbstractFileData(object):
+
+    def __init__(self, ctx, ctx2, wfile, status=None, rpath=None):
+        self._ctx = ctx
+        self._pctx = ctx2
+        self._wfile = wfile
+        self._status = status
+        self._rpath = rpath or ''
         self.contents = None
         self.ucontents = None
         self.error = None
@@ -36,12 +68,131 @@ class FileData(object):
         self.flabel = u''
         self.elabel = u''
         self.changes = None
+
+        self._textencoding = fileencoding.contentencoding(ctx._repo.ui)
+
+    def createRebased(self, pctx):
+        # new status is not known
+        return self.__class__(self._ctx, pctx, self._wfile)
+
+    def load(self, changeselect=False, force=False):
+        # Note: changeselect may be set to True even if the underlying data
+        # isn't chunk-selectable
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        # unlike changectx, this also compares hash in case it was stripped and
+        # recreated.  FileData may live longer than changectx in Mercurial.
+        return (isinstance(other, self.__class__)
+                and self._ctx == other._ctx
+                and self._ctx.node() == other._ctx.node()
+                and self._pctx == other._pctx
+                and (self._pctx is None
+                     or self._pctx.node() == other._pctx.node())
+                and self._wfile == other._wfile
+                and self._rpath == other._rpath)
+
+    def __ne__(self, other):
+        return not self == other
+
+    def __hash__(self):
+        return hash((self._ctx, self._ctx.node(),
+                     self._pctx, self._pctx is None or self._pctx.node(),
+                     self._wfile, self._rpath))
+
+    def __repr__(self):
+        return '<%s %s@%s>' % (self.__class__.__name__,
+                               posixpath.join(self._rpath, self._wfile),
+                               self._ctx)
+
+    def isNull(self):
+        return self._ctx.rev() == nullrev and not self._wfile
+
+    def isValid(self):
+        return self.error is None and not self.isNull()
+
+    def rev(self):
+        return self._ctx.rev()
+
+    def baseRev(self):
+        return self._pctx.rev()
+
+    def rawContext(self):
+        return self._ctx
+
+    def rawBaseContext(self):
+        return self._pctx
+
+    # absoluteFilePath    : "C:\\Documents\\repo\\foo\\subrepo\\bar\\baz"
+    # absoluteRepoRootPath: "C:\\Documents\\repo\\foo\\subrepo"
+    # canonicalFilePath: "bar/baz"
+    # filePath         : "foo/subrepo/bar/baz"
+    # repoRootPath     : "foo/subrepo"
+
+    def absoluteFilePath(self):
+        """Absolute file-system path of this file"""
+        repo = self._ctx._repo
+        return hglib.tounicode(os.path.normpath(repo.wjoin(self._wfile)))
+
+    def absoluteRepoRootPath(self):
+        """Absolute file-system path to the root of the container repository"""
+        # repo.root should be normalized
+        repo = self._ctx._repo
+        return hglib.tounicode(repo.root)
+
+    def canonicalFilePath(self):
+        """Path relative to the repository root which contains this file"""
+        return hglib.tounicode(self._wfile)
+
+    def filePath(self):
+        """Path relative to the top repository root in the current context"""
+        return hglib.tounicode(posixpath.join(self._rpath, self._wfile))
+
+    def repoRootPath(self):
+        """Root path of the container repository relative to the top repository
+        in the current context; '' for top repository"""
+        return hglib.tounicode(self._rpath)
+
+    def fileStatus(self):
+        return self._status
+
+    def isDir(self):
+        return not self._wfile
+
+    def subrepoType(self):
+        pass
+
+    def textEncoding(self):
+        return self._textencoding
+
+    def setTextEncoding(self, name):
+        self._textencoding = fileencoding.canonname(name)
+
+    def _textToUnicode(self, s):
+        return s.decode(self._textencoding, 'replace')
+
+    def diffText(self):
+        return self._textToUnicode(self.diff or '')
+
+    def fileText(self):
+        return self._textToUnicode(self.contents or '')
+
+
+class FileData(_AbstractFileData):
+
+    def load(self, changeselect=False, force=False):
+        if self.rev() == nullrev:
+            return
+        ctx = self._ctx
+        ctx2 = self._pctx
+        wfile = self._wfile
+        status = self._status
         try:
-            self.readStatus(ctx, ctx2, wfile, status, changeselect, force)
+            self._readStatus(ctx, ctx2, wfile, status, changeselect, force)
         except (EnvironmentError, error.LookupError), e:
             self.error = hglib.tounicode(str(e))
 
-    def checkMaxDiff(self, ctx, wfile, maxdiff, status, force):
+    def _checkMaxDiff(self, ctx, wfile, maxdiff, status, force):
         self.error = None
         p = _('File or diffs not displayed: ')
         try:
@@ -60,6 +211,8 @@ class FileData(object):
             self.error = p + _('File is larger than the specified max size.\n'
                                'maxdiff = %s KB') % (maxdiff // 1024)
             self.error += u'\n\n' + forcedisplaymsg
+            if status == 'A':
+                self._checkRenamed(ctx, fctx)
             return None
 
         try:
@@ -73,30 +226,30 @@ class FileData(object):
                         _('File may be binary (maximum line length exceeded)')
             if self.error:
                 self.error += u'\n\n' + forcedisplaymsg
-                if status != 'A':
-                    return None
-
-                renamed = fctx.renamed()
-                if renamed:
-                    oldname, node = renamed
-                    fr = hglib.tounicode(oldname)
-                    if oldname in ctx:
-                        self.flabel += _(' <i>(copied from %s)</i>') % fr
-                    else:
-                        self.flabel += _(' <i>(renamed from %s)</i>') % fr
-                else:
-                    self.flabel += _(' <i>(was added)</i>')
-
+                if status == 'A':
+                    self._checkRenamed(ctx, fctx)
                 return None
         except (EnvironmentError, util.Abort), e:
             self.error = p + hglib.tounicode(str(e))
             return None
         return fctx, data
 
-    def isValid(self):
-        return self.error is None
+    def _checkRenamed(self, ctx, fctx):
+        # TODO: maybe we can use fctx.parents() in place of (oldname, node)
+        renamed = fctx.renamed()
+        if not renamed:
+            self.flabel += _(' <i>(was added)</i>')
+            return
 
-    def readStatus(self, ctx, ctx2, wfile, status, changeselect, force):
+        oldname, node = renamed
+        fr = hglib.tounicode(oldname)
+        if oldname in ctx:
+            self.flabel += _(' <i>(copied from %s)</i>') % fr
+        else:
+            self.flabel += _(' <i>(renamed from %s)</i>') % fr
+        return oldname, node
+
+    def _readStatus(self, ctx, ctx2, wfile, status, changeselect, force):
         def getstatus(repo, n1, n2, wfile):
             m = match.exact(repo.root, repo.getcwd(), [wfile])
             modified, added, removed = repo.status(n1, n2, match=m)[:3]
@@ -113,39 +266,7 @@ class FileData(object):
         isbfile = False
         repo = ctx._repo
         maxdiff = repo.maxdiff
-        self.flabel += u'<b>%s</b>' % hglib.tounicode(wfile)
-
-        if isinstance(ctx, patchctx.patchctx):
-            self.diff = ctx.thgmqpatchdata(wfile)
-            flags = ctx.flags(wfile)
-            if flags == 'x':
-                self.elabel = _("exec mode has been "
-                                "<font color='red'>set</font>")
-            elif flags == '-':
-                self.elabel = _("exec mode has been "
-                                "<font color='red'>unset</font>")
-            elif flags == 'l':
-                self.flabel += _(' <i>(is a symlink)</i>')
-
-            # Do not show patches that are too big or may be binary
-            if not force:
-                p = _('Diff not displayed: ')
-                data = self.diff
-                size = len(data)
-                if (size > maxdiff):
-                    self.error = p + _('File is larger than the specified max '
-                                       'size.\n'
-                                   'maxdiff = %s KB') % (maxdiff // 1024)
-                elif '\0' in data:
-                    self.error = p + _('File is binary')
-                elif _exceedsMaxLineLength(data):
-                    # it's incredibly slow to render long line by QScintilla
-                    self.error = p + \
-                        _('File may be binary (maximum line length exceeded)')
-                if self.error:
-                    self.error += u'\n\n' + forcedisplaymsg
-
-            return
+        self.flabel = u'<b>%s</b>' % self.filePath()
 
         if ctx2:
             # If a revision to compare to was provided, we must put it in
@@ -171,213 +292,6 @@ class FileData(object):
             status = getstatus(repo, ctx.p1().node(), ctx.node(), wfile)
         if ctx2 is None:
             ctx2 = ctx.p1()
-
-        if status == 'S':
-            try:
-                from mercurial import subrepo, commands
-
-                def genSubrepoRevChangedDescription(subrelpath, sfrom, sto,
-                                                    repo):
-                    """Generate a subrepository revision change description"""
-                    out = []
-                    def getLog(_ui, srepo, opts):
-                        if srepo is None:
-                            return _('changeset: %s') % opts['rev'][0][:12]
-                        _ui.pushbuffer()
-                        logOutput = ''
-                        try:
-                            commands.log(_ui, srepo, **opts)
-                            logOutput = _ui.popbuffer()
-                            if not logOutput:
-                                return _('Initial revision') + u'\n'
-                        except error.ParseError, e:
-                            # Some mercurial versions have a bug that results in
-                            # saving a subrepo node id in the .hgsubstate file
-                            # which ends with a "+" character. If that is the
-                            # case, add a warning to the output, but try to
-                            # get the revision information anyway
-                            for n, rev in enumerate(opts['rev']):
-                                if rev.endswith('+'):
-                                    logOutput += _('[WARNING] Invalid subrepo '
-                                        'revision ID:\n\t%s\n\n') % rev
-                                    opts['rev'][n] = rev[:-1]
-                            commands.log(_ui, srepo, **opts)
-                            logOutput += _ui.popbuffer()
-                        return hglib.tounicode(logOutput)
-
-                    opts = {'date':None, 'user':None, 'rev':[sfrom]}
-                    subabspath = os.path.join(repo.root, subrelpath)
-                    missingsub = srepo is None or not os.path.isdir(subabspath)
-                    sfromlog = ''
-                    def isinitialrevision(rev):
-                        return all([el == '0' for el in rev])
-                    if isinitialrevision(sfrom):
-                        sfrom = ''
-                    if isinitialrevision(sto):
-                        sto = ''
-                    header = ''
-                    if not sfrom and not sto:
-                        sstatedesc = 'new'
-                        out.append(_('Subrepo created and set to initial '
-                                     'revision.') + u'\n\n')
-                        return out, sstatedesc
-                    elif not sfrom:
-                        sstatedesc = 'new'
-                        header = _('Subrepo initialized to revision:') + u'\n\n'
-                    elif not sto:
-                        sstatedesc = 'removed'
-                        out.append(_('Subrepo removed from repository.')
-                                   + u'\n\n')
-                        out.append(_('Previously the subrepository was '
-                                     'at the following revision:') + u'\n\n')
-                        subinfo = getLog(_ui, srepo, {'rev': [sfrom]})
-                        slog = hglib.tounicode(subinfo)
-                        out.append(slog)
-                        return out, sstatedesc
-                    elif sfrom == sto:
-                        sstatedesc = 'unchanged'
-                        header = _('Subrepo was not changed.')
-                        slog = _('changeset: %s') % sfrom[:12] + u'\n'
-                        if missingsub:
-                            header = _('[WARNING] Missing subrepo. '
-                                   'Update to this revision to clone it.') \
-                                 + u'\n\n' + header
-                        else:
-                            try:
-                                slog = getLog(_ui, srepo, opts)
-                            except error.RepoError:
-                                header = _('[WARNING] Incomplete subrepo. '
-                                   'Update to this revision to pull it.') \
-                                 + u'\n\n' + header
-                        out.append(header + u' ')
-                        out.append(_('Subrepo state is:') + u'\n\n' + slog)
-                        return out, sstatedesc
-                    else:
-                        sstatedesc = 'changed'
-
-                        header = _('Revision has changed to:') + u'\n\n'
-                        sfromlog = _('changeset: %s') % sfrom[:12] + u'\n\n'
-                        if not missingsub:
-                            try:
-                                sfromlog = getLog(_ui, srepo, opts)
-                            except error.RepoError:
-                                sfromlog = _('changeset: %s '
-                                             '(not found on subrepository)') \
-                                                % sfrom[:12] + u'\n\n'
-                        sfromlog = _('From:') + u'\n' + sfromlog
-
-                    stolog = ''
-                    if missingsub:
-                        header = _(
-                            '[WARNING] Missing changed subrepository. '
-                            'Update to this revision to clone it.') \
-                            + u'\n\n' + header
-                        stolog = _('changeset: %s') % sto[:12] + '\n\n'
-                        sfromlog += _(
-                            'Subrepository not found in the working '
-                            'directory.') + '\n'
-                    else:
-                        try:
-                            opts['rev'] = [sto]
-                            stolog = getLog(_ui, srepo, opts)
-                        except error.RepoError:
-                            header = _(
-                                '[WARNING] Incomplete changed subrepository. '
-                                'Update to this revision to pull it.') \
-                                 + u'\n\n' + header
-                            stolog = _('changeset: %s '
-                                       '(not found on subrepository)') \
-                                     % sto[:12] + u'\n\n'
-                    out.append(header)
-                    out.append(stolog)
-
-                    if sfromlog:
-                        out.append(sfromlog)
-
-                    return out, sstatedesc
-
-                srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
-                srepo = None
-                subabspath = os.path.join(ctx._repo.root, wfile)
-                sactual = ''
-                if os.path.isdir(subabspath):
-                    try:
-                        sub = ctx.sub(wfile)
-                        if isinstance(sub, subrepo.hgsubrepo):
-                            srepo = sub._repo
-                            if srepo is not None:
-                                sactual = srepo['.'].hex()
-                        else:
-                            self.error = _('Not a Mercurial subrepo, not '
-                                           'previewable')
-                            return
-                    except util.Abort, e:
-                        self.error = (_('Error previewing subrepo: %s')
-                                      % hglib.tounicode(str(e))) + u'\n\n'
-                        self.error += _('Subrepo may be damaged or '
-                                        'inaccessible.')
-                        return
-                    except KeyError, e:
-                        # Missing, incomplete or removed subrepo.
-                        # Will be handled later as such below
-                        pass
-                out = []
-                _ui = uimod.ui()
-
-                if srepo is None or ctx.rev() is not None:
-                    data = []
-                else:
-                    _ui.pushbuffer()
-                    commands.status(_ui, srepo, modified=True, added=True,
-                                    removed=True, deleted=True)
-                    data = _ui.popbuffer()
-                    if data:
-                        out.append(_('The subrepository is dirty.') + u' '
-                                   + _('File Status:') + u'\n')
-                        out.append(hglib.tounicode(data))
-                        out.append(u'\n')
-
-                sstatedesc = 'changed'
-                if ctx.rev() is not None:
-                    sparent = ctx2.substate.get(wfile, subrepo.nullstate)[1]
-                    subrepochange, sstatedesc = \
-                        genSubrepoRevChangedDescription(wfile,
-                            sparent, srev, ctx._repo)
-                    out += subrepochange
-                else:
-                    sstatedesc = 'dirty'
-                    if srev != sactual:
-                        subrepochange, sstatedesc = \
-                            genSubrepoRevChangedDescription(wfile,
-                                srev, sactual, ctx._repo)
-                        out += subrepochange
-                        if data:
-                            sstatedesc += ' and dirty'
-                    elif srev and not sactual:
-                        sstatedesc = 'removed'
-                self.ucontents = u''.join(out).strip()
-
-                lbl = {
-                    'changed':   _('(is a changed sub-repository)'),
-                    'unchanged':   _('(is an unchanged sub-repository)'),
-                    'dirty':   _('(is a dirty sub-repository)'),
-                    'new':   _('(is a new sub-repository)'),
-                    'removed':   _('(is a removed sub-repository)'),
-                    'changed and dirty': _('(is a changed and dirty '
-                                           'sub-repository)'),
-                    'new and dirty':   _('(is a new and dirty sub-repository)'),
-                    'removed and dirty':   _('(is a removed sub-repository)')
-                }[sstatedesc]
-                self.flabel += ' <i>' + lbl + '</i>'
-                if sactual:
-                    lbl = ' <a href="repo:%%s">%s</a>' % _('open...')
-                    self.flabel += lbl % hglib.tounicode(srepo.root)
-            except (EnvironmentError, error.RepoError, util.Abort), e:
-                self.error = _('Error previewing subrepo: %s') % \
-                        hglib.tounicode(str(e))
-            return
-
-        # TODO: elif check if a subdirectory (for manifest tool)
 
         mde = _('File or diffs not displayed: '
                 'File is larger than the specified max size.\n'
@@ -419,7 +333,7 @@ class FileData(object):
             if ctx.hasStandin(wfile):
                 wfile = ctx.findStandin(wfile)
                 isbfile = True
-            res = self.checkMaxDiff(ctx, wfile, maxdiff, status, force)
+            res = self._checkMaxDiff(ctx, wfile, maxdiff, status, force)
             if res is None:
                 return
             fctx, newdata = res
@@ -436,17 +350,10 @@ class FileData(object):
                                     "<font color='red'>unset</font>")
 
         if status == 'A':
-            renamed = fctx.renamed()
+            renamed = self._checkRenamed(ctx, fctx)
             if not renamed:
-                self.flabel += _(' <i>(was added)</i>')
                 return
-
             oldname, node = renamed
-            fr = hglib.tounicode(oldname)
-            if oldname in ctx:
-                self.flabel += _(' <i>(copied from %s)</i>') % fr
-            else:
-                self.flabel += _(' <i>(renamed from %s)</i>') % fr
             olddata = repo.filectx(oldname, fileid=node).data()
         elif status == 'M':
             if wfile not in ctx2:
@@ -504,3 +411,355 @@ class FileData(object):
                              + difftext)
             else:
                 self.diff = ''
+
+    def diffText(self):
+        udiff = self._textToUnicode(self.diff or '')
+        if self.changes:
+            return udiff
+        return _trimdiffheader(udiff)
+
+
+class DirData(_AbstractFileData):
+
+    def load(self, changeselect=False, force=False):
+        self.error = None
+        self.flabel = u'<b>%s</b>' % self.filePath()
+
+        # TODO: enforce maxdiff before generating diff?
+        ctx = self._ctx
+        pctx = self._pctx
+        try:
+            m = ctx.match(['path:%s' % self._wfile])
+            self.diff = ''.join(ctx.diff(pctx, m))
+        except (EnvironmentError, util.Abort), e:
+            self.error = hglib.tounicode(str(e))
+            return
+
+        if not force:
+            self.error = _checkdifferror(self.diff, ctx._repo.maxdiff)
+            if self.error:
+                self.error += u'\n\n' + forcedisplaymsg
+
+    def isDir(self):
+        return True
+
+
+class PatchFileData(_AbstractFileData):
+
+    def load(self, changeselect=False, force=False):
+        ctx = self._ctx
+        wfile = self._wfile
+        maxdiff = ctx._repo.maxdiff
+
+        self.error = None
+        self.flabel = u'<b>%s</b>' % self.filePath()
+
+        try:
+            self.diff = ctx.thgmqpatchdata(wfile)
+            flags = ctx.flags(wfile)
+        except EnvironmentError, e:
+            self.error = hglib.tounicode(str(e))
+            return
+
+        if flags == 'x':
+            self.elabel = _("exec mode has been "
+                            "<font color='red'>set</font>")
+        elif flags == '-':
+            self.elabel = _("exec mode has been "
+                            "<font color='red'>unset</font>")
+        elif flags == 'l':
+            self.flabel += _(' <i>(is a symlink)</i>')
+
+        # Do not show patches that are too big or may be binary
+        if not force:
+            self.error = _checkdifferror(self.diff, maxdiff)
+            if self.error:
+                self.error += u'\n\n' + forcedisplaymsg
+
+    def rev(self):
+        # avoid mixing integer and localstr
+        return nullrev
+
+    def baseRev(self):
+        # patch has no comparison base
+        return nullrev
+
+    def diffText(self):
+        return _trimdiffheader(self._textToUnicode(self.diff or ''))
+
+
+class PatchDirData(_AbstractFileData):
+
+    def load(self, changeselect=False, force=False):
+        self.error = None
+        self.flabel = u'<b>%s</b>' % self.filePath()
+
+        ctx = self._ctx
+        try:
+            self.diff = ''.join([ctx.thgmqpatchdata(f) for f in ctx.files()
+                                 if f.startswith(self._wfile + '/')])
+        except EnvironmentError, e:
+            self.error = hglib.tounicode(str(e))
+            return
+
+        if not force:
+            self.error = _checkdifferror(self.diff, ctx._repo.maxdiff)
+            if self.error:
+                self.error += u'\n\n' + forcedisplaymsg
+
+    def rev(self):
+        # avoid mixing integer and localstr
+        return nullrev
+
+    def baseRev(self):
+        # patch has no comparison base
+        return nullrev
+
+    def isDir(self):
+        return True
+
+
+class SubrepoData(_AbstractFileData):
+
+    def __init__(self, ctx, pctx, path, status, rpath, subkind):
+        super(SubrepoData, self).__init__(ctx, pctx, path, status, rpath)
+        self._subkind = subkind
+
+    def load(self, changeselect=False, force=False):
+        ctx = self._ctx
+        ctx2 = self._pctx
+        if ctx2 is None:
+            ctx2 = ctx.p1()
+        wfile = self._wfile
+
+        self.error = None
+        self.flabel = u'<b>%s</b>' % self.filePath()
+
+        try:
+            def genSubrepoRevChangedDescription(subrelpath, sfrom, sto,
+                                                repo):
+                """Generate a subrepository revision change description"""
+                out = []
+                def getLog(_ui, srepo, opts):
+                    if srepo is None:
+                        return _('changeset: %s') % opts['rev'][0][:12]
+                    _ui.pushbuffer()
+                    logOutput = ''
+                    try:
+                        commands.log(_ui, srepo, **opts)
+                        logOutput = _ui.popbuffer()
+                        if not logOutput:
+                            return _('Initial revision') + u'\n'
+                    except error.ParseError, e:
+                        # Some mercurial versions have a bug that results in
+                        # saving a subrepo node id in the .hgsubstate file
+                        # which ends with a "+" character. If that is the
+                        # case, add a warning to the output, but try to
+                        # get the revision information anyway
+                        for n, rev in enumerate(opts['rev']):
+                            if rev.endswith('+'):
+                                logOutput += _('[WARNING] Invalid subrepo '
+                                    'revision ID:\n\t%s\n\n') % rev
+                                opts['rev'][n] = rev[:-1]
+                        commands.log(_ui, srepo, **opts)
+                        logOutput += _ui.popbuffer()
+                    return hglib.tounicode(logOutput)
+
+                opts = {'date':None, 'user':None, 'rev':[sfrom]}
+                subabspath = os.path.join(repo.root, subrelpath)
+                missingsub = srepo is None or not os.path.isdir(subabspath)
+                sfromlog = ''
+                def isinitialrevision(rev):
+                    return all([el == '0' for el in rev])
+                if isinitialrevision(sfrom):
+                    sfrom = ''
+                if isinitialrevision(sto):
+                    sto = ''
+                header = ''
+                if not sfrom and not sto:
+                    sstatedesc = 'new'
+                    out.append(_('Subrepo created and set to initial '
+                                 'revision.') + u'\n\n')
+                    return out, sstatedesc
+                elif not sfrom:
+                    sstatedesc = 'new'
+                    header = _('Subrepo initialized to revision:') + u'\n\n'
+                elif not sto:
+                    sstatedesc = 'removed'
+                    out.append(_('Subrepo removed from repository.')
+                               + u'\n\n')
+                    out.append(_('Previously the subrepository was '
+                                 'at the following revision:') + u'\n\n')
+                    subinfo = getLog(_ui, srepo, {'rev': [sfrom]})
+                    slog = hglib.tounicode(subinfo)
+                    out.append(slog)
+                    return out, sstatedesc
+                elif sfrom == sto:
+                    sstatedesc = 'unchanged'
+                    header = _('Subrepo was not changed.')
+                    slog = _('changeset: %s') % sfrom[:12] + u'\n'
+                    if missingsub:
+                        header = _('[WARNING] Missing subrepo. '
+                               'Update to this revision to clone it.') \
+                             + u'\n\n' + header
+                    else:
+                        try:
+                            slog = getLog(_ui, srepo, opts)
+                        except error.RepoError:
+                            header = _('[WARNING] Incomplete subrepo. '
+                               'Update to this revision to pull it.') \
+                             + u'\n\n' + header
+                    out.append(header + u' ')
+                    out.append(_('Subrepo state is:') + u'\n\n' + slog)
+                    return out, sstatedesc
+                else:
+                    sstatedesc = 'changed'
+
+                    header = _('Revision has changed to:') + u'\n\n'
+                    sfromlog = _('changeset: %s') % sfrom[:12] + u'\n\n'
+                    if not missingsub:
+                        try:
+                            sfromlog = getLog(_ui, srepo, opts)
+                        except error.RepoError:
+                            sfromlog = _('changeset: %s '
+                                         '(not found on subrepository)') \
+                                            % sfrom[:12] + u'\n\n'
+                    sfromlog = _('From:') + u'\n' + sfromlog
+
+                stolog = ''
+                if missingsub:
+                    header = _(
+                        '[WARNING] Missing changed subrepository. '
+                        'Update to this revision to clone it.') \
+                        + u'\n\n' + header
+                    stolog = _('changeset: %s') % sto[:12] + '\n\n'
+                    sfromlog += _(
+                        'Subrepository not found in the working '
+                        'directory.') + '\n'
+                else:
+                    try:
+                        opts['rev'] = [sto]
+                        stolog = getLog(_ui, srepo, opts)
+                    except error.RepoError:
+                        header = _(
+                            '[WARNING] Incomplete changed subrepository. '
+                            'Update to this revision to pull it.') \
+                             + u'\n\n' + header
+                        stolog = _('changeset: %s '
+                                   '(not found on subrepository)') \
+                                 % sto[:12] + u'\n\n'
+                out.append(header)
+                out.append(stolog)
+
+                if sfromlog:
+                    out.append(sfromlog)
+
+                return out, sstatedesc
+
+            srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
+            srepo = None
+            subabspath = os.path.join(ctx._repo.root, wfile)
+            sactual = ''
+            if os.path.isdir(subabspath):
+                try:
+                    sub = ctx.sub(wfile)
+                    if isinstance(sub, subrepo.hgsubrepo):
+                        srepo = sub._repo
+                        if srepo is not None:
+                            sactual = srepo['.'].hex()
+                    else:
+                        self.error = _('Not a Mercurial subrepo, not '
+                                       'previewable')
+                        return
+                except util.Abort, e:
+                    self.error = (_('Error previewing subrepo: %s')
+                                  % hglib.tounicode(str(e))) + u'\n\n'
+                    self.error += _('Subrepo may be damaged or '
+                                    'inaccessible.')
+                    return
+                except KeyError, e:
+                    # Missing, incomplete or removed subrepo.
+                    # Will be handled later as such below
+                    pass
+            out = []
+            _ui = uimod.ui()
+
+            if srepo is None or ctx.rev() is not None:
+                data = []
+            else:
+                _ui.pushbuffer()
+                commands.status(_ui, srepo, modified=True, added=True,
+                                removed=True, deleted=True)
+                data = _ui.popbuffer()
+                if data:
+                    out.append(_('The subrepository is dirty.') + u' '
+                               + _('File Status:') + u'\n')
+                    out.append(hglib.tounicode(data))
+                    out.append(u'\n')
+
+            sstatedesc = 'changed'
+            if ctx.rev() is not None:
+                sparent = ctx2.substate.get(wfile, subrepo.nullstate)[1]
+                subrepochange, sstatedesc = \
+                    genSubrepoRevChangedDescription(wfile,
+                        sparent, srev, ctx._repo)
+                out += subrepochange
+            else:
+                sstatedesc = 'dirty'
+                if srev != sactual:
+                    subrepochange, sstatedesc = \
+                        genSubrepoRevChangedDescription(wfile,
+                            srev, sactual, ctx._repo)
+                    out += subrepochange
+                    if data:
+                        sstatedesc += ' and dirty'
+                elif srev and not sactual:
+                    sstatedesc = 'removed'
+            self.ucontents = u''.join(out).strip()
+
+            lbl = {
+                'changed':   _('(is a changed sub-repository)'),
+                'unchanged':   _('(is an unchanged sub-repository)'),
+                'dirty':   _('(is a dirty sub-repository)'),
+                'new':   _('(is a new sub-repository)'),
+                'removed':   _('(is a removed sub-repository)'),
+                'changed and dirty': _('(is a changed and dirty '
+                                       'sub-repository)'),
+                'new and dirty':   _('(is a new and dirty sub-repository)'),
+                'removed and dirty':   _('(is a removed sub-repository)')
+            }[sstatedesc]
+            self.flabel += ' <i>' + lbl + '</i>'
+            if sactual:
+                lbl = ' <a href="repo:%%s">%s</a>' % _('open...')
+                self.flabel += lbl % hglib.tounicode(srepo.root)
+        except (EnvironmentError, error.RepoError, util.Abort), e:
+            self.error = _('Error previewing subrepo: %s') % \
+                    hglib.tounicode(str(e))
+
+    def isDir(self):
+        return True
+
+    def subrepoType(self):
+        return self._subkind
+
+
+def createFileData(ctx, ctx2, wfile, status=None, rpath=None):
+    if isinstance(ctx, patchctx.patchctx):
+        return PatchFileData(ctx, ctx2, wfile, status, rpath)
+    return FileData(ctx, ctx2, wfile, status, rpath)
+
+def createDirData(ctx, pctx, path, rpath=None):
+    if isinstance(ctx, patchctx.patchctx):
+        return PatchDirData(ctx, pctx, path, rpath=rpath)
+    return DirData(ctx, pctx, path, rpath=rpath)
+
+def createSubrepoData(ctx, pctx, path, status=None, rpath=None, subkind=None):
+    if not subkind:
+        subkind = ctx.substate.get(path, subrepo.nullstate)[2]
+    # TODO: replace 'S' by subrepo's status
+    return SubrepoData(ctx, pctx, path, 'S', rpath, subkind)
+
+def createNullData(repo):
+    ctx = repo[nullrev]
+    fd = FileData(ctx, ctx.p1(), '', 'C')
+    return fd

@@ -12,10 +12,8 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util
-
-from tortoisehg.hgqt import qtlib, revert, thgrepo, visdiff, customtools
-from tortoisehg.hgqt.filedialogs import FileLogDialog, FileDiffDialog
+from tortoisehg.hgqt import qtlib, revert, visdiff, customtools
+from tortoisehg.hgqt import filedata, filedialogs
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib
 
@@ -28,6 +26,10 @@ _actionsbytype = {
             None, 'explore', 'terminal', 'copypath'],
     }
 
+def _lcanonpaths(fds):
+    return [hglib.fromunicode(e.canonicalFilePath()) for e in fds]
+
+
 class FilectxActions(QObject):
     """Container for repository file actions"""
 
@@ -37,22 +39,19 @@ class FilectxActions(QObject):
 
     runCustomCommandRequested = pyqtSignal(str, list)
 
-    def __init__(self, repo, parent=None, rev=None):
+    def __init__(self, repoagent, parent=None):
         super(FilectxActions, self).__init__(parent)
         if parent is not None and not isinstance(parent, QWidget):
             raise ValueError('parent must be a QWidget')
 
-        self.repo = repo
-        self.ctx = self.repo[rev]
-        self._selectedfiles = []  # local encoding
-        self._currentfile = None  # local encoding
-        self._itemissubrepo = False
-        self._itemisdir = False
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
+        self._curfd = filedata.createNullData(repo)
+        self._selfds = []
 
         self._nav_dialogs = qtlib.DialogKeeper(FilectxActions._createnavdialog,
                                                FilectxActions._gennavdialogkey,
                                                self)
-        self._contextmenus = {}
 
         self._actions = {}
         for name, desc, icon, key, tip, cb in [
@@ -103,76 +102,65 @@ class FilectxActions(QObject):
 
         self._updateActions()
 
-    def setRepo(self, repo):
-        self.repo = repo
+    @property
+    def _ui(self):
+        repo = self._repoagent.rawRepo()
+        return repo.ui
 
-    def setRev(self, rev):
-        self.ctx = self.repo[rev]
-        self._updateActions()
+    def _fdRepoAgent(self):
+        rpath = self._curfd.repoRootPath()
+        if not rpath:
+            return self._repoagent
+        return self._repoagent.subRepoAgent(rpath)
 
     def _updateActions(self):
-        rev = self.ctx.rev()
-        real = type(rev) is int
-        wd = rev is None
-        for act in ['navigate', 'diffnavigate', 'ldiff', 'edit', 'save']:
+        real = self._curfd.rev() is not None and self._curfd.rev() >= 0
+        wd = self._curfd.rev() is None
+        singlefile = len(self._selfds) == 1 and not self._curfd.isDir()
+        for act in ['ldiff', 'edit', 'save']:
             self._actions[act].setEnabled(real)
         for act in ['diff', 'revert']:
             self._actions[act].setEnabled(real or wd)
+        for act in ['navigate', 'diffnavigate']:
+            self._actions[act].setEnabled(real and singlefile)
+        for act in ['opensubrepo']:
+            self._actions[act].setEnabled(self._curfd.subrepoType() == 'hg')
 
-    def setPaths(self, selectedfiles, currentfile=None, itemissubrepo=False,
-                 itemisdir=False):
-        """Set selected files [unicode]"""
-        self.setPaths_(map(hglib.fromunicode, selectedfiles),
-                       hglib.fromunicode(currentfile), itemissubrepo, itemisdir)
-
-    def setPaths_(self, selectedfiles, currentfile=None, itemissubrepo=False,
-                  itemisdir=False):
-        """Set selected files [local encoding]"""
-        if not currentfile and selectedfiles:
-            currentfile = selectedfiles[0]
-        self._selectedfiles = list(selectedfiles)
-        self._currentfile = currentfile
-        self._itemissubrepo = itemissubrepo
-        self._itemisdir = itemisdir
+    def setFileData(self, curfd, selfds=None):
+        self._curfd = curfd
+        if selfds:
+            self._selfds = list(selfds)
+        elif not curfd.isNull():
+            self._selfds = [curfd]
+        else:
+            self._selfds = []
+        self._updateActions()
 
     def actions(self):
         """List of the actions; The owner widget should register them"""
         return self._actions.values()
 
-    def menu(self):
-        """Menu for the current selection if available; otherwise None"""
-        # Subrepos and regular items have different context menus
-        if self._itemissubrepo:
-            contextmenu = self._cachedcontextmenu('subrepo')
-        elif self._itemisdir:
-            contextmenu = self._cachedcontextmenu('dir')
-        else:
-            contextmenu = self._cachedcontextmenu('file')
-
-        ln = len(self._selectedfiles)
-        if ln == 0:
+    def createMenu(self, parent=None):
+        """New menu for the current selection if available; otherwise None"""
+        if self._curfd.isNull():
             return
-        if ln > 1 and not self._itemissubrepo:
-            singlefileactions = False
+
+        # Subrepos and regular items have different context menus
+        if self._curfd.subrepoType():
+            return self._createMenuFor('subrepo', parent)
+        elif self._curfd.isDir():
+            return self._createMenuFor('dir', parent)
         else:
-            singlefileactions = True
-        self._actions['navigate'].setEnabled(singlefileactions)
-        self._actions['diffnavigate'].setEnabled(singlefileactions)
-        return contextmenu
+            return self._createMenuFor('file', parent)
 
-    def _cachedcontextmenu(self, key):
-        contextmenu = self._contextmenus.get(key)
-        if contextmenu:
-            return contextmenu
-
-        contextmenu = QMenu(self.parent())
+    def _createMenuFor(self, key, parent):
+        contextmenu = QMenu(parent)
         for act in _actionsbytype[key]:
             if act:
                 contextmenu.addAction(self._actions[act])
             else:
                 contextmenu.addSeparator()
         self._setupCustomSubmenu(contextmenu)
-        self._contextmenus[key] = contextmenu
         return contextmenu
 
     def _setupCustomSubmenu(self, menu):
@@ -183,15 +171,15 @@ class FilectxActions(QObject):
             return action
 
         menu.addSeparator()
-        customtools.addCustomToolsSubmenu(menu, self.repo.ui,
+        customtools.addCustomToolsSubmenu(menu, self._ui,
             location='workbench.filelist.custom-menu',
             make=make,
             slot=self._runCustomCommandByMenu)
 
     @pyqtSlot(QAction)
     def _runCustomCommandByMenu(self, action):
-        files = [file for file in self._selectedfiles
-                    if os.path.exists(self.repo.wjoin(file))]
+        files = [fd.filePath() for fd in self._selfds
+                 if os.path.exists(fd.absoluteFilePath())]
         if not files:
             qtlib.WarningMsgBox(_('File(s) not found'),
                 _('The selected files do not exist in the working directory'))
@@ -200,95 +188,18 @@ class FilectxActions(QObject):
             str(action.data().toString()), files)
 
     def navigate(self):
-        self._navigate(FileLogDialog)
+        self._navigate(filedialogs.FileLogDialog)
 
     def diffNavigate(self):
-        self._navigate(FileDiffDialog)
-
-    def filterfile(self):
-        """Ask to only show the revisions in which files on that folder are
-        present"""
-        if not self._selectedfiles:
-            return
-        self.filterRequested.emit("file('%s/**')" % self._selectedfiles[0])
-
-    def vdiff(self):
-        repo, filenames, rev = self._findsub(self._selectedfiles)
-        if not filenames:
-            return
-        if rev in repo.thgmqunappliedpatches:
-            QMessageBox.warning(self.parent(),
-                _("Cannot display visual diff"),
-                _("Visual diffs are not supported for unapplied patches"))
-            return
-        opts = {'change': rev}
-        dlg = visdiff.visualdiff(repo.ui, repo, filenames, opts)
-        if dlg:
-            dlg.exec_()
-
-    def vdifflocal(self):
-        repo, filenames, rev = self._findsub(self._selectedfiles)
-        if not filenames:
-            return
-        assert type(rev) is int
-        opts = {'rev': ['rev(%d)' % rev]}
-        dlg = visdiff.visualdiff(repo.ui, repo, filenames, opts)
-        if dlg:
-            dlg.exec_()
-
-    def editfile(self):
-        repo, filenames, rev = self._findsub(self._selectedfiles)
-        if not filenames:
-            return
-        if rev is None:
-            qtlib.editfiles(repo, filenames, parent=self.parent())
-        else:
-            base, _ = visdiff.snapshot(repo, filenames, repo[rev])
-            files = [os.path.join(base, filename)
-                     for filename in filenames]
-            qtlib.editfiles(repo, files, parent=self.parent())
-
-    def savefile(self):
-        repo, filenames, rev = self._findsub(self._selectedfiles)
-        if not filenames:
-            return
-        qtlib.savefiles(repo, filenames, rev, parent=self.parent())
-
-    def editlocal(self):
-        repo, filenames, _rev = self._findsub(self._selectedfiles)
-        if not filenames:
-            return
-        qtlib.editfiles(repo, filenames, parent=self.parent())
-
-    def openlocal(self):
-        repo, filenames, _rev = self._findsub(self._selectedfiles)
-        if not filenames:
-            return
-        qtlib.openfiles(repo, filenames)
-
-    def copypath(self):
-        absfiles = [util.localpath(self.repo.wjoin(f))
-                    for f in self._selectedfiles]
-        QApplication.clipboard().setText(
-            hglib.tounicode(os.linesep.join(absfiles)))
-
-    def revertfile(self):
-        repo, fileSelection, rev = self._findsub(self._selectedfiles)
-        if not fileSelection:
-            return
-        if rev is None:
-            rev = repo[rev].p1().rev()
-        repoagent = repo._pyqtobj  # TODO
-        dlg = revert.RevertDialog(repoagent, fileSelection, rev,
-                                  parent=self.parent())
-        dlg.exec_()
+        self._navigate(filedialogs.FileDiffDialog)
 
     def _navigate(self, dlgclass):
-        repo, filename, rev = self._findsubsingle(self._currentfile)
-        if filename and len(repo.file(filename)) > 0:
-            repoagent = repo._pyqtobj  # TODO
+        repoagent = self._fdRepoAgent()
+        repo = repoagent.rawRepo()
+        filename = hglib.fromunicode(self._curfd.canonicalFilePath())
+        if len(repo.file(filename)) > 0:
             dlg = self._nav_dialogs.open(dlgclass, repoagent, filename)
-            dlg.goto(rev)
+            dlg.goto(self._curfd.rev())
 
     def _createnavdialog(self, dlgclass, repoagent, filename):
         return dlgclass(repoagent, filename)
@@ -297,52 +208,104 @@ class FilectxActions(QObject):
         repo = repoagent.rawRepo()
         return dlgclass, repo.wjoin(filename)
 
-    def _findsub(self, paths):
-        """Find the nearest (sub-)repository for the given paths
+    def filterfile(self):
+        """Ask to only show the revisions in which files on that folder are
+        present"""
+        if self._curfd.isNull():
+            return
+        pats = ["file('path:%s')" % fd.filePath() for fd in self._selfds]
+        self.filterRequested.emit(' or '.join(pats))
 
-        All paths should be in the same repository. Otherwise, unmatched
-        paths are silently omitted.
-        """
-        if not paths:
-            return self.repo, [], self.ctx.rev()
+    def vdiff(self):
+        if self._curfd.rev() is not None and self._curfd.rev() < 0:
+            QMessageBox.warning(self.parent(),
+                _("Cannot display visual diff"),
+                _("Visual diffs are not supported for unapplied patches"))
+            return
+        self._visualDiff(change=self._curfd.rev())
 
-        repopath, _relpath, ctx = hglib.getDeepestSubrepoContainingFile(
-            paths[0], self.ctx)
-        if not repopath:
-            return self.repo, paths, self.ctx.rev()
+    def vdifflocal(self):
+        assert self._curfd.rev() is not None
+        self._visualDiff(rev=['rev(%d)' % self._curfd.rev()])
 
-        repo = thgrepo.repository(self.repo.ui, self.repo.wjoin(repopath))
-        pfx = repopath + '/'
-        relpaths = [e[len(pfx):] for e in paths if e.startswith(pfx)]
-        return repo, relpaths, ctx.rev()
+    def _visualDiff(self, **opts):
+        if self._curfd.isNull():
+            return
+        repo = self._fdRepoAgent().rawRepo()
+        filenames = _lcanonpaths(self._selfds)
+        dlg = visdiff.visualdiff(repo.ui, repo, filenames, opts)
+        if dlg:
+            dlg.exec_()
 
-    def _findsubsingle(self, path):
-        if not path:
-            return self.repo, None, self.ctx.rev()
-        repo, relpaths, rev = self._findsub([path])
-        return repo, relpaths[0], rev
+    def editfile(self):
+        if self._curfd.isNull():
+            return
+        repo = self._fdRepoAgent().rawRepo()
+        filenames = _lcanonpaths(self._selfds)
+        if self._curfd.rev() is None:
+            qtlib.editfiles(repo, filenames, parent=self.parent())
+        else:
+            ctx = self._curfd.rawContext()
+            base, _ = visdiff.snapshot(repo, filenames, ctx)
+            files = [os.path.join(base, filename)
+                     for filename in filenames]
+            qtlib.editfiles(repo, files, parent=self.parent())
+
+    def savefile(self):
+        if self._curfd.isNull():
+            return
+        repo = self._fdRepoAgent().rawRepo()
+        filenames = _lcanonpaths(self._selfds)
+        rev = self._curfd.rev()
+        qtlib.savefiles(repo, filenames, rev, parent=self.parent())
+
+    def editlocal(self):
+        if self._curfd.isNull():
+            return
+        repo = self._fdRepoAgent().rawRepo()
+        filenames = _lcanonpaths(self._selfds)
+        qtlib.editfiles(repo, filenames, parent=self.parent())
+
+    def openlocal(self):
+        if self._curfd.isNull():
+            return
+        repo = self._fdRepoAgent().rawRepo()
+        filenames = _lcanonpaths(self._selfds)
+        qtlib.openfiles(repo, filenames)
+
+    def copypath(self):
+        paths = [fd.absoluteFilePath() for fd in self._selfds]
+        QApplication.clipboard().setText(os.linesep.join(paths))
+
+    def revertfile(self):
+        if self._curfd.isNull():
+            return
+        repoagent = self._fdRepoAgent()
+        fileSelection = _lcanonpaths(self._selfds)
+        rev = self._curfd.rev()
+        if rev is None:
+            repo = repoagent.rawRepo()
+            rev = repo[rev].p1().rev()
+        dlg = revert.RevertDialog(repoagent, fileSelection, rev,
+                                  parent=self.parent())
+        dlg.exec_()
 
     def opensubrepo(self):
-        path = os.path.join(self.repo.root, self._currentfile)
-        spath = path[len(self.repo.root)+1:]
-        if spath in self.ctx.substate and os.path.isdir(path):
-            source, revid, stype = self.ctx.substate[spath]
-            link = u'repo:' + hglib.tounicode(path)
-            if stype == 'hg':
-                link = u'%s?%s' % (link, revid)
-            self.linkActivated.emit(link)
-        else:
-            QMessageBox.warning(self.parent(),
-                _("Cannot open subrepository"),
-                _("The selected subrepository does not exist on the working "
-                  "directory"))
+        fd = self._curfd
+        if fd.subrepoType() != 'hg':
+            return
+        ctx = fd.rawContext()
+        spath = hglib.fromunicode(fd.canonicalFilePath())
+        revid = ctx.substate[spath][1]
+        link = 'repo:%s?%s' % (fd.absoluteFilePath(), revid)
+        self.linkActivated.emit(link)
 
     def explore(self):
-        root = self.repo.wjoin(self._currentfile)
-        if os.path.isdir(root):
-            qtlib.openlocalurl(root)
+        if self._curfd.isDir():
+            qtlib.openlocalurl(self._curfd.absoluteFilePath())
 
     def terminal(self):
-        root = self.repo.wjoin(self._currentfile)
-        if os.path.isdir(root):
-            qtlib.openshell(root, self._currentfile, self.repo.ui)
+        if self._curfd.isDir():
+            root = hglib.fromunicode(self._curfd.absoluteFilePath())
+            currentfile = hglib.fromunicode(self._curfd.filePath())
+            qtlib.openshell(root, currentfile, self._ui)

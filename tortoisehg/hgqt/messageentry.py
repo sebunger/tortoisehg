@@ -202,7 +202,7 @@ class MessageEntry(qscilib.Scintilla):
         outlines = QStringList()
         line = QStringList()
         partslen = indentcount - 1
-        newcurline, newcurcol = b, 0
+        newcurlinenum, newcurcol = b, 0
         for part in parts:
             if MARKER and MARKER in part:
                 # wherever the marker is found, that is where the cursor

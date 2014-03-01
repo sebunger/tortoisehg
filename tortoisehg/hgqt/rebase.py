@@ -12,12 +12,12 @@ import os
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, cmdui, resolve, thgrepo, wctxcleaner
+from tortoisehg.hgqt import qtlib, csinfo, resolve, thgrepo, wctxcleaner
+from tortoisehg.hgqt import cmdcore, cmdui
 
 BB = QDialogButtonBox
 
 class RebaseDialog(QDialog):
-    showMessage = pyqtSignal(QString)
 
     def __init__(self, repoagent, parent, **opts):
         super(RebaseDialog, self).__init__(parent)
@@ -25,9 +25,9 @@ class RebaseDialog(QDialog):
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint)
         self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
         repo = repoagent.rawRepo()
         self.opts = opts
-        self.aborted = False
 
         box = QVBoxLayout()
         box.setSpacing(8)
@@ -54,10 +54,10 @@ class RebaseDialog(QDialog):
         self.destcsinfo = dest
         self.layout().addWidget(destb)
 
-        swaplabel = QLabel('<a href="X">%s</a>'  # don't care href
+        self.swaplabel = QLabel('<a href="X">%s</a>'  # don't care href
                            % _('Swap source and destination'))
-        swaplabel.linkActivated.connect(self.swap)
-        self.layout().addWidget(swaplabel)
+        self.swaplabel.linkActivated.connect(self.swap)
+        self.layout().addWidget(self.swaplabel)
 
         sep = qtlib.LabeledSeparator(_('Options'))
         self.layout().addWidget(sep)
@@ -83,18 +83,18 @@ class RebaseDialog(QDialog):
             repo.ui.configbool('tortoisehg', 'autoresolve', False))
         self.layout().addWidget(self.autoresolvechk)
 
-        if 'hgsubversion' in repo.extensions():
-            self.svnchk = QCheckBox(_('Rebase unpublished onto Subversion head '
-                                      '(override source, destination)'))
-            self.layout().addWidget(self.svnchk)
-        else:
-            self.svnchk = None
+        self.svnchk = QCheckBox(_('Rebase unpublished onto Subversion head '
+                                  '(override source, destination)'))
+        self.svnchk.setVisible('hgsubversion' in repo.extensions())
+        self.layout().addWidget(self.svnchk)
 
-        self.cmd = cmdui.Widget(True, True, self)
-        self.cmd.commandFinished.connect(self.commandFinished)
-        self.showMessage.connect(self.cmd.stbar.showMessage)
-        self.cmd.stbar.linkActivated.connect(self.linkActivated)
-        self.layout().addWidget(self.cmd, 2)
+        self._cmdlog = cmdui.LogWidget(self)
+        self._cmdlog.hide()
+        self.layout().addWidget(self._cmdlog, 2)
+        self._stbar = cmdui.ThgStatusBar(self)
+        self._stbar.setSizeGripEnabled(False)
+        self._stbar.linkActivated.connect(self.linkActivated)
+        self.layout().addWidget(self._stbar)
 
         bbox = QDialogButtonBox()
         self.cancelbtn = bbox.addButton(QDialogButtonBox.Cancel)
@@ -114,9 +114,9 @@ class RebaseDialog(QDialog):
             for w in (srcb, destb, sep, self.keepchk,
                       self.collapsechk, self.keepbrancheschk):
                 w.setHidden(True)
-            self.cmd.setShowOutput(True)
+            self._cmdlog.show()
         else:
-            self.showMessage.emit(_('Checking...'))
+            self._stbar.showMessage(_('Checking...'))
             self.abortbtn.setEnabled(False)
             self.rebasebtn.setEnabled(False)
             QTimer.singleShot(0, self._wctxcleaner.check)
@@ -124,7 +124,7 @@ class RebaseDialog(QDialog):
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
         self.resize(0, 340)
-        self.setWindowTitle(_('Rebase - %s') % self.repo.displayname)
+        self.setWindowTitle(_('Rebase - %s') % repoagent.displayName())
 
     @property
     def repo(self):
@@ -140,7 +140,7 @@ class RebaseDialog(QDialog):
         else:
             self.rebasebtn.setEnabled(True)
             txt = _('You may continue the rebase')
-        self.showMessage.emit(txt)
+        self._stbar.showMessage(txt)
 
     def rebase(self):
         self.rebasebtn.setEnabled(False)
@@ -149,29 +149,29 @@ class RebaseDialog(QDialog):
         self.keepbrancheschk.setEnabled(False)
         self.basechk.setEnabled(False)
         self.collapsechk.setEnabled(False)
-        cmdline = ['rebase', '--repository', self.repo.root]
-        cmdline += ['--config', 'ui.merge=internal:' +
-                    (self.autoresolvechk.isChecked() and 'merge' or 'fail')]
+        self.swaplabel.setVisible(False)
+
+        itool = self.autoresolvechk.isChecked() and 'merge' or 'fail'
+        opts = {'config': 'ui.merge=internal:%s' % itool}
         if os.path.exists(self.repo.join('rebasestate')):
-            cmdline += ['--continue']
+            opts['continue'] = True
         else:
-            if self.keepchk.isChecked():
-                cmdline += ['--keep']
-            if self.keepbrancheschk.isChecked():
-                cmdline += ['--keepbranches']
-            if self.collapsechk.isChecked():
-                cmdline += ['--collapse']
-            if self.svnchk is not None and self.svnchk.isChecked():
-                cmdline += ['--svn']
+            opts.update({
+                'keep': self.keepchk.isChecked(),
+                'keepbranches': self.keepbrancheschk.isChecked(),
+                'collapse': self.collapsechk.isChecked(),
+                })
+            if self.svnchk.isChecked():
+                opts['svn'] = True
             else:
-                source = self.opts.get('source')
-                dest = self.opts.get('dest')
-                sourcearg = '--source'
+                sourcearg = 'source'
                 if self.basechk.isChecked():
-                    sourcearg = '--base'
-                cmdline += [sourcearg, str(source), '--dest', str(dest)]
-        self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
+                    sourcearg = 'base'
+                opts[sourcearg] = hglib.tounicode(str(self.opts.get('source')))
+                opts['dest'] = hglib.tounicode(str(self.opts.get('dest')))
+        cmdline = hglib.buildcmdargs('rebase', **opts)
+        sess = self._runCommand(cmdline)
+        sess.commandFinished.connect(self._rebaseFinished)
 
     def swap(self):
         oldsource = self.opts.get('source', '.')
@@ -184,27 +184,41 @@ class RebaseDialog(QDialog):
         self.opts['dest'] = oldsource
 
     def abort(self):
-        cmdline = ['rebase', '--repository', self.repo.root, '--abort']
-        self.repo.incrementBusyCount()
-        self.aborted = True
-        self.cmd.run(cmdline)
+        cmdline = hglib.buildcmdargs('rebase', abort=True)
+        sess = self._runCommand(cmdline)
+        sess.commandFinished.connect(self._abortFinished)
 
-    def commandFinished(self, ret):
-        self.repo.decrementBusyCount()
+    def _runCommand(self, cmdline):
+        assert self._cmdsession.isFinished()
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.outputReceived.connect(self._cmdlog.appendLog)
+        sess.progressReceived.connect(self._stbar.progress)
+        cmdui.updateStatusMessage(self._stbar, sess)
+        return sess
+
+    @pyqtSlot(int)
+    def _rebaseFinished(self, ret):
         # TODO since hg 2.6, rebase will end with ret=1 in case of "unresolved
         # conflicts", so we can fine-tune checkResolve() later.
         if self.checkResolve() is False:
             msg = _('Rebase is complete')
-            if self.aborted:
-                msg = _('Rebase aborted')
-            elif ret == 255:
+            if ret == 255:
                 msg = _('Rebase failed')
-                self.cmd.setShowOutput(True)  # contains hint
-            self.showMessage.emit(msg)
-            self.rebasebtn.setEnabled(True)
-            self.rebasebtn.setText(_('Close'))
-            self.rebasebtn.clicked.disconnect(self.rebase)
-            self.rebasebtn.clicked.connect(self.accept)
+                self._cmdlog.show()  # contains hint
+            self._stbar.showMessage(msg)
+            self._makeCloseButton()
+
+    @pyqtSlot()
+    def _abortFinished(self):
+        if self.checkResolve() is False:
+            self._stbar.showMessage(_('Rebase aborted'))
+            self._makeCloseButton()
+
+    def _makeCloseButton(self):
+        self.rebasebtn.setEnabled(True)
+        self.rebasebtn.setText(_('Close'))
+        self.rebasebtn.clicked.disconnect(self.rebase)
+        self.rebasebtn.clicked.connect(self.accept)
 
     def checkResolve(self):
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
@@ -216,9 +230,10 @@ class RebaseDialog(QDialog):
         else:
             self.rebasebtn.setEnabled(True)
             txt = _('You may continue the rebase')
-        self.showMessage.emit(txt)
+        self._stbar.showMessage(txt)
 
         if os.path.exists(self.repo.join('rebasestate')):
+            self.swaplabel.setVisible(False)
             self.abortbtn.setEnabled(True)
             self.rebasebtn.setText('Continue')
             return True

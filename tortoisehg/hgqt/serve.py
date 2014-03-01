@@ -17,7 +17,7 @@ from tortoisehg.hgqt.webconf import WebconfForm
 
 class ServeDialog(QDialog):
     """Dialog for serving repositories via web"""
-    def __init__(self, webconf, parent=None):
+    def __init__(self, ui, webconf, parent=None):
         super(ServeDialog, self).__init__(parent)
         self.setWindowFlags((self.windowFlags() | Qt.WindowMinimizeButtonHint)
                             & ~Qt.WindowContextHelpButtonHint)
@@ -28,15 +28,15 @@ class ServeDialog(QDialog):
         self._qui.setupUi(self)
 
         self._initwebconf(webconf)
-        self._initcmd()
+        self._initcmd(ui)
         self._initactions()
         self._updateform()
 
-    def _initcmd(self):
+    def _initcmd(self, ui):
         # TODO: forget old logs?
         self._log_edit = cmdui.LogWidget(self)
         self._qui.details_tabs.addTab(self._log_edit, _('Log'))
-        self._agent = cmdcore.CmdAgent(self)
+        self._agent = cmdcore.CmdAgent(ui, self)
         self._agent.outputReceived.connect(self._log_edit.appendLog)
         self._agent.busyChanged.connect(self._updateform)
 
@@ -220,7 +220,7 @@ def _readconfig(ui, repopath, webconfpath):
                 c.set('paths', '/', repopath)
             else:
                 # since hg 8cbb59124e67, path entry is parsed as a list
-                base = lui.config('web', 'name') or os.path.basename(repopath)
+                base = hglib.shortreponame(lui) or os.path.basename(repopath)
                 c.set('paths', base,
                       _asconfigliststr(os.path.join(repopath, '**')))
         except (EnvironmentError, error.Abort, error.RepoError):
@@ -234,7 +234,7 @@ def run(ui, *pats, **opts):
     webconfpath = opts.get('web_conf') or opts.get('webdir_conf')
 
     lui, webconf = _readconfig(ui, repopath, webconfpath)
-    dlg = ServeDialog(webconf=webconf)
+    dlg = ServeDialog(lui, webconf=webconf)
     try:
         dlg.setport(int(lui.config('web', 'port', '8000')))
     except ValueError:

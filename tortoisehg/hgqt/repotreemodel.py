@@ -391,10 +391,10 @@ class RepoTreeModel(QAbstractItemModel):
 
     @pyqtSlot(unicode)
     def _updateShortName(self, uroot):
-        repo = self._repomanager.repoAgent(uroot).rawRepo()
+        repoagent = self._repomanager.repoAgent(uroot)
         it = self.getRepoItem(hglib.fromunicode(uroot))
         if it:
-            it.setShortName(repo.shortname)
+            it.setShortName(repoagent.shortName())
             self._emitItemDataChanged(it)
 
     @pyqtSlot(unicode)

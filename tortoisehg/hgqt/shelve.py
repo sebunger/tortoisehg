@@ -29,7 +29,6 @@ class ShelveDialog(QDialog):
         self.setWindowIcon(qtlib.geticon('shelve'))
 
         self._repoagent = repoagent
-        repo = repoagent.rawRepo()
         self.shelves = []
         self.patches = []
 
@@ -73,7 +72,7 @@ class ShelveDialog(QDialog):
         ahbox.addWidget(self.clearShelfButtonA)
         ahbox.addWidget(self.delShelfButtonA)
 
-        self.browsea = chunks.ChunksWidget(self._repoagent, self, True)
+        self.browsea = chunks.ChunksWidget(self._repoagent, self)
         self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
         self.browsea.linkActivated.connect(self.linkActivated)
         self.browsea.showMessage.connect(self.showMessage)
@@ -103,7 +102,7 @@ class ShelveDialog(QDialog):
         bhbox.addWidget(self.clearShelfButtonB)
         bhbox.addWidget(self.delShelfButtonB)
 
-        self.browseb = chunks.ChunksWidget(self._repoagent, self, True)
+        self.browseb = chunks.ChunksWidget(self._repoagent, self)
         self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
         self.browseb.linkActivated.connect(self.linkActivated)
         self.browseb.showMessage.connect(self.showMessage)
@@ -194,7 +193,8 @@ class ShelveDialog(QDialog):
         self.refreshCombos()
         repoagent.repositoryChanged.connect(self.refreshCombos)
 
-        self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
+        self.setWindowTitle(_('TortoiseHg Shelve - %s')
+                            % repoagent.displayName())
         self.restoreSettings()
 
     @property

@@ -33,9 +33,8 @@ class HgignoreDialog(QDialog):
             | Qt.WindowMaximizeButtonHint)
 
         self._repoagent = repoagent
-        repo = repoagent.rawRepo()
         self.pats = pats
-        self.setWindowTitle(_('Ignore filter - %s') % repo.displayname)
+        self.setWindowTitle(_('Ignore filter - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('ignore'))
 
         vbox = QVBoxLayout()
@@ -57,6 +56,7 @@ class HgignoreDialog(QDialog):
         hbox.addWidget(add, 0)
 
         # layer 2
+        repo = repoagent.rawRepo()
         hbox = QHBoxLayout()
         vbox.addLayout(hbox)
         ignorefiles = [repo.wjoin('.hgignore')]

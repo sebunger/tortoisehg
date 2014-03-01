@@ -10,24 +10,24 @@ from PyQt4.QtGui import *
 
 import os
 
+from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, resolve, thgrepo, wctxcleaner
+from tortoisehg.hgqt import qtlib, cmdcore, cmdui, resolve, thgrepo, wctxcleaner
 from tortoisehg.hgqt import csinfo, cslist
 
 BB = QDialogButtonBox
 
 class GraftDialog(QDialog):
-    showMessage = pyqtSignal(QString)
 
     def __init__(self, repoagent, parent, **opts):
         super(GraftDialog, self).__init__(parent)
         self.setWindowIcon(qtlib.geticon('hg-transplant'))
-        f = self.windowFlags()
-        self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint)
 
         self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
         self._graftstatefile = self.repo.join('graftstate')
-        self.aborted = False
         self.valid = True
 
         def cleanrevlist(revlist):
@@ -61,7 +61,7 @@ class GraftDialog(QDialog):
         destrev = self.repo['.'].rev()
         if len(self.sourcelist) > 1:
             listlabel = qtlib.LabeledSeparator(
-                _('Graft %d changesets on top of changeset %s') \
+                _('Graft %d changesets on top of changeset %s')
                 % (len(self.sourcelist), destrev))
             self.layout().addWidget(listlabel)
             self.cslist = cslist.ChangesetList(self.repo)
@@ -78,7 +78,7 @@ class GraftDialog(QDialog):
         srcb.layout().addWidget(self.source)
         self.layout().addWidget(srcb)
 
-        destb = QGroupBox( _('To graft destination'))
+        destb = QGroupBox(_('To graft destination'))
         destb.setLayout(QVBoxLayout())
         destb.layout().setContentsMargins(*(2,)*4)
         dest = csinfo.create(self.repo, destrev, style, withupdate=True)
@@ -99,26 +99,26 @@ class GraftDialog(QDialog):
         self.logvechk = QCheckBox(_('Append graft info to log message'))
         self.layout().addWidget(self.logvechk)
 
-        self.autoresolvechk = QCheckBox(_('Automatically resolve merge conflicts '
-                                           'where possible'))
+        self.autoresolvechk = QCheckBox(_('Automatically resolve merge '
+                                          'conflicts where possible'))
         self.autoresolvechk.setChecked(
             self.repo.ui.configbool('tortoisehg', 'autoresolve', False))
         self.layout().addWidget(self.autoresolvechk)
 
-        self.cmd = cmdui.Widget(True, True, self)
-        self.cmd.commandFinished.connect(self.commandFinished)
-        self.showMessage.connect(self.cmd.stbar.showMessage)
-        self.cmd.stbar.linkActivated.connect(self.linkActivated)
-        self.layout().addWidget(self.cmd, 2)
+        self._cmdlog = cmdui.LogWidget(self)
+        self._cmdlog.hide()
+        self.layout().addWidget(self._cmdlog, 2)
+        self._stbar = cmdui.ThgStatusBar(self)
+        self._stbar.setSizeGripEnabled(False)
+        self._stbar.linkActivated.connect(self.linkActivated)
+        self.layout().addWidget(self._stbar)
 
         bbox = QDialogButtonBox()
         self.cancelbtn = bbox.addButton(QDialogButtonBox.Cancel)
         self.cancelbtn.clicked.connect(self.reject)
-        self.graftbtn = bbox.addButton(_('Graft'),
-                                            QDialogButtonBox.ActionRole)
+        self.graftbtn = bbox.addButton(_('Graft'), QDialogButtonBox.ActionRole)
         self.graftbtn.clicked.connect(self.graft)
-        self.abortbtn = bbox.addButton(_('Abort'),
-                                            QDialogButtonBox.ActionRole)
+        self.abortbtn = bbox.addButton(_('Abort'), QDialogButtonBox.ActionRole)
         self.abortbtn.clicked.connect(self.abort)
         self.layout().addWidget(bbox)
         self.bbox = bbox
@@ -128,7 +128,7 @@ class GraftDialog(QDialog):
         if self.checkResolve():
             self.abortbtn.setEnabled(True)
         else:
-            self.showMessage.emit(_('Checking...'))
+            self._stbar.showMessage(_('Checking...'))
             self.abortbtn.setEnabled(False)
             self.graftbtn.setEnabled(False)
             QTimer.singleShot(0, self._wctxcleaner.check)
@@ -136,7 +136,7 @@ class GraftDialog(QDialog):
         self.setMinimumWidth(480)
         self.setMaximumHeight(800)
         self.resize(0, 340)
-        self.setWindowTitle(_('Graft - %s') % self.repo.displayname)
+        self.setWindowTitle(_('Graft - %s') % repoagent.displayName())
 
     @property
     def repo(self):
@@ -164,37 +164,33 @@ class GraftDialog(QDialog):
         else:
             self.graftbtn.setEnabled(True)
             txt = _('You may continue or start the graft')
-        self.showMessage.emit(txt)
+        self._stbar.showMessage(txt)
 
     def graft(self):
         self.graftbtn.setEnabled(False)
         self.cancelbtn.setShown(False)
-        cmdline = ['graft', '--repository', self.repo.root]
-        cmdline += ['--config', 'ui.merge=internal:' +
-                    (self.autoresolvechk.isChecked() and 'merge' or 'fail')]
-        if self.currentuservechk.isChecked():
-            cmdline += ['--currentuser']
-        if self.currentdatevechk.isChecked():
-            cmdline += ['--currentdate']
-        if self.logvechk.isChecked():
-            cmdline += ['--log']
+        itool = self.autoresolvechk.isChecked() and 'merge' or 'fail'
+        opts = {'config': 'ui.merge=internal:%s' % itool,
+                'currentuser': self.currentuservechk.isChecked(),
+                'currentdate': self.currentdatevechk.isChecked(),
+                'log': self.logvechk.isChecked()}
         if os.path.exists(self._graftstatefile):
-            cmdline += ['--continue']
+            opts['continue'] = True
+            args = []
         else:
-            for source in self.sourcelist:
-                cmdline += [str(source)]
-        self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
+            args = [hglib.tounicode(str(s)) for s in self.sourcelist]
+        cmdline = hglib.buildcmdargs('graft', *args, **opts)
+        sess = self._runCommand(cmdline)
+        sess.commandFinished.connect(self._graftFinished)
 
     def abort(self):
         self.abortbtn.setDisabled(True)
         if os.path.exists(self._graftstatefile):
             # Remove the existing graftstate file!
             os.remove(self._graftstatefile)
-        cmdline = ['update', '--repository', self.repo.root, '--clean', '--rev', 'p1()']
-        self.repo.incrementBusyCount()
-        self.aborted = True
-        self.cmd.run(cmdline)
+        cmdline = hglib.buildcmdargs('update', clean=True, rev='p1()')
+        sess = self._runCommand(cmdline)
+        sess.commandFinished.connect(self._abortFinished)
 
     def graftstate(self):
         graftstatefile = self.repo.join('graftstate')
@@ -209,22 +205,37 @@ class GraftDialog(QDialog):
                     return revlist
         return None
 
-    def commandFinished(self, ret):
-        self.repo.decrementBusyCount()
-        if  self.aborted or self.checkResolve() is False:
+    def _runCommand(self, cmdline):
+        assert self._cmdsession.isFinished()
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.outputReceived.connect(self._cmdlog.appendLog)
+        sess.progressReceived.connect(self._stbar.progress)
+        cmdui.updateStatusMessage(self._stbar, sess)
+        return sess
+
+    @pyqtSlot(int)
+    def _graftFinished(self, ret):
+        if self.checkResolve() is False:
             msg = _('Graft is complete')
-            if self.aborted:
-                msg = _('Graft aborted')
-            elif ret == 255:
+            if ret == 255:
                 msg = _('Graft failed')
-                self.cmd.setShowOutput(True)  # contains hint
+                self._cmdlog.show()  # contains hint
             else:
                 self._updateSource(len(self.sourcelist) - 1)
-            self.showMessage.emit(msg)
-            self.graftbtn.setEnabled(True)
-            self.graftbtn.setText(_('Close'))
-            self.graftbtn.clicked.disconnect(self.graft)
-            self.graftbtn.clicked.connect(self.accept)
+            self._stbar.showMessage(msg)
+            self._makeCloseButton()
+
+    @pyqtSlot()
+    def _abortFinished(self):
+        if self.checkResolve() is False:
+            self._stbar.showMessage(_('Graft aborted'))
+            self._makeCloseButton()
+
+    def _makeCloseButton(self):
+        self.graftbtn.setEnabled(True)
+        self.graftbtn.setText(_('Close'))
+        self.graftbtn.clicked.disconnect(self.graft)
+        self.graftbtn.clicked.connect(self.accept)
 
     def checkResolve(self):
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
@@ -236,7 +247,7 @@ class GraftDialog(QDialog):
         else:
             self.graftbtn.setEnabled(True)
             txt = _('You may continue the graft')
-        self.showMessage.emit(txt)
+        self._stbar.showMessage(txt)
 
         currgraftrevs = self.graftstate()
         if currgraftrevs:

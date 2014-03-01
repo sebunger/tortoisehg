@@ -29,11 +29,11 @@ class DetectRenameDialog(QDialog):
         QDialog.__init__(self, parent)
 
         self._repoagent = repoagent
-        repo = repoagent.rawRepo()
         self.pats = pats
         self.thread = None
 
-        self.setWindowTitle(_('Detect Copies/Renames in %s') % repo.displayname)
+        self.setWindowTitle(_('Detect Copies/Renames in %s')
+                            % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('detect_rename'))
         self.setWindowFlags(Qt.Window)
 

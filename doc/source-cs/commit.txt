@@ -4,7 +4,7 @@ Commit
 .. module:: commit.dialog
     :synopsis: Dialog used to perform commit
 
-Commit je druhá nejvíce používaná procedura po Verpánku. Tento nástroj provede nejenom požadované předání (commit), ale umí také přezkoumat stav pracovního adresáře a provádět nejběžnější udržovací úlohy, jako je přidání nových souborů, zjistit přejmenování a manipulovat s filtrem pro ignorování souborů.
+Commit je druhá nejvíce používaná procedura po Verpánku. Tento nástroj provede nejenom požadovanou registraci změn (commit), ale umí také přezkoumat stav pracovního adresáře a provádět nejběžnější prvozní  úlohy, jako je přidání nových souborů, zjistit přejmenování souborů a manipulovat s filtrem pro ignorování souborů.
 
 
 .. figure:: figures/commit.png
@@ -15,95 +15,140 @@ Commit je druhá nejvíce používaná procedura po Verpánku. Tento nástroj pr
 Popis prvků
 -----------
 
-Výčet prvků nástrojové lišty nahoře:
+Výčet prvků nástrojové lišty úlohy komit:
 
 	:guilabel:`### filter text ###`
-		Pole pro zadání filtrovacího řetězce.
+		Pole pro zadání filtrovacího řetězce pro vyhledání souborů.
 	:guilabel:`Status`
-		Rozvinovací seznam různých módů souborů. V panelu se seznamem souborů se zobrazí pouze ty soubory, jejichž módy jsou v seznamu Status zatrženy.
-		Označení *Removed* znamená, že revizovaný soubor byl označen jako smazaný.
-		Označení *Deleted* znamená, že revizovaný soubor chybí ale Mercurial nebyl požádán, aby přestal tento soubor sledovat. Když napřiklad přejmenujete revizovaný soubor ve Windows Exploreru, objeví se jako smazaný a jeho nové jméno jako neznámé. Pravým poklepem na novém názvu vyvoláme dialog, ve kterém lze přejmenování odhalit porovnáním obsahů a označit starý soubor jako odstraněný, nový soubor jako přidaný a zapsat celou operaci jako přejmenování.
-		Označení *Unknown* patří souborům, které Mercurial nesleduje, ani nejsou uvedeny v seznamu ignorovaných souborů. Toto označení je implicitní pro soubory, které mají být do správy revizí teprve přídány. Kontextové menu neznámého souboru obsahuje volbu "Ignore", která otevře dialogové okno pro podrobnější nastavení volby.
-		Označení *Clean* platí pro soubory, které nebyly editovány.
-		Označení *Ignored* patří nesledovaným souborům, uvedeným ale v seznamu ignorovaných souborů.
-	:guilabel:`Refresh`
-		Obnovit seznam souborů.
-	:guilabel:`Copy message`
-		Rozvinovací seznam posledních 10ti popisek u komitů.
-	:guilabel:`Branch`
-		Uvádí název aktuální větve pracovního adresáře. Poklepem otevřeme dialogové okno, kde lze s větví manipulovat. Nedoporučujeme používat bez dobré znalosti `pojmenovaných větví Mercurialu <http://mercurial.selenic.com/wiki/NamedBranches>`_.
-	:guilabel:`Možnosti`
-		Dialogové okno pro podrobné nastavení náležitostí komitu.	
+		Rozvinovací seznam různých módů souborů. V seznamu souborů se zobrazí pouze ty soubory, jejichž stavy jsou v seznamu Status zatrženy:
+	* *upravený* ( **M** odified) znamená, že sledovaný soubor byl změněn.
+	* *přidaný* ( **A** dded) znamená, že nesledovaný soubor byl přidán ke sledování.
+	* *odebraný* ( **R** emoved) znamená, že sledovaný soubor byl odebrán příkazem :guilabel:`hg remove`.
+	* *chybějící* ( **!** ) znamená, že Mercurial soubor postrádá. Když napřiklad přejmenujete nebo smažete sledovaný soubor v Exploreru, objeví se jako chybějící a jeho nové jméno jako neznámé. Pravým poklepem na novém názvu vyvoláme dialog, ve kterém lze přejmenování odhalit porovnáním obsahů a označit starý soubor jako odstraněný, nový soubor jako přidaný a zapsat celou operaci jako přejmenování.
+	* *neznámý* ( **?** ) patří souborům, které Mercurial nesleduje, ani nejsou uvedeny v seznamu ignorovaných souborů. Toto označení je implicitní pro soubory, které mají být do správy revizí teprve přídány. Kontextové menu neznámého souboru obsahuje volbu "Ignore", která otevře dialogové okno pro podrobnější nastavení volby.
+	* *ignorovaný* ( **I** ) patří nesledovaným souborům, které jsou uvedeny v seznamu ignorovaných souborů.
+	* *čistý* ( **C** lean) platí pro sledované soubory, které nebyly editovány.
 
-Na posledním řádku vpravo dole rozhodujeme:
+	:guilabel:`Refresh`
+		Znovu načíst seznam souborů.
+	:guilabel:`Větev`
+		Uvádí název aktuální větve pracovního adresáře. Poklepem otevřeme dialogové okno, kde lze s větví manipulovat. Nedoporučujeme používat bez dobré znalosti `pojmenovaných větví Mercurialu <http://mercurial.selenic.com/wiki/NamedBranches>`_.
+	:guilabel:`Copy message`
+		Rozvinovací seznam posledních deseti souhrnných zpráv komitů.
+	:guilabel:`Možnosti`
+		Dialogové okno pro podrobné nastavení náležitostí komitu - Jméno uživatele, Datum, Push po komitu, Auto Includes, Odbočit do subrepozitářů.	
+
+Lištu uzavírá roletka pro výběr procedury:
 
 	:guilabel:`Commit`
-		Předat vybrané diffy v označených souborech.
-	:guilabel:`Undo`
-		Zrušit platnost posledního komitu. Zpráva komitu bude dostupná v historii zpráv, takže lze v případě potřeby komit opakovat.
+		Komitovat změny.
+	:guilabel:`Amend`
+		Upravit aktuální revizi.
+	:guilabel:`QNew`
+		Vytvořit novou oprávku.				
+	:guilabel:`Refresh`
+		Znovu načíst aktuální oprávku (patch).
 
 		
 		
 		
-Panel se seznamem souborů má pět (šest) sloupců:
+Pole se seznamem souborů má pět (šest)  sloupců:
 
-	1) Zatržítko, které označuje soubor, vybraný pro operaci. Neoznačené soubory se akce Commit nezůčastní.
-	2) Sloupec :guilabel:`Stat` uvádí status (mód) jednotlivého souboru. Status 'S' označuje 'nečistý subrepozitář', který potřebuje být komitován.
-	3) Sloupec :guilabel:`MS` označuje stav sloučení souboru, což může být R(esolved) nebo U(nresolved).
-	4) Sloupec :guilabel:`Název souboru` uvádí kanonickou cestu souboru relativně ke kořeni repozitáře.
-	5) Sloupec :guilabel:`Typ` uvádí příponu souboru (pokud existuje).
-	6) Sloupec :guilabel:`Size` uvádí velikost neodebraného souboru.
+* Zatržítko, které označuje soubor, vybraný pro operaci. Neoznačené soubory se akce Commit nezůčastní.
+* Sloupec :guilabel:`Stat` uvádí status (mód) jednotlivého souboru. Status 'S' označuje 'nečistý subrepozitář', který potřebuje být komitován.
+* Sloupec :guilabel:`MS` označuje stav sloučení souboru, což může být R(esolved) nebo U(nresolved); zobrazí se jen v případě potřeby
+* Sloupec :guilabel:`Název souboru` uvádí kanonickou cestu souboru relativně ke kořeni repozitáře (k repozitóriu).
+* Sloupec :guilabel:`Typ` uvádí příponu souboru (pokud existuje).
+* Sloupec :guilabel:`Velikost` uvádí velikost neodebraného souboru.
 		
-.. note::
-	If the commit tool was started with a file pattern or selection, a
-	button will appear at the bottom of the file list that can clear the
-	file pattern and give you an unfiltered view of the entire working
-	directory.
+
 	
 Výběr změn
 ----------
 
-Proces výběru změn spočívá ve výběru těch změn v pracovním adresáři, které mají být zahrnuty do následného komitu. Nástroj pro komit umožňuje vyloučit některé změněné (nebo přidané či odebrané) soubory z komitu.
+Proces výběru změn spočívá ve výběru těch souborů pracovního adresáře, které mají být zahrnuty do následného komitu. Nezatržené soubory jsou z komitu vyloučeny.
 
-Toto poněkud porušuje zásadu Mercurialu, že každý changeset popisuje stav repozitáře v daném časovém okamžiku. Když vyloučíte soubory z komitu, nemusel vytvořený changeset nikdy existovat. Protože výběr souborů je někdy při komitu potřebný a Mercurial jej podporuje, je tato možnost součástí komitu již od první verze THg.
+Toto poněkud porušuje zásadu Mercurialu, že každý changeset popisuje stav repozitáře v daném časovém okamžiku. Když vyloučíte soubory z komitu, vytváříte zkreslený pohled na stav změn. Protože výběr souborů při provádění komitu je někdy potřebný a Mercurial jej podporuje, je tato možnost součástí komitu již od první verze THg.
 
-Nově v TortoiseHg 2.7 umožňuje nástroj komitu částečný výběr dat z jednotlivých upravených souborů. Znamená to, že můžete vyloučit jen část provedených změn v souboru. To opět porušuje zásadu Mercurialu pro komitování stavu pracovní kopie ale je to velice užitečná vlastnost. Nejčastěji citovaným příkladem je schopnost registrovat opravu chyby při vyloučení všech ostatních opravných nástrojů, takže po komitu můžete pokračovat v odlaďování.
+Nově v TortoiseHg 2.7 umožňuje nástroj komitu provádět částečný výběr dat z jednotlivých upravených souborů. Znamená to, že můžete vyloučit část provedených změn v souboru. To opět porušuje zásadu Mercurialu pro komitování stavu pracovní kopie ale je to velice užitečná vlastnost. Nejčastěji citovaným příkladem je schopnost komitovat opravu chyby při vyloučení všech ostatních opravných zásahů, takže po komitu můžete pokračovat v odlaďování.
 
-Když uživatel vyloučí jednu nebo více změn souboru, považuje TortoiseHg tento soubor za částečně vybraný (tato možnost výběru změn je někdy označována jako **částečný komit**). Částečně vybrané soubory jsou v seznamu souborů uvedeny se speciálním označením.
+Vyloučení určité části změněného a vybraného souboru v seznamu na levé straně se provádí tak, že se v odpovídajícím zobrazení změn v pravém dolním poli zvýrazní ta část, která má být vyloučena.
 
-Panel pro zobrazení diffů má v kontextové nabídce možnost konfigurace označení vyloučených změn. Volba :menuselection:`Označit vyloučené změny` je přepínač pro přeškrtnutí vyloučených změn. Toto nastavení je primárně osobní preference ale budoucí verze TortoiseHg mohou rozšířit použití tohoto proškrtnutí pro částečné  vyloučení individuálních změn.
+Kontextové menu zvýrazněné části má tyto položky:
 
-Tato nová možnost částečného výběru je podobná proceduře `chunk selection <http://tortoisehg.bitbucket.org/manual/0.9/commit.html#change-selection>`_ u hgtk a to v několika ohledech:
+	:guilabel:`Copy`
+
+	:guilabel:`Select All`
+
+	:guilabel:`Editor Options >`
+		Wrap >, Whitespace >, EOL Visibility >.
+	:guilabel:`Označit vyloučené změny`
+		Přepínač pro přeškrtnutí vyloučených změn. Toto nastavení je primárně osobní preference ale budoucí verze TortoiseHg mohou rozšířit použití tohoto proškrtnutí pro částečné  vyloučení individuálních změn.
+	:guilabel:`Hledat v aktuálním souboru`
+		Při tomto výběru se otevře další lišta s těmito prvky:
+	
+		:guilabel:`Zavřít lištu`
+	
+		:guilabel:`Textové pole`
+	
+		:guilabel:`Ignorovat velikost písmen - zatržítko`
+	
+		:guilabel:`Wrap search - zatržítko`
+	
+		:guilabel:`Prev, Next`
+	
+	:guilabel:`Hledat v celé historii`
+		Při tomto výběru se otevře karta Hledat
+	
+Když uživatel vyloučí jednu nebo více změn souboru, považuje TortoiseHg tento soubor za částečně vybraný (tato možnost výběru změn je někdy označována jako **částečný komit**. Částečně vybrané soubory jsou v seznamu souborů uvedeny se speciálním označením.
+
+Tato nová možnost částečného výběru je podobná proceduře `Hunk selection <http://tortoisehg.bitbucket.org/manual/0.9/commit.html#change-selection>`_ popsaná v dokumentaci k TortoiseHg 0.9.3 a to v několika ohledech:
 
 1) Výběr změn je integrován přímo do zobrazení diffu. Žádný přepínač režimu není potřebný.
 
-2) Soubory pracovní kopie se během částečného komitu nemění. Tak je možné se vyhnout vážnému problému s povolením souboru ve Windows.
+2) Soubory pracovní kopie se během částečného komitu nemění. Tak je možné se vyhnout vážnému problému s oprávněním ve Windows.
 
 3) Výběr změn je možný pro kopírované či přejmenované soubory s jednou výjimkou - nelze vyloučit všechny změny, protože se tím vylučuje celý soubor z komitu.
 
-TortoiseHg má od verze 2.0 odkládací (shelve) nástroj který umí přesunout vybrané změny z pracovního adresáře do oprávky (patch) nebo mezi oprávkami ale možnost částečného komitu je velice odlišná a sice v tom, že nikdy nemění soubory pracovní kopie. Vše co činí je to, že vyloučí část změn z komitované verze souboru. Po komitu zůstávají všechny vyloučené změny stále v pracovní kopii.
+TortoiseHg má od verze 2.0 odkládací (shelve) nástroj který umí přesunout vybrané změny z pracovního adresáře do oprávky (patch) nebo mezi oprávkami ale možnost částečného komitu je velice odlišná v tom, že nikdy nemění soubory pracovní kopie. Vše co činí je to, že vyloučí část změn z komitované verze souboru. Po komitu zůstávají všechny vyloučené změny stále v pracovní kopii.
 
 Po stisknutí tlačítka Commit zkontroluje komitový nástroj zda některý z ověřovaných souborů není částečně vyloučený. Je-li nějaký částečný komit potřebný, vytvoří komitový nástroj prozatimní oprávkový soubor, který popisuje jak generovat obsah částečně komitovaných souborů a předá tento oprávkový soubor extenzi TortoiseHg pro částečný komit. Tato extenze spouští komitový příkaz Mercurialu se specielními háčky (hooks), v důsledku čehož přicházejí obsahy pro částečný komit z dočasných oprávkových souborů místo aby byly čteny z pracovní kopie. Po komitu jsou tyto dočasné soubory vymazány a soubory pracovní kopie zůstávají nedotčeny.
 
-
-Klávesová navigace
-------------------
-
-:kbd:`Ctrl-Enter`
-	Spustit nástroj Commit
-:kbd:`Ctrl-E`
-	Reflow the paragraph currently under the cursor.  You must configure
-	a message format policy for this shortcut to work.
 
 
 Kontextová menu souborů
 -----------------------
 
-Pravým poklepem na soubor v seznamu otevřeme kontextové menu příkazů, použitelných právě pro tento soubor.
+Pravým poklepem na soubor v seznamu souborů otevřeme kontextové menu příkazů, použitelných právě pro tento soubor.
 
-U neznámých **?** souborů umožňuje kontextové menu zjistit přejmenování (pokud si myslíte, že neznámý soubor je kopií nebo přejmenování revizovaného souboru) nebo nastavit seznam ignorovaných souborů repozitáře (pokud nemá být neznámý soubor revizován a chcete, aby jej Mercurial ignoroval).
+U neznámých **?** souborů umožňuje kontextové menu zjistit přejmenování (pokud si myslíte, že neznámý soubor je kopií nebo přejmenování revizovaného souboru) nebo nastavit seznam ignorovaných souborů repozitáře (pokud nemá být neznámý soubor sledován a chcete, aby jej Mercurial ignoroval).
 
 
+
+
+
+Pole pro zprávy komitů
+-----------------------
+
+Pole pro zprávy komitů karty Commit má kromě běžných (Undo, Redo, Cut, Copy, Paste, Delete, Select All, Editor Options a Zvýraznění skladby) ještě tyto speciální kontextové nabídky:
+
+	:guilabel:`Vložit jména souborů`:
+		Vlepit v seznamu vybrané názvy souborů do komitové zprávy v místě kurzoru.
+	:guilabel:`Použít formát`:
+		Použít nastavené zalamování řádků.
+	:guilabel:`Nastavit formát`:
+		Otevře dialogové okno Nastavení TortoiseHg > Commit.
+
+Má-li váš projekt pravidla pro formátování komitových zpráv, můžete je nastavit v tomto konfiguračním okně.	Procedura komitu uplatní vaše zadání formátu při provádění komitu.
+
+Pro formát komitové zprávy jsou signifikantní tyto položky karty Commit widgetu Settings:
+
+    :guilabel:`Délka souhrnného řádku`:
+		Maximální délka řádku souhrnného popisu komitu. 
+    :guilabel:`Průvodní texty anglicky`:
+		Generovat anglickou zprávu komitu i pro neanglické jazykové prostředí.
+		
+		
 Slučování
 ---------
 
@@ -118,32 +163,12 @@ Pro úplnost dodejme, že *local* je revize, u níž začíná proces slučován
 Abychom zrušili neúspěšný pokus o sloučení, musíme přikázat, aby Mercurial odstranil druhého rodiče z pracovního adresáře. To obvykle znamená provést čistou aktualizaci prvního rodiče. Slučovací nástroj má tlačítko :guilabel:`Undo`, jímž lze zařídit přesně to samé.
 
 Jakmile máte svůj pracovní adresář zpět u jedné rodičovské revize, můžete zopakovat proces sloučení.
-
-Panel pro zprávy komitů
------------------------
-
-Panel pro zprávy komitů má tyto speciální kontextové nabídky:
-
-	:guilabel:`Paste Filenames`:
-		Vlepit vybrané názvy souborů do komitové zprávy v místě kurzoru.
-	:guilabel:`Apply Format`:
-		Použít nastavenou délku řádků.
-	:guilabel:`Configure Format`:
-		Otevře dialogové okno TortoiseHg Settings.
-
-Má-li váš projekt pravidla pro formátování komitových zpráv, můžete je nastavit v tomto konfiguračním okně.	Procedura komitu uplatní vaše zadání formátu při provádění komitu.
-Záložka :guilabel:`Commit` konfiguračního okna má tyto dvě možnosti pro nastavení formátu komitové zprávy:
-
-    :guilabel:`Délka souhrnného řádku`:
-		Maximální délka řádku souhrnného popisu komitu. 
-    :guilabel:`Průvodní texty anglicky`:
-		...
 		
 
 Subrepozitáře
 -------------
 
-`Subrepozitář <http://mercurial.selenic.com/wiki/subrepos>`_ je entita, zavedená v Mercurialu 1.3. Umožňuje repozitáři Mercurialu ukládat odkazy na externí repozitáře (případně jiných VCS) a připojit stavy těchto externích repozitářů do historie hlavního repozitáře.
+`Subrepozitář <http://mercurial.selenic.com/wiki/subrepos>`_ je entita, zavedená v Mercurialu 1.3. Umožňuje repozitáři Mercurialu ukládat odkazy na externí repozitáře (případně jiných VCS) a zahrnout stavy těchto externích repozitářů do historie hlavního repozitáře.
 
 TortoiseHg 1.0 zavedl rudimentární podporu pro subrepozitáře a to pouze v nástroji commit a status. Považuje-li Mercurial subrepozitář za "nečistý", objeví se v seznamu souborů nástroje Commit s označením stavu *S* a je potom komitován spolu s jinými změnami, přičemž se aktualizuje soubor .hgsubstate v kořenovém adresáři repozitáře.
 
@@ -151,23 +176,9 @@ TortoiseHg 1.0 zavedl rudimentární podporu pro subrepozitáře a to pouze v n�
 Nastavitelné parametry
 ----------------------
 
-Na záložce Commit konfiguračního okna TortoiseHg Settings lze nastavit tyto parametry:
+Nastavitelné parametry úkonu Commit  lze zadat v dialogu  :menuselection:`File > Settings > Commit` viz odstavec 6.1.3 kapitoly 6. Nastavení parametrů.
 
-:menuselection:`Commit > Jméno uživatele`
-	Nastaví uživatelské jméno spojené s vašimi komity (viz :doc:`quick`)
-:menuselection:`Commit > Délka souhrnného řádku`
-	Nastaví délku řádku souhrnné zprávy komitu
-:menuselection:`Commit > Po komitu zavřít`:
-	Zadáno-li True, komitový nástroj se zavře po úspěšném provedení komitu.
-	
-A tři další paremetry pro *pokročilé* uživatele:
 
-:menuselection:`Commit > Push po komitu`:
-	Je-li nastaveno, pokusí se komitový nástroj po každém komitu provést push do zadané adresy URL nebo aliasu. 
-:menuselection:`Commit > Seznam auto-include`:
-	Čárkami oddělený seznam souborů, které jsou automaticky včleněny do každého komitu. Zamýšleno pouze jako nastavení repozitáře.
-:menuselection:`TortoiseHg > Max. velikost diffu`
-	Nastaví limitní hodnotu pro velikost diffu.
 
 
 Spuštění z příkazového řádku

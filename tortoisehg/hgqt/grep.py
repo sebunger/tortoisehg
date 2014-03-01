@@ -30,6 +30,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
     def __init__(self, repoagent, upats, parent=None, **opts):
         QWidget.__init__(self, parent)
 
+        self._repoagent = repoagent
         self.thread = None
 
         mainvbox = QVBoxLayout()
@@ -99,12 +100,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         grid.setColumnStretch(1, 0)
         frame = QFrame()
         frame.setFrameStyle(QFrame.StyledPanel)
-        def revisiontoggled(checked):
-            revle.setEnabled(checked)
-            if checked:
-                revle.selectAll()
-                QTimer.singleShot(0, lambda:revle.setFocus())
-        revision.toggled.connect(revisiontoggled)
+        revision.toggled.connect(self._onRevisionToggled)
         history.toggled.connect(singlematch.setDisabled)
         revle.setEnabled(False)
         revle.returnPressed.connect(self.runSearch)
@@ -112,30 +108,13 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         incle.returnPressed.connect(self.runSearch)
         bt.clicked.connect(self.runSearch)
 
-        def updateRecurse(checked):
-            try:
-                wctx = self.repo[None]
-                if '.hgsubstate' in wctx:
-                    recurse.setEnabled(checked)
-                else:
-                    recurse.setEnabled(False)
-                    recurse.setChecked(False)
-            except Exception:
-                recurse.setEnabled(False)
-                recurse.setChecked(False)
-        working.toggled.connect(updateRecurse)
         recurse.setChecked(True)
         working.setChecked(True)
+        working.toggled.connect(self._updateRecurse)
 
-        def updatefollow():
-            slowpath = bool(incle.text() or excle.text())
-            follow.setEnabled(history.isChecked() and not slowpath)
-            if slowpath:
-                follow.setChecked(False)
-        history.toggled.connect(updatefollow)
-        incle.textChanged.connect(updatefollow)
-        excle.textChanged.connect(updatefollow)
-        updatefollow()
+        history.toggled.connect(self._updateFollow)
+        incle.textChanged.connect(self._updateFollow)
+        excle.textChanged.connect(self._updateFollow)
 
         mainvbox.addLayout(hbox)
         frame.setLayout(grid)
@@ -148,7 +127,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         mainvbox.addWidget(tv)
         le.returnPressed.connect(self.runSearch)
 
-        self._repoagent = repoagent
         repo = repoagent.rawRepo()
         self.tv, self.regexple, self.chk, self.recurse = tv, le, chk, recurse
         self.incle, self.excle, self.revle = incle, excle, revle
@@ -173,23 +151,11 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.searchhistory = [s for s in sh if s]
         self.setCompleters()
 
-        if parent:
-            self.closeonesc = False
-            mainvbox.setContentsMargins(0, 0, 0, 0)
-            self.setLayout(mainvbox)
-        else:
-            self.setWindowTitle(_('TortoiseHg Search'))
-            self.resize(800, 550)
-            self.closeonesc = True
-            self.stbar = cmdui.ThgStatusBar()
-            mainvbox.setContentsMargins(5, 5, 5, 5)
-            outervbox = QVBoxLayout()
-            outervbox.addLayout(mainvbox)
-            outervbox.addWidget(self.stbar)
-            outervbox.setContentsMargins(0, 0, 0, 0)
-            self.setLayout(outervbox)
-            self.showMessage.connect(self.stbar.showMessage)
-            self.progress.connect(self.stbar.progress)
+        mainvbox.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(mainvbox)
+
+        self._updateRecurse()
+        self._updateFollow()
 
     @property
     def repo(self):
@@ -241,6 +207,34 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         if isinstance(rev, int):
             self.revle.setText(str(rev))
 
+    @pyqtSlot(bool)
+    def _onRevisionToggled(self, checked):
+        self.revle.setEnabled(checked)
+        if checked:
+            self.revle.selectAll()
+            self.revle.setFocus()
+
+    @pyqtSlot()
+    def _updateRecurse(self):
+        checked = self.wctxradio.isChecked()
+        try:
+            wctx = self.repo[None]
+            if '.hgsubstate' in wctx:
+                self.recurse.setEnabled(checked)
+            else:
+                self.recurse.setEnabled(False)
+                self.recurse.setChecked(False)
+        except util.Abort:
+            self.recurse.setEnabled(False)
+            self.recurse.setChecked(False)
+
+    @pyqtSlot()
+    def _updateFollow(self):
+        slowpath = bool(self.incle.text() or self.excle.text())
+        self.follow.setEnabled(self.aradio.isChecked() and not slowpath)
+        if slowpath:
+            self.follow.setChecked(False)
+
     def setSearch(self, upattern, **opts):
         self.regexple.setText(upattern)
         if opts.get('all'):
@@ -255,11 +249,9 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             self.thread.wait(2000)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            if self.thread and self.thread.isRunning():
-                self.stopClicked()
-            elif self.closeonesc:
-                self.close()
+        if (event.key() == Qt.Key_Escape
+            and self.thread and self.thread.isRunning()):
+            self.stopClicked()
         else:
             return super(SearchWidget, self).keyPressEvent(event)
 
@@ -670,10 +662,9 @@ class MatchTree(QTableView):
                 abs = repo.wjoin(path)
                 root = paths.find_root(abs)
                 if root and abs.startswith(root):
+                    uroot = hglib.tounicode(root)
+                    srepoagent = self._repoagent.subRepoAgent(uroot)
                     path = abs[len(root)+1:]
-                    # TODO: do not instantiate repo here
-                    srepo = thgrepo.repository(None, root)
-                    srepoagent = srepo._pyqtobj
                     self._openAnnotateDialog(srepoagent, rev, path, line)
                 else:
                     continue
@@ -802,9 +793,20 @@ class SearchDialog(QDialog):
         super(SearchDialog, self).__init__(parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('view-filter'))
-        self.setLayout(QVBoxLayout(self))
+        self.setWindowTitle(_('TortoiseHg Search'))
+
+        outervbox = QVBoxLayout()
+        outervbox.setContentsMargins(5, 5, 5, 0)
+        self.setLayout(outervbox)
         self._searchwidget = SearchWidget(repoagent, upats, parent=self, **opts)
-        self.layout().addWidget(self._searchwidget)
+        outervbox.addWidget(self._searchwidget)
+
+        self._stbar = cmdui.ThgStatusBar()
+        outervbox.addWidget(self._stbar)
+        self._searchwidget.showMessage.connect(self._stbar.showMessage)
+        self._searchwidget.progress.connect(self._stbar.progress)
+
+        self.resize(800, 550)
 
     def closeEvent(self, event):
         if not self._searchwidget.canExit():

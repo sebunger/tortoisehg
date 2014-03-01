@@ -20,9 +20,11 @@ class ResolveDialog(QDialog):
     def __init__(self, repoagent, parent=None):
         super(ResolveDialog, self).__init__(parent)
         self._repoagent = repoagent
-        repo = repoagent.rawRepo()
-        self.setWindowFlags(Qt.Window)
-        self.setWindowTitle(_('Resolve Conflicts - %s') % repo.displayname)
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint
+                            | Qt.WindowMaximizeButtonHint)
+        self.setWindowTitle(_('Resolve Conflicts - %s')
+                            % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-merge'))
 
         self.setLayout(QVBoxLayout())
@@ -50,7 +52,8 @@ class ResolveDialog(QDialog):
             vbox = QVBoxLayout()
             vbox.setContentsMargins(*MARGINS)
             hbox.addLayout(vbox)
-            localrevtitle = qtlib.LabeledSeparator(_('Local revision information'))
+            localrevtitle = qtlib.LabeledSeparator(_('Local revision '
+                                                     'information'))
             localrevinfo = csinfo.create(repo)
             localrevinfo.update(repo[None].p1())
             vbox.addWidget(localrevtitle)
@@ -60,7 +63,8 @@ class ResolveDialog(QDialog):
             vbox = QVBoxLayout()
             vbox.setContentsMargins(*MARGINS)
             hbox.addLayout(vbox)
-            otherrevtitle = qtlib.LabeledSeparator(_('Other revision information'))
+            otherrevtitle = qtlib.LabeledSeparator(_('Other revision '
+                                                     'information'))
             otherrevinfo = csinfo.create(repo)
             otherrevinfo.update(repo[None].p2())
 
@@ -81,46 +85,33 @@ class ResolveDialog(QDialog):
         hbox.setContentsMargins(*MARGINS)
         self.layout().addLayout(hbox)
 
-        self.utree = PathsTree(self.repo, self)
+        self.utree = QTreeView(self)
+        self.utree.setDragDropMode(QTreeView.DragOnly)
+        self.utree.setSelectionMode(QTreeView.ExtendedSelection)
+        self.utree.setSortingEnabled(True)
         hbox.addWidget(self.utree)
-
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(*MARGINS)
-        hbox.addLayout(vbox)
-        auto = QPushButton(_('Mercurial Re&solve'))
-        auto.setToolTip(_('Attempt automatic (trivial) merge'))
-        auto.clicked.connect(lambda: self.merge('internal:merge'))
-        manual = QPushButton(_('Tool &Resolve'))
-        manual.setToolTip(_('Merge using selected merge tool'))
-        manual.clicked.connect(self.merge)
-        local = QPushButton(_('&Take Local'))
-        local.setToolTip(_('Accept the local file version (yours)'))
-        local.clicked.connect(lambda: self.merge('internal:local'))
-        other = QPushButton(_('Take &Other'))
-        other.setToolTip(_('Accept the other file version (theirs)'))
-        other.clicked.connect(lambda: self.merge('internal:other'))
-        res = QPushButton(_('&Mark as Resolved'))
-        res.setToolTip(_('Mark this file as resolved'))
-        res.clicked.connect(self.markresolved)
-        vbox.addWidget(auto)
-        vbox.addWidget(manual)
-        vbox.addWidget(local)
-        vbox.addWidget(other)
-        vbox.addWidget(res)
-        vbox.addStretch(1)
-        self.ubuttons = (auto, manual, local, other, res)
 
         self.utree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.utreecmenu = QMenu(self)
+        mergeactions = QActionGroup(self)
+        mergeactions.triggered.connect(self._mergeByAction)
         cmauto = self.utreecmenu.addAction(_('Mercurial Re&solve'))
-        cmauto.triggered.connect(lambda: self.merge('internal:merge'))
+        cmauto.setToolTip(_('Attempt automatic (trivial) merge'))
+        cmauto.setData('internal:merge')
+        mergeactions.addAction(cmauto)
         cmmanual = self.utreecmenu.addAction(_('Tool &Resolve'))
-        cmmanual.triggered.connect(self.merge)
+        cmmanual.setToolTip(_('Merge using selected merge tool'))
+        mergeactions.addAction(cmmanual)
         cmlocal = self.utreecmenu.addAction(_('&Take Local'))
-        cmlocal.triggered.connect(lambda: self.merge('internal:local'))
+        cmlocal.setToolTip(_('Accept the local file version (yours)'))
+        cmlocal.setData('internal:local')
+        mergeactions.addAction(cmlocal)
         cmother = self.utreecmenu.addAction(_('Take &Other'))
-        cmother.triggered.connect(lambda: self.merge('internal:other'))
+        cmother.setToolTip(_('Accept the other file version (theirs)'))
+        cmother.setData('internal:other')
+        mergeactions.addAction(cmother)
         cmres = self.utreecmenu.addAction(_('&Mark as Resolved'))
+        cmres.setToolTip(_('Mark this file as resolved'))
         cmres.triggered.connect(self.markresolved)
         self.utreecmenu.addSeparator()
         cmdiffLocToAnc = self.utreecmenu.addAction(_('Diff &Local to Ancestor'))
@@ -133,6 +124,13 @@ class ResolveDialog(QDialog):
 
         self.utree.doubleClicked.connect(self.utreeDoubleClicked)
 
+        vbox = QVBoxLayout()
+        vbox.setContentsMargins(*MARGINS)
+        hbox.addLayout(vbox)
+        for action in [cmauto, cmmanual, cmlocal, cmother, cmres]:
+            vbox.addWidget(ActionPushButton(action, self))
+        vbox.addStretch(1)
+
         res = qtlib.LabeledSeparator(_('Resolved conflicts'))
         self.layout().addWidget(res)
 
@@ -141,53 +139,43 @@ class ResolveDialog(QDialog):
         hbox.setSpacing(0)
         self.layout().addLayout(hbox)
 
-        self.rtree = PathsTree(self.repo, self)
+        self.rtree = QTreeView(self)
+        self.rtree.setDragDropMode(QTreeView.DragOnly)
+        self.rtree.setSelectionMode(QTreeView.ExtendedSelection)
+        self.rtree.setSortingEnabled(True)
         hbox.addWidget(self.rtree)
-
-        vbox = QVBoxLayout()
-        vbox.setContentsMargins(*MARGINS)
-        hbox.addLayout(vbox)
-        edit = QPushButton(_('&Edit File'))
-        edit.setToolTip(_('Edit resolved file'))
-        edit.clicked.connect(self.edit)
-        v3way = QPushButton(_('3-&Way Diff'))
-        v3way.setToolTip(_('Visual three-way diff'))
-        v3way.clicked.connect(self.v3way)
-        vp0 = QPushButton(_('Diff to &Local'))
-        vp0.setToolTip(_('Visual diff between resolved file and first parent'))
-        vp0.clicked.connect(self.vp0)
-        vp1 = QPushButton(_('&Diff to Other'))
-        vp1.setToolTip(_('Visual diff between resolved file and second parent'))
-        vp1.clicked.connect(self.vp1)
-        ures = QPushButton(_('Mark as &Unresolved'))
-        ures.setToolTip(_('Mark this file as unresolved'))
-        ures.clicked.connect(self.markunresolved)
-        vbox.addWidget(edit)
-        vbox.addWidget(v3way)
-        vbox.addWidget(vp0)
-        vbox.addWidget(vp1)
-        vbox.addWidget(ures)
-        vbox.addStretch(1)
-        self.rbuttons = (edit, vp0, ures)
-        self.rmbuttons = (vp1, v3way)
 
         self.rtree.setContextMenuPolicy(Qt.CustomContextMenu)
         self.rtreecmenu = QMenu(self)
         cmedit = self.rtreecmenu.addAction(_('&Edit File'))
+        cmedit.setToolTip(_('Edit resolved file'))
         cmedit.triggered.connect(self.edit)
         cmv3way = self.rtreecmenu.addAction(_('3-&Way Diff'))
+        cmv3way.setToolTip(_('Visual three-way diff'))
         cmv3way.triggered.connect(self.v3way)
         cmvp0 = self.rtreecmenu.addAction(_('Diff to &Local'))
+        cmvp0.setToolTip(_('Visual diff between resolved file and first '
+                           'parent'))
         cmvp0.triggered.connect(self.vp0)
         cmvp1 = self.rtreecmenu.addAction(_('&Diff to Other'))
+        cmvp1.setToolTip(_('Visual diff between resolved file and second '
+                           'parent'))
         cmvp1.triggered.connect(self.vp1)
         cmures = self.rtreecmenu.addAction(_('Mark as &Unresolved'))
+        cmures.setToolTip(_('Mark this file as unresolved'))
         cmures.triggered.connect(self.markunresolved)
         self.rmenuitems = (cmedit, cmvp0, cmures)
         self.rmmenuitems = (cmvp1, cmv3way)
         self.rtree.customContextMenuRequested.connect(self.rtreeMenuRequested)
 
         self.rtree.doubleClicked.connect(self.v3way)
+
+        vbox = QVBoxLayout()
+        vbox.setContentsMargins(*MARGINS)
+        hbox.addLayout(vbox)
+        for action in [cmedit, cmv3way, cmvp0, cmvp1, cmures]:
+            vbox.addWidget(ActionPushButton(action, self))
+        vbox.addStretch(1)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*MARGINS)
@@ -201,10 +189,8 @@ class ResolveDialog(QDialog):
 
         out = qtlib.LabeledSeparator(_('Command output'))
         self.layout().addWidget(out)
-        self.cmd = cmdui.Widget(True, False, self)
-        self.cmd.commandFinished.connect(self.refresh)
-        self.cmd.setShowOutput(True)
-        self.layout().addWidget(self.cmd)
+        self._cmdlog = cmdui.LogWidget(self)
+        self.layout().addWidget(self._cmdlog)
 
         BB = QDialogButtonBox
         bbox = QDialogButtonBox(BB.Close)
@@ -218,20 +204,15 @@ class ResolveDialog(QDialog):
         self.refresh()
         self.utree.selectAll()
         self.utree.setFocus()
-        repoagent.configChanged.connect(self.configChanged)
-        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.configChanged.connect(self.tcombo.reset)
+        repoagent.repositoryChanged.connect(self.refresh)
 
     @property
     def repo(self):
         return self._repoagent.rawRepo()
 
-    @pyqtSlot()
-    def repositoryChanged(self):
-        self.refresh()
-
     def getSelectedPaths(self, tree):
         paths = []
-        repo = self.repo
         if not tree.selectionModel():
             return paths
         for idx in tree.selectionModel().selectedRows():
@@ -248,10 +229,12 @@ class ResolveDialog(QDialog):
             for root, wfile in selected:
                 if root == curroot:
                     cmd.append(os.path.normpath(os.path.join(root, wfile)))
-            cmdlines.append(cmd)
+            cmdlines.append(map(hglib.tounicode, cmd))
             selected = [(r, w) for r, w in selected if r != curroot]
         if cmdlines:
-            self.cmd.run(*cmdlines)
+            sess = self._repoagent.runCommandSequence(cmdlines, self)
+            sess.commandFinished.connect(self.refresh)
+            sess.outputReceived.connect(self._cmdlog.appendLog)
 
     def merge(self, tool=False):
         if not tool:
@@ -260,6 +243,11 @@ class ResolveDialog(QDialog):
         if tool:
             cmd += ['--tool='+tool]
         self.runCommand(self.utree, cmd)
+
+    @pyqtSlot(QAction)
+    def _mergeByAction(self, action):
+        tool = str(action.data().toString())
+        self.merge(tool)
 
     def markresolved(self):
         self.runCommand(self.utree, ['resolve', '--mark'])
@@ -270,7 +258,7 @@ class ResolveDialog(QDialog):
     def edit(self):
         paths = self.getSelectedPaths(self.rtree)
         if paths:
-            abspaths = [os.path.join(r,w) for r,w in paths]
+            abspaths = [os.path.join(r, w) for r, w in paths]
             qtlib.editfiles(self.repo, abspaths, parent=self)
 
     def getVdiffFiles(self, tree):
@@ -340,13 +328,7 @@ class ResolveDialog(QDialog):
                 dlg.exec_()
 
     @pyqtSlot()
-    def configChanged(self):
-        'repository has detected a change to config files'
-        self.tcombo.reset()
-
     def refresh(self):
-        repo = self.repo
-
         u, r = [], []
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
             if status == 'u':
@@ -370,15 +352,8 @@ class ResolveDialog(QDialog):
                 smodel.select(model.index(i, 1), sflags)
                 smodel.select(model.index(i, 2), sflags)
 
-        @pyqtSlot(QItemSelection, QItemSelection)
-        def uchanged(selected, deselected):
-            enable = self.utree.selectionModel().hasSelection()
-            for b in self.ubuttons:
-                b.setEnabled(enable)
-            for c in self.umenuitems:
-                c.setEnabled(enable)
-        smodel.selectionChanged.connect(uchanged)
-        uchanged(None, None)
+        smodel.selectionChanged.connect(self._updateUnresolvedActions)
+        self._updateUnresolvedActions()
 
         paths = self.getSelectedPaths(self.rtree)
         oldmodel = self.rtree.model()
@@ -396,20 +371,8 @@ class ResolveDialog(QDialog):
                 smodel.select(model.index(i, 1), sflags)
                 smodel.select(model.index(i, 2), sflags)
 
-        @pyqtSlot(QItemSelection, QItemSelection)
-        def rchanged(selected, deselected):
-            enable = self.rtree.selectionModel().hasSelection()
-            for b in self.rbuttons:
-                b.setEnabled(enable)
-            for c in self.rmenuitems:
-                c.setEnabled(enable)
-            merge = len(self.repo.parents()) > 1
-            for b in self.rmbuttons:
-                b.setEnabled(enable and merge)
-            for c in self.rmmenuitems:
-                c.setEnabled(enable and merge)
-        smodel.selectionChanged.connect(rchanged)
-        rchanged(None, None)
+        smodel.selectionChanged.connect(self._updateResolvedActions)
+        self._updateResolvedActions()
 
         if u:
             txt = _('There are merge <b>conflicts</b> to be resolved')
@@ -432,13 +395,28 @@ class ResolveDialog(QDialog):
                 return
         super(ResolveDialog, self).reject()
 
+    @pyqtSlot()
+    def _updateUnresolvedActions(self):
+        enable = self.utree.selectionModel().hasSelection()
+        for c in self.umenuitems:
+            c.setEnabled(enable)
+
+    @pyqtSlot()
+    def _updateResolvedActions(self):
+        enable = self.rtree.selectionModel().hasSelection()
+        for c in self.rmenuitems:
+            c.setEnabled(enable)
+        merge = len(self.repo.parents()) > 1
+        for c in self.rmmenuitems:
+            c.setEnabled(enable and merge)
+
     @pyqtSlot(QPoint)
     def utreeMenuRequested(self, point):
-        self.utreecmenu.exec_(self.utree.viewport().mapToGlobal(point))
+        self.utreecmenu.popup(self.utree.viewport().mapToGlobal(point))
 
     @pyqtSlot(QPoint)
     def rtreeMenuRequested(self, point):
-        self.rtreecmenu.exec_(self.rtree.viewport().mapToGlobal(point))
+        self.rtreecmenu.popup(self.rtree.viewport().mapToGlobal(point))
 
     def utreeDoubleClicked(self):
         if self.repo.ui.configbool('tortoisehg', 'autoresolve'):
@@ -446,39 +424,6 @@ class ResolveDialog(QDialog):
         else:
             self.merge('internal:merge')
 
-class PathsTree(QTreeView):
-    def __init__(self, repo, parent):
-        QTreeView.__init__(self, parent)
-        self.repo = repo
-        self.setSelectionMode(QTreeView.ExtendedSelection)
-        self.setSortingEnabled(True)
-
-    def dragObject(self):
-        urls = []
-        for index in self.selectionModel().selectedRows():
-            root, path = self.model().getPathForIndex(index)
-            urls.append(QUrl.fromLocalFile(os.path.join(root, path)))
-        if urls:
-            d = QDrag(self)
-            m = QMimeData()
-            m.setUrls(urls)
-            d.setMimeData(m)
-            d.start(Qt.CopyAction)
-
-    def mousePressEvent(self, event):
-        self.pressPos = event.pos()
-        self.pressTime = QTime.currentTime()
-        return QTreeView.mousePressEvent(self, event)
-
-    def mouseMoveEvent(self, event):
-        d = event.pos() - self.pressPos
-        if d.manhattanLength() < QApplication.startDragDistance():
-            return QTreeView.mouseMoveEvent(self, event)
-        elapsed = self.pressTime.msecsTo(QTime.currentTime())
-        if elapsed < QApplication.startDragTime():
-            return QTreeView.mouseMoveEvent(self, event)
-        self.dragObject()
-        return QTreeView.mouseMoveEvent(self, event)
 
 class PathsModel(QAbstractTableModel):
     def __init__(self, pathlist, parent):
@@ -507,6 +452,13 @@ class PathsModel(QAbstractTableModel):
             return QVariant(hglib.tounicode(data))
         return QVariant()
 
+    def flags(self, index):
+        flags = super(PathsModel, self).flags(index)
+        if not index.isValid():
+            return flags
+        flags |= Qt.ItemIsDragEnabled
+        return flags
+
     def headerData(self, col, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
             return QVariant()
@@ -518,6 +470,38 @@ class PathsModel(QAbstractTableModel):
         row = index.row()
         return self.rows[row][2], self.rows[row][0]
 
+    def mimeTypes(self):
+        return ['text/uri-list']
+
+    def mimeData(self, indexes):
+        paths = [hglib.tounicode(os.path.join(*self.getPathForIndex(i)))
+                 for i in indexes if i.column() == 0]
+        data = QMimeData()
+        data.setUrls([QUrl.fromLocalFile(p) for p in paths])
+        return data
+
+
+class ActionPushButton(QPushButton):
+    def __init__(self, action, parent=None):
+        super(ActionPushButton, self).__init__(parent)
+        self._defaultAction = action
+        self.addAction(action)
+        self.clicked.connect(action.trigger)
+        self._copyActionProps()
+
+    def actionEvent(self, event):
+        if (event.type() == QEvent.ActionChanged
+            and event.action() is self._defaultAction):
+            self._copyActionProps()
+        super(ActionPushButton, self).actionEvent(event)
+
+    def _copyActionProps(self):
+        action = self._defaultAction
+        self.setEnabled(action.isEnabled())
+        self.setText(action.text())
+        self.setToolTip(action.toolTip())
+
+
 class ToolsCombo(QComboBox):
     def __init__(self, repo, parent):
         QComboBox.__init__(self, parent)
@@ -527,6 +511,7 @@ class ToolsCombo(QComboBox):
         self.addItem(self.default)
         self.repo = repo
 
+    @pyqtSlot()
     def reset(self):
         self.loaded = False
         self.clear()
