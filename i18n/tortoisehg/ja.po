@@ -9,16 +9,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2013-10-31 00:28-0200\n"
-"PO-Revision-Date: 2013-09-16 10:45+0000\n"
+"POT-Creation-Date: 2014-02-03 11:14-0200\n"
+"PO-Revision-Date: 2014-02-02 12:59+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2013-10-31 05:25+0000\n"
-"X-Generator: Launchpad (build 16820)\n"
+"X-Launchpad-Export-Date: 2014-02-04 06:05+0000\n"
+"X-Generator: Launchpad (build 16916)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
@@ -33,7 +33,7 @@ msgid "Copyright 2008-2013 Steve Borho and others"
 msgstr "Copyright 2008-2013 Steve Borho 他"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
-msgstr ""
+msgstr "いくつかのアイコンは TortoiseSVN と Tango から無料提供されています。"
 
 msgid "You can visit our site here"
 msgstr "最新情報はこちら"
@@ -54,40 +54,34 @@ msgstr "Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr ""
+msgstr "新しいバージョンの TortoiseHg (%s) がダウンロードできます。"
 
 msgid "= Working Directory Parent ="
 msgstr "= 作業領域の親リビジョン ="
 
-msgid "Revision:"
-msgstr "リビジョン:"
-
-msgid "Only files modified/created in this revision"
-msgstr "このリビジョンで更新・作成されたファイルのみ"
-
-msgid "Recurse into subrepositories"
-msgstr "サブリポジトリを含む"
-
-msgid "Destination path:"
-msgstr "保存先:"
-
-msgid "Browse..."
-msgstr "選択..."
-
-msgid "Archive types:"
-msgstr "アーカイブの種類:"
-
 msgid "Directory of files"
 msgstr "ディレクトリにファイルとして保存"
+
+msgid "Tar archives"
+msgstr "tar アーカイブ"
 
 msgid "Uncompressed tar archive"
 msgstr "無圧縮の tar アーカイブ"
 
+msgid "Bzip2 tar archives"
+msgstr "bzip2 圧縮の tar アーカイブ"
+
 msgid "Tar archive compressed using bzip2"
 msgstr "bzip2 を使用した tar アーカイブ"
 
+msgid "Gzip tar archives"
+msgstr "gzip 圧縮の tar アーカイブ"
+
 msgid "Tar archive compressed using gzip"
 msgstr "gzip を使用した tar アーカイブ"
+
+msgid "Zip archives"
+msgstr "Zip アーカイブ"
 
 msgid "Uncompressed zip archive"
 msgstr "無圧縮の zip アーカイブ"
@@ -95,24 +89,26 @@ msgstr "無圧縮の zip アーカイブ"
 msgid "Zip archive compressed using deflate"
 msgstr "deflate で圧縮した zip アーカイブ"
 
+msgid "Only files modified/created in this revision"
+msgstr "このリビジョンで更新・作成されたファイルのみ"
+
+msgid "Recurse into subrepositories"
+msgstr "サブリポジトリを含む"
+
+msgid "Revision:"
+msgstr "リビジョン:"
+
+msgid "Browse..."
+msgstr "選択..."
+
+msgid "Destination path:"
+msgstr "保存先:"
+
+msgid "Archive types:"
+msgstr "アーカイブの種類:"
+
 msgid "Hg command:"
 msgstr "Hg コマンド:"
-
-msgid "Always show output"
-msgstr "常にコマンド出力を表示"
-
-msgid "&Archive"
-msgstr "アーカイブ(&A)"
-
-msgid "&Detail"
-msgstr "詳細(&D)"
-
-msgid "Cancel"
-msgstr "キャンセル"
-
-#, python-format
-msgid "Archive - %s"
-msgstr "アーカイブ - %s"
 
 msgid "Select Destination Folder"
 msgstr "保存先フォルダの選択"
@@ -122,18 +118,6 @@ msgstr "保存先ファイルの選択"
 
 msgid "All files (*)"
 msgstr "すべてのファイル (*)"
-
-msgid "Tar archives"
-msgstr "tar アーカイブ"
-
-msgid "Bzip2 tar archives"
-msgstr "bzip2 圧縮の tar アーカイブ"
-
-msgid "Gzip tar archives"
-msgstr "gzip 圧縮の tar アーカイブ"
-
-msgid "Zip archives"
-msgstr "Zip アーカイブ"
 
 msgid "Duplicate Name"
 msgstr "名前の重複"
@@ -168,6 +152,13 @@ msgstr ""
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
 msgstr "保存先のフォルダ「%s」は既に存在します!"
+
+#, python-format
+msgid "Archive - %s"
+msgstr "アーカイブ - %s"
+
+msgid "&Archive"
+msgstr "アーカイブ(&A)"
 
 #, python-format
 msgid "Backout - %s"
@@ -333,23 +324,26 @@ msgstr "打ち消したチェンジセット"
 msgid "Bisect - %s"
 msgstr "二分探索 - %s"
 
-msgid "Known good revision:"
-msgstr "既知の正常なリビジョン:"
-
 msgid "Accept"
 msgstr "取り込む"
+
+msgid "Known good revision:"
+msgstr "既知の正常なリビジョン:"
 
 msgid "Known bad revision:"
 msgstr "既知の問題リビジョン:"
 
-msgid "Revision is Good"
-msgstr "このリビジョンは問題ありません"
+msgid "Discard local changes (revert --all)"
+msgstr "作業領域の変更を破棄 (revert --all)"
 
-msgid "Revision is Bad"
-msgstr "このリビジョンは問題あります"
+msgid "Revision is &Good"
+msgstr "リビジョンは問題なし(&G)"
 
-msgid "Skip this Revision"
-msgstr "このリビジョンを飛ばします"
+msgid "Revision is &Bad"
+msgstr "リビジョンは問題あり(&B)"
+
+msgid "&Skip this Revision"
+msgstr "リビジョンを飛ばす(&S)"
 
 msgid "Close"
 msgstr "閉じる"
@@ -377,7 +371,7 @@ msgid "New Name:"
 msgstr "新しいブックマーク名:"
 
 msgid "Activate:"
-msgstr ""
+msgstr "アクティブ化:"
 
 msgid "&Add"
 msgstr "追加(&A)"
@@ -447,7 +441,7 @@ msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 msgstr "バグを <a href=\"%s\">バグトラッカー</a> へ報告しましょう"
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr "アップデートを確認しています..."
 
 msgid "Copy"
 msgstr "コピー"
@@ -459,10 +453,10 @@ msgid "TortoiseHg Bug Report"
 msgstr "TortoiseHgバグ報告"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr ""
+msgstr "新しいバージョンの TortoiseHg へアップグレードすることを推奨します。"
 
 msgid "Your TortoiseHg is up to date."
-msgstr ""
+msgstr "TortoiseHg の最新版をお使いです。"
 
 msgid "Save error report to"
 msgstr "バグ報告の保存"
@@ -564,7 +558,7 @@ msgid "Chunks selected: %d / %d"
 msgstr "選択したチャンク: %d / %d"
 
 msgid "Please wait while the file is opened ..."
-msgstr ""
+msgstr "ファイルが開くまでしばらくお待ちください..."
 
 msgid "Source:"
 msgstr "ソース:"
@@ -602,16 +596,6 @@ msgstr "リモートコマンド:"
 msgid "Start revision:"
 msgstr "指定リビジョンから:"
 
-msgid "&Clone"
-msgstr "クローン(&C)"
-
-msgid "Detail"
-msgstr "詳細"
-
-#, python-format
-msgid "Clone - %s"
-msgstr "クローン - %s"
-
 msgid "TortoiseHg Clone"
 msgstr "TortoiseHg クローンツール"
 
@@ -621,21 +605,6 @@ msgstr "クローン先のフォルダを作成できませんでした"
 msgid "Please specify a different path."
 msgstr "違うパスを指定してください"
 
-msgid "Source path is empty"
-msgstr "クローン元のパスが入力されていません"
-
-msgid "Please enter a valid source path."
-msgstr "正しいクローン元のパスを入力してください"
-
-msgid "Source and destination are the same"
-msgstr "クローン元とクローン先が同一です"
-
-msgid "Please specify different paths."
-msgstr "違うパスを指定してください"
-
-msgid "Please enter a new destination path."
-msgstr "新しいクローン先のパスを入力してください"
-
 msgid "Select source repository"
 msgstr "クローン元リポジトリを選んでください"
 
@@ -644,6 +613,13 @@ msgstr "クローン先リポジトリを選んでください"
 
 msgid "Select patch folder"
 msgstr "パッチフォルダーを選んでください"
+
+#, python-format
+msgid "Clone - %s"
+msgstr "クローン - %s"
+
+msgid "&Clone"
+msgstr "クローン(&C)"
 
 msgid "failed to start command\n"
 msgstr "コマンドの開始に失敗しました\n"
@@ -670,6 +646,10 @@ msgstr "[コマンドの返り値 %d %%s]"
 msgid "[command completed successfully %s]"
 msgstr "[コマンドが成功しました %s]"
 
+#, python-format
+msgid "ignoring invalid cmdworker '%s'\n"
+msgstr "無効な cmdworker 「%s」を無視\n"
+
 msgid "Running..."
 msgstr "実行中..."
 
@@ -677,10 +657,10 @@ msgid "Failed!"
 msgstr "失敗!"
 
 msgid "Clea&r Log"
-msgstr ""
+msgstr "ログを削除(&R)"
 
-msgid "TortoiseHg Command Dialog"
-msgstr "TortoiseHg コマンドダイアログ"
+msgid "Detail"
+msgstr "詳細"
 
 msgid "Confirm Exit"
 msgstr "終了"
@@ -692,12 +672,18 @@ msgstr ""
 "Mercurialのコマンドがまだ実行中です。\n"
 "本当に終了しますか？"
 
+msgid "&Run"
+msgstr "実行(&R)"
+
+msgid "TortoiseHg Command Dialog"
+msgstr "TortoiseHg コマンドダイアログ"
+
 msgid "Command Error"
-msgstr ""
+msgstr "コマンドエラー"
 
 #, python-format
 msgid "[Code: %d]"
-msgstr ""
+msgstr "[終了値: %d]"
 
 msgctxt "start progress"
 msgid "Commit"
@@ -778,6 +764,9 @@ msgstr "ブランチを切り直し(&B)"
 
 msgid "&Commit to current branch"
 msgstr "現行のブランチへコミット(&C)"
+
+msgid "Cancel"
+msgstr "キャンセル"
 
 msgid "Confirm New Branch"
 msgstr "新規ブランチの作成"
@@ -893,7 +882,7 @@ msgid "Push After Commit:"
 msgstr "コミット後にプッシュ"
 
 msgid "Auto Includes:"
-msgstr ""
+msgstr "自動的に追加:"
 
 msgid "Recurse into subrepositories (--subrepos)"
 msgstr "サブリポジトリも巡回 (--subrepos)"
@@ -908,13 +897,13 @@ msgid "Unable to write configuration file"
 msgstr "設定ファイルに書き込めません"
 
 msgid "Unable to save after commit push"
-msgstr ""
+msgstr "コミット後にプッシュの保存失敗"
 
 msgid "Unable to save auto include list"
-msgstr ""
+msgstr "自動的に追加の保存失敗"
 
 msgid "Unable to save recurse in subrepos."
-msgstr ""
+msgstr "サブリポジトリも巡回の保存失敗"
 
 msgid "Invalid date format"
 msgstr "日付の形式が不正です"
@@ -999,7 +988,7 @@ msgid "Transplant:"
 msgstr "移植元:"
 
 msgid "Obsolete state:"
-msgstr ""
+msgstr "廃止状態:"
 
 msgid "Perforce:"
 msgstr "Perforce:"
@@ -1011,7 +1000,7 @@ msgid "Converted From:"
 msgstr "変換元:"
 
 msgid "Original Parent:"
-msgstr ""
+msgstr "元の親:"
 
 msgid "No items to display"
 msgstr "表示する項目がありません"
@@ -1066,16 +1055,16 @@ msgid "Command"
 msgstr "コマンド"
 
 msgid "New hook"
-msgstr ""
+msgstr "フック追加"
 
 msgid "Edit hook"
-msgstr ""
+msgstr "フック編集"
 
 msgid "Delete hook"
-msgstr ""
+msgstr "フック削除"
 
 msgid "Replace existing hook?"
-msgstr ""
+msgstr "既存のフックを置き換え?"
 
 #, python-format
 msgid ""
@@ -1083,6 +1072,9 @@ msgid ""
 "\n"
 "Do you want to replace it?"
 msgstr ""
+"%s.%s というフックは既にあります。\n"
+"\n"
+"置き換えますか?"
 
 msgid "OK"
 msgstr "OK"
@@ -1214,10 +1206,10 @@ msgid "You must set a command to run."
 msgstr "実行するコマンドを設定して下さい。"
 
 msgid "Configure Hook"
-msgstr ""
+msgstr "フックを設定"
 
 msgid "Hook type"
-msgstr ""
+msgstr "フックタイプ"
 
 msgid "Select when your command will be run"
 msgstr ""
@@ -1229,12 +1221,14 @@ msgid ""
 "The command that will be executed.\n"
 "To execute a python function prepend the command with \"python:\".\n"
 msgstr ""
+"実行するコマンド。\n"
+"Python 関数を実行する場合は「python:」を先頭に追加してください。\n"
 
 msgid "You must set a valid hook type."
-msgstr ""
+msgstr "正しいフックタイプを指定して下さい。"
 
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
-msgstr ""
+msgstr "フック名に空白・タブ・「=」は使えません。"
 
 msgid "Custom Tools"
 msgstr "カスタムツール"
@@ -1278,13 +1272,13 @@ msgid "&View at Revision"
 msgstr "このリビジョンを開く(&V)"
 
 msgid "View file as it appeared at this revision"
-msgstr ""
+msgstr "このリビジョン時点でのファイルを開く"
 
 msgid "&Save at Revision..."
 msgstr "このリビジョンを保存(&S)..."
 
 msgid "Save file as it appeared at this revision"
-msgstr ""
+msgstr "このリビジョン時点でのファイルを保存"
 
 msgid "&Edit Local"
 msgstr "ローカルファイルを編集(&E)"
@@ -1320,10 +1314,10 @@ msgid "Open a shell terminal in the selected folder"
 msgstr "選択したフォルダーで端末を開きます。"
 
 msgid "File(s) not found"
-msgstr ""
+msgstr "ファイルがありません"
 
 msgid "The selected files do not exist in the working directory"
-msgstr ""
+msgstr "選択されたファイルが作業領域にありません"
 
 msgid "Cannot display visual diff"
 msgstr "GUI差分を表示できません"
@@ -1331,17 +1325,11 @@ msgstr "GUI差分を表示できません"
 msgid "Visual diffs are not supported for unapplied patches"
 msgstr "未適用のパッチに対するGUI差分はサポートされていません"
 
-msgid "Cannot open subrepository"
-msgstr "サブディレクトリを開けません"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "作業領域には選択したサブリポジトリがありません"
-
 msgid "Display the file anyway"
-msgstr ""
+msgstr "ファイルを表示させる"
 
-msgid "File or diffs not displayed: "
-msgstr "ファイルや差分を表示しません: "
+msgid "Diff not displayed: "
+msgstr "差分は表示されません: "
 
 #, python-format
 msgid ""
@@ -1357,28 +1345,45 @@ msgstr "バイナリファイル"
 msgid "File may be binary (maximum line length exceeded)"
 msgstr "おそらくバイナリファイルです(最大行数を超えています)"
 
+msgid "File or diffs not displayed: "
+msgstr "ファイルや差分を表示しません: "
+
+msgid " <i>(was added)</i>"
+msgstr " <i>(追加)</i>"
+
 #, python-format
 msgid " <i>(copied from %s)</i>"
-msgstr ""
+msgstr " <i>(%s から複製)</i>"
 
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(改名元: %s)</i>"
 
-msgid " <i>(was added)</i>"
-msgstr " <i>(追加)</i>"
+msgid " <i>(is a symlink)</i>"
+msgstr " <i>(シンボリックリンク)</i>"
+
+#, python-format
+msgid ""
+"File or diffs not displayed: File is larger than the specified max size.\n"
+"maxdiff = %s KB"
+msgstr ""
+"ファイルか差分が表示できません。: ファイルは最大サイズ設定より大きいです。\n"
+"最大差分 = %s KB"
+
+msgid " <i>(was deleted)</i>"
+msgstr " <i>(は削除されました)</i>"
+
+msgid " <i>(was added, now missing)</i>"
+msgstr " <i>(は追加されましたが今はありません)</i>"
+
+msgid " <i>(is unversioned)</i>"
+msgstr " <i>(はまだバージョン管理下にはありません)</i>"
 
 msgid "exec mode has been <font color='red'>set</font>"
 msgstr "実行権限を<font color='red'>設定</font>"
 
 msgid "exec mode has been <font color='red'>unset</font>"
 msgstr "実行権限を<font color='red'>解除</font>"
-
-msgid " <i>(is a symlink)</i>"
-msgstr " <i>(シンボリックリンク)</i>"
-
-msgid "Diff not displayed: "
-msgstr "差分は表示されません: "
 
 #, python-format
 msgid "changeset: %s"
@@ -1481,31 +1486,14 @@ msgid "(is a new and dirty sub-repository)"
 msgstr ""
 
 msgid "open..."
-msgstr ""
-
-#, python-format
-msgid ""
-"File or diffs not displayed: File is larger than the specified max size.\n"
-"maxdiff = %s KB"
-msgstr ""
-"ファイルか差分が表示できません。: ファイルは最大サイズ設定より大きいです。\n"
-"最大差分 = %s KB"
-
-msgid " <i>(was deleted)</i>"
-msgstr " <i>(は削除されました)</i>"
-
-msgid " <i>(was added, now missing)</i>"
-msgstr " <i>(は追加されましたが今はありません)</i>"
-
-msgid " <i>(is unversioned)</i>"
-msgstr " <i>(はまだバージョン管理下にはありません)</i>"
+msgstr "開く…"
 
 #, python-format
 msgid "Hg file log viewer [%s] - %s"
 msgstr "Hg ファイルログビューアー [%s] - %s"
 
 msgid "File History Log Columns"
-msgstr ""
+msgstr "ファイル変更履歴のログ表示列"
 
 msgid "Back"
 msgstr "戻る"
@@ -1514,16 +1502,16 @@ msgid "Forward"
 msgstr "進む"
 
 msgid "&Diff Selected Changesets"
-msgstr ""
+msgstr "選択したリビジョンの差分 (&diff)"
 
 msgid "Diff Selected &File Revisions"
-msgstr ""
+msgstr "選択したリビジョンのファイル差分(&F)"
 
 msgid "&Diff Changeset to Parent"
-msgstr ""
+msgstr "親リビジョンとの差分 (&diff)"
 
 msgid "Diff Changeset to &Local"
-msgstr ""
+msgstr "ローカルとの差分(&L) (diff)"
 
 msgid "Diff &File to Parent"
 msgstr "親リビジョンとのファイル差分(&F)"
@@ -1532,7 +1520,7 @@ msgid "Diff File to Lo&cal"
 msgstr "ローカルとのファイル差分(&C)"
 
 msgid "Show Revision &Details"
-msgstr ""
+msgstr "リビジョンの詳細を表示(&D)"
 
 msgid "You must select two revisions to diff"
 msgstr "差分を見るには２つのリビジョンを選択して下さい。"
@@ -1541,7 +1529,7 @@ msgid "Too many rows selected for menu"
 msgstr ""
 
 msgid "File Differences Log Columns"
-msgstr ""
+msgstr "ファイル比較のログ表示列"
 
 msgid "Next diff"
 msgstr "次の差分"
@@ -1549,12 +1537,84 @@ msgstr "次の差分"
 msgid "Previous diff"
 msgstr "前の差分"
 
+msgid "Unicode"
+msgstr "Unicode"
+
+msgid "Western Europe"
+msgstr "西欧"
+
+msgid "Unified Chinese"
+msgstr "簡体中国語"
+
+msgid "Traditional Chinese"
+msgstr "繁体中国語"
+
+msgid "Korean"
+msgstr "韓国語"
+
+msgid "Japanese"
+msgstr "日本語"
+
+msgid "Thai"
+msgstr "タイ語"
+
+msgid "Central and Eastern Europe"
+msgstr "中東欧"
+
+msgid "Cyrillic"
+msgstr "キリル文字"
+
+msgid "Russian"
+msgstr "ロシア語"
+
+msgid "Ukrainian"
+msgstr "ウクライナ語"
+
+msgid "Greek"
+msgstr "ギリシャ語"
+
+msgid "Turkish"
+msgstr "トルコ語"
+
+msgid "Arabic"
+msgstr "アラビア語"
+
+msgid "Hebrew"
+msgstr "ヘブライ語"
+
+msgid "Vietnamese"
+msgstr "ベトナム語"
+
+msgid "Baltic"
+msgstr "バルト語"
+
+msgid "Southern Europe"
+msgstr "南欧"
+
+msgid "Nordic"
+msgstr "北欧"
+
+msgid "Celtic"
+msgstr "ケルト語"
+
+msgid "South-Eastern Europe"
+msgstr "南東欧"
+
+#. i18n: comma-separated list of common encoding names in your locale, e.g.
+#. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
+#.
+#. pick from the following encodings:
+#. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
+#. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
+#. cp1251, koi8-r, koi8-u, iso8859-7, cp1253, cp1254, cp1256, iso8859-6,
+#. cp1255, iso8859-8, cp1258, iso8859-4, iso8859-13, cp1257, iso8859-3,
+#. iso8859-10, iso8859-14, iso8859-16
+msgid "$FILE_ENCODINGS"
+msgstr "utf-8,shift_jis,euc_jp,iso2022_jp"
+
 msgctxt "column header"
 msgid "Filename"
 msgstr "ファイル名"
-
-msgid " (excluded from the next commit)"
-msgstr ""
 
 msgid "View change as unified diff output"
 msgstr "unified diff形式で表示"
@@ -1562,14 +1622,17 @@ msgstr "unified diff形式で表示"
 msgid "View change in context of file"
 msgstr "変更点をファイル内で表示"
 
-msgid "annotate with revision numbers"
-msgstr "リビジョン番号も表示"
+msgid "Annotate with revision numbers"
+msgstr "行ごとの由来リビジョンを表示"
 
-msgid "Next diff (alt+down)"
-msgstr "次の差分 (alt+下)"
+msgid "Next Diff"
+msgstr "次の差分"
 
-msgid "Previous diff (alt+up)"
-msgstr "前の差分 (alt+上)"
+msgid "Previous Diff"
+msgstr "前の差分"
+
+msgid "Open shelve tool"
+msgstr "シェルフツールを開く"
 
 msgid "Show changes from first parent"
 msgstr "最初の親からの変更を表示"
@@ -1577,54 +1640,21 @@ msgstr "最初の親からの変更を表示"
 msgid "Show changes from second parent"
 msgstr "二番目の親からの変更を表示"
 
-msgid "Open shelve tool"
-msgstr "シェルフツールを開く"
-
-msgid "Mark excluded changes"
-msgstr ""
+msgid "E&ncoding"
+msgstr "エンコーディング(&N)"
 
 msgid "&Search in Current File"
 msgstr "ファイル内を検索(&S)"
 
 msgid "Search in All &History"
-msgstr ""
+msgstr "全履歴を検索(&H)"
 
-msgid "Annotate Op&tions"
-msgstr "由来情報オプション(&T)"
-
-msgid "Search Selected Text"
-msgstr ""
-
-msgid "In Current &File"
-msgstr ""
-
-msgid "In &Current Revision"
-msgstr ""
-
-msgid "In &Original Revision"
-msgstr ""
-
-msgid "In All &History"
-msgstr ""
-
-msgid "Go to"
-msgstr ""
-
-msgid "View File at"
-msgstr ""
-
-msgid "Diff File to"
-msgstr ""
-
-msgid "&Originating Revision"
-msgstr ""
-
-msgid "&Local"
-msgstr "ローカル(&L)"
+msgid "Go to Line"
+msgstr "指定行へ移動"
 
 #, python-format
-msgid "&Parent Revision (%d)"
-msgstr ""
+msgid "Enter line number (1 - %d)"
+msgstr "行番号を入力 (1 〜 %d)"
 
 msgid "Show &Author"
 msgstr "ユーザ名を表示(&A)"
@@ -1634,6 +1664,52 @@ msgstr "日付を表示(&D)"
 
 msgid "Show &Revision"
 msgstr "リビジョン番号を表示(&R)"
+
+msgid "Annotate Op&tions"
+msgstr "由来情報オプション(&T)"
+
+msgid "Search Selected Text"
+msgstr "選択した文字列を検索"
+
+msgid "In Current &File"
+msgstr "ファイル内から(&F)"
+
+msgid "In &Current Revision"
+msgstr "現在のリビジョンから(&C)"
+
+msgid "In &Original Revision"
+msgstr "由来リビジョンから(&O)"
+
+msgid "In All &History"
+msgstr "全履歴から(&H)"
+
+msgid "Go to"
+msgstr "移動"
+
+msgid "View File at"
+msgstr "ファイルを表示"
+
+msgid "Diff File to"
+msgstr "ファイル差分"
+
+msgid "&Originating Revision"
+msgstr "由来リビジョン(&O)"
+
+msgid "&Local"
+msgstr "ローカル(&L)"
+
+msgid "&Parent Revision"
+msgstr "親リビジョン(&P)"
+
+#, python-format
+msgid "&Parent Revision (%d)"
+msgstr "親リビジョン(&P) (%d)"
+
+msgid "&Mark Excluded Changes"
+msgstr ""
+
+msgid "(excluded from the next commit)"
+msgstr "(次のコミットから除外)"
 
 msgid "Interrupted graft operation found"
 msgstr "移植が中断されています。"
@@ -1653,7 +1729,7 @@ msgstr "中断された移植を再開しますか？中止しますか？"
 
 #, python-format
 msgid "Graft %d changesets on top of changeset %s"
-msgstr ""
+msgstr "%d つのリビジョンを %s の続きへ移植"
 
 msgid "To graft destination"
 msgstr "移植先"
@@ -1662,10 +1738,10 @@ msgid "Use my user name instead of graft committer user name"
 msgstr ""
 
 msgid "Use current date"
-msgstr ""
+msgstr "現時刻を使う"
 
 msgid "Append graft info to log message"
-msgstr ""
+msgstr "コミットログへ移植情報を追加"
 
 msgid "Graft"
 msgstr "移植 (graft)"
@@ -1682,7 +1758,7 @@ msgstr "移植元リビジョン"
 
 #, python-format
 msgid "Graft changeset #%d of %d"
-msgstr ""
+msgstr "移植元リビジョン #%d (全 %d)"
 
 msgid ""
 "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
@@ -1697,11 +1773,11 @@ msgstr "移植を開始できます"
 msgid "Graft is complete"
 msgstr "移植を完了しました"
 
-msgid "Graft aborted"
-msgstr "移植が中止されました"
-
 msgid "Graft failed"
 msgstr "移植が失敗しました"
+
+msgid "Graft aborted"
+msgstr "移植が中止されました"
 
 msgid ""
 "Graft generated merge <b>conflicts</b> that must be <a href=\"resolve"
@@ -1766,9 +1842,6 @@ msgstr ""
 "検索対象ファイルパターンをカンマ区切りで指定します。デフォルトではリポジトリ"
 "全体を検索します。"
 
-msgid "TortoiseHg Search"
-msgstr "TortoiseHg 検索"
-
 #, python-format
 msgid "\"%s\" removed from search history"
 msgstr "検索履歴から\"%s\"を削除しました"
@@ -1831,6 +1904,9 @@ msgstr "ユーザー名"
 
 msgid "Match Text"
 msgstr "発見した文字"
+
+msgid "TortoiseHg Search"
+msgstr "TortoiseHg 検索"
 
 #, python-format
 msgid "Detect Copies/Renames in %s"
@@ -1902,7 +1978,7 @@ msgstr ""
 #. i18n: percent format
 #, python-format
 msgid "%d%%"
-msgstr ""
+msgstr "%d%%"
 
 msgid "Source"
 msgstr "元ファイル"
@@ -2194,19 +2270,6 @@ msgstr "順番を変えるにはドラッグしてください"
 msgid "Workbench"
 msgstr "ワークベンチ"
 
-#, python-format
-msgid "Manifest %s@%s"
-msgstr "マニフェスト %s@%s"
-
-msgid "### filter text ###"
-msgstr "### 抽出する文字列 ###"
-
-msgid "Filter:"
-msgstr "フィルター:"
-
-msgid "Status"
-msgstr "状態"
-
 msgid "Find revisions matching fields of:"
 msgstr "フィールド検索元リビジョン:"
 
@@ -2364,7 +2427,7 @@ msgid "Commit merge results"
 msgstr "マージ結果をコミット"
 
 msgid "Commit Options"
-msgstr ""
+msgstr "コミットオプション"
 
 msgid "Commit Now"
 msgstr "すぐにコミット"
@@ -2380,7 +2443,7 @@ msgid "Merge with %s"
 msgstr "%s とマージ"
 
 msgid "TortoiseHg Merge Commit"
-msgstr ""
+msgstr "TortoiseHg マージコミット"
 
 #, python-format
 msgid ""
@@ -2392,7 +2455,7 @@ msgid "Merge changeset"
 msgstr "マージしたチェンジセット"
 
 msgid "Syntax Highlighting"
-msgstr ""
+msgstr "構文強調表示"
 
 msgid "Paste &Filenames"
 msgstr "ファイル名を貼り付け(&F)"
@@ -2404,28 +2467,28 @@ msgid "C&onfigure Format"
 msgstr "フォーマットを設定(&C)"
 
 msgid "&Commit to Queue..."
-msgstr ""
+msgstr "キューをコミット(&C)..."
 
 msgid "Create &New Queue..."
-msgstr ""
+msgstr "キューを作成(&N)..."
 
 msgid "&Rename Active Queue..."
-msgstr ""
+msgstr "使用中のキュー名を変更(&R)..."
 
 msgid "&Delete Queue..."
-msgstr ""
+msgstr "キューの参照を削除(&D)..."
 
 msgid "&Purge Queue..."
-msgstr ""
+msgstr "キューを完全に削除(&P)..."
 
 msgid "Create Patch Queue"
-msgstr ""
+msgstr "キューを作成"
 
 msgid "New patch queue name"
 msgstr "作成するパッチキューの名前"
 
 msgid "Rename Patch Queue"
-msgstr ""
+msgstr "キュー名を変更"
 
 #, python-format
 msgid "Rename patch queue '%s' to"
@@ -2435,29 +2498,29 @@ msgid "Rename"
 msgstr "名前の変更"
 
 msgid "Delete Patch Queue"
-msgstr ""
+msgstr "キューの参照を削除"
 
 msgid "Delete reference to"
-msgstr ""
+msgstr "次の参照を削除"
 
 msgid "Delete"
 msgstr "削除"
 
 msgid "Purge Patch Queue"
-msgstr ""
+msgstr "キューを完全に削除"
 
 msgid "Remove patch directory of"
-msgstr ""
+msgstr "次のパッチディレクトリを削除"
 
 msgid "Purge"
 msgstr "完全に削除"
 
 msgid "Rename Patch"
-msgstr ""
+msgstr "パッチ名を変更"
 
 #, python-format
 msgid "Rename patch <b>%s</b> to:"
-msgstr "パッチ <b>%s</a> の新しい名前:"
+msgstr "パッチ <b>%s</b> の新しい名前:"
 
 msgid "no guards"
 msgstr "ガードはありません"
@@ -2480,13 +2543,13 @@ msgid "Apply one patch"
 msgstr "パッチを一つ適用"
 
 msgid "Set &Guards..."
-msgstr ""
+msgstr "ガードを設定(&G)..."
 
 msgid "Configure guards for selected patch"
 msgstr "選択したパッチへのガードを設定"
 
 msgid "&Delete Patches..."
-msgstr ""
+msgstr "パッチを削除(&D)..."
 
 msgid "Delete selected patches"
 msgstr "選択したパッチを削除します"
@@ -2534,7 +2597,7 @@ msgid "Force push or pop (--force)"
 msgstr "作業領域の変更をそのままでパッチを適用 (--force)"
 
 msgid "Tolerate non-conflicting local changes (--keep-changes)"
-msgstr ""
+msgstr "衝突しない作業領域中の変更を許容 (--keep-changes)"
 
 msgid "### patch name ###"
 msgstr "### パッチ名 ###"
@@ -2560,9 +2623,6 @@ msgstr "p4チェンジリストをサブミット中..."
 
 msgid "Reverting p4 changelist..."
 msgstr "p4チェンジリスト復旧しています..."
-
-msgid "Edit Repository URL"
-msgstr "リポジトリURLを編集"
 
 msgid "Patch Branch Toolbar"
 msgstr "パッチブランチツールバー"
@@ -2622,6 +2682,9 @@ msgstr ""
 
 msgid "Graph"
 msgstr "グラフ"
+
+msgid "Status"
+msgstr "状態"
 
 msgid "Title"
 msgstr "タイトル"
@@ -2774,7 +2837,7 @@ msgid "Deleted %d files and %d folders"
 msgstr "%d つのファイルと %d つのフォルダーを削除しました"
 
 msgid "Delete Patches"
-msgstr ""
+msgstr "パッチを削除"
 
 msgid "Remove patches from queue?"
 msgstr "キューからパッチを除外しますか？"
@@ -2861,7 +2924,7 @@ msgid "&Invisible"
 msgstr "非表示(&I)"
 
 msgid "&AfterIndent"
-msgstr ""
+msgstr "インデント以外(&A)"
 
 msgid "&TAB Inserts"
 msgstr "&TAB 入力"
@@ -2903,13 +2966,43 @@ msgid "Wrap search"
 msgstr "先頭から再検索"
 
 msgid "Prev"
-msgstr ""
+msgstr "前へ"
 
 msgid "Next"
-msgstr ""
+msgstr "次へ"
 
-msgid "Unable to read/write config file"
-msgstr "設定ファイルを読み書きできません"
+msgid "Unable to read file"
+msgstr "ファイルの読み込みに失敗"
+
+msgid "Could not open the specified file for reading."
+msgstr "指定したファイルを読み込み用に開けませんでした。"
+
+msgid "This appears to be a binary file."
+msgstr "バイナリファイルと思われます。"
+
+msgid "An error occurred while reading the file."
+msgstr "ファイル読み込み中にエラーが起きました。"
+
+msgid "Text Translation Failure"
+msgstr "文字列の翻訳に失敗"
+
+msgid "Could not translate the file content from native encoding."
+msgstr "ファイルの内容を環境依存のエンコーディングから変換できませんでした。"
+
+msgid "Several characters would be lost."
+msgstr "文字列が欠けた可能性があります。"
+
+msgid "Unable to write file"
+msgstr "ファイルの書き込みに失敗"
+
+msgid "Could not translate the file content to native encoding."
+msgstr "ファイルの内容を環境依存のエンコーディングへ変換できませんでした。"
+
+msgid "Could not open the specified file for writing."
+msgstr "指定したファイルを書き込み用に開けませんでした。"
+
+msgid "An error occurred while writing the file."
+msgstr "ファイル書き込み中にエラーが起きました。"
 
 msgid "Try refreshing your repository."
 msgstr "リポジトリを更新してください"
@@ -2971,6 +3064,10 @@ msgstr "ターミナルでパスを開けません"
 msgid "\"%s\" is not a valid directory"
 msgstr "\"%s\" は正しいディレクトリではありません"
 
+#, python-format
+msgid "Invalid configuration: %s"
+msgstr ""
+
 msgid "Unable to start the following command:"
 msgstr "以下のコマンドの起動に失敗しました:"
 
@@ -2988,9 +3085,6 @@ msgstr "ユーザー名を入力してください"
 
 msgid "You must identify yourself to Mercurial"
 msgstr "Mercurialにあなた自身の情報を入力してください"
-
-msgid "Text Translation Failure"
-msgstr "文字列の翻訳に失敗"
 
 msgid "Unable to translate input to local encoding."
 msgstr "入力をローカルのエンコーディングに変換できません"
@@ -3055,7 +3149,7 @@ msgid "To rebase destination"
 msgstr "リベース先"
 
 msgid "Swap source and destination"
-msgstr ""
+msgstr "リベース元と先を入れ替え"
 
 msgid "Keep original changesets"
 msgstr "元のチェンジセットを保持"
@@ -3067,7 +3161,7 @@ msgid "Collapse the rebased changesets "
 msgstr "移動後に移動リビジョンを単一化する "
 
 msgid "Rebase entire source branch"
-msgstr ""
+msgstr "元リビジョンのブランチ全体を移動"
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3092,11 +3186,11 @@ msgstr "リベースできます"
 msgid "Rebase is complete"
 msgstr "リベースが完了しました"
 
-msgid "Rebase aborted"
-msgstr "リベースが中断しました"
-
 msgid "Rebase failed"
 msgstr "リベースが失敗しました"
+
+msgid "Rebase aborted"
+msgstr "リベースが中断しました"
 
 msgid ""
 "Rebase generated merge <b>conflicts</b> that must be <a href=\"resolve"
@@ -3121,14 +3215,14 @@ msgstr "このチャンクを衝突解消済みと印をつけ、次の未解消
 msgid "Mark this chunk as unresolved"
 msgstr "このチャンクを衝突未解消と印を付ける"
 
-msgid "Unable to merge rejects"
-msgstr ""
+msgid "Reload File"
+msgstr "再読み込み"
 
-msgid "Can't read this file (maybe deleted)"
-msgstr "このファイルを開けません(削除された可能性があります)"
+msgid "Are you sure you want to reload this file?"
+msgstr "本当にファイルを読み込み直しますか?"
 
-msgid "This appears to be a binary file"
-msgstr "バイナリファイルと思われます"
+msgid "All unsaved changes will be lost."
+msgstr "保存していない変更は全て失われます。"
 
 msgid "Warning"
 msgstr "警告"
@@ -3153,16 +3247,8 @@ msgstr ""
 msgid "Copy source -> destination"
 msgstr "変更元から変更先にコピーする"
 
-#, python-format
-msgid "Copy - %s"
-msgstr "コピー　- %s"
-
 msgid "Copy Error"
 msgstr "コピーエラー"
-
-#, python-format
-msgid "Rename - %s"
-msgstr "名前の変更 - %s"
 
 msgid "Select Source File"
 msgstr "元ファイルの選択"
@@ -3179,17 +3265,19 @@ msgstr "元ファイルはこのリポジトリツリーの中になくてはい
 msgid "The destination must be within the repository tree."
 msgstr "保存先ファイルこのリポジトリツリーの中になくてはいけません"
 
-msgid "Please give a destination that differs from the source"
-msgstr "変更元とは違う名前を指定して下さい"
-
 msgid "Destination file already exists."
 msgstr "保存先ファイルはすでにあります"
 
 msgid "Are you sure you want to overwrite it ?"
 msgstr "本当に上書きしますか?"
 
-msgid "Cannot do a pure casefolding copy on Windows"
-msgstr "Windowsでは大文字小文字を保ったまま名前変更できません"
+#, python-format
+msgid "Copy - %s"
+msgstr "コピー　- %s"
+
+#, python-format
+msgid "Rename - %s"
+msgstr "名前の変更 - %s"
 
 msgid "Show all"
 msgstr "全て表示"
@@ -3216,13 +3304,13 @@ msgid "Toggle filtering of non-matched changesets"
 msgstr "適合しないチェンジセットも表示する/しない の切り替え"
 
 msgid "Show/Hide hidden changesets"
-msgstr ""
+msgstr "不可視状態のリビジョンを表示・非表示"
 
 msgid "Toggle graft relations visibility"
-msgstr ""
+msgstr "移植関係の表示を切り替え"
 
 msgid "Keyword Search"
-msgstr ""
+msgstr "キーワード検索"
 
 msgid "Revision Set"
 msgstr "リビジョンセット"
@@ -3326,7 +3414,7 @@ msgid "Show S&hort Paths"
 msgstr "短いパス名で表示(&H)"
 
 msgid "&Scan Repositories at Startup"
-msgstr ""
+msgstr "起動時にリポジトリをスキャン(&S)"
 
 msgid "Scan &Remote Repositories"
 msgstr ""
@@ -3402,7 +3490,7 @@ msgid "Convert an existing repository into a subrepository"
 msgstr "今あるリポジトリをサブリポジトリに変換します"
 
 msgid "Remo&ve Subrepository..."
-msgstr ""
+msgstr "サブリポジトリを削除(&V)..."
 
 msgid "Remove this subrepository from the current revision"
 msgstr ""
@@ -3648,10 +3736,6 @@ msgid "Synchronize"
 msgstr "同期"
 
 msgctxt "tab tooltip"
-msgid "Manifest"
-msgstr "マニフェスト"
-
-msgctxt "tab tooltip"
 msgid "Search"
 msgstr "検索"
 
@@ -3678,33 +3762,33 @@ msgstr "取り込み対象のチェンジセットを却下します"
 
 #, python-format
 msgid "Push current branch (%s)"
-msgstr ""
+msgstr "現ブランチをプッシュ (%s)"
 
 #, python-format
 msgid "Push up to current revision (#%d)"
-msgstr ""
+msgstr "現リビジョンまでプッシュ (#%d)"
 
 #, python-format
 msgid "Push up to revision #%d"
-msgstr ""
+msgstr "リビジョン #%d までプッシュ"
 
 msgid "Push all"
 msgstr "全てをプッシュ"
 
 msgid "no outgoing changesets"
-msgstr ""
+msgstr "反映候補リビジョンがありません"
 
 #, python-format
 msgid "no outgoing changesets in current branch (%s) / %d in total"
-msgstr ""
+msgstr "現ブランチ(%s)に反映候補リビジョンがありません / 全 %d 件"
 
 #, python-format
 msgid "no outgoing changesets up to current revision (#%d) / %d in total"
-msgstr ""
+msgstr "現リビジョン(#%d)までに反映候補リビジョンがありません / 全 %d 件"
 
 #, python-format
 msgid "no outgoing changesets up to revision #%d / %d in total"
-msgstr ""
+msgstr "リビジョン #%d までに反映候補リビジョンがありません / 全 %d 件"
 
 #, python-format
 msgid "%d outgoing changesets"
@@ -3712,18 +3796,18 @@ msgstr "%d 件の送信チェンジセット"
 
 #, python-format
 msgid "%d outgoing changesets in current branch (%s) / %d in total"
-msgstr ""
+msgstr "%d 件の反映候補リビジョン (現ブランチ %s) / 全 %d 件"
 
 #, python-format
 msgid "%d outgoing changesets up to current revision (#%d) / %d in total"
-msgstr ""
+msgstr "%d 件の反映候補リビジョン (現リビジョン #%d まで) / 全 %d 件"
 
 #, python-format
 msgid "%d outgoing changesets up to revision #%d / %d in total"
-msgstr ""
+msgstr "%d 件の反映候補リビジョン (リビジョン #%d まで) / 全 %d 件"
 
 msgid "Nothing to push"
-msgstr ""
+msgstr "反映対象がありません"
 
 #, python-format
 msgid "%s - verify repository"
@@ -3818,7 +3902,7 @@ msgid "Boo&kmark..."
 msgstr "ブックマーク (boo&kmark)..."
 
 msgid "Sig&n..."
-msgstr ""
+msgstr "署名(&N)..."
 
 msgid "&Backout..."
 msgstr "変更の打ち消し (&backout)..."
@@ -3854,7 +3938,7 @@ msgid "Modi&fy History"
 msgstr "履歴を修正(&F)"
 
 msgid "&Unapply Patch"
-msgstr ""
+msgstr "パッチを適用解除(&U)"
 
 msgid "Import to &MQ"
 msgstr "&MQ へインポート (qimport)"
@@ -3863,7 +3947,7 @@ msgid "&Finish Patch"
 msgstr "パッチを通常リビジョン化 (q&finish)"
 
 msgid "MQ &Options"
-msgstr ""
+msgstr "MQ オプション(&O)"
 
 msgid "&Rebase..."
 msgstr "移動 (&rebase)..."
@@ -3923,7 +4007,7 @@ msgid "Compress History..."
 msgstr "履歴を圧縮..."
 
 msgid "Rebase..."
-msgstr ""
+msgstr "移動 (rebase)..."
 
 msgid "Goto common ancestor"
 msgstr "共通の祖先に移動"
@@ -3938,13 +4022,13 @@ msgid "Post Selected to Review Board..."
 msgstr "選択した部分をレビューボードに投稿..."
 
 msgid "Apply patch"
-msgstr ""
+msgstr "パッチを適用"
 
 msgid "Apply onto original parent"
-msgstr ""
+msgstr "元の親へパッチを適用"
 
 msgid "Apply only this patch"
-msgstr ""
+msgstr "このパッチだけ適用"
 
 msgid "Fold patches..."
 msgstr "パッチを統合..."
@@ -4280,18 +4364,39 @@ msgstr "<デフォルト>"
 msgid "File List Toolbar"
 msgstr "ファイルリストツールバー"
 
-msgid "Update to this revision"
-msgstr "このリビジョンに更新する"
+msgid "Manifest Mode"
+msgstr "マニフェスト表示"
 
-msgid "Show All"
-msgstr "すべて表示"
+msgid "Show the full manifest in tree view"
+msgstr "マニフェストをツリー表示"
 
-msgid "Toggle display of all files and the direction they were merged"
-msgstr ""
+msgid "Fl&at List View"
+msgstr "リスト表示(&A)"
+
+msgid "### filter text ###"
+msgstr "### 抽出する文字列 ###"
+
+msgid "&Changed by This Commit"
+msgstr "このリビジョンでの変更(&C)"
+
+msgid "Show files changed by this commit"
+msgstr "このリビジョンで変更されたファイルを表示"
+
+msgid "Compare to &1st Parent"
+msgstr "第&1親リビジョンと比較"
+
+msgid "Compare to &2nd Parent"
+msgstr "第&2親リビジョンと比較"
+
+msgid "Toggle parent to be used as the base revision"
+msgstr "比較元の親リビジョンを切り替え"
+
+msgid "&Filter by Status"
+msgstr "状態フィルター(&F)"
 
 #, python-format
 msgid "%s - Revision Details (%s)"
-msgstr ""
+msgstr "%s - リビジョンの詳細 (%s)"
 
 #, python-format
 msgid "Revert - %s"
@@ -4544,6 +4649,17 @@ msgstr "thg: %s\n"
 msgid "abort: %s!\n"
 msgstr "中止: %s!\n"
 
+#, python-format
+msgid "abort: %s\n"
+msgstr "中止: %s\n"
+
+#, python-format
+msgid "(%s)\n"
+msgstr ""
+
+msgid "option --config may not be abbreviated!"
+msgstr ""
+
 msgid "invalid arguments"
 msgstr "引数が正しくありません"
 
@@ -4569,6 +4685,9 @@ msgstr "出力を抑制する"
 
 msgid "display help and exit"
 msgstr "ヘルプを表示して終了する"
+
+msgid "set/override config option (use 'section.name=value')"
+msgstr ""
 
 msgid "start debugger"
 msgstr "デバッガを開始"
@@ -4614,7 +4733,7 @@ msgstr "thg annotate"
 
 #, python-format
 msgid "invalid line number: %s"
-msgstr ""
+msgstr "行番号が不正: %s"
 
 msgid "revision to archive"
 msgstr "アーカイブするリビジョン"
@@ -4641,7 +4760,7 @@ msgid "revision"
 msgstr ""
 
 msgid "thg bookmarks [-r REV] [NAME]"
-msgstr ""
+msgstr "thg bookmarks [-r REV] [NAME]"
 
 msgid "only one new bookmark name allowed"
 msgstr ""
@@ -4664,8 +4783,8 @@ msgstr "メタデータのコピーに Pull を使用する"
 msgid "use uncompressed transfer (fast over LAN)"
 msgstr "非圧縮での転送(LAN での高速転送用)"
 
-msgid "thg clone [OPTION]... SOURCE [DEST]"
-msgstr "thg clone [オプション]... SOURCE [DEST]"
+msgid "thg clone [OPTION]... [SOURCE] [DEST]"
+msgstr "thg clone [OPTION]... [SOURCE] [DEST]"
 
 msgid "record user as committer"
 msgstr "ユーザをコミッタとして記録する"
@@ -4677,7 +4796,7 @@ msgid "thg commit [OPTIONS] [FILE]..."
 msgstr "thg commit [オプション] [ファイル]..."
 
 msgid "thg debugbugreport [TEXT]"
-msgstr ""
+msgstr "thg debugbugreport [TEXT]"
 
 msgid "thg drag_copy SOURCE... DEST"
 msgstr "thg drag_copy SOURCE... DEST"
@@ -4789,7 +4908,7 @@ msgid "thg init [DEST]"
 msgstr "thg init [作成先ディレクトリ]"
 
 msgid "(DEPRECATED)"
-msgstr ""
+msgstr "(非推奨)"
 
 msgid "thg log [OPTIONS] [FILE]"
 msgstr "thg log [オプション] [ファイル]"
@@ -4810,7 +4929,7 @@ msgid "a revision to post"
 msgstr ""
 
 msgid "thg postreview [-r] REV..."
-msgstr ""
+msgstr "thg postreview [-r] REV..."
 
 msgid "no revisions specified"
 msgstr ""
@@ -4831,7 +4950,7 @@ msgid "rebase onto the specified changeset"
 msgstr "移動先リビジョン"
 
 msgid "thg rebase -s REV -d REV [--keep]"
-msgstr ""
+msgstr "thg rebase -s REV -d REV [--keep]"
 
 msgid "Rebase already in progress"
 msgstr "リベースは既に実行中です。"
@@ -4851,8 +4970,8 @@ msgstr "ファイルに対するパスを指定する必要があります"
 msgid "thg remove [FILE]..."
 msgstr "thg remove [ファイル]..."
 
-msgid "thg rename SOURCE [DEST]..."
-msgstr "thg rename 変更元 [変更先]..."
+msgid "thg rename [SOURCE] [DEST]"
+msgstr "thg rename [SOURCE] [DEST]"
 
 msgid "field to give initial focus"
 msgstr "初期化時にフォーカスを与えるフィールド"
@@ -4867,7 +4986,7 @@ msgid "the revision to show"
 msgstr ""
 
 msgid "thg revdetails [-r REV]"
-msgstr ""
+msgstr "thg revdetails [-r REV]"
 
 msgid "thg revert [FILE]..."
 msgstr "thg revert [ファイル]..."
@@ -4876,7 +4995,7 @@ msgid "revision to update"
 msgstr "リビジョンを更新"
 
 msgid "thg rupdate [[-r] REV]"
-msgstr ""
+msgstr "thg rupdate [[-r] REV]"
 
 msgid "name of the hgweb config file (serve more than one repository)"
 msgstr "hgweb 設定ファイル名 (複数のリポジトリを公開)"
@@ -4909,7 +5028,7 @@ msgid "use <text> as commit message"
 msgstr "<テキスト>をコミットメッセージとして使う"
 
 msgid "thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]"
-msgstr ""
+msgstr "thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]"
 
 msgid "Please enable the Gpg extension first."
 msgstr ""
@@ -4936,7 +5055,7 @@ msgid "thg strip [-f] [-n] [[-r] REV]"
 msgstr "thg strip [-f] [-n] [[-r] リビジョン]"
 
 msgid "thg sync [PEER]"
-msgstr ""
+msgstr "thg sync [PEER]"
 
 msgid "replace existing tag"
 msgstr "既存のタグを置換"
@@ -4969,7 +5088,7 @@ msgid "udpate all repos in current dir"
 msgstr "このディレクトリにある全てのリポジトリを更新する"
 
 msgid "thg thgstatus [OPTION]"
-msgstr ""
+msgstr "thg thgstatus [OPTION]"
 
 msgid "thg update [-C] [[-r] REV]"
 msgstr "thg update [-C] [[-r] リビジョン]"
@@ -5002,6 +5121,15 @@ msgstr "TortoiseHg フロントエンド (バージョン %s), Mercurial (バー
 msgid "Location:"
 msgstr "場所:"
 
+msgid "Update to:"
+msgstr "更新先:"
+
+msgid "Target:"
+msgstr "対象:"
+
+msgid "Options:"
+msgstr "オプション:"
+
 msgid "Discard remote changes, no backup (-C/--clean)"
 msgstr "リモートの未コミット変更内容の破棄(保存無し) (-C/--clean)"
 
@@ -5013,6 +5141,19 @@ msgstr "新規ブランチの反映を許可 (--new-branch)"
 
 msgid "Force push to remote location (-f/--force)"
 msgstr "反映先にヘッドが増える場合でも実施 (-f/--force)"
+
+msgid "remove working directory"
+msgstr "作業領域のファイルを削除"
+
+msgid "unknown revision!"
+msgstr "不明なリビジョン"
+
+#, python-format
+msgid "Remote Update - %s"
+msgstr ""
+
+msgid "&Update"
+msgstr "更新(&U)"
 
 msgid "Log"
 msgstr "ログ"
@@ -5028,7 +5169,7 @@ msgid "Stopped"
 msgstr "停止"
 
 msgid "TortoiseHg Web Server"
-msgstr ""
+msgstr "TortoiseHg ウェブサーバー"
 
 msgid "Web Server"
 msgstr "ウェブサーバー"
@@ -5059,19 +5200,19 @@ msgstr "未設定(&U)"
 
 #, python-format
 msgid "%dpt"
-msgstr ""
+msgstr "%dpt"
 
 msgid "Bold"
-msgstr ""
+msgstr "太字"
 
 msgid "Italic"
-msgstr ""
+msgstr "斜体"
 
 msgid "Strike"
 msgstr ""
 
 msgid "Underline"
-msgstr ""
+msgstr "下線"
 
 msgid "&Set..."
 msgstr "設定(&S)"
@@ -5179,10 +5320,8 @@ msgstr "リポジトリの変更監視"
 
 msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
-"always"
+"localonly"
 msgstr ""
-"TortoiseHgが変更をファイルシステムの変更を監視します。デフォルトは常に"
-"(always)です。"
 
 msgid "Max Diff Size"
 msgstr "最大差分サイズ"
@@ -5315,9 +5454,8 @@ msgstr ""
 msgid ""
 "Specify which task buttons you want to show on the task toolbar and in which "
 "order.<br>Type a list of the task button names. Add separators by putting \"|"
-"\" between task button names.<br>Valid names are: log commit mq sync "
-"manifest grep and pbranch.<br>Default: log commit manifest grep pbranch | "
-"sync"
+"\" between task button names.<br>Valid names are: log commit sync grep and "
+"pbranch.<br>Default: log commit grep pbranch | sync"
 msgstr ""
 
 msgid "Long Summary"
@@ -5465,6 +5603,16 @@ msgid "Make MQ patches secret (instead of draft). Default: False"
 msgstr ""
 "MQパッチを(draftの代わりに)Secretに設定します。デフォルトでは無効です。"
 
+msgid "Check Subrepo Phase"
+msgstr ""
+
+msgid ""
+"Check the phase of the current revision of each subrepository.  For settings "
+"other than \"ignore\", the phase of the current revision of each "
+"subrepository is checked before committing the parent repository.  Default: "
+"follow"
+msgstr ""
+
 msgid "Monitor working<br>directory changes"
 msgstr "作業領域の変更を監視"
 
@@ -5502,7 +5650,7 @@ msgid ""
 msgstr ""
 
 msgid "Sync"
-msgstr ""
+msgstr "同期"
 
 msgid "After Pull Operation"
 msgstr "プル後の処理"
@@ -5549,30 +5697,20 @@ msgid ""
 msgstr ""
 
 msgid "SSH Command"
-msgstr ""
+msgstr "SSH コマンド"
 
 msgid ""
 "Command to use for SSH connections.<p>Default: \"ssh\" or \"TortoisePlink."
 "exe -ssh -2\" (Windows)"
 msgstr ""
+"SSH 接続に使用するコマンド。<p>デフォルト: \"ssh\" または \"TortoisePlink."
+"exe -ssh -2\" (Windows)"
 
 msgid "Server"
 msgstr "サーバー"
 
-msgid "<b>Behavior:</b>"
-msgstr ""
-
-msgid "'Publishing' repository"
-msgstr ""
-
-msgid ""
-"Controls draft phase behavior when working as a server. When true, pushed "
-"changesets are set to public in both client and server and pulled or cloned "
-"changesets are set to public in the client. Default: True"
-msgstr ""
-
-msgid "<b>Web Server:</b>"
-msgstr "<b>Webサーバー:</b>"
+msgid "<b>Repository Details:</b>"
+msgstr "<b>リポジトリの詳細:</b>"
 
 msgid ""
 "Repository name to use in the web interface, and by TortoiseHg as a "
@@ -5580,6 +5718,32 @@ msgid ""
 msgstr ""
 "このウェブサーバで使うリポジトリ名とTortoiseHgが使う短い名前。初期設定は作業"
 "領域。"
+
+msgid "Encoding"
+msgstr "文字エンコーディング"
+
+msgid ""
+"Character encoding of files in the repository, used by the web interface and "
+"TortoiseHg."
+msgstr ""
+"リポジトリ内のファイルの文字エンコーディング。 ウェブインターフェースと "
+"TortoiseHg で利用。"
+
+msgid "'Publishing' repository"
+msgstr "「公開」リポジトリ"
+
+msgid ""
+"Controls draft phase behavior when working as a server. When true, pushed "
+"changesets are set to public in both client and server and pulled or cloned "
+"changesets are set to public in the client. Default: True"
+msgstr ""
+"サーバとして機能する際の、 draft フェーズに対する挙動の設定。 True の場合、ク"
+"ライアントから反映されたリビジョンのフェーズは、クライアント / サーバ双方で "
+"public 化され、クライアントに取り込み、または複製されたリビジョンのフェーズ"
+"は、クライアント側でのみ public 化されます。 デフォルト: True"
+
+msgid "<b>Web Server:</b>"
+msgstr "<b>Webサーバー:</b>"
 
 msgid "Textual description of the repository's purpose or contents."
 msgstr "リポジトリの目的または内容に関する説明文。"
@@ -5672,12 +5836,6 @@ msgstr ""
 "をカンマ区切り(空白文字でも可)で指定された場合は拒否されます。deny_push 一覧"
 "は allow_push 一覧の前に適用されます。"
 
-msgid "Encoding"
-msgstr "文字エンコーディング"
-
-msgid "Character encoding name"
-msgstr "文字エンコーディング名"
-
 msgid "Proxy"
 msgstr "プロキシ"
 
@@ -5760,8 +5918,8 @@ msgstr "メールサーバに接続するときのポート番号。デフォル
 msgid "SMTP TLS"
 msgstr "SMTP TLS 設定"
 
-msgid "Connect to mail server using TLS. Default: False"
-msgstr "TLSを使ってメールサーバに接続する。デフォルトでは無効。"
+msgid "Method to enable TLS when connecting to mail server. Default: none"
+msgstr "メールサーバ接続における TLS 接続の有無 / 方式の指定。"
 
 msgid "SMTP Username"
 msgstr "SMTP ユーザ名"
@@ -5912,7 +6070,7 @@ msgid "Tools"
 msgstr "カスタムツール"
 
 msgid "Hooks"
-msgstr ""
+msgstr "フック"
 
 msgid "Issue Tracking"
 msgstr "課題管理"
@@ -5974,7 +6132,7 @@ msgid ""
 msgstr ""
 
 msgid "Changeset Link"
-msgstr ""
+msgstr "リビジョンリンク"
 
 msgid ""
 "A \"template string\" that, when set, turns the revision number and short "
@@ -6123,13 +6281,13 @@ msgid ""
 msgstr ""
 
 msgid "GnuPG"
-msgstr ""
+msgstr "GnuPG"
 
 msgid "Specify the path to GPG. Default: gpg"
 msgstr ""
 
 msgid "Key ID"
-msgstr ""
+msgstr "鍵 ID"
 
 msgid "GPG key ID associated with user. Default: None (leave blank)"
 msgstr ""
@@ -6383,29 +6541,32 @@ msgid "Patch: %s"
 msgstr "パッチ: %s"
 
 msgid "Key:"
-msgstr ""
+msgstr "鍵:"
 
 msgid "Local sign"
-msgstr ""
+msgstr "ローカルな署名"
 
 msgid "Sign even if the sigfile is modified (-f/--force)"
-msgstr ""
+msgstr "署名ファイルが変更されていても署名 (-f/--force)"
 
 msgid "No commit"
-msgstr ""
+msgstr "コミットしない"
 
 msgid "Use custom commit message:"
 msgstr "カスタムコミットメッセージを使用する:"
 
 msgid "&Sign"
-msgstr ""
+msgstr "署名(&S)"
 
 #, python-format
 msgid "Sign - %s"
-msgstr ""
+msgstr "署名 - %s"
 
 msgid "Signature has been added"
-msgstr ""
+msgstr "署名しました"
+
+msgid "Filter:"
+msgstr "フィルター:"
 
 msgid "Check all files"
 msgstr "すべてのファイルを選択"
@@ -6453,7 +6614,7 @@ msgstr "サイズ (KB)"
 
 #, python-format
 msgid "Checked count: %d"
-msgstr ""
+msgstr "チェック数: %d"
 
 msgid ", resolved merge"
 msgstr "、マージ解消済み"
@@ -6517,9 +6678,6 @@ msgstr "%s は変更されているサブリポジトリです"
 msgid "subrepo"
 msgstr "サブリポ"
 
-msgid "TortoiseHg Sync"
-msgstr "TortoiseHg 同期"
-
 msgid "Check for incoming changes from selected URL"
 msgstr "指定のURLからプルできるか(取り込めるか)確認"
 
@@ -6544,11 +6702,8 @@ msgstr "バンドルファイルの適用"
 msgid "Stop current operation"
 msgstr "現在の操作を中断する"
 
-msgid "Target:"
-msgstr "対象:"
-
 msgid "<b>Selected Options:</b>"
-msgstr ""
+msgstr "<b>選択したオプション:</b>"
 
 msgid "Path Edit Toolbar"
 msgstr "パス編集ツールバー"
@@ -6603,14 +6758,11 @@ msgstr ""
 msgid "Delete %s from your repo configuration file?"
 msgstr "%s をリポジトリの設定ファイルから削除しますか?"
 
-msgid "Are you sure that you want to cancel synchronization?"
-msgstr "本当に同期をキャンセルしますか?"
-
 msgid "No host specified"
 msgstr ""
 
 msgid "Please set a valid URL to continue."
-msgstr ""
+msgstr "続ける前に URL を正しく設定してください。"
 
 msgid "No remote repository URL or path set"
 msgstr "反映先のURLかパスが設定されていません"
@@ -6654,6 +6806,10 @@ msgid "Incoming from %s aborted, ret %d"
 msgstr "%s からの取り込めるチェンジセットの確認が中断されました。 %d"
 
 #, python-format
+msgid "Pulling from %s..."
+msgstr "%s からプル(取り込み)中..."
+
+#, python-format
 msgid "Pull from %s completed"
 msgstr "%s からのプル(取り込み)を完了しました"
 
@@ -6668,16 +6824,16 @@ msgid "File conflicts need to be resolved"
 msgstr "変更が衝突しました。解消してください。"
 
 #, python-format
-msgid "Pulling from %s..."
-msgstr "%s からプル(取り込み)中..."
-
-#, python-format
 msgid "Finding outgoing changesets to %s..."
 msgstr "%s へ送信できるチェンジセットを確認中..."
 
 #, python-format
 msgid "%d outgoing changesets to %s"
 msgstr "%d 件のチェンジセットを %s に送信できます"
+
+#, python-format
+msgid "outgoing changesets to %s found"
+msgstr "%s に送信できるチェンジセットがあります"
 
 #, python-format
 msgid "No outgoing changesets to %s"
@@ -6687,9 +6843,8 @@ msgstr "%s に送信できるチェンジセットはありません"
 msgid "Outgoing to %s aborted, ret %d"
 msgstr "%s への送信確認が中断されました: %d"
 
-#, python-format
-msgid "outgoing changesets to %s found"
-msgstr "%s に送信できるチェンジセットがあります"
+msgid "Perforce pending..."
+msgstr ""
 
 #, python-format
 msgid "%s (submitted)"
@@ -6715,9 +6870,6 @@ msgstr "p4pending 中断"
 msgid "Unable to determine pending changesets"
 msgstr "保留中の変更リストを決定できません"
 
-msgid "Perforce pending..."
-msgstr ""
-
 msgid "Confirm Push to remote Repository"
 msgstr "プッシュの確認"
 
@@ -6733,6 +6885,12 @@ msgstr ""
 #, python-format
 msgid "Push to %s aborted"
 msgstr "%s への送信が中断されました"
+
+#, python-format
+msgid ""
+"Invalid default push revision: %s. Please check your Mercurial configuration "
+"(tortoisehg.defaultpush)"
+msgstr ""
 
 #, python-format
 msgid "Pushing to %s..."
@@ -6754,12 +6912,6 @@ msgstr ""
 "これからプッシュするチェンジセットは新しいブランチを作成します。連携先に新し"
 "いブランチを作成しますか？"
 
-#, python-format
-msgid ""
-"Invalid default push revision: %s. Please check your Mercurial configuration "
-"(tortoisehg.defaultpush)"
-msgstr ""
-
 msgid "Determining outgoing changesets to email..."
 msgstr "メール送信するチェンジセットを決定中..."
 
@@ -6778,6 +6930,12 @@ msgstr "バンドルファイル (*.hg)"
 
 msgid "Unable to remove URL"
 msgstr "URLを削除できません"
+
+msgid "TortoiseHg Sync"
+msgstr "TortoiseHg 同期"
+
+msgid "Are you sure that you want to cancel synchronization?"
+msgstr "本当に同期をキャンセルしますか?"
 
 msgid "Post Pull Behavior"
 msgstr "プル後の処理"
@@ -6835,7 +6993,7 @@ msgstr ""
 "ます"
 
 msgid "Update subrepo paths"
-msgstr ""
+msgstr "サブリポジトリのパスを更新"
 
 #, python-format
 msgid ""
@@ -7022,6 +7180,10 @@ msgstr "'%s' タグを削除しました"
 msgid "Patch files (*.diff *.patch)"
 msgstr "パッチファイル (*.diff *.patch)"
 
+#, python-format
+msgid "Import - %s"
+msgstr "インポート - %s"
+
 msgid "Browse Directory..."
 msgstr "ディレクトリの選択..."
 
@@ -7042,10 +7204,6 @@ msgstr "作業領域の状態を調べています..."
 
 msgid "&Import"
 msgstr "インポート(&I)"
-
-#, python-format
-msgid "Import - %s"
-msgstr "インポート - %s"
 
 msgid "Working directory is not clean!  <a href=\"view\">View changes...</a>"
 msgstr "作業領域がクリーンでありません! <a href=\"view\">変更を見る...</a>"
@@ -7070,21 +7228,11 @@ msgstr "インポートするパッチがありません"
 msgid "Strip:"
 msgstr "削除:"
 
-msgid "Options:"
-msgstr "オプション:"
-
 msgid "Discard local changes, no backup (-f/--force)"
 msgstr "ローカルの変更を破棄する (バックアップなし, -f/--force)"
 
 msgid "No backup (-n/--nobackup)"
 msgstr "バックアップなし (-n/--nobackup)"
-
-msgid "&Strip"
-msgstr "削除(&S)"
-
-#, python-format
-msgid "Strip - %s"
-msgstr "リビジョンの削除 - %s"
 
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
@@ -7097,14 +7245,24 @@ msgstr "不明なリビジョンです"
 msgid "Detected uncommitted local changes."
 msgstr "コミットしていない変更があります"
 
-msgid "Do you want to discard them and continue?"
-msgstr "これらの変更を破棄して続けますか?"
+msgid "Do you want to keep them or discard them?"
+msgstr ""
 
-msgid "&Yes (--force)"
-msgstr "はい(--force)(&Y)"
+msgid "&Keep (--keep)"
+msgstr ""
+
+msgid "&Discard (--force)"
+msgstr ""
 
 msgid "Confirm Strip"
 msgstr "削除の確認"
+
+#, python-format
+msgid "Strip - %s"
+msgstr "リビジョンの削除 - %s"
+
+msgid "&Strip"
+msgstr "削除(&S)"
 
 msgid "response expected"
 msgstr "応答がありませんでした"
@@ -7174,14 +7332,14 @@ msgstr "中止: ロックできません %s:%s\n"
 
 #, python-format
 msgid "hg %s: %s\n"
-msgstr ""
+msgstr "hg %s: %s\n"
 
 #, python-format
 msgid "hg: %s\n"
-msgstr ""
+msgstr "hg: %s\n"
 
 msgid "abort: remote error:\n"
-msgstr ""
+msgstr "中止: 連携エラー:\n"
 
 #, python-format
 msgid "abort: %s"
@@ -7192,11 +7350,7 @@ msgstr " 空の文字列\n"
 
 #, python-format
 msgid "hg: unknown command '%s'\n"
-msgstr ""
-
-#, python-format
-msgid "abort: %s\n"
-msgstr "中止: %s\n"
+msgstr "hg: 未知のコマンド '%s'\n"
 
 #, python-format
 msgid "abort: error: %s\n"
@@ -7204,9 +7358,6 @@ msgstr "中止: エラー: %s\n"
 
 msgid "broken pipe\n"
 msgstr "パイプ破壊(EPIPE)\n"
-
-msgid "Update to:"
-msgstr "更新先:"
 
 msgid "Parent 1:"
 msgstr "親リビジョン1:"
@@ -7223,24 +7374,8 @@ msgstr "ローカルの変更を破棄する (バックアップなし, -C/--cle
 msgid "Always merge (when possible)"
 msgstr "可能なときは常にマージ"
 
-msgid "Always show command log"
-msgstr "常にコマンドログを表示"
-
-msgid "&Update"
-msgstr "更新(&U)"
-
-#, python-format
-msgid "Update - %s"
-msgstr "更新 - %s"
-
-msgid "remove working directory"
-msgstr ""
-
 msgid "(same as parent)"
 msgstr "(親リビジョンと同じ)"
-
-msgid "unknown revision!"
-msgstr "不明なリビジョン"
 
 msgid "Activate bookmark?"
 msgstr "ブックマークを有効化しますか?"
@@ -7292,6 +7427,10 @@ msgstr "マージ - ローカルの変更とのマージを試みる"
 
 msgid "Confirm Update"
 msgstr "更新の確認"
+
+#, python-format
+msgid "Update - %s"
+msgstr "更新 - %s"
 
 msgid "[non-existant]"
 msgstr "[存在しません]"
@@ -7431,6 +7570,12 @@ msgstr " アウトプット"
 msgid " Aborted"
 msgstr " が中断されました"
 
+msgid "Cannot open subrepository"
+msgstr "サブディレクトリを開けません"
+
+msgid "The selected subrepository does not exist on the working directory"
+msgstr "作業領域には選択したサブリポジトリがありません"
+
 msgid "Uncommited merge - please select a parent revision"
 msgstr "未コミットマージ - 親リビジョンを選択してください"
 
@@ -7468,7 +7613,7 @@ msgid "Discard outstanding changes to working directory?"
 msgstr "作業領域のコミットしていない変更を破棄しますか?"
 
 msgid "Config files (*.conf *.config *.ini)"
-msgstr ""
+msgstr "設定ファイル (*.conf *.config *.ini)"
 
 msgid "Open hgweb config"
 msgstr "hgweb設定を開く"
@@ -7569,9 +7714,6 @@ msgstr "パッチブランチ(&P)"
 msgid "Revision &Details"
 msgstr "リビジョンの詳細(&D)"
 
-msgid "&Manifest"
-msgstr "マニフェスト(&M)"
-
 msgid "&Search"
 msgstr "検索(&S)"
 
@@ -7605,8 +7747,17 @@ msgstr "リビジョンへ移動(&G)..."
 msgid "Go to a specific revision"
 msgstr "指定のリビジョンに移動"
 
-msgid "Start &Web Server"
-msgstr "ウェブサーバーを起動(&W) (serve)"
+msgid "&Filter Toolbar"
+msgstr "フィルターツールバー(&F)"
+
+msgid "Filter graph with revision sets or branches"
+msgstr "リビジョンセットやブランチで履歴をフィルター"
+
+msgid "&Workbench Toolbars"
+msgstr "&Workbench ツールバー"
+
+msgid "Update working directory or switch revisions"
+msgstr "作業領域の内容更新またはリビジョンの切り替え"
 
 msgid "&Shelve..."
 msgstr "変更点の退避 (&shelve)..."
@@ -7614,23 +7765,26 @@ msgstr "変更点の退避 (&shelve)..."
 msgid "&Import..."
 msgstr "パッチの取り込み (&import)..."
 
-msgid "&Verify"
-msgstr "整合性を検証 (&verify)"
-
-msgid "Re&cover"
-msgstr "修復 (re&cover)"
-
 msgid "&Resolve..."
 msgstr "マージ衝突を解消 (&resolve)..."
 
-msgid "Rollback/&Undo..."
-msgstr "元に戻す(&U) (rollback)..."
+msgid "R&ollback/Undo..."
+msgstr "元に戻す (r&ollback)..."
 
 msgid "&Purge..."
 msgstr "対象外ファイルを削除 (&purge)..."
 
 msgid "&Bisect..."
 msgstr "問題の二分探索 (&bisect)..."
+
+msgid "&Verify"
+msgstr "整合性を検証 (&verify)"
+
+msgid "Re&cover"
+msgstr "修復 (re&cover)"
+
+msgid "&Web Server"
+msgstr "ウェブサーバ(&W)"
 
 msgid "E&xplorer Help"
 msgstr ""
@@ -7644,32 +7798,25 @@ msgstr "&Qt について"
 msgid "&About TortoiseHg"
 msgstr "TortoiseHg について(&A)"
 
-msgid "&Filter Toolbar"
-msgstr "フィルターツールバー(&F)"
-
-msgid "Filter graph with revision sets or branches"
-msgstr "リビジョンセットやブランチで履歴をフィルター"
-
-msgid "&Workbench Toolbars"
-msgstr "&Workbench ツールバー"
-
 msgid "&Incoming"
-msgstr ""
+msgstr "未取り込みを検索 (&incoming)"
 
 msgid "&Pull"
-msgstr ""
+msgstr "取り込み (&pull)"
 
 msgid "&Outgoing"
-msgstr ""
+msgstr "反映候補を検索 (&outgoing)"
 
 msgid "P&ush"
-msgstr ""
+msgstr "反映 (p&ush)"
 
 #, python-format
 msgid ""
 "pull: %s\n"
 "push: %s"
 msgstr ""
+"pull: %s\n"
+"push: %s"
 
 msgid ""
 "There are no configured sync paths.\n"
@@ -7677,40 +7824,48 @@ msgid ""
 msgstr ""
 
 msgid "Check for incoming changes"
-msgstr ""
+msgstr "未取り込みリビジョンを検索"
 
 msgid "Pull incoming changes"
-msgstr ""
+msgstr "変更を取り込む"
 
 msgid "Detect outgoing changes"
-msgstr ""
+msgstr "反映可能なリビジョンを検索"
 
 msgid "Push outgoing changes"
-msgstr ""
+msgstr "変更を反映"
 
 #, python-format
 msgid ""
 "Check for incoming changes from\n"
 "%s"
 msgstr ""
+"%s\n"
+"から未取り込みリビジョンを検索"
 
 #, python-format
 msgid ""
 "Pull incoming changes from\n"
 "%s"
 msgstr ""
+"%s\n"
+"から変更を取り込む"
 
 #, python-format
 msgid ""
 "Detect outgoing changes to\n"
 "%s"
 msgstr ""
+"%s\n"
+"へ反映可能なリビジョンを検索"
 
 #, python-format
 msgid ""
 "Push outgoing changes to\n"
 "%s"
 msgstr ""
+"%s\n"
+"へ変更を反映"
 
 #, python-format
 msgid "Execute custom tool '%s'"
@@ -7735,7 +7890,7 @@ msgid "Reopen last closed tab group"
 msgstr "最後に閉じたタブグループを開く"
 
 msgid "Custom Toolbar &Settings"
-msgstr ""
+msgstr "カスタムツールバーの設定(&S)"
 
 msgid "Failed to open repository"
 msgstr "リポジトリを開けません"
@@ -8633,6 +8788,12 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "Maximum number of files to list per changeset."
 #~ msgstr "チェンジセットで表示するファイルの最大数。"
 
+#~ msgid "Character encoding name"
+#~ msgstr "文字エンコーディング名"
+
+#~ msgid "Connect to mail server using TLS. Default: False"
+#~ msgstr "TLSを使ってメールサーバに接続する。デフォルトでは無効。"
+
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr "全ての空行の変更を無視する。デフォルトで無効。"
 
@@ -8864,6 +9025,9 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "Please enter a valid source path"
 #~ msgstr "有効なクローン元のパスを入力してください"
+
+#~ msgid "Source path is empty"
+#~ msgstr "クローン元のパスが入力されていません"
 
 #~ msgid "Bottom Diffs"
 #~ msgstr "差分を画面下部に表示"
@@ -9487,6 +9651,9 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "Confirm Abort"
 #~ msgstr "中止の確認"
 
+#~ msgid "Source and destination are the same"
+#~ msgstr "クローン元とクローン先が同一です"
+
 #~ msgid "Please specify different paths"
 #~ msgstr "異なるパスを指定してください"
 
@@ -9889,6 +10056,9 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "Stripped successfully"
 #~ msgstr "正常に削除されました"
+
+#~ msgid "&Yes (--force)"
+#~ msgstr "はい(--force)(&Y)"
 
 #~ msgid "Diff to second Parent"
 #~ msgstr "もう1つの親との差分"
@@ -10921,15 +11091,6 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "Push new branch"
 #~ msgstr "新規ブランチをプッシュ"
 
-#~ msgid "Repository:"
-#~ msgstr "リポジトリ:"
-
-#~ msgid "Patch queues:"
-#~ msgstr "パッチキュー:"
-
-#~ msgid "Patches:"
-#~ msgstr "パッチ:"
-
 #~ msgid "Backed out successfully, you must now commit the results"
 #~ msgstr "バックアウトしました。結果をコミットしてください。"
 
@@ -10944,12 +11105,6 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "Allow pushing a new branch"
 #~ msgstr "新規ブランチの反映を許可"
-
-#~ msgid "Manage MQ patch queues"
-#~ msgstr "パッチキュー(MQ)を管理"
-
-#~ msgid "Rename patch"
-#~ msgstr "パッチ名を変更"
 
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "%d番目のハンクが%d行目で適用済み(あいまいさは%d文字)\n"
@@ -10972,36 +11127,11 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "bad shelve backup directory name"
 #~ msgstr "バックアップファイルの保存先として利用できないディレクトリ名です"
 
-#~ msgid "QQueue"
-#~ msgstr "QQueue"
-
 #~ msgid "delete of shelve backup failed"
 #~ msgstr "バックアップファイルを削除できません"
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "中断: バックアップの復元に失敗しました %s\n"
-
-#~ msgid "Activate"
-#~ msgstr "有効化"
-
-#~ msgid "Confirm patch queue delete"
-#~ msgstr "パッチキューの削除確認"
-
-#~ msgid "Do you really want to delete patch queue '%s' ?"
-#~ msgstr "パッチキュー '%s' を削除しますか?"
-
-#~ msgid "Confirm patch queue purge"
-#~ msgstr "パッチキューの完全な削除確認"
-
-#~ msgid ""
-#~ "<p>This will also erase the patchfiles on disk!</p><p>Do you really want "
-#~ "to purge patch queue '%s' ?</p>"
-#~ msgstr ""
-#~ "<p>コンピュータからパッチファイルが完全に削除されます!</p><p>パッチキュー "
-#~ "'%s' を本当に完全に削除しますか?</p>"
-
-#~ msgid "Please enable the MQ extension first."
-#~ msgstr "MQ拡張を有効にして下さい。"
 
 #~ msgid "file %s already exists\n"
 #~ msgstr "ファイル %s はすでに存在しています\n"
@@ -11012,12 +11142,6 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "bad hunk #%d %s (%d %d %d %d)"
 #~ msgstr "不正なハンク #%d %s (%d %d %d %d)"
 
-#~ msgid "Unapplied Patches - drag to reorder"
-#~ msgstr "未適用のパッチ - ドラッグして順番を変える"
-
-#~ msgid "Applied Patches"
-#~ msgstr "適用済みパッチ"
-
 #~ msgid "user quit"
 #~ msgstr "ユーザーによるキャンセル"
 
@@ -11026,9 +11150,6 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "バックアップを除去中: %r\n"
-
-#~ msgid "Reorder Unapplied Patches"
-#~ msgstr "未適用のパッチの順番を変える"
 
 #~ msgid "Restart merge with"
 #~ msgstr "指定ツールで再マージ"

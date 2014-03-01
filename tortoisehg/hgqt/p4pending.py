@@ -57,7 +57,7 @@ class PerforcePending(QDialog):
         self.p4clActivated(clcombo.currentText())
 
         self.setWindowTitle(_('Pending Perforce Changelists - %s') %
-                            repo.displayname)
+                            repoagent.displayName())
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 

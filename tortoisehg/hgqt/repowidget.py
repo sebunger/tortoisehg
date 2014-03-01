@@ -19,18 +19,16 @@ from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qtlib import QuestionMsgBox, InfoMsgBox, WarningMsgBox
 from tortoisehg.hgqt.qtlib import DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
-from tortoisehg.hgqt import cmdui, update, tag, backout, merge, visdiff
+from tortoisehg.hgqt import cmdcore, cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, purge, bookmark
 from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
 from tortoisehg.hgqt import shelve
-from tortoisehg.hgqt import matching, graft, hgemail, postreview
+from tortoisehg.hgqt import matching, graft, hgemail, postreview, revdetails
 from tortoisehg.hgqt import sign
 
 from tortoisehg.hgqt.repofilter import RepoFilterBar
 from tortoisehg.hgqt.repoview import HgRepoView
-from tortoisehg.hgqt.revdetails import RevDetailsWidget
 from tortoisehg.hgqt.commit import CommitWidget
-from tortoisehg.hgqt.manifestdialog import ManifestDialog, ManifestWidget
 from tortoisehg.hgqt.sync import SyncWidget
 from tortoisehg.hgqt.grep import SearchWidget
 from tortoisehg.hgqt.pbranch import PatchBranchWidget
@@ -43,8 +41,7 @@ class RepoWidget(QWidget):
     showMessageSignal = pyqtSignal(QString)
     toolbarVisibilityChanged = pyqtSignal()
 
-    # TODO: output and progress can be removed if all widgets use RepoAgent
-    output = pyqtSignal(QString, QString)
+    # TODO: progress can be removed if all actions are run as hg command
     progress = pyqtSignal(QString, object, QString, QString, object)
     makeLogVisible = pyqtSignal(bool)
 
@@ -123,7 +120,6 @@ class RepoWidget(QWidget):
             'revdetails': self.logTabIndex,
             'commit': self.commitTabIndex,
             'sync': self.syncTabIndex,
-            'manifest': self.manifestTabIndex,
             'search': self.grepTabIndex
         }
         if initialRevision == 'workingdir':
@@ -137,7 +133,6 @@ class RepoWidget(QWidget):
             #       be negative
             if widgetIndex > 0:
                 self.taskTabsWidget.setCurrentIndex(widgetIndex)
-        self.output.connect(self._showOutputOnInfoBar)
 
     def setupUi(self):
         SP = QSizePolicy
@@ -149,7 +144,7 @@ class RepoWidget(QWidget):
 
         self._activeInfoBar = None
 
-        self.filterbar = RepoFilterBar(self.repo, self)
+        self.filterbar = RepoFilterBar(self._repoagent, self)
         self.layout().addWidget(self.filterbar)
 
         self.filterbar.branchChanged.connect(self.setBranch)
@@ -192,13 +187,14 @@ class RepoWidget(QWidget):
         tt.setDocumentMode(True)
         self.updateTaskTabs()
 
-        self.revDetailsWidget = w = RevDetailsWidget(self._repoagent, self)
+        w = revdetails.RevDetailsWidget(self._repoagent, self)
+        self.revDetailsWidget = w
         self.revDetailsWidget.filelisttbar.setStyleSheet(qtlib.tbstylesheet)
         w.linkActivated.connect(self._openLink)
         w.revisionSelected.connect(self.repoview.goto)
         w.grepRequested.connect(self.grep)
         w.showMessage.connect(self.showMessage)
-        w.updateToRevision.connect(self.updateToRevision)
+        w.revsetFilterRequested.connect(self.setFilter)
         w.runCustomCommandRequested.connect(
             self.handleRunCustomCommandRequest)
         self.logTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-log'), '')
@@ -214,11 +210,6 @@ class RepoWidget(QWidget):
         self.syncTabIndex = idx = tt.addTab(w, qtlib.geticon('thg-sync'), '')
         self.namedTabs['sync'] = idx
         tt.setTabToolTip(idx, _("Synchronize", "tab tooltip"))
-
-        self.manifestDemand = w = DemandWidget('createManifestWidget', self)
-        self.manifestTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-annotate'), '')
-        self.namedTabs['manifest'] = idx
-        tt.setTabToolTip(idx, _('Manifest', "tab tooltip"))
 
         self.grepDemand = w = DemandWidget('createGrepWidget', self)
         self.grepTabIndex = idx = tt.addTab(w, qtlib.geticon('hg-grep'), '')
@@ -251,14 +242,18 @@ class RepoWidget(QWidget):
     def repoRootPath(self):
         return self._repoagent.rootPath()
 
+    def repoDisplayName(self):
+        return self._repoagent.displayName()
+
     def title(self):
         """Returns the expected title for this widget [unicode]"""
+        name = self._repoagent.shortName()
         if self.bundle:
-            return _('%s <incoming>') % self.repo.shortname
+            return _('%s <incoming>') % name
         elif self.repomodel.branch():
-            return u'%s [%s]' % (self.repo.shortname, self.repomodel.branch())
+            return u'%s [%s]' % (name, self.repomodel.branch())
         else:
-            return self.repo.shortname
+            return name
 
     def busyIcon(self):
         if self._busyIconNames:
@@ -317,7 +312,6 @@ class RepoWidget(QWidget):
             w.setFocus()  # to handle key press by InfoBar
         return w
 
-    @pyqtSlot()
     def clearInfoBar(self, priority=None):
         """Close current infobar if available; return True if got empty"""
         if not self._activeInfoBar:
@@ -419,47 +413,36 @@ class RepoWidget(QWidget):
         self.taskTabsWidget.currentChanged.connect(
             self._refreshCommitTabIfNeeded)
 
-    def createManifestWidget(self):
-        if isinstance(self.rev, basestring):
-            rev = None
-        else:
-            rev = self.rev
-        w = ManifestWidget(self._repoagent, rev, self)
-        w.loadSettings(QSettings(), 'workbench')
-        w.revChanged.connect(self.repoview.goto)
-        w.linkActivated.connect(self._openLink)
-        w.showMessage.connect(self.showMessage)
-        w.grepRequested.connect(self.grep)
-        w.revsetFilterRequested.connect(self.setFilter)
-        w.runCustomCommandRequested.connect(
-            self.handleRunCustomCommandRequest)
-        return w
-
     def createSyncWidget(self):
-        sw = SyncWidget(self._repoagent, self)
-        sw.output.connect(self.output)
-        sw.progress.connect(self.progress)
-        sw.makeLogVisible.connect(self.makeLogVisible)
-        sw.syncStarted.connect(self.clearInfoBar)
+        sw = SyncWidget(self._repoagent, self, embedded=True)
+        sw.newCommand.connect(self._handleNewSyncCommand)
         sw.outgoingNodes.connect(self.setOutgoingNodes)
         sw.showMessage.connect(self.showMessage)
         sw.showMessage.connect(self._showMessageOnInfoBar)
         sw.incomingBundle.connect(self.setBundle)
         sw.pullCompleted.connect(self.onPullCompleted)
         sw.pushCompleted.connect(self.pushCompleted)
-        sw.showBusyIcon.connect(self.onShowBusyIcon)
-        sw.hideBusyIcon.connect(self.onHideBusyIcon)
         sw.refreshTargets(self.rev)
         sw.switchToRequest.connect(self.switchToNamedTaskTab)
         return sw
 
-    @pyqtSlot(QString)
-    def onShowBusyIcon(self, iconname):
+    @pyqtSlot(cmdcore.CmdSession)
+    def _handleNewSyncCommand(self, sess):
+        self._handleNewCommand(sess)
+        if sess.isFinished():
+            return
+        sess.commandFinished.connect(self._onSyncCommandFinished)
+        self._setBusyIcon('thg-sync')
+
+    @pyqtSlot()
+    def _onSyncCommandFinished(self):
+        self._clearBusyIcon('thg-sync')
+
+    def _setBusyIcon(self, iconname):
         self._busyIconNames.append(iconname)
         self.busyIconChanged.emit()
 
-    @pyqtSlot(QString)
-    def onHideBusyIcon(self, iconname):
+    def _clearBusyIcon(self, iconname):
         if iconname in self._busyIconNames:
             self._busyIconNames.remove(iconname)
         self.busyIconChanged.emit()
@@ -481,7 +464,6 @@ class RepoWidget(QWidget):
                                        bundle=self.bundle)
         self.repoview.setRepo(self.repo)
         self.revDetailsWidget.setRepo(self.repo)
-        self.manifestDemand.forward('setRepo', self.repo)
         self.filterbar.setQuery('incoming()')
         self.filterbar.setEnableFilter(False)
         self.titleChanged.emit(self.title())
@@ -515,7 +497,6 @@ class RepoWidget(QWidget):
         self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
         self.repoview.setRepo(self.repo)
         self.revDetailsWidget.setRepo(self.repo)
-        self.manifestDemand.forward('setRepo', self.repo)
 
     def onPullCompleted(self):
         if self.bundle:
@@ -788,20 +769,18 @@ class RepoWidget(QWidget):
 
     def bisect(self):
         dlg = bisect.BisectDialog(self._repoagent, {}, self)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def resolve(self):
         dlg = resolve.ResolveDialog(self._repoagent, self)
-        dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
     def thgimport(self, paths=None):
         dlg = thgimport.ImportDialog(self._repoagent, self)
-        dlg.patchImported.connect(self.gotoTip)
         if paths:
             dlg.setfilepaths(paths)
-        dlg.exec_()
+        if dlg.exec_() == 0:
+            self.gotoTip()
 
     def shelve(self, arg=None):
         self._dialogs.open(RepoWidget._createShelveDialog)
@@ -815,7 +794,7 @@ class RepoWidget(QWidget):
         cmdline = ['verify', '--verbose']
         dlg = cmdui.CmdSessionDialog(self)
         dlg.setWindowIcon(qtlib.geticon('hg-verify'))
-        dlg.setWindowTitle(_('%s - verify repository') % self.repo.displayname)
+        dlg.setWindowTitle(_('%s - verify repository') % self.repoDisplayName())
         dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowMaximizeButtonHint)
         dlg.setSession(self._repoagent.runCommand(cmdline, self))
         dlg.exec_()
@@ -824,7 +803,8 @@ class RepoWidget(QWidget):
         cmdline = ['recover', '--verbose']
         dlg = cmdui.CmdSessionDialog(self)
         dlg.setWindowIcon(qtlib.geticon('hg-recover'))
-        dlg.setWindowTitle(_('%s - recover repository') % self.repo.displayname)
+        dlg.setWindowTitle(_('%s - recover repository')
+                           % self.repoDisplayName())
         dlg.setWindowFlags(dlg.windowFlags() | Qt.WindowMaximizeButtonHint)
         dlg.setSession(self._repoagent.runCommand(cmdline, self))
         dlg.exec_()
@@ -946,19 +926,9 @@ class RepoWidget(QWidget):
             self.revisionSelected.emit(rev)
             if type(rev) != str:
                 # Regular patch or working directory
-                if self.manifestDemand.isHidden():
-                    self.manifestDemand.forward('selectRev', rev)
-                else:
-                    self.manifestDemand.forward('setRev', rev)
                 self.grepDemand.forward('setRevision', rev)
                 self.syncDemand.forward('refreshTargets', rev)
                 self.commitDemand.forward('setRev', rev)
-            else:
-                # unapplied patch
-                if self.manifestDemand.isHidden():
-                    self.manifestDemand.forward('selectRev', None)
-                else:
-                    self.manifestDemand.forward('setRev', None)
         except (IndexError, error.RevlogError, error.Abort), e:
             self.showMessage(hglib.tounicode(str(e)))
 
@@ -1043,8 +1013,6 @@ class RepoWidget(QWidget):
             ttw = self.revDetailsWidget
         elif tti == self.commitTabIndex:
             ttw = self.commitDemand.get()
-        elif tti == self.manifestTabIndex:
-            ttw = self.manifestDemand.get()
         elif tti == self.syncTabIndex:
             ttw = self.syncDemand.get()
         elif tti == self.grepTabIndex:
@@ -1161,7 +1129,6 @@ class RepoWidget(QWidget):
                 pass
         self.revDetailsWidget.saveSettings(s)
         self.commitDemand.forward('saveSettings', s, 'workbench')
-        self.manifestDemand.forward('saveSettings', s, 'workbench')
         self.grepDemand.forward('saveSettings', s)
         self.filterbar.saveSettings(s)
         self.repoview.saveSettings(s)
@@ -1518,13 +1485,11 @@ class RepoWidget(QWidget):
             revA, revB = self.menuselection
             opts = {'good':str(revA), 'bad':str(revB)}
             dlg = bisect.BisectDialog(self._repoagent, opts, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def bisectReverse():
             revA, revB = self.menuselection
             opts = {'good':str(revB), 'bad':str(revA)}
             dlg = bisect.BisectDialog(self._repoagent, opts, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
         def compressDlg():
             ctxa, ctxb = map(self.repo.hgchangectx, self.menuselection)
@@ -1687,7 +1652,8 @@ class RepoWidget(QWidget):
             if not udir:
                 return
             udir = unicode(udir)
-            epath = os.path.join(udir, self.repo.shortname + '_%r.patch')
+            ename = self._repoagent.shortName() + '_%r.patch'
+            epath = os.path.join(udir, ename)
             custompath = False
 
         cmdline = ['export', '--verbose', '--output', epath]
@@ -1783,18 +1749,17 @@ class RepoWidget(QWidget):
 
     @pyqtSlot()
     def updateToRevision(self):
-        rev = hglib.getrevisionlabel(self.repo, self.rev)
+        rev = None
+        if isinstance(self.rev, int):
+            rev = hglib.getrevisionlabel(self.repo, self.rev)
         dlg = update.UpdateDialog(self._repoagent, rev, self)
-        dlg.output.connect(self.output)
-        dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.progress.connect(self.progress)
         dlg.exec_()
 
     def matchRevision(self):
         revlist = self.rev
         if len(self.menuselection) > 1:
             revlist = '|'.join([str(rev) for rev in self.menuselection])
-        dlg = matching.MatchDialog(self.repo, revlist, self)
+        dlg = matching.MatchDialog(self._repoagent, revlist, self)
         if dlg.exec_():
             self.setFilter(dlg.revsetexpression)
 
@@ -1818,7 +1783,7 @@ class RepoWidget(QWidget):
             dlg.setRev(self.rev)
 
     def _createManifestDialog(self):
-        return ManifestDialog(self._repoagent, self.rev)
+        return revdetails.createManifestDialog(self._repoagent, self.rev)
 
     def mergeWithRevision(self):
         pctx = self.repo['.']
@@ -1862,10 +1827,8 @@ class RepoWidget(QWidget):
 
     def stripRevision(self):
         'Strip the selected revision and all descendants'
-        dlg = thgstrip.StripDialog(self._repoagent, rev=str(self.rev),
-                                   parent=self)
-        dlg.showBusyIcon.connect(self.onShowBusyIcon)
-        dlg.hideBusyIcon.connect(self.onHideBusyIcon)
+        dlg = thgstrip.createStripDialog(self._repoagent, rev=str(self.rev),
+                                         parent=self)
         dlg.exec_()
 
     def sendToReviewBoard(self):
@@ -1877,10 +1840,7 @@ class RepoWidget(QWidget):
 
     def rupdate(self):
         import rupdate
-        dlg = rupdate.rUpdateDialog(self._repoagent, self.rev, self)
-        dlg.output.connect(self.output)
-        dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.progress.connect(self.progress)
+        dlg = rupdate.createRemoteUpdateDialog(self._repoagent, self.rev, self)
         dlg.exec_()
 
     @pyqtSlot()
@@ -1895,10 +1855,7 @@ class RepoWidget(QWidget):
 
     def archiveRevision(self):
         rev = hglib.getrevisionlabel(self.repo, self.rev)
-        dlg = archive.ArchiveDialog(self._repoagent, rev, self)
-        dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.output.connect(self.output)
-        dlg.progress.connect(self.progress)
+        dlg = archive.createArchiveDialog(self._repoagent, rev, self)
         dlg.exec_()
 
     def bundleRevisions(self, base=None, tip=None):
@@ -2243,20 +2200,17 @@ class RepoWidget(QWidget):
 
     def _runCommand(self, cmdline):
         sess = self._repoagent.runCommand(cmdline, self)
-        sess.commandFinished.connect(self._makeLogVisibleOnError)
-        sess.outputReceived.connect(self._showOutputOnInfoBar)
+        self._handleNewCommand(sess)
         return sess
 
     def _runCommandSequence(self, cmdlines):
         sess = self._repoagent.runCommandSequence(cmdlines, self)
-        sess.commandFinished.connect(self._makeLogVisibleOnError)
-        sess.outputReceived.connect(self._showOutputOnInfoBar)
+        self._handleNewCommand(sess)
         return sess
 
-    @pyqtSlot(int)
-    def _makeLogVisibleOnError(self, ret):
-        if ret != 0:
-            self.makeLogVisible.emit(True)
+    def _handleNewCommand(self, sess):
+        self.clearInfoBar()
+        sess.outputReceived.connect(self._showOutputOnInfoBar)
 
     @pyqtSlot()
     def _notifyWorkingDirChanges(self):
@@ -2272,5 +2226,5 @@ class RepoWidget(QWidget):
         # Valid refreshwd values are 'auto', 'always' and 'alwayslocal'
         if refreshwd != 'auto':
             if refreshwd == 'always' \
-                    or not paths.netdrive_status(self.repo.root):
+                    or paths.is_on_fixed_drive(self.repo.root):
                 self.commitDemand.forward('refreshWctx')

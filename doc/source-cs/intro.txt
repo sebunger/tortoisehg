@@ -8,11 +8,10 @@
 Co je TortoiseHg?
 =================
 
-TortoiseHg je sada grafických nástrojů a extenzí uživatelského rozhraní 
-programu `Mercurial <http://mercurial.selenic.com/wiki/>`_ pro necentralizovanou správu verzí.
+TortoiseHg je sada grafických nástrojů a extenzí uživatelského rozhraní programu `Mercurial <http://mercurial.selenic.com/wiki/>`_ pro necentralizovanou správu verzí.
 
 Ve Windows
-	se TortoiseHg skládá z grafické aplikace Workbench, z extenze uživatelského rozhranní s překryvnými ikonami a kontextovým menu v Průzkumníku a z programu pro příkazový řádek :file:`thg.exe` který spouští nástroje TortoiseHg. Binární pakety aplikace TortoiseHg pro Windows obsahují Mercurial i slučovací nástroj a je proto možné je bezprostředně použít "přímo z krabice".
+	se TortoiseHg skládá z grafické aplikace Verpánek (Workbench), z extenze uživatelského rozhranní s překryvnými ikonami a kontextovým menu v Průzkumníku a z programu pro příkazový řádek :file:`thg.exe` který spouští nástroje TortoiseHg. Binární pakety aplikace TortoiseHg pro Windows obsahují Mercurial i slučovací nástroj a je proto možné je použít bezprostředně po instalaci.
 	
 V Linuxu
 	se TortoiseHg skládá ze skriptu thg pro příkazový řádek a z extenze
@@ -22,7 +21,7 @@ V Linuxu
 	programu Mercurial. Binární pakety TortoiseHg znají Mercurial jako
 	závislou aplikaci, která je obvykle instalována automaticky.
 	
-.. note:: Ve Window obsahuje TortoiseHg jak thg.exe, tak thgw.exe. programy. Nástroj thgw.exe je zamýšlen pro použití v zástupci na ploše nebo v menu. Nástroj thg.exe je pro použití v konzoli a pro volání nápovědy z příkazového řádku. Dávkový soubor thg.cmd, který instalace přidá do proměnné PATH, volá thg.exe.	
+.. note:: Ve Window obsahuje TortoiseHg jak thg.exe, tak thgw.exe. programy. Nástroj thgw.exe je zamýšlen pro použití v zástupci na ploše nebo v menu. Nástroj thg.exe je určen pro použití v konzoli a pro volání nápovědy z příkazového řádku. Dávkový soubor thg.cmd, který instalace přidá do proměnné PATH, volá thg.exe.	
     
 TortoiseHg je napsán převážně v Pythonu a PyQt (extenze rozhraní Windows je významná výjimka). Skript thg a dialogy TortoiseHg lze použít na jakékoliv platformě, která podporuje PyQt, včetně Mac OS X.
 
@@ -59,7 +58,7 @@ Pokud se i potom vyskytnou problémy s extenzí rozhraní, doporučujeme znovu s
 Jazykové nastavení ve Windows
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Uživatelské rozhraní TorotiseHg bylo přeloženo do mnoha jazyků. Jazykové balíčky nejsou potřebné, neboť všechny přeložené jazyky jsou nainstalované. Preferovaný jazyk (:guilabel:`UI Language`) lze nastavit v nástroji pro globální konfiguraci.
+Uživatelské rozhraní TorotiseHg bylo přeloženo do mnoha jazyků. Jazykové balíčky nejsou potřebné, neboť všechny přeložené jazyky jsou nainstalované. Preferovaný jazyk lze nastavit v nástroji pro globální konfiguraci (:guilabel:`Settings > TortoiseHg > Jazyk aplikace`).
 
 Kontextové nabídky rozhraní Windows jsou překládány pomocí registrů Windows. Překlady pro mnohé lokalizace byly nainstalovány do složky
 :file:`C:\\Program Files\\TortoiseHg\\i18n\\cmenu`. Na vybraném jazyku proveďte dvojpoklep a potvrďte dotazy. 

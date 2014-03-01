@@ -1,98 +1,113 @@
 Synchronizace
 =============
 
+
 .. module:: synchronize.dialog
 	:synopsis: Dialog used to perform synchronization operations
 
+Nástroj `TortoiseHg > Synchronizovat`	
+	
 .. figure:: figures/synchronize.png
 	:alt: Synchronize dialog
 
-	Synchronize dialog
 
-Synchronizační nástroj se používá pro přesouvání changesetů mezi repozitáři nebo pro odesílání změn pře e-mail.
+Synchronizační nástroj se používá pro přesouvání changesetů mezi repozitáři nebo pro odesílání změn přes e-mail. 	
+
+:guilabel:`Incoming`
+  Ukázat (příchozí) changesety, které mohou být staženy (pulled) z cílového repozitáře, neboli změny v cílovém repozitáři, které nejsou v lokálním repozitáři
+:guilabel:`Pull`
+  Stáhnout příchozí changesety z cílového repozitáře
+:guilabel:`Outgoing`
+  Ukázat (odchozí) changesety, které mohou být poslány (pushed) do cílového repozitáře, neboli změny v lokálním repozitáři, které nejsou v cílovém repozitáři
+:guilabel:`Push`
+  Poslat odchozí changesety do cílového repozitáře, neboli zařídit, aby se lokální *tip* stal *tipem* v cílovém repozitáři
+:guilabel:`Email`
+  Poslat odchozí changesety (do cílového repozitáře) jako e-mail
+:guilabel:`Rozbalit`
+  Rozbalit svazkový (bundle) soubor *.hg
+:guilabel:`Stop`
+  Zastavit probíhající operaci
+:guilabel:`Po akci pull:`
+  Tlačítko obsahuje zatržítka pro výběr operací, které se mají provést po stažení (pull) změn ze vzdáleného repozitáře. Otevřete-li konfigurační nástroj, můžete vybrat implicitní chování pro váš uživatelský účet a potlačit tento výběr na úrovni repozitáře.
+
+  :guilabel:`None`
+     Po akci pull se neprovedou žádné operace. Můžete si prohlédnout stažené changesety v záznamovém panelu a můžete se pokusit o aktualizaci k novému tipu.
+		
+  :guilabel:`Update`
+     Automaticky aktualizovat k tipu aktuální větve tehdy a jen tehdy, jestliže byly nové revize staženy do lokálního repozitáře. Může to spustit slučování, jestliže stažené změny kolidují s lokálními nekomitovanými změnami.
+		
+  :guilabel:`Fetch`
+     Ekvivalentní k hg fetch. Viz dokumentaci k extenzi fetch. Tato  procedura je přístupná, pokud byla povolena uživatelem.
+  
+  :guilabel:`Konflikty při slučování`
+     Konflikty při sloučování řešit pokud možno automaticky. Je-li tato volba zatržena, pokusí se Mercurial řešit triviální konflikty bez spoluúčasti uživatele. Není-li, jsou všechna slučování interaktivní.
+
+
+:guilabel:`Možnosti` 
+  Tlačítko obsahuje zatržítka pro výběr méně používaných příkazových opcí.
+
+  :guilabel:`Povolit push nové větve`
+     Povolit vyslání (push) nové větve
+  :guilabel:`Vynutit push nebo pull`
+	 Potlačit varování o vícerých čelech (heads) nebo nespřízněných repozitářích
+  :guilabel:`Zabočit do subrepozitářů`
+	 Příkazy incoming (příchozí) nebo outgoing (odchozí) mohou zahrnout i subrepozitáře a poskytnout úplný přehled
+  :guilabel:`Dočasně odpojit nastavené HTTP proxy`
+	 Tato volba je sensitivní pouze tehdy, je-li pro daný repozitář nastaven proxy web; zatržením se tento web zapoví.
+  :guilabel:`Emitovat výstup ladění`
+	 ...
+  :guilabel:`Pracovat s frontou oprávek (-mq)`
+	 ...	
+  :guilabel:`Vzdálený příkaz`
+     Textové pole pro zadání vzdáleného příkazu
+  :guilabel:`Větev`
+	 Textové pole pro zadání názvu větve	
+
+Je-li synchronizační nástroj otevřen ve Verpánku, má nástrojová lišta ještě zatržítko
+
+:guilabel:`Cíl`. 
+  Zatržením se aktivuje roletkový seznam, ve kterém lze vybrat cílovou revizi, bookmark nebo větev. Tyto výběry se přidají ke každému synchronizačnímu příkazu. Je-li synchronizační nástroj otevřen mimo Verpánek, je toto zatržítko skryté.
 	
+Než bude zatržítko "Cíl" doplněno i do widgetu `TortoiseHg > Synchronizovat`, bude zřejmě vhodnější používat synchronizační nástroj z Verpánku.
 
-	:guilabel:`Incoming`
-		ukázat changesety, které mohou být staženy (pulled) z cílového repozitáře, neboli změny v cílovém repozitáři, které nejsou v lokálním repozitáři
-	:guilabel:`Pull`
-		stáhnout příchozí changesety z cílového repozitáře
-	:guilabel:`Outgoing`
-		ukázat (odchozí) changesety, které mohou být poslány (pushed) do cílového repozitáře, neboli změny v lokálním repozitáři, které nejsou v cílovém repozitáři
-		:guilabel:`Push`
-		poslat odchozí changesety do cílového repozitáře, neboli zařídit, aby se lokální *tip* stal *tipem* v cílovém repozitáři
-		:guilabel:`Email`
-		poslat odchozí changesety (do cílového repozitáře) jako e-mail
-		:guilabel:`Stop`
-		zastavit probíhající operaci
-
-Tlačítko :guilabel:`Post Pull` obsahuje zatržítka pro výběr operací, které se mají provést po stažení (pull). Otevřete-li konfigurační nástroj, můžete vybrat implicitní chování pro váš uživatelský účet a potlačit tento výběr na úrovni repozitáře.
-
-	:guilabel:`None`
-		Po akci pull se neprovedou žádné operace. Můžete si prohlédnout stažené changesety v záznamovém panelu a můžete se pokusit o aktualizaci k novému tipu.
-		
-	:guilabel:`Update`
-		Automaticky aktualizovat k tipu aktuální větve tehdy a jen tehdy, jestliže byly nové revize staženy do lokálního repozitáře. Může to spustit slučování, jestliže stažené změny kolidují s lokálními nekomitovanými změnami.
-		
-	:guilabel:`Fetch`
-		Ekvivalentní k hg fetch. Viz dokumentaci k extenzi fetch. Tato  procedura je přístupná, pokud byla povolena uživatelem.
-		
-	:guilabel:`Rebase`
-		Ekvivalentní k pull --rebase. Viz dokumentaci k extenzi rebase. Procedura je přistupná, pokud byla povolena uživatelem.
-		
-	:guilabel:`Automatically resolve merge conflicts where possible`
-		Konflikty při sloučení řešit pokud možno automaticky. Je-li vybráno update nebo rebase, může operace pull vést ke slučování. Je-li tato volba zatržena, pokusí se Mercurial řešit triviální konflikty bez spoluúčasti uživatele. Není-li, jsou všechna slučování interaktivní.
-
-
-Tlačítko :guilabel:`Options` obsahuje zatržítka pro výběr méně používaných příkazových opcí.
-
-	:guilabel:`Allow push of a new branch`
-	    povolit vyslání (push) nové větve
-	:guilabel:`Force push or pull`
-		potlačit varování o vícerých čelech (heads) nebo nespřízněných repozitářích
-	:guilabel:`Recurse into subdirectories`
-		příkazy incoming (příchozí) nebo outgoing (odchozí) mohou zahrnout i subrepozitáře a poskytnout úplný přehled
-	:guilabel:`Temporarily disable configured proxy`
-		tato volba je sensitivní pouze tehdy, je-li pro daný repozitář nastaven proxy web; zatržením se tento web zapoví.
-	:guilabel:`Emit debugging output`
-		...
-	:guilabel:`Remote Command`
-		poskytuje --remotecmd argument	
-
-Je-li synchronizační nástroj otevřen ve Verpánku, má nástrojová lišta zatržítko :guilabel:`Target`. Zatržením se aktivuje roletkový seznam, ve kterém lze vybrat cílovou revizi, bookmark nebo větev. Tyto výběry se přidají ke každému synchronizačnímu příkazu. Je-li synchronizační nástroj otevřen mimo Workbench, je toto zatržítko skryté.
-
-Poklep na revizi v tabulce revizí aktualizuje hodnotu v textovém poli roletkového seznamu. Přidržení klávesy :kbd:`Alt` při výběru jiné revize způsobí aktualizaci textu bez výstupu z prostředí synchronizačního nástroje.
 
 Pod nástrojovou lištou je uvedena aktuálně vybraná adresa URL. Tuto adresu použijí všechny synchronizační nástroje.
 
-Celý synchronizační panel ve Verpánku je aktivován poklepem na tlačítko :guilabel:`Incoming` nebo :guilabel:`Outgoing`. V otevřeném panelu zadáme potřebné parametry a aktivujeme příkaz :guilabel:`Pull` nebo :guilabel:`Push`.
+Celkový účinek nástroje `Synchronizovat` je ten, že může být čten jako příkaz Mercuriálu z příkazového řádku. Tlačítky nástroje se vybere příkaz, v dialozích `Po akci pull` a `Možnosti` se zadají parametry, v roletkovém seznamu `Cíl` se určí revize či větve a textovém poli lze zkontrolovat adresu vzdáleného repozitáře.
+ 
+Před textovým polem pro URL jsou dvě ikony pro nastavení bezpečného spojení a uložení aktuálního URL jako alias. 
+
 
 
 Přidání URL
 -----------
 
-Novou adresu URL snadno přidáte do repozitáře metodou Drag and Drop přetažením z jiné aplikace nad synchronizační panel, tlačítkem :guilabel:`Save` se otevře dialog, kde můžete k URL zadat alias.
+Nejsnadněji přidáte nové URL do svého repozitáře jeho přetažením (drag @ drop) z jiné aplikace, uložíte  a zadáte alias. 
 
-Ve dvou seznamech níže lze vidět adresy, uložené v konfiguračním souboru aktuálního repozitáře (:guilabel:`Paths in Repository Settings`) a adresy, které jsou uložené v jiných spřízněných repozitářích, uvedených v Repozitory Registry (:guilabel:`Related Paths`). Je-li synchronizační panel otevřen mimo Workbench, je seznam v :guilabel:`Related Paths` prázdný. 
+V textových polích spodní části karty Synchronizovat lze vidět adresy, uložené v konfiguračním souboru aktuálního repozitáře (:guilabel:`Cesty v nastavení repozitáře`) a adresy, které jsou uložené v jiných příbuzných repozitářích, uvedených v Seznamu repozitářů (:guilabel:`Příbuzné cesty`). 
 
 .. note::
-	"Spřízněný" znamená, že dva repozitáře mají alespoň jeden společný kořenový changeset. Klonované repozitáře jsou zcela zřejmě spřízněné. Operace push a pull vyžadují spřízněnost repozitářů; tento požadavek lze potlačit opcí --force.
+	"Příbuzný" znamená, že dva repozitáře mají alespoň jeden společný kořenový changeset. Klonované repozitáře jsou zcela zřejmě příbuzné. Operace push a pull vyžadují příbuznost repozitářů; tento požadavek lze potlačit opcí --force.
 
-Seznamy adres URL mají kontextové menu s nabídkami Explore, Terminal a Odebrat.
-
-
-Bezpečnost
-----------
-
-Mercurial (a TortoiseHg) podporují dva bezpečnostní protokoly pro výměnu dat se vzdálenými servery, HTTPS (SSL) a SSH.
+Seznamy adres URL mají kontextové menu s nabídkami Explore, Terminal, Copy Path, Edit a Remove.
 
 
-HTTPS
-~~~~~
+Bezpečné připojení ke vzdálenému repozitáři
+-------------------------------------------
 
-There are two asymmetrical parts to a secure HTTPS connection.  The
-first part of the secure connection is authenticating the identification
-of the server.  The second is authenticating yourself (the client) to
-the server, either via a username and passphrase or a certificate key.  
+Mercurial (a TortoiseHg) podporují dva bezpečnostní protokoly pro výměnu dat se vzdálenými servery, HTTPS  a SSH.
+
+Bezpečné spojení HTTPS lze nastavit aktivací ikony :guilabel:`Bezpečné spojení HTTPS` v kartě Synchronizovat.
+
+Bezpečné spojení HTTPS se skládá ze dvou asymetrických částí. První částí je ověření hostitele, což lze v nástroji Bezpečné spojení HTTPS zadat trojím způsobem:
+
+* Ověřit pomocí certifikátů certifikační autority (CA)
+
+* Ověřit pomocí uloženého fingerprintu hostitele
+
+* Bez ověření hostitele avšak stále se zašifrováním (nejhorší)
+
+Druhou částí bezpečného spojení je ověření uživatele zadáním jména, hesla, případně certifikačního klíče či řetězce (chain).
 
 Host Authentication
 +++++++++++++++++++
@@ -142,7 +157,7 @@ security, are:
 
 Until recently, TortoiseHg only supported the first option in the
 graphical interface even though the second and third options were
-supported internally.  TortoiseHg 2.0, we only support the latter two
+supported internally. In TortoiseHg 2.0, we only support the latter two
 options in the graphical interface, and we do not allow the user
 configure the first option anymore.  By default we strip the username
 and password off of URLs when they are saved.
@@ -181,7 +196,7 @@ SSH
 SSH is a symmetrical peer-to-peer secure tunnel.  SSH clients and
 servers have their own key management systems, so Mercurial does not get
 involved with password prompts when SSH is used.  This is problematic on
-Windows and thus TortoiseHg bundles the TortosePlink SSH client with its
+Windows and thus TortoiseHg bundles the TortoisePlink SSH client with its
 Windows installers.  TortoisePlink is a port of the Plink SSH client
 that uses dialog prompts for host-key authorizations and passphrase
 prompts.  TortoisePlink (developed by the TortoiseSVN project) can use
@@ -200,15 +215,13 @@ E-mail
 .. figure:: figures//email.png
 	:alt: Email dialog
 
-	Email dialog
- 
-Emailový dialog lze spustit ze dvou nástrojů TortoiseHg.
+Dialogové okno **Email** lze spustit ze dvou nástrojů TortoiseHg.
 
-1) Z Verpánku jako kontextové menu pro jednu nebo více vybraných revizi.
+* Z Verpánku jako kontextové menu pro jednu nebo více vybraných revizi.
    
-2) Tlačítkem :guilabel:`Email out..` v synchronizačním panelu odešlete všechny odchozí změny do zadaného cílového repozitáře.
+* Tlačítkem :guilabel:`Email out..` v synchronizačním panelu odešlete všechny odchozí změny do zadaného cílového repozitáře.
  
-Parametry poštovního klienta lze přednastavit v otevřeném okně 'Email' výběrem :guilabel:Settings`.
+Parametry poštovního klienta lze přednastavit v otevřeném okně 'Email out' výběrem :guilabel:Settings`.
 
 V dokumentaci pro Mercurial se seznámíte s rozdíly mezi plain patches, Hg patches, Git patches a svazky (bundles).
 

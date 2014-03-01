@@ -14,6 +14,7 @@ import stat
 import subprocess
 import tempfile
 import re
+import sip
 import weakref
 
 from mercurial.i18n import _ as hggettext
@@ -31,6 +32,9 @@ try:
     openflags = win32con.CREATE_NO_WINDOW
 except ImportError:
     openflags = 0
+
+# largest allowed size for widget, defined in <src/gui/kernel/qwidget.h>
+QWIDGETSIZE_MAX = (1 << 24) - 1
 
 tmproot = None
 def gettempdir():
@@ -53,7 +57,7 @@ def gettempdir():
 def openhelpcontents(url):
     'Open online help, use local CHM file if available'
     if not url.startswith('http'):
-        fullurl = 'http://tortoisehg.org/manual/2.7/' + url
+        fullurl = 'http://tortoisehg.readthedocs.org/en/latest/' + url
         # Use local CHM file if it can be found
         if os.name == 'nt' and paths.bin_path:
             chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
@@ -232,19 +236,29 @@ def openshell(root, reponame, ui=None):
         return
     shell, args = terminal.detectterminal(ui)
     if shell:
+        if args:
+            shell = shell + ' ' + util.expandpath(args)
+        # check invalid expression in tortoisehg.shell.  we shouldn't apply
+        # string formatting to untrusted value, but too late to change syntax.
+        try:
+            shell % {'root': '', 'reponame': ''}
+        except (KeyError, TypeError, ValueError):
+            # KeyError: "%(invalid)s", TypeError: "%(root)d", ValueError: "%"
+            ErrorMsgBox(_('Failed to open path in terminal'),
+                        _('Invalid configuration: %s')
+                        % hglib.tounicode(shell))
+            return
+        shellcmd = shell % {'root': root, 'reponame': reponame}
+
         cwd = os.getcwd()
         try:
-            if args:
-                shell = shell + ' ' + util.expandpath(args)
-            shellcmd = shell % {'root': root, 'reponame': reponame}
-
             # Unix: QProcess.startDetached(program) cannot parse single-quoted
             # parameters built using util.shellquote().
             # Windows: subprocess.Popen(program, shell=True) cannot spawn
             # cmd.exe in new window, probably because the initial cmd.exe is
             # invoked with SW_HIDE.
             os.chdir(root)
-            fullargs = shlex.split(shellcmd)
+            fullargs = map(hglib.tounicode, shlex.split(shellcmd))
             started = QProcess.startDetached(fullargs[0], fullargs[1:])
         finally:
             os.chdir(cwd)
@@ -286,6 +300,7 @@ _thgstyles = {
    'log.removed': 'black #ffcccc_background',
    'status.deleted': 'red bold',
    'ui.error': 'red bold #ffcccc_background',
+   'ui.warning': 'black bold #ffffaa_background',
    'control': 'black bold #dddddd_background',
 }
 
@@ -736,6 +751,59 @@ def allowCaseChangingInput(combo):
     assert isinstance(combo, QComboBox) and combo.isEditable()
     combo.completer().setCaseSensitivity(Qt.CaseSensitive)
 
+class BadCompletionBlocker(QObject):
+    """Disable unexpected inline completion by enter key if selectAll()-ed
+
+    If the selection state looks in the middle of the completion, QComboBox
+    replaces the edit text by the current completion on enter key pressed.
+    This is wrong in the following scenario:
+
+    >>> combo = QComboBox(editable=True)
+    >>> combo.addItem('history value')
+    >>> combo.setEditText('initial value')
+    >>> combo.lineEdit().selectAll()
+    >>> QApplication.sendEvent(
+    ...     combo, QKeyEvent(QEvent.KeyPress, Qt.Key_Enter, Qt.NoModifier))
+    True
+    >>> str(combo.currentText())
+    'history value'
+
+    In this example, QLineControl picks the first item in the combo box
+    because the completion prefix has not been set.
+
+    BadCompletionBlocker is intended to work around this problem.
+
+    >>> combo.installEventFilter(BadCompletionBlocker(combo))
+    >>> combo.setEditText('initial value')
+    >>> combo.lineEdit().selectAll()
+    >>> QApplication.sendEvent(
+    ...     combo, QKeyEvent(QEvent.KeyPress, Qt.Key_Enter, Qt.NoModifier))
+    True
+    >>> str(combo.currentText())
+    'initial value'
+
+    For details, read QLineControl::processKeyEvent() and complete() of
+    src/gui/widgets/qlinecontrol.cpp.
+    """
+
+    def __init__(self, parent):
+        super(BadCompletionBlocker, self).__init__(parent)
+        if not isinstance(parent, QComboBox):
+            raise ValueError('invalid object to watch: %r' % parent)
+
+    def eventFilter(self, watched, event):
+        if watched is not self.parent():
+            return super(BadCompletionBlocker, self).eventFilter(watched, event)
+        if (event.type() != QEvent.KeyPress
+            or event.key() not in (Qt.Key_Enter, Qt.Key_Return)
+            or not watched.isEditable()):
+            return False
+        # deselect without completion if all text selected
+        le = watched.lineEdit()
+        if le.selectedText() == le.text():
+            le.deselect()
+        return False
+
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
 
@@ -1142,11 +1210,15 @@ class DialogKeeper(QObject):
     >>> dialogs.count()
     1
 
-    closed dialog will be disowned:
+    closed dialog will be deleted:
+
+    >>> def processDeferredDeletion():
+    ...     loop = QEventLoop()
+    ...     QTimer.singleShot(0, loop.quit)
+    ...     loop.exec_()
 
     >>> dlg1.reject()
-    >>> dlg1.parent() is None
-    True
+    >>> processDeferredDeletion()
     >>> dialogs.count()
     0
 
@@ -1169,6 +1241,7 @@ class DialogKeeper(QObject):
     >>> dialogs.open(QDialog) is dlg4
     True
     >>> dlg4.reject()
+    >>> processDeferredDeletion()
     >>> dialogs.count()
     1
     >>> dialogs.open(QDialog) is dlg3
@@ -1179,33 +1252,6 @@ class DialogKeeper(QObject):
 
         self._dialogs = DialogKeeper(self._createDialog)
         self._dialogs = DialogKeeper(lambda *args: Foo(self))
-
-    When to delete reference:
-
-    If a dialog is not referenced, and if accept(), reject() and done() are
-    not overridden, it could be garbage-collected during finished signal and
-    lead to hard crash::
-
-        #0  isSignalConnected (signal_index=..., this=0x0)
-        #1  QMetaObject::activate (...)
-        #2  ... in sipQDialog::done (this=0x1d655b0, ...)
-        #3  ... in sipQDialog::reject (this=0x1d655b0)
-        #4  ... in QDialog::closeEvent (this=this@entry=0x1d655b0, ...)
-
-    To avoid crash, a finished dialog is referenced explicitly by DialogKeeper
-    until next event processing.
-
-    >>> dialogs = DialogKeeper(QDialog)
-    >>> dlgref = weakref.ref(dialogs.open())
-    >>> dialogs.count()
-    1
-    >>> esckeyev = QKeyEvent(QEvent.KeyPress, Qt.Key_Escape, Qt.NoModifier)
-    >>> QApplication.postEvent(dlgref(), esckeyev)  # close without incref
-    >>> QApplication.processEvents()  # should not crash
-    >>> dialogs.count()
-    0
-    >>> dlgref() is None  # nobody should have reference
-    True
     """
 
     def __init__(self, createdlg, genkey=None, parent=None):
@@ -1213,11 +1259,6 @@ class DialogKeeper(QObject):
         self._createdlg = createdlg
         self._genkey = genkey or DialogKeeper._defaultgenkey
         self._keytodlgs = {}  # key: [dlg, ...]
-        self._dlgtokey = {}   # dlg: key
-
-        self._garbagedlgs = []
-        self._emptygarbagelater = QTimer(self, interval=0, singleShot=True)
-        self._emptygarbagelater.timeout.connect(self._emptygarbage)
 
     def open(self, *args, **kwargs):
         """Create new dialog or reactivate existing dialog"""
@@ -1249,33 +1290,22 @@ class DialogKeeper(QObject):
         if key not in self._keytodlgs:
             self._keytodlgs[key] = []
         self._keytodlgs[key].append(dlg)
-        self._dlgtokey[dlg] = key
-        dlg.finished.connect(self._forgetdlg)
+        dlg.setAttribute(Qt.WA_DeleteOnClose)
+        dlg.destroyed.connect(self._cleanupdlgs)
         return dlg
 
-    #@pyqtSlot()
-    def _forgetdlg(self):
-        dlg = self.sender()
-        dlg.finished.disconnect(self._forgetdlg)
-        if dlg.parent() is self.parent():
-            dlg.setParent(None)  # assist gc
-        key = self._dlgtokey.pop(dlg)
-        self._keytodlgs[key].remove(dlg)
-        if not self._keytodlgs[key]:
-            del self._keytodlgs[key]
-
-        # avoid deletion inside finished signal
-        self._garbagedlgs.append(dlg)
-        self._emptygarbagelater.start()
-
+    # "destroyed" is emitted soon after Python wrapper is deleted
     @pyqtSlot()
-    def _emptygarbage(self):
-        del self._garbagedlgs[:]
+    def _cleanupdlgs(self):
+        for key, dialogs in self._keytodlgs.items():
+            livedialogs = [dlg for dlg in dialogs if not sip.isdeleted(dlg)]
+            if livedialogs:
+                self._keytodlgs[key] = livedialogs
+            else:
+                del self._keytodlgs[key]
 
     def count(self):
-        assert len(self._dlgtokey) == sum(len(dlgs) for dlgs
-                                          in self._keytodlgs.itervalues())
-        return len(self._dlgtokey)
+        return sum(len(dlgs) for dlgs in self._keytodlgs.itervalues())
 
     @staticmethod
     def _defaultgenkey(_parent, *args, **_kwargs):

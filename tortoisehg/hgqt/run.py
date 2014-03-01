@@ -159,7 +159,7 @@ def get_files_from_listfile():
     files = []
     for f in lines:
         try:
-            cpath = scmutil.canonpath(root, cwd, f)
+            cpath = hglib.canonpath(root, cwd, f)
             # canonpath will abort on .hg/ paths
         except util.Abort:
             continue
@@ -222,6 +222,8 @@ def _parse(ui, args):
 
 def _runcatch(ui, args):
     try:
+        # read --config before doing anything else like Mercurial
+        hglib.parseconfigopts(ui, args)
         try:
             return runcommand(ui, args)
         finally:
@@ -241,11 +243,19 @@ def _runcatch(ui, args):
             help_(ui, 'shortlist')
     except error.RepoError, inst:
         ui.warn(_("abort: %s!\n") % inst)
+    except util.Abort, inst:
+        ui.warn(_("abort: %s\n") % inst)
+        if inst.hint:
+            ui.warn(_("(%s)\n") % inst.hint)
 
     return -1
 
 def runcommand(ui, args):
     cmd, func, args, options, cmdoptions, alias = _parse(ui, args)
+
+    if options['config']:
+        raise util.Abort(_('option --config may not be abbreviated!'))
+
     cmdoptions['alias'] = alias
     ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
     i18n.setlanguage(ui.config('tortoisehg', 'ui.language'))
@@ -369,6 +379,8 @@ globalopts = [
     ('v', 'verbose', None, _('enable additional output')),
     ('q', 'quiet', None, _('suppress output')),
     ('h', 'help', None, _('display help and exit')),
+    ('', 'config', [],
+     _("set/override config option (use 'section.name=value')")),
     ('', 'debugger', None, _('start debugger')),
     ('', 'profile', None, _('print command execution profile')),
     ('', 'nofork', None, _('do not fork GUI process')),
@@ -461,7 +473,7 @@ def archive(ui, repoagent, *pats, **opts):
     """archive dialog"""
     from tortoisehg.hgqt import archive as archivemod
     rev = opts.get('rev')
-    return archivemod.ArchiveDialog(repoagent, rev)
+    return archivemod.createArchiveDialog(repoagent, rev)
 
 @command('^backout',
     [('', 'merge', None, _('merge with old dirstate parent after backout')),
@@ -509,11 +521,11 @@ def bookmark(ui, repoagent, *names, **opts):
      ('', 'pull', None, _('use pull protocol to copy metadata')),
      ('', 'uncompressed', None, _('use uncompressed transfer '
                                   '(fast over LAN)'))],
-    _('thg clone [OPTION]... SOURCE [DEST]'))
+    _('thg clone [OPTION]... [SOURCE] [DEST]'))
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt import clone as clonemod
-    return clonemod.CloneDialog(pats, opts)
+    return clonemod.CloneDialog(ui, pats, opts)
 
 @command('^commit|ci',
     [('u', 'user', '', _('record user as committer')),
@@ -841,20 +853,19 @@ def log(ui, *pats, **opts):
     _('thg manifest [-r REV] [FILE]'))
 def manifest(ui, repoagent, *pats, **opts):
     """display the current or given revision of the project manifest"""
-    from tortoisehg.hgqt import manifestdialog
+    from tortoisehg.hgqt import revdetails as revdetailsmod
     repo = repoagent.rawRepo()
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
-    dlg = manifestdialog.ManifestDialog(repoagent, rev)
+    dlg = revdetailsmod.createManifestDialog(repoagent, rev)
     if pats:
         path = hglib.canonpaths(pats)[0]
+        dlg.setFilePath(hglib.tounicode(path))
         if opts.get('line'):
             try:
                 lineno = int(opts['line'])
             except ValueError:
                 raise util.Abort(_('invalid line number: %s') % opts['line'])
-        else:
-            lineno = None
-        dlg.setSource(hglib.tounicode(path), rev, lineno)
+            dlg.showLine(lineno)
     if opts.get('pattern'):
         dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
     return dlg
@@ -928,12 +939,18 @@ def remove(ui, repoagent, *pats, **opts):
     """remove selected files"""
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('rename|mv|copy', [], _('thg rename SOURCE [DEST]...'))
-def rename(ui, repoagent, *pats, **opts):
+@command('rename|mv|copy', [], _('thg rename [SOURCE] [DEST]'))
+def rename(ui, repoagent, source=None, dest=None, **opts):
     """rename dialog"""
     from tortoisehg.hgqt import rename as renamemod
+    repo = repoagent.rawRepo()
+    cwd = repo.getcwd()
+    if source:
+        source = hglib.tounicode(hglib.canonpath(repo.root, cwd, source))
+    if dest:
+        dest = hglib.tounicode(hglib.canonpath(repo.root, cwd, dest))
     iscopy = (opts.get('alias') == 'copy')
-    return renamemod.RenameDialog(repoagent, pats, iscopy=iscopy)
+    return renamemod.RenameDialog(repoagent, None, source, dest, iscopy)
 
 @command('^repoconfig',
     [('', 'focus', '', _('field to give initial focus'))],
@@ -976,7 +993,7 @@ def rupdate(ui, repoagent, *pats, **opts):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return rupdatemod.rUpdateDialog(repoagent, rev, None, opts)
+    return rupdatemod.createRemoteUpdateDialog(repoagent, rev)
 
 @command('^serve',
     [('', 'web-conf', '', _('name of the hgweb config file (serve more than '
@@ -1046,13 +1063,13 @@ def strip(ui, repoagent, *pats, **opts):
         rev = opts.get('rev')
     elif len(pats) == 1:
         rev = pats[0]
-    return thgstrip.StripDialog(repoagent, rev=rev, opts=opts)
+    return thgstrip.createStripDialog(repoagent, rev=rev, opts=opts)
 
 @command('^sync|synchronize', [], _('thg sync [PEER]'))
 def sync(ui, repoagent, *pats, **opts):
     """synchronize with other repositories"""
     from tortoisehg.hgqt import sync as syncmod
-    w = syncmod.SyncWidget(repoagent, None, **opts)
+    w = syncmod.SyncDialog(repoagent)
     if pats:
         w.setUrl(hglib.tounicode(pats[0]))
     return w

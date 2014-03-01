@@ -12,7 +12,7 @@ from hgext import record
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, lexers
+from tortoisehg.hgqt import qtlib, qscilib, fileencoding, lexers
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -33,6 +33,8 @@ class RejectsDialog(QDialog):
         editor.setBraceMatching(qsci.SloppyBraceMatch)
         editor.setFolding(qsci.BoxedTreeFoldStyle)
         editor.installEventFilter(qscilib.KeyPressInterceptor(self))
+        editor.setContextMenuPolicy(Qt.CustomContextMenu)
+        editor.customContextMenuRequested.connect(self._onMenuRequested)
         self.baseLineColor = editor.markerDefine(qsci.Background, -1)
         editor.setMarkerBackgroundColor(QColor('lightblue'), self.baseLineColor)
         self.layout().addWidget(editor, 3)
@@ -75,6 +77,11 @@ class RejectsDialog(QDialog):
         self.rejectbrowser = RejectBrowser(self)
         hbox.addWidget(self.rejectbrowser, 5)
 
+        self.textencgroup = fileencoding.createActionGroup(self)
+        self.textencgroup.triggered.connect(self._reloadFile)
+        fileencoding.checkActionByName(self.textencgroup,
+                                       fileencoding.contentencoding(ui))
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -87,26 +94,16 @@ class RejectsDialog(QDialog):
         self.editor.loadSettings(s, 'rejects/editor')
         self.rejectbrowser.loadSettings(s, 'rejects/rejbrowse')
 
-        f = QFile(hglib.tounicode(path))
-        if not f.open(QIODevice.ReadOnly):
-            qtlib.ErrorMsgBox(_('Unable to merge rejects'),
-                              _("Can't read this file (maybe deleted)"))
+        if not qscilib.readFile(editor, hglib.tounicode(path),
+                                self._textEncoding()):
             self.hide()
             QTimer.singleShot(0, self.reject)
             return
-        earlybytes = f.read(4096)
-        if '\0' in earlybytes:
-            qtlib.ErrorMsgBox(_('Unable to merge rejects'),
-                              _('This appears to be a binary file'))
-            self.hide()
-            QTimer.singleShot(0, self.reject)
-            return
-
-        f.seek(0)
-        editor.read(f)
-        editor.setModified(False)
+        earlybytes = hglib.fromunicode(editor.text(), 'replace')[:4096]
         lexer = lexers.getlexer(ui, path, earlybytes, self)
         editor.setLexer(lexer)
+        if lexer is None:
+            editor.setFont(qtlib.getfont('fontlog').font())
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
 
@@ -130,6 +127,15 @@ class RejectsDialog(QDialog):
         self.resolved.setDisabled(True)
         self.unresolved.setDisabled(True)
         QTimer.singleShot(0, lambda: self.chunklist.setCurrentRow(0))
+
+    @pyqtSlot(QPoint)
+    def _onMenuRequested(self, point):
+        menu = self.editor.createStandardContextMenu()
+        menu.addSeparator()
+        m = menu.addMenu(_('E&ncoding'))
+        fileencoding.addActionsToMenu(m, self.textencgroup)
+        menu.exec_(self.editor.viewport().mapToGlobal(point))
+        menu.setParent(None)
 
     def updateChunkList(self):
         self.updating = True
@@ -178,6 +184,22 @@ class RejectsDialog(QDialog):
         self.resolved.setEnabled(not chunk.resolved)
         self.unresolved.setEnabled(chunk.resolved)
 
+    def _textEncoding(self):
+        return fileencoding.checkedActionName(self.textencgroup)
+
+    @pyqtSlot()
+    def _reloadFile(self):
+        if self.editor.isModified():
+            r = qtlib.QuestionMsgBox(_('Reload File'),
+                                     _('Are you sure you want to reload this '
+                                       'file?'),
+                                     _('All unsaved changes will be lost.'),
+                                     parent=self)
+            if not r:
+                return
+        qscilib.readFile(self.editor, hglib.tounicode(self.path),
+                         self._textEncoding())
+
     def saveSettings(self):
         s = QSettings()
         s.setValue('rejects/geometry', self.saveGeometry())
@@ -205,11 +227,8 @@ class RejectsDialog(QDialog):
                 acceptresolution = True
 
         if acceptresolution:
-            f = QFile(hglib.tounicode(self.path))
-            saved = f.open(QIODevice.WriteOnly) and self.editor.write(f)
-            if not saved:
-                qtlib.ErrorMsgBox(_('Unable to save file'),
-                                  f.errorString(), parent=self)
+            if not qscilib.writeFile(self.editor, hglib.tounicode(self.path),
+                                     self._textEncoding()):
                 return
             self.saveSettings()
             super(RejectsDialog, self).accept()

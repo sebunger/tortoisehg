@@ -288,8 +288,8 @@ class QtRunner(QObject):
         self._exccatcher = None
         self._server = None
         self._repomanager = None
+        self._reporeleaser = None
         self._workbench = None
-        self._dialogs = {}  # dlg: reporoot
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         if self._mainapp:
@@ -316,6 +316,8 @@ class QtRunner(QObject):
         self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
         self._repomanager = thgrepo.RepoManager(ui, self)
+        self._reporeleaser = releaser = QSignalMapper(self)
+        releaser.mapped[unicode].connect(self._repomanager.releaseRepoAgent)
 
         dlg, reporoot = self._createdialog(dlgfunc, args, opts)
         try:
@@ -377,20 +379,16 @@ class QtRunner(QObject):
         if not dlg:
             return
 
-        self._dialogs[dlg] = reporoot  # avoid garbage collection
-        if hasattr(dlg, 'finished') and hasattr(dlg.finished, 'connect'):
-            dlg.finished.connect(dlg.deleteLater)
-        # NOTE: Somehow `destroyed` signal doesn't emit the original obj.
-        # So we cannot write `dlg.destroyed.connect(self._forgetdialog)`.
-        dlg.destroyed.connect(lambda: self._forgetdialog(dlg))
-        dlg.show()
-
-    def _forgetdialog(self, dlg):
-        """forget the dialog to be garbage collectable"""
-        assert dlg in self._dialogs
-        reporoot = self._dialogs.pop(dlg)
+        dlg.setAttribute(Qt.WA_DeleteOnClose)
         if reporoot:
-            self._repomanager.releaseRepoAgent(reporoot)
+            dlg.destroyed[()].connect(self._reporeleaser.map)
+            self._reporeleaser.setMapping(dlg, reporoot)
+        if dlg is not self._workbench and not dlg.parent():
+            # keep reference to avoid garbage collection.  workbench should
+            # exist when run.dispatch() is called for the second time.
+            assert self._workbench
+            dlg.setParent(self._workbench, dlg.windowFlags())
+        dlg.show()
 
     def createWorkbench(self):
         """Create Workbench window and keep single reference"""

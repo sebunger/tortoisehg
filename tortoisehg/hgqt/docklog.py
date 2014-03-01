@@ -14,7 +14,7 @@ from PyQt4.Qsci import QsciScintilla
 from mercurial import commands, util
 
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdcore, cmdui
+from tortoisehg.hgqt import cmdui
 from tortoisehg.util import hglib
 
 class _LogWidgetForConsole(cmdui.LogWidget):
@@ -279,8 +279,8 @@ class ConsoleWidget(QWidget):
         agent.busyChanged.connect(self._suppressPromptOnBusy)
         agent.outputReceived.connect(self._logwidget.appendLog)
         agent.progressReceived.connect(self._emitProgress)
-        if self._repo:
-            self._logwidget.setPrompt('%s%% ' % self._repo.displayname)
+        if util.safehasattr(agent, 'displayName'):
+            self._logwidget.setPrompt('%s%% ' % agent.displayName())
         self.openPrompt()
         self._commandHistory = []
         self._commandIdx = 0
@@ -540,7 +540,7 @@ class LogDockWidget(QDockWidget):
     progressReceived = pyqtSignal(QString, object, QString, QString,
                                   object, object)
 
-    def __init__(self, repomanager, parent=None):
+    def __init__(self, repomanager, cmdagent, parent=None):
         super(LogDockWidget, self).__init__(parent)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
@@ -557,7 +557,7 @@ class LogDockWidget(QDockWidget):
 
         self._consoles = QStackedWidget(self)
         self.setWidget(self._consoles)
-        self._createConsole(cmdcore.CmdAgent(self))
+        self._createConsole(cmdagent)
         for root in self._repomanager.repoRootPaths():
             self._createConsoleFor(root)
 

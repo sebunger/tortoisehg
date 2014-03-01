@@ -20,8 +20,7 @@ class QFoldDialog(QDialog):
     def __init__(self, repoagent, patches, parent):
         super(QFoldDialog, self).__init__(parent)
         self._repoagent = repoagent
-        repo = repoagent.rawRepo()
-        self.setWindowTitle(_('Patch fold - %s') % repo.displayname)
+        self.setWindowTitle(_('Patch fold - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-qfold'))
 
         f = self.windowFlags()

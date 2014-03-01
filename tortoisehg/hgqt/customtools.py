@@ -245,8 +245,9 @@ class ToolsFrame(QFrame):
             for field in sorted(tools[name]):
                 keyname = '%s.%s' % (name, field)
                 value = tools[name][field]
-                if not value is '':
-                    ini.set(section, keyname, value)
+                # value may be bool if originating from hglib.tortoisehgtools()
+                if value != '':
+                    ini.set(section, keyname, str(value))
 
         # 2. Save the new guidefs
         for n, toollistwidget in enumerate(self.widgets):

@@ -1,26 +1,33 @@
 Serve
 =====
 
+Mercurial přichází s vestavěným, úsporným serverem, který je schopný zprostředkovat jedno spojení pro jeden repozitář. Server neprovádí ověření uživatele ale poskytuje vhodnou, ad-hoc metodu pro synchronizaci repozitářů v rámci lokální sítě.
+
+Bližší informaci o publikování repozitářů lze nalézt v článku `Publishing Repositories <http://mercurial.selenic.com/wiki/PublishingRepositories>`_. 
+
+Spuštění z TortoiseHg
+---------------------
+
 .. module:: serve.dialog
     :synopsis: Dialog used to start/stop the web server
 
 .. figure:: figures/serve.png
 	:alt: Web server dialog
 
-Procedura Serve je obálkou pro vestavěný webový server Mercurialu. Jakmile je spuštěn, může se kterýkoli počítač připojit k http portu a procházet vašimi repozitáři nebo provádět úkony clone, pull, či dokonce push, pokud to konfigurace vašeho serveru dovoluje.
+Nástroj Serve je prostředníkem pro vestavěný webový server Mercurialu. Jakmile je spuštěn, může se počítač připojit k portu http a procházet vašimi repozitáři, provádět úkony clone, pull, či dokonce push, pokud to konfigurace vašeho serveru dovoluje. Webový server může být spuštěn buď z Verpánku - Repozitář > **Start Web Server** nebo z kontextové nabídky Exploreru - TortoiseHg > **Webový server**.
 
 Tlačítka nástrojové lišty:
 
 	:guilabel:`Spustit`
 		spustit webový server
-	:guilabel:`Stop`
+	:guilabel:`Zastavit`
 		zavřít webový server
 	:guilabel:`Nastavit`
-		nastavit webové zobrazení repozitáře, popis a přístupová pravidla
+		otevře kartu Server nástroje Settings
 
 Je-li konfigurační dialog spuštěn prostřednictvím tlačítka :guilabel:`Configure`, je spuštěn pro aktuální repozitář. Navštivte prosím wiki stránky Mercurialu pro podrobný popis různých konfigurací webu.
 
-Nástroj serve v TortoiseHg nativně podporuje kolekci lokálních repozitářů. Jednoduše je přetáhnete v dialogovém okně "serve", nebo je přidáte ručně s použitím editovacích tlačítek. Kolekci repozitářů lze uložit a znovu načíst.
+Nástroj serve v TortoiseHg 2.0 nativně podporuje kolekci lokálních repozitářů. Jednoduše je přetáhnete v dialogovém okně "serve", nebo je přidáte ručně s použitím editovacích tlačítek. Kolekci repozitářů lze uložit a znovu načíst.
 
 
 Spuštění z příkazového řádku

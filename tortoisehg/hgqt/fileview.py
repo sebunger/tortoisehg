@@ -14,7 +14,7 @@ from mercurial import util, patch
 from tortoisehg.util import hglib, colormap, thread2
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qscilib, qtlib, blockmatcher, lexers
-from tortoisehg.hgqt import visdiff, filedata
+from tortoisehg.hgqt import visdiff, filedata, fileencoding
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -22,14 +22,29 @@ from PyQt4 import Qsci
 
 qsci = qscilib.Scintilla
 
+# _NullMode is the fallback mode to display error message or repository history
+_NullMode = 0
 DiffMode = 1
 FileMode = 2
 AnnMode = 3
 
+_LineNumberMargin = 1
+_AnnotateMargin = 2
+_ChunkSelectionMargin = 4
+
+_ChunkStartMarker = 0
+_IncludedChunkStartMarker = 1
+_ExcludedChunkStartMarker = 2
+_InsertedLineMarker = 3
+_ReplacedLineMarker = 4
+_ExcludedLineMarker = 5
+_FirstAnnotateLineMarker = 6  # to 31
+
+_ChunkSelectionMarkerMask = (
+    (1 << _IncludedChunkStartMarker) | (1 << _ExcludedChunkStartMarker))
+
 class HgFileView(QFrame):
     "file diff, content, and annotation viewer"
-
-    diffHeaderRegExp = re.compile("^@@ -[0-9]+,[0-9]+ \+[0-9]+,[0-9]+ @@")
 
     linkActivated = pyqtSignal(QString)
     fileDisplayed = pyqtSignal(QString, QString)
@@ -55,11 +70,6 @@ class HgFileView(QFrame):
         repo = repoagent.rawRepo()
         # TODO: replace by repoagent if setRepo(bundlerepo) can be removed
         self.repo = repo
-        self._diffs = []
-        self.changes = None
-        self.changeselection = False
-        self.chunkatline = {}
-        self.excludemsg = _(' (excluded from the next commit)')
 
         self.topLayout = QVBoxLayout()
 
@@ -96,18 +106,14 @@ class HgFileView(QFrame):
 
         self.blk = blockmatcher.BlockList(self)
         self.blksearch = blockmatcher.BlockList(self)
-        self.sci = AnnotateView(repoagent, self)
-        self._forceviewindicator = None
+        self.sci = qscilib.Scintilla(self)
         hbox.addWidget(self.blk)
         hbox.addWidget(self.sci, 1)
         hbox.addWidget(self.blksearch)
 
-        self.sci.showMessage.connect(self.showMessage)
-        self.sci.setAnnotationEnabled(False)
+        self.sci.cursorPositionChanged.connect(self._updateDiffActions)
         self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.sci.customContextMenuRequested.connect(self.menuRequest)
-        self.annmarginclicked = False
-        self.sci.marginClicked.connect(self.marginClicked)
+        self.sci.customContextMenuRequested.connect(self._onMenuRequested)
 
         self.blk.linkScrollBar(self.sci.verticalScrollBar())
         self.blk.setVisible(False)
@@ -116,38 +122,10 @@ class HgFileView(QFrame):
 
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
-        keys = set((Qt.Key_Space,))
-        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self, keys))
+        self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.sci.setCaretLineVisible(False)
 
-        # define markers for colorize zones of diff
-        self.markerplus = self.sci.markerDefine(qsci.Background)
-        self.markerminus = self.sci.markerDefine(qsci.Background)
-        self.markertriangle = self.sci.markerDefine(qsci.Background)
-        self.sci.setMarkerBackgroundColor(QColor('#B0FFA0'), self.markerplus)
-        self.sci.setMarkerBackgroundColor(QColor('#A0A0FF'), self.markerminus)
-        self.sci.setMarkerBackgroundColor(QColor('#FFA0A0'), self.markertriangle)
-
-        self._checkedpix = qtlib.getcheckboxpixmap(QStyle.State_On,
-                                                   QColor('#B0FFA0'), self)
-        self.inclmarker = self.sci.markerDefine(self._checkedpix, -1)
-
-        self._uncheckedpix = qtlib.getcheckboxpixmap(QStyle.State_Off,
-                                                     QColor('#B0FFA0'), self)
-        self.exclmarker = self.sci.markerDefine(self._uncheckedpix, -1)
-
-        self.exclcolor = self.sci.markerDefine(qsci.Background, -1)
-        self.sci.setMarkerBackgroundColor(QColor('lightgrey'), self.exclcolor)
-        self.sci.setMarkerForegroundColor(QColor('darkgrey'), self.exclcolor)
-        mask = (1 << self.inclmarker) | (1 << self.exclmarker) | \
-               (1 << self.exclcolor)
-        self.sci.setMarginType(4, qsci.SymbolMargin)
-        self.sci.setMarginMarkerMask(4, mask)
-        self.markexcluded = QSettings().value('changes-mark-excluded').toBool()
-        self.excludeindicator = -1
-        self.updateChunkIndicatorMarks()
-        self.sci.setIndicatorDrawUnder(True, self.excludeindicator)
-        self.sci.setIndicatorForegroundColor(QColor('gray'), self.excludeindicator)
+        self.sci.markerDefine(qsci.Invisible, _ChunkStartMarker)
 
         # hide margin 0 (markers)
         self.sci.setMarginType(0, qsci.SymbolMargin)
@@ -159,100 +137,118 @@ class HgFileView(QFrame):
         self.searchbar.conditionChanged.connect(self.highlightText)
         self.layout().addWidget(self.searchbar)
 
-        self._ctx = None
-        self._filename = None
-        self._status = None
-        self._mode = None
-        self._parent = 0
-        self._lostMode = None
+        self._fd = self._nullfd = filedata.createNullData(repo)
+        self._lostMode = _NullMode
         self._lastSearch = u'', False
 
-        self.actionDiffMode = QAction(qtlib.geticon('view-diff'),
-                                      _('View change as unified diff output'),
-                                      self)
-        self.actionDiffMode.setCheckable(True)
-        self.actionDiffMode._mode = DiffMode
-        self.actionFileMode = QAction(qtlib.geticon('view-file'),
-                                      _('View change in context of file'),
-                                      self)
-        self.actionFileMode.setCheckable(True)
-        self.actionFileMode._mode = FileMode
-        self.actionAnnMode = QAction(qtlib.geticon('view-annotate'),
-                                     _('annotate with revision numbers'),
-                                     self)
-        self.actionAnnMode.setCheckable(True)
-        self.actionAnnMode._mode = AnnMode
+        self._modeToggleGroup = QActionGroup(self)
+        self._modeToggleGroup.triggered.connect(self._setModeByAction)
+        self._modeActionMap = {}
+        for mode, icon, tooltip in [
+                (DiffMode, 'view-diff', _('View change as unified diff '
+                                          'output')),
+                (FileMode, 'view-file', _('View change in context of file')),
+                (AnnMode, 'view-annotate', _('Annotate with revision numbers')),
+                (_NullMode, '', '')]:
+            if icon:
+                a = self._modeToggleGroup.addAction(qtlib.geticon(icon), '')
+            else:
+                a = self._modeToggleGroup.addAction('')
+            self._modeActionMap[mode] = a
+            a.setCheckable(True)
+            a.setData(mode)
+            a.setToolTip(tooltip)
 
-        self.modeToggleGroup = QActionGroup(self)
-        self.modeToggleGroup.addAction(self.actionDiffMode)
-        self.modeToggleGroup.addAction(self.actionFileMode)
-        self.modeToggleGroup.addAction(self.actionAnnMode)
-        self.modeToggleGroup.triggered.connect(self._setModeByAction)
+        diffc = _DiffViewControl(self.sci, self)
+        diffc.chunkMarkersBuilt.connect(self._updateDiffActions)
+        filec = _FileViewControl(repo.ui, self.sci, self.blk, self)
+        filec.chunkMarkersBuilt.connect(self._updateDiffActions)
+        messagec = _MessageViewControl(self.sci, self)
+        messagec.forceDisplayRequested.connect(self._forceDisplayFile)
+        annotatec = _AnnotateViewControl(repo.ui, self.sci, self._fd, self)
+        annotatec.showMessage.connect(self.showMessage)
+        annotatec.editSelectedRequested.connect(self._editSelected)
+        annotatec.grepRequested.connect(self.grepRequested)
+        annotatec.searchSelectedTextRequested.connect(self._searchSelectedText)
+        annotatec.setSourceRequested.connect(self._setSource)
+        annotatec.visualDiffRevisionRequested.connect(self._visualDiffRevision)
+        annotatec.visualDiffToLocalRequested.connect(self._visualDiffToLocal)
+        chunkselc = _ChunkSelectionViewControl(self.sci, self)
+        chunkselc.chunkSelectionChanged.connect(self.chunkSelectionChanged)
+
+        self._activeViewControls = []
+        self._modeViewControlsMap = {
+            DiffMode: [diffc],
+            FileMode: [filec],
+            AnnMode: [filec, annotatec],
+            _NullMode: [messagec],
+            }
+        self._chunkSelectionViewControl = chunkselc  # enabled as necessary
 
         # Next/Prev diff (in full file mode)
-        self.actionNextDiff = QAction(qtlib.geticon('go-down'),
-                                      _('Next diff (alt+down)'), self)
-        self.actionNextDiff.setShortcut('Alt+Down')
-        self.actionNextDiff.triggered.connect(self.nextDiff)
-        self.actionPrevDiff = QAction(qtlib.geticon('go-up'),
-                                      _('Previous diff (alt+up)'), self)
-        self.actionPrevDiff.setShortcut('Alt+Up')
-        self.actionPrevDiff.triggered.connect(self.prevDiff)
-        self._setModeByAction(self.actionDiffMode)
+        self.actionNextDiff = a = QAction(qtlib.geticon('go-down'),
+                                          _('Next Diff'), self)
+        a.setShortcut('Alt+Down')
+        a.setToolTip('%s (%s)' % (a.text(), a.shortcut().toString()))
+        a.triggered.connect(self._nextDiff)
+        self.actionPrevDiff = a = QAction(qtlib.geticon('go-up'),
+                                          _('Previous Diff'), self)
+        a.setShortcut('Alt+Up')
+        a.setToolTip('%s (%s)' % (a.text(), a.shortcut().toString()))
+        a.triggered.connect(self._prevDiff)
 
-        self.actionFirstParent = QAction('1', self)
-        self.actionFirstParent.setCheckable(True)
-        self.actionFirstParent.setChecked(True)
-        self.actionFirstParent.setShortcut('CTRL+1')
-        self.actionFirstParent.setToolTip(_('Show changes from first parent'))
-        self.actionSecondParent = QAction('2', self)
-        self.actionSecondParent.setCheckable(True)
-        self.actionSecondParent.setShortcut('CTRL+2')
-        self.actionSecondParent.setToolTip(_('Show changes from second parent'))
-        self.parentToggleGroup = QActionGroup(self)
-        self.parentToggleGroup.addAction(self.actionFirstParent)
-        self.parentToggleGroup.addAction(self.actionSecondParent)
-        self.parentToggleGroup.triggered.connect(self.setParent)
+        self._parentToggleGroup = QActionGroup(self)
+        self._parentToggleGroup.triggered.connect(self._setParentRevision)
+        for text in '12':
+            a = self._parentToggleGroup.addAction(text)
+            a.setCheckable(True)
+            a.setShortcut('Ctrl+%s' % text)
 
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))
         self.actionFind.setToolTip(_('Toggle display of text search bar'))
-        self.actionFind.triggered.connect(self.searchbarTriggered)
-        qtlib.newshortcutsforstdkey(QKeySequence.Find, self, self.showsearchbar)
+        self.actionFind.triggered.connect(self._onSearchbarTriggered)
+        qtlib.newshortcutsforstdkey(QKeySequence.Find, self,
+                                    self._showSearchbar)
 
         self.actionShelf = QAction('Shelve', self)
         self.actionShelf.setIcon(qtlib.geticon('shelve'))
         self.actionShelf.setToolTip(_('Open shelve tool'))
-        self.actionShelf.triggered.connect(self.launchShelve)
+        self.actionShelf.setVisible(False)
+        self.actionShelf.triggered.connect(self._launchShelve)
+
+        self._textEncodingGroup = fileencoding.createActionGroup(self)
+        self._textEncodingGroup.triggered.connect(self._applyTextEncoding)
 
         tb = self.diffToolbar
-        tb.addAction(self.actionFirstParent)
-        tb.addAction(self.actionSecondParent)
+        tb.addActions(self._parentToggleGroup.actions())
         tb.addSeparator()
-        tb.addAction(self.actionDiffMode)
-        tb.addAction(self.actionFileMode)
-        tb.addAction(self.actionAnnMode)
+        tb.addActions(self._modeToggleGroup.actions()[:-1])
         tb.addSeparator()
         tb.addAction(self.actionNextDiff)
         tb.addAction(self.actionPrevDiff)
+        tb.addAction(filec.gotoLineAction())
         tb.addSeparator()
         tb.addAction(self.actionFind)
         tb.addAction(self.actionShelf)
 
-        self.timer = QTimer(self)
-        self.timer.setSingleShot(False)
-        self.timer.timeout.connect(self.timerBuildDiffMarkers)
+        self._clearMarkup()
+        self._changeEffectiveMode(_NullMode)
 
-    def launchShelve(self):
+        repoagent.configChanged.connect(self._applyRepoConfig)
+        self._applyRepoConfig()
+
+    @pyqtSlot()
+    def _launchShelve(self):
         from tortoisehg.hgqt import shelve
-        # TODO: pass self._filename
+        # TODO: pass self._fd.canonicalFilePath()
         dlg = shelve.ShelveDialog(self._repoagent, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self.shelveToolExited.emit()
 
-    def setFont(self, font):
-        self.sci.setFont(font)
+    def setShelveButtonVisible(self, visible):
+        self.actionShelf.setVisible(visible)
 
     def loadSettings(self, qs, prefix):
         self.sci.loadSettings(qs, prefix)
@@ -260,93 +256,106 @@ class HgFileView(QFrame):
     def saveSettings(self, qs, prefix):
         self.sci.saveSettings(qs, prefix)
 
+    @pyqtSlot()
+    def _applyRepoConfig(self):
+        self.sci.setIndentationWidth(self.repo.tabwidth)
+        self.sci.setTabWidth(self.repo.tabwidth)
+        enc = fileencoding.contentencoding(self.repo.ui)
+        fileencoding.checkActionByName(self._textEncodingGroup, enc)
+        if not self._fd.isNull():
+            self._applyTextEncoding()
+
     def setRepo(self, repo):
         self.repo = repo
         self.sci.repo = repo
 
-    def updateChunkIndicatorMarks(self):
-        '''
-        This method has some pre-requisites:
-        - self.markexcluded and self.excludeindicator MUST be defined
-        - self.excludeindicator MUST be set to -1 before calling this
-        method for the first time
-        '''
-        indicatortypes = (qsci.HiddenIndicator, qsci.StrikeIndicator)
-        self.excludeindicator = self.sci.indicatorDefine(
-            indicatortypes[self.markexcluded],
-            self.excludeindicator)
+    def isChangeSelectionEnabled(self):
+        chunkselc = self._chunkSelectionViewControl
+        controls = self._modeViewControlsMap[DiffMode]
+        return chunkselc in controls
 
     def enableChangeSelection(self, enable):
         'Enable the use of a selection margin when a diff view is active'
         # Should only be called with True from the commit tool when it is in
         # a 'commit' mode and False for other uses
-        self.changeselection = enable
-        self._showChangeSelectMargin(enable)
+        if self.isChangeSelectionEnabled() == bool(enable):
+            return
+        chunkselc = self._chunkSelectionViewControl
+        controls = self._modeViewControlsMap[DiffMode]
+        if enable:
+            controls.append(chunkselc)
+        else:
+            controls.remove(chunkselc)
+        if self._effectiveMode() == DiffMode:
+            self._changeEffectiveMode(DiffMode)
 
     def updateChunk(self, chunk, exclude):
         'change chunk exclusion state, update display when necessary'
-        # returns True if the chunk state was changed
-        if chunk.excluded == exclude:
-            return False
-        if exclude:
-            chunk.excluded = True
-            self.changes.excludecount += 1
-
-            self.sci.setReadOnly(False)
-            llen = self.sci.text(chunk.lineno).length()
-            self.sci.insertAt(self.excludemsg, chunk.lineno, llen-1)
-            self.sci.setReadOnly(True)
-
-            self.sci.markerDelete(chunk.lineno, self.inclmarker)
-            self.sci.markerAdd(chunk.lineno, self.exclmarker)
-            for i in xrange(chunk.linecount-1):
-                self.sci.markerAdd(chunk.lineno+i+1, self.exclcolor)
-            self.sci.fillIndicatorRange(chunk.lineno+1, 0,
-                                        chunk.lineno+chunk.linecount, 0,
-                                        self.excludeindicator)
-        else:
-            chunk.excluded = False
-            self.changes.excludecount -= 1
-
-            self.sci.setReadOnly(False)
-            llen = self.sci.text(chunk.lineno).length()
-            mlen = len(self.excludemsg)
-            pos = self.sci.positionFromLineIndex(chunk.lineno, llen-mlen-1)
-            self.sci.SendScintilla(qsci.SCI_SETTARGETSTART, pos)
-            self.sci.SendScintilla(qsci.SCI_SETTARGETEND, pos + mlen)
-            self.sci.SendScintilla(qsci.SCI_REPLACETARGET, 0, '')
-            self.sci.setReadOnly(True)
-
-            self.sci.markerDelete(chunk.lineno, self.exclmarker)
-            self.sci.markerAdd(chunk.lineno, self.inclmarker)
-            for i in xrange(chunk.linecount-1):
-                self.sci.markerDelete(chunk.lineno+i+1, self.exclcolor)
-            self.sci.clearIndicatorRange(chunk.lineno+1, 0,
-                                         chunk.lineno+chunk.linecount, 0,
-                                         self.excludeindicator)
-        return True
+        self._chunkSelectionViewControl.updateChunk(chunk, exclude)
 
     @pyqtSlot(QAction)
     def _setModeByAction(self, action):
         'One of the mode toolbar buttons has been toggled'
-        mode = action._mode
-        self._lostMode = mode
-        if mode != self._mode:
-            self._mode = mode
-            self.actionNextDiff.setEnabled(False)
-            self.actionPrevDiff.setEnabled(False)
-            self.blk.setVisible(mode != DiffMode)
-            self.sci.setAnnotationEnabled(mode == AnnMode)
-            self.displayFile(self._filename, self._status)
+        mode = action.data().toInt()[0]
+        self._lostMode = _NullMode
+        self._changeEffectiveMode(mode)
+        # TODO: delete fd.load(), which is necessary because ChunkSelection
+        # view cannot start with chunk.excluded = True
+        self._fd.load(self.isChangeSelectionEnabled())
+        self._displayLoaded(self._fd)
+
+    def _effectiveMode(self):
+        a = self._modeToggleGroup.checkedAction()
+        return a.data().toInt()[0]
+
+    def _changeEffectiveMode(self, mode):
+        self._modeActionMap[mode].setChecked(True)
+
+        newcontrols = list(self._modeViewControlsMap[mode])
+        for c in reversed(self._activeViewControls):
+            if c not in newcontrols:
+                c.close()
+        for c in newcontrols:
+            if c not in self._activeViewControls:
+                c.open()
+        self._activeViewControls = newcontrols
+
+    def _restrictModes(self, available):
+        'Disable modes based on content constraints'
+        available.add(_NullMode)
+        for m, a in self._modeActionMap.iteritems():
+            a.setEnabled(m in available)
+        self._fallBackToAvailableMode()
+
+    def _fallBackToAvailableMode(self):
+        if self._lostMode and self._modeActionMap[self._lostMode].isEnabled():
+            self._changeEffectiveMode(self._lostMode)
+            self._lostMode = _NullMode
+            return
+        curmode = self._effectiveMode()
+        if curmode and self._modeActionMap[curmode].isEnabled():
+            return
+        fallbackmode = iter(a.data().toInt()[0]
+                            for a in self._modeToggleGroup.actions()
+                            if a.isEnabled()).next()
+        if not self._lostMode:
+            self._lostMode = curmode
+        self._changeEffectiveMode(fallbackmode)
+
+    def _modeAction(self, mode):
+        if not mode:
+            raise ValueError('null mode cannot be set explicitly')
+        try:
+            return self._modeActionMap[mode]
+        except KeyError:
+            raise ValueError('invalid mode: %r' % mode)
 
     def setMode(self, mode):
         """Switch view to DiffMode/FileMode/AnnMode if available for the current
         content; otherwise it will be switched later"""
-        actionmap = dict((a._mode, a) for a in self.modeToggleGroup.actions())
-        try:
-            action = actionmap[mode]
-        except KeyError:
-            raise ValueError('invalid mode: %r' % mode)
+        action = self._modeAction(mode)
+        if not action.isVisible():
+            raise ValueError('unsupported mode: %r' % mode)
 
         if action.isEnabled():
             if not action.isChecked():
@@ -354,274 +363,101 @@ class HgFileView(QFrame):
         else:
             self._lostMode = mode
 
+    def setModeVisible(self, mode, visible):
+        action = self._modeAction(mode)
+        action.setVisible(visible)
+        self._fallBackToAvailableMode()
+
     @pyqtSlot(QAction)
-    def setParent(self, action):
-        if action.text() == '1':
-            parent = 0
-        else:
-            parent = 1
-        if self._parent != parent:
-            self._parent = parent
-            self.displayFile(self._filename, self._status)
+    def _setParentRevision(self, action):
+        fd = self._fd
+        ctx = fd.rawContext()
+        pctx = {'1': ctx.p1, '2': ctx.p2}[str(action.text())]()
+        self.display(fd.createRebased(pctx))
 
-    def restrictModes(self, candiff, canfile, canann):
-        'Disable modes based on content constraints'
-        self.actionDiffMode.setEnabled(candiff)
-        self.actionFileMode.setEnabled(canfile)
-        self.actionAnnMode.setEnabled(canann)
+    def _updateFileDataActions(self):
+        fd = self._fd
+        ctx = fd.rawContext()
+        parents = ctx.parents()
+        ismerge = len(parents) == 2
+        self._parentToggleGroup.setVisible(ismerge)
+        tooltips = [_('Show changes from first parent'),
+                    _('Show changes from second parent')]
+        for a, pctx, tooltip in zip(self._parentToggleGroup.actions(),
+                                    parents, tooltips):
+            firstline = hglib.longsummary(ctx.description())
+            a.setToolTip('%s:\n%s [%d:%s] %s'
+                         % (tooltip, hglib.tounicode(pctx.branch()),
+                            pctx.rev(), pctx, firstline))
+            a.setChecked(fd.baseRev() == pctx.rev())
 
-        # Switch mode if necessary
-        mode = self._mode
-        if not candiff and mode == DiffMode and canfile:
-            mode = FileMode
-        if not canfile and mode != DiffMode:
-            mode = DiffMode
-        if self._lostMode is None:
-            self._lostMode = self._mode
-        if self._mode != mode:
-            self.actionNextDiff.setEnabled(False)
-            self.actionPrevDiff.setEnabled(False)
-            self.blk.setVisible(mode != DiffMode)
-            self.sci.setAnnotationEnabled(mode == AnnMode)
-            self._mode = mode
+    def _textEncoding(self):
+        return fileencoding.checkedActionName(self._textEncodingGroup)
 
-        if self._mode == DiffMode:
-            self.actionDiffMode.setChecked(True)
-        elif self._mode == FileMode:
-            self.actionFileMode.setChecked(True)
-        else:
-            self.actionAnnMode.setChecked(True)
+    @pyqtSlot()
+    def _applyTextEncoding(self):
+        self._fd.setTextEncoding(self._textEncoding())
+        self._displayLoaded(self._fd)
 
-    def setContext(self, ctx, ctx2=None):
-        self._ctx = ctx
-        self._ctx2 = ctx2
-        self.sci.setTabWidth(ctx._repo.tabwidth)
-        self.actionAnnMode.setVisible(ctx.rev() != None)
-        self.actionShelf.setVisible(ctx.rev() == None)
-        self.actionFirstParent.setVisible(len(ctx.parents()) == 2)
-        self.actionSecondParent.setVisible(len(ctx.parents()) == 2)
-        self.actionFirstParent.setEnabled(len(ctx.parents()) == 2)
-        self.actionSecondParent.setEnabled(len(ctx.parents()) == 2)
-
-    def setSource(self, path, rev, line):
+    @pyqtSlot(unicode, int, int)
+    def _setSource(self, path, rev, line):
+        # BUG: not work for subrepo
         self.revisionSelected.emit(rev)
-        self.setContext(self.repo[rev])
-        self.displayFile(path, None)
+        ctx = self.repo[rev]
+        fd = filedata.createFileData(ctx, ctx.p1(), hglib.fromunicode(path))
+        self.display(fd)
         self.showLine(line)
 
     def showLine(self, line):
         if line < self.sci.lines():
             self.sci.setCursorPosition(line, 0)
 
+    def _moveAndScrollToLine(self, line):
+        self.sci.setCursorPosition(line, 0)
+        self.sci.verticalScrollBar().setValue(line)
+
+    def filePath(self):
+        return self._fd.filePath()
+
     @pyqtSlot()
     def clearDisplay(self):
-        self._filename = None
-        self._diffs = []
-        self.restrictModes(False, False, False)
-        self.sci.setMarginWidth(1, 0)
-        self.clearMarkup()
+        self._displayLoaded(self._nullfd)
 
-    def clearMarkup(self):
+    def _clearMarkup(self):
         self.sci.clear()
+        self.sci.clearMarginText()
+        self.sci.markerDeleteAll()
         self.blk.clear()
         self.blksearch.clear()
         # Setting the label to ' ' rather than clear() keeps the label
         # from disappearing during refresh, and tool layouts bouncing
         self.filenamelabel.setText(' ')
         self.extralabel.hide()
-        self.actionNextDiff.setEnabled(False)
-        self.actionPrevDiff.setEnabled(False)
+        self._updateDiffActions()
 
         self.maxWidth = 0
-        self.changes = None
-        self.chunkatline = {}
-        self._showChangeSelectMargin(False)
         self.sci.showHScrollBar(False)
 
-    def _showChangeSelectMargin(self, show):
-        'toggle the display of the diff change selection margin'
-        self.sci.setMarginWidth(4, show and 15 or 0)
-        self.sci.setMarginSensitivity(4, show)
+    @pyqtSlot()
+    def _forceDisplayFile(self):
+        self._fd.load(self.isChangeSelectionEnabled(), force=True)
+        self._displayLoaded(self._fd)
 
-    #@pyqtSlot(int, int, Qt.KeyboardModifiers)
-    def marginClicked(self, margin, line, state):
-        'margin clicked event'
-        if margin == 2:
-            if self.annmarginclicked or state == Qt.ControlModifier:
-                fctx, line = self.sci._links[line]
-                self.setSource(hglib.tounicode(fctx.path()), fctx.rev(), line)
-            else:
-                self.annmarginclicked = True
-                def disableClick():
-                    self.annmarginclicked = False
-                QTimer.singleShot(QApplication.doubleClickInterval(), disableClick)
+    def display(self, fd):
+        fd.load(self.isChangeSelectionEnabled())
+        fd.setTextEncoding(self._textEncoding())
+        self._displayLoaded(fd)
 
-                # mimic the default "border selection" behavior,
-                # which is disabled when you use setMarginSensitivity()
-                if state == Qt.ShiftModifier:
-                    sellinetop, selchartop, sellinebottom, selcharbottom = self.sci.getSelection()
-                    if sellinetop <= line:
-                        sline = sellinetop
-                        eline = line + 1
-                    else:
-                        sline = line
-                        eline = sellinebottom
-                        if selcharbottom != 0:
-                            eline += 1
-                else:
-                    sline = line
-                    eline = line + 1
-                self.sci.setSelection(sline, 0, eline, 0)
-            return
-
-        if line not in self.chunkatline:
-            return
-        chunk = self.chunkatline[line]
-        if self.updateChunk(chunk, not chunk.excluded):
-            self.chunkSelectionChanged.emit()
-
-    def _setupForceViewIndicator(self):
-        if not self._forceviewindicator:
-            self._forceviewindicator = self.sci.indicatorDefine(self.sci.PlainIndicator)
-            self.sci.setIndicatorDrawUnder(True, self._forceviewindicator)
-            self.sci.setIndicatorForegroundColor(
-                QColor('blue'), self._forceviewindicator)
-            # delay until next event-loop in order to complete mouse release
-            self.sci.SCN_INDICATORRELEASE.connect(self.forceDisplayFile,
-                                                  Qt.QueuedConnection)
-
-    def forceDisplayFile(self):
-        if self.changes is not None:
-            return
-        self.sci.setText(_('Please wait while the file is opened ...'))
-        # Wait a little to ensure that the "wait message" is displayed
-        QTimer.singleShot(10,
-            lambda: self.displayFile(self._filename, self._status, force=True))
-
-    def displayFile(self, filename=None, status=None, force=False):
-        if isinstance(filename, (unicode, QString)):
-            filename = hglib.fromunicode(filename)
-            status = hglib.fromunicode(status)
-        if filename and self._filename == filename:
+    def _displayLoaded(self, fd):
+        if self._fd.filePath() == fd.filePath():
             # Get the last visible line to restore it after reloading the editor
             lastCursorPosition = self.sci.getCursorPosition()
             lastScrollPosition = self.sci.firstVisibleLine()
         else:
             lastCursorPosition = (0, 0)
             lastScrollPosition = 0
-        self._filename, self._status = filename, status
 
-        self.clearMarkup()
-        self._diffs = []
-        if filename is None:
-            self.restrictModes(False, False, False)
-            return
-
-        if self._ctx2:
-            ctx2 = self._ctx2
-        elif self._parent == 0 or len(self._ctx.parents()) == 1:
-            ctx2 = self._ctx.p1()
-        else:
-            ctx2 = self._ctx.p2()
-        fd = filedata.FileData(self._ctx, ctx2, filename, status, self.changeselection, force=force)
-
-        if fd.elabel:
-            self.extralabel.setText(fd.elabel)
-            self.extralabel.show()
-        else:
-            self.extralabel.hide()
-        self.filenamelabel.setText(fd.flabel)
-
-        uf = hglib.tounicode(filename)
-
-        if not fd.isValid():
-            self.sci.setText(fd.error)
-            self.sci.setLexer(None)
-            self.sci.setFont(qtlib.getfont('fontlog').font())
-            self.sci.setMarginWidth(1, 0)
-            self.blk.setVisible(False)
-            self.restrictModes(False, False, False)
-            self.newChunkList.emit(uf, None)
-
-            forcedisplaymsg = filedata.forcedisplaymsg
-            linkstart = fd.error.find(forcedisplaymsg)
-            if linkstart >= 0:
-                # add the link to force to view the data anyway
-                self._setupForceViewIndicator()
-                self.sci.fillIndicatorRange(
-                    0, linkstart, 0, linkstart+len(forcedisplaymsg), self._forceviewindicator)
-            return
-
-        candiff = bool(fd.diff)
-        canfile = bool(fd.contents or fd.ucontents)
-        canann = bool(fd.contents) and type(self._ctx.rev()) is int
-
-        if not candiff or not canfile:
-            self.restrictModes(candiff, canfile, canann)
-        else:
-            self.actionDiffMode.setEnabled(True)
-            self.actionFileMode.setEnabled(True)
-            self.actionAnnMode.setEnabled(True)
-            if self._lostMode:
-                self._mode = self._lostMode
-                if self._lostMode == DiffMode:
-                    self.actionDiffMode.trigger()
-                elif self._lostMode == FileMode:
-                    self.actionFileMode.trigger()
-                elif self._lostMode == AnnMode:
-                    self.actionAnnMode.trigger()
-                self._lostMode = None
-                self.blk.setVisible(self._mode != DiffMode)
-                self.sci.setAnnotationEnabled(self._mode == AnnMode)
-
-        if self._mode == DiffMode:
-            self.sci.setMarginWidth(1, 0)
-            lexer = lexers.difflexer(self)
-            self.sci.setLexer(lexer)
-            if lexer is None:
-                self.sci.setFont(qtlib.getfont('fontlog').font())
-            if fd.changes:
-                self._showChangeSelectMargin(True)
-                self.changes = fd.changes
-                self.sci.setText(hglib.tounicode(fd.diff))
-                for chunk in self.changes.hunks:
-                    self.chunkatline[chunk.lineno] = chunk
-                    self.sci.markerAdd(chunk.lineno, self.inclmarker)
-            elif fd.diff:
-                # trim first three lines, for example:
-                # diff -r f6bfc41af6d7 -r c1b18806486d tortoisehg/hgqt/mq.py
-                # --- a/tortoisehg/hgqt/mq.py
-                # +++ b/tortoisehg/hgqt/mq.py
-                out = fd.diff.split('\n', 3)
-                if len(out) == 4:
-                    self.sci.setText(hglib.tounicode(out[3]))
-                else:
-                    # there was an error or rename without diffs
-                    self.sci.setText(hglib.tounicode(fd.diff))
-            self.newChunkList.emit(uf, fd.changes)
-        elif fd.ucontents:
-            # subrepo summary and perhaps other data
-            self.sci.setText(fd.ucontents)
-            self.sci.setLexer(None)
-            self.sci.setFont(qtlib.getfont('fontlog').font())
-            self.sci.setMarginWidth(1, 0)
-            self.blk.setVisible(False)
-            self.newChunkList.emit(uf, None)
-            return
-        elif fd.contents:
-            lexer = lexers.getlexer(self.repo.ui, filename, fd.contents, self)
-            self.sci.setLexer(lexer)
-            if lexer is None:
-                self.sci.setFont(qtlib.getfont('fontlog').font())
-            self.sci.setText(hglib.tounicode(fd.contents))
-            self.blk.setVisible(True)
-            self.sci._updatemarginwidth()
-            if self._mode == AnnMode:
-                self.sci._updateannotation(self._ctx, filename)
-            self.newChunkList.emit(uf, None)
-        else:
-            self.newChunkList.emit(uf, None)
-            return
+        self._updateDisplay(fd)
 
         # Recover the last cursor/scroll position
         self.sci.setCursorPosition(*lastCursorPosition)
@@ -630,22 +466,42 @@ class HgFileView(QFrame):
         lastScrollPosition = min(lastScrollPosition,  self.sci.lines() - 1)
         self.sci.verticalScrollBar().setValue(lastScrollPosition)
 
+    def _updateDisplay(self, fd):
+        self._fd = fd
+
+        self._clearMarkup()
+        self._updateFileDataActions()
+
+        if fd.elabel:
+            self.extralabel.setText(fd.elabel)
+            self.extralabel.show()
+        else:
+            self.extralabel.hide()
+        self.filenamelabel.setText(fd.flabel)
+
+        availablemodes = set()
+        if fd.isValid():
+            if fd.diff:
+                availablemodes.add(DiffMode)
+            if fd.contents:
+                availablemodes.add(FileMode)
+            if (fd.contents and fd.rev() is not None and fd.rev() >= 0
+                and fd.fileStatus() != 'R'):
+                availablemodes.add(AnnMode)
+        self._restrictModes(availablemodes)
+
+        for c in self._activeViewControls:
+            c.display(fd)
+
+        if self._effectiveMode() == DiffMode and fd.isValid():
+            self.newChunkList.emit(fd.filePath(), fd.changes)
+        else:
+            self.newChunkList.emit(fd.filePath(), None)
+
         self.highlightText(*self._lastSearch)
-        uc = hglib.tounicode(fd.contents) or ''
-        self.fileDisplayed.emit(uf, uc)
+        self.fileDisplayed.emit(fd.filePath(), fd.fileText())
 
-        if self._mode != DiffMode:
-            self.blk.setVisible(True)
-            self.blk.syncPageStep()
         self.blksearch.syncPageStep()
-
-        if fd.contents and fd.olddata:
-            if self.timer.isActive():
-                self.timer.stop()
-            self._fd = fd
-            self.timer.start()
-        self.actionNextDiff.setEnabled(bool(self._diffs))
-        self.actionPrevDiff.setEnabled(bool(self._diffs))
 
         lexer = self.sci.lexer()
 
@@ -665,26 +521,7 @@ class HgFileView(QFrame):
             except TypeError:  # Python<2.5 has no key support
                 longestline = max((len(l), l) for l in lines)[1]
             self.maxWidth += fm.width(longestline)
-        self.updateScrollBar()
-
-    #
-    # These four functions are used by Shift+Cursor actions in revdetails
-    #
-    def nextLine(self):
-        x, y = self.sci.getCursorPosition()
-        self.sci.setCursorPosition(x+1, y)
-
-    def prevLine(self):
-        x, y = self.sci.getCursorPosition()
-        self.sci.setCursorPosition(x-1, y)
-
-    def nextCol(self):
-        x, y = self.sci.getCursorPosition()
-        self.sci.setCursorPosition(x, y+1)
-
-    def prevCol(self):
-        x, y = self.sci.getCursorPosition()
-        self.sci.setCursorPosition(x, y-1)
+        self._updateScrollBar()
 
     @pyqtSlot(unicode, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
@@ -703,314 +540,421 @@ class HgFileView(QFrame):
         blk.setVisible(bool(match))
         blk.setUpdatesEnabled(True)
 
-    def loadSelectionIntoSearchbar(self):
+    def _loadSelectionIntoSearchbar(self):
         text = self.sci.selectedText()
         if text:
             self.searchbar.setPattern(text)
 
     @pyqtSlot(bool)
-    def searchbarTriggered(self, checked):
+    def _onSearchbarTriggered(self, checked):
         if checked:
-            self.loadSelectionIntoSearchbar()
+            self._loadSelectionIntoSearchbar()
 
     @pyqtSlot()
-    def showsearchbar(self):
-        self.loadSelectionIntoSearchbar()
+    def _showSearchbar(self):
+        self._loadSelectionIntoSearchbar()
+        self.searchbar.show()
+
+    @pyqtSlot()
+    def _searchSelectedText(self):
+        self.searchbar.search(self.sci.selectedText())
         self.searchbar.show()
 
     def verticalScrollBar(self):
         return self.sci.verticalScrollBar()
 
-    #
-    # file mode diff markers
-    #
+    def _findNextChunk(self):
+        mask = 1 << _ChunkStartMarker
+        line = self.sci.getCursorPosition()[0]
+        return self.sci.markerFindNext(line + 1, mask)
+
+    def _findPrevChunk(self):
+        mask = 1 << _ChunkStartMarker
+        line = self.sci.getCursorPosition()[0]
+        return self.sci.markerFindPrevious(line - 1, mask)
+
     @pyqtSlot()
-    def timerBuildDiffMarkers(self):
-        'show modified and added lines in the self.blk margin'
-        # The way the diff markers are generated differs between the DiffMode
-        # and the other modes
-        # In the DiffMode case, the marker positions are found by looking for
-        # lines matching a regular expression representing a diff header, while
-        # in all other cases we use the difflib.SequenceMatcher, which returns
-        # a set of opcodes that must be parsed
-        # In any case, the markers are generated incrementally. This function is
-        # run by a timer, which each time that is called processes a bunch of
-        # lines (when in DiffMode) or of opcodes (in all other modes).
-        # When there are no more lines or opcodes to consume the timer is
-        # stopped.
+    def _nextDiff(self):
+        line = self._findNextChunk()
+        if line >= 0:
+            self._moveAndScrollToLine(line)
 
-        self.sci.setUpdatesEnabled(False)
-        self.blk.setUpdatesEnabled(False)
+    @pyqtSlot()
+    def _prevDiff(self):
+        line = self._findPrevChunk()
+        if line >= 0:
+            self._moveAndScrollToLine(line)
 
-        if self._mode == DiffMode:
-            if self._fd:
-                self._fd = None
-                self._diffs = []
-                self._linestoprocess = unicode(self.sci.text()).splitlines()
-                self._firstlinetoprocess = 0
-                self._opcodes = True
-            # Process linesPerBlock lines at a time
-            linesPerBlock = 100
-            # Look for lines matching the "diff header"
-            for n, line in enumerate(self._linestoprocess[:linesPerBlock]):
-                if self.diffHeaderRegExp.match(line):
-                    diffLine = self._firstlinetoprocess + n
-                    self._diffs.append([diffLine, diffLine])
-                    self.sci.markerAdd(diffLine, self.markerplus)
-            self._linestoprocess = self._linestoprocess[linesPerBlock:]
-            self._firstlinetoprocess += linesPerBlock
-            if not self._linestoprocess:
-                self._opcodes = False
-                self._firstlinetoprocess = 0
-        else:
-            if self._fd:
-                olddata = self._fd.olddata.splitlines()
-                newdata = self._fd.contents.splitlines()
-                diff = difflib.SequenceMatcher(None, olddata, newdata)
-                self._opcodes = diff.get_opcodes()
-                self._fd = None
-                self._diffs = []
-            elif isinstance(self._opcodes, bool):
-                # catch self._mode changes while this thread is active
-                self._opcodes = []
+    @pyqtSlot()
+    def _updateDiffActions(self):
+        self.actionNextDiff.setEnabled(self._findNextChunk() >= 0)
+        self.actionPrevDiff.setEnabled(self._findPrevChunk() >= 0)
 
-            for tag, alo, ahi, blo, bhi in self._opcodes[:30]:
-                if tag == 'replace':
-                    self._diffs.append([blo, bhi])
-                    self.blk.addBlock('x', blo, bhi)
-                    for i in range(blo, bhi):
-                        self.sci.markerAdd(i, self.markertriangle)
-                elif tag == 'insert':
-                    self._diffs.append([blo, bhi])
-                    self.blk.addBlock('+', blo, bhi)
-                    for i in range(blo, bhi):
-                        self.sci.markerAdd(i, self.markerplus)
-                elif tag in ('equal', 'delete'):
-                    pass
-                else:
-                    raise ValueError, 'unknown tag %r' % (tag,)
-
-            self._opcodes = self._opcodes[30:]
-
-        if not self._opcodes:
-            self.actionNextDiff.setEnabled(bool(self._diffs))
-            self.actionPrevDiff.setEnabled(False)
-            self.timer.stop()
-
-        self.sci.setUpdatesEnabled(True)
-        self.blk.setUpdatesEnabled(True)
-
-    def nextDiff(self):
-        if not self._diffs:
-            self.actionNextDiff.setEnabled(False)
-            self.actionPrevDiff.setEnabled(False)
-            return
-        else:
-            row, column = self.sci.getCursorPosition()
-            for i, (lo, hi) in enumerate(self._diffs):
-                if lo > row:
-                    last = (i == (len(self._diffs)-1))
-                    self.sci.setCursorPosition(lo, 0)
-                    self.sci.verticalScrollBar().setValue(lo)
-                    break
-            else:
-                last = True
-        self.actionNextDiff.setEnabled(not last)
-        self.actionPrevDiff.setEnabled(True)
-
-    def prevDiff(self):
-        if not self._diffs:
-            self.actionNextDiff.setEnabled(False)
-            self.actionPrevDiff.setEnabled(False)
-            return
-        else:
-            row, column = self.sci.getCursorPosition()
-            for i, (lo, hi) in enumerate(reversed(self._diffs)):
-                if hi < row:
-                    first = (i == (len(self._diffs)-1))
-                    self.sci.setCursorPosition(lo, 0)
-                    self.sci.verticalScrollBar().setValue(lo)
-                    break
-            else:
-                first = True
-        self.actionNextDiff.setEnabled(True)
-        self.actionPrevDiff.setEnabled(not first)
-
-    def nDiffs(self):
-        return len(self._diffs)
-
-    def editSelected(self, path, rev, line):
+    @pyqtSlot(unicode, int, int)
+    def _editSelected(self, path, rev, line):
         """Open editor to show the specified file"""
         path = hglib.fromunicode(path)
         base = visdiff.snapshot(self.repo, [path], self.repo[rev])[0]
         files = [os.path.join(base, path)]
-        pattern = hglib.fromunicode(self._lastSearch[0])
+        pattern = hglib.fromunicode(self.sci.selectedText())
         qtlib.editfiles(self.repo, files, line, pattern, self)
 
-    def vdiff(self, path, **opts):
+    def _visualDiff(self, path, **opts):
         path = hglib.fromunicode(path)
         dlg = visdiff.visualdiff(self.repo.ui, self.repo, [path], opts)
         if dlg:
             dlg.exec_()
 
+    @pyqtSlot(unicode, int)
+    def _visualDiffRevision(self, path, rev):
+        self._visualDiff(path, change=rev)
+
+    @pyqtSlot(unicode, int)
+    def _visualDiffToLocal(self, path, rev):
+        self._visualDiff(path, rev=[str(rev)])
+
     @pyqtSlot(QPoint)
-    def menuRequest(self, point):
+    def _onMenuRequested(self, point):
         menu = self._createContextMenu(point)
         menu.exec_(self.sci.viewport().mapToGlobal(point))
         menu.setParent(None)
 
     def _createContextMenu(self, point):
         menu = self.sci.createEditorContextMenu()
+        m = menu.addMenu(_('E&ncoding'))
+        fileencoding.addActionsToMenu(m, self._textEncodingGroup)
+
         line = self.sci.lineNearPoint(point)
 
         selection = self.sci.selectedText()
         def sreq(**opts):
             return lambda: self.grepRequested.emit(selection, opts)
-        def sann():
-            self.searchbar.search(selection)
-            self.searchbar.show()
 
-        if self._mode != AnnMode:
-            if self.changeselection:
-                def toggleMarkExcluded():
-                    self.markexcluded = not self.markexcluded
-                    self.updateChunkIndicatorMarks()
-                    QSettings().setValue('changes-mark-excluded',
-                        self.markexcluded)
-                actmarkexcluded = menu.addAction(_('Mark excluded changes'))
-                actmarkexcluded.setCheckable(True)
-                actmarkexcluded.setChecked(self.markexcluded)
-                actmarkexcluded.triggered.connect(toggleMarkExcluded)
+        if self._effectiveMode() != AnnMode:
             if selection:
                 menu.addSeparator()
-                menu.addAction(_('&Search in Current File'), sann)
+                menu.addAction(_('&Search in Current File'),
+                               self._searchSelectedText)
                 menu.addAction(_('Search in All &History'), sreq(all=True))
-            return menu
 
-        menu.addSeparator()
-        annoptsmenu = menu.addMenu(_('Annotate Op&tions'))
-        annoptsmenu.addActions(self.sci.annotateOptionActions())
-
-        if line < 0 or line >= len(self.sci._links):
-            return menu
-
-        menu.addSeparator()
-
-        fctx, line = self.sci._links[line]
-        if selection:
-            def sreq(**opts):
-                return lambda: self.grepRequested.emit(selection, opts)
-            def sann():
-                self.searchbar.search(selection)
-                self.searchbar.show()
-            menu.addSeparator()
-            annsearchmenu = menu.addMenu(_('Search Selected Text'))
-            annsearchmenu.addAction(_('In Current &File'), sann)
-            annsearchmenu.addAction(_('In &Current Revision'), sreq(rev='.'))
-            annsearchmenu.addAction(_('In &Original Revision'),
-                                    sreq(rev=fctx.rev()))
-            annsearchmenu.addAction(_('In All &History'), sreq(all=True))
-
-        data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
-
-        def annorig():
-            self.setSource(*data)
-        def editorig():
-            self.editSelected(*data)
-        def difflocal():
-            self.vdiff(data[0], rev=['rev(%d)' % data[1]])
-
-        menu.addSeparator()
-        origrev = fctx.rev()
-        anngotomenu = menu.addMenu(_('Go to'))
-        annviewmenu = menu.addMenu(_('View File at'))
-        anndiffmenu = menu.addMenu(_('Diff File to'))
-        anngotomenu.addAction(_('&Originating Revision'), annorig)
-        annviewmenu.addAction(_('&Originating Revision'), editorig)
-        anndiffmenu.addAction(_('&Local'), difflocal)
-        for pfctx in fctx.parents():
-            pdata = [hglib.tounicode(pfctx.path()), pfctx.changectx().rev(),
-                     line]
-            def annparent(data):
-                self.setSource(*data)
-            def editparent(data):
-                self.editSelected(*data)
-            def diffparent(pdata, cdata=data):
-                self.vdiff(cdata[0], rev=['rev(%d)' % d[1] for d in (pdata, cdata)])
-            for name, func, smenu in [(_('&Parent Revision (%d)') % pdata[1],
-                                  annparent, anngotomenu),
-                               (_('&Parent Revision (%d)') % pdata[1],
-                                  editparent, annviewmenu),
-                               (_('&Parent Revision (%d)') % pdata[1],
-                                  diffparent, anndiffmenu)]:
-                def add(name, func):
-                    action = smenu.addAction(name)
-                    action.data = pdata
-                    action.run = lambda: func(action.data)
-                    action.triggered.connect(action.run)
-                add(name, func)
+        for c in self._activeViewControls:
+            c.setupContextMenu(menu, line)
         return menu
 
     def resizeEvent(self, event):
         super(HgFileView, self).resizeEvent(event)
-        self.updateScrollBar()
+        self._updateScrollBar()
 
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Space:
-            if self.changeselection:
-                x, y = self.sci.getCursorPosition()
-                chunk = self.chunkContainsLine(x)
-                if self.updateChunk(chunk, not chunk.excluded):
-                    self.chunkSelectionChanged.emit()
-            return
-        return super(HgFileView, self).keyPressEvent(event)
-
-    def chunkContainsLine(self, line):
-        chunks = self.chunkatline
-        if line in chunks:
-            return chunks[line]
-
-        line = max(i for i in chunks.keys() if i < line)
-        return chunks[line]
-
-    def updateScrollBar(self):
+    def _updateScrollBar(self):
         sbWidth = self.sci.verticalScrollBar().width()
         scrollWidth = self.maxWidth + sbWidth - self.sci.width()
         self.sci.showHScrollBar(scrollWidth > 0)
         self.sci.horizontalScrollBar().setRange(0, scrollWidth)
 
-class AnnotateView(qscilib.Scintilla):
-    'QScintilla widget capable of displaying annotations'
+
+class _AbstractViewControl(QObject):
+    """Provide the mode-specific view in HgFileView"""
+
+    def open(self):
+        raise NotImplementedError
+
+    def close(self):
+        raise NotImplementedError
+
+    def display(self, fd):
+        raise NotImplementedError
+
+    def setupContextMenu(self, menu, line):
+        pass
+
+
+_diffHeaderRegExp = re.compile("^@@ -[0-9]+,[0-9]+ \+[0-9]+,[0-9]+ @@")
+
+class _DiffViewControl(_AbstractViewControl):
+    """Display the unified diff in HgFileView"""
+
+    chunkMarkersBuilt = pyqtSignal()
+
+    def __init__(self, sci, parent=None):
+        super(_DiffViewControl, self).__init__(parent)
+        self._sci = sci
+        self._buildtimer = QTimer(self)
+        self._buildtimer.timeout.connect(self._buildMarker)
+        self._linestoprocess = []
+        self._firstlinetoprocess = 0
+
+    def open(self):
+        self._sci.markerDefine(qsci.Background, _ChunkStartMarker)
+        self._sci.setMarkerBackgroundColor(QColor('#B0FFA0'), _ChunkStartMarker)
+        self._sci.setLexer(lexers.difflexer(self))
+
+    def close(self):
+        self._sci.markerDefine(qsci.Invisible, _ChunkStartMarker)
+        self._sci.setLexer(None)
+        self._buildtimer.stop()
+
+    def display(self, fd):
+        self._sci.setText(fd.diffText())
+        self._startBuildMarker()
+
+    def _startBuildMarker(self):
+        self._linestoprocess = unicode(self._sci.text()).splitlines()
+        self._firstlinetoprocess = 0
+        self._buildtimer.start()
+
+    @pyqtSlot()
+    def _buildMarker(self):
+        self._sci.setUpdatesEnabled(False)
+
+        # Process linesPerBlock lines at a time
+        linesPerBlock = 100
+        # Look for lines matching the "diff header"
+        for n, line in enumerate(self._linestoprocess[:linesPerBlock]):
+            if _diffHeaderRegExp.match(line):
+                diffLine = self._firstlinetoprocess + n
+                self._sci.markerAdd(diffLine, _ChunkStartMarker)
+        self._linestoprocess = self._linestoprocess[linesPerBlock:]
+        self._firstlinetoprocess += linesPerBlock
+
+        self._sci.setUpdatesEnabled(True)
+
+        if not self._linestoprocess:
+            self._buildtimer.stop()
+            self.chunkMarkersBuilt.emit()
+
+
+class _FileViewControl(_AbstractViewControl):
+    """Display the file content with chunk markers in HgFileView"""
+
+    chunkMarkersBuilt = pyqtSignal()
+
+    def __init__(self, ui, sci, blk, parent=None):
+        super(_FileViewControl, self).__init__(parent)
+        self._ui = ui
+        self._sci = sci
+        self._blk = blk
+        self._sci.setMarginLineNumbers(_LineNumberMargin, True)
+        self._sci.setMarginWidth(_LineNumberMargin, 0)
+
+        # define markers for colorize zones of diff
+        self._sci.markerDefine(qsci.Background, _InsertedLineMarker)
+        self._sci.markerDefine(qsci.Background, _ReplacedLineMarker)
+        self._sci.setMarkerBackgroundColor(QColor('#B0FFA0'),
+                                           _InsertedLineMarker)
+        self._sci.setMarkerBackgroundColor(QColor('#A0A0FF'),
+                                           _ReplacedLineMarker)
+
+        self._actionGotoLine = a = QAction(qtlib.geticon('go-jump'),
+                                           _('Go to Line'), self)
+        a.setEnabled(False)
+        a.setShortcut('Ctrl+J')
+        a.setToolTip('%s (%s)' % (a.text(), a.shortcut().toString()))
+        a.triggered.connect(self._gotoLineDialog)
+
+        self._buildtimer = QTimer(self)
+        self._buildtimer.timeout.connect(self._buildMarker)
+        self._opcodes = []
+
+    def open(self):
+        self._blk.setVisible(True)
+        self._actionGotoLine.setEnabled(True)
+
+    def close(self):
+        self._blk.setVisible(False)
+        self._sci.setMarginWidth(_LineNumberMargin, 0)
+        self._sci.setLexer(None)
+        self._actionGotoLine.setEnabled(False)
+        self._buildtimer.stop()
+
+    def display(self, fd):
+        if fd.contents:
+            filename = hglib.fromunicode(fd.filePath())
+            lexer = lexers.getlexer(self._ui, filename, fd.contents, self)
+            self._sci.setLexer(lexer)
+            if lexer is None:
+                self._sci.setFont(qtlib.getfont('fontlog').font())
+            self._sci.setText(fd.fileText())
+
+        self._sci.setMarginsFont(self._sci.font())
+        width = len(str(self._sci.lines())) + 2  # 2 for margin
+        self._sci.setMarginWidth(_LineNumberMargin, 'M' * width)
+        self._blk.syncPageStep()
+
+        if fd.contents and fd.olddata:
+            self._startBuildMarker(fd)
+        else:
+            self._buildtimer.stop()  # in case previous request not finished
+
+    def _startBuildMarker(self, fd):
+        # use the difflib.SequenceMatcher, which returns a set of opcodes
+        # that must be parsed
+        olddata = fd.olddata.splitlines()
+        newdata = fd.contents.splitlines()
+        diff = difflib.SequenceMatcher(None, olddata, newdata)
+        self._opcodes = diff.get_opcodes()
+        self._buildtimer.start()
+
+    @pyqtSlot()
+    def _buildMarker(self):
+        self._sci.setUpdatesEnabled(False)
+        self._blk.setUpdatesEnabled(False)
+
+        for tag, alo, ahi, blo, bhi in self._opcodes[:30]:
+            if tag in ('replace', 'insert'):
+                self._sci.markerAdd(blo, _ChunkStartMarker)
+            if tag == 'replace':
+                self._blk.addBlock('x', blo, bhi)
+                for i in range(blo, bhi):
+                    self._sci.markerAdd(i, _ReplacedLineMarker)
+            elif tag == 'insert':
+                self._blk.addBlock('+', blo, bhi)
+                for i in range(blo, bhi):
+                    self._sci.markerAdd(i, _InsertedLineMarker)
+            elif tag in ('equal', 'delete'):
+                pass
+            else:
+                raise ValueError, 'unknown tag %r' % (tag,)
+        self._opcodes = self._opcodes[30:]
+
+        self._sci.setUpdatesEnabled(True)
+        self._blk.setUpdatesEnabled(True)
+
+        if not self._opcodes:
+            self._buildtimer.stop()
+            self.chunkMarkersBuilt.emit()
+
+    def gotoLineAction(self):
+        return self._actionGotoLine
+
+    @pyqtSlot()
+    def _gotoLineDialog(self):
+        last = self._sci.lines()
+        if last == 0:
+            return
+        cur = self._sci.getCursorPosition()[0] + 1
+        line, ok = QInputDialog.getInt(self.parent(), _('Go to Line'),
+                                       _('Enter line number (1 - %d)') % last,
+                                       cur, 1, last)
+        if ok:
+            self._sci.setCursorPosition(line - 1, 0)
+            self._sci.ensureLineVisible(line - 1)
+            self._sci.setFocus()
+
+
+class _MessageViewControl(_AbstractViewControl):
+    """Display error message or repository history in HgFileView"""
+
+    forceDisplayRequested = pyqtSignal()
+
+    def __init__(self, sci, parent=None):
+        super(_MessageViewControl, self).__init__(parent)
+        self._sci = sci
+        self._forceviewindicator = None
+
+    def open(self):
+        self._sci.setLexer(None)
+        self._sci.setFont(qtlib.getfont('fontlog').font())
+
+    def close(self):
+        pass
+
+    def display(self, fd):
+        if not fd.isValid():
+            errormsg = fd.error or ''
+            self._sci.setText(errormsg)
+            forcedisplaymsg = filedata.forcedisplaymsg
+            linkstart = errormsg.find(forcedisplaymsg)
+            if linkstart >= 0:
+                # add the link to force to view the data anyway
+                self._setupForceViewIndicator()
+                self._sci.fillIndicatorRange(
+                    0, linkstart, 0, linkstart + len(forcedisplaymsg),
+                    self._forceviewindicator)
+        elif fd.ucontents:
+            # subrepo summary and perhaps other data
+            self._sci.setText(fd.ucontents)
+
+    def _setupForceViewIndicator(self):
+        if self._forceviewindicator is not None:
+            return
+        self._forceviewindicator = self._sci.indicatorDefine(
+            self._sci.PlainIndicator)
+        self._sci.setIndicatorDrawUnder(True, self._forceviewindicator)
+        self._sci.setIndicatorForegroundColor(
+            QColor('blue'), self._forceviewindicator)
+        # delay until next event-loop in order to complete mouse release
+        self._sci.SCN_INDICATORRELEASE.connect(self._requestForceDisplay,
+                                               Qt.QueuedConnection)
+
+    @pyqtSlot()
+    def _requestForceDisplay(self):
+        self._sci.setText(_('Please wait while the file is opened ...'))
+        # Wait a little to ensure that the "wait message" is displayed
+        QTimer.singleShot(10, self, SIGNAL('forceDisplayRequested()'))
+
+
+class _AnnotateViewControl(_AbstractViewControl):
+    """Display annotation margin and colorize file content in HgFileView"""
 
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repoagent, parent=None):
-        super(AnnotateView, self).__init__(parent)
-        self.setReadOnly(True)
-        self.setMarginLineNumbers(1, True)
-        self.setMarginType(2, qsci.TextMarginRightJustified)
-        self.setMouseTracking(False)
+    editSelectedRequested = pyqtSignal(unicode, int, int)
+    grepRequested = pyqtSignal(unicode, dict)
+    searchSelectedTextRequested = pyqtSignal()
+    setSourceRequested = pyqtSignal(unicode, int, int)
+    visualDiffRevisionRequested = pyqtSignal(unicode, int)
+    visualDiffToLocalRequested = pyqtSignal(unicode, int)
 
-        self._repoagent = repoagent
-        repo = repoagent.rawRepo()
-        # TODO: replace by repoagent if sci.repo = bundlerepo can be removed
-        self.repo = repo
+    def __init__(self, ui, sci, fd, parent=None):
+        super(_AnnotateViewControl, self).__init__(parent)
+        self._sci = sci
+        self._sci.setMarginType(_AnnotateMargin, qsci.TextMarginRightJustified)
+        self._sci.setMarginSensitivity(_AnnotateMargin, True)
+        self._sci.marginClicked.connect(self._onMarginClicked)
 
-        self._annotation_enabled = False
+        self._fd = fd
         self._links = []  # by line
-        self._anncache = {}  # by rev
         self._revmarkers = {}  # by rev
         self._lastrev = None
 
-        diffopts = patch.diffopts(repo.ui, section='annotate')
+        self._lastmarginclick = QTime.currentTime()
+        self._lastmarginclick.addMSecs(-QApplication.doubleClickInterval())
+
+        diffopts = patch.diffopts(ui, section='annotate')
         self._thread = AnnotateThread(self, diffopts=diffopts)
         self._thread.finished.connect(self.fillModel)
 
-        self._initAnnotateOptionActions()
+        self._abortshortcut = a = QShortcut(Qt.Key_Escape, sci)
+        a.setContext(Qt.WidgetShortcut)
+        a.setEnabled(False)
+        a.activated.connect(self._thread.abort)
 
-        self._repoagent.configChanged.connect(self.configChanged)
-        self.configChanged()
+        self._initAnnotateOptionActions()
         self._loadAnnotateSettings()
+
+    def open(self):
+        self._sci.viewport().installEventFilter(self)
+        self._abortshortcut.setEnabled(True)
+
+    def close(self):
+        self._sci.viewport().removeEventFilter(self)
+        self._sci.setMarginWidth(_AnnotateMargin, 0)
+        self._sci.markerDeleteAll()
+        self._abortshortcut.setEnabled(False)
+        self._thread.abort()
+
+    def eventFilter(self, watched, event):
+        # Python wrapper is deleted immediately before QEvent.Destroy
+        try:
+            sciviewport = self._sci.viewport()
+        except RuntimeError:
+            sciviewport = None
+        if watched is sciviewport:
+            if event.type() == QEvent.MouseMove:
+                line = self._sci.lineNearPoint(event.pos())
+                self._emitRevisionHintAtLine(line)
+            return False
+        return super(_AnnotateViewControl, self).eventFilter(watched, event)
 
     def _loadAnnotateSettings(self):
         s = QSettings()
@@ -1019,7 +963,6 @@ class AnnotateView(qscilib.Scintilla):
             a.setChecked(s.value(wb + a.data().toString()).toBool())
         if not util.any(a.isChecked() for a in self._annoptactions):
             self._annoptactions[-1].setChecked(True)  # 'rev' by default
-        self._setupLineAnnotation()
 
     def _saveAnnotateSettings(self):
         s = QSettings()
@@ -1043,15 +986,10 @@ class AnnotateView(qscilib.Scintilla):
         if not util.any(a.isChecked() for a in self._annoptactions):
             self.sender().setChecked(True)
 
-        self._setupLineAnnotation()
-        self.fillModel()
+        self._updateView()
         self._saveAnnotateSettings()
 
-    def annotateOptionActions(self):
-        """List of QAction for annotate options"""
-        return list(self._annoptactions)
-
-    def _setupLineAnnotation(self):
+    def _buildRevMarginTexts(self):
         def getauthor(fctx):
             return hglib.tounicode(hglib.username(fctx.user()))
         def getdate(fctx):
@@ -1061,8 +999,7 @@ class AnnotateView(qscilib.Scintilla):
 
         aformat = [str(a.data().toString()) for a in self._annoptactions
                    if a.isChecked()]
-        tiprev = self.repo['tip'].rev()
-        revwidth = len(str(tiprev))
+        revwidth = len(str(self._fd.rev()))
         annfields = {
             'rev': ('%%%dd' % revwidth, getrev),
             'author': ('%s', getauthor),
@@ -1071,36 +1008,14 @@ class AnnotateView(qscilib.Scintilla):
         annformat = []
         annfunc = []
         for fieldname in aformat:
-            fielddata = annfields.get(fieldname, ())
-            if fielddata:
-                annformat.append(fielddata[0])
-                annfunc.append(fielddata[1])
+            s, f = annfields[fieldname]
+            annformat.append(s)
+            annfunc.append(f)
         annformat = ' : '.join(annformat)
 
-        self._anncache.clear()
-        def lineannotation(fctx):
-            rev = fctx.rev()
-            ann = self._anncache.get(rev, None)
-            if ann is None:
-                ann = annformat % tuple([f(fctx) for f in annfunc])
-                self._anncache[rev] = ann
-            return ann
-        self._lineannotation = lineannotation
-
-    @pyqtSlot()
-    def configChanged(self):
-        self.setIndentationWidth(self.repo.tabwidth)
-        self.setTabWidth(self.repo.tabwidth)
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self._thread.abort()
-            return
-        return super(AnnotateView, self).keyPressEvent(event)
-
-    def mouseMoveEvent(self, event):
-        self._emitRevisionHintAtLine(self.lineNearPoint(event.pos()))
-        super(AnnotateView, self).mouseMoveEvent(event)
+        uniqfctxs = set(fctx for fctx, _origline in self._links)
+        return dict((fctx.rev(), annformat % tuple(f(fctx) for f in annfunc))
+                    for fctx in uniqfctxs)
 
     def _emitRevisionHintAtLine(self, line):
         if line < 0:
@@ -1108,22 +1023,23 @@ class AnnotateView(qscilib.Scintilla):
         try:
             fctx = self._links[line][0]
             if fctx.rev() != self._lastrev:
-                s = hglib.get_revision_desc(fctx, self.annfile)
+                filename = hglib.fromunicode(self._fd.canonicalFilePath())
+                s = hglib.get_revision_desc(fctx, filename)
                 self.showMessage.emit(s)
                 self._lastrev = fctx.rev()
         except IndexError:
             pass
 
-    def _updateannotation(self, ctx, filename):
-        if ctx.rev() is None:
+    def display(self, fd):
+        if fd.rev() is None:
             return
-        wsub, filename, ctx = hglib.getDeepestSubrepoContainingFile(filename, ctx)
-        if wsub is None:
-            # The file was not found in the repo context or its subrepos
-            # This may happen for files that have been removed
+        if self._fd == fd and self._links:
+            self._updateView()
             return
-        self.ctx = ctx
-        self.annfile = filename
+        self._fd = fd
+        del self._links[:]
+        ctx = fd.rawContext()
+        filename = hglib.fromunicode(fd.canonicalFilePath())
         self._thread.abort()
         self._thread.start(ctx[filename])
 
@@ -1134,43 +1050,30 @@ class AnnotateView(qscilib.Scintilla):
             return
 
         self._links = list(self._thread.data)
-        self._anncache.clear()
+        self._updateView()
 
-        self._updaterevmargin()
+    def _updateView(self):
+        if not self._links:
+            return
+        revtexts = self._buildRevMarginTexts()
+        self._updaterevmargin(revtexts)
         self._updatemarkers()
-        self._updatemarginwidth()
+        self._updatemarginwidth(revtexts)
 
-    def clear(self):
-        super(AnnotateView, self).clear()
-        self.clearMarginText()
-        self.markerDeleteAll()
-
-    def setAnnotationEnabled(self, enabled):
-        """Enable / disable annotation"""
-        self._annotation_enabled = enabled
-        self._updatemarginwidth()
-        self.setMouseTracking(enabled)
-        if not enabled:
-            self.markerDeleteAll()
-
-    def isAnnotationEnabled(self):
-        """True if annotation enabled and available"""
-        return self._annotation_enabled
-
-    def _updaterevmargin(self):
+    def _updaterevmargin(self, revtexts):
         """Update the content of margin area showing revisions"""
         s = self._margin_style
         # Workaround to set style of the current sci widget.
         # QsciStyle sends style data only to the first sci widget.
         # See qscintilla2/Qt4/qscistyle.cpp
-        self.SendScintilla(qsci.SCI_STYLESETBACK,
-                           s.style(), s.paper())
-        self.SendScintilla(qsci.SCI_STYLESETFONT,
-                           s.style(), s.font().family().toAscii().data())
-        self.SendScintilla(qsci.SCI_STYLESETSIZE,
-                           s.style(), s.font().pointSize())
+        self._sci.SendScintilla(qsci.SCI_STYLESETBACK,
+                                s.style(), s.paper())
+        self._sci.SendScintilla(qsci.SCI_STYLESETFONT,
+                                s.style(), s.font().family().toAscii().data())
+        self._sci.SendScintilla(qsci.SCI_STYLESETSIZE,
+                                s.style(), s.font().pointSize())
         for i, (fctx, _origline) in enumerate(self._links):
-            self.setMarginText(i, self._lineannotation(fctx), s)
+            self._sci.setMarginText(i, revtexts[fctx.rev()], s)
 
     def _updatemarkers(self):
         """Update markers which colorizes each line"""
@@ -1178,49 +1081,137 @@ class AnnotateView(qscilib.Scintilla):
         for i, (fctx, _origline) in enumerate(self._links):
             m = self._revmarkers.get(fctx.rev())
             if m is not None:
-                self.markerAdd(i, m)
+                self._sci.markerAdd(i, m)
 
     def _redefinemarkers(self):
         """Redefine line markers according to the current revs"""
-        curdate = self.ctx.date()[0]
+        curdate = self._fd.rawContext().date()[0]
 
         # make sure to colorize at least 1 year
         mindate = curdate - 365 * 24 * 60 * 60
 
         self._revmarkers.clear()
         filectxs = iter(fctx for fctx, _origline in self._links)
+        maxcolors = 32 - _FirstAnnotateLineMarker
         palette = colormap.makeannotatepalette(filectxs, curdate,
-                                               maxcolors=32, maxhues=8,
+                                               maxcolors=maxcolors, maxhues=8,
                                                maxsaturations=16,
                                                mindate=mindate)
         for i, (color, fctxs) in enumerate(palette.iteritems()):
-            self.markerDefine(qsci.Background, i)
-            self.setMarkerBackgroundColor(QColor(color), i)
+            m = _FirstAnnotateLineMarker + i
+            self._sci.markerDefine(qsci.Background, m)
+            self._sci.setMarkerBackgroundColor(QColor(color), m)
             for fctx in fctxs:
-                self._revmarkers[fctx.rev()] = i
+                self._revmarkers[fctx.rev()] = m
 
     @util.propertycache
     def _margin_style(self):
         """Style for margin area"""
         s = Qsci.QsciStyle()
         s.setPaper(QApplication.palette().color(QPalette.Window))
-        s.setFont(self.font())
+        s.setFont(self._sci.font())
         return s
 
-    @pyqtSlot()
-    def _updatemarginwidth(self):
-        self.setMarginsFont(self.font())
-        def lentext(s):
-            return 'M' * (len(str(s)) + 2)  # 2 for margin
-        self.setMarginWidth(1, lentext(self.lines()))
-        showannmargin = bool(self.isAnnotationEnabled() and self._anncache)
-        if showannmargin:
-            # add 2 for margin
-            maxwidth = 2 + max(len(s) for s in self._anncache.itervalues())
-            self.setMarginWidth(2, 'M' * maxwidth)
+    def _updatemarginwidth(self, revtexts):
+        self._sci.setMarginsFont(self._sci.font())
+        # add 2 for margin
+        maxwidth = 2 + max(len(s) for s in revtexts.itervalues())
+        self._sci.setMarginWidth(_AnnotateMargin, 'M' * maxwidth)
+
+    def setupContextMenu(self, menu, line):
+        menu.addSeparator()
+        annoptsmenu = menu.addMenu(_('Annotate Op&tions'))
+        annoptsmenu.addActions(self._annoptactions)
+
+        if line < 0 or line >= len(self._links):
+            return
+
+        menu.addSeparator()
+
+        fctx, line = self._links[line]
+        selection = self._sci.selectedText()
+        if selection:
+            def sreq(**opts):
+                return lambda: self.grepRequested.emit(selection, opts)
+            menu.addSeparator()
+            annsearchmenu = menu.addMenu(_('Search Selected Text'))
+            a = annsearchmenu.addAction(_('In Current &File'))
+            a.triggered.connect(self.searchSelectedTextRequested)
+            annsearchmenu.addAction(_('In &Current Revision'), sreq(rev='.'))
+            annsearchmenu.addAction(_('In &Original Revision'),
+                                    sreq(rev=fctx.rev()))
+            annsearchmenu.addAction(_('In All &History'), sreq(all=True))
+
+        data = [hglib.tounicode(fctx.path()), fctx.rev(), line]
+
+        def annorig():
+            self.setSourceRequested.emit(*data)
+        def editorig():
+            self.editSelectedRequested.emit(*data)
+        def difflocal():
+            self.visualDiffToLocalRequested.emit(data[0], data[1])
+        def diffparent():
+            self.visualDiffRevisionRequested.emit(data[0], data[1])
+
+        menu.addSeparator()
+        origrev = fctx.rev()
+        anngotomenu = menu.addMenu(_('Go to'))
+        annviewmenu = menu.addMenu(_('View File at'))
+        anndiffmenu = menu.addMenu(_('Diff File to'))
+        anngotomenu.addAction(_('&Originating Revision'), annorig)
+        annviewmenu.addAction(_('&Originating Revision'), editorig)
+        anndiffmenu.addAction(_('&Local'), difflocal)
+        anndiffmenu.addAction(_('&Parent Revision'), diffparent)
+        for pfctx in fctx.parents():
+            pdata = [hglib.tounicode(pfctx.path()), pfctx.changectx().rev(),
+                     line]
+            def annparent(data):
+                self.setSourceRequested.emit(*data)
+            def editparent(data):
+                self.editSelectedRequested.emit(*data)
+            for name, func, smenu in [(_('&Parent Revision (%d)') % pdata[1],
+                                  annparent, anngotomenu),
+                               (_('&Parent Revision (%d)') % pdata[1],
+                                  editparent, annviewmenu)]:
+                def add(name, func):
+                    action = smenu.addAction(name)
+                    action.data = pdata
+                    action.run = lambda: func(action.data)
+                    action.triggered.connect(action.run)
+                add(name, func)
+
+    #@pyqtSlot(int, int, Qt.KeyboardModifiers)
+    def _onMarginClicked(self, margin, line, state):
+        if margin != _AnnotateMargin:
+            return
+
+        lastclick = self._lastmarginclick
+        if (state == Qt.ControlModifier
+            or lastclick.elapsed() < QApplication.doubleClickInterval()):
+            fctx, line = self._links[line]
+            self.setSourceRequested.emit(
+                hglib.tounicode(fctx.path()), fctx.rev(), line)
         else:
-            self.setMarginWidth(2, 0)
-        self.setMarginSensitivity(2, showannmargin)
+            lastclick.restart()
+
+            # mimic the default "border selection" behavior,
+            # which is disabled when you use setMarginSensitivity()
+            if state == Qt.ShiftModifier:
+                r = self._sci.getSelection()
+                sellinetop, selchartop, sellinebottom, selcharbottom = r
+                if sellinetop <= line:
+                    sline = sellinetop
+                    eline = line + 1
+                else:
+                    sline = line
+                    eline = sellinebottom
+                    if selcharbottom != 0:
+                        eline += 1
+            else:
+                sline = line
+                eline = line + 1
+            self._sci.setSelection(sline, 0, eline, 0)
+
 
 class AnnotateThread(QThread):
     'Background thread for annotating a file at a revision'
@@ -1261,3 +1252,145 @@ class AnnotateThread(QThread):
         finally:
             self._threadid = None
             del self._fctx
+
+
+class _ChunkSelectionViewControl(_AbstractViewControl):
+    """Display chunk selection margin and colorize chunks in HgFileView"""
+
+    chunkSelectionChanged = pyqtSignal()
+
+    def __init__(self, sci, parent=None):
+        super(_ChunkSelectionViewControl, self).__init__(parent)
+        self._sci = sci
+        p = qtlib.getcheckboxpixmap(QStyle.State_On, QColor('#B0FFA0'), sci)
+        self._sci.markerDefine(p, _IncludedChunkStartMarker)
+        p = qtlib.getcheckboxpixmap(QStyle.State_Off, QColor('#B0FFA0'), sci)
+        self._sci.markerDefine(p, _ExcludedChunkStartMarker)
+
+        self._sci.markerDefine(qsci.Background, _ExcludedLineMarker)
+        self._sci.setMarkerBackgroundColor(QColor('lightgrey'),
+                                           _ExcludedLineMarker)
+        self._sci.setMarkerForegroundColor(QColor('darkgrey'),
+                                           _ExcludedLineMarker)
+        self._sci.setMarginType(_ChunkSelectionMargin, qsci.SymbolMargin)
+        self._sci.setMarginMarkerMask(_ChunkSelectionMargin,
+                                      _ChunkSelectionMarkerMask)
+        self._sci.setMarginSensitivity(_ChunkSelectionMargin, True)
+        self._sci.marginClicked.connect(self._onMarginClicked)
+
+        self._actmarkexcluded = a = QAction(_('&Mark Excluded Changes'), self)
+        a.setCheckable(True)
+        a.setChecked(QSettings().value('changes-mark-excluded').toBool())
+        a.triggered.connect(self._updateChunkIndicatorMarks)
+        self._excludeindicator = -1
+        self._updateChunkIndicatorMarks(a.isChecked())
+        self._sci.setIndicatorDrawUnder(True, self._excludeindicator)
+        self._sci.setIndicatorForegroundColor(QColor('gray'),
+                                              self._excludeindicator)
+
+        self._toggleshortcut = a = QShortcut(Qt.Key_Space, sci)
+        a.setContext(Qt.WidgetShortcut)
+        a.setEnabled(False)
+        a.activated.connect(self._toggleCurrentChunk)
+
+        self._changes = None
+        self._chunkatline = {}
+
+    def open(self):
+        self._sci.setMarginWidth(_ChunkSelectionMargin, 15)
+        self._toggleshortcut.setEnabled(True)
+
+    def close(self):
+        self._sci.setMarginWidth(_ChunkSelectionMargin, 0)
+        self._toggleshortcut.setEnabled(False)
+
+    def display(self, fd):
+        self._changes = None
+        self._chunkatline.clear()
+        if not fd.changes:
+            return
+        self._changes = fd.changes
+        for chunk in fd.changes.hunks:
+            self._chunkatline[chunk.lineno] = chunk
+            self._sci.markerAdd(chunk.lineno, _IncludedChunkStartMarker)
+
+    def updateChunk(self, chunk, exclude):
+        if chunk.excluded == exclude:
+            return
+        excludemsg = ' ' + _('(excluded from the next commit)')
+        if exclude:
+            chunk.excluded = True
+            self._changes.excludecount += 1
+
+            self._sci.setReadOnly(False)
+            llen = self._sci.lineLength(chunk.lineno)  # in bytes
+            self._sci.insertAt(excludemsg, chunk.lineno, llen - 1)
+            self._sci.setReadOnly(True)
+
+            self._sci.markerDelete(chunk.lineno, _IncludedChunkStartMarker)
+            self._sci.markerAdd(chunk.lineno, _ExcludedChunkStartMarker)
+            for i in xrange(chunk.linecount - 1):
+                self._sci.markerAdd(chunk.lineno + i + 1, _ExcludedLineMarker)
+            self._sci.fillIndicatorRange(chunk.lineno + 1, 0,
+                                         chunk.lineno + chunk.linecount, 0,
+                                         self._excludeindicator)
+        else:
+            chunk.excluded = False
+            self._changes.excludecount -= 1
+
+            self._sci.setReadOnly(False)
+            llen = self._sci.lineLength(chunk.lineno)  # in bytes
+            mlen = len(excludemsg.encode('utf-8'))  # in bytes
+            pos = self._sci.positionFromLineIndex(chunk.lineno, llen - mlen - 1)
+            self._sci.SendScintilla(qsci.SCI_SETTARGETSTART, pos)
+            self._sci.SendScintilla(qsci.SCI_SETTARGETEND, pos + mlen)
+            self._sci.SendScintilla(qsci.SCI_REPLACETARGET, 0, '')
+            self._sci.setReadOnly(True)
+
+            self._sci.markerDelete(chunk.lineno, _ExcludedChunkStartMarker)
+            self._sci.markerAdd(chunk.lineno, _IncludedChunkStartMarker)
+            for i in xrange(chunk.linecount - 1):
+                self._sci.markerDelete(chunk.lineno + i + 1,
+                                       _ExcludedLineMarker)
+            self._sci.clearIndicatorRange(chunk.lineno + 1, 0,
+                                          chunk.lineno + chunk.linecount, 0,
+                                          self._excludeindicator)
+
+    @pyqtSlot(int, int)
+    def _onMarginClicked(self, margin, line):
+        if margin != _ChunkSelectionMargin:
+            return
+        if line not in self._chunkatline:
+            return
+        self._toggleChunkAtLine(line)
+
+    def _toggleChunkAtLine(self, line):
+        chunk = self._chunkatline[line]
+        self.updateChunk(chunk, not chunk.excluded)
+        self.chunkSelectionChanged.emit()
+
+    @pyqtSlot()
+    def _toggleCurrentChunk(self):
+        line = self._currentChunkLine()
+        if line >= 0:
+            self._toggleChunkAtLine(line)
+
+    def _currentChunkLine(self):
+        line = self._sci.getCursorPosition()[0]
+        return self._sci.markerFindPrevious(line, _ChunkSelectionMarkerMask)
+
+    def setupContextMenu(self, menu, line):
+        menu.addAction(self._actmarkexcluded)
+
+    @pyqtSlot(bool)
+    def _updateChunkIndicatorMarks(self, checked):
+        '''
+        This method has some pre-requisites:
+        - self.excludeindicator MUST be set to -1 before calling this
+        method for the first time
+        '''
+        indicatortypes = (qsci.HiddenIndicator, qsci.StrikeIndicator)
+        self._excludeindicator = self._sci.indicatorDefine(
+            indicatortypes[checked],
+            self._excludeindicator)
+        QSettings().setValue('changes-mark-excluded', checked)

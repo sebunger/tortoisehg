@@ -9,7 +9,7 @@ from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
+from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdcore, cmdui, status, resolve
 from tortoisehg.hgqt import qscilib, thgrepo, messageentry, wctxcleaner
 
 from PyQt4.QtCore import *
@@ -26,8 +26,7 @@ class BackoutDialog(QWizard):
         self.parentbackout = False
         self.backoutmergeparentrev = None
 
-        repo = repoagent.rawRepo()
-        self.setWindowTitle(_('Backout - %s') % repo.displayname)
+        self.setWindowTitle(_('Backout - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-revert'))
         self.setOption(QWizard.NoBackButtonOnStartPage, True)
         self.setOption(QWizard.NoBackButtonOnLastPage, True)
@@ -292,10 +291,8 @@ class BackoutPage(BasePage):
         self.setSubTitle(_('All conflicting files will be marked unresolved.'))
         self.setLayout(QVBoxLayout())
 
-        self.cmd = cmdui.Widget(True, False, self)
-        self.cmd.commandFinished.connect(self.onCommandFinished)
-        self.cmd.setShowOutput(True)
-        self.layout().addWidget(self.cmd)
+        self._cmdlog = cmdui.LogWidget(self)
+        self.layout().addWidget(self._cmdlog)
 
         self.reslabel = QLabel()
         self.reslabel.linkActivated.connect(self.onLinkActivated)
@@ -313,15 +310,16 @@ class BackoutPage(BasePage):
         if self.wizard().parentbackout:
             self.wizard().next()
             return
-        cmdline = ['--repository', self.repo.root, 'backout']
+        cmdline = ['backout']
         tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
         cmdline += ['--tool=internal:' + tool]
         cmdline += ['--rev', str(self.wizard().backoutrev)]
         if self.wizard().backoutmergeparentrev:
             cmdline += ['--parent', str(self.wizard().backoutmergeparentrev)]
-        self.repo.incrementBusyCount()
-        self.cmd.core.clearOutput()
-        self.cmd.run(cmdline)
+        self._cmdlog.clearLog()
+        sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self.onCommandFinished)
+        sess.outputReceived.connect(self._cmdlog.appendLog)
 
     def isComplete(self):
         'should Next button be sensitive?'
@@ -348,8 +346,8 @@ class BackoutPage(BasePage):
     def cleanupPage(self):
         QSettings().setValue('backout/autoadvance', self.autonext.isChecked())
 
+    @pyqtSlot(int)
     def onCommandFinished(self, ret):
-        self.repo.decrementBusyCount()
         if ret in (0, 1):
             self.backoutcomplete = True
             if self.autonext.isChecked():
@@ -360,7 +358,6 @@ class BackoutPage(BasePage):
     def onLinkActivated(self, cmd):
         if cmd == 'resolve':
             dlg = resolve.ResolveDialog(self._repoagent, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             if self.autonext.isChecked():
                 self.tryAutoAdvance(True)
@@ -448,10 +445,10 @@ class CommitPage(BasePage):
         self.layout().addWidget(msgEntry)
         self.msgEntry = msgEntry
 
-        self.cmd = cmdui.Widget(True, False, self)
-        self.cmd.commandFinished.connect(self.onCommandFinished)
-        self.cmd.setShowOutput(False)
-        self.layout().addWidget(self.cmd)
+        self._cmdsession = cmdcore.nullCmdSession()
+        self._cmdlog = cmdui.LogWidget(self)
+        self._cmdlog.hide()
+        self.layout().addWidget(self._cmdlog)
 
         def tryperform():
             if self.isComplete():
@@ -540,41 +537,42 @@ class CommitPage(BasePage):
             if self.skiplast.isChecked():
                 self.wizard().close()
             return True
-        if self.cmd.core.running():
+        if not self._cmdsession.isFinished():
             return False
 
-        user = qtlib.getCurrentUsername(self, self.repo)
+        user = hglib.tounicode(qtlib.getCurrentUsername(self, self.repo))
         if not user:
             return False
 
         if self.wizard().parentbackout:
             self.setTitle(_('Backing out and committing...'))
             self.setSubTitle(_('Please wait while making backout.'))
-            message = hglib.fromunicode(self.msgEntry.text())
+            message = unicode(self.msgEntry.text())
             cmdline = ['backout', '--verbose', '--message', message, '--rev',
-                       str(self.wizard().backoutrev), '--user', user,
-                       '--repository', self.repo.root]
+                       str(self.wizard().backoutrev), '--user', user]
             if self.wizard().backoutmergeparentrev:
                 cmdline += ['--parent', str(self.wizard().backoutmergeparentrev)]
         else:
             self.setTitle(_('Committing...'))
             self.setSubTitle(_('Please wait while committing merged files.'))
-            message = hglib.fromunicode(self.msgEntry.text())
+            message = unicode(self.msgEntry.text())
             cmdline = ['commit', '--verbose', '--message', message,
-                       '--repository', self.repo.root, '--user', user]
+                       '--user', user]
         commandlines = [cmdline]
         pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
         if pushafter:
-            cmd = ['push', '--repository', self.repo.root, pushafter]
+            cmd = ['push', hglib.tounicode(pushafter)]
             commandlines.append(cmd)
 
-        self.repo.incrementBusyCount()
-        self.cmd.setShowOutput(True)
-        self.cmd.run(*commandlines)
+        self._cmdlog.show()
+        sess = self._repoagent.runCommandSequence(commandlines, self)
+        self._cmdsession = sess
+        sess.commandFinished.connect(self.onCommandFinished)
+        sess.outputReceived.connect(self._cmdlog.appendLog)
         return False
 
+    @pyqtSlot(int)
     def onCommandFinished(self, ret):
-        self.repo.decrementBusyCount()
         if ret == 0:
             self.commitComplete = True
             self.wizard().next()

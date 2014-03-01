@@ -117,13 +117,14 @@ class RevisionSetQuery(QDialog):
     showMessage = pyqtSignal(QString)
     progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
         # Since the revset dialot belongs to a repository, we display
         # the repository name in the dialog title
-        self.setWindowTitle(_('Revision Set Query') + ' - ' + repo.displayname)
+        self.setWindowTitle(_('Revision Set Query')
+                            + ' - ' + repoagent.displayName())
         self.setWindowFlags(Qt.Window)
 
         layout = QVBoxLayout()
@@ -134,6 +135,7 @@ class RevisionSetQuery(QDialog):
         logical = _logical
         ancestry = _ancestry
 
+        repo = repoagent.rawRepo()
         if 'hgsubversion' in repo.extensions():
             logical = list(logical) + [('fromsvn()',
                     _('all revisions converted from subversion')),]
@@ -231,7 +233,8 @@ class RevisionSetQuery(QDialog):
         self.showMessage.emit(_('Searching...'))
         self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
 
-        self.refreshing = RevsetThread(self.repo, self.entry.text(), self)
+        repo = self._repoagent.rawRepo()
+        self.refreshing = RevsetThread(repo, self.entry.text(), self)
         self.refreshing.showMessage.connect(self.showMessage)
         self.refreshing.queryIssued.connect(self.queryIssued)
         self.refreshing.finished.connect(self.queryFinished)

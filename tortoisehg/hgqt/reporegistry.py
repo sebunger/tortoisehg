@@ -11,7 +11,7 @@ from mercurial import commands, hg, ui, util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings
+from tortoisehg.hgqt import qtlib, repotreemodel, settings
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -225,6 +225,7 @@ class RepoRegistryView(QDockWidget):
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
     removeRepo = pyqtSignal(QString)
+    cloneRepoRequested = pyqtSignal(QString)
     progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
     def __init__(self, repomanager, parent):
@@ -393,6 +394,14 @@ class RepoRegistryView(QDockWidget):
             self._scanAddedRepo(index)
             self.updateSettingsFile()
 
+    def addClonedRepo(self, root, sourceroot):
+        """Add repo to the same group as the source"""
+        m = self.tview.model()
+        src = m.indexFromRepoRoot(sourceroot, standalone=True)
+        if src.isValid() and not m.isKnownRepoRoot(root):
+            index = m.addRepo(root, parent=src.parent())
+            self._scanAddedRepo(index)
+
     def setActiveTabRepo(self, root):
         """"The selected tab has changed on the workbench"""
         m = self.tview.model()
@@ -502,10 +511,7 @@ class RepoRegistryView(QDockWidget):
 
     def cloneRepo(self):
         root = self.selitem.internalPointer().rootpath()
-        d = clone.CloneDialog(args=[root, root + '-clone'], parent=self)
-        d.finished.connect(d.deleteLater)
-        d.clonedRepository.connect(self._openClone)
-        d.show()
+        self.cloneRepoRequested.emit(hglib.tounicode(root))
 
     def explore(self):
         root = self.selitem.internalPointer().rootpath()
@@ -513,7 +519,8 @@ class RepoRegistryView(QDockWidget):
 
     def terminal(self):
         repoitem = self.selitem.internalPointer()
-        qtlib.openshell(repoitem.rootpath(), repoitem.shortname())
+        qtlib.openshell(repoitem.rootpath(),
+                        hglib.fromunicode(repoitem.shortname()))
 
     def addNewRepo(self):
         'menu action handler for adding a new repository'
@@ -722,15 +729,6 @@ class RepoRegistryView(QDockWidget):
         for root in self.selitem.internalPointer().childRoots():
             self.openRepo.emit(hglib.tounicode(root), False)
 
-    @pyqtSlot(unicode, unicode)
-    def _openClone(self, root, sourceroot):
-        m = self.tview.model()
-        src = m.indexFromRepoRoot(sourceroot, standalone=True)
-        if src.isValid() and not m.isKnownRepoRoot(root):
-            index = m.addRepo(root, parent=src.parent())
-            self._scanAddedRepo(index)
-        self.open(root)
-
     def open(self, root=None):
         'open context menu action, open repowidget unconditionally'
         if not root:
@@ -833,7 +831,7 @@ class RepoRegistryView(QDockWidget):
         indexes = m.indexesOfRepoItems(standalone=True)
         if not self._isSettingEnabled('showNetworkSubrepos'):
             indexes = [idx for idx in indexes
-                       if not paths.netdrive_status(m.repoRoot(idx))]
+                       if paths.is_on_fixed_drive(m.repoRoot(idx))]
 
         topic = _('Updating repository registry')
         for n, idx in enumerate(indexes):

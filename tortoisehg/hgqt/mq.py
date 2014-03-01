@@ -14,7 +14,7 @@ from mercurial import error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdcore, qtlib, cmdui, thgrepo
+from tortoisehg.hgqt import cmdcore, qtlib, cmdui
 from tortoisehg.hgqt import commit, qdelete, qfold, qrename, mqutil
 from tortoisehg.hgqt.qtlib import geticon
 
@@ -80,9 +80,7 @@ class QueueManagementActions(QObject):
         if not self._repoagent:
             return
         repo = self._repoagent.rawRepo()
-        # TODO: do not instantiate mqrepo here
-        mqrepo = thgrepo.repository(None, repo.mq.path)
-        repoagent = mqrepo._pyqtobj
+        repoagent = self._repoagent.subRepoAgent(hglib.tounicode(repo.mq.path))
         dlg = commit.CommitDialog(repoagent, [], {}, self.parent())
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
@@ -311,7 +309,7 @@ class PatchQueueActions(QObject):
 
     @pyqtSlot(int)
     def _onPushFinished(self, ret):
-        if ret != 0 and self._repoagent:
+        if ret == 2 and self._repoagent:
             repo = self._repoagent.rawRepo()
             output = hglib.fromunicode(self._cmdsession.warningString())
             if mqutil.checkForRejects(repo, output, self.parent()) > 0:

@@ -13,6 +13,13 @@ from mercurial import ui, util, extensions, match
 from mercurial import encoding, templatefilters, filemerge, error, scmutil
 from mercurial import dispatch as hgdispatch
 
+try:
+    from mercurial import pathutil
+    canonpath = pathutil.canonpath
+except (AttributeError, ImportError):
+    # hg<2.9 (f962870712da)
+    canonpath = scmutil.canonpath
+
 _encoding = encoding.encoding
 _encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
@@ -37,11 +44,10 @@ def tounicode(s):
         return s
     if isinstance(s, encoding.localstr):
         return s._utf8.decode('utf-8')
-    for e in ('utf-8', _encoding):
-        try:
-            return s.decode(e, 'strict')
-        except UnicodeDecodeError:
-            pass
+    try:
+        return s.decode(_encoding, 'strict')
+    except UnicodeDecodeError:
+        pass
     return s.decode(_fallbackencoding, 'replace')
 
 def fromunicode(s, errors='strict'):
@@ -126,34 +132,6 @@ def getrevisionlabel(repo, rev):
         return label
 
     return str(rev)
-
-_hidetags = None
-def gethidetags(ui):
-    global _hidetags
-    if _hidetags is None:
-        tags = toutf(ui.config('tortoisehg', 'hidetags', ''))
-        taglist = [t.strip() for t in tags.split()]
-        _hidetags = taglist
-    return _hidetags
-
-def getrawctxtags(changectx):
-    '''Returns the tags for changectx, converted to UTF-8 but
-    unfiltered for hidden tags'''
-    value = [toutf(tag) for tag in changectx.tags()]
-    if len(value) == 0:
-        return None
-    return value
-
-def getctxtags(changectx):
-    '''Returns all unhidden tags for changectx, converted to UTF-8'''
-    value = getrawctxtags(changectx)
-    if value:
-        htlist = gethidetags(changectx._repo.ui)
-        tags = [tag for tag in value if tag not in htlist]
-        if len(tags) == 0:
-            return None
-        return tags
-    return None
 
 def getmqpatchtags(repo):
     '''Returns all tag names used by MQ patches, or []'''
@@ -291,6 +269,7 @@ def wrapextensionsloader():
     extensions.wrapfunction(extensions, 'load',
                             _loadextensionwithblacklist)
 
+# TODO: provide singular canonpath() wrapper instead?
 def canonpaths(list):
     'Get canonical paths (relative to root) for list of files'
     # This is a horrible hack.  Please remove this when HG acquires a
@@ -300,14 +279,13 @@ def canonpaths(list):
     root = paths.find_root(cwd)
     for f in list:
         try:
-            canonpats.append(scmutil.canonpath(root, cwd, f))
+            canonpats.append(canonpath(root, cwd, f))
         except util.Abort:
             # Attempt to resolve case folding conflicts.
             fu = f.upper()
             cwdu = cwd.upper()
             if fu.startswith(cwdu):
-                canonpats.append(scmutil.canonpath(root, cwd,
-                                                   f[len(cwd+os.sep):]))
+                canonpats.append(canonpath(root, cwd, f[len(cwd+os.sep):]))
             else:
                 # May already be canonical
                 canonpats.append(f)
@@ -559,6 +537,17 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         toollist.append(name)
     return selectedtools, toollist
 
+def shortreponame(ui):
+    name = ui.config('web', 'name')
+    if not name:
+        return
+    src = ui.configsource('web', 'name')  # path:line
+    if '/.hg/hgrc:' not in util.pconvert(src):
+        # global web.name will set the same name to all repositories
+        ui.debug('ignoring global web.name defined at %s\n' % src)
+        return
+    return name
+
 def displaytime(date):
     return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
 
@@ -626,7 +615,7 @@ def get_revision_desc(fctx, curpath=None):
         source = u''
     else:
         source = u'(%s)' % tounicode(fctx.path())
-    date = tounicode(age(fctx.date()))
+    date = age(fctx.date()).decode('utf-8')
     l = tounicode(fctx.description()).splitlines()
     summary = l and l[0] or ''
     return u'%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
@@ -700,11 +689,25 @@ def getLineSeparator(line):
             break
     return linesep
 
+def parseconfigopts(ui, args):
+    """Pop the --config options from the command line and apply them
+
+    >>> u = ui.ui()
+    >>> args = ['log', '--config', 'extensions.mq=!']
+    >>> parseconfigopts(u, args)
+    [('extensions', 'mq', '!')]
+    >>> args
+    ['log']
+    >>> u.config('extensions', 'mq')
+    '!'
+    """
+    config = hgdispatch._earlygetopt(['--config'], args)
+    return hgdispatch._parseconfig(ui, config)
+
 def dispatch(ui, args):
     req = hgdispatch.request(args, ui)
     # since hg 2.8 (09573ad59f7b), --config is parsed prior to _dispatch()
-    hgdispatch._parseconfig(req.ui,
-                            hgdispatch._earlygetopt(['--config'], req.args))
+    parseconfigopts(req.ui, req.args)
     return hgdispatch._dispatch(req)
 
 def buildcmdargs(name, *args, **opts):

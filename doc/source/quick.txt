@@ -12,24 +12,24 @@ front-end to the Mercurial distributed version control system (DVCS).
 All TortoiseHg functionality is reachable from 3 places:
 
 1. The :command:`Workbench` application
-	
-	You can start the Workbench from the Start Menu, or by right clicking on the
-	Desktop and selecting :menuselection:`Hg Workbench`.
 
-	.. figure:: figures/desktop-workbench.png
-		:alt: Desktop Context Menu
+   You can start the Workbench from the Start Menu, or by right clicking on the
+   Desktop and selecting :menuselection:`Hg Workbench`.
 
-	Start the Workbench from the Desktop
+   .. figure:: figures/desktop-workbench.png
+      :alt: Desktop Context Menu
+
+      Start the Workbench from the Desktop
 
 2. The :command:`Explorer` context menu
-	
-	All you have to do is right click on the right folder or files in Explorer,
-	and select a context menu entry.
+
+   All you have to do is right click on the right folder or files in Explorer,
+   and select a context menu entry.
 
 3. The :command:`thg` command line application
-	
-	Type the appropriate commands from any command line interface, in the form
-	:kbd:`thg <command> [options]`.
+
+   Type the appropriate commands from any command line interface, in the form
+   :kbd:`thg <command> [options]`.
 
 In this quick guide we would like to make you get started using the Workbench
 application, but we will also indicate how to do the same with the other

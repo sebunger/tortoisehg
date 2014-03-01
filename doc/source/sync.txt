@@ -213,7 +213,7 @@ SSH
 SSH is a symmetrical peer-to-peer secure tunnel.  SSH clients and
 servers have their own key management systems, so Mercurial does not get
 involved with password prompts when SSH is used.  This is problematic on
-Windows and thus TortoiseHg bundles the TortosePlink SSH client with its
+Windows and thus TortoiseHg bundles the TortoisePlink SSH client with its
 Windows installers.  TortoisePlink is a port of the Plink SSH client
 that uses dialog prompts for host-key authorizations and passphrase
 prompts.  TortoisePlink (developed by the TortoiseSVN project) can use

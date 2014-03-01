@@ -13,29 +13,19 @@ from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _, ngettext
-from tortoisehg.hgqt import cmdui, cslist, qtlib
+from tortoisehg.hgqt import cmdcore, cmdui, cslist, qtlib
 
-class StripDialog(QDialog):
-    """Dialog to strip changesets"""
-
-    showBusyIcon = pyqtSignal(QString)
-    hideBusyIcon = pyqtSignal(QString)
+class StripWidget(cmdui.AbstractCmdWidget):
+    """Command widget to strip changesets"""
 
     def __init__(self, repoagent, rev=None, parent=None, opts={}):
-        super(StripDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags()
-                            & ~Qt.WindowContextHelpButtonHint)
-        self.setWindowIcon(qtlib.geticon('menudelete'))
+        super(StripWidget, self).__init__(parent)
         self._repoagent = repoagent
 
-        # base layout box
-        box = QVBoxLayout()
-        box.setSpacing(6)
-
-        ## main layout grid
-        self.grid = grid = QGridLayout()
+        grid = QGridLayout()
+        grid.setContentsMargins(0, 0, 0, 0)
         grid.setSpacing(6)
-        box.addLayout(grid)
+        self.setLayout(grid)
 
         ### target revision combo
         self.rev_combo = combo = QComboBox()
@@ -69,9 +59,7 @@ class StripDialog(QDialog):
         ### options
         optbox = QVBoxLayout()
         optbox.setSpacing(6)
-        expander = qtlib.ExpanderLabel(_('Options:'), False)
-        expander.expanded.connect(self.show_options)
-        grid.addWidget(expander, 3, 0, Qt.AlignLeft | Qt.AlignTop)
+        grid.addWidget(QLabel(_('Options:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
         grid.addLayout(optbox, 3, 1)
 
         self.discard_chk = QCheckBox(_('Discard local changes, no backup '
@@ -83,50 +71,16 @@ class StripDialog(QDialog):
         self.discard_chk.setChecked(bool(opts.get('force')))
         self.nobackup_chk.setChecked(bool(opts.get('nobackup')))
 
-        ## command widget
-        self.cmd = cmdui.Widget(True, True, self)
-        self.cmd.commandStarted.connect(self.command_started)
-        self.cmd.commandFinished.connect(self.command_finished)
-        self.cmd.commandCanceling.connect(self.command_canceling)
-        box.addWidget(self.cmd)
-
-        ## bottom buttons
-        buttons = QDialogButtonBox()
-        self.cancel_btn = buttons.addButton(QDialogButtonBox.Cancel)
-        self.cancel_btn.clicked.connect(self.cancel_clicked)
-        self.close_btn = buttons.addButton(QDialogButtonBox.Close)
-        self.close_btn.clicked.connect(self.reject)
-        self.close_btn.setAutoDefault(False)
-        self.strip_btn = buttons.addButton(_('&Strip'),
-                                           QDialogButtonBox.ActionRole)
-        self.strip_btn.clicked.connect(self.strip)
-        self.detail_btn = buttons.addButton(_('Detail'),
-                                            QDialogButtonBox.ResetRole)
-        self.detail_btn.setAutoDefault(False)
-        self.detail_btn.setCheckable(True)
-        self.detail_btn.toggled.connect(self.detail_toggled)
         grid.setRowStretch(cslistrow, 1)
         grid.setColumnStretch(cslistcol, 1)
-        box.addWidget(buttons)
 
         # signal handlers
         self.rev_combo.editTextChanged.connect(self.preview)
-        self.rev_combo.lineEdit().returnPressed.connect(self.strip)
         self.discard_chk.toggled.connect(self.preview)
-
-        # dialog setting
-        self.setLayout(box)
-        self.layout().setSizeConstraint(QLayout.SetMinAndMaxSize)
-        self.setWindowTitle(_('Strip - %s') % self.repo.displayname)
-        #self.setWindowIcon(qtlib.geticon('strip'))
 
         # prepare to show
         self.rev_combo.lineEdit().selectAll()
         self.cslist.setHidden(False)
-        self.cmd.setHidden(True)
-        self.cancel_btn.setHidden(True)
-        self.detail_btn.setHidden(True)
-        self.nobackup_chk.setHidden(True)
         self.preview()
 
     ### Private Methods ###
@@ -167,86 +121,66 @@ class StripDialog(QDialog):
                 "<b>%d changesets</b> will be stripped",
                 len(striprevs)) % len(striprevs)
             self.status.setText(cstext)
-            self.strip_btn.setEnabled(True)
         else:
             self.cslist.clear()
             self.cslist.updatestatus()
             cstext = qtlib.markup(_('Unknown revision!'), fg='red',
                                   weight='bold')
             self.status.setText(cstext)
-            self.strip_btn.setDisabled(True)
+        self.commandChanged.emit()
 
-    def strip(self):
+    def canRunCommand(self):
+        return self.get_rev() is not None
+
+    def runCommand(self):
         # Note that we have discussed that --hidden should only be passed to
         # mercurial commands when hidden revisions are shown.
         # However in the case of strip we can always pass it --hidden safely,
         # since strip will always strip all the descendants of a revision.
         # Thus in this case --hidden will just let us choose a hidden revision
         # as the base revision to strip.
-        cmdline = ['strip', '--repository', self.repo.root, '--verbose',
-                   '--hidden']
-        rev = hglib.fromunicode(self.rev_combo.currentText())
-        if not rev:
-            return
-        cmdline.append(rev)
+        opts = {'verbose': True,
+                'hidden': True,
+                'force': self.discard_chk.isChecked(),
+                'nobackup': self.nobackup_chk.isChecked(),
+                }
 
-        if self.discard_chk.isChecked():
-            cmdline.append('--force')
-        else:
-            def isclean():
-                """return whether WD is changed"""
-                wc = self.repo[None]
-                return not (wc.modified() or wc.added() or wc.removed())
-            if not isclean():
-                main = _("Detected uncommitted local changes.")
-                text = _("Do you want to discard them and continue?")
-                labels = ((QMessageBox.Yes, _('&Yes (--force)')),
-                          (QMessageBox.No, _('&No')))
-                if qtlib.QuestionMsgBox(_('Confirm Strip'), main, text,
-                                        labels=labels, parent=self):
-                    cmdline.append('--force')
-                else:
-                    return
+        wc = self.repo[None]
+        wcparents = wc.parents()
+        wcp1rev = wcparents[0].rev()
+        wcp2rev = None
+        if len(wcparents) > 1:
+            wcp2rev = wcparents[1].rev()
+        if not opts['force'] and \
+                (wcp1rev in self.cslist.curitems or
+                         wcp2rev in self.cslist.curitems) and \
+                (wc.modified() or wc.added() or wc.removed()):
+            main = _("Detected uncommitted local changes.")
+            text = _("Do you want to keep them or discard them?")
+            choices = (_('&Keep (--keep)'),
+                      _('&Discard (--force)'),
+                      _('&Cancel'),
+            )
+            resp = qtlib.CustomPrompt(_('Confirm Strip'),
+                '<b>%s</b><p>%s' % (main, text),
+                self, choices, default=0, esc=2).run()
+            if resp == 0:
+                opts['keep'] = True
+            elif resp == 1:
+                opts['force'] = True
+            else:
+                return cmdcore.nullCmdSession()
 
-        # backup options
-        if self.nobackup_chk.isChecked():
-            cmdline.append('--nobackup')
+        rev = self.rev_combo.currentText()
+        cmdline = hglib.buildcmdargs('strip', rev, **opts)
+        return self._repoagent.runCommand(cmdline, self)
 
-        # start the strip
-        self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
 
-    ### Signal Handlers ###
-
-    def cancel_clicked(self):
-        self.cmd.cancel()
-        self.reject()
-
-    def detail_toggled(self, checked):
-        self.cmd.setShowOutput(checked)
-
-    def show_options(self, visible):
-        self.nobackup_chk.setShown(visible)
-
-    def command_started(self):
-        self.cmd.setShown(True)
-        self.strip_btn.setHidden(True)
-        self.close_btn.setHidden(True)
-        self.cancel_btn.setShown(True)
-        self.detail_btn.setShown(True)
-        self.showBusyIcon.emit('hg-remove')
-
-    def command_finished(self, ret):
-        self.hideBusyIcon.emit('hg-remove')
-        self.repo.decrementBusyCount()
-        if ret != 0 or self.cmd.outputShown():
-            self.detail_btn.setChecked(True)
-            self.close_btn.setShown(True)
-            self.close_btn.setAutoDefault(True)
-            self.close_btn.setFocus()
-            self.cancel_btn.setHidden(True)
-        else:
-            self.accept()
-
-    def command_canceling(self):
-        self.cancel_btn.setDisabled(True)
+def createStripDialog(repoagent, rev=None, parent=None, opts={}):
+    dlg = cmdui.CmdControlDialog(parent)
+    dlg.setWindowIcon(qtlib.geticon('menudelete'))
+    dlg.setWindowTitle(_('Strip - %s') % repoagent.displayName())
+    dlg.setObjectName('strip')
+    dlg.setRunButtonText(_('&Strip'))
+    dlg.setCommandWidget(StripWidget(repoagent, rev, dlg, opts))
+    return dlg

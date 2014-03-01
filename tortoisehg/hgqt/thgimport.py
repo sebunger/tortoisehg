@@ -20,30 +20,39 @@ from tortoisehg.hgqt import cmdui, cslist, qtlib, commit
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))
 
+def _writetempfile(text):
+    fd, filename = tempfile.mkstemp(suffix='.patch', prefix='thg-import-',
+                                    dir=qtlib.gettempdir())
+    try:
+        os.write(fd, text)
+    finally:
+        os.close(fd)
+    return filename
+
 # TODO: handle --mq options from command line or MQ widget
 
 class ImportDialog(QDialog):
     """Dialog to import patches"""
-    patchImported = pyqtSignal()
 
     def __init__(self, repoagent, parent, **opts):
         super(ImportDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint
                             | Qt.WindowMaximizeButtonHint)
+        self.setWindowTitle(_('Import - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-import'))
 
-        self.tempfiles = []
         self._repoagent = repoagent
 
         # base layout box
         box = QVBoxLayout()
         box.setSpacing(6)
+        self.setLayout(box)
 
         ## main layout grid
         self.grid = grid = QGridLayout()
         grid.setSpacing(6)
-        box.addLayout(grid)
+        box.addLayout(grid, 1)
 
         ### source input
         self.src_combo = QComboBox()
@@ -88,55 +97,30 @@ class ImportDialog(QDialog):
             self.targetcombo.addItem(hglib.tounicode(cur), ('qimport',))
         self.targetcombo.currentIndexChanged.connect(self._updatep0chk)
         statbox.addWidget(self.targetcombo)
-        grid.addItem(statbox, 3, 1)
+        grid.addLayout(statbox, 3, 1)
 
         ## command widget
-        self.cmd = cmdui.Widget(True, False, self)
-        self.cmd.commandStarted.connect(self.command_started)
-        self.cmd.commandFinished.connect(self.command_finished)
-        self.cmd.commandCanceling.connect(self.command_canceling)
-        grid.setRowStretch(cslistrow, 1)
-        grid.setColumnStretch(cslistcol, 1)
-        box.addWidget(self.cmd)
+        self._cmdcontrol = cmd = cmdui.CmdSessionControlWidget(self)
+        cmd.finished.connect(self.done)
+        cmd.linkActivated.connect(self.commitActivated)
+        box.addWidget(cmd)
 
-        self.stlabel = QLabel(_('Checking working directory status...'))
-        self.stlabel.linkActivated.connect(self.commitActivated)
-        box.addWidget(self.stlabel)
+        cmd.showStatusMessage(_('Checking working directory status...'))
         QTimer.singleShot(0, self.checkStatus)
 
-        ## bottom buttons
-        buttons = QDialogButtonBox()
-        self.cancel_btn = buttons.addButton(QDialogButtonBox.Cancel)
-        self.cancel_btn.clicked.connect(self.cancel_clicked)
-        self.close_btn = buttons.addButton(QDialogButtonBox.Close)
-        self.close_btn.clicked.connect(self.reject)
-        self.close_btn.setAutoDefault(False)
-        self.import_btn = buttons.addButton(_('&Import'),
-                                            QDialogButtonBox.ActionRole)
-        self.import_btn.clicked.connect(self.thgimport)
-        self.detail_btn = buttons.addButton(_('Detail'),
-                                            QDialogButtonBox.ResetRole)
-        self.detail_btn.setAutoDefault(False)
-        self.detail_btn.setCheckable(True)
-        self.detail_btn.toggled.connect(self.detail_toggled)
-        box.addWidget(buttons)
+        self._runbutton = cmd.addButton(_('&Import'),
+                                        QDialogButtonBox.AcceptRole)
+        self._runbutton.clicked.connect(self._runCommand)
+
+        grid.setRowStretch(cslistrow, 1)
+        grid.setColumnStretch(cslistcol, 1)
 
         # signal handlers
         self.src_combo.editTextChanged.connect(self.preview)
-        self.src_combo.lineEdit().returnPressed.connect(self.thgimport)
         self.p0chk.toggled.connect(self.preview)
-
-        # dialog setting
-        self.setLayout(box)
-        self.layout().setSizeConstraint(QLayout.SetMinAndMaxSize)
-        self.setWindowTitle(_('Import - %s') % self.repo.displayname)
-        #self.setWindowIcon(qtlib.geticon('import'))
 
         # prepare to show
         self.src_combo.lineEdit().selectAll()
-        self.cmd.setHidden(True)
-        self.cancel_btn.setHidden(True)
-        self.detail_btn.setHidden(True)
         self._updatep0chk()
         self.preview()
 
@@ -159,9 +143,9 @@ class ImportDialog(QDialog):
         if M or A or R:
             text = _('Working directory is not clean!  '
                      '<a href="view">View changes...</a>')
-            self.stlabel.setText(text)
+            self._cmdcontrol.showStatusMessage(text)
         else:
-            self.stlabel.clear()
+            self._cmdcontrol.showStatusMessage('')
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Refresh):
@@ -171,9 +155,9 @@ class ImportDialog(QDialog):
 
     def browsefiles(self):
         caption = _("Select patches")
-        filelist = QFileDialog.getOpenFileNames(parent=self, caption=caption,
-                                                directory=self.repo.root,
-                                                filter=_FILE_FILTER)
+        filelist = QFileDialog.getOpenFileNames(self, caption,
+                                                self._repoagent.rootPath(),
+                                                _FILE_FILTER)
         if filelist:
             # Qt file browser uses '/' in paths, even on Windows.
             nl = QStringList([QDir.toNativeSeparators(x) for x in filelist])
@@ -182,9 +166,8 @@ class ImportDialog(QDialog):
 
     def browsedir(self):
         caption = _("Select Directory containing patches")
-        path = QFileDialog.getExistingDirectory(parent=self,
-                                                directory=self.repo.root,
-                                                caption=caption)
+        path = QFileDialog.getExistingDirectory(self, caption,
+                                                self._repoagent.rootPath())
         if path:
             self.src_combo.setEditText(QDir.toNativeSeparators(path))
             self.src_combo.setFocus()
@@ -197,7 +180,7 @@ class ImportDialog(QDialog):
             text = hglib.fromunicode(mdata.text(), errors='ignore')
         else:
             return
-        filename = self.writetempfile(text)
+        filename = _writetempfile(text)
         curtext = self.src_combo.currentText()
         if curtext:
             self.src_combo.setEditText(curtext + os.pathsep + filename)
@@ -232,11 +215,10 @@ class ImportDialog(QDialog):
         patches = self.getfilepaths()
         if not patches:
             self.cslist.clear()
-            self.import_btn.setDisabled(True)
         else:
             self.cslist.update([os.path.abspath(p) for p in patches])
-            self.import_btn.setEnabled(True)
         self.updatestatus()
+        self._updateUi()
 
     def getfilepaths(self):
         src = hglib.fromunicode(self.src_combo.currentText())
@@ -262,79 +244,43 @@ class ImportDialog(QDialog):
         self.src_combo.setEditText(
             os.pathsep.join(hglib.tounicode(p) for p in paths))
 
-    def thgimport(self):
+    @pyqtSlot()
+    def _runCommand(self):
         if self.cslist.curitems is None:
             return
-        cmdline = list(self._targetcommand())
+        cmdline = map(str, self._targetcommand())
         if cmdline == ['copy']:
             # import to shelf
-            existing = self.repo.thgshelves()
+            self.repo.thgshelves()  # initialize repo.shelfdir
             if not os.path.exists(self.repo.shelfdir):
                 os.mkdir(self.repo.shelfdir)
             for file in self.cslist.curitems:
                 shutil.copy(file, self.repo.shelfdir)
             return
-        cmdline.extend(['--repository', self.repo.root])
+
         if self.p0chk.isChecked():
             cmdline.append('-p0')
         cmdline.extend(['--verbose', '--'])
-        cmdline.extend(self.cslist.curitems)
+        cmdline.extend(map(hglib.tounicode, self.cslist.curitems))
+        sess = self._repoagent.runCommand(cmdline, self)
+        self._cmdcontrol.setSession(sess)
+        sess.commandFinished.connect(self._onCommandFinished)
+        self._updateUi()
 
-        self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
-
-    def writetempfile(self, text):
-        fd, filename = tempfile.mkstemp(suffix='.patch', prefix='thg-import-')
-        try:
-            os.write(fd, text)
-        finally:
-            os.close(fd)
-        self.tempfiles.append(filename)
-        return filename
-
-    def unlinktempfiles(self):
-        for path in self.tempfiles:
-            os.unlink(path)
-
-    ### Override Handlers ###
-
-    def accept(self):
-        self.unlinktempfiles()
-        super(ImportDialog, self).accept()
+    @pyqtSlot(int)
+    def _onCommandFinished(self, ret):
+        self._updateUi()
+        if ret == 0:
+            self._runbutton.hide()
+            self._cmdcontrol.setFocusToCloseButton()
+        elif not self._cmdcontrol.session().isAborted():
+            cmdui.errorMessageBox(self._cmdcontrol.session(), self)
+        if ret == 0 and not self._cmdcontrol.isLogVisible():
+            self._cmdcontrol.reject()
 
     def reject(self):
-        self.unlinktempfiles()
-        super(ImportDialog, self).reject()
+        self._cmdcontrol.reject()
 
-    ### Signal Handlers ###
-
-    def cancel_clicked(self):
-        self.cmd.cancel()
-        self.reject()
-
-    def detail_toggled(self, checked):
-        self.cmd.setShowOutput(checked)
-
-    def command_started(self):
-        self.cmd.setShown(True)
-        self.import_btn.setHidden(True)
-        self.close_btn.setHidden(True)
-        self.cancel_btn.setShown(True)
-        self.detail_btn.setShown(True)
-
-    def command_finished(self, ret):
-        self.repo.decrementBusyCount()
-        if ret == 0:
-            self.patchImported.emit()
-        if ret != 0 or self.cmd.outputShown():
-            self.detail_btn.setChecked(True)
-            self.close_btn.setShown(True)
-            self.close_btn.setAutoDefault(True)
-            self.close_btn.setFocus()
-            self.cancel_btn.setHidden(True)
-            self.import_btn.setHidden(False)
-        else:
-            self.accept()
-
-    def command_canceling(self):
-        self.cancel_btn.setDisabled(True)
+    def _updateUi(self):
+        self._runbutton.setEnabled(bool(self.getfilepaths())
+                                   and self._cmdcontrol.session().isFinished())

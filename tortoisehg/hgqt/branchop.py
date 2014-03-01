@@ -17,12 +17,13 @@ from tortoisehg.hgqt import qtlib
 
 class BranchOpDialog(QDialog):
     'Dialog for manipulating wctx.branch()'
-    def __init__(self, repo, oldbranchop, parent=None):
+    def __init__(self, repoagent, oldbranchop, parent=None):
         QDialog.__init__(self, parent)
-        self.setWindowTitle(_('%s - branch operation') % repo.displayname)
+        self.setWindowTitle(_('%s - branch operation') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('branch'))
         layout = QVBoxLayout()
         self.setLayout(layout)
+        repo = repoagent.rawRepo()
         wctx = repo[None]
 
         if len(wctx.parents()) == 2:

@@ -93,7 +93,7 @@ class BookmarkDialog(QDialog):
         self._finishmsg = None
 
         # dialog setting
-        self.setWindowTitle(_('Bookmark - %s') % self.repo.displayname)
+        self.setWindowTitle(_('Bookmark - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-bookmarks'))
 
         # prepare to show

@@ -81,14 +81,15 @@ class RepoFilterBar(QToolBar):
 
     _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         super(RepoFilterBar, self).__init__(parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
         self.setIconSize(QSize(16,16))
         self.setFloatable(False)
         self.setMovable(False)
-        self._repo = repo
+        self._repoagent = repoagent
         self._permanent_queries = list(_permanent_queries)
+        repo = repoagent.rawRepo()
         username = repo.ui.config('ui', 'username')
         if username:
             self._permanent_queries.insert(0,
@@ -99,7 +100,7 @@ class RepoFilterBar(QToolBar):
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
             self._allBranchesLabel = u'*** %s ***' % _('Show all')
 
-        self.entrydlg = revset.RevisionSetQuery(repo, self)
+        self.entrydlg = revset.RevisionSetQuery(repoagent, self)
         self.entrydlg.progress.connect(self.progress)
         self.entrydlg.showMessage.connect(self.showMessage)
         self.entrydlg.queryIssued.connect(self.queryIssued)
@@ -179,6 +180,10 @@ class RepoFilterBar(QToolBar):
 
         self._initBranchFilter()
         self.refresh()
+
+    @property
+    def _repo(self):
+        return self._repoagent.rawRepo()
 
     def onClearButtonClicked(self):
         if self.revsetcombo.currentText():
@@ -395,7 +400,7 @@ class RepoFilterBar(QToolBar):
                 for n in self._repo.heads()
                 if not self._repo[n].extra().get('close')]))
         elif self._cbranchAction.isChecked():
-            branches = sorted(self._repo.branchtags().keys())
+            branches = sorted(self._repo.branchmap())
         else:
             branches = self._repo.namedbranches
 

@@ -13,10 +13,7 @@ from mercurial import revset
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import csinfo, cmdui, commit, wctxcleaner
 
-BB = QDialogButtonBox
-
 class CompressDialog(QDialog):
-    showMessage = pyqtSignal(QString)
 
     def __init__(self, repoagent, revs, parent):
         super(CompressDialog, self).__init__(parent)
@@ -47,32 +44,25 @@ class CompressDialog(QDialog):
         self.destcsinfo = dest
         self.layout().addWidget(destb)
 
-        self.cmd = cmdui.Widget(True, True, self)
-        self.cmd.commandFinished.connect(self.commandFinished)
-        self.cmd.setShowOutput(True)
-        self.showMessage.connect(self.cmd.stbar.showMessage)
-        self.layout().addWidget(self.cmd, 2)
-
-        bbox = QDialogButtonBox()
-        self.cancelbtn = bbox.addButton(QDialogButtonBox.Cancel)
-        self.cancelbtn.clicked.connect(self.reject)
-        self.compressbtn = bbox.addButton(_('Compress'),
-                                            QDialogButtonBox.ActionRole)
+        self._cmdcontrol = cmd = cmdui.CmdSessionControlWidget(self)
+        cmd.finished.connect(self.done)
+        cmd.setLogVisible(True)
+        cmd.logVisibilityChanged.connect(self._adjustHeightConstraint)
+        self.compressbtn = cmd.addButton(_('Compress'),
+                                         QDialogButtonBox.AcceptRole)
+        self.compressbtn.setEnabled(False)
         self.compressbtn.clicked.connect(self.compress)
-        self.layout().addWidget(bbox)
-        self.bbox = bbox
+        self.layout().addWidget(cmd)
 
-        self.showMessage.emit(_('Checking...'))
+        cmd.showStatusMessage(_('Checking...'))
         self._wctxcleaner = wctxcleaner.WctxCleaner(repoagent, self)
         self._wctxcleaner.checkFinished.connect(self._checkCompleted)
-        self.cmd.stbar.linkActivated.connect(self._wctxcleaner.runCleaner)
+        cmd.linkActivated.connect(self._wctxcleaner.runCleaner)
         QTimer.singleShot(0, self._wctxcleaner.check)
 
         self.setMinimumWidth(480)
-        self.setMaximumHeight(800)
         self.resize(0, 340)
-        repo = repoagent.rawRepo()
-        self.setWindowTitle(_('Compress - %s') % repo.displayname)
+        self.setWindowTitle(_('Compress - %s') % repoagent.displayName())
 
         self.restoreSettings()
 
@@ -90,23 +80,23 @@ class CompressDialog(QDialog):
         else:
             self.compressbtn.setEnabled(True)
             txt = _('You may continue the compress')
-        self.showMessage.emit(txt)
+        self._cmdcontrol.showStatusMessage(txt)
 
     def compress(self):
-        self.cancelbtn.setShown(False)
-        uc = ['update', '--repository', self.repo.root, '--clean', '--rev',
-              str(self.revs[1])]
-        rc = ['revert', '--repository', self.repo.root, '--all', '--rev',
-              str(self.revs[0])]
-        self.repo.incrementBusyCount()
-        self.cmd.run(uc, rc)
+        uc = ['update', '--clean', '--rev', str(self.revs[1])]
+        rc = ['revert', '--all', '--rev', str(self.revs[0])]
+        sess = self._repoagent.runCommandSequence([uc, rc], self)
+        self._cmdcontrol.setSession(sess)
+        sess.commandFinished.connect(self.commandFinished)
+        self.compressbtn.setEnabled(sess.isFinished())
 
     def commandFinished(self, ret):
-        self.repo.decrementBusyCount()
-        self.showMessage.emit(_('Changes have been moved, you must now commit'))
+        self._cmdcontrol.showStatusMessage(_('Changes have been moved, you '
+                                             'must now commit'))
         self.compressbtn.setText(_('Commit', 'action button'))
         self.compressbtn.clicked.disconnect(self.compress)
         self.compressbtn.clicked.connect(self.commit)
+        self.compressbtn.setEnabled(self._cmdcontrol.session().isFinished())
 
     def commit(self):
         tip, base = self.revs
@@ -119,10 +109,10 @@ class CompressDialog(QDialog):
         dlg = commit.CommitDialog(self._repoagent, [], {}, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
-        self.showMessage.emit(_('Compress is complete, old history untouched'))
-        self.compressbtn.setText(_('Close'))
-        self.compressbtn.clicked.disconnect(self.commit)
-        self.compressbtn.clicked.connect(self.accept)
+        self._cmdcontrol.showStatusMessage(_('Compress is complete, old '
+                                             'history untouched'))
+        self.compressbtn.hide()
+        self.storeSettings()
 
     def storeSettings(self):
         s = QSettings()
@@ -132,10 +122,9 @@ class CompressDialog(QDialog):
         s = QSettings()
         self.restoreGeometry(s.value('compress/geometry').toByteArray())
 
-    def accept(self):
-        self.storeSettings()
-        super(CompressDialog, self).accept()
+    @pyqtSlot()
+    def _adjustHeightConstraint(self):
+        cmdui.adjustWindowHeightConstraint(self, self._cmdcontrol)
 
     def reject(self):
-        self.storeSettings()
-        super(CompressDialog, self).reject()
+        self._cmdcontrol.reject()

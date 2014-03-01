@@ -353,9 +353,8 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         """
         if self.pbranch is None:
             return False
-        self.repo.incrementBusyCount()
         self.pbranch.cmdnew(self.repo.ui, self.repo, patch_name)
-        self.repo.decrementBusyCount()
+        self._repoagent.pollStatus()
         return True
 
     def pmerge(self, patch_name=None):

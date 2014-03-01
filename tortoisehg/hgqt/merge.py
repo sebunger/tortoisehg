@@ -10,7 +10,7 @@ from mercurial import error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdui, status, resolve
+from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdcore, cmdui, status, resolve
 from tortoisehg.hgqt import qscilib, thgrepo, messageentry, commit, wctxcleaner
 
 from PyQt4.QtCore import *
@@ -29,7 +29,7 @@ class MergeDialog(QWizard):
         self.otherrev = str(otherrev)
         self.localrev = str(repo['.'].rev())
 
-        self.setWindowTitle(_('Merge - %s') % repo.displayname)
+        self.setWindowTitle(_('Merge - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-merge'))
         self.setOption(QWizard.NoBackButtonOnStartPage, True)
         self.setOption(QWizard.NoBackButtonOnLastPage, True)
@@ -317,10 +317,9 @@ class MergePage(BasePage):
         self.setSubTitle(_('All conflicting files will be marked unresolved.'))
         self.setLayout(QVBoxLayout())
 
-        self.cmd = cmdui.Widget(True, False, self)
-        self.cmd.commandFinished.connect(self.onCommandFinished)
-        self.cmd.setShowOutput(True)
-        self.layout().addWidget(self.cmd)
+        self._cmdsession = cmdcore.nullCmdSession()
+        self._cmdlog = cmdui.LogWidget(self)
+        self.layout().addWidget(self._cmdlog)
 
         self.reslabel = QLabel()
         self.reslabel.linkActivated.connect(self.onLinkActivated)
@@ -339,20 +338,21 @@ class MergePage(BasePage):
         if self.field('discard').toBool():
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
-            cmdline = ['--repository', self.repo.root, 'debugsetparents',
-                       '.', self.wizard().otherrev]
+            cmdline = ['debugsetparents', '.',
+                       hglib.tounicode(self.wizard().otherrev)]
         else:
-            cmdline = ['--repository', self.repo.root, 'merge', '--verbose']
+            cmdline = ['merge', '--verbose']
             if self.field('force').toBool():
                 cmdline.append('--force')
             tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
             cmdline += ['--tool=internal:' + tool]
-            cmdline.append(self.wizard().otherrev)
+            cmdline.append(hglib.tounicode(self.wizard().otherrev))
 
         if len(self.repo.parents()) == 1:
-            self.repo.incrementBusyCount()
-            self.cmd.core.clearOutput()
-            self.cmd.run(cmdline)
+            self._cmdlog.clearLog()
+            self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+            sess.commandFinished.connect(self.onCommandFinished)
+            sess.outputReceived.connect(self._cmdlog.appendLog)
         else:
             self.mergecomplete = True
             self.completeChanged.emit()
@@ -388,11 +388,12 @@ class MergePage(BasePage):
     def cleanupPage(self):
         QSettings().setValue('merge/autoadvance', self.autonext.isChecked())
 
+    @pyqtSlot(int)
     def onCommandFinished(self, ret):
-        self.repo.decrementBusyCount()
+        sess = self._cmdsession
         if ret in (0, 1):
             self.mergecomplete = True
-            if self.autonext.isChecked():
+            if self.autonext.isChecked() and not sess.warningString():
                 self.tryAutoAdvance(True)
             self.completeChanged.emit()
 
@@ -400,7 +401,6 @@ class MergePage(BasePage):
     def onLinkActivated(self, cmd):
         if cmd == 'resolve':
             dlg = resolve.ResolveDialog(self._repoagent, self)
-            dlg.finished.connect(dlg.deleteLater)
             dlg.exec_()
             if self.autonext.isChecked():
                 self.tryAutoAdvance(True)
@@ -485,10 +485,10 @@ class CommitPage(BasePage):
         self.layout().addWidget(msgEntry)
         self.msgEntry = msgEntry
 
-        self.cmd = cmdui.Widget(True, False, self)
-        self.cmd.commandFinished.connect(self.onCommandFinished)
-        self.cmd.setShowOutput(False)
-        self.layout().addWidget(self.cmd)
+        self._cmdsession = cmdcore.nullCmdSession()
+        self._cmdlog = cmdui.LogWidget(self)
+        self._cmdlog.hide()
+        self.layout().addWidget(self._cmdlog)
 
         self.delayednext = False
 
@@ -564,8 +564,7 @@ class CommitPage(BasePage):
         return len(self.repo.parents()) == 2 and len(self.msgEntry.text()) > 0
 
     def validatePage(self):
-
-        if self.cmd.core.running():
+        if not self._cmdsession.isFinished():
             return False
 
         if len(self.repo.parents()) == 1:
@@ -574,23 +573,23 @@ class CommitPage(BasePage):
                 self.wizard().close()
             return True
 
-        user = qtlib.getCurrentUsername(self, self.repo, self.opts)
+        user = hglib.tounicode(qtlib.getCurrentUsername(self, self.repo,
+                                                        self.opts))
         if not user:
             return False
 
         self.setTitle(_('Committing...'))
         self.setSubTitle(_('Please wait while committing merged files.'))
 
-        message = hglib.fromunicode(self.msgEntry.text())
-        cmdline = ['commit', '--verbose', '--message', message,
-                   '--repository', self.repo.root, '--user', user]
+        message = unicode(self.msgEntry.text())
+        cmdline = ['commit', '--verbose', '--message', message, '--user', user]
         if self.opts.get('recurseinsubrepos'):
             cmdline.append('--subrepos')
         try:
             date = self.opts.get('date')
             if date:
                 util.parsedate(date)
-                dcmd = ['--date', date]
+                dcmd = ['--date', hglib.tounicode(date)]
             else:
                 dcmd = []
         except error.Abort, e:
@@ -609,24 +608,26 @@ class CommitPage(BasePage):
         commandlines = [cmdline]
         pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
         if pushafter:
-            cmd = ['push', '--repository', self.repo.root, pushafter]
+            cmd = ['push', hglib.tounicode(pushafter)]
             commandlines.append(cmd)
-        self.repo.incrementBusyCount()
-        self.cmd.setShowOutput(True)
-        self.cmd.run(*commandlines)
+        self._cmdlog.show()
+        sess = self._repoagent.runCommandSequence(commandlines, self)
+        self._cmdsession = sess
+        sess.commandFinished.connect(self.onCommandFinished)
+        sess.outputReceived.connect(self._cmdlog.appendLog)
         return False
 
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
         if len(self.repo.parents()) == 1:
-            if self.cmd.core.running():
+            if not self._cmdsession.isFinished():
                 # call self.wizard().next() after the current command finishes
                 self.delayednext = True
             else:
                 self.wizard().next()
 
-    def onCommandFinished(self, ret):
-        self.repo.decrementBusyCount()
+    @pyqtSlot()
+    def onCommandFinished(self):
         if self.delayednext:
             self.delayednext = False
             self.wizard().next()
@@ -641,7 +642,8 @@ class CommitPage(BasePage):
 
     def details(self):
         self.userhist = self.readUserHistory()
-        dlg = commit.DetailsDialog(self.opts, self.userhist, self, mode='merge')
+        dlg = commit.DetailsDialog(self._repoagent, self.opts, self.userhist,
+                                   self, mode='merge')
         dlg.finished.connect(dlg.deleteLater)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)

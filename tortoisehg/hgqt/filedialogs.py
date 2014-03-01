@@ -23,7 +23,7 @@ import difflib
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
-from tortoisehg.hgqt import fileview, repoview, revpanel, revert
+from tortoisehg.hgqt import filedata, fileview, repoview, revpanel, revert
 from tortoisehg.hgqt.qscilib import Scintilla
 
 from PyQt4.QtCore import *
@@ -72,7 +72,6 @@ class _FileDiffScintilla(Scintilla):
             p.drawLine(0, y, viewport.width(), y)
 
 class _AbstractFileDialog(QMainWindow):
-    finished = pyqtSignal(int)
 
     def __init__(self, repoagent, filename):
         QMainWindow.__init__(self)
@@ -84,9 +83,9 @@ class _AbstractFileDialog(QMainWindow):
         assert not isinstance(filename, (unicode, QString))
         self.filename = filename
 
-        repo = repoagent.rawRepo()
         self.setWindowTitle(_('Hg file log viewer [%s] - %s')
-                            % (repo.displayname, hglib.tounicode(filename)))
+                            % (repoagent.displayName(),
+                               hglib.tounicode(filename)))
         self.setWindowIcon(qtlib.geticon('hg-log'))
 
         self.createActions()
@@ -94,10 +93,6 @@ class _AbstractFileDialog(QMainWindow):
 
         self.setupViews()
         self.setupModels()
-
-    def closeEvent(self, event):
-        super(_AbstractFileDialog, self).closeEvent(event)
-        self.finished.emit(0)  # mimic QDialog exit
 
     @property
     def repo(self):
@@ -398,8 +393,9 @@ class FileLogDialog(_AbstractFileDialog):
     def onRevisionSelected(self, rev):
         pos = self.textView.verticalScrollBar().value()
         ctx = self.filerevmodel.repo.changectx(rev)
-        self.textView.setContext(ctx)
-        self.textView.displayFile(self.filerevmodel.graph.filename(rev), None)
+        filename = self.filerevmodel.graph.filename(rev)
+        fd = filedata.createFileData(ctx, ctx.p1(), filename)
+        self.textView.display(fd)
         self.textView.verticalScrollBar().setValue(pos)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)

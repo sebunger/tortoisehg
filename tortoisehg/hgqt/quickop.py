@@ -35,14 +35,14 @@ class QuickOpDialog(QDialog):
         self._repoagent = repoagent
         self._cmdsession = cmdcore.nullCmdSession()
         self._cmddialog = cmdui.CmdSessionDialog(self)
-        repo = repoagent.rawRepo()
 
         # Handle rm alias
         if command == 'rm':
             command = 'remove'
         self.command = command
 
-        self.setWindowTitle(_('%s - hg %s') % (repo.displayname, command))
+        self.setWindowTitle(_('%s - hg %s')
+                            % (repoagent.displayName(), command))
         self.setWindowIcon(qtlib.geticon(ICONS[command]))
 
         layout = QVBoxLayout()

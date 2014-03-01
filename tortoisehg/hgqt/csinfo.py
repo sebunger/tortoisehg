@@ -172,7 +172,11 @@ class SummaryInfo(object):
                 value = self.get_data('rawbranch', *args)
                 if value:
                     repo = ctx._repo
-                    if ctx.node() not in repo.branchtags().values():
+                    try:
+                        if ctx.node() != repo.branchtip(ctx.branch()):
+                            return None
+                    except error.RepoLookupError:
+                        # ctx.branch() can be invalid for null or workingctx
                         return None
                     if value in repo.deadbranches:
                         return None
@@ -181,7 +185,7 @@ class SummaryInfo(object):
             elif item == 'close':
                 return ctx.extra().get('close')
             elif item == 'tags':
-                return hglib.getctxtags(ctx)
+                return ctx.thgtags() or None
             elif item == 'graft':
                 extra = ctx.extra()
                 try:

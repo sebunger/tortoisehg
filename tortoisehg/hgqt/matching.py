@@ -16,15 +16,13 @@ from PyQt4.QtGui import *
 
 class MatchDialog(QDialog):
 
-    revmatch = pyqtSignal(QString)
-
-    def __init__(self, repo, rev=None, parent=None):
+    def __init__(self, repoagent, rev=None, parent=None):
         super(MatchDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & \
                             ~Qt.WindowContextHelpButtonHint)
 
         self.revsetexpression = ''
-        self.repo = repo
+        self._repoagent = repoagent
 
         # base layout box
         box = QVBoxLayout()
@@ -55,7 +53,7 @@ class MatchDialog(QDialog):
         # make it easy to match the workding directory parent revision
         combo.addItem(hglib.tounicode('.'))
 
-        tags = list(self.repo.tags()) + repo._bookmarks.keys()
+        tags = list(self.repo.tags()) + self.repo._bookmarks.keys()
         tags.sort(reverse=True)
         for tag in tags:
             combo.addItem(hglib.tounicode(tag))
@@ -142,7 +140,7 @@ class MatchDialog(QDialog):
         # dialog setting
         self.setLayout(box)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
-        self.setWindowTitle(_('Find matches - %s') % self.repo.displayname)
+        self.setWindowTitle(_('Find matches - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-update'))
 
         # prepare to show
@@ -156,6 +154,11 @@ class MatchDialog(QDialog):
         expander.set_expanded(hiddenOptionsChecked)
 
     ### Private Methods ###
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     def hiddenSettingIsChecked(self):
         for chk in self._hideable_chks:
             if chk.isChecked():

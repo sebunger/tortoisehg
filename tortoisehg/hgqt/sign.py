@@ -22,7 +22,6 @@ class SignDialog(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
 
         self._repoagent = repoagent
-        repo = repoagent.rawRepo()
         self._cmdsession = cmdcore.nullCmdSession()
         self.rev = rev
 
@@ -42,6 +41,7 @@ class SignDialog(QDialog):
         form = QFormLayout(fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow)
         box.addLayout(form)
 
+        repo = repoagent.rawRepo()
         form.addRow(_('Revision:'), QLabel('%s (%s)' % (rev, repo[rev])))
 
         ### key line edit
@@ -103,7 +103,7 @@ class SignDialog(QDialog):
         self.layout().addWidget(self.status)
 
         # prepare to show
-        self.setWindowTitle(_('Sign - %s') % repo.displayname)
+        self.setWindowTitle(_('Sign - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-sign'))
 
         self.clear_status()

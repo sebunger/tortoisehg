@@ -21,10 +21,7 @@ from mercurial.util import propertycache
 from mercurial.context import workingctx
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.graph import Graph
-from tortoisehg.hgqt.graph import revision_grapher
-from tortoisehg.hgqt.graph import LINE_TYPE_GRAFT
-from tortoisehg.hgqt import qtlib
+from tortoisehg.hgqt import graph, qtlib
 
 from tortoisehg.hgqt.i18n import _
 
@@ -75,12 +72,14 @@ def get_color(n, ignore=()):
     return colors[n % len(colors)]
 
 def get_style(line_type, active):
-    if line_type == LINE_TYPE_GRAFT:
+    if line_type == graph.LINE_TYPE_GRAFT:
         return Qt.DashLine
+    if line_type == graph.LINE_TYPE_OBSOLETE:
+        return Qt.DotLine
     return Qt.SolidLine
 
 def get_width(line_type, active):
-    if line_type == LINE_TYPE_GRAFT or not active:
+    if line_type >= graph.LINE_TYPE_GRAFT or not active:
         return 1
     return 2
 
@@ -190,7 +189,7 @@ class HgRepoListModel(QAbstractTableModel):
         # Then assign colors to all branches in alphabetical order
         # Note that re-assigning the color to the default branch
         # is not expensive
-        for branch in sorted(self.repo.branchtags().keys()):
+        for branch in sorted(self.repo.branchmap()):
             self.namedbranch_color(branch)
 
     def setBranch(self, branch, allparents=False):
@@ -207,25 +206,20 @@ class HgRepoListModel(QAbstractTableModel):
         self._initGraph()
 
     def _initGraph(self):
-        branch = self.filterbranch
-        allparents = self.allparents
-        showhidden = self.showhidden
-        showgraftsource = self.showgraftsource
         self.invalidateCache()
+        opts = {
+            'branch': hglib.fromunicode(self.filterbranch),
+            'showhidden': self.showhidden,
+            'showgraftsource': self.showgraftsource,
+            }
         if self.revset and self.filterbyrevset:
-            grapher = revision_grapher(self.repo,
-                                       branch=hglib.fromunicode(branch),
-                                       revset=self.revset,
-                                       showhidden=showhidden,
-                                       showgraftsource=showgraftsource)
-            self.graph = Graph(self.repo, grapher, include_mq=False)
+            opts['revset'] = self.revset
+            grapher = graph.revision_grapher(self.repo, opts)
+            self.graph = graph.Graph(self.repo, grapher, include_mq=False)
         else:
-            grapher = revision_grapher(self.repo,
-                                       branch=hglib.fromunicode(branch),
-                                       allparents=allparents,
-                                       showhidden=showhidden,
-                                       showgraftsource=showgraftsource)
-            self.graph = Graph(self.repo, grapher, include_mq=True)
+            opts['allparents'] = self.allparents
+            grapher = graph.revision_grapher(self.repo, opts)
+            self.graph = graph.Graph(self.repo, grapher, include_mq=True)
         self.rowcount = 0
         self.layoutChanged.emit()
         self.ensureBuilt(row=0)
@@ -354,7 +348,7 @@ class HgRepoListModel(QAbstractTableModel):
                 pass
         if column == 'Branch':
             try:
-                return sorted(self.repo.branchtags().keys(), key=lambda x: len(x))[-1]
+                return sorted(self.repo.branchmap(), key=lambda x: len(x))[-1]
             except IndexError:
                 pass
         if column == 'Filename':
@@ -662,11 +656,9 @@ class HgRepoListModel(QAbstractTableModel):
         else:
             destpatch = None  # next to working rev
 
-        self.repo.incrementBusyCount()
-        try:
-            hglib.movemqpatches(self.repo, destpatch, dragpatches)
-        finally:
-            self.repo.decrementBusyCount()
+        hglib.movemqpatches(self.repo, destpatch, dragpatches)
+        repoagent = self.repo._pyqtobj  # TODO
+        repoagent.pollStatus()
         return True
 
     def headerData(self, section, orientation, role):
@@ -714,7 +706,8 @@ class HgRepoListModel(QAbstractTableModel):
             if rev in self.latesttags:
                 continue
             ctx = repo[rev]
-            tags = [t for t in ctx.tags() if repo.tagtype(t) == 'global']
+            tags = [t for t in ctx.tags()
+                    if repo.tagtype(t) and repo.tagtype(t) != 'local']
             if tags:
                 self.latesttags[rev] = ':'.join(sorted(tags))
                 continue

@@ -8,41 +8,59 @@
 # Foundation; either version 2 of the License, or (at your option) any later
 # version.
 
-import os, itertools, fnmatch
+import os, re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util
-from mercurial.subrepo import hgsubrepo
+from mercurial import error, subrepo, util
+from mercurial import match as matchmod
+
 from tortoisehg.util import hglib
-from tortoisehg.hgqt import qtlib, status, visdiff
+from tortoisehg.hgqt import filedata, qtlib, status, visdiff
+
+_subrepoType2IcoMap = {
+    'hg': 'hg',
+    'hgsubversion': 'thg-svn-subrepo',
+    'git': 'thg-git-subrepo',
+    'svn': 'thg-svn-subrepo',
+    }
+
+_subrepoStatus2IcoMap = {
+    'A': 'thg-added-subrepo',
+    'R': 'thg-removed-subrepo',
+    }
 
 class ManifestModel(QAbstractItemModel):
-    """
-    Qt model to display a hg manifest, ie. the tree of files at a
-    given revision. To be used with a QTreeView.
-    """
+    """Status of files between two revisions or patch"""
+
+    # emitted when all files of the revision has been loaded successfully
+    revLoaded = pyqtSignal(object)
 
     StatusRole = Qt.UserRole + 1
     """Role for file change status"""
 
-    _fileiconprovider = QFileIconProvider()
-    _icons = {}
+    # -1 and None are valid revision number
+    FirstParent = -2
+    SecondParent = -3
 
-    def __init__(self, repo, rev=None, namefilter=None, statusfilter='MASC',
-                 parent=None):
+    def __init__(self, repoagent, parent=None, rev=None, namefilter=None,
+                 statusfilter='MASC', flat=False):
         QAbstractItemModel.__init__(self, parent)
 
-        self._diricon = QApplication.style().standardIcon(QStyle.SP_DirIcon)
-        self._fileicon = QApplication.style().standardIcon(QStyle.SP_FileIcon)
-        self._repo = repo
-        self._rev = rev
-        self._subinfo = {}
+        self._fileiconprovider = QFileIconProvider()
+        self._iconcache = {}  # (path, status, subkind): icon
+        self._repoagent = repoagent
 
-        self._namefilter = namefilter
+        self._namefilter = unicode(namefilter or '')
         assert util.all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
+        self._changedfilesonly = False
+        self._nodeop = _nodeopmap[bool(flat)]
+
+        self._rootentry = self._newRevNode(rev)
+        self._populate = _populaterepo
+        self._rootpopulated = False
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
@@ -64,75 +82,69 @@ class ManifestModel(QAbstractItemModel):
 
         return index.internalPointer().path
 
-    def fileSubrepoCtx(self, index):
-        """Return the subrepo context of the specified index"""
-        path = self.filePath(index)
-        return self.fileSubrepoCtxFromPath(path)
+    def fileData(self, index):
+        """Returns the displayable file data at the given index"""
+        repo = self._repoagent.rawRepo()
+        if not index.isValid():
+            return filedata.createNullData(repo)
 
-    def fileSubrepoCtxFromPath(self, path):
-        """Return the subrepo context of the specified file"""
-        if not path:
-            return None, path
-        for subpath in sorted(self._subinfo.keys())[::-1]:
-            if path.startswith(subpath + '/'):
-                return self._subinfo[subpath]['ctx'], path[len(subpath)+1:]
-        return None, path
+        f = index.internalPointer()
+        e = f.parent
+        while e and e.ctx is None:
+            e = e.parent
+        assert e, 'root entry must have ctx'
+        wfile = hglib.fromunicode(f.path[len(e.path):].lstrip('/'))
+        rpath = hglib.fromunicode(e.path)
+        if f.subkind:
+            # TODO: use subrepo ctxs and status resolved by this model
+            return filedata.createSubrepoData(e.ctx, e.pctx, wfile, f.status,
+                                              rpath, f.subkind)
+        if f.isdir:
+            return filedata.createDirData(e.ctx, e.pctx, wfile, rpath)
+        return filedata.createFileData(e.ctx, e.pctx, wfile, f.status, rpath)
 
     def subrepoType(self, index):
         """Return the subrepo type the specified index"""
-        path = self.filePath(index)
-        return self.subrepoTypeFromPath(path)
-
-    def subrepoTypeFromPath(self, path):
-        """Return the subrepo type of the specified subrepo"""
-        if not path:
-            return None
-        try:
-            substate = self._subinfo[path]
-            return substate['substate'][2]
-        except:
-            return None
+        if not index.isValid():
+            return
+        e = index.internalPointer()
+        return e.subkind
 
     def fileIcon(self, index):
         if not index.isValid():
-            if self.isDir(index):
-                return self._diricon
-            else:
-                return self._fileicon
+            return QIcon()
         e = index.internalPointer()
-        ic = e.icon
-        if not ic:
-            if self.isDir(index):
-                ic = self._diricon
-            else:
-                ext = os.path.splitext(e.path)[1]
-                if not ext:
-                    ic = self._fileicon
-                else:
-                    ic = self._icons.get(ext, None)
-                    if not ic:
-                        ic = self._fileiconprovider.icon(
-                            QFileInfo(self._wjoin(e.path)))
-                        if not ic.availableSizes():
-                            ic = self._fileicon
-                        self._icons[ext] = ic
-            e.seticon(ic)
+        k = (e.path, e.status, e.subkind)
+        try:
+            return self._iconcache[k]
+        except KeyError:
+            self._iconcache[k] = ic = self._makeFileIcon(e)
+            return ic
+
+    def _makeFileIcon(self, e):
+        if e.subkind in _subrepoType2IcoMap:
+            ic = qtlib.geticon(_subrepoType2IcoMap[e.subkind])
+            # use fine-tuned status overlay if any
+            n = _subrepoStatus2IcoMap.get(e.status)
+            if n:
+                return qtlib.getoverlaidicon(ic, qtlib.geticon(n))
+            ic = qtlib.getoverlaidicon(ic, qtlib.geticon('thg-subrepo'))
+        elif e.isdir:
+            ic = self._fileiconprovider.icon(QFileIconProvider.Folder)
+        else:
+            # assumes file still exists in wdir; otherwise falls back to default
+            info = QFileInfo(os.path.join(self._repoagent.rootPath(), e.path))
+            ic = self._fileiconprovider.icon(info)
+            if ic.isNull():
+                ic = self._fileiconprovider.icon(QFileIconProvider.File)
 
         if not e.status:
             return ic
         st = status.statusTypes[e.status]
         if st.icon:
             icOverlay = qtlib.geticon(st.icon[:-4])
-            if e.status == 'S':
-                _subrepoType2IcoMap = {
-                  'hg': 'hg',
-                  'git': 'thg-git-subrepo',
-                  'svn': 'thg-svn-subrepo',
-                }
-                stype = self.subrepoType(index)
-                if stype in _subrepoType2IcoMap:
-                    ic = qtlib.geticon(_subrepoType2IcoMap[stype])
             ic = qtlib.getoverlaidicon(ic, icOverlay)
+
         return ic
 
     def fileStatus(self, index):
@@ -140,49 +152,59 @@ class ManifestModel(QAbstractItemModel):
         if not index.isValid():
             return
         e = index.internalPointer()
+        # TODO: 'S' should not be a status
+        if e.subkind:
+            return 'S'
+        return e.status
+
+    # TODO: this should be merged to fileStatus()
+    def subrepoStatus(self, index):
+        """Return the change status of the specified subrepo"""
+        if not index.isValid():
+            return
+        e = index.internalPointer()
+        if not e.subkind:
+            return
         return e.status
 
     def isDir(self, index):
         if not index.isValid():
             return True  # root entry must be a directory
         e = index.internalPointer()
-        if e.status == 'S':
-            # Consider subrepos as dirs as well
-            return True
-        else:
-            return len(e) != 0
+        return e.isdir
 
     def mimeData(self, indexes):
-        def preparefiles():
-            files = [self.filePath(i) for i in indexes if i.isValid()]
-            if self._rev is not None:
-                base, _fns = visdiff.snapshot(self._repo, files,
-                                              self._repo[self._rev])
-            else:  # working copy
-                base = self._repo.root
-            return iter(os.path.join(base, e) for e in files)
+        files = [self.filePath(i) for i in indexes if i.isValid()]
+        ctx = self._rootentry.ctx
+        if ctx.rev() is not None:
+            repo = self._repoagent.rawRepo()
+            lfiles = map(hglib.fromunicode, files)
+            lbase, _fns = visdiff.snapshot(repo, lfiles, ctx)
+            base = hglib.tounicode(lbase)
+        else:
+            # working copy
+            base = self._repoagent.rootPath()
 
         m = QMimeData()
-        m.setUrls([QUrl.fromLocalFile(e) for e in preparefiles()])
+        m.setUrls([QUrl.fromLocalFile(os.path.join(base, e)) for e in files])
         return m
 
     def mimeTypes(self):
         return ['text/uri-list']
 
     def flags(self, index):
+        f = super(ManifestModel, self).flags(index)
         if not index.isValid():
-            return Qt.ItemIsEnabled
-        f = Qt.ItemIsEnabled | Qt.ItemIsSelectable
-        if not (self.isDir(index) or self.fileStatus(index) == 'R'):
+            return f
+        if not (self.isDir(index) or self.fileStatus(index) == 'R'
+                or self._populate is _populatepatch):
             f |= Qt.ItemIsDragEnabled
         return f
 
     def index(self, row, column, parent=QModelIndex()):
-        try:
-            return self.createIndex(row, column,
-                                    self._parententry(parent).at(row))
-        except IndexError:
+        if row < 0 or self.rowCount(parent) <= row or column != 0:
             return QModelIndex()
+        return self.createIndex(row, column, self._parententry(parent).at(row))
 
     def indexFromPath(self, path, column=0):
         """Return index for the specified path if found [unicode]
@@ -192,11 +214,8 @@ class ManifestModel(QAbstractItemModel):
         if not path:
             return QModelIndex()
 
-        e = self._rootentry
-        paths = path and unicode(path).split('/') or []
         try:
-            for p in paths:
-                e = e[p]
+            e = self._nodeop.findpath(self._rootentry, unicode(path))
         except KeyError:
             return QModelIndex()
 
@@ -224,20 +243,68 @@ class ManifestModel(QAbstractItemModel):
     def columnCount(self, parent=QModelIndex()):
         return 1
 
+    def rev(self, parent=QModelIndex()):
+        """Revision number of the current changectx"""
+        e = self._parententry(parent)
+        if e.ctx is None or not _isreporev(e.ctx.rev()):
+            return -1
+        return e.ctx.rev()
+
+    def baseRev(self, parent=QModelIndex()):
+        """Revision of the base changectx where status is calculated from"""
+        e = self._parententry(parent)
+        if e.pctx is None or not _isreporev(e.pctx.rev()):
+            return -1
+        return e.pctx.rev()
+
+    def setRev(self, rev, prev=FirstParent):
+        """Change to the specified repository revision; None for working-dir"""
+        roote = self._rootentry
+        newroote = self._newRevNode(rev, prev)
+        if (_samectx(newroote.ctx, roote.ctx)
+            and _samectx(newroote.pctx, roote.pctx)):
+            return
+        self._populate = _populaterepo
+        self._repopulateNodes(newroote=newroote)
+        if self._rootpopulated:
+            self.revLoaded.emit(self.rev())
+
+    def setRawContext(self, ctx):
+        """Change to the specified changectx in place of repository revision"""
+        if _samectx(self._rootentry.ctx, ctx):
+            return
+        if _isreporev(ctx.rev()):
+            repo = self._repoagent.rawRepo()
+            try:
+                if ctx == repo[ctx.rev()]:
+                    return self.setRev(ctx.rev())
+            except error.RepoLookupError:
+                pass
+        newroote = _Entry()
+        newroote.ctx = ctx
+        self._populate = _populatepatch
+        self._repopulateNodes(newroote=newroote)
+        if self._rootpopulated:
+            self.revLoaded.emit(self.rev())
+
+    def nameFilter(self):
+        """Return the current name filter"""
+        return self._namefilter
+
     @pyqtSlot(unicode)
     def setNameFilter(self, pattern):
         """Filter file name by partial match of glob pattern"""
-        pattern = pattern and unicode(pattern) or None
+        pattern = unicode(pattern)
         if self._namefilter == pattern:
             return
         self._namefilter = pattern
-        self._rebuildrootentry()
+        self._repopulateNodes()
 
-    @property
-    def nameFilter(self):
-        """Return the current name filter if available; otherwise None"""
-        return self._namefilter
+    def statusFilter(self):
+        """Return the current status filter"""
+        return self._statusfilter
 
+    # TODO: split or remove 'S' which causes several design flaws
     @pyqtSlot(str)
     def setStatusFilter(self, status):
         """Filter file tree by change status 'MARSC'"""
@@ -246,160 +313,125 @@ class ManifestModel(QAbstractItemModel):
         if self._statusfilter == status:
             return  # for performance reason
         self._statusfilter = status
-        self._rebuildrootentry()
+        self._repopulateNodes()
 
-    @property
-    def statusFilter(self):
-        """Return the current status filter"""
-        return self._statusfilter
+    def isChangedFilesOnly(self):
+        """Whether or not to filter by ctx.files, i.e. to exclude files not
+        changed in the current revision.
 
-    def _wjoin(self, path):
-        return os.path.join(hglib.tounicode(self._repo.root), unicode(path))
+        If this filter is enabled, 'C' (clean) files are not listed.  For
+        merge changeset, 'M' (modified) files in one side are also excluded.
+        """
+        return self._changedfilesonly
 
-    @property
-    def _rootentry(self):
-        try:
-            return self.__rootentry
-        except (AttributeError, TypeError):
-            self.__rootentry = self._newrootentry()
-            return self.__rootentry
+    def setChangedFilesOnly(self, changedonly):
+        if self._changedfilesonly == bool(changedonly):
+            return
+        self._changedfilesonly = bool(changedonly)
+        self._repopulateNodes()
 
-    def _rebuildrootentry(self):
-        """Rebuild the tree of files and directories"""
-        roote = self._newrootentry()
+    def isFlat(self):
+        """Whether all entries are listed in the same level or per directory"""
+        return self._nodeop is _listnodeop
+
+    def setFlat(self, flat):
+        if self.isFlat() == bool(flat):
+            return
+        # self._nodeop must be changed after layoutAboutToBeChanged; otherwise
+        # client code may obtain invalid indexes in its slot
+        self._repopulateNodes(newnodeop=_nodeopmap[bool(flat)])
+
+    def canFetchMore(self, parent):
+        if parent.isValid():
+            return False
+        return not self._rootpopulated
+
+    def fetchMore(self, parent):
+        if parent.isValid() or self._rootpopulated:
+            return
+        assert len(self._rootentry) == 0
+        newroote = self._rootentry.copyskel()
+        self._populateNodes(newroote)
+        self.beginInsertRows(parent, 0, len(newroote) - 1)
+        self._rootentry = newroote
+        self._rootpopulated = True
+        self.endInsertRows()
+        self.revLoaded.emit(self.rev())
+
+    def _repopulateNodes(self, newnodeop=None, newroote=None):
+        """Recreate populated nodes if any"""
+        if not self._rootpopulated:
+            # no stale nodes
+            if newnodeop:
+                self._nodeop = newnodeop
+            if newroote:
+                self._rootentry = newroote
+            return
 
         self.layoutAboutToBeChanged.emit()
         try:
             oldindexmap = [(i, self.filePath(i))
                            for i in self.persistentIndexList()]
-            self.__rootentry = roote
+            if newnodeop:
+                self._nodeop = newnodeop
+            if not newroote:
+                newroote = self._rootentry.copyskel()
+            self._populateNodes(newroote)
+            self._rootentry = newroote
             for oi, path in oldindexmap:
                 self.changePersistentIndex(oi, self.indexFromPath(path))
         finally:
             self.layoutChanged.emit()
 
-    def _newrootentry(self):
-        """Create the tree of files and directories and return its root"""
-
-        def pathinstatus(path, status, uncleanpaths):
-            """Test path is included by the status filter"""
-            if util.any(c in self._statusfilter and path in e
-                        for c, e in status.iteritems()):
-                return True
-            if 'C' in self._statusfilter and path not in uncleanpaths:
-                return True
-            return False
-
-        def getctxtreeinfo(ctx):
-            """
-            Get the context information that is relevant to populating the tree
-            """
-            status = dict(zip(('M', 'A', 'R'),
-                      (set(a) for a in self._repo.status(ctx.parents()[0],
-                                                             ctx)[:3])))
-            uncleanpaths = status['M'] | status['A'] | status['R']
-            files = itertools.chain(ctx.manifest(), status['R'])
-            return status, uncleanpaths, files
-
-        def addfilestotree(treeroot, files, status, uncleanpaths):
-            """Add files to the tree according to their state"""
-            if self._namefilter:
-                files = fnmatch.filter(files, '*%s*' % self._namefilter)
-            for path in files:
-                if not pathinstatus(path, status, uncleanpaths):
-                    continue
-
-                origpath = path
-                path = self._repo.removeStandin(path)
-
-                e = treeroot
-                for p in hglib.tounicode(path).split('/'):
-                    if not p in e:
-                        e.addchild(p)
-                    e = e[p]
-
-                for st, filesofst in status.iteritems():
-                    if origpath in filesofst:
-                        e.setstatus(st)
-                        break
-                else:
-                    e.setstatus('C')
-
-        # Add subrepos to the tree
-        def addrepocontentstotree(roote, ctx, toproot=''):
-            subpaths = ctx.substate.keys()
-            for path in subpaths:
-                if not 'S' in self._statusfilter:
-                    break
-                e = roote
-                pathelements = hglib.tounicode(path).split('/')
-                for p in pathelements[:-1]:
-                    if not p in e:
-                        e.addchild(p)
-                    e = e[p]
-
-                p = pathelements[-1]
-                if not p in e:
-                    e.addchild(p)
-                e = e[p]
-                e.setstatus('S')
-
-                # If the subrepo exists in the working directory
-                # and it is a mercurial subrepo,
-                # add the files that it contains to the tree as well, according
-                # to the status filter
-                abspath = os.path.join(ctx._repo.root, path)
-                if os.path.isdir(abspath):
-                    # Add subrepo files to the tree
-                    substate = ctx.substate[path]
-                    # Add the subrepo info to the _subinfo dictionary:
-                    # The value is the subrepo context, while the key is
-                    # the path of the subrepo relative to the topmost repo
-                    if toproot:
-                        # Note that we cannot use os.path.join() because we
-                        # need path items to be separated by "/"
-                        toprelpath = '/'.join([toproot, path])
-                    else:
-                        toprelpath = path
-                    toprelpath = util.pconvert(toprelpath)
-                    self._subinfo[toprelpath] = \
-                        {'substate': substate, 'ctx': None}
-                    srev = substate[1]
-                    sub = ctx.sub(path)
-                    if srev and isinstance(sub, hgsubrepo):
-                        srepo = sub._repo
-                        if srev in srepo:
-                            sctx = srepo[srev]
-
-                            self._subinfo[toprelpath]['ctx'] = sctx
-
-                            # Add the subrepo contents to the tree
-                            e = addrepocontentstotree(e, sctx, toprelpath)
-
-            # Add regular files to the tree
-            status, uncleanpaths, files = getctxtreeinfo(ctx)
-
-            addfilestotree(roote, files, status, uncleanpaths)
-            return roote
-
-        # Clear the _subinfo
-        self._subinfo = {}
+    def _newRevNode(self, rev, prev=FirstParent):
+        """Create empty root node for the specified revision"""
+        if not _isreporev(rev):
+            raise ValueError('unacceptable revision number: %r' % rev)
+        if not _isreporev(prev):
+            raise ValueError('unacceptable parent revision number: %r' % prev)
+        repo = self._repoagent.rawRepo()
         roote = _Entry()
-        ctx = self._repo[self._rev]
-
-        addrepocontentstotree(roote, ctx)
-        roote.sort()
+        roote.ctx = repo[rev]
+        if prev == ManifestModel.FirstParent:
+            roote.pctx = roote.ctx.p1()
+        elif prev == ManifestModel.SecondParent:
+            roote.pctx = roote.ctx.p2()
+        else:
+            roote.pctx = repo[prev]
         return roote
+
+    def _populateNodes(self, roote):
+        repo = self._repoagent.rawRepo()
+        lpat = hglib.fromunicode(self._namefilter)
+        match = _makematcher(repo, roote.ctx, lpat, self._changedfilesonly)
+        self._populate(roote, repo, self._nodeop, self._statusfilter, match)
+        roote.sort()
+
 
 class _Entry(object):
     """Each file or directory"""
+
+    __slots__ = ('_name', '_parent', 'status', 'ctx', 'pctx', 'subkind',
+                 '_child', '_nameindex')
+
     def __init__(self, name='', parent=None):
         self._name = name
         self._parent = parent
-        self._status = None
-        self._icon = None
+        self.status = None
+        self.ctx = None
+        self.pctx = None
+        self.subkind = None
         self._child = {}
         self._nameindex = []
+
+    def copyskel(self):
+        """Create unpopulated copy of this entry"""
+        e = self.__class__()
+        e.status = self.status
+        e.ctx = self.ctx
+        e.pctx = self.pctx
+        e.subkind = self.subkind
+        return e
 
     @property
     def parent(self):
@@ -417,31 +449,32 @@ class _Entry(object):
         return self._name
 
     @property
-    def icon(self):
-        return self._icon
-
-    def seticon(self, icon):
-        self._icon = icon
-
-    @property
-    def status(self):
-        """Return file change status"""
-        return self._status
-
-    def setstatus(self, status):
-        assert status in 'MARSC'
-        self._status = status
+    def isdir(self):
+        return bool(self.subkind or self._child)
 
     def __len__(self):
         return len(self._child)
 
+    def __nonzero__(self):
+        # leaf node should not be False because of len(node) == 0
+        return True
+
     def __getitem__(self, name):
         return self._child[name]
 
-    def addchild(self, name):
+    def makechild(self, name):
         if name not in self._child:
             self._nameindex.append(name)
-        self._child[name] = self.__class__(name, parent=self)
+        self._child[name] = e = self.__class__(name, parent=self)
+        return e
+
+    def putchild(self, name, e):
+        assert not e.name and not e.parent
+        e._name = name
+        e._parent = self
+        if name not in self._child:
+            self._nameindex.append(name)
+        self._child[name] = e
 
     def __contains__(self, item):
         return item in self._child
@@ -457,8 +490,158 @@ class _Entry(object):
         for e in self._child.itervalues():
             e.sort(reverse=reverse)
         self._nameindex.sort(
-            key=lambda s: (not self[s], os.path.normcase(s)),
+            key=lambda s: (not self[s].isdir, os.path.normcase(s)),
             reverse=reverse)
+
+
+def _isreporev(rev):
+    # patchctx.rev() returns str, which isn't a valid repository revision
+    return rev is None or isinstance(rev, int)
+
+def _samectx(ctx1, ctx2):
+    # compare hash in case it was stripped and recreated (e.g. by qrefresh)
+    return ctx1 == ctx2 and ctx1.node() == ctx2.node()
+
+# TODO: visual feedback to denote query type and error as in repofilter
+def _makematcher(repo, ctx, pat, changedonly):
+    cwd = ''  # always relative to repo root
+    patterns = []
+    if pat and ':' not in pat and '*' not in pat:
+        # mimic case-insensitive partial string match
+        patterns.append('relre:(?i)' + re.escape(pat))
+    elif pat:
+        patterns.append(pat)
+
+    include = []
+    if changedonly:
+        include.extend('path:%s' % p for p in ctx.files())
+        if not include:
+            # no match
+            return matchmod.exact(repo.root, cwd, [])
+
+    try:
+        return matchmod.match(repo.root, cwd, patterns, include=include,
+                              default='relglob', auditor=repo.auditor, ctx=ctx)
+    except (error.Abort, error.ParseError):
+        # no match
+        return matchmod.exact(repo.root, cwd, [])
+
+
+class _listnodeop(object):
+    subreporecursive = False
+
+    @staticmethod
+    def findpath(e, path):
+        return e[path]
+
+    @staticmethod
+    def makepath(e, path):
+        return e.makechild(path)
+
+    @staticmethod
+    def putpath(e, path, c):
+        e.putchild(path, c)
+
+class _treenodeop(object):
+    subreporecursive = True
+
+    @staticmethod
+    def findpath(e, path):
+        for p in path.split('/'):
+            e = e[p]
+        return e
+
+    @staticmethod
+    def makepath(e, path):
+        for p in path.split('/'):
+            if p not in e:
+                e.makechild(p)
+            e = e[p]
+        return e
+
+    @staticmethod
+    def putpath(e, path, c):
+        rp = path.rfind('/')
+        if rp >= 0:
+            e = _treenodeop.makepath(e, path[:rp])
+        e.putchild(path[rp + 1:], c)
+
+_nodeopmap = {
+    False: _treenodeop,
+    True: _listnodeop,
+    }
+
+
+def _populaterepo(roote, repo, nodeop, statusfilter, match):
+    if 'S' in statusfilter:
+        _populatesubrepos(roote, repo, nodeop, statusfilter, match)
+
+    ctx = roote.ctx
+    pctx = roote.pctx
+    repo.lfstatus = True
+    try:
+        stat = repo.status(pctx, ctx, match, clean='C' in statusfilter)
+    finally:
+        repo.lfstatus = False
+    for st, files in zip('MAR!?IC', stat):
+        if st not in statusfilter:
+            continue
+        for path in files:
+            e = nodeop.makepath(roote, hglib.tounicode(path))
+            e.status = st
+
+def _comparesubstate(state1, state2):
+    if state1 == state2:
+        return 'C'
+    elif state1 == subrepo.nullstate:
+        return 'A'
+    elif state2 == subrepo.nullstate:
+        return 'R'
+    else:
+        return 'M'
+
+def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
+    ctx = roote.ctx
+    pctx = roote.pctx
+    for path, sub in subrepo.itersubrepos(ctx, pctx):
+        substate = ctx.substate.get(path, subrepo.nullstate)
+        psubstate = pctx.substate.get(path, subrepo.nullstate)
+        e = _Entry()
+        e.status = _comparesubstate(psubstate, substate)
+        if e.status == 'R':
+            # denotes the original subrepo has been removed
+            e.subkind = psubstate[2]
+        else:
+            e.subkind = substate[2]
+
+        if (nodeop.subreporecursive and e.subkind == 'hg' and e.status != 'R'
+            and os.path.isdir(repo.wjoin(path))):
+            srepo = sub._repo
+            smatch = matchmod.narrowmatcher(path, match)
+            try:
+                e.ctx = srepo[substate[1]]
+                e.pctx = srepo[psubstate[1] or 'null']
+                _populaterepo(e, srepo, nodeop, statusfilter, smatch)
+            except error.RepoLookupError:
+                pass
+
+        # subrepo is filtered out only if the node and its children do not
+        # match the specified condition at all
+        if len(e) > 0 or (e.status in statusfilter and match(path)):
+            nodeop.putpath(roote, hglib.tounicode(path), e)
+
+def _populatepatch(roote, repo, nodeop, statusfilter, match):
+    ctx = roote.ctx
+    stat = ctx.changesToParent(0)
+    for st, files in zip('MAR', stat):
+        if st not in statusfilter:
+            continue
+        for path in files:
+            if not match(path):
+                continue
+            e = nodeop.makepath(roote, hglib.tounicode(path))
+            e.status = st
+
 
 class ManifestCompleter(QCompleter):
     """QCompleter for ManifestModel"""

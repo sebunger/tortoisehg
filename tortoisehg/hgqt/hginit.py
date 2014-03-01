@@ -12,7 +12,7 @@ from mercurial import hg, ui, error, util
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.util import hglib, shlib
+from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -53,15 +53,11 @@ class InitDialog(QDialog):
             self.grid.addWidget(self.run_wb_chk, 3, 1)
 
         # buttons
-        self.init_btn = QPushButton(_('Create'))
-        self.init_btn.setDefault(True)
-        self.close_btn = QPushButton(_('&Close'))
-        self.close_btn.setAutoDefault(False)
-        self.hbox = QHBoxLayout()
-        self.hbox.addStretch(0)
-        self.hbox.addWidget(self.init_btn)
-        self.hbox.addWidget(self.close_btn)
-        self.vbox.addLayout(self.hbox)
+        buttonbox = QDialogButtonBox(self)
+        self.init_btn = buttonbox.addButton(_('Create'),
+                                            QDialogButtonBox.AcceptRole)
+        self.close_btn = buttonbox.addButton(QDialogButtonBox.Close)
+        self.vbox.addWidget(buttonbox)
 
         # some extras
         self.hgcmd_lbl = QLabel(_('Hg command:'))
@@ -155,7 +151,7 @@ class InitDialog(QDialog):
             try:
                 # create the folder, just like Hg would
                 os.makedirs(dest)
-            except:
+            except OSError:
                 qtlib.ErrorMsgBox(_('Error executing init'),
                         _('Cannot create folder %s') % udest)
                 return False
@@ -183,12 +179,6 @@ class InitDialog(QDialog):
             qtlib.ErrorMsgBox(_('Error executing init'),
                     _('Error when creating repository'), err)
             return False
-        except:
-            import traceback
-            qtlib.ErrorMsgBox(_('Error executing init'),
-                    _('Error when creating repository'),
-                    traceback.format_exc())
-            return False
 
         # Create the .hg* file, mainly to workaround
         # Explorer's problem in creating files with a name
@@ -199,7 +189,7 @@ class InitDialog(QDialog):
             if not os.path.exists(hgignore):
                 try:
                     open(hgignore, 'wb')
-                except:
+                except IOError:
                     pass
 
         if self.run_wb_chk.isChecked():

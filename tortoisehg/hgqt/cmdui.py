@@ -9,11 +9,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
 
-from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _, localgettext
+from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdcore, qtlib, qscilib
-
-local = localgettext()
 
 def startProgress(topic, status):
     topic, item, pos, total, unit = topic, '...', status, None, ''
@@ -143,96 +140,6 @@ def updateStatusMessage(stbar, session):
         stbar.showMessage(_('Failed!'), True)
 
 
-class Core(QObject):
-    """Core functionality for running Mercurial command.
-    Do not attempt to instantiate and use this directly.
-    """
-
-    commandStarted = pyqtSignal()
-    commandFinished = pyqtSignal(int)
-    commandCanceling = pyqtSignal()
-
-    output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
-
-    def __init__(self, logWindow, parent):
-        super(Core, self).__init__(parent)
-
-        self._agent = cmdcore.CmdAgent(self)
-        self._session = cmdcore.nullCmdSession()
-        self.rawoutlines = []
-        self.stbar = None
-        if logWindow:
-            self.outputLog = LogWidget()
-            self.outputLog.installEventFilter(qscilib.KeyPressInterceptor(self))
-            self.output.connect(self.outputLog.appendLog)
-
-    ### Public Methods ###
-
-    def run(self, cmdline, *cmdlines, **opts):
-        '''Execute or queue Mercurial command'''
-        display = opts.get('display')
-        worker = opts.get('useproc', False) and 'proc' or None
-        ucmdlines = [map(hglib.tounicode, xs) for xs in (cmdline,) + cmdlines]
-        udisplay = hglib.tounicode(display)
-        sess = self._agent.runCommandSequence(ucmdlines, self,
-                                              display=udisplay, worker=worker)
-        sess.commandFinished.connect(self.onCommandFinished)
-        sess.outputReceived.connect(self.onOutputReceived)
-        sess.progressReceived.connect(self.onProgressReceived)
-        self._session = sess
-        # client widget assumes that the command starts immediately
-        self.onCommandStarted()
-
-    def cancel(self):
-        '''Cancel running Mercurial command'''
-        if self.running():
-            self._session.abort()
-            self.commandCanceling.emit()
-
-    def running(self):
-        # pending session is "running" in cmdui world
-        return not self._session.isFinished()
-
-    def rawoutput(self):
-        return ''.join(self.rawoutlines)
-
-    def setStbar(self, stbar):
-        self.stbar = stbar
-
-    ### Private Method ###
-
-    def clearOutput(self):
-        if hasattr(self, 'outputLog'):
-            self.outputLog.clearLog()
-
-    ### Signal Handlers ###
-
-    def onCommandStarted(self):
-        self.rawoutlines = []
-        self.commandStarted.emit()
-        if self.stbar:
-            updateStatusMessage(self.stbar, self._session)
-
-    @pyqtSlot(int)
-    def onCommandFinished(self, ret):
-        if self.stbar:
-            updateStatusMessage(self.stbar, self._session)
-        self.commandFinished.emit(ret)
-
-    @pyqtSlot(QString, QString)
-    def onOutputReceived(self, msg, label):
-        if label != 'control':
-            self.rawoutlines.append(hglib.fromunicode(msg, 'replace'))
-        self.output.emit(msg, label)
-
-    @pyqtSlot(QString, object, QString, QString, object)
-    def onProgressReceived(self, topic, pos, item, unit, total):
-        self.progress.emit(topic, pos, item, unit, total)
-        if self.stbar:
-            self.stbar.progress(topic, pos, item, unit, total)
-
-
 class LogWidget(qscilib.ScintillaCompat):
     """Output log viewer"""
 
@@ -257,7 +164,7 @@ class LogWidget(qscilib.ScintillaCompat):
 
     def _initmarkers(self):
         self._markers = {}
-        for l in ('ui.error', 'control'):
+        for l in ('ui.error', 'ui.warning', 'control'):
             self._markers[l] = m = self.markerDefine(QsciScintilla.Background)
             c = QColor(qtlib.getbgcoloreffect(l))
             if c.isValid():
@@ -294,96 +201,44 @@ class LogWidget(qscilib.ScintillaCompat):
         menu.exec_(event.globalPos())
         menu.setParent(None)
 
-class Widget(QWidget):
-    """An embeddable widget for running Mercurial command"""
-
-    commandStarted = pyqtSignal()
-    commandFinished = pyqtSignal(int)
-    commandCanceling = pyqtSignal()
-
-    output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    makeLogVisible = pyqtSignal(bool)
-
-    def __init__(self, logWindow, statusBar, parent):
-        super(Widget, self).__init__(parent)
-
-        self.core = Core(logWindow, self)
-        self.core.commandStarted.connect(self.commandStarted)
-        self.core.commandFinished.connect(self.onCommandFinished)
-        self.core.commandCanceling.connect(self.commandCanceling)
-        self.core.output.connect(self.output)
-        self.core.progress.connect(self.progress)
-        if not logWindow:
+    def keyPressEvent(self, event):
+        # propagate key events important for dialog
+        if event.key() == Qt.Key_Escape:
+            event.ignore()
             return
+        super(LogWidget, self).keyPressEvent(event)
+
+
+class CmdSessionControlWidget(QWidget):
+    """Helper widget to implement dialog to run Mercurial commands"""
+
+    finished = pyqtSignal(int)
+    linkActivated = pyqtSignal(unicode)
+    logVisibilityChanged = pyqtSignal(bool)
+
+    # this won't provide commandFinished signal because the client code
+    # should know the running session.
+
+    def __init__(self, parent=None, logVisible=False):
+        super(CmdSessionControlWidget, self).__init__(parent)
 
         vbox = QVBoxLayout()
         vbox.setSpacing(4)
-        vbox.setContentsMargins(*(1,)*4)
-        self.setLayout(vbox)
-
-        # command output area
-        self.core.outputLog.setHidden(True)
-        self.layout().addWidget(self.core.outputLog, 1)
-
-        if statusBar:
-            ## status and progress labels
-            self.stbar = ThgStatusBar()
-            self.stbar.setSizeGripEnabled(False)
-            self.core.setStbar(self.stbar)
-            self.layout().addWidget(self.stbar)
-
-    ### Public Methods ###
-
-    def run(self, cmdline, *args, **opts):
-        self.core.run(cmdline, *args, **opts)
-
-    def cancel(self):
-        self.core.cancel()
-
-    def setShowOutput(self, visible):
-        if hasattr(self.core, 'outputLog'):
-            self.core.outputLog.setShown(visible)
-
-    def outputShown(self):
-        if hasattr(self.core, 'outputLog'):
-            return self.core.outputLog.isVisible()
-        else:
-            return False
-
-    ### Signal Handler ###
-
-    @pyqtSlot(int)
-    def onCommandFinished(self, ret):
-        if ret == -1:
-            self.makeLogVisible.emit(True)
-            self.setShowOutput(True)
-        self.commandFinished.emit(ret)
-
-class CmdSessionDialog(QDialog):
-    """Dialog to monitor running Mercurial commands"""
-
-    def __init__(self, parent=None):
-        super(CmdSessionDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags()
-                            & ~Qt.WindowContextHelpButtonHint)
-
-        vbox = QVBoxLayout()
-        vbox.setSpacing(4)
-        vbox.setContentsMargins(5, 5, 5, 5)
+        vbox.setContentsMargins(0, 0, 0, 0)
 
         # command output area
         self._outputLog = LogWidget(self)
-        self._outputLog.installEventFilter(qscilib.KeyPressInterceptor(self))
+        self._outputLog.setVisible(logVisible)
         vbox.addWidget(self._outputLog, 1)
 
         ## status and progress labels
         self._stbar = ThgStatusBar()
         self._stbar.setSizeGripEnabled(False)
+        self._stbar.linkActivated.connect(self.linkActivated)
         vbox.addWidget(self._stbar)
 
         # bottom buttons
-        buttons = QDialogButtonBox()
+        self._buttonbox = buttons = QDialogButtonBox()
         self._cancelBtn = buttons.addButton(QDialogButtonBox.Cancel)
         self._cancelBtn.clicked.connect(self.abortCommand)
 
@@ -394,42 +249,65 @@ class CmdSessionDialog(QDialog):
                                             QDialogButtonBox.ResetRole)
         self._detailBtn.setAutoDefault(False)
         self._detailBtn.setCheckable(True)
-        self._detailBtn.setChecked(True)
+        self._detailBtn.setChecked(logVisible)
         self._detailBtn.toggled.connect(self.setLogVisible)
         vbox.addWidget(buttons)
 
         self.setLayout(vbox)
-        self.setWindowTitle(_('TortoiseHg Command Dialog'))
-        self.resize(540, 420)
 
         self._session = cmdcore.nullCmdSession()
+        self._stbar.hide()
         self._updateUi()
+
+    def session(self):
+        return self._session
 
     def setSession(self, sess):
         """Start watching the given command session"""
         assert self._session.isFinished()
         self._session = sess
-        sess.commandFinished.connect(self._updateUi)
+        sess.commandFinished.connect(self._updateStatus)
         sess.outputReceived.connect(self._outputLog.appendLog)
         sess.progressReceived.connect(self._stbar.progress)
-        self._updateUi()
+        self._cancelBtn.setEnabled(True)
+        self._updateStatus()
 
     @pyqtSlot()
     def abortCommand(self):
         self._session.abort()
         self._cancelBtn.setDisabled(True)
 
+    def addButton(self, text, role):
+        """Add custom button which will typically start Mercurial command"""
+        button = self._buttonbox.addButton(text, role)
+        self._updateUi()
+        return button
+
+    @pyqtSlot()
+    def setFocusToCloseButton(self):
+        self._closeBtn.setFocus()
+
+    def showStatusMessage(self, message):
+        """Display the given message in status bar; the message remains until
+        the command status is changed"""
+        self._stbar.showMessage(message)
+        self._stbar.show()
+
+    def isLogVisible(self):
+        return self._outputLog.isVisibleTo(self)
+
+    @pyqtSlot(bool)
     def setLogVisible(self, visible):
         """show/hide command output"""
+        if visible == self.isLogVisible():
+            return
         self._outputLog.setVisible(visible)
         self._detailBtn.setChecked(visible)
+        self.logVisibilityChanged.emit(visible)
 
-        # workaround to adjust only window height
-        self.setMinimumWidth(self.width())
-        self.adjustSize()
-        self.setMinimumWidth(0)
-
+    @pyqtSlot()
     def reject(self):
+        """Request to close the dialog or abort the running command"""
         if not self._session.isFinished():
             ret = QMessageBox.question(self, _('Confirm Exit'),
                         _('Mercurial command is still running.\n'
@@ -438,22 +316,261 @@ class CmdSessionDialog(QDialog):
                         QMessageBox.No)
             if ret == QMessageBox.Yes:
                 self.abortCommand()
-            # don't close dialog
             return
 
-        # close dialog
-        if self._session.exitCode() == 0:
-            self.accept()  # means command successfully finished
-        else:
-            super(CmdSessionDialog, self).reject()
+        self.finished.emit(self._session.exitCode())
 
     @pyqtSlot()
+    def _updateStatus(self):
+        updateStatusMessage(self._stbar, self._session)
+        self._stbar.show()
+        self._updateUi()
+
     def _updateUi(self):
         updateStatusMessage(self._stbar, self._session)
         self._cancelBtn.setVisible(not self._session.isFinished())
         self._closeBtn.setVisible(self._session.isFinished())
-        if self._session.isFinished():
-            self._closeBtn.setFocus()
+
+
+def adjustWindowHeightConstraint(window, cmdcontrol):
+    """Mimic SetFizedSize constraint vertically if command log is hidden"""
+    assert window.isWindow() and window.isAncestorOf(cmdcontrol)
+    if cmdcontrol.isLogVisible():
+        window.setMaximumHeight(qtlib.QWIDGETSIZE_MAX)
+    else:
+        # recalculate size constraints
+        cmdcontrol.adjustSize()
+        window.layout().activate()
+        window.setMaximumHeight(window.minimumHeight())
+
+
+class AbstractCmdWidget(QWidget):
+    """Widget to prepare Mercurial command controlled by CmdControlDialog"""
+
+    # signal to update "Run" button, etc.
+    commandChanged = pyqtSignal()
+
+    def readSettings(self, qs):
+        pass
+    def writeSettings(self, qs):
+        pass
+    def canRunCommand(self):
+        # True if all command parameters are valid
+        raise NotImplementedError
+    def runCommand(self):
+        # return new CmdSession or nullCmdSession on error
+        raise NotImplementedError
+
+
+class CmdControlDialog(QDialog):
+    """Dialog to run one-shot Mercurial command prepared by embedded widget
+
+    The embedded widget must implement AbstractCmdWidget or provide signals
+    and methods defined by it.
+
+    Settings are prefixed by the objectName() group, so you should specify
+    unique name by setObjectName().
+
+    You don't need to extend this class unless you want to provide additional
+    public methods/signals, or implement custom error handling.
+
+    Unlike QDialog, the result code is set to the exit code of the last
+    command.  exec_() returns 0 on success.
+    """
+
+    commandFinished = pyqtSignal(int)
+
+    def __init__(self, parent=None):
+        super(CmdControlDialog, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint)
+
+        vbox = QVBoxLayout()
+        self.setLayout(vbox)
+
+        self.__cmdwidget = None
+
+        self.__cmdcontrol = cmd = CmdSessionControlWidget(self)
+        cmd.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
+        cmd.finished.connect(self.done)
+        vbox.addWidget(cmd)
+        self.__runbutton = cmd.addButton(_('&Run'), QDialogButtonBox.AcceptRole)
+        self.__runbutton.clicked.connect(self.runCommand)
+
+        self.__updateUi()
+
+    # use __-prefix, name mangling, to avoid name conflicts in derived classes
+
+    def __readSettings(self):
+        if not self.objectName():
+            return
+        assert self.__cmdwidget
+        qs = QSettings()
+        qs.beginGroup(self.objectName())
+        self.__cmdwidget.readSettings(qs)
+        self.restoreGeometry(qs.value('geom').toByteArray())
+        qs.endGroup()
+
+    def __writeSettings(self):
+        if not self.objectName():
+            return
+        assert self.__cmdwidget
+        qs = QSettings()
+        qs.beginGroup(self.objectName())
+        self.__cmdwidget.writeSettings(qs)
+        qs.setValue('geom', self.saveGeometry())
+        qs.endGroup()
+
+    def commandWidget(self):
+        return self.__cmdwidget
+
+    def setCommandWidget(self, widget):
+        oldwidget = self.__cmdwidget
+        if oldwidget is widget:
+            return
+        if oldwidget:
+            oldwidget.commandChanged.disconnect(self.__updateUi)
+            self.layout().removeWidget(oldwidget)
+            oldwidget.setParent(None)
+
+        self.__cmdwidget = widget
+        if widget:
+            self.layout().insertWidget(0, widget, 1)
+            widget.commandChanged.connect(self.__updateUi)
+            self.__readSettings()
+            self.__fixInitialFocus()
+        self.__updateUi()
+
+    def __fixInitialFocus(self):
+        if self.focusWidget():
+            # do not change if already set
+            return
+
+        # set focus to the first item of the command widget
+        fw = self.__cmdwidget
+        while fw.focusPolicy() == Qt.NoFocus or not fw.isVisibleTo(self):
+            fw = fw.nextInFocusChain()
+            if fw is self.__cmdwidget or fw is self.__cmdcontrol:
+                # no candidate available
+                return
+        fw.setFocus()
+
+    def runButtonText(self):
+        return self.__runbutton.text()
+
+    def setRunButtonText(self, text):
+        self.__runbutton.setText(text)
+
+    def isLogVisible(self):
+        return self.__cmdcontrol.isLogVisible()
+
+    def setLogVisible(self, visible):
+        self.__cmdcontrol.setLogVisible(visible)
+
+    def isCommandFinished(self):
+        """True if no pending or running command exists (but might not be
+        ready to run command because of incomplete user input)"""
+        return self.__cmdcontrol.session().isFinished()
+
+    def canRunCommand(self):
+        """True if everything's ready to run command"""
+        return (bool(self.__cmdwidget) and self.__cmdwidget.canRunCommand()
+                and self.isCommandFinished())
+
+    @pyqtSlot()
+    def runCommand(self):
+        if not self.canRunCommand():
+            return
+        sess = self.__cmdwidget.runCommand()
+        if sess.isFinished():
+            return
+        self.__cmdcontrol.setSession(sess)
+        sess.commandFinished.connect(self.__onCommandFinished)
+        self.__updateUi()
+
+    @pyqtSlot(int)
+    def __onCommandFinished(self, ret):
+        self.__updateUi()
+        if ret == 0:
+            self.__runbutton.hide()
+            self.__cmdcontrol.setFocusToCloseButton()
+        elif ret == 255 and not self.__cmdcontrol.session().isAborted():
+            errorMessageBox(self.__cmdcontrol.session(), self)
+
+        # handle command-specific error if any
+        self.commandFinished.emit(ret)
+
+        if ret != 255:
+            self.__writeSettings()
+        if ret == 0 and not self.isLogVisible():
+            self.__cmdcontrol.reject()
+
+    def lastFinishedSession(self):
+        """Session of the last executed command; can be used in commandFinished
+        handler"""
+        sess = self.__cmdcontrol.session()
+        if not sess.isFinished():
+            # do not expose running session because this dialog should have
+            # full responsibility to control running command
+            return cmdcore.nullCmdSession()
+        return sess
+
+    def reject(self):
+        self.__cmdcontrol.reject()
+
+    @pyqtSlot()
+    def __updateUi(self):
+        if self.__cmdwidget:
+            self.__cmdwidget.setEnabled(self.isCommandFinished())
+        self.__runbutton.setEnabled(self.canRunCommand())
+
+
+class CmdSessionDialog(QDialog):
+    """Dialog to monitor running Mercurial commands
+
+    Unlike QDialog, the result code is set to the exit code of the last
+    command.  exec_() returns 0 on success.
+    """
+
+    # this won't provide commandFinished signal because the client code
+    # should know the running session.
+
+    def __init__(self, parent=None):
+        super(CmdSessionDialog, self).__init__(parent)
+        self.setWindowFlags(self.windowFlags()
+                            & ~Qt.WindowContextHelpButtonHint)
+        self.setWindowTitle(_('TortoiseHg Command Dialog'))
+        self.resize(540, 420)
+
+        vbox = QVBoxLayout()
+        self.setLayout(vbox)
+        vbox.setContentsMargins(5, 5, 5, 5)
+
+        self._cmdcontrol = cmd = CmdSessionControlWidget(self, logVisible=True)
+        cmd.finished.connect(self.done)
+        cmd.logVisibilityChanged.connect(self._adjustHeightByLogVisibility)
+        vbox.addWidget(cmd)
+
+    def setSession(self, sess):
+        """Start watching the given command session"""
+        self._cmdcontrol.setSession(sess)
+        sess.commandFinished.connect(self._cmdcontrol.setFocusToCloseButton)
+
+    def isLogVisible(self):
+        return self._cmdcontrol.isLogVisible()
+
+    def setLogVisible(self, visible):
+        """show/hide command output"""
+        self._cmdcontrol.setLogVisible(visible)
+
+    @pyqtSlot(bool)
+    def _adjustHeightByLogVisibility(self, visible):
+        adjustWindowHeightConstraint(self, self._cmdcontrol)
+        if visible:
+            self.resize(self.width(), self.sizeHint().height())
+
+    def reject(self):
+        self._cmdcontrol.reject()
 
 
 def errorMessageBox(session, parent=None, title=None):

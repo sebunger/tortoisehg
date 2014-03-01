@@ -274,7 +274,7 @@ class EmailDialog(QDialog):
         cmd.setWindowTitle(_('Sending Email'))
         cmd.setLogVisible(False)
         cmd.setSession(self._repoagent.runCommand(cmdline, self))
-        if cmd.exec_():
+        if cmd.exec_() == 0:
             self._writehistory()
 
     def _initintrobox(self):

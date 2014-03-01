@@ -15,7 +15,7 @@ from tortoisehg.util import hglib, shlib, wconfig
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
-from tortoisehg.hgqt import cmdcore, cmdui, thgrepo
+from tortoisehg.hgqt import cmdcore, cmdui
 from tortoisehg.hgqt import qtlib, qscilib, status, branchop, revpanel
 from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n, partialcommit
 
@@ -445,7 +445,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         commandlines = []
         newbranch = False
         branch = hglib.fromunicode(self.branchop)
-        if branch in repo.branchtags():
+        if branch in repo.branchmap():
             # response: 0=Yes, 1=No, 2=Cancel
             if branch in [p.branch() for p in repo.parents()]:
                 resp = 0
@@ -571,7 +571,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         mode = 'commit'
         if len(self.repo.parents()) > 1:
             mode = 'merge'
-        dlg = DetailsDialog(self.opts, self.userhist, self, mode=mode)
+        dlg = DetailsDialog(self._repoagent, self.opts, self.userhist, self,
+                            mode=mode)
         dlg.finished.connect(dlg.deleteLater)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
@@ -582,14 +583,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
+        # refresh() may save the stale 'amend' message in commitSetAction()
+        self.refresh()
+        self.stwidget.refreshWctx() # Trigger reload of working context
         # clear the last 'amend' message
         # do not clear the last 'commit' message because there are many cases
         # in which we may write a commit message first, modify the repository
         # (e.g. amend or update and merge uncommitted changes) and then do the
         # actual commit
         self.lastCommitMsgs['amend'] = ''
-        self.refresh()
-        self.stwidget.refreshWctx() # Trigger reload of working context
 
     @pyqtSlot()
     def refreshWctx(self):
@@ -650,7 +652,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.commitSetAction()
 
     def branchOp(self):
-        d = branchop.BranchOpDialog(self.repo, self.branchop, self)
+        d = branchop.BranchOpDialog(self._repoagent, self.branchop, self)
         d.setWindowFlags(Qt.Sheet)
         d.setWindowModality(Qt.WindowModal)
         if d.exec_() == QDialog.Accepted:
@@ -857,10 +859,13 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.stwidget.tv.setFocus()
             return
 
-        user = qtlib.getCurrentUsername(self, self.repo, self.opts)
-        if not user:
-            return
-        self.addUsernameToHistory(user)
+        user = self.opts.get('user')
+        if not amend:
+            # TODO: no need to specify --user if it was read from ui
+            user = qtlib.getCurrentUsername(self, self.repo, self.opts)
+            if not user:
+                return
+            self.addUsernameToHistory(user)
 
         checkedUnknowns = self.stwidget.getChecked('?I')
         if checkedUnknowns:
@@ -922,7 +927,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 err = hglib.tounicode(str(e))
             self.showMessage.emit(err)
             dcmd = []
-        cmdline = ['commit', '--verbose', '--user', user, '--message='+msg]
+        cmdline = ['commit', '--verbose', '--message='+msg]
+        if user:
+            cmdline.extend(['--user', user])
         cmdline += dcmd + brcmd
 
         if partials:
@@ -1011,10 +1018,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
 class DetailsDialog(QDialog):
     'Utility dialog for configuring uncommon settings'
-    def __init__(self, opts, userhistory, parent, mode='commit'):
+    def __init__(self, repoagent, opts, userhistory, parent, mode='commit'):
         QDialog.__init__(self, parent)
-        self.setWindowTitle(_('%s - commit options') % parent.repo.displayname)
-        self.repo = parent.repo
+        self.setWindowTitle(_('%s - commit options') % repoagent.displayName())
+        self._repoagent = repoagent
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -1156,6 +1163,10 @@ class DetailsDialog(QDialog):
         bb.rejected.connect(self.reject)
         self.bb = bb
         layout.addWidget(bb)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def saveInRepo(self):
         fn = os.path.join(self.repo.root, '.hg', 'hgrc')
@@ -1318,6 +1329,7 @@ class CommitDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('hg-commit'))
+        self._repoagent = repoagent
         self.pats = pats
         self.opts = opts
 
@@ -1361,8 +1373,7 @@ class CommitDialog(QDialog):
         repoagent.repositoryChanged.connect(self.updateUndo)
         commit.commitComplete.connect(self.postcommit)
 
-        repo = repoagent.rawRepo()
-        self.setWindowTitle(_('%s - commit') % repo.displayname)
+        self.setWindowTitle(_('%s - commit') % repoagent.displayName())
         self.commit = commit
         self.commit.reload()
         self.updateUndo()
@@ -1375,9 +1386,7 @@ class CommitDialog(QDialog):
             self._subdialogs.open(link[len('repo:'):])
 
     def _createSubDialog(self, uroot):
-        # TODO: do not instantiate repo here
-        repo = thgrepo.repository(None, hglib.fromunicode(uroot))
-        repoagent = repo._pyqtobj
+        repoagent = self._repoagent.subRepoAgent(uroot)
         return CommitDialog(repoagent, [], {}, parent=self)
 
     @pyqtSlot()

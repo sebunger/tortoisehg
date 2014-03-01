@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
-"POT-Creation-Date: 2013-10-31 00:28-0200\n"
+"POT-Creation-Date: 2014-02-03 11:14-0200\n"
 "PO-Revision-Date: 2013-09-19 08:36+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2013-10-31 05:23+0000\n"
-"X-Generator: Launchpad (build 16820)\n"
+"X-Launchpad-Export-Date: 2014-02-04 06:03+0000\n"
+"X-Generator: Launchpad (build 16916)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg overlay-ikon server"
@@ -57,35 +57,29 @@ msgstr ""
 msgid "= Working Directory Parent ="
 msgstr "= Forælder til arbejdskataloget ="
 
-msgid "Revision:"
-msgstr "Revision:"
-
-msgid "Only files modified/created in this revision"
-msgstr "Kun filer ændret/oprettet i denne revision"
-
-msgid "Recurse into subrepositories"
-msgstr "Gentag i alle underdepoter"
-
-msgid "Destination path:"
-msgstr "Mål-sti:"
-
-msgid "Browse..."
-msgstr "Gennemse..."
-
-msgid "Archive types:"
-msgstr "Arkivtyper:"
-
 msgid "Directory of files"
 msgstr "Katalog over filer"
+
+msgid "Tar archives"
+msgstr "Tar-arkiver"
 
 msgid "Uncompressed tar archive"
 msgstr "Ukomprimeret tar-arkiv"
 
+msgid "Bzip2 tar archives"
+msgstr "Bzip2-tar-arkiver"
+
 msgid "Tar archive compressed using bzip2"
 msgstr "Tar-arkiv comprimeret med bzip2"
 
+msgid "Gzip tar archives"
+msgstr "Gzip-tar-arkiver"
+
 msgid "Tar archive compressed using gzip"
 msgstr "Tar-arkiv komprimeret med gzip"
+
+msgid "Zip archives"
+msgstr "Zip-arkiver"
 
 msgid "Uncompressed zip archive"
 msgstr "Ukomprimeret zip-arkiv"
@@ -93,24 +87,26 @@ msgstr "Ukomprimeret zip-arkiv"
 msgid "Zip archive compressed using deflate"
 msgstr "Zip-arkiv komprimeet med deflate"
 
+msgid "Only files modified/created in this revision"
+msgstr "Kun filer ændret/oprettet i denne revision"
+
+msgid "Recurse into subrepositories"
+msgstr "Gentag i alle underdepoter"
+
+msgid "Revision:"
+msgstr "Revision:"
+
+msgid "Browse..."
+msgstr "Gennemse..."
+
+msgid "Destination path:"
+msgstr "Mål-sti:"
+
+msgid "Archive types:"
+msgstr "Arkivtyper:"
+
 msgid "Hg command:"
 msgstr "Hg-kommando:"
-
-msgid "Always show output"
-msgstr "Vis altid uddata"
-
-msgid "&Archive"
-msgstr "&Arkiv"
-
-msgid "&Detail"
-msgstr "&Detalje"
-
-msgid "Cancel"
-msgstr "Annuler"
-
-#, python-format
-msgid "Archive - %s"
-msgstr "Arkiv - %s"
 
 msgid "Select Destination Folder"
 msgstr "Vælg mål-mappe"
@@ -120,18 +116,6 @@ msgstr "Vælg mål-fil"
 
 msgid "All files (*)"
 msgstr ""
-
-msgid "Tar archives"
-msgstr "Tar-arkiver"
-
-msgid "Bzip2 tar archives"
-msgstr "Bzip2-tar-arkiver"
-
-msgid "Gzip tar archives"
-msgstr "Gzip-tar-arkiver"
-
-msgid "Zip archives"
-msgstr "Zip-arkiver"
 
 msgid "Duplicate Name"
 msgstr "Duplikér navn"
@@ -166,6 +150,13 @@ msgstr ""
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
 msgstr "Destinationen \"%s\" eksisterer allerede som en mappe!"
+
+#, python-format
+msgid "Archive - %s"
+msgstr "Arkiv - %s"
+
+msgid "&Archive"
+msgstr "&Arkiv"
 
 #, python-format
 msgid "Backout - %s"
@@ -331,23 +322,26 @@ msgstr "Omgjort ændring"
 msgid "Bisect - %s"
 msgstr "Bisect - %s"
 
-msgid "Known good revision:"
-msgstr "Kendt god revision:"
-
 msgid "Accept"
 msgstr "Godkend"
+
+msgid "Known good revision:"
+msgstr "Kendt god revision:"
 
 msgid "Known bad revision:"
 msgstr "Kendt dårlig revision:"
 
-msgid "Revision is Good"
-msgstr "Revision er god"
+msgid "Discard local changes (revert --all)"
+msgstr ""
 
-msgid "Revision is Bad"
-msgstr "Revision er dårlig"
+msgid "Revision is &Good"
+msgstr ""
 
-msgid "Skip this Revision"
-msgstr "Spring over denne revision"
+msgid "Revision is &Bad"
+msgstr ""
+
+msgid "&Skip this Revision"
+msgstr ""
 
 msgid "Close"
 msgstr "Luk"
@@ -603,16 +597,6 @@ msgstr "Fjernkommando:"
 msgid "Start revision:"
 msgstr "Start revision:"
 
-msgid "&Clone"
-msgstr "&Klon"
-
-msgid "Detail"
-msgstr "Detalje"
-
-#, python-format
-msgid "Clone - %s"
-msgstr "Klon - %s"
-
 msgid "TortoiseHg Clone"
 msgstr "TortoiseHg klon"
 
@@ -622,21 +606,6 @@ msgstr "Fejl under oprettelse af destinationsmappe"
 msgid "Please specify a different path."
 msgstr "Angiv venligst en anden sti"
 
-msgid "Source path is empty"
-msgstr "Kilde sti er tom"
-
-msgid "Please enter a valid source path."
-msgstr "Angiv venligst en gyldig kilde-sti."
-
-msgid "Source and destination are the same"
-msgstr "Kilde og destination er den samme"
-
-msgid "Please specify different paths."
-msgstr "Angiv venligst andre stier."
-
-msgid "Please enter a new destination path."
-msgstr "Ny destinations-sti"
-
 msgid "Select source repository"
 msgstr "Vælg kildedepot"
 
@@ -645,6 +614,13 @@ msgstr "Vælg destinationsdepot"
 
 msgid "Select patch folder"
 msgstr ""
+
+#, python-format
+msgid "Clone - %s"
+msgstr "Klon - %s"
+
+msgid "&Clone"
+msgstr "&Klon"
 
 msgid "failed to start command\n"
 msgstr "mislykkedes med at starte kommando\n"
@@ -671,6 +647,10 @@ msgstr "[kommando returnerede kode %d %%s]"
 msgid "[command completed successfully %s]"
 msgstr "[kommando udført med succes %s]"
 
+#, python-format
+msgid "ignoring invalid cmdworker '%s'\n"
+msgstr ""
+
 msgid "Running..."
 msgstr "Kører..."
 
@@ -680,8 +660,8 @@ msgstr "Fejlede!"
 msgid "Clea&r Log"
 msgstr ""
 
-msgid "TortoiseHg Command Dialog"
-msgstr "TortoiseHg kommandodialog"
+msgid "Detail"
+msgstr "Detalje"
 
 msgid "Confirm Exit"
 msgstr "Bekræft exit"
@@ -692,6 +672,12 @@ msgid ""
 msgstr ""
 "Mercurial-kommando kører fortsat.\n"
 "Er du sikker på at du vil terminere?"
+
+msgid "&Run"
+msgstr ""
+
+msgid "TortoiseHg Command Dialog"
+msgstr "TortoiseHg kommandodialog"
 
 msgid "Command Error"
 msgstr ""
@@ -780,6 +766,9 @@ msgstr "Genstart &Gren"
 
 msgid "&Commit to current branch"
 msgstr "&Integrer på nuværende gren"
+
+msgid "Cancel"
+msgstr "Annuler"
 
 msgid "Confirm New Branch"
 msgstr "Bekræft ny gren"
@@ -1311,17 +1300,11 @@ msgstr ""
 msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
-msgid "Cannot open subrepository"
-msgstr "Kan ikke åbne underdepot"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "Det valgte underdepot findes ikke i arbejdskataloget"
-
 msgid "Display the file anyway"
 msgstr ""
 
-msgid "File or diffs not displayed: "
-msgstr "Fil eller diff'er som ikke vises: "
+msgid "Diff not displayed: "
+msgstr ""
 
 #, python-format
 msgid ""
@@ -1337,6 +1320,12 @@ msgstr "Filen er binær"
 msgid "File may be binary (maximum line length exceeded)"
 msgstr ""
 
+msgid "File or diffs not displayed: "
+msgstr "Fil eller diff'er som ikke vises: "
+
+msgid " <i>(was added)</i>"
+msgstr " <i>(blev tilføjet)</i>"
+
 #, python-format
 msgid " <i>(copied from %s)</i>"
 msgstr ""
@@ -1345,19 +1334,30 @@ msgstr ""
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(omdøbt fra %s)</i>"
 
-msgid " <i>(was added)</i>"
-msgstr " <i>(blev tilføjet)</i>"
+msgid " <i>(is a symlink)</i>"
+msgstr " <i>(er et symlink)</i>"
+
+#, python-format
+msgid ""
+"File or diffs not displayed: File is larger than the specified max size.\n"
+"maxdiff = %s KB"
+msgstr ""
+"Fil eller diff ikke vist: Filen er større end den anførte maks størrelse.\n"
+"maxdiff = %s KB"
+
+msgid " <i>(was deleted)</i>"
+msgstr " <i>(blev slettet)</i>"
+
+msgid " <i>(was added, now missing)</i>"
+msgstr " <i>(blev tilføjet, mangler nu)</i>"
+
+msgid " <i>(is unversioned)</i>"
+msgstr " <i>(er uversioneret)</i>"
 
 msgid "exec mode has been <font color='red'>set</font>"
 msgstr ""
 
 msgid "exec mode has been <font color='red'>unset</font>"
-msgstr ""
-
-msgid " <i>(is a symlink)</i>"
-msgstr " <i>(er et symlink)</i>"
-
-msgid "Diff not displayed: "
 msgstr ""
 
 #, python-format
@@ -1461,23 +1461,6 @@ msgid "open..."
 msgstr ""
 
 #, python-format
-msgid ""
-"File or diffs not displayed: File is larger than the specified max size.\n"
-"maxdiff = %s KB"
-msgstr ""
-"Fil eller diff ikke vist: Filen er større end den anførte maks størrelse.\n"
-"maxdiff = %s KB"
-
-msgid " <i>(was deleted)</i>"
-msgstr " <i>(blev slettet)</i>"
-
-msgid " <i>(was added, now missing)</i>"
-msgstr " <i>(blev tilføjet, mangler nu)</i>"
-
-msgid " <i>(is unversioned)</i>"
-msgstr " <i>(er uversioneret)</i>"
-
-#, python-format
 msgid "Hg file log viewer [%s] - %s"
 msgstr ""
 
@@ -1526,12 +1509,84 @@ msgstr "Næste diff"
 msgid "Previous diff"
 msgstr "Forrige diff"
 
+msgid "Unicode"
+msgstr ""
+
+msgid "Western Europe"
+msgstr ""
+
+msgid "Unified Chinese"
+msgstr ""
+
+msgid "Traditional Chinese"
+msgstr ""
+
+msgid "Korean"
+msgstr ""
+
+msgid "Japanese"
+msgstr ""
+
+msgid "Thai"
+msgstr ""
+
+msgid "Central and Eastern Europe"
+msgstr ""
+
+msgid "Cyrillic"
+msgstr ""
+
+msgid "Russian"
+msgstr ""
+
+msgid "Ukrainian"
+msgstr ""
+
+msgid "Greek"
+msgstr ""
+
+msgid "Turkish"
+msgstr ""
+
+msgid "Arabic"
+msgstr ""
+
+msgid "Hebrew"
+msgstr ""
+
+msgid "Vietnamese"
+msgstr ""
+
+msgid "Baltic"
+msgstr ""
+
+msgid "Southern Europe"
+msgstr ""
+
+msgid "Nordic"
+msgstr ""
+
+msgid "Celtic"
+msgstr ""
+
+msgid "South-Eastern Europe"
+msgstr ""
+
+#. i18n: comma-separated list of common encoding names in your locale, e.g.
+#. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
+#.
+#. pick from the following encodings:
+#. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
+#. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
+#. cp1251, koi8-r, koi8-u, iso8859-7, cp1253, cp1254, cp1256, iso8859-6,
+#. cp1255, iso8859-8, cp1258, iso8859-4, iso8859-13, cp1257, iso8859-3,
+#. iso8859-10, iso8859-14, iso8859-16
+msgid "$FILE_ENCODINGS"
+msgstr ""
+
 msgctxt "column header"
 msgid "Filename"
 msgstr "Filnavn"
-
-msgid " (excluded from the next commit)"
-msgstr ""
 
 msgid "View change as unified diff output"
 msgstr ""
@@ -1539,14 +1594,17 @@ msgstr ""
 msgid "View change in context of file"
 msgstr ""
 
-msgid "annotate with revision numbers"
+msgid "Annotate with revision numbers"
 msgstr ""
 
-msgid "Next diff (alt+down)"
-msgstr "Næste dif (alt+ned)"
+msgid "Next Diff"
+msgstr ""
 
-msgid "Previous diff (alt+up)"
-msgstr "Forrige dif (alt+op)"
+msgid "Previous Diff"
+msgstr ""
+
+msgid "Open shelve tool"
+msgstr ""
 
 msgid "Show changes from first parent"
 msgstr ""
@@ -1554,16 +1612,29 @@ msgstr ""
 msgid "Show changes from second parent"
 msgstr ""
 
-msgid "Open shelve tool"
-msgstr ""
-
-msgid "Mark excluded changes"
+msgid "E&ncoding"
 msgstr ""
 
 msgid "&Search in Current File"
 msgstr ""
 
 msgid "Search in All &History"
+msgstr ""
+
+msgid "Go to Line"
+msgstr ""
+
+#, python-format
+msgid "Enter line number (1 - %d)"
+msgstr ""
+
+msgid "Show &Author"
+msgstr ""
+
+msgid "Show &Date"
+msgstr ""
+
+msgid "Show &Revision"
 msgstr ""
 
 msgid "Annotate Op&tions"
@@ -1599,17 +1670,17 @@ msgstr ""
 msgid "&Local"
 msgstr "&Lokal"
 
+msgid "&Parent Revision"
+msgstr ""
+
 #, python-format
 msgid "&Parent Revision (%d)"
 msgstr ""
 
-msgid "Show &Author"
+msgid "&Mark Excluded Changes"
 msgstr ""
 
-msgid "Show &Date"
-msgstr ""
-
-msgid "Show &Revision"
+msgid "(excluded from the next commit)"
 msgstr ""
 
 msgid "Interrupted graft operation found"
@@ -1675,11 +1746,11 @@ msgstr "Du må fortsætte eller starte podningen"
 msgid "Graft is complete"
 msgstr "Podning fuldført"
 
-msgid "Graft aborted"
-msgstr "Podning annuleret"
-
 msgid "Graft failed"
 msgstr "Podning fejlede"
+
+msgid "Graft aborted"
+msgstr "Podning annuleret"
 
 msgid ""
 "Graft generated merge <b>conflicts</b> that must be <a href=\"resolve"
@@ -1744,9 +1815,6 @@ msgstr ""
 "Kommasepareret liste af fil-mønstre som skal inkluderes. Som udgangspunkt "
 "bliver hele depotet gennemsøgt."
 
-msgid "TortoiseHg Search"
-msgstr "TortoiseHg Søgning"
-
 #, python-format
 msgid "\"%s\" removed from search history"
 msgstr "\"%s\" er fjernet fra søgehistorik"
@@ -1809,6 +1877,9 @@ msgstr "Bruger"
 
 msgid "Match Text"
 msgstr "Match tekst"
+
+msgid "TortoiseHg Search"
+msgstr "TortoiseHg Søgning"
 
 #, python-format
 msgid "Detect Copies/Renames in %s"
@@ -2169,19 +2240,6 @@ msgstr ""
 msgid "Workbench"
 msgstr "Arbejdsbord"
 
-#, python-format
-msgid "Manifest %s@%s"
-msgstr "Manifest %s@%s"
-
-msgid "### filter text ###"
-msgstr ""
-
-msgid "Filter:"
-msgstr ""
-
-msgid "Status"
-msgstr "Status"
-
 msgid "Find revisions matching fields of:"
 msgstr ""
 
@@ -2527,9 +2585,6 @@ msgstr "Indsender p4-ændringsliste..."
 msgid "Reverting p4 changelist..."
 msgstr ""
 
-msgid "Edit Repository URL"
-msgstr "Redigér depot-URL"
-
 msgid "Patch Branch Toolbar"
 msgstr ""
 
@@ -2586,6 +2641,9 @@ msgstr ""
 
 msgid "Graph"
 msgstr "Graf"
+
+msgid "Status"
+msgstr "Status"
 
 msgid "Title"
 msgstr "Titel"
@@ -2877,7 +2935,37 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-msgid "Unable to read/write config file"
+msgid "Unable to read file"
+msgstr ""
+
+msgid "Could not open the specified file for reading."
+msgstr ""
+
+msgid "This appears to be a binary file."
+msgstr ""
+
+msgid "An error occurred while reading the file."
+msgstr ""
+
+msgid "Text Translation Failure"
+msgstr ""
+
+msgid "Could not translate the file content from native encoding."
+msgstr ""
+
+msgid "Several characters would be lost."
+msgstr ""
+
+msgid "Unable to write file"
+msgstr ""
+
+msgid "Could not translate the file content to native encoding."
+msgstr ""
+
+msgid "Could not open the specified file for writing."
+msgstr ""
+
+msgid "An error occurred while writing the file."
 msgstr ""
 
 msgid "Try refreshing your repository."
@@ -2936,6 +3024,10 @@ msgstr ""
 msgid "\"%s\" is not a valid directory"
 msgstr ""
 
+#, python-format
+msgid "Invalid configuration: %s"
+msgstr ""
+
 msgid "Unable to start the following command:"
 msgstr ""
 
@@ -2953,9 +3045,6 @@ msgstr "Indtast venligst et brugernavn"
 
 msgid "You must identify yourself to Mercurial"
 msgstr "Du er nødt til at identificere dig for Mercurial"
-
-msgid "Text Translation Failure"
-msgstr ""
 
 msgid "Unable to translate input to local encoding."
 msgstr ""
@@ -3053,10 +3142,10 @@ msgstr ""
 msgid "Rebase is complete"
 msgstr ""
 
-msgid "Rebase aborted"
+msgid "Rebase failed"
 msgstr ""
 
-msgid "Rebase failed"
+msgid "Rebase aborted"
 msgstr ""
 
 msgid ""
@@ -3080,13 +3169,13 @@ msgstr "Marker denne blok som løst, gå til næste uløste"
 msgid "Mark this chunk as unresolved"
 msgstr "Marker denne blok som uløst"
 
-msgid "Unable to merge rejects"
+msgid "Reload File"
 msgstr ""
 
-msgid "Can't read this file (maybe deleted)"
+msgid "Are you sure you want to reload this file?"
 msgstr ""
 
-msgid "This appears to be a binary file"
+msgid "All unsaved changes will be lost."
 msgstr ""
 
 msgid "Warning"
@@ -3112,15 +3201,7 @@ msgstr ""
 msgid "Copy source -> destination"
 msgstr ""
 
-#, python-format
-msgid "Copy - %s"
-msgstr ""
-
 msgid "Copy Error"
-msgstr ""
-
-#, python-format
-msgid "Rename - %s"
 msgstr ""
 
 msgid "Select Source File"
@@ -3138,16 +3219,18 @@ msgstr ""
 msgid "The destination must be within the repository tree."
 msgstr ""
 
-msgid "Please give a destination that differs from the source"
-msgstr ""
-
 msgid "Destination file already exists."
 msgstr ""
 
 msgid "Are you sure you want to overwrite it ?"
 msgstr ""
 
-msgid "Cannot do a pure casefolding copy on Windows"
+#, python-format
+msgid "Copy - %s"
+msgstr ""
+
+#, python-format
+msgid "Rename - %s"
 msgstr ""
 
 msgid "Show all"
@@ -3599,10 +3682,6 @@ msgstr ""
 
 msgctxt "tab tooltip"
 msgid "Synchronize"
-msgstr ""
-
-msgctxt "tab tooltip"
-msgid "Manifest"
 msgstr ""
 
 msgctxt "tab tooltip"
@@ -4215,13 +4294,34 @@ msgstr ""
 msgid "File List Toolbar"
 msgstr ""
 
-msgid "Update to this revision"
+msgid "Manifest Mode"
 msgstr ""
 
-msgid "Show All"
-msgstr "Vis alle"
+msgid "Show the full manifest in tree view"
+msgstr ""
 
-msgid "Toggle display of all files and the direction they were merged"
+msgid "Fl&at List View"
+msgstr ""
+
+msgid "### filter text ###"
+msgstr ""
+
+msgid "&Changed by This Commit"
+msgstr ""
+
+msgid "Show files changed by this commit"
+msgstr ""
+
+msgid "Compare to &1st Parent"
+msgstr ""
+
+msgid "Compare to &2nd Parent"
+msgstr ""
+
+msgid "Toggle parent to be used as the base revision"
+msgstr ""
+
+msgid "&Filter by Status"
 msgstr ""
 
 #, python-format
@@ -4469,6 +4569,17 @@ msgstr "thg: %s\n"
 msgid "abort: %s!\n"
 msgstr "afbrudt: %s!\n"
 
+#, python-format
+msgid "abort: %s\n"
+msgstr ""
+
+#, python-format
+msgid "(%s)\n"
+msgstr ""
+
+msgid "option --config may not be abbreviated!"
+msgstr ""
+
 msgid "invalid arguments"
 msgstr "ugyldige parametre"
 
@@ -4494,6 +4605,9 @@ msgstr "undertryk output"
 
 msgid "display help and exit"
 msgstr "vis hjælp og exit"
+
+msgid "set/override config option (use 'section.name=value')"
+msgstr ""
 
 msgid "start debugger"
 msgstr "start debugger"
@@ -4589,8 +4703,8 @@ msgstr "brug træk-protokol til at kopiere metadata"
 msgid "use uncompressed transfer (fast over LAN)"
 msgstr ""
 
-msgid "thg clone [OPTION]... SOURCE [DEST]"
-msgstr "thg clone [FLAG]... KILDE [MÅL]"
+msgid "thg clone [OPTION]... [SOURCE] [DEST]"
+msgstr ""
 
 msgid "record user as committer"
 msgstr "noter bruger som integrator"
@@ -4776,8 +4890,8 @@ msgstr ""
 msgid "thg remove [FILE]..."
 msgstr "thg remove [FIL]..."
 
-msgid "thg rename SOURCE [DEST]..."
-msgstr "thg rename KILDE [MÅL]..."
+msgid "thg rename [SOURCE] [DEST]"
+msgstr ""
 
 msgid "field to give initial focus"
 msgstr "felt som gives indledende fokus"
@@ -4927,6 +5041,15 @@ msgstr "TortoiseHg Dialoger (version %s), Mercurial (version %s)\n"
 msgid "Location:"
 msgstr ""
 
+msgid "Update to:"
+msgstr "Opdater til:"
+
+msgid "Target:"
+msgstr "Mål:"
+
+msgid "Options:"
+msgstr "Indstillinger:"
+
 msgid "Discard remote changes, no backup (-C/--clean)"
 msgstr ""
 
@@ -4938,6 +5061,19 @@ msgstr ""
 
 msgid "Force push to remote location (-f/--force)"
 msgstr ""
+
+msgid "remove working directory"
+msgstr ""
+
+msgid "unknown revision!"
+msgstr "ukendt revision!"
+
+#, python-format
+msgid "Remote Update - %s"
+msgstr ""
+
+msgid "&Update"
+msgstr "&Opdatér"
 
 msgid "Log"
 msgstr ""
@@ -5091,7 +5227,7 @@ msgstr ""
 
 msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
-"always"
+"localonly"
 msgstr ""
 
 msgid "Max Diff Size"
@@ -5204,9 +5340,8 @@ msgstr ""
 msgid ""
 "Specify which task buttons you want to show on the task toolbar and in which "
 "order.<br>Type a list of the task button names. Add separators by putting \"|"
-"\" between task button names.<br>Valid names are: log commit mq sync "
-"manifest grep and pbranch.<br>Default: log commit manifest grep pbranch | "
-"sync"
+"\" between task button names.<br>Valid names are: log commit sync grep and "
+"pbranch.<br>Default: log commit grep pbranch | sync"
 msgstr ""
 
 msgid "Long Summary"
@@ -5350,6 +5485,16 @@ msgstr ""
 msgid "Make MQ patches secret (instead of draft). Default: False"
 msgstr ""
 
+msgid "Check Subrepo Phase"
+msgstr ""
+
+msgid ""
+"Check the phase of the current revision of each subrepository.  For settings "
+"other than \"ignore\", the phase of the current revision of each "
+"subrepository is checked before committing the parent repository.  Default: "
+"follow"
+msgstr ""
+
 msgid "Monitor working<br>directory changes"
 msgstr ""
 
@@ -5439,7 +5584,20 @@ msgstr ""
 msgid "Server"
 msgstr ""
 
-msgid "<b>Behavior:</b>"
+msgid "<b>Repository Details:</b>"
+msgstr ""
+
+msgid ""
+"Repository name to use in the web interface, and by TortoiseHg as a "
+"shorthand name.  Default is the working directory."
+msgstr ""
+
+msgid "Encoding"
+msgstr "Indkodning"
+
+msgid ""
+"Character encoding of files in the repository, used by the web interface and "
+"TortoiseHg."
 msgstr ""
 
 msgid "'Publishing' repository"
@@ -5455,11 +5613,6 @@ msgstr ""
 "ændringer bliver sat til public hos klienten. Standard: sand"
 
 msgid "<b>Web Server:</b>"
-msgstr ""
-
-msgid ""
-"Repository name to use in the web interface, and by TortoiseHg as a "
-"shorthand name.  Default is the working directory."
 msgstr ""
 
 msgid "Textual description of the repository's purpose or contents."
@@ -5555,12 +5708,6 @@ msgstr ""
 "afvist. Indholdet af tillad_skub listen bliver undersøgt efter forbyd_skub "
 "listen."
 
-msgid "Encoding"
-msgstr "Indkodning"
-
-msgid "Character encoding name"
-msgstr "Navn på indkodning af tegn"
-
 msgid "Proxy"
 msgstr "Proxy"
 
@@ -5645,8 +5792,8 @@ msgstr "Port til at forbinde til mail server. Standard: 25"
 msgid "SMTP TLS"
 msgstr "SMTP TLS"
 
-msgid "Connect to mail server using TLS. Default: False"
-msgstr "Forbind til mail server via TLS. Standard: Falsk"
+msgid "Method to enable TLS when connecting to mail server. Default: none"
+msgstr ""
 
 msgid "SMTP Username"
 msgstr "SMTP brugernavn"
@@ -6285,6 +6432,9 @@ msgstr ""
 msgid "Signature has been added"
 msgstr ""
 
+msgid "Filter:"
+msgstr ""
+
 msgid "Check all files"
 msgstr ""
 
@@ -6395,9 +6545,6 @@ msgstr ""
 msgid "subrepo"
 msgstr ""
 
-msgid "TortoiseHg Sync"
-msgstr ""
-
 msgid "Check for incoming changes from selected URL"
 msgstr ""
 
@@ -6421,9 +6568,6 @@ msgstr ""
 
 msgid "Stop current operation"
 msgstr ""
-
-msgid "Target:"
-msgstr "Mål:"
 
 msgid "<b>Selected Options:</b>"
 msgstr ""
@@ -6481,9 +6625,6 @@ msgstr ""
 msgid "Delete %s from your repo configuration file?"
 msgstr ""
 
-msgid "Are you sure that you want to cancel synchronization?"
-msgstr ""
-
 msgid "No host specified"
 msgstr ""
 
@@ -6527,6 +6668,10 @@ msgid "Incoming from %s aborted, ret %d"
 msgstr ""
 
 #, python-format
+msgid "Pulling from %s..."
+msgstr "Trækker fra %s..."
+
+#, python-format
 msgid "Pull from %s completed"
 msgstr "Træk fra %s fuldført"
 
@@ -6541,15 +6686,15 @@ msgid "File conflicts need to be resolved"
 msgstr ""
 
 #, python-format
-msgid "Pulling from %s..."
-msgstr "Trækker fra %s..."
-
-#, python-format
 msgid "Finding outgoing changesets to %s..."
 msgstr ""
 
 #, python-format
 msgid "%d outgoing changesets to %s"
+msgstr ""
+
+#, python-format
+msgid "outgoing changesets to %s found"
 msgstr ""
 
 #, python-format
@@ -6560,8 +6705,7 @@ msgstr ""
 msgid "Outgoing to %s aborted, ret %d"
 msgstr ""
 
-#, python-format
-msgid "outgoing changesets to %s found"
+msgid "Perforce pending..."
 msgstr ""
 
 #, python-format
@@ -6588,9 +6732,6 @@ msgstr "Afbrudt p4pending"
 msgid "Unable to determine pending changesets"
 msgstr "Ikke i stand til at bestemme afventende ændringssæt"
 
-msgid "Perforce pending..."
-msgstr ""
-
 msgid "Confirm Push to remote Repository"
 msgstr "Bekræft skub til fjern-depot"
 
@@ -6606,6 +6747,12 @@ msgstr ""
 
 #, python-format
 msgid "Push to %s aborted"
+msgstr ""
+
+#, python-format
+msgid ""
+"Invalid default push revision: %s. Please check your Mercurial configuration "
+"(tortoisehg.defaultpush)"
 msgstr ""
 
 #, python-format
@@ -6626,12 +6773,6 @@ msgid ""
 "repository?"
 msgstr ""
 
-#, python-format
-msgid ""
-"Invalid default push revision: %s. Please check your Mercurial configuration "
-"(tortoisehg.defaultpush)"
-msgstr ""
-
 msgid "Determining outgoing changesets to email..."
 msgstr ""
 
@@ -6649,6 +6790,12 @@ msgid "Bundle files (*.hg)"
 msgstr ""
 
 msgid "Unable to remove URL"
+msgstr ""
+
+msgid "TortoiseHg Sync"
+msgstr ""
+
+msgid "Are you sure that you want to cancel synchronization?"
 msgstr ""
 
 msgid "Post Pull Behavior"
@@ -6890,6 +7037,10 @@ msgstr ""
 msgid "Patch files (*.diff *.patch)"
 msgstr ""
 
+#, python-format
+msgid "Import - %s"
+msgstr "Importér - %s"
+
 msgid "Browse Directory..."
 msgstr "Gennemse katalog..."
 
@@ -6910,10 +7061,6 @@ msgstr ""
 
 msgid "&Import"
 msgstr ""
-
-#, python-format
-msgid "Import - %s"
-msgstr "Importér - %s"
 
 msgid "Working directory is not clean!  <a href=\"view\">View changes...</a>"
 msgstr ""
@@ -6938,21 +7085,11 @@ msgstr "Intet at importere"
 msgid "Strip:"
 msgstr "Fjern:"
 
-msgid "Options:"
-msgstr "Indstillinger:"
-
 msgid "Discard local changes, no backup (-f/--force)"
 msgstr "Kasser lokale ændringer, uden sikkerhedskopi (-f/--force)"
 
 msgid "No backup (-n/--nobackup)"
 msgstr "Ingen sikkerhedskopiering (-n/--nobackup)"
-
-msgid "&Strip"
-msgstr ""
-
-#, python-format
-msgid "Strip - %s"
-msgstr "Fjern - %s"
 
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
@@ -6966,14 +7103,24 @@ msgstr "Ukendt revision!"
 msgid "Detected uncommitted local changes."
 msgstr ""
 
-msgid "Do you want to discard them and continue?"
+msgid "Do you want to keep them or discard them?"
 msgstr ""
 
-msgid "&Yes (--force)"
-msgstr "&Ja (--force)"
+msgid "&Keep (--keep)"
+msgstr ""
+
+msgid "&Discard (--force)"
+msgstr ""
 
 msgid "Confirm Strip"
 msgstr "Bekræft fjern"
+
+#, python-format
+msgid "Strip - %s"
+msgstr "Fjern - %s"
+
+msgid "&Strip"
+msgstr ""
 
 msgid "response expected"
 msgstr "svar forventet"
@@ -7062,18 +7209,11 @@ msgid "hg: unknown command '%s'\n"
 msgstr ""
 
 #, python-format
-msgid "abort: %s\n"
-msgstr ""
-
-#, python-format
 msgid "abort: error: %s\n"
 msgstr ""
 
 msgid "broken pipe\n"
 msgstr ""
-
-msgid "Update to:"
-msgstr "Opdater til:"
 
 msgid "Parent 1:"
 msgstr "Forælder 1:"
@@ -7090,24 +7230,8 @@ msgstr "Forkast lokale ændringer, ingen sikkerhedskopi (-C/--clean)"
 msgid "Always merge (when possible)"
 msgstr "Flet altid (når det er muligt)"
 
-msgid "Always show command log"
-msgstr "Vis altid kommando-log"
-
-msgid "&Update"
-msgstr "&Opdatér"
-
-#, python-format
-msgid "Update - %s"
-msgstr "Opdater - %s"
-
-msgid "remove working directory"
-msgstr ""
-
 msgid "(same as parent)"
 msgstr "(samme som forælder)"
-
-msgid "unknown revision!"
-msgstr "ukendt revision!"
 
 msgid "Activate bookmark?"
 msgstr ""
@@ -7154,6 +7278,10 @@ msgstr "Flet - for at flette med lokale ændringer"
 
 msgid "Confirm Update"
 msgstr "Bekræft opdater"
+
+#, python-format
+msgid "Update - %s"
+msgstr "Opdater - %s"
 
 msgid "[non-existant]"
 msgstr "[ikke-eksisterende]"
@@ -7293,6 +7421,12 @@ msgstr ""
 msgid " Aborted"
 msgstr " Afbrudt"
 
+msgid "Cannot open subrepository"
+msgstr "Kan ikke åbne underdepot"
+
+msgid "The selected subrepository does not exist on the working directory"
+msgstr "Det valgte underdepot findes ikke i arbejdskataloget"
+
 msgid "Uncommited merge - please select a parent revision"
 msgstr "Ikke-integreret flet - vælg en forælderrevision"
 
@@ -7431,9 +7565,6 @@ msgstr ""
 msgid "Revision &Details"
 msgstr ""
 
-msgid "&Manifest"
-msgstr ""
-
 msgid "&Search"
 msgstr ""
 
@@ -7467,7 +7598,16 @@ msgstr ""
 msgid "Go to a specific revision"
 msgstr ""
 
-msgid "Start &Web Server"
+msgid "&Filter Toolbar"
+msgstr ""
+
+msgid "Filter graph with revision sets or branches"
+msgstr ""
+
+msgid "&Workbench Toolbars"
+msgstr ""
+
+msgid "Update working directory or switch revisions"
 msgstr ""
 
 msgid "&Shelve..."
@@ -7476,22 +7616,25 @@ msgstr ""
 msgid "&Import..."
 msgstr ""
 
-msgid "&Verify"
-msgstr ""
-
-msgid "Re&cover"
-msgstr ""
-
 msgid "&Resolve..."
 msgstr ""
 
-msgid "Rollback/&Undo..."
+msgid "R&ollback/Undo..."
 msgstr ""
 
 msgid "&Purge..."
 msgstr ""
 
 msgid "&Bisect..."
+msgstr ""
+
+msgid "&Verify"
+msgstr ""
+
+msgid "Re&cover"
+msgstr ""
+
+msgid "&Web Server"
 msgstr ""
 
 msgid "E&xplorer Help"
@@ -7505,15 +7648,6 @@ msgstr "Om &Qt"
 
 msgid "&About TortoiseHg"
 msgstr "&Om TortoiseHg"
-
-msgid "&Filter Toolbar"
-msgstr ""
-
-msgid "Filter graph with revision sets or branches"
-msgstr ""
-
-msgid "&Workbench Toolbars"
-msgstr ""
 
 msgid "&Incoming"
 msgstr ""
@@ -8004,6 +8138,9 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "(No help text available)"
 #~ msgstr "(Ingen hjælpetekst)"
+
+#~ msgid "Source path is empty"
+#~ msgstr "Kilde sti er tom"
 
 #~ msgid ""
 #~ "Your username has not been configured.\n"
@@ -8856,6 +8993,9 @@ msgstr "depot %s ikke fundet"
 #~ msgid "Maximum number of changes to list on the changelog."
 #~ msgstr "Maksimum antal ændringer at vise i ændringsloggen."
 
+#~ msgid "Character encoding name"
+#~ msgstr "Navn på indkodning af tegn"
+
 #~ msgid "Edit remote repository path"
 #~ msgstr "Rediger sti til fjerndepot"
 
@@ -9137,6 +9277,9 @@ msgstr "depot %s ikke fundet"
 #~ "Depotnavn der skal anvendes i web grænsefladen. Standard er "
 #~ "arbejdskataloget."
 
+#~ msgid "Connect to mail server using TLS. Default: False"
+#~ msgstr "Forbind til mail server via TLS. Standard: Falsk"
+
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "Ignorer blanktegn ved sammenligning af linjer. Standard: Falsk"
 
@@ -9371,6 +9514,9 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "Confirm Abort"
 #~ msgstr "Bekræft Afbrydelse"
+
+#~ msgid "Source and destination are the same"
+#~ msgstr "Kilde og destination er den samme"
 
 #~ msgid "Please specify different paths"
 #~ msgstr "Venligst angiv forskellige stier"
@@ -9867,6 +10013,9 @@ msgstr "depot %s ikke fundet"
 #~ msgstr ""
 #~ "Fandt ikke-integrerede lokale ændringer.\n"
 #~ "Ønsker du at forkaste dem og fortsætte?"
+
+#~ msgid "&Yes (--force)"
+#~ msgstr "&Ja (--force)"
 
 #~ msgid "Stripped successfully"
 #~ msgstr "Fjern gennemført"
@@ -11057,15 +11206,6 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "Use merge tool:"
 #~ msgstr "Brug flet-værktøj:"
-
-#~ msgid "Activate"
-#~ msgstr "Aktivér"
-
-#~ msgid "Repository:"
-#~ msgstr "Depot:"
-
-#~ msgid "Patches:"
-#~ msgstr "Lapper:"
 
 #~ msgid "Bookmark \"%s\" has been renamed to \"%s\""
 #~ msgstr "Bogmærke \"%s\" er blevet omdøbt til \"%s\""

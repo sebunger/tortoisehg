@@ -16,7 +16,7 @@ from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, lexers, visdiff, revert, rejects
-from tortoisehg.hgqt import filelistmodel, filelistview, filedata, blockmatcher
+from tortoisehg.hgqt import filelistview, filedata, blockmatcher, manifestmodel
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -38,11 +38,10 @@ class ChunksWidget(QWidget):
 
     contextmenu = None
 
-    def __init__(self, repoagent, parent, multiselectable):
+    def __init__(self, repoagent, parent):
         QWidget.__init__(self, parent)
 
         self._repoagent = repoagent
-        self.multiselectable = multiselectable
         self.currentFile = None
 
         layout = QVBoxLayout(self)
@@ -57,9 +56,10 @@ class ChunksWidget(QWidget):
         self.layout().addWidget(self.splitter)
 
         repo = self._repoagent.rawRepo()
-        self.filelist = filelistview.HgFileListView(repo, self, multiselectable)
-        self.filelistmodel = filelistmodel.HgFileListModel(self)
-        self.filelist.setModel(self.filelistmodel)
+        self.filelist = filelistview.HgFileListView(self)
+        model = manifestmodel.ManifestModel(
+            repoagent, self, statusfilter='MAR', flat=True)
+        self.filelist.setModel(model)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.filelist.customContextMenuRequested.connect(self.menuRequest)
         self.filelist.doubleClicked.connect(self.vdiff)
@@ -448,7 +448,7 @@ class ChunksWidget(QWidget):
 
     def setContext(self, ctx):
         self.diffbrowse.setContext(ctx)
-        self.filelist.setContext(ctx)
+        self.filelist.model().setRawContext(ctx)
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)
@@ -716,7 +716,8 @@ class DiffBrowser(QFrame):
         self._lastfile = filename
         self.clearChunks()
 
-        fd = filedata.FileData(self._ctx, None, filename, status, force=force)
+        fd = filedata.createFileData(self._ctx, None, filename, status)
+        fd.load(force=force)
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
