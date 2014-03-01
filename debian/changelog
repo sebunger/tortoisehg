@@ -1,3 +1,9 @@
+tortoisehg (2.11-1) UNRELEASED; urgency=medium
+
+  * Imported Upstream version 2.11 (Closes: #738816).
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Fri, 28 Feb 2014 22:46:04 -0800
+
 tortoisehg (2.10-1) unstable; urgency=low
 
   * Imported Upstream version 2.10
