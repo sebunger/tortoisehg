@@ -12,11 +12,23 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.filelistview import HgFileListView
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
+from tortoisehg.hgqt import customtools
 from tortoisehg.hgqt import filectxactions, manifestmodel, qtlib, cmdui, status
 from tortoisehg.util import hglib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+_fileactionsbytype = {
+    'subrepo': ['openSubrepo', 'explore', 'terminal', 'copyPath', None,
+                'revertFile'],
+    'file': ['visualDiffFile', 'visualDiffFileToLocal', None, 'editFile',
+             'saveFile', None, 'editLocalFile', 'openLocalFile', 'copyPath',
+             None, 'revertFile', None, 'navigateFileLog', 'navigateFileDiff',
+             'filterFile'],
+    'dir': ['visualDiffFile', 'visualDiffFileToLocal', None, 'revertFile',
+            None, 'filterFile', None, 'explore', 'terminal', 'copyPath'],
+    }
 
 class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 
@@ -170,19 +182,17 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._fileactions = filectxactions.FilectxActions(self._repoagent, self)
         self._fileactions.linkActivated.connect(self.linkActivated)
         self._fileactions.filterRequested.connect(self.revsetFilterRequested)
-        self._fileactions.runCustomCommandRequested.connect(
-            self.runCustomCommandRequested)
         self.addActions(self._fileactions.actions())
 
     def _createFileListActions(self):
         tbar = self.filelisttbar
-        self._actionManifestMode = a = tbar.addAction(_('Manifest Mode'))
+        self._actionManifestMode = a = tbar.addAction(_('Ma&nifest Mode'))
         a.setCheckable(True)
         a.setIcon(qtlib.geticon('hg-annotate'))
-        a.setToolTip(_('Show the full manifest in tree view'))
+        a.setToolTip(_('Show all version-controlled files in tree view'))
         a.triggered.connect(self._applyManifestMode)
 
-        self._actionFlatFileList = a = QAction(_('Fl&at List View'), self)
+        self._actionFlatFileList = a = QAction(_('&Flat List'), self)
         a.setCheckable(True)
         a.setChecked(True)
         a.triggered.connect(self._applyFlatFileList)
@@ -205,7 +215,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._parentToggleGroup = QActionGroup(self)
         self._parentToggleGroup.triggered.connect(self._selectParentRevision)
         for i, (icon, text, tip) in enumerate([
-                ('hg-merged-both', _('&Changed by This Commit'),
+                ('hg-merged-both', _('Changed by &This Commit'),
                  _('Show files changed by this commit')),
                 ('hg-merged-p1', _('Compare to &1st Parent'),
                  _('Show changes from first parent')),
@@ -264,6 +274,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._setContextToFileList(ctx)
 
     def _setContextToFileList(self, ctx):
+        # useless to toggle manifest mode in patchctx
+        self._actionManifestMode.setEnabled(not ctx.thgmqunappliedpatch())
+
         self._parentToggleGroup.setVisible(len(ctx.parents()) == 2)
         self._actionParentToggle.setVisible(self._parentToggleGroup.isVisible())
 
@@ -318,14 +331,14 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def onDoubleClick(self, index):
         model = self.filelist.model()
         if model.subrepoType(index):
-            self._fileactions.opensubrepo()
+            self._fileactions.openSubrepo()
         elif model.isDir(index):
             # expand/collapse tree by default
             pass
         elif model.fileStatus(index) == 'C':
-            self._fileactions.editfile()
+            self._fileactions.editFile()
         else:
-            self._fileactions.vdiff()
+            self._fileactions.visualDiffFile()
 
     def filePath(self):
         return hglib.tounicode(self.filelist.currentFile())
@@ -348,18 +361,67 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
-        contextmenu = self._fileactions.createMenu(self)
-        if contextmenu:
+        contextmenu = QMenu(self)
+        if self.filelist.currentIndex().isValid():
+            self._setupFileMenu(contextmenu)
+            self._setupCustomSubmenu(contextmenu)
             contextmenu.addSeparator()
-        else:
-            contextmenu = QMenu(self)
 
-        m = contextmenu.addMenu(_('&Filter by Status'))
+        m = contextmenu.addMenu(_('List Optio&ns'))
+        m.addAction(self._actionManifestMode)
+        m.addSeparator()
         m.addActions(self._fileStatusFilter.actions())
-        contextmenu.addAction(self._actionFlatFileList)
+        m.addSeparator()
+        m.addActions(self._parentToggleGroup.actions())
+        m.addSeparator()
+        m.addAction(self._actionFlatFileList)
 
         contextmenu.setAttribute(Qt.WA_DeleteOnClose)
         contextmenu.popup(self.filelist.viewport().mapToGlobal(point))
+
+    def _setupFileMenu(self, contextmenu):
+        index = self.filelist.currentIndex()
+        model = self.filelist.model()
+
+        # Subrepos and regular items have different context menus
+        if model.subrepoType(index):
+            actnames = _fileactionsbytype['subrepo']
+        elif model.isDir(index):
+            actnames = _fileactionsbytype['dir']
+        else:
+            actnames = _fileactionsbytype['file']
+        for act in actnames:
+            if act:
+                contextmenu.addAction(self._fileactions.action(act))
+            else:
+                contextmenu.addSeparator()
+
+    def _setupCustomSubmenu(self, menu):
+        def make(text, func, types=None, icon=None, inmenu=None):
+            action = inmenu.addAction(text)
+            if icon:
+                action.setIcon(qtlib.geticon(icon))
+            return action
+
+        menu.addSeparator()
+        customtools.addCustomToolsSubmenu(menu, self.repo.ui,
+            location='workbench.filelist.custom-menu',
+            make=make,
+            slot=self._runCustomCommandByMenu)
+
+    @pyqtSlot(QAction)
+    def _runCustomCommandByMenu(self, action):
+        model = self.filelist.model()
+        selmodel = self.filelist.selectionModel()
+        selfds = map(model.fileData, selmodel.selectedIndexes())
+        files = [fd.filePath() for fd in selfds
+                 if os.path.exists(fd.absoluteFilePath())]
+        if not files:
+            qtlib.WarningMsgBox(_('File(s) not found'),
+                _('The selected files do not exist in the working directory'))
+            return
+        self.runCustomCommandRequested.emit(
+            str(action.data().toString()), files)
 
     @pyqtSlot()
     def updateItemFileActions(self):

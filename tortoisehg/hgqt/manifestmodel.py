@@ -132,11 +132,10 @@ class ManifestModel(QAbstractItemModel):
         elif e.isdir:
             ic = self._fileiconprovider.icon(QFileIconProvider.Folder)
         else:
-            # assumes file still exists in wdir; otherwise falls back to default
-            info = QFileInfo(os.path.join(self._repoagent.rootPath(), e.path))
-            ic = self._fileiconprovider.icon(info)
-            if ic.isNull():
-                ic = self._fileiconprovider.icon(QFileIconProvider.File)
+            # do not use fileiconprovier.icon(fileinfo), which may return icon
+            # with shell (i.e. status of working directory) overlay.
+            # default file icon looks ugly with status overlay on Windows
+            ic = qtlib.geticon('text-x-generic')
 
         if not e.status:
             return ic
@@ -499,6 +498,9 @@ def _isreporev(rev):
     return rev is None or isinstance(rev, int)
 
 def _samectx(ctx1, ctx2):
+    # no fast way to detect changes in uncommitted ctx, just assumes different
+    if ctx1.rev() is None or not _isreporev(ctx1.rev()):
+        return False
     # compare hash in case it was stripped and recreated (e.g. by qrefresh)
     return ctx1 == ctx2 and ctx1.node() == ctx2.node()
 
@@ -603,7 +605,9 @@ def _comparesubstate(state1, state2):
 def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
     ctx = roote.ctx
     pctx = roote.pctx
-    for path, sub in subrepo.itersubrepos(ctx, pctx):
+    subpaths = set(pctx.substate)
+    subpaths.update(ctx.substate)
+    for path in subpaths:
         substate = ctx.substate.get(path, subrepo.nullstate)
         psubstate = pctx.substate.get(path, subrepo.nullstate)
         e = _Entry()
@@ -614,15 +618,17 @@ def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
         else:
             e.subkind = substate[2]
 
+        # do not call ctx.sub() unnecessarily, which may raise Abort or OSError
+        # if git or svn executable not found
         if (nodeop.subreporecursive and e.subkind == 'hg' and e.status != 'R'
             and os.path.isdir(repo.wjoin(path))):
-            srepo = sub._repo
             smatch = matchmod.narrowmatcher(path, match)
             try:
+                srepo = ctx.sub(path)._repo
                 e.ctx = srepo[substate[1]]
                 e.pctx = srepo[psubstate[1] or 'null']
                 _populaterepo(e, srepo, nodeop, statusfilter, smatch)
-            except error.RepoLookupError:
+            except (error.RepoError, EnvironmentError):
                 pass
 
         # subrepo is filtered out only if the node and its children do not

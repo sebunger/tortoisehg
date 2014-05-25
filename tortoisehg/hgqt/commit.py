@@ -11,13 +11,13 @@ import tempfile
 
 from mercurial import util, error, scmutil, phases
 
-from tortoisehg.util import hglib, shlib, wconfig
+from tortoisehg.util import hglib, partialcommit, shlib, wconfig
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import cmdcore, cmdui
 from tortoisehg.hgqt import qtlib, qscilib, status, branchop, revpanel
-from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n, partialcommit
+from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -58,6 +58,19 @@ def commitopts2str(opts, mode='commit'):
             elif value:
                 optslist.append('--%s=%s' % (opt, value))
     return ' '.join(optslist)
+
+def mergecommitmessage(repo):
+    wctx = repo[None]
+    engmsg = repo.ui.configbool('tortoisehg', 'engmsg', False)
+    if wctx.p1().branch() == wctx.p2().branch():
+        msgset = i18n.keepgettext()._('Merge')
+        text = engmsg and msgset['id'] or msgset['str']
+        text = unicode(text)
+    else:
+        msgset = i18n.keepgettext()._('Merge with %s')
+        text = engmsg and msgset['id'] or msgset['str']
+        text = unicode(text) % hglib.tounicode(wctx.p2().branch())
+    return text
 
 _topicmap = {
     'amend': _('Commit', 'start progress'),
@@ -144,6 +157,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             toolTip=_('Copy one of the recent commit messages'))
         self.recentMessagesButton.clicked.connect(
             self.recentMessagesButton.showMenu)
+        m = QMenu(self.recentMessagesButton)
+        m.triggered.connect(self.msgSelected)
+        self.recentMessagesButton.setMenu(m)
         tbar.addWidget(self.recentMessagesButton)
         self.updateRecentMessages()
 
@@ -417,6 +433,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             if self.lastAction in ('qref', 'amend'):
                 self.lastCommitMsgs['amend'] = self.msgte.text()
                 self.setMessage(self.lastCommitMsgs['commit'])
+            elif len(self.repo[None].parents()) > 1:
+                self.setMessage(mergecommitmessage(self.repo))
         if curraction._name == 'amend':
             self.stwidget.defcheck = 'amend'
         else:
@@ -583,7 +601,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
-        # refresh() may save the stale 'amend' message in commitSetAction()
+        self.lastCommitMsgs['amend'] = ''  # avoid loading stale cache
+        # refresh() may load/save the stale 'amend' message in commitSetAction()
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
         # clear the last 'amend' message
@@ -591,7 +610,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # in which we may write a commit message first, modify the repository
         # (e.g. amend or update and merge uncommitted changes) and then do the
         # actual commit
-        self.lastCommitMsgs['amend'] = ''
+        self.lastCommitMsgs['amend'] = ''  # clear saved stale cache
 
     @pyqtSlot()
     def refreshWctx(self):
@@ -691,12 +710,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def updateRecentMessages(self):
         # Define a menu that lists recent messages
-        m = QMenu(self.recentMessagesButton)
+        m = self.recentMessagesButton.menu()
+        m.clear()
         for s in self.msghistory:
             title = s.split('\n', 1)[0][:70]
-            def overwriteMsg(newMsg): return lambda: self.msgSelected(newMsg)
-            m.addAction(title).triggered.connect(overwriteMsg(s))
-        self.recentMessagesButton.setMenu(m)
+            a = m.addAction(title)
+            a.setData(s)
 
     def getMessage(self, allowreplace):
         text = self.msgte.text()
@@ -708,13 +727,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             else:
                 raise
 
-    def msgSelected(self, message):
+    @pyqtSlot(QAction)
+    def msgSelected(self, action):
         if self.msgte.text() and self.msgte.isModified():
             d = QMessageBox.question(self, _('Confirm Discard Message'),
                         _('Discard current commit message?'),
                         QMessageBox.Ok | QMessageBox.Cancel)
             if d != QMessageBox.Ok:
                 return
+        message = action.data().toString()
         self.setMessage(message)
         self.msgte.setFocus()
 
@@ -804,7 +825,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             return
 
         if not msg:
-            qtlib.WarningMsgBox(_('Nothing Commited'),
+            qtlib.WarningMsgBox(_('Nothing Committed'),
                                 _('Please enter commit message'),
                                 parent=self)
             self.msgte.setFocus()
@@ -817,7 +838,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             if issueregex:
                 m = re.search(issueregex, msg)
                 if not m:
-                    qtlib.WarningMsgBox(_('Nothing Commited'),
+                    qtlib.WarningMsgBox(_('Nothing Committed'),
                                         _('No issue link was found in the '
                                           'commit message.  The commit message '
                                           'should contain an issue link.  '
@@ -1012,6 +1033,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 if self.currentAction == 'commit':
                     shlib.shell_notify(self.files)
                     self.commitComplete.emit()
+        elif ret == 1 and self.currentAction in ('amend', 'commit'):
+            qtlib.WarningMsgBox(_('Nothing Committed'),
+                                _('Nothing changed.'),
+                                parent=self)
         else:
             cmdui.errorMessageBox(self._cmdsession, self,
                                   _('Commit', 'window title'))

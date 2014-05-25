@@ -440,10 +440,12 @@ def genEditCombo(opts, defaults=[]):
     opts['defaults'] = defaults
     return SettingsCombo(**opts)
 
-def genIntEditCombo(opts):
+def genIntEditCombo(opts, defaults=None):
     'EditCombo, only allows integer values'
     opts['canedit'] = True
     opts['validator'] = QIntValidator(None)  # missing parent=None on PyQt4.6
+    if defaults:
+        opts['defaults'] = ['%d' % n for n in defaults]
     return SettingsCombo(**opts)
 
 def genLineEditBox(opts):
@@ -619,7 +621,7 @@ INFO = (
           'with changes on both sides of the merge will report as conflicting, '
           'even if the edits are to different parts of the file. In either '
           'case, when conflicts occur, the user will be invited to review and '
-          'resolve changes manually. Default: False.')),
+          'resolve changes manually. Default: True.')),
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
@@ -908,7 +910,7 @@ INFO = (
           'is enough to use sendmail to send messages.')),
     _fi(_('SMTP Host'), 'smtp.host', genEditCombo,
         _('Host name of mail server')),
-    _fi(_('SMTP Port'), 'smtp.port', genIntEditCombo,
+    _fi(_('SMTP Port'), 'smtp.port', (genIntEditCombo, [25, 465, 587]),
         _('Port to connect to on mail server. '
           'Default: 25')),
     _fi(_('SMTP TLS'), 'smtp.tls',

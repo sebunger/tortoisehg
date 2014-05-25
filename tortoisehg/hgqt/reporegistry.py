@@ -286,7 +286,7 @@ class RepoRegistryView(QDockWidget):
 
     @pyqtSlot()
     def _initView(self):
-        self.expand()
+        self._loadExpandedState()
         self._updateColumnVisibility()
         if self._isSettingEnabled('showSubrepos'):
             self._scanAllRepos()
@@ -305,6 +305,15 @@ class RepoRegistryView(QDockWidget):
         s.beginGroup('Workbench')  # for compatibility with old release
         for key, action in self._settingactions.iteritems():
             s.setValue(key, action.isChecked())
+        s.endGroup()
+        s.beginGroup('reporegistry')
+        self._writeExpandedState(s)
+        s.endGroup()
+
+    def _loadExpandedState(self):
+        s = QSettings()
+        s.beginGroup('reporegistry')
+        self._readExpandedState(s)
         s.endGroup()
 
     def _setupSettingActions(self):
@@ -375,13 +384,21 @@ class RepoRegistryView(QDockWidget):
         oldmodel.deleteLater()
         if self._isSettingEnabled('showSubrepos'):
             self._scanAllRepos()
-        self.expand()
+        self._loadExpandedState()
         if activeroot:
             self.setActiveTabRepo(activeroot)
         self._reloadModelTimer.stop()
 
-    def expand(self):
-        self.tview.expandToDepth(0)
+    def _readExpandedState(self, s):
+        model = self.tview.model()
+        for path in s.value('expanded').toStringList():
+            self.tview.expand(model.indexFromItemPath(path))
+
+    def _writeExpandedState(self, s):
+        model = self.tview.model()
+        paths = [model.itemPath(i) for i in model.persistentIndexList()
+                 if i.column() == 0 and self.tview.isExpanded(i)]
+        s.setValue('expanded', paths)
 
     def addRepo(self, uroot):
         """Add repo if not exists; called when the workbench has opened it"""

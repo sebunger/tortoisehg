@@ -39,6 +39,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
 
     def __init__(self, repoagent, rev=None, parent=None):
         super(ArchiveWidget, self).__init__(parent)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._repoagent = repoagent
 
         form = QFormLayout()
@@ -268,7 +269,6 @@ def createArchiveDialog(repoagent, rev=None, parent=None):
     dlg = cmdui.CmdControlDialog(parent)
     dlg.setWindowTitle(_('Archive - %s') % repoagent.displayName())
     dlg.setWindowIcon(qtlib.geticon('hg-archive'))
-    dlg.layout().setSizeConstraint(QLayout.SetFixedSize)
     dlg.setObjectName('archive')
     dlg.setRunButtonText(_('&Archive'))
     dlg.setCommandWidget(ArchiveWidget(repoagent, rev, dlg))

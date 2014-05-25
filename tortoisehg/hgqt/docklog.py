@@ -262,13 +262,6 @@ class ConsoleWidget(QWidget):
     """Console to run hg/thg command and show output"""
     closeRequested = pyqtSignal()
 
-    progressReceived = pyqtSignal(QString, object, QString, QString,
-                                  object, object)
-    """Emitted when progress received
-
-    Args: topic, pos, item, unit, total, reporoot
-    """
-
     def __init__(self, agent, parent=None):
         super(ConsoleWidget, self).__init__(parent)
         self.setLayout(QVBoxLayout())
@@ -278,7 +271,6 @@ class ConsoleWidget(QWidget):
         self._agent = agent
         agent.busyChanged.connect(self._suppressPromptOnBusy)
         agent.outputReceived.connect(self._logwidget.appendLog)
-        agent.progressReceived.connect(self._emitProgress)
         if util.safehasattr(agent, 'displayName'):
             self._logwidget.setPrompt('%s%% ' % agent.displayName())
         self.openPrompt()
@@ -423,7 +415,7 @@ class ConsoleWidget(QWidget):
     @pyqtSlot()
     def _appendExtprocStderr(self):
         text = hglib.tounicode(self._extproc.readAllStandardError().data())
-        self._logwidget.appendLog(text, 'ui.error')
+        self._logwidget.appendLog(text, 'ui.warning')
 
     @pyqtSlot(unicode, str)
     def appendLog(self, msg, label):
@@ -453,11 +445,6 @@ class ConsoleWidget(QWidget):
             self._logwidget.clearPrompt()
         else:
             self.openPrompt()
-
-    @pyqtSlot(unicode, object, unicode, unicode, object)
-    def _emitProgress(self, *args):
-        self.progressReceived.emit(
-            *(args + (self._repo and self._repo.root or None,)))
 
     @pyqtSlot(unicode)
     def _runcommand(self, cmdline):
@@ -507,7 +494,7 @@ class ConsoleWidget(QWidget):
 
     def _cmd_hg(self, args):
         self.closePrompt()
-        self._agent.runCommand(args)
+        self._agent.runCommand(args, self)
 
     def _cmd_thg(self, args):
         from tortoisehg.hgqt import run
@@ -536,9 +523,6 @@ class ConsoleWidget(QWidget):
         }
 
 class LogDockWidget(QDockWidget):
-
-    progressReceived = pyqtSignal(QString, object, QString, QString,
-                                  object, object)
 
     def __init__(self, repomanager, cmdagent, parent=None):
         super(LogDockWidget, self).__init__(parent)
@@ -578,7 +562,6 @@ class LogDockWidget(QDockWidget):
     def _createConsole(self, agent):
         w = ConsoleWidget(agent, self)
         w.closeRequested.connect(self.close)
-        w.progressReceived.connect(self.progressReceived)
         self._consoles.addWidget(w)
         return w
 

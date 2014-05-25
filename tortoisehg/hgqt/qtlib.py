@@ -18,7 +18,7 @@ import sip
 import weakref
 
 from mercurial.i18n import _ as hggettext
-from mercurial import commands, extensions, error, util
+from mercurial import extensions, error, util
 
 from tortoisehg.util import hglib, paths, editor, terminal
 from tortoisehg.hgqt.i18n import _
@@ -35,6 +35,16 @@ except ImportError:
 
 # largest allowed size for widget, defined in <src/gui/kernel/qwidget.h>
 QWIDGETSIZE_MAX = (1 << 24) - 1
+
+if PYQT_VERSION < 0x40704:
+    # QObject.sender() goes wrong if connection made in Qt layer.  consider
+    # using QSignalMapper for zero-argument slots instead.
+    def senderSafeSlot(*types, **opts):
+        def deco(func):
+            return func
+        return deco
+else:
+    senderSafeSlot = pyqtSlot
 
 tmproot = None
 def gettempdir():
@@ -198,35 +208,6 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
                 _('Editor launch failure'),
                 u'%s : %s' % (hglib.tounicode(cmdline),
                               hglib.tounicode(str(e))))
-
-def savefiles(repo, files, rev, parent=None):
-    for curfile in files:
-        wfile = util.localpath(curfile)
-        wfile, ext = os.path.splitext(os.path.basename(wfile))
-        extfilter = [_("All files (*)")]
-        if wfile:
-            filename = "%s@%d%s" % (wfile, rev, ext)
-            if ext:
-                extfilter.insert(0, "*%s" % ext)
-        else:
-            filename = "%s@%d" % (ext, rev)
-
-        result = QFileDialog.getSaveFileName(parent, _("Save file to"),
-                                             hglib.tounicode(filename),
-                                             ";;".join(extfilter))
-        if not result:
-            continue
-        cwd = os.getcwd()
-        try:
-            os.chdir(repo.root)
-            try:
-                commands.cat(repo.ui, repo, curfile, rev=rev,
-                             output=hglib.fromunicode(result))
-            except (util.Abort, IOError), e:
-                QMessageBox.critical(parent, _('Unable to save file'),
-                                     hglib.tounicode(str(e)))
-        finally:
-            os.chdir(cwd)
 
 def openshell(root, reponame, ui=None):
     if not os.path.exists(root):
@@ -522,6 +503,7 @@ _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
                         (QSize(), 'scalable/apps', '.svg'),
                         (QSize(), 'scalable/status', '.svg'),
                         (QSize(16, 16), '16x16/apps', '.png'),
+                        (QSize(16, 16), '16x16/mimetypes', '.png'),
                         (QSize(22, 22), '22x22/actions', '.png'),
                         (QSize(32, 32), '32x32/actions', '.png'),
                         (QSize(24, 24), '24x24/actions', '.png')]

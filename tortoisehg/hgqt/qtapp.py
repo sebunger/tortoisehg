@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import gc, os, sys, traceback
+import gc, os, platform, sys, traceback
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import QApplication, QFont
@@ -289,6 +289,7 @@ class QtRunner(QObject):
         self._server = None
         self._repomanager = None
         self._reporeleaser = None
+        self._mainreporoot = None
         self._workbench = None
 
     def __call__(self, dlgfunc, ui, *args, **opts):
@@ -297,6 +298,16 @@ class QtRunner(QObject):
             return
 
         QSettings.setDefaultFormat(QSettings.IniFormat)
+
+        # fixes font placement on OSX 10.9 with QT <= 4.8.5
+        # see QTBUG-32789 (https://bugreports.qt-project.org/browse/QTBUG-32789)
+        if sys.platform == 'darwin' and QT_VERSION <= 0x040805:
+            version = platform.mac_ver()[0]
+            version = '.'.join(version.split('.')[:2])
+            if version == '10.9':
+                # needs to replace the font created in the constructor of
+                # QApplication, which is invalid use of QFont but works on Mac
+                QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
 
         self._ui = ui
         self._mainapp = QApplication(sys.argv)
@@ -319,12 +330,21 @@ class QtRunner(QObject):
         self._reporeleaser = releaser = QSignalMapper(self)
         releaser.mapped[unicode].connect(self._repomanager.releaseRepoAgent)
 
+        # stop services after control returns to the main event loop
+        self._mainapp.setQuitOnLastWindowClosed(False)
+        self._mainapp.lastWindowClosed.connect(self._quitGracefully,
+                                               Qt.QueuedConnection)
+
         dlg, reporoot = self._createdialog(dlgfunc, args, opts)
+        self._mainreporoot = reporoot
         try:
             if dlg:
                 dlg.show()
                 dlg.raise_()
             else:
+                if reporoot:
+                    self._repomanager.releaseRepoAgent(reporoot)
+                    self._mainreporoot = None
                 return -1
 
             if thginithook is not None:
@@ -332,12 +352,29 @@ class QtRunner(QObject):
 
             return self._mainapp.exec_()
         finally:
-            if reporoot:
-                self._repomanager.releaseRepoAgent(reporoot)
-            if self._server:
-                self._server.close()
             self._exccatcher.release()
             self._mainapp = self._ui = None
+
+    @pyqtSlot()
+    def _quitGracefully(self):
+        # won't be called if the application is quit by BugReport dialog
+        if self._mainreporoot:
+            self._repomanager.releaseRepoAgent(self._mainreporoot)
+            self._mainreporoot = None
+        if self._server:
+            self._server.close()
+        if self._tryQuit():
+            return
+        self._ui.debug('repositories are closing asynchronously\n')
+        self._repomanager.repositoryClosed.connect(self._tryQuit)
+        QTimer.singleShot(5000, self._mainapp.quit)  # in case of bug
+
+    @pyqtSlot()
+    def _tryQuit(self):
+        if self._repomanager.repoRootPaths():
+            return False
+        self._mainapp.quit()
+        return True
 
     def _fixlibrarypaths(self):
         # make sure to use the bundled Qt plugins to avoid ABI incompatibility

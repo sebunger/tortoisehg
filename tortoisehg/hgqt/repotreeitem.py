@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import os
+import os, re
 
 from mercurial import node
 from mercurial import ui, hg, util, error
@@ -54,6 +54,103 @@ def find(root, targetfunc, stopfunc=None):
         if targetfunc(e):
             return e
     raise ValueError('not found')
+
+# '/' for path separator, '#n' for index of duplicated names
+_quotenamere = re.compile(r'[%/#]')
+
+def _quotename(s):
+    r"""Replace special characters to %xx (minimal set of urllib.quote)
+
+    >>> _quotename('foo/bar%baz#qux')
+    'foo%2Fbar%25baz%23qux'
+    >>> _quotename(u'\xa1')
+    u'\xa1'
+    """
+    return _quotenamere.sub(lambda m: '%%%02X' % ord(m.group(0)), s)
+
+def _buildquotenamemap(items):
+    namemap = {}
+    for e in items:
+        q = _quotename(e.shortname())
+        if q not in namemap:
+            namemap[q] = [e]
+        else:
+            namemap[q].append(e)
+    return namemap
+
+def itempath(item):
+    """Virtual path to the given item"""
+    rnames = []
+    while item.parent():
+        namemap = _buildquotenamemap(item.parent().childs)
+        q = _quotename(item.shortname())
+        i = namemap[q].index(item)
+        if i == 0:
+            rnames.append(q)
+        else:
+            rnames.append('%s#%d' % (q, i))
+        item = item.parent()
+    return '/'.join(reversed(rnames))
+
+def findbyitempath(root, path):
+    """Return the item for the given virtual path
+
+    >>> root = RepoTreeItem()
+    >>> foo = RepoGroupItem('foo')
+    >>> root.appendChild(foo)
+    >>> bar = RepoGroupItem('bar')
+    >>> root.appendChild(bar)
+    >>> bar.appendChild(RepoItem('/tmp/baz', 'baz'))
+    >>> root.appendChild(RepoGroupItem('foo'))
+    >>> root.appendChild(RepoGroupItem('qux/quux'))
+
+    >>> def f(path):
+    ...     return itempath(findbyitempath(root, path))
+
+    >>> f('')
+    ''
+    >>> f('foo')
+    'foo'
+    >>> f('bar/baz')
+    'bar/baz'
+    >>> f('qux%2Fquux')
+    'qux%2Fquux'
+    >>> f('bar/baz/unknown')
+    Traceback (most recent call last):
+      ...
+    ValueError: not found
+
+    >>> f('foo#1')
+    'foo#1'
+    >>> f('foo#2')
+    Traceback (most recent call last):
+      ...
+    ValueError: not found
+    >>> f('foo#bar')
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid path
+    """
+    if not path:
+        return root
+    item = root
+    for q in path.split('/'):
+        h = q.rfind('#')
+        if h >= 0:
+            try:
+                i = int(q[h + 1:])
+            except ValueError:
+                raise ValueError('invalid path')
+            q = q[:h]
+        else:
+            i = 0
+        namemap = _buildquotenamemap(item.childs)
+        try:
+            item = namemap[q][i]
+        except LookupError:
+            raise ValueError('not found')
+    return item
+
 
 class RepoTreeItem(object):
     xmltagname = 'treeitem'
@@ -457,7 +554,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def setData(self, column, value):
         if column == 0:
-            self.name = value.toString()
+            self.name = unicode(value.toString())
             return True
         return False
 
@@ -465,7 +562,7 @@ class RepoGroupItem(RepoTreeItem):
         return ''  # may be okay to return _commonpath instead?
 
     def shortname(self):  # for sortbyname()
-        return unicode(self.name)
+        return self.name
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
@@ -486,7 +583,7 @@ class RepoGroupItem(RepoTreeItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(a.value('', 'name').toString())
+        obj = cls(unicode(a.value('', 'name').toString()))
         _undumpChild(xr, parent=obj)
         return obj
 

@@ -740,20 +740,20 @@ class MatchModel(QAbstractTableModel):
         self.headers = (_('File'), _('Line'), _('Rev'), _('User'),
                         _('Match Text'))
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         return len(self.rows)
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         return len(self.headers)
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
         if role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
         return QVariant()
 
-    def headerData(self, col, orientation, role):
+    def headerData(self, col, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
             return QVariant()
         else:

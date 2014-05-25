@@ -419,7 +419,7 @@ class ResolveDialog(QDialog):
         self.rtreecmenu.popup(self.rtree.viewport().mapToGlobal(point))
 
     def utreeDoubleClicked(self):
-        if self.repo.ui.configbool('tortoisehg', 'autoresolve'):
+        if self.repo.ui.configbool('tortoisehg', 'autoresolve', True):
             self.merge()
         else:
             self.merge('internal:merge')

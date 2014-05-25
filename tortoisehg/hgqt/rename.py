@@ -22,6 +22,7 @@ class RenameWidget(cmdui.AbstractCmdWidget):
     def __init__(self, repoagent, parent=None, source=None, destination=None,
                  iscopy=False):
         super(RenameWidget, self).__init__(parent)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._repoagent = repoagent
 
         form = QFormLayout()
@@ -195,7 +196,6 @@ class RenameDialog(cmdui.CmdControlDialog):
         super(RenameDialog, self).__init__(parent)
         self._repoagent = repoagent
 
-        self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.setWindowIcon(qtlib.geticon('hg-rename'))
         self.setObjectName('rename')
         cmdwidget = RenameWidget(repoagent, self, source, destination, iscopy)

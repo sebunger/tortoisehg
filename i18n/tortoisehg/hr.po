@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Croatian <hg@li.org>\n"
-"POT-Creation-Date: 2014-02-03 11:14-0200\n"
+"POT-Creation-Date: 2014-04-28 11:26-0300\n"
 "PO-Revision-Date: 2013-08-10 15:26+0000\n"
 "Last-Translator: Mario Šarić <mario.saric@helix.hr>\n"
 "Language-Team: Croatian <hr@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2014-02-04 06:07+0000\n"
-"X-Generator: Launchpad (build 16916)\n"
+"X-Launchpad-Export-Date: 2014-04-29 06:00+0000\n"
+"X-Generator: Launchpad (build 16985)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg poslužitelj prekrivnih ikona"
@@ -28,8 +28,8 @@ msgstr "Izlazak"
 msgid "About"
 msgstr "O programu"
 
-msgid "Copyright 2008-2013 Steve Borho and others"
-msgstr "Autorska prava 2008-2013 Steve Borho i drugi"
+msgid "Copyright 2008-2014 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr ""
@@ -159,6 +159,12 @@ msgstr "Arhiva - %s"
 msgid "&Archive"
 msgstr "&Arhiva"
 
+msgid "Backout requires a parent revision"
+msgstr "Poništenje zahtjeva prethodnu reviziju"
+
+msgid "Cannot backout change on a different branch"
+msgstr "Ne može se poništiti izmjena u drugoj grani"
+
 #, python-format
 msgid "Backout - %s"
 msgstr "Poništi - %s"
@@ -170,20 +176,8 @@ msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
 "Provjerite reviziju poništenja i osigurajte da je radni direktorij čist."
 
-msgid "Unable to backout"
-msgstr "Nije moguće poništiti"
-
-msgid "Backout revision not found"
-msgstr "Nije pronađena revizija poništenja"
-
 msgid "Backing out a parent revision is a single step operation"
 msgstr "Poništenje prethodne revizije je operacija jednog koraka"
-
-msgid "Backout requires a parent revision"
-msgstr "Poništenje zahtjeva prethodnu reviziju"
-
-msgid "Cannot backout change on a different branch"
-msgstr "Ne može se poništiti izmjena u drugoj grani"
 
 msgid "Backout revision"
 msgstr "Revizja poništenja"
@@ -193,30 +187,6 @@ msgstr "Nije glava, poništenje će otvoriti novu glavu!"
 
 msgid "Current local revision"
 msgstr "Trenutna lokalna revizija"
-
-msgid "Merge parent to backout to"
-msgstr "Stopi prethodnu reviziju s revizijom poništenja"
-
-msgid ""
-"To backout a <b>merge</b> revision you must select which parent to backout "
-"to (i.e. whose changes will be <i>kept</i>)"
-msgstr ""
-"Kako bi poništili reviziju <b>stapanja</b> morate odabrati prethodnu "
-"reviziju na koju ćete se vratiti (čije izmjene će biti <i>sačuvane</i>)"
-
-#, python-format
-msgid "First Parent: revision %s (%s)"
-msgstr "Prva prethodna revizija: %s (%s)"
-
-msgid "Backout to the first parent of the merge revision"
-msgstr "Poništiti na prvu prethodnu reviziju od revizije stapanja"
-
-#, python-format
-msgid "Second Parent: revision %s (%s)"
-msgstr "Druga prethodna revizija: %s (%s)"
-
-msgid "Backout to the second parent of the merge revision"
-msgstr "Poništiti na drugu prethodnu reviziju od revizije stapanja"
 
 msgid "Working directory status"
 msgstr "Status radnog direktorija"
@@ -282,9 +252,6 @@ msgstr "Poruka pohrane"
 msgid "Skip final confirmation page, close after commit."
 msgstr "Preskoči dijalog potvrde, zatvori nakon pohrane"
 
-msgid "Backed out merge changeset: "
-msgstr "Poništena izmjena stapanja: "
-
 msgid "Backed out changeset: "
 msgstr "Poništena izmjena: "
 
@@ -296,14 +263,6 @@ msgstr "Odbaci trenutnu poruku poništavanja?"
 
 msgid "Use English backout message"
 msgstr "Koristi englesku poruku za poništavanje"
-
-#, python-format
-msgid "Backed out merge revision to its first parent (%s)"
-msgstr "Poništena revizija stapanja na prvog roditelja (%s)"
-
-#, python-format
-msgid "Backed out merge revision to its second parent (%s)"
-msgstr "Poništena revizija stapanja na drugog roditelja (%s)"
 
 msgid "Backing out and committing..."
 msgstr "Poništavanje i pohrana..."
@@ -595,15 +554,6 @@ msgstr "Udaljena naredba:"
 msgid "Start revision:"
 msgstr ""
 
-msgid "TortoiseHg Clone"
-msgstr "TortoiseHg kloniraj"
-
-msgid "Error creating destination folder"
-msgstr ""
-
-msgid "Please specify a different path."
-msgstr ""
-
 msgid "Select source repository"
 msgstr ""
 
@@ -624,6 +574,32 @@ msgid "failed to start command\n"
 msgstr ""
 
 msgid "error while running command\n"
+msgstr ""
+
+#, python-format
+msgid "process exited unexpectedly with code %d"
+msgstr ""
+
+#, python-format
+msgid "timed out while reading: %r..."
+msgstr ""
+
+msgid "timed out waiting for message"
+msgstr ""
+
+#, python-format
+msgid "unexpected response on required channel %r"
+msgstr ""
+
+#, python-format
+msgid "invalid \"hello\" message: %r"
+msgstr ""
+
+msgid "no \"runcommand\" capability"
+msgstr ""
+
+#, python-format
+msgid "corrupted command result: %r"
 msgstr ""
 
 msgid "Terminated by user"
@@ -658,7 +634,13 @@ msgstr ""
 msgid "Clea&r Log"
 msgstr ""
 
-msgid "Detail"
+msgid "TortoiseHg Prompt"
+msgstr ""
+
+msgid "Show Detail"
+msgstr ""
+
+msgid "Hide Detail"
 msgstr ""
 
 msgid "Confirm Exit"
@@ -680,6 +662,13 @@ msgstr ""
 
 #, python-format
 msgid "[Code: %d]"
+msgstr ""
+
+msgid "Merge"
+msgstr ""
+
+#, python-format
+msgid "Merge with %s"
 msgstr ""
 
 msgctxt "start progress"
@@ -817,7 +806,7 @@ msgstr ""
 msgid "&Replace"
 msgstr ""
 
-msgid "Nothing Commited"
+msgid "Nothing Committed"
 msgstr ""
 
 msgid "Please enter commit message"
@@ -845,6 +834,9 @@ msgid "Confirm Remove"
 msgstr ""
 
 msgid "Remove selected deleted files?"
+msgstr ""
+
+msgid "Nothing changed."
 msgstr ""
 
 msgctxt "window title"
@@ -1110,6 +1102,8 @@ msgid ""
 "- {ROOT}: The path to the current repository root.\n"
 "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
 "hash respectively.\n"
+"- {SELECTEDFILES}: The list of files selected by the user on the revision "
+"details file list.\n"
 "- {FILES}: The list of files touched by the selected revision.\n"
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
@@ -1220,22 +1214,43 @@ msgstr ""
 msgid "Show the history of the selected file"
 msgstr ""
 
-msgid "Folder &History"
-msgstr ""
-
 msgid "Co&mpare File Revisions"
 msgstr ""
 
 msgid "Compare revisions of the selected file"
 msgstr ""
 
+msgid "Filter Histor&y"
+msgstr ""
+
+msgid "Query about changesets affecting the selected files"
+msgstr ""
+
+msgid "Diff &Changeset to Parent"
+msgstr ""
+
+msgid "Diff Changeset to Loc&al"
+msgstr ""
+
+msgid "Diff Selected Cha&ngesets"
+msgstr ""
+
 msgid "&Diff to Parent"
+msgstr ""
+
+msgid "Cannot display visual diff"
+msgstr ""
+
+msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
 msgid "Diff to &Local"
 msgstr ""
 
 msgid "View changes to current in external diff tool"
+msgstr ""
+
+msgid "Diff Selected &File Revisions"
 msgstr ""
 
 msgid "&View at Revision"
@@ -1249,6 +1264,9 @@ msgstr ""
 
 msgid "Save file as it appeared at this revision"
 msgstr ""
+
+msgid "Save file to"
+msgstr "Snimi datoteku u"
 
 msgid "&Edit Local"
 msgstr ""
@@ -1281,18 +1299,6 @@ msgid "Open &Terminal"
 msgstr ""
 
 msgid "Open a shell terminal in the selected folder"
-msgstr ""
-
-msgid "File(s) not found"
-msgstr ""
-
-msgid "The selected files do not exist in the working directory"
-msgstr ""
-
-msgid "Cannot display visual diff"
-msgstr ""
-
-msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
 msgid "Display the file anyway"
@@ -1464,28 +1470,7 @@ msgstr ""
 msgid "Forward"
 msgstr ""
 
-msgid "&Diff Selected Changesets"
-msgstr ""
-
-msgid "Diff Selected &File Revisions"
-msgstr ""
-
-msgid "&Diff Changeset to Parent"
-msgstr ""
-
-msgid "Diff Changeset to &Local"
-msgstr ""
-
-msgid "Diff &File to Parent"
-msgstr ""
-
-msgid "Diff File to Lo&cal"
-msgstr ""
-
 msgid "Show Revision &Details"
-msgstr ""
-
-msgid "You must select two revisions to diff"
 msgstr ""
 
 msgid "Too many rows selected for menu"
@@ -1566,6 +1551,10 @@ msgstr ""
 #. i18n: comma-separated list of common encoding names in your locale, e.g.
 #. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
 #.
+#. for the best guess, put structured encodings like "utf-8" in front, e.g.
+#. "utf-8,iso8859-1" instead of "iso8859-1,utf-8" because "iso8859-1" can
+#. decode arbitrary byte sequence and never fall back.
+#.
 #. pick from the following encodings:
 #. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
 #. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
@@ -1573,10 +1562,6 @@ msgstr ""
 #. cp1255, iso8859-8, cp1258, iso8859-4, iso8859-13, cp1257, iso8859-3,
 #. iso8859-10, iso8859-14, iso8859-16
 msgid "$FILE_ENCODINGS"
-msgstr ""
-
-msgctxt "column header"
-msgid "Filename"
 msgstr ""
 
 msgid "View change as unified diff output"
@@ -1595,6 +1580,9 @@ msgid "Previous Diff"
 msgstr ""
 
 msgid "Open shelve tool"
+msgstr ""
+
+msgid "&Auto Detect"
 msgstr ""
 
 msgid "Show changes from first parent"
@@ -1685,10 +1673,6 @@ msgid ""
 msgstr ""
 
 msgid "Continue or abort interrupted graft operation?"
-msgstr ""
-
-#, python-format
-msgid "Graft %d changesets on top of changeset %s"
 msgstr ""
 
 msgid "To graft destination"
@@ -2168,10 +2152,6 @@ msgstr ""
 msgid "Insufficient access rights."
 msgstr ""
 
-#, python-format
-msgid "?? Error: %s ??"
-msgstr ""
-
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
 "make more efficient use of disk space by adding these files as largefiles, "
@@ -2187,12 +2167,6 @@ msgid "Add as &Normal Files"
 msgstr ""
 
 msgid "License"
-msgstr ""
-
-msgid "Drag to change order"
-msgstr ""
-
-msgid "Workbench"
 msgstr ""
 
 msgid "Find revisions matching fields of:"
@@ -2276,12 +2250,6 @@ msgstr "Nije vršna revizija!"
 msgid "Merge from (other revision)"
 msgstr ""
 
-msgid "Unable to merge"
-msgstr ""
-
-msgid "Merge revision not specified or not found"
-msgstr ""
-
 msgid "Merge to (working directory)"
 msgstr ""
 
@@ -2345,13 +2313,6 @@ msgid "Commit Now"
 msgstr ""
 
 msgid "Commit Later"
-msgstr ""
-
-msgid "Merge"
-msgstr ""
-
-#, python-format
-msgid "Merge with %s"
 msgstr ""
 
 msgid "TortoiseHg Merge Commit"
@@ -2959,12 +2920,6 @@ msgstr ""
 msgid "Editor launch failure"
 msgstr ""
 
-msgid "Save file to"
-msgstr "Snimi datoteku u"
-
-msgid "Unable to save file"
-msgstr ""
-
 msgid "Failed to open path in terminal"
 msgstr ""
 
@@ -3063,7 +3018,7 @@ msgstr ""
 msgid "Keep original branch names"
 msgstr ""
 
-msgid "Collapse the rebased changesets "
+msgid "Collapse the rebased changesets"
 msgstr ""
 
 msgid "Rebase entire source branch"
@@ -3283,6 +3238,10 @@ msgstr ""
 
 msgctxt "column header"
 msgid "Phase"
+msgstr ""
+
+msgctxt "column header"
+msgid "Filename"
 msgstr ""
 
 #, python-format
@@ -3613,6 +3572,9 @@ msgstr ""
 msgid "Can't find revision '%s'"
 msgstr ""
 
+msgid "Drag to change order"
+msgstr ""
+
 msgid "Workbench Log Columns"
 msgstr ""
 
@@ -3756,9 +3718,6 @@ msgid "Sync tab cannot exit"
 msgstr ""
 
 msgid "Search tab cannot exit"
-msgstr ""
-
-msgid "Repository command still running"
 msgstr ""
 
 msgid "Pus&h"
@@ -3998,8 +3957,14 @@ msgstr ""
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr ""
 
+msgid "Unable to merge"
+msgstr ""
+
 msgid "You cannot merge a revision with itself"
 msgstr ""
+
+msgid "Unable to backout"
+msgstr "Nije moguće poništiti"
 
 msgid "Write bundle"
 msgstr ""
@@ -4228,19 +4193,19 @@ msgstr ""
 msgid "File List Toolbar"
 msgstr ""
 
-msgid "Manifest Mode"
+msgid "Ma&nifest Mode"
 msgstr ""
 
-msgid "Show the full manifest in tree view"
+msgid "Show all version-controlled files in tree view"
 msgstr ""
 
-msgid "Fl&at List View"
+msgid "&Flat List"
 msgstr ""
 
 msgid "### filter text ###"
 msgstr ""
 
-msgid "&Changed by This Commit"
+msgid "Changed by &This Commit"
 msgstr ""
 
 msgid "Show files changed by this commit"
@@ -4255,7 +4220,13 @@ msgstr ""
 msgid "Toggle parent to be used as the base revision"
 msgstr ""
 
-msgid "&Filter by Status"
+msgid "List Optio&ns"
+msgstr ""
+
+msgid "File(s) not found"
+msgstr ""
+
+msgid "The selected files do not exist in the working directory"
 msgstr ""
 
 #, python-format
@@ -4765,6 +4736,9 @@ msgstr ""
 msgid "thg merge [[-r] REV]"
 msgstr ""
 
+msgid "Merge revision not specified or not found"
+msgstr ""
+
 msgid "a revision to post"
 msgstr ""
 
@@ -5180,7 +5154,10 @@ msgid ""
 "is not possible. When False, all files with changes on both sides of the "
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
-"to review and resolve changes manually. Default: False."
+"to review and resolve changes manually. Default: True."
+msgstr ""
+
+msgid "Workbench"
 msgstr ""
 
 msgid "Single Workbench Window"
@@ -6211,6 +6188,16 @@ msgstr ""
 msgid "TortoiseHg Shelve - %s"
 msgstr ""
 
+msgid "Delete selected chunks from working copy?"
+msgstr ""
+
+#, python-format
+msgid "Delete selected chunks from shelf file %s?"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
 msgid "TortoiseHg New Shelf Name"
 msgstr ""
 
@@ -6231,9 +6218,6 @@ msgid "A shelf file of that name already exists"
 msgstr ""
 
 msgid "New shelf created"
-msgstr ""
-
-msgid "Are you sure?"
 msgstr ""
 
 #, python-format
@@ -6284,6 +6268,9 @@ msgid "Sign - %s"
 msgstr ""
 
 msgid "Signature has been added"
+msgstr ""
+
+msgid "Repository command still running"
 msgstr ""
 
 msgid "Filter:"
@@ -6372,10 +6359,10 @@ msgid "unknown"
 msgstr ""
 
 #, python-format
-msgid "%s is missing!"
+msgid "%s is deleted by non-hg command, but still tracked"
 msgstr ""
 
-msgid "deleted"
+msgid "missing"
 msgstr ""
 
 #, python-format
@@ -6979,9 +6966,6 @@ msgstr ""
 msgid "password: "
 msgstr ""
 
-msgid "TortoiseHg Prompt"
-msgstr ""
-
 msgid "abort: "
 msgstr ""
 
@@ -7070,6 +7054,9 @@ msgid "Parent 1:"
 msgstr ""
 
 msgid "Parent 2:"
+msgstr ""
+
+msgid "Pull subrepos from:"
 msgstr ""
 
 msgid "List updated files (--verbose)"
@@ -7859,7 +7846,18 @@ msgid "Synchronize with dragged repository"
 msgstr ""
 
 #, python-format
+msgid "unrecognized response: %s"
+msgstr ""
+
+#, python-format
 msgid "repository %s not found"
+msgstr ""
+
+msgid "win32ill: cannot create window for messages"
+msgstr ""
+
+#, python-format
+msgid "win32ill: unsupported platform: %s\n"
 msgstr ""
 
 #~ msgid "(version %s)"
@@ -7931,6 +7929,9 @@ msgstr ""
 #~ msgid "Confirm revert file to old revision"
 #~ msgstr "Potvrdite vraćanje datoteke na staru reviziju"
 
+#~ msgid "TortoiseHg Clone"
+#~ msgstr "TortoiseHg kloniraj"
+
 #~ msgid "Clone"
 #~ msgstr "Kloniraj"
 
@@ -7984,3 +7985,40 @@ msgstr ""
 
 #~ msgid "unexpected type: %s"
 #~ msgstr "neočekivan tip: %s"
+
+#~ msgid "Copyright 2008-2013 Steve Borho and others"
+#~ msgstr "Autorska prava 2008-2013 Steve Borho i drugi"
+
+#~ msgid "Backout revision not found"
+#~ msgstr "Nije pronađena revizija poništenja"
+
+#~ msgid "Backout to the second parent of the merge revision"
+#~ msgstr "Poništiti na drugu prethodnu reviziju od revizije stapanja"
+
+#~ msgid "Merge parent to backout to"
+#~ msgstr "Stopi prethodnu reviziju s revizijom poništenja"
+
+#~ msgid "Backout to the first parent of the merge revision"
+#~ msgstr "Poništiti na prvu prethodnu reviziju od revizije stapanja"
+
+#~ msgid "Second Parent: revision %s (%s)"
+#~ msgstr "Druga prethodna revizija: %s (%s)"
+
+#~ msgid ""
+#~ "To backout a <b>merge</b> revision you must select which parent to "
+#~ "backout to (i.e. whose changes will be <i>kept</i>)"
+#~ msgstr ""
+#~ "Kako bi poništili reviziju <b>stapanja</b> morate odabrati prethodnu "
+#~ "reviziju na koju ćete se vratiti (čije izmjene će biti <i>sačuvane</i>)"
+
+#~ msgid "First Parent: revision %s (%s)"
+#~ msgstr "Prva prethodna revizija: %s (%s)"
+
+#~ msgid "Backed out merge changeset: "
+#~ msgstr "Poništena izmjena stapanja: "
+
+#~ msgid "Backed out merge revision to its second parent (%s)"
+#~ msgstr "Poništena revizija stapanja na drugog roditelja (%s)"
+
+#~ msgid "Backed out merge revision to its first parent (%s)"
+#~ msgstr "Poništena revizija stapanja na prvog roditelja (%s)"

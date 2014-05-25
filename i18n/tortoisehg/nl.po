@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-02-03 11:14-0200\n"
-"PO-Revision-Date: 2013-08-14 16:17+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2014-04-28 11:26-0300\n"
+"PO-Revision-Date: 2014-05-01 09:41+0000\n"
+"Last-Translator: Aldwoni <aldwoni@gmail.com>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-02-04 06:03+0000\n"
-"X-Generator: Launchpad (build 16916)\n"
+"X-Launchpad-Export-Date: 2014-05-02 06:27+0000\n"
+"X-Generator: Launchpad (build 16985)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -27,8 +27,8 @@ msgstr "Afsluiten"
 msgid "About"
 msgstr "Info"
 
-msgid "Copyright 2008-2013 Steve Borho and others"
-msgstr "Copyright 2008-2013 Steve Borho en anderen"
+msgid "Copyright 2008-2014 Steve Borho and others"
+msgstr "Copyright 2008-2014 Steve Borho en anderen"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr ""
@@ -158,6 +158,12 @@ msgstr "Archieveren - %s"
 msgid "&Archive"
 msgstr "&Archiveren"
 
+msgid "Backout requires a parent revision"
+msgstr "Backout heeft een ouder-revisie nodig"
+
+msgid "Cannot backout change on a different branch"
+msgstr "Kan backout in een andere tak niet uitvoeren"
+
 #, python-format
 msgid "Backout - %s"
 msgstr "Backout - %s"
@@ -170,20 +176,8 @@ msgstr ""
 "Kontroleer de backout revisie en zorg ervoor dat de werkmap geen wijzigingen "
 "bevat."
 
-msgid "Unable to backout"
-msgstr "Kan backout niet uitvoeren"
-
-msgid "Backout revision not found"
-msgstr "Backout revisie niet gevonden"
-
 msgid "Backing out a parent revision is a single step operation"
 msgstr "Backout van een ouder revisie is een bewerking in één stap"
-
-msgid "Backout requires a parent revision"
-msgstr "Backout heeft een ouder-revisie nodig"
-
-msgid "Cannot backout change on a different branch"
-msgstr "Kan backout in een andere tak niet uitvoeren"
 
 msgid "Backout revision"
 msgstr "Backout revisie"
@@ -193,31 +187,6 @@ msgstr "Geen hoofd, backout zal een nieuw hoofd aanmaken!"
 
 msgid "Current local revision"
 msgstr "Huidige lokale revisie"
-
-msgid "Merge parent to backout to"
-msgstr "Samenvoegouder waarnaartoe backout moet gebeuren"
-
-msgid ""
-"To backout a <b>merge</b> revision you must select which parent to backout "
-"to (i.e. whose changes will be <i>kept</i>)"
-msgstr ""
-"Om backout te doen van een <b>samenvoeg</b>revisie moet u kiezen naar welke "
-"ouder u de backout wilt doen (d.i. welke wijzigingen zullen <i>behouden</i> "
-"worden)"
-
-#, python-format
-msgid "First Parent: revision %s (%s)"
-msgstr "Eerste Ouder: revisie %s (%s)"
-
-msgid "Backout to the first parent of the merge revision"
-msgstr "Backout naar de eerste ouder van de samenvoegrevisie"
-
-#, python-format
-msgid "Second Parent: revision %s (%s)"
-msgstr "Tweede Ouder: revisie %s (%s)"
-
-msgid "Backout to the second parent of the merge revision"
-msgstr "Backout naar de tweede ouder van de samenvoegrevisie"
 
 msgid "Working directory status"
 msgstr "Werkmap status"
@@ -283,9 +252,6 @@ msgstr "Commitbericht"
 msgid "Skip final confirmation page, close after commit."
 msgstr "Sla afsluitende bevestingspagina over, sluit na commit"
 
-msgid "Backed out merge changeset: "
-msgstr "Samenvoegchangeset waarvan backout gedaan is: "
-
 msgid "Backed out changeset: "
 msgstr "Changeset waarvan backout gedaan is: "
 
@@ -297,14 +263,6 @@ msgstr "Huidig backout bericht verwerpen?"
 
 msgid "Use English backout message"
 msgstr "Gebruik engels backout bericht"
-
-#, python-format
-msgid "Backed out merge revision to its first parent (%s)"
-msgstr "Backout gedaan van samenvoegrevisie naar zijn eerste ouder (%s)"
-
-#, python-format
-msgid "Backed out merge revision to its second parent (%s)"
-msgstr "Backout gedaan van samenvoegrevisie naar zijn tweede ouder (%s)"
 
 msgid "Backing out and committing..."
 msgstr "Bezig met backout en commit..."
@@ -605,15 +563,6 @@ msgstr "Externe opdracht:"
 msgid "Start revision:"
 msgstr "Begin revisie:"
 
-msgid "TortoiseHg Clone"
-msgstr "TortoiseHg Klonen"
-
-msgid "Error creating destination folder"
-msgstr "Fout bij het creëren van de doelmap"
-
-msgid "Please specify a different path."
-msgstr "Geef een ander pad op aub."
-
 msgid "Select source repository"
 msgstr "Kies bronmap"
 
@@ -635,6 +584,32 @@ msgstr "Kon opdracht niet starten\n"
 
 msgid "error while running command\n"
 msgstr "fout bij uitvoeren opdracht\n"
+
+#, python-format
+msgid "process exited unexpectedly with code %d"
+msgstr ""
+
+#, python-format
+msgid "timed out while reading: %r..."
+msgstr ""
+
+msgid "timed out waiting for message"
+msgstr ""
+
+#, python-format
+msgid "unexpected response on required channel %r"
+msgstr ""
+
+#, python-format
+msgid "invalid \"hello\" message: %r"
+msgstr ""
+
+msgid "no \"runcommand\" capability"
+msgstr ""
+
+#, python-format
+msgid "corrupted command result: %r"
+msgstr ""
 
 msgid "Terminated by user"
 msgstr "Beëindigd door gebruiker"
@@ -668,8 +643,14 @@ msgstr "Mislukt!"
 msgid "Clea&r Log"
 msgstr ""
 
-msgid "Detail"
-msgstr "Detail"
+msgid "TortoiseHg Prompt"
+msgstr "TortoiseHg Opdrachtregel"
+
+msgid "Show Detail"
+msgstr ""
+
+msgid "Hide Detail"
+msgstr ""
 
 msgid "Confirm Exit"
 msgstr "Afsluiten bevestigen"
@@ -693,6 +674,13 @@ msgstr ""
 #, python-format
 msgid "[Code: %d]"
 msgstr ""
+
+msgid "Merge"
+msgstr "Samenvoegen"
+
+#, python-format
+msgid "Merge with %s"
+msgstr "Voeg samen met %s"
 
 msgctxt "start progress"
 msgid "Commit"
@@ -832,8 +820,8 @@ msgstr ""
 msgid "&Replace"
 msgstr "Vervangen"
 
-msgid "Nothing Commited"
-msgstr "Niets gecommit"
+msgid "Nothing Committed"
+msgstr ""
 
 msgid "Please enter commit message"
 msgstr "Geef commit bericht in aub"
@@ -864,6 +852,9 @@ msgstr "Verwijderen Bevestigen"
 
 msgid "Remove selected deleted files?"
 msgstr "Gekozen geschrapte bestanden verwijderen?"
+
+msgid "Nothing changed."
+msgstr ""
 
 msgctxt "window title"
 msgid "Commit"
@@ -1133,20 +1124,11 @@ msgid ""
 "- {ROOT}: The path to the current repository root.\n"
 "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
 "hash respectively.\n"
+"- {SELECTEDFILES}: The list of files selected by the user on the revision "
+"details file list.\n"
 "- {FILES}: The list of files touched by the selected revision.\n"
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
-"De opdracht die uitgevoerd zal worden.\n"
-"Gebruik \"hg\" (eerder dan \"hg.exe\") als de uitvoeringsopdracht om een "
-"Mercurial opdracht uit te voeren.\n"
-"U kunt verscheidene {VARIABELEN} gebruiken om uw opdracht samen te stellen:\n"
-"- {ROOT}: Het pad naar de huidige repository wortel.\n"
-"- {REV} / {REVID}: het gekozen revisie nummer / respectievelijk de "
-"hexadecimale revisie id hash.\n"
-"- {FILES}: De lijst van bestanden die door de gekozen revisie gewijzigd "
-"zijn.\n"
-"- {ALLFILES}: Alle bestanden die door Mercurial getraceerd zijn op het "
-"moment van de gekozen revisie."
 
 msgid ""
 "The directory where the command will be executed.\n"
@@ -1283,17 +1265,36 @@ msgstr "Bestands&historiek"
 msgid "Show the history of the selected file"
 msgstr "Geef de geschiedenis van het geselecteerd bestand weer"
 
-msgid "Folder &History"
-msgstr "Map&historiek"
-
 msgid "Co&mpare File Revisions"
 msgstr "Vergelijk bestandsrevisies"
 
 msgid "Compare revisions of the selected file"
 msgstr "Vergelijk revisies van het geselecteerde bestand"
 
+msgid "Filter Histor&y"
+msgstr ""
+
+msgid "Query about changesets affecting the selected files"
+msgstr ""
+
+msgid "Diff &Changeset to Parent"
+msgstr ""
+
+msgid "Diff Changeset to Loc&al"
+msgstr ""
+
+msgid "Diff Selected Cha&ngesets"
+msgstr ""
+
 msgid "&Diff to Parent"
 msgstr "Vergelijk met Ouder"
+
+msgid "Cannot display visual diff"
+msgstr "Kan visuele vergelijking niet tonen"
+
+msgid "Visual diffs are not supported for unapplied patches"
+msgstr ""
+"Visuele vergelijkingen worden niet ondersteund voor niet-toegepaste patches"
 
 msgid "Diff to &Local"
 msgstr "Vergelijk met &Lokale versie"
@@ -1302,6 +1303,9 @@ msgid "View changes to current in external diff tool"
 msgstr ""
 "Bekijk wijzigingen ten opzichte van huidige revisie met extern "
 "vergelijkingsprogramma"
+
+msgid "Diff Selected &File Revisions"
+msgstr "Vergelijk Gekozen Bestandsrevisies"
 
 msgid "&View at Revision"
 msgstr "Bekijk volgens Revisie"
@@ -1314,6 +1318,9 @@ msgstr "Opslaan volgens Revisie..."
 
 msgid "Save file as it appeared at this revision"
 msgstr "Bestand opslaan zoals het was in deze revisie"
+
+msgid "Save file to"
+msgstr "Bestand opslaan naar"
 
 msgid "&Edit Local"
 msgstr "&Editeer Lokale versie"
@@ -1347,19 +1354,6 @@ msgstr "&Terminal openen"
 
 msgid "Open a shell terminal in the selected folder"
 msgstr "Open een shell terminal in de gekozen map"
-
-msgid "File(s) not found"
-msgstr ""
-
-msgid "The selected files do not exist in the working directory"
-msgstr ""
-
-msgid "Cannot display visual diff"
-msgstr "Kan visuele vergelijking niet tonen"
-
-msgid "Visual diffs are not supported for unapplied patches"
-msgstr ""
-"Visuele vergelijkingen worden niet ondersteund voor niet-toegepaste patches"
 
 msgid "Display the file anyway"
 msgstr "Toon het bestand hoedanook"
@@ -1538,29 +1532,8 @@ msgstr "Terug"
 msgid "Forward"
 msgstr "Vooruit"
 
-msgid "&Diff Selected Changesets"
-msgstr "&Vergelijk Gekozen Changesets"
-
-msgid "Diff Selected &File Revisions"
-msgstr "Vergelijk Gekozen Bestandsrevisies"
-
-msgid "&Diff Changeset to Parent"
-msgstr "Vergelijk Changeset met Ouder"
-
-msgid "Diff Changeset to &Local"
-msgstr "Vergelijk Changeset met &Lokale versie"
-
-msgid "Diff &File to Parent"
-msgstr "Vergelijk Bestand met Ouder"
-
-msgid "Diff File to Lo&cal"
-msgstr "Vergelijk bestand met Lokale versie"
-
 msgid "Show Revision &Details"
 msgstr "Toon Revisie &Details"
-
-msgid "You must select two revisions to diff"
-msgstr "U moet twee revisies kiezen om te vergelijken"
 
 msgid "Too many rows selected for menu"
 msgstr "Teveel rijen gekozen voor menu"
@@ -1640,6 +1613,10 @@ msgstr ""
 #. i18n: comma-separated list of common encoding names in your locale, e.g.
 #. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
 #.
+#. for the best guess, put structured encodings like "utf-8" in front, e.g.
+#. "utf-8,iso8859-1" instead of "iso8859-1,utf-8" because "iso8859-1" can
+#. decode arbitrary byte sequence and never fall back.
+#.
 #. pick from the following encodings:
 #. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
 #. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
@@ -1648,10 +1625,6 @@ msgstr ""
 #. iso8859-10, iso8859-14, iso8859-16
 msgid "$FILE_ENCODINGS"
 msgstr ""
-
-msgctxt "column header"
-msgid "Filename"
-msgstr "Bestandsnaam"
 
 msgid "View change as unified diff output"
 msgstr "Bekijk wijzigingen als unified diff resultaat"
@@ -1670,6 +1643,9 @@ msgstr ""
 
 msgid "Open shelve tool"
 msgstr "Open shelve gereedschap"
+
+msgid "&Auto Detect"
+msgstr ""
 
 msgid "Show changes from first parent"
 msgstr "Toon wijzigingen uit de eerste ouder"
@@ -1764,10 +1740,6 @@ msgstr ""
 
 msgid "Continue or abort interrupted graft operation?"
 msgstr "Onderbroken graft operatie voortzetten of afbreken ?"
-
-#, python-format
-msgid "Graft %d changesets on top of changeset %s"
-msgstr "Graft %d changesets bovenop changeset %s"
 
 msgid "To graft destination"
 msgstr "Naar graft bestemming"
@@ -2284,10 +2256,6 @@ msgstr "Kan instellingenbestand niet aanmaken"
 msgid "Insufficient access rights."
 msgstr "Onvoldoende toegangsrechten."
 
-#, python-format
-msgid "?? Error: %s ??"
-msgstr "?? Fout: %s ??"
-
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
 "make more efficient use of disk space by adding these files as largefiles, "
@@ -2309,12 +2277,6 @@ msgstr "Voeg toe als Normale Bestanden"
 
 msgid "License"
 msgstr "Licentie"
-
-msgid "Drag to change order"
-msgstr "Sleep om volgorde te wijzigen"
-
-msgid "Workbench"
-msgstr "Werkbank"
 
 msgid "Find revisions matching fields of:"
 msgstr "Zoek revisies die overeenkomen met velden van:"
@@ -2403,12 +2365,6 @@ msgstr "Geen hoofd revisie!"
 msgid "Merge from (other revision)"
 msgstr "Samenvoegen vanaf (andere revisie)"
 
-msgid "Unable to merge"
-msgstr "Kan niet samenvoegen"
-
-msgid "Merge revision not specified or not found"
-msgstr "Revisie om samen te voegen niet opgegeven of niet gevonden"
-
 msgid "Merge to (working directory)"
 msgstr "Voeg samen naar (werkmap)"
 
@@ -2486,13 +2442,6 @@ msgstr "Commit Nu"
 
 msgid "Commit Later"
 msgstr "Commit Later"
-
-msgid "Merge"
-msgstr "Samenvoegen"
-
-#, python-format
-msgid "Merge with %s"
-msgstr "Voeg samen met %s"
 
 msgid "TortoiseHg Merge Commit"
 msgstr "TortoiseHg Samenvoeg Commit"
@@ -3113,12 +3062,6 @@ msgstr "Stel een visual editor in aub."
 msgid "Editor launch failure"
 msgstr "Lanceren van de editor is mislukt."
 
-msgid "Save file to"
-msgstr "Bestand opslaan naar"
-
-msgid "Unable to save file"
-msgstr "Kan bestand niet opslaan"
-
 msgid "Failed to open path in terminal"
 msgstr "Kon pad niet openen in een terminal"
 
@@ -3219,8 +3162,8 @@ msgstr "Behoudt originele changesets"
 msgid "Keep original branch names"
 msgstr "Behoudt originele taknamen"
 
-msgid "Collapse the rebased changesets "
-msgstr "Ineenklappen van de rebased changesets "
+msgid "Collapse the rebased changesets"
+msgstr ""
 
 msgid "Rebase entire source branch"
 msgstr ""
@@ -3459,6 +3402,10 @@ msgstr "Omgezet Vanuit"
 msgctxt "column header"
 msgid "Phase"
 msgstr "Fase"
+
+msgctxt "column header"
+msgid "Filename"
+msgstr "Bestandsnaam"
 
 #, python-format
 msgid "filling (%d)"
@@ -3811,6 +3758,9 @@ msgstr "Ga naar voorouder van %s en %s"
 msgid "Can't find revision '%s'"
 msgstr "Kan revisie '%s' niet vinden"
 
+msgid "Drag to change order"
+msgstr "Sleep om volgorde te wijzigen"
+
 msgid "Workbench Log Columns"
 msgstr "Werkbank Log Kolommen"
 
@@ -3961,9 +3911,6 @@ msgstr "Het Sync tabblad kan niet afsluiten"
 
 msgid "Search tab cannot exit"
 msgstr "Het Zoek tabblad kan niet afsluiten"
-
-msgid "Repository command still running"
-msgstr "Er loopt nog steeds een repository opdracht"
 
 msgid "Pus&h"
 msgstr "Pus&h"
@@ -4210,8 +4157,14 @@ msgstr "De patches zijn geëxporteerd"
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d patches werden geëxporteerd naar: <p><a href=\"file:///%s\">%s</a>"
 
+msgid "Unable to merge"
+msgstr "Kan niet samenvoegen"
+
 msgid "You cannot merge a revision with itself"
 msgstr "U kunt een revisie niet met zichzelf samenvoegen"
+
+msgid "Unable to backout"
+msgstr "Kan backout niet uitvoeren"
 
 msgid "Write bundle"
 msgstr "Bundel wegschrijven"
@@ -4476,19 +4429,19 @@ msgstr "<standaard>"
 msgid "File List Toolbar"
 msgstr "Bestandslijst Toolbar"
 
-msgid "Manifest Mode"
+msgid "Ma&nifest Mode"
 msgstr ""
 
-msgid "Show the full manifest in tree view"
+msgid "Show all version-controlled files in tree view"
 msgstr ""
 
-msgid "Fl&at List View"
+msgid "&Flat List"
 msgstr ""
 
 msgid "### filter text ###"
 msgstr "### filter tekst ###"
 
-msgid "&Changed by This Commit"
+msgid "Changed by &This Commit"
 msgstr ""
 
 msgid "Show files changed by this commit"
@@ -4503,7 +4456,13 @@ msgstr ""
 msgid "Toggle parent to be used as the base revision"
 msgstr ""
 
-msgid "&Filter by Status"
+msgid "List Optio&ns"
+msgstr ""
+
+msgid "File(s) not found"
+msgstr ""
+
+msgid "The selected files do not exist in the working directory"
 msgstr ""
 
 #, python-format
@@ -5049,6 +5008,9 @@ msgstr "revisie om samen te voegen"
 msgid "thg merge [[-r] REV]"
 msgstr "thg merge [[-r] REV]"
 
+msgid "Merge revision not specified or not found"
+msgstr "Revisie om samen te voegen niet opgegeven of niet gevonden"
+
 msgid "a revision to post"
 msgstr ""
 
@@ -5495,16 +5457,11 @@ msgid ""
 "is not possible. When False, all files with changes on both sides of the "
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
-"to review and resolve changes manually. Default: False."
+"to review and resolve changes manually. Default: True."
 msgstr ""
-"Geeft aan of TortoiseHg wijzigingen van beide zijden aan hetzelfde bestand "
-"automatisch dient op te lossen, en enkel samenvoeg conflicten moet melden "
-"als dat niet mogelijk is. Indien Nee, dan zullen alle bestanden met "
-"wijzigingen aan beide zijden van het samenvoegen als conflict gerapporteerd "
-"worden, zelfs als de aanpassingen in verschillende delen van het bestand "
-"voorkomen. Als er conflicten zijn zal de gebruiker in beide gevallen "
-"uitgenodigd worden om de wijzigingen manueel vooraf te bekijken en op te "
-"lossen. Standaard: Nee"
+
+msgid "Workbench"
+msgstr "Werkbank"
 
 msgid "Single Workbench Window"
 msgstr "Eén-venster Werkbank"
@@ -6365,7 +6322,7 @@ msgid "User name to authenticate with review board"
 msgstr "Gebruikersnaam voor authenticatie met review board"
 
 msgid "Password to authenticate with review board"
-msgstr "Paswoord voor authenticatie met review board"
+msgstr "Wachtwoord voor authenticatie met review board"
 
 msgid "Server Repository ID"
 msgstr "Server Repository ID"
@@ -6739,6 +6696,16 @@ msgstr "Backup kopiën van gewijzigde bestanden zijn te vinden in .hg/Trashcan/"
 msgid "TortoiseHg Shelve - %s"
 msgstr "TortoiseHg Shelve - %s"
 
+msgid "Delete selected chunks from working copy?"
+msgstr ""
+
+#, python-format
+msgid "Delete selected chunks from shelf file %s?"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr "Weet u het zeker ?"
+
 msgid "TortoiseHg New Shelf Name"
 msgstr "TortoiseHg Nieuwe Shelf Naam"
 
@@ -6760,9 +6727,6 @@ msgstr "Er bestaat al een shelf met die naam"
 
 msgid "New shelf created"
 msgstr "Nieuwe shelf aangemaakt"
-
-msgid "Are you sure?"
-msgstr "Weet u het zeker ?"
 
 #, python-format
 msgid "Delete shelf file %s?"
@@ -6813,6 +6777,9 @@ msgstr ""
 
 msgid "Signature has been added"
 msgstr ""
+
+msgid "Repository command still running"
+msgstr "Er loopt nog steeds een repository opdracht"
 
 msgid "Filter:"
 msgstr "Filter:"
@@ -6900,11 +6867,11 @@ msgid "unknown"
 msgstr "onbekend"
 
 #, python-format
-msgid "%s is missing!"
-msgstr "%s wordt vermist!"
+msgid "%s is deleted by non-hg command, but still tracked"
+msgstr ""
 
-msgid "deleted"
-msgstr "verwijderd"
+msgid "missing"
+msgstr ""
 
 #, python-format
 msgid "%s is ignored"
@@ -7539,9 +7506,6 @@ msgstr "antwoord verwacht"
 msgid "password: "
 msgstr "paswoord: "
 
-msgid "TortoiseHg Prompt"
-msgstr "TortoiseHg Opdrachtregel"
-
 msgid "abort: "
 msgstr "afgebroken: "
 
@@ -7633,6 +7597,9 @@ msgstr "Ouder 1:"
 
 msgid "Parent 2:"
 msgstr "Ouder 2:"
+
+msgid "Pull subrepos from:"
+msgstr ""
 
 msgid "List updated files (--verbose)"
 msgstr "Geef lijst van bijgewerkte bestanden (--verbose)"
@@ -8438,8 +8405,19 @@ msgid "Synchronize with dragged repository"
 msgstr "Synchroniseer met gesleepte repository"
 
 #, python-format
+msgid "unrecognized response: %s"
+msgstr ""
+
+#, python-format
 msgid "repository %s not found"
 msgstr "repository %s niet gevonden"
+
+msgid "win32ill: cannot create window for messages"
+msgstr ""
+
+#, python-format
+msgid "win32ill: unsupported platform: %s\n"
+msgstr ""
 
 #~ msgid "(version %s)"
 #~ msgstr "(versie %s)"
@@ -8528,6 +8506,9 @@ msgstr "repository %s niet gevonden"
 #~ msgid "Backout commit message"
 #~ msgstr "Backout commit bericht"
 
+#~ msgid "Detail"
+#~ msgstr "Detail"
+
 #~ msgid ""
 #~ "The directory \"%s\" isn't empty!\n"
 #~ "\n"
@@ -8549,17 +8530,32 @@ msgstr "repository %s niet gevonden"
 #~ msgid "unable to find %s or %s for patching"
 #~ msgstr "kan %s of %s niet vinden voor patching"
 
+#~ msgid "Error creating destination folder"
+#~ msgstr "Fout bij het creëren van de doelmap"
+
 #~ msgid "Recent commit messages..."
 #~ msgstr "Recente commit berichten..."
 
+#~ msgid "Backout revision not found"
+#~ msgstr "Backout revisie niet gevonden"
+
 #~ msgid "Source and destination are the same"
 #~ msgstr "Bron en doel zijn gelijk"
+
+#~ msgid "Please specify a different path."
+#~ msgstr "Geef een ander pad op aub."
+
+#~ msgid "Nothing Commited"
+#~ msgstr "Niets gecommit"
 
 #~ msgid "Save as.."
 #~ msgstr "Opslaan als..."
 
 #~ msgid "Undo"
 #~ msgstr "Ongedaan maken"
+
+#~ msgid "Collapse the rebased changesets "
+#~ msgstr "Ineenklappen van de rebased changesets "
 
 #~ msgid "Push"
 #~ msgstr "Push"
@@ -9108,6 +9104,9 @@ msgstr "repository %s niet gevonden"
 #~ msgid "bad hunk #%d old text line %d"
 #~ msgstr "slecht blok #%d oude tekst regel %d"
 
+#~ msgid "?? Error: %s ??"
+#~ msgstr "?? Fout: %s ??"
+
 #~ msgid "Backout..."
 #~ msgstr "Backout..."
 
@@ -9119,6 +9118,24 @@ msgstr "repository %s niet gevonden"
 
 #~ msgid "Serve"
 #~ msgstr "Serve"
+
+#~ msgid ""
+#~ "Indicates whether TortoiseHg should attempt to automatically resolve "
+#~ "changes from both sides to the same file, and only report merge conflicts "
+#~ "when this is not possible. When False, all files with changes on both "
+#~ "sides of the merge will report as conflicting, even if the edits are to "
+#~ "different parts of the file. In either case, when conflicts occur, the "
+#~ "user will be invited to review and resolve changes manually. Default: "
+#~ "False."
+#~ msgstr ""
+#~ "Geeft aan of TortoiseHg wijzigingen van beide zijden aan hetzelfde "
+#~ "bestand automatisch dient op te lossen, en enkel samenvoeg conflicten "
+#~ "moet melden als dat niet mogelijk is. Indien Nee, dan zullen alle "
+#~ "bestanden met wijzigingen aan beide zijden van het samenvoegen als "
+#~ "conflict gerapporteerd worden, zelfs als de aanpassingen in verschillende "
+#~ "delen van het bestand voorkomen. Als er conflicten zijn zal de gebruiker "
+#~ "in beide gevallen uitgenodigd worden om de wijzigingen manueel vooraf te "
+#~ "bekijken en op te lossen. Standaard: Nee"
 
 #~ msgid "&Yes (--force)"
 #~ msgstr "&Ja (--force)"
@@ -9756,6 +9773,24 @@ msgstr "repository %s niet gevonden"
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "Negeer witruimte bij het vergelijken van regels. Standaard: Uit"
 
+#~ msgid "deleted"
+#~ msgstr "verwijderd"
+
+#~ msgid "%s is missing!"
+#~ msgstr "%s wordt vermist!"
+
+#~ msgid "You must select two revisions to diff"
+#~ msgstr "U moet twee revisies kiezen om te vergelijken"
+
+#~ msgid "Graft %d changesets on top of changeset %s"
+#~ msgstr "Graft %d changesets bovenop changeset %s"
+
+#~ msgid "Copyright 2008-2013 Steve Borho and others"
+#~ msgstr "Copyright 2008-2013 Steve Borho en anderen"
+
+#~ msgid "Folder &History"
+#~ msgstr "Map&historiek"
+
 #~ msgid "No repository found here"
 #~ msgstr "her is geen repository gevonden"
 
@@ -9765,15 +9800,92 @@ msgstr "repository %s niet gevonden"
 #~ msgid "Incoming"
 #~ msgstr "Inkomend"
 
+#~ msgid "TortoiseHg Clone"
+#~ msgstr "TortoiseHg Klonen"
+
 #~ msgid "Character encoding name"
 #~ msgstr "Naam karakter encodering"
 
 #~ msgid "Pull"
 #~ msgstr "Pull"
 
+#~ msgid "Backed out merge revision to its first parent (%s)"
+#~ msgstr "Backout gedaan van samenvoegrevisie naar zijn eerste ouder (%s)"
+
+#~ msgid "Backed out merge revision to its second parent (%s)"
+#~ msgstr "Backout gedaan van samenvoegrevisie naar zijn tweede ouder (%s)"
+
+#~ msgid "&Diff Selected Changesets"
+#~ msgstr "&Vergelijk Gekozen Changesets"
+
+#~ msgid "&Diff Changeset to Parent"
+#~ msgstr "Vergelijk Changeset met Ouder"
+
+#~ msgid "Diff Changeset to &Local"
+#~ msgstr "Vergelijk Changeset met &Lokale versie"
+
+#~ msgid "Diff &File to Parent"
+#~ msgstr "Vergelijk Bestand met Ouder"
+
+#~ msgid "Diff File to Lo&cal"
+#~ msgstr "Vergelijk bestand met Lokale versie"
+
+#~ msgid "Backout to the first parent of the merge revision"
+#~ msgstr "Backout naar de eerste ouder van de samenvoegrevisie"
+
+#~ msgid "Backout to the second parent of the merge revision"
+#~ msgstr "Backout naar de tweede ouder van de samenvoegrevisie"
+
+#~ msgid "First Parent: revision %s (%s)"
+#~ msgstr "Eerste Ouder: revisie %s (%s)"
+
+#~ msgid "Second Parent: revision %s (%s)"
+#~ msgstr "Tweede Ouder: revisie %s (%s)"
+
 #~ msgid "Several icons are courtesy of the TortoiseSVN project"
 #~ msgstr ""
 #~ "Verscheidene iconen zijn een vriendendienst van het TortoiseSVN project"
 
+#~ msgid "Merge parent to backout to"
+#~ msgstr "Samenvoegouder waarnaartoe backout moet gebeuren"
+
+#~ msgid ""
+#~ "To backout a <b>merge</b> revision you must select which parent to "
+#~ "backout to (i.e. whose changes will be <i>kept</i>)"
+#~ msgstr ""
+#~ "Om backout te doen van een <b>samenvoeg</b>revisie moet u kiezen naar "
+#~ "welke ouder u de backout wilt doen (d.i. welke wijzigingen zullen "
+#~ "<i>behouden</i> worden)"
+
+#~ msgid "Backed out merge changeset: "
+#~ msgstr "Samenvoegchangeset waarvan backout gedaan is: "
+
 #~ msgid "Source path is empty"
 #~ msgstr "Doelpad is leeg"
+
+#~ msgid ""
+#~ "The command that will be executed.\n"
+#~ "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
+#~ "executable command.\n"
+#~ "You can use several {VARIABLES} to compose your command:\n"
+#~ "- {ROOT}: The path to the current repository root.\n"
+#~ "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
+#~ "hash respectively.\n"
+#~ "- {FILES}: The list of files touched by the selected revision.\n"
+#~ "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
+#~ msgstr ""
+#~ "De opdracht die uitgevoerd zal worden.\n"
+#~ "Gebruik \"hg\" (eerder dan \"hg.exe\") als de uitvoeringsopdracht om een "
+#~ "Mercurial opdracht uit te voeren.\n"
+#~ "U kunt verscheidene {VARIABELEN} gebruiken om uw opdracht samen te "
+#~ "stellen:\n"
+#~ "- {ROOT}: Het pad naar de huidige repository wortel.\n"
+#~ "- {REV} / {REVID}: het gekozen revisie nummer / respectievelijk de "
+#~ "hexadecimale revisie id hash.\n"
+#~ "- {FILES}: De lijst van bestanden die door de gekozen revisie gewijzigd "
+#~ "zijn.\n"
+#~ "- {ALLFILES}: Alle bestanden die door Mercurial getraceerd zijn op het "
+#~ "moment van de gekozen revisie."
+
+#~ msgid "Unable to save file"
+#~ msgstr "Kan bestand niet opslaan"

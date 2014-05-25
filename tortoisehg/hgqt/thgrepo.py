@@ -25,7 +25,7 @@ from hgext import mq
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.util.patchctx import patchctx
-from tortoisehg.hgqt import cmdcore
+from tortoisehg.hgqt import cmdcore, qtlib
 
 _repocache = {}
 _kbfregex = re.compile(r'^\.kbf/')
@@ -297,10 +297,12 @@ class RepoAgent(QObject):
     repositoryDestroyed = pyqtSignal()
     workingBranchChanged = pyqtSignal()
 
+    serviceStopped = pyqtSignal()
     busyChanged = pyqtSignal(bool)
+
     commandFinished = pyqtSignal(cmdcore.CmdSession)
     outputReceived = pyqtSignal(unicode, unicode)
-    progressReceived = pyqtSignal(unicode, object, unicode, unicode, object)
+    progressReceived = pyqtSignal(cmdcore.ProgressMessage)
 
     def __init__(self, repo):
         QObject.__init__(self)
@@ -319,6 +321,7 @@ class RepoAgent(QObject):
         cmdagent.setWorkingDirectory(self.rootPath())
         cmdagent.outputReceived.connect(self.outputReceived)
         cmdagent.progressReceived.connect(self.progressReceived)
+        cmdagent.serviceStopped.connect(self._tryEmitServiceStopped)
         cmdagent.busyChanged.connect(self._onBusyChanged)
         cmdagent.commandFinished.connect(self._onCommandFinished)
 
@@ -341,10 +344,20 @@ class RepoAgent(QObject):
         else:
             self._watcher.startMonitoring()
 
-    def stopMonitoring(self):
-        """Stop filesystem monitoring on repository closed by RepoManager or
-        command about to run"""
-        self._watcher.stopMonitoring()
+    def isServiceRunning(self):
+        return self._watcher.isMonitoring() or self._cmdagent.isServiceRunning()
+
+    def stopService(self):
+        """Shut down back-end services on repository closed by RepoManager"""
+        if self._watcher.isMonitoring():
+            self._watcher.stopMonitoring()
+            self._tryEmitServiceStopped()
+        self._cmdagent.stopService()
+
+    @pyqtSlot()
+    def _tryEmitServiceStopped(self):
+        if not self.isServiceRunning():
+            self.serviceStopped.emit()
 
     def rawRepo(self):
         return self._repo
@@ -376,6 +389,8 @@ class RepoAgent(QObject):
     @pyqtSlot()
     def _onConfigChanged(self):
         self._repo.invalidateui()
+        assert not self._cmdagent.isBusy()
+        self._cmdagent.stopService()  # to reload config
         self.configChanged.emit()
 
     @pyqtSlot()
@@ -387,7 +402,8 @@ class RepoAgent(QObject):
     def _onRepositoryDestroyed(self):
         if self._repo.root in _repocache:
             del _repocache[self._repo.root]
-        self.stopMonitoring()  # avoid further changed/destroyed signals
+        # avoid further changed/destroyed signals
+        self._watcher.stopMonitoring()
         self.repositoryDestroyed.emit()
 
     @pyqtSlot()
@@ -408,19 +424,19 @@ class RepoAgent(QObject):
     @pyqtSlot(bool)
     def _onBusyChanged(self, busy):
         if busy:
-            self.stopMonitoring()
+            self._watcher.stopMonitoring()
         else:
             self._watcher.pollStatus()
             self.startMonitoringIfEnabled()
         self.busyChanged.emit(busy)
 
-    def runCommand(self, cmdline, parent=None, worker=None):
+    def runCommand(self, cmdline, uihandler=None, worker=None):
         """Executes a single command asynchronously in this repository"""
-        return self._cmdagent.runCommand(cmdline, parent, worker)
+        return self._cmdagent.runCommand(cmdline, uihandler, worker)
 
-    def runCommandSequence(self, cmdlines, parent=None, worker=None):
+    def runCommandSequence(self, cmdlines, uihandler=None, worker=None):
         """Executes a series of commands asynchronously in this repository"""
-        return self._cmdagent.runCommandSequence(cmdlines, parent, worker)
+        return self._cmdagent.runCommandSequence(cmdlines, uihandler, worker)
 
     def abortCommands(self):
         """Abort running and queued commands"""
@@ -435,7 +451,7 @@ class RepoAgent(QObject):
         """Return RepoAgent of sub or patch repository"""
         root = self.rootPath()
         path = _normreporoot(os.path.join(root, path))
-        if path == root or not path.startswith(root + os.sep):
+        if path == root or not path.startswith(root.rstrip(os.sep) + os.sep):
             # only sub path is allowed to avoid circular references
             raise ValueError('invalid sub path: %s' % path)
         try:
@@ -481,6 +497,9 @@ class RepoManager(QObject):
     repositoryChanged = pyqtSignal(unicode)
     repositoryDestroyed = pyqtSignal(unicode)
 
+    busyChanged = pyqtSignal(unicode, bool)
+    progressReceived = pyqtSignal(unicode, cmdcore.ProgressMessage)
+
     _SIGNALMAP = [
         # source, dest
         (SIGNAL('configChanged()'),
@@ -489,12 +508,17 @@ class RepoManager(QObject):
          SIGNAL('repositoryChanged(QString)')),
         (SIGNAL('repositoryDestroyed()'),
          SIGNAL('repositoryDestroyed(QString)')),
+        (SIGNAL('serviceStopped()'),
+         SLOT('_tryCloseRepoAgent(QString)')),
+        (SIGNAL('busyChanged(bool)'),
+         SLOT('_mapBusyChanged(QString)')),
         ]
 
     def __init__(self, ui, parent=None):
         super(RepoManager, self).__init__(parent)
         self._ui = ui
         self._openagents = {}  # path: (agent, refcount)
+        # refcount=0 means the repo is about to be closed
 
         self._sigmappers = []
         for _sig, slot in self._SIGNALMAP:
@@ -518,6 +542,7 @@ class RepoManager(QObject):
         for (sig, _slot), mapper in zip(self._SIGNALMAP, self._sigmappers):
             QObject.connect(agent, sig, mapper, SLOT('map()'))
             mapper.setMapping(agent, agent.rootPath())
+        agent.progressReceived.connect(self._mapProgressReceived)
         agent.startMonitoringIfEnabled()
 
         assert agent.rootPath() == path
@@ -530,20 +555,33 @@ class RepoManager(QObject):
         """Decrement refcount of RepoAgent and close it if possible"""
         path = _normreporoot(path)
         agent, refcount = self._openagents[path]
+        self._openagents[path] = (agent, refcount - 1)
         if refcount > 1:
-            self._openagents[path] = (agent, refcount - 1)
             return
 
         # close child agents first, which may reenter to releaseRepoAgent()
         agent.releaseSubRepoAgents()
 
+        if agent.isServiceRunning():
+            self._ui.debug('stopping service: %s\n' % hglib.fromunicode(path))
+            agent.stopService()
+        else:
+            self._tryCloseRepoAgent(path)
+
+    @pyqtSlot(unicode)
+    def _tryCloseRepoAgent(self, path):
+        path = unicode(path)
+        agent, refcount = self._openagents[path]
+        if refcount > 0:
+            # repo may be reopen before its services stopped
+            return
         self._ui.debug('closing repo: %s\n' % hglib.fromunicode(path))
-        agent, _refcount = self._openagents.pop(path)
-        agent.stopMonitoring()
+        del self._openagents[path]
         # TODO: disconnected automatically if _repocache does not exist
         for (sig, _slot), mapper in zip(self._SIGNALMAP, self._sigmappers):
             QObject.disconnect(agent, sig, mapper, SLOT('map()'))
             mapper.removeMappings(agent)
+        agent.progressReceived.disconnect(self._mapProgressReceived)
         agent.setParent(None)
         self.repositoryClosed.emit(path)
 
@@ -556,6 +594,17 @@ class RepoManager(QObject):
     def repoRootPaths(self):
         """Return list of root paths of open repositories"""
         return self._openagents.keys()
+
+    @pyqtSlot(unicode)
+    def _mapBusyChanged(self, path):
+        agent, _refcount = self._openagents[unicode(path)]
+        self.busyChanged.emit(path, agent.isBusy())
+
+    @qtlib.senderSafeSlot(cmdcore.ProgressMessage)
+    def _mapProgressReceived(self, progress):
+        agent = self.sender()
+        assert isinstance(agent, RepoAgent)
+        self.progressReceived.emit(agent.rootPath(), progress)
 
 
 _uiprops = '''_uifiles postpull tabwidth maxdiff
@@ -710,22 +759,10 @@ def _extendrepo(repo):
         @propertycache
         def namedbranches(self):
             branchmap = self.branchmap()
-            if not util.safehasattr(branchmap, 'iterbranches'):
-                return self._namedbranches()
             dead = self.deadbranches
             return sorted(br for br, _heads, _tip, isclosed
                           in branchmap.iterbranches()
                           if not isclosed and br not in dead)
-
-        # hg<2.9 has repo.branchtags, but no branchmap.iterbranches
-        def _namedbranches(self):
-            allbranches = self.branchtags()
-            openbrnodes = []
-            for br in allbranches.iterkeys():
-                openbrnodes.extend(self.branchheads(br, closed=False))
-            dead = self.deadbranches
-            return sorted(br for br, n in allbranches.iteritems()
-                          if n in openbrnodes and br not in dead)
 
         @propertycache
         def _branchheads(self):
@@ -866,9 +903,6 @@ def _createchangectxcls(parentcls):
 
         def thgmqunappliedpatch(self):
             return False
-
-        def thgid(self):
-            return self._node
 
         def thgmqpatchname(self):
             '''Return self's MQ patch name. AssertionError if self not an MQ patch'''

@@ -217,6 +217,8 @@ class HgFileView(QFrame):
         self.actionShelf.setVisible(False)
         self.actionShelf.triggered.connect(self._launchShelve)
 
+        self._actionAutoTextEncoding = a = QAction(_('&Auto Detect'), self)
+        a.setCheckable(True)
         self._textEncodingGroup = fileencoding.createActionGroup(self)
         self._textEncodingGroup.triggered.connect(self._applyTextEncoding)
 
@@ -252,18 +254,29 @@ class HgFileView(QFrame):
 
     def loadSettings(self, qs, prefix):
         self.sci.loadSettings(qs, prefix)
+        self._actionAutoTextEncoding.setChecked(
+            qs.value(prefix + '/autotextencoding', True).toBool())
+        enc = str(qs.value(prefix + '/textencoding').toString())
+        if enc:
+            try:
+                # prefer repository-specific encoding if specified
+                enc = fileencoding.contentencoding(self.repo.ui, enc)
+            except LookupError:
+                enc = ''
+        if enc:
+            self._changeTextEncoding(enc)
 
     def saveSettings(self, qs, prefix):
         self.sci.saveSettings(qs, prefix)
+        qs.setValue(prefix + '/autotextencoding', self._autoTextEncoding())
+        qs.setValue(prefix + '/textencoding', self._textEncoding())
 
     @pyqtSlot()
     def _applyRepoConfig(self):
         self.sci.setIndentationWidth(self.repo.tabwidth)
         self.sci.setTabWidth(self.repo.tabwidth)
-        enc = fileencoding.contentencoding(self.repo.ui)
-        fileencoding.checkActionByName(self._textEncodingGroup, enc)
-        if not self._fd.isNull():
-            self._applyTextEncoding()
+        enc = fileencoding.contentencoding(self.repo.ui, self._textEncoding())
+        self._changeTextEncoding(enc)
 
     def setRepo(self, repo):
         self.repo = repo
@@ -391,6 +404,9 @@ class HgFileView(QFrame):
                             pctx.rev(), pctx, firstline))
             a.setChecked(fd.baseRev() == pctx.rev())
 
+    def _autoTextEncoding(self):
+        return self._actionAutoTextEncoding.isChecked()
+
     def _textEncoding(self):
         return fileencoding.checkedActionName(self._textEncodingGroup)
 
@@ -398,6 +414,11 @@ class HgFileView(QFrame):
     def _applyTextEncoding(self):
         self._fd.setTextEncoding(self._textEncoding())
         self._displayLoaded(self._fd)
+
+    def _changeTextEncoding(self, enc):
+        fileencoding.checkActionByName(self._textEncodingGroup, enc)
+        if not self._fd.isNull():
+            self._applyTextEncoding()
 
     @pyqtSlot(unicode, int, int)
     def _setSource(self, path, rev, line):
@@ -446,6 +467,10 @@ class HgFileView(QFrame):
     def display(self, fd):
         fd.load(self.isChangeSelectionEnabled())
         fd.setTextEncoding(self._textEncoding())
+        if self._autoTextEncoding():
+            fd.detectTextEncoding()
+            fileencoding.checkActionByName(self._textEncodingGroup,
+                                           fd.textEncoding())
         self._displayLoaded(fd)
 
     def _displayLoaded(self, fd):
@@ -622,6 +647,8 @@ class HgFileView(QFrame):
     def _createContextMenu(self, point):
         menu = self.sci.createEditorContextMenu()
         m = menu.addMenu(_('E&ncoding'))
+        m.addAction(self._actionAutoTextEncoding)
+        m.addSeparator()
         fileencoding.addActionsToMenu(m, self._textEncodingGroup)
 
         line = self.sci.lineNearPoint(point)
@@ -1356,18 +1383,40 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
                                           chunk.lineno + chunk.linecount, 0,
                                           self._excludeindicator)
 
-    @pyqtSlot(int, int)
-    def _onMarginClicked(self, margin, line):
+    #@pyqtSlot(int, int, Qt.KeyboardModifier)
+    def _onMarginClicked(self, margin, line, state):
         if margin != _ChunkSelectionMargin:
             return
         if line not in self._chunkatline:
             return
-        self._toggleChunkAtLine(line)
+        if state & Qt.ShiftModifier:
+            excluded = self._getChunkAtLine(line)
+            cl = self._currentChunkLine()
+            end = max(line, cl)
+            l = min(line, cl)
+            lines = []
+            while l < end:
+                assert l >= 0
+                lines.append(l)
+                l = self._sci.markerFindNext(l + 1, _ChunkSelectionMarkerMask)
+            lines.append(end)
+            self._setChunkAtLines(lines, not excluded)
+        else:
+            self._toggleChunkAtLine(line)
+
+        self._sci.setCursorPosition(line, 0)
+
+    def _getChunkAtLine(self, line):
+        return self._chunkatline[line].excluded
+
+    def _setChunkAtLines(self, lines, excluded):
+        for l in lines:
+            self.updateChunk(self._chunkatline[l], excluded)
+        self.chunkSelectionChanged.emit()
 
     def _toggleChunkAtLine(self, line):
-        chunk = self._chunkatline[line]
-        self.updateChunk(chunk, not chunk.excluded)
-        self.chunkSelectionChanged.emit()
+        excluded = self._getChunkAtLine(line)
+        self._setChunkAtLines([line], not excluded)
 
     @pyqtSlot()
     def _toggleCurrentChunk(self):

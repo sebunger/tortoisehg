@@ -29,7 +29,6 @@ class QDeleteDialog(QDialog):
         self.layout().addWidget(lbl)
 
         self._keepchk = QCheckBox(_('Keep patch files'))
-        self._keepchk.setChecked(True)
         self.layout().addWidget(self._keepchk)
 
         BB = QDialogButtonBox
@@ -37,6 +36,23 @@ class QDeleteDialog(QDialog):
         bbox.accepted.connect(self.accept)
         bbox.rejected.connect(self.reject)
         self.layout().addWidget(bbox)
+        self._readSettings()
+
+    def _readSettings(self):
+        qs = QSettings()
+        qs.beginGroup('qdelete')
+        self._keepchk.setChecked(qs.value('keep', True).toBool())
+        qs.endGroup()
+
+    def _writeSettings(self):
+        qs = QSettings()
+        qs.beginGroup('qdelete')
+        qs.setValue('keep', self._keepchk.isChecked())
+        qs.endGroup()
+
+    def accept(self):
+        self._writeSettings()
+        super(QDeleteDialog, self).accept()
 
     def options(self):
         return {'keep': self._keepchk.isChecked()}

@@ -166,11 +166,12 @@ class ChunksWidget(QWidget):
             pass
 
     def runPatcher(self, fp, wfile, updatestate):
-        ui = self.repo.ui.copy()
+        # don't repo.ui.copy(), which is protected to clone baseui since hg 2.9
+        ui = self.repo.ui
         class warncapt(ui.__class__):
             def warn(self, msg, *args, **opts):
                 self.write(msg)
-        ui.__class__ = warncapt
+        ui = warncapt(ui)
 
         ok = True
         repo = self.repo
@@ -718,6 +719,7 @@ class DiffBrowser(QFrame):
 
         fd = filedata.createFileData(self._ctx, None, filename, status)
         fd.load(force=force)
+        fd.detectTextEncoding()
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -752,7 +754,8 @@ class DiffBrowser(QFrame):
             chunk.selected = False
             chunk.write(buf)
             chunk.lines = buf.getvalue().splitlines()
-            utext += [hglib.tounicode(l) for l in chunk.lines]
+            utext += [l.decode(fd.textEncoding(), 'replace')
+                      for l in chunk.lines]
             utext.append('')
         self.sci.setText(u'\n'.join(utext))
 

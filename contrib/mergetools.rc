@@ -1,4 +1,29 @@
 [merge-tools]
+; Windows version of BeyondCompare 4
+beyondcompare4.priority=-1
+beyondcompare4.args=$local $other $base /mergeoutput=$output /ro /lefttitle=parent1 /centertitle=base /righttitle=parent2 /outputtitle=merged /automerge /reviewconflicts /solo
+beyondcompare4.premerge=False
+beyondcompare4.regkey=Software\Scooter Software\Beyond Compare 4
+beyondcompare4.regkeyalt=Software\Wow6432Node\Scooter Software\Beyond Compare 4
+beyondcompare4.regname=ExePath
+beyondcompare4.gui=True
+beyondcompare4.diffargs=/lro /lefttitle='$plabel1' /righttitle='$clabel' /solo /expandall $parent $child
+beyondcompare4.diff3args=$parent1 $parent2 $child /lefttitle='$plabel1' /centertitle='$clabel' /righttitle='$plabel2' /solo /ro
+beyondcompare4.dirdiff=True
+
+; copy of BeyondCompare 4 above, dropping /automerge
+beyondcompare4-noauto.executable=beyondcompare4
+beyondcompare4-noauto.priority=-1
+beyondcompare4-noauto.args=$local $other $base /mergeoutput=$output /ro /lefttitle=parent1 /centertitle=base /righttitle=parent2 /outputtitle=merged /reviewconflicts /solo
+beyondcompare4-noauto.premerge=False
+beyondcompare4-noauto.regkey=Software\Scooter Software\Beyond Compare 4
+beyondcompare4-noauto.regkeyalt=Software\Wow6432Node\Scooter Software\Beyond Compare 4
+beyondcompare4-noauto.regname=ExePath
+beyondcompare4-noauto.gui=True
+beyondcompare4-noauto.diffargs=/lro /lefttitle='$plabel1' /righttitle='$clabel' /solo /expandall $parent $child
+beyondcompare4-noauto.diff3args=$parent1 $parent2 $child /lefttitle='$plabel1' /centertitle='$clabel' /righttitle='$plabel2' /solo /ro
+beyondcompare4-noauto.dirdiff=True
+
 ; Windows version of BeyondCompare 3
 beyondcompare3.priority=-1
 beyondcompare3.args=$local $other $base /mergeoutput=$output /ro /lefttitle=parent1 /centertitle=base /righttitle=parent2 /outputtitle=merged /automerge /reviewconflicts /solo
@@ -137,6 +162,16 @@ tortoisemerge.checkchanged=True
 tortoisemerge.gui=True
 tortoisemerge.diffargs=/base:$parent /mine:$child /basename:'$plabel1' /minename:'$clabel'
 ; TortoiseMerge does not support three-way file or directory comparisons
+
+; Fork of TortoiseMerge bundled with TortoiseGit
+tortoisegitmerge.priority=-9
+tortoisegitmerge.args=/base:$base /mine:$local /theirs:$other /merged:$output
+tortoisegitmerge.regkey=Software\TortoiseGit
+tortoisegitmerge.regkeyalt=Software\Wow6432Node\TortoiseGit
+tortoisegitmerge.regname=TMergePath
+tortoisegitmerge.checkchanged=True
+tortoisegitmerge.gui=True
+tortoisegitmerge.diffargs=/base:$parent /mine:$child /basename:'$plabel1' /minename:'$clabel'
 
 ecmerge.priority=-10
 ecmerge.args=$base $local $other --mode=merge3 --title0=base --title1=local --title2=other --to=$output

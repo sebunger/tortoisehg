@@ -53,6 +53,13 @@ class EmailDialog(QDialog):
         QShortcut(QKeySequence('CTRL+Return'), self, self.accept)
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
 
+        # The email dialog is available no matter if patchbomb extension isn't
+        # enabled.  The extension name makes it unlikely first-time users
+        # would discover that Mercurial ships with a functioning patch MTA.
+        # Since patchbomb doesn't monkey patch any Mercurial code, it's safe
+        # to enable it on demand.
+        hglib.loadextension(self._ui, 'patchbomb')
+
     def closeEvent(self, event):
         self._writesettings()
         super(EmailDialog, self).closeEvent(event)
@@ -244,7 +251,7 @@ class EmailDialog(QDialog):
         if self._introrequired():
             self._qui.writeintro_check.setChecked(True)
 
-    #@pyqtSlot()
+    @qtlib.senderSafeSlot()
     def _updateattachmodes(self):
         """Update checkboxes to select the embedding style of the patch"""
         attachmodes = [self._qui.attach_check, self._qui.inline_check]
@@ -266,14 +273,13 @@ class EmailDialog(QDialog):
             getattr(self._qui, e).editTextChanged.connect(self._updateforms)
 
     def accept(self):
-        hglib.loadextension(self._ui, 'patchbomb')
-
         opts = self._patchbombopts()
         cmdline = hglib.buildcmdargs('email', **opts)
         cmd = cmdui.CmdSessionDialog(self)
         cmd.setWindowTitle(_('Sending Email'))
         cmd.setLogVisible(False)
-        cmd.setSession(self._repoagent.runCommand(cmdline, self))
+        uih = cmdui.PasswordUiHandler(cmd)  # skip "intro" prompt
+        cmd.setSession(self._repoagent.runCommand(cmdline, uih))
         if cmd.exec_() == 0:
             self._writehistory()
 
@@ -284,7 +290,7 @@ class EmailDialog(QDialog):
 
     def _introrequired(self):
         """Is intro message required?"""
-        return len(self._revs) > 1 or self._qui.bundle_radio.isChecked()
+        return self._qui.bundle_radio.isChecked()
 
     def _initpreviewtab(self):
         def initqsci(w):

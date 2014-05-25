@@ -8,11 +8,9 @@
 
 import os
 
-from mercurial import hg
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from tortoisehg.hgqt import csinfo, qtlib, thgrepo
+from tortoisehg.hgqt import csinfo, qtlib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util.patchctx import patchctx
 
@@ -21,7 +19,7 @@ _SPACING = 6
 class ChangesetList(QWidget):
 
     def __init__(self, repo=None, parent=None):
-        super(ChangesetList, self).__init__()
+        super(ChangesetList, self).__init__(parent)
 
         self.currepo = repo
         self.curitems = None
@@ -108,7 +106,7 @@ class ChangesetList(QWidget):
         """Clear the item list"""
         while self.csvbox.count():
             w = self.csvbox.takeAt(0).widget()
-            w.deleteLater()
+            w.setParent(None)
         self.curitems = None
 
     def insertcs(self, item):
@@ -165,7 +163,6 @@ class ChangesetList(QWidget):
             showitems, lastitem = items[:self.limit - 1], items[-1]
         else:
             showitems, lastitem = items, None
-        numshow = len(showitems) + (lastitem and 1 or 0)
         self.showitems = showitems + (lastitem and [lastitem] or [])
 
         # show items

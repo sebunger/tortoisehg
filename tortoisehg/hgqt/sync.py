@@ -706,7 +706,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         link = self.linkifyWithTarget(url or self.currentUrl())
 
         cmdline = ['pull', '--verbose']
-        uimerge = self.repo.ui.configbool('tortoisehg', 'autoresolve') \
+        uimerge = self.repo.ui.configbool('tortoisehg', 'autoresolve', True) \
             and 'ui.merge=internal:merge' or 'ui.merge=internal:fail'
         if self.cachedpp == 'rebase':
             cmdline += ['--rebase', '--config', uimerge]
@@ -715,7 +715,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         elif self.cachedpp == 'updateorrebase':
             cmdline += ['--update', '--rebase', '--config', uimerge]
         elif self.cachedpp == 'fetch':
-            cmdline[2] = 'fetch'
+            cmdline[0] = 'fetch'
         elif self.opts.get('mq'):
             # force the tool to update to the pulled changeset
             cmdline += ['--update', '--config', uimerge]
@@ -939,7 +939,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if ret == 0:
             cmdline = self.lastcmdline
             data = hglib.fromunicode(''.join(self._cmdoutputs), 'replace')
-            revs = tuple(_extractnodeids(data))
+            revs = tuple(self.repo[n].rev() for n in _extractnodeids(data))
             self.showMessage.emit(_('%d outgoing changesets') % len(revs))
             try:
                 outgoingrevs = (cmdline[cmdline.index('--rev') + 1],)
@@ -1023,8 +1023,9 @@ class SyncDialog(QDialog):
 
     @pyqtSlot(cmdcore.CmdSession)
     def _handleNewCommand(self, sess):
+        sess.commandFinished.connect(self._stbar.clearProgress)
         sess.outputReceived.connect(self._cmdlog.appendLog)
-        sess.progressReceived.connect(self._stbar.progress)
+        sess.progressReceived.connect(self._stbar.setProgress)
         self._cmdlog.show()
 
     def reject(self):
@@ -1088,7 +1089,7 @@ class PostPullDialog(QDialog):
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge '
                                            'conflicts where possible'))
         self.autoresolve_chk.setChecked(
-            repo.ui.configbool('tortoisehg', 'autoresolve', False))
+            repo.ui.configbool('tortoisehg', 'autoresolve', True))
         layout.addWidget(self.autoresolve_chk)
 
         cfglabel = QLabel(_('<a href="config">Launch settings tool...</a>'))

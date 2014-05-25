@@ -10,23 +10,49 @@ import Queue
 import urllib2, urllib
 import socket
 import errno
-import weakref
 
 from PyQt4.QtCore import *
-from PyQt4.QtGui import *
 
 from mercurial import util, error, subrepo
 from mercurial import ui as uimod
 
 from tortoisehg.util import thread2, hglib
 from tortoisehg.hgqt.i18n import _, localgettext
-from tortoisehg.hgqt import qtlib
 
 local = localgettext()
 
 class DataWrapper(object):
     def __init__(self, data):
         self.data = data
+
+# reference as cmdcore.ProgressMessage instead of thread.ProgressMessage
+class ProgressMessage(tuple):
+    __slots__ = ()
+
+    def __new__(cls, topic, pos, item='', unit='', total=None):
+        return tuple.__new__(cls, (topic, pos, item, unit, total))
+
+    @property
+    def topic(self):
+        return self[0]  # unicode
+    @property
+    def pos(self):
+        return self[1]  # int or None
+    @property
+    def item(self):
+        return self[2]  # unicode
+    @property
+    def unit(self):
+        return self[3]  # unicode
+    @property
+    def total(self):
+        return self[4]  # int or None
+
+    def __repr__(self):
+        names = ('topic', 'pos', 'item', 'unit', 'total')
+        fields = ('%s=%r' % (n, v) for n, v in zip(names, self))
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(fields))
+
 
 class UiSignal(QObject):
     writeSignal = pyqtSignal(QString, QString)
@@ -58,9 +84,9 @@ class UiSignal(QObject):
         except EOFError:
             raise util.Abort(local._('response expected'))
 
-    def promptchoice(self, msg, choices, default):
+    def promptchoice(self, prompt, default):
         try:
-            r = self._waitresponse(msg, False, choices, default)
+            r = self._waitresponse(prompt, False, True, default)
             if r is None:
                 raise EOFError
             return r
@@ -119,10 +145,7 @@ class QtUi(uimod.ui):
 
     def promptchoice(self, prompt, default=0):
         if not self.interactive(): return default
-        parts = prompt.split('$$')
-        msg = parts[0].rstrip(' ')
-        choices = [p.strip(' ') for p in parts[1:]]
-        return self.sig.promptchoice(msg, choices, default)
+        return self.sig.promptchoice(prompt, default)
 
     def getpass(self, prompt=None, default=None):
         return self.sig.getpass(prompt or _('password: '), default)
@@ -140,12 +163,13 @@ class CmdThread(QThread):
     for feedback from Mercurial can be handled by the user via dialog
     windows.
     """
+
+    serviceStateChanged = pyqtSignal(int)
+
     # (msg=str, label=str)
     outputReceived = pyqtSignal(QString, QString)
 
-    # (topic=str, pos=int, item=str, unit=str, total=int)
-    # pos and total are emitted as object, since they may be None
-    progressReceived = pyqtSignal(QString, object, QString, QString, object)
+    progressReceived = pyqtSignal(ProgressMessage)
 
     # result: -1 - command is incomplete, possibly exited with exception
     #          0 - command is finished successfully
@@ -157,7 +181,7 @@ class CmdThread(QThread):
 
         self.cmdline = None
         self._cwd = hglib.fromunicode(cwd)
-        self._uiparentref = None
+        self._uihandler = None
         self.ret = -1
         self.responseq = Queue.Queue()
         self.topics = {}
@@ -168,24 +192,38 @@ class CmdThread(QThread):
         self.started.connect(self.timer.start)
         self.finished.connect(self.thread_finished)
 
-    def startCommand(self, cmdline):
-        assert not self.isRunning() or HAVE_QTBUG_30251
+    def serviceState(self):
+        return 0  # NoService
+
+    def startService(self):
+        pass
+
+    def stopService(self):
+        pass
+
+    def startCommand(self, cmdline, uihandler):
+        assert not self.isCommandRunning() or HAVE_QTBUG_30251
         self.cmdline = map(hglib.fromunicode, cmdline)
+        self._uihandler = uihandler
         if self._cwd:
             self.cmdline[0:0] = ['--cwd', self._cwd]
         self.start()
 
-    def abort(self):
-        if self.isRunning() and hasattr(self, 'thread_id'):
+    def abortCommand(self):
+        if self.isCommandRunning() and hasattr(self, 'thread_id'):
             try:
                 thread2._async_raise(self.thread_id, KeyboardInterrupt)
             except ValueError:
                 pass
 
+    def isCommandRunning(self):
+        return self.isRunning()
+
     @pyqtSlot()
     def thread_finished(self):
         self.timer.stop()
         self.flush()
+        self._uihandler = None
         self.commandFinished.emit(self.ret)
 
     def flush(self):
@@ -196,13 +234,16 @@ class CmdThread(QThread):
             keys = self.topics.keys()
             for topic in keys:
                 pos, item, unit, total = self.topics[topic]
-                self.progressReceived.emit(topic, pos, item, unit, total)
+                progress = ProgressMessage(unicode(topic), pos, unicode(item),
+                                           unicode(unit), total)
+                self.progressReceived.emit(progress)
                 if pos is None:
                     del self.topics[topic]
         else:
             # Close all progress bars
             for topic in self.topics:
-                self.progressReceived.emit(topic, None, '', '', None)
+                progress = ProgressMessage(unicode(topic), None)
+                self.progressReceived.emit(progress)
             self.topics = {}
 
     @pyqtSlot(QString, QString)
@@ -223,46 +264,22 @@ class CmdThread(QThread):
     def interact_handler(self, wrapper):
         prompt, password, choices, default = wrapper.data
         prompt = hglib.tounicode(prompt)
+        uihandler = self._uihandler
         if choices:
-            dlg = QMessageBox(QMessageBox.Question,
-                              _('TortoiseHg Prompt'), prompt,
-                              parent=self._parentWidget())
-            dlg.setWindowFlags(Qt.Sheet)
-            dlg.setWindowModality(Qt.WindowModal)
-            for index, choice in enumerate(choices):
-                button = dlg.addButton(hglib.tounicode(choice),
-                                       QMessageBox.ActionRole)
-                button.response = index
-                if index == default:
-                    dlg.setDefaultButton(button)
-            dlg.exec_()
-            button = dlg.clickedButton()
-            if button is 0:
+            parts = prompt.split('$$')
+            resps = [p[p.index('&') + 1].lower() for p in parts[1:]]
+            uihandler.setPrompt(prompt, uihandler.ChoiceInput, resps[default])
+            r = uihandler.getLineInput()
+            if r is None:
                 self.responseq.put(None)
             else:
-                self.responseq.put(button.response)
+                self.responseq.put(resps.index(r))
         else:
-            mode = password and QLineEdit.Password \
-                             or QLineEdit.Normal
-            text, ok = qtlib.getTextInput(self._parentWidget(),
-                         _('TortoiseHg Prompt'),
-                         prompt.title(),
-                         mode=mode)
-            if ok:
-                text = hglib.fromunicode(text)
-            else:
-                text = None
+            mode = password and uihandler.PasswordInput \
+                             or uihandler.TextInput
+            uihandler.setPrompt(prompt, mode)
+            text = hglib.fromunicode(uihandler.getLineInput())
             self.responseq.put(text)
-
-    def setUiParent(self, parent):
-        assert not self.isRunning() or HAVE_QTBUG_30251
-        self._uiparentref = parent and weakref.ref(parent)
-
-    def _parentWidget(self):
-        p = self._uiparentref and self._uiparentref()
-        while p and not p.isWidgetType():
-            p = p.parent()
-        return p
 
     def run(self):
         ui = QtUi(responseq=self.responseq)

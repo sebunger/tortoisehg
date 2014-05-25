@@ -120,40 +120,41 @@ class _SciImSupport(object):
 class ScintillaCompat(QsciScintilla):
     """Scintilla widget with compatibility patches"""
 
-    def __init__(self, parent=None):
-        super(ScintillaCompat, self).__init__(parent)
-        self._imsupport = _SciImSupport(self)
+    # QScintilla 2.8 can handle input method events properly
+    if QSCINTILLA_VERSION < 0x20800:
+        def __init__(self, parent=None):
+            super(ScintillaCompat, self).__init__(parent)
+            self._imsupport = _SciImSupport(self)
 
-    def inputMethodQuery(self, query):
-        if query == Qt.ImMicroFocus:
-            return self._cursorRect()
-        return super(ScintillaCompat, self).inputMethodQuery(query)
+        def inputMethodQuery(self, query):
+            if query == Qt.ImMicroFocus:
+                # a rectangle (in viewport coords) including the cursor
+                l, i = self.getCursorPosition()
+                p = self.positionFromLineIndex(l, i)
+                x = self.SendScintilla(QsciScintilla.SCI_POINTXFROMPOSITION,
+                                       0, p)
+                y = self.SendScintilla(QsciScintilla.SCI_POINTYFROMPOSITION,
+                                       0, p)
+                w = self.SendScintilla(QsciScintilla.SCI_GETCARETWIDTH)
+                return QRect(x, y, w, self.textHeight(l))
+            return super(ScintillaCompat, self).inputMethodQuery(query)
 
-    def inputMethodEvent(self, event):
-        if self.isReadOnly():
-            return
+        def inputMethodEvent(self, event):
+            if self.isReadOnly():
+                return
 
-        self.removeSelectedText()
-        self._imsupport.removepreedit()
-        self._imsupport.commitstr(event.replacementStart(),
-                                  event.replacementLength(),
-                                  event.commitString())
-        self._imsupport.insertpreedit(event.preeditString())
-        for a in event.attributes():
-            if a.type == QInputMethodEvent.Cursor:
-                self._imsupport.movepreeditcursor(a.start)
-            # TODO TextFormat
+            self.removeSelectedText()
+            self._imsupport.removepreedit()
+            self._imsupport.commitstr(event.replacementStart(),
+                                      event.replacementLength(),
+                                      event.commitString())
+            self._imsupport.insertpreedit(event.preeditString())
+            for a in event.attributes():
+                if a.type == QInputMethodEvent.Cursor:
+                    self._imsupport.movepreeditcursor(a.start)
+                # TextFormat is not supported
 
-        event.accept()
-
-    def _cursorRect(self):
-        """Return a rectangle (in viewport coords) including the cursor"""
-        l, i = self.getCursorPosition()
-        p = self.positionFromLineIndex(l, i)
-        x = self.SendScintilla(QsciScintilla.SCI_POINTXFROMPOSITION, 0, p)
-        y = self.SendScintilla(QsciScintilla.SCI_POINTYFROMPOSITION, 0, p)
-        w = self.SendScintilla(QsciScintilla.SCI_GETCARETWIDTH)
-        return QRect(x, y, w, self.textHeight(l))
+            event.accept()
 
     # QScintilla 2.5 can translate Backtab to Shift+SCK_TAB (issue #82)
     if QSCINTILLA_VERSION < 0x20500:
@@ -697,20 +698,24 @@ def readFile(editor, filename, encoding=None):
                             _('Could not open the specified file for reading.'),
                             f.errorString(), parent=editor)
         return False
-    earlybytes = f.read(4096)
-    if '\0' in earlybytes:
-        qtlib.WarningMsgBox(_('Unable to read file'),
-                            _('This appears to be a binary file.'),
-                            parent=editor)
-        return False
+    try:
+        earlybytes = f.read(4096)
+        if '\0' in earlybytes:
+            qtlib.WarningMsgBox(_('Unable to read file'),
+                                _('This appears to be a binary file.'),
+                                parent=editor)
+            return False
 
-    f.seek(0)
-    data = str(f.readAll())
-    if f.error():
-        qtlib.WarningMsgBox(_('Unable to read file'),
-                            _('An error occurred while reading the file.'),
-                            f.errorString(), parent=editor)
-        return False
+        f.seek(0)
+        data = str(f.readAll())
+        if f.error():
+            qtlib.WarningMsgBox(_('Unable to read file'),
+                                _('An error occurred while reading the file.'),
+                                f.errorString(), parent=editor)
+            return False
+    finally:
+        f.close()
+
     if encoding:
         try:
             text = data.decode(encoding)
@@ -749,11 +754,14 @@ def writeFile(editor, filename, encoding=None):
                             _('Could not open the specified file for writing.'),
                             f.errorString(), parent=editor)
         return False
-    if f.write(data) < 0:
-        qtlib.WarningMsgBox(_('Unable to write file'),
-                            _('An error occurred while writing the file.'),
-                            f.errorString(), parent=editor)
-        return False
+    try:
+        if f.write(data) < 0:
+            qtlib.WarningMsgBox(_('Unable to write file'),
+                                _('An error occurred while writing the file.'),
+                                f.errorString(), parent=editor)
+            return False
+    finally:
+        f.close()
     return True
 
 def fileEditor(filename, **opts):

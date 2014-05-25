@@ -250,13 +250,22 @@ def readfile(path):
 
 def writefile(config, path):
     """Write the given config obj to the specified file"""
-    f = util.atomictempfile(os.path.realpath(path), 'w')
+    # normalize line endings
+    buf = cStringIO.StringIO()
+    config.write(buf)
+    data = '\n'.join(buf.getvalue().splitlines()) + '\n'
+
+    if os.name == 'nt':
+        # no atomic rename to the existing file that may fail occasionally
+        # for unknown reasons, possibly because of our QFileSystemWatcher or
+        # a virus scanner.  also it breaks NTFS symlink (issue #2181).
+        openfile = util.posixfile
+    else:
+        # atomic rename is reliable on Unix
+        openfile = util.atomictempfile
+    f = openfile(os.path.realpath(path), 'w')
     try:
-        buf = cStringIO.StringIO()
-        config.write(buf)
-        # normalize line endings
-        for line in buf.getvalue().splitlines():
-            f.write(line + '\n')
+        f.write(data)
         f.close()
     finally:
         del f  # unlink temp file

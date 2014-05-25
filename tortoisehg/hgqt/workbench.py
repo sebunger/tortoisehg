@@ -17,7 +17,6 @@ from tortoisehg.hgqt import cmdcore, cmdui, qtlib, mq, serve
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.repowidget import RepoWidget
 from tortoisehg.hgqt.reporegistry import RepoRegistryView
-from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 from tortoisehg.hgqt.docklog import LogDockWidget
 from tortoisehg.hgqt.settings import SettingsDialog
 
@@ -47,6 +46,9 @@ class Workbench(QMainWindow):
         self._repomanager.repositoryDestroyed.connect(self.closeRepo)
 
         self.setupUi()
+        repomanager.busyChanged.connect(self.statusbar.clearRepoProgress)
+        repomanager.progressReceived.connect(self.statusbar.setRepoProgress)
+
         self.reporegistry = rr = RepoRegistryView(repomanager, self)
         rr.setObjectName('RepoRegistryView')
         rr.showMessage.connect(self.showMessage)
@@ -66,7 +68,6 @@ class Workbench(QMainWindow):
 
         self.log = LogDockWidget(repomanager, cmdcore.CmdAgent(ui, self), self)
         self.log.setObjectName('Log')
-        self.log.progressReceived.connect(self.statusbar.progress)
         self.log.hide()
         self.addDockWidget(Qt.BottomDockWidgetArea, self.log)
 
@@ -208,8 +209,8 @@ class Workbench(QMainWindow):
         menu.addActions(self.reporegistry.settingActions())
 
         newseparator(menu='view')
-        newaction(_("C&hoose Log Columns..."), self.setHistoryColumns,
-                  menu='view')
+        newaction(_("C&hoose Log Columns..."), self._setHistoryColumns,
+                  enabled='repoopen', menu='view')
         self.actionSaveRepos = \
         newaction(_("Save Open Repositories on E&xit"), checkable=True,
                   menu='view')
@@ -276,9 +277,11 @@ class Workbench(QMainWindow):
 
         self.actionBack = \
         newaction(_("Back"), self._repofwd('back'), icon='go-previous',
+                  shortcut=QKeySequence.Back,
                   enabled=False, toolbar='edit')
         self.actionForward = \
         newaction(_("Forward"), self._repofwd('forward'), icon='go-next',
+                  shortcut=QKeySequence.Forward,
                   enabled=False, toolbar='edit')
         newseparator(toolbar='edit', menu='View')
 
@@ -532,6 +535,8 @@ class Workbench(QMainWindow):
             else:
                 action.setShortcut(keyseq)
         if tooltip:
+            if action.shortcut():
+                tooltip += ' (%s)' % action.shortcut().toString()
             action.setToolTip(tooltip)
         if data is not None:
             action.setData(data)
@@ -867,7 +872,7 @@ class Workbench(QMainWindow):
         rw = RepoWidget(repoagent, self, bundle=bundle)
         rw.showMessageSignal.connect(self.showMessage)
         rw.progress.connect(lambda tp, p, i, u, tl:
-            self.statusbar.progress(tp, p, i, u, tl, rw.repo.root))
+            self.statusbar.progress(tp, p, i, u, tl, rw.repoRootPath()))
         rw.makeLogVisible.connect(self.log.setShown)
         rw.revisionSelected.connect(self.updateHistoryActions)
         rw.repoLinkClicked.connect(self.openLinkedRepo)
@@ -901,7 +906,7 @@ class Workbench(QMainWindow):
         self.statusbar.showMessage(msg)
 
     @pyqtSlot(QString, object, QString, QString, object)
-    def progress(self, topic, pos, item, unit, total=100, root=None):
+    def progress(self, topic, pos, item, unit, total=100):
         if self.progressDialog:
             if pos is None:
                 self.progressDialog.close()
@@ -916,17 +921,14 @@ class Workbench(QMainWindow):
             self.progressDialog.show()
             self.progressDialog.setValue(pos)
         else:
-            self.statusbar.progress(topic, pos, item, unit, total, root)
+            self.statusbar.progress(topic, pos, item, unit, total)
 
-    def setHistoryColumns(self, *args):
+    @pyqtSlot()
+    def _setHistoryColumns(self):
         """Display the column selection dialog"""
         w = self.repoTabsWidget.currentWidget()
-        dlg = ColumnSelectDialog('workbench', _('Workbench'),
-                                 w and w.repoview.model() or None)
-        if dlg.exec_() == QDialog.Accepted:
-            if w:
-                w.repoview.model().updateColumns()
-                w.repoview.resizeColumns()
+        assert w
+        w.repoview.setHistoryColumns()
 
     def _repotogglefwd(self, name):
         """Return function to forward action to the current repo tab"""
@@ -1217,6 +1219,7 @@ class Workbench(QMainWindow):
             event.ignore()
         else:
             self.storeSettings()
+            self._clearRepoTabs()
             self.reporegistry.close()
 
     def closeRepoTabs(self):
@@ -1227,7 +1230,16 @@ class Workbench(QMainWindow):
             if not rw.closeRepoWidget():
                 tw.setCurrentWidget(rw)
                 return False
+        # don't close tabs here because 'openrepos' isn't saved yet
         return True
+
+    def _clearRepoTabs(self):
+        tw = self.repoTabsWidget
+        while tw.count() > 0:
+            rw = tw.widget(0)
+            tw.removeTab(0)
+            self._repomanager.releaseRepoAgent(rw.repoRootPath())
+            rw.deleteLater()
 
     @pyqtSlot()
     def closeCurrentRepoTab(self):

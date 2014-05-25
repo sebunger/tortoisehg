@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import sys
+import os, sys
 
 from mercurial import util
 
@@ -159,12 +159,13 @@ class QuickOpDialog(QDialog):
         self._cmdsession = sess = self._repoagent.runCommandSequence(ucmdlines,
                                                                      self)
         sess.commandFinished.connect(self.commandFinished)
-        sess.progressReceived.connect(self.statusbar.progress)
+        sess.progressReceived.connect(self.statusbar.setProgress)
         self._cmddialog.setSession(sess)
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
 
     def commandFinished(self, ret):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(True)
+        self.statusbar.clearProgress()
         if ret == 0:
             shlib.shell_notify(self.files)
             self.reject()
@@ -292,4 +293,5 @@ def run(ui, repoagent, *pats, **opts):
         cmdline = [command] + pats
         return HeadlessQuickop(repoagent, cmdline)
     else:
+        os.chdir(repo.root)  # for scmutil.match() in StatusThread
         return QuickOpDialog(repoagent, command, pats, None)

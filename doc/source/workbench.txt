@@ -177,6 +177,13 @@ Work with the various task tabs.
 
 ..
 
+	:guilabel:`Search`
+		For performing text searches through file content.
+		
+..		See _`Search` for more detail.
+
+..
+
 	:guilabel:`Synchronize`
 		Gives you full control about how you let your repositories
 		communicate with any other repository.
@@ -186,13 +193,6 @@ Work with the various task tabs.
 			:alt: Synchronise Task Tab
 			
 			Sync Task Tab
-
-..
-
-	:guilabel:`Search`
-		For performing text searches through file content.
-		
-..		See _`Search` for more detail.
 
 ..
 

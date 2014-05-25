@@ -36,7 +36,7 @@ class RebaseDialog(QDialog):
 
         style = csinfo.panelstyle(selectable=True)
 
-        srcb = QGroupBox( _('Rebase changeset and descendants'))
+        srcb = QGroupBox(_('Rebase changeset and descendants'))
         srcb.setLayout(QVBoxLayout())
         srcb.layout().setContentsMargins(*(2,)*4)
         s = opts.get('source', '.')
@@ -45,7 +45,7 @@ class RebaseDialog(QDialog):
         self.sourcecsinfo = source
         self.layout().addWidget(srcb)
 
-        destb = QGroupBox( _('To rebase destination'))
+        destb = QGroupBox(_('To rebase destination'))
         destb.setLayout(QVBoxLayout())
         destb.layout().setContentsMargins(*(2,)*4)
         d = opts.get('dest', '.')
@@ -55,7 +55,7 @@ class RebaseDialog(QDialog):
         self.layout().addWidget(destb)
 
         self.swaplabel = QLabel('<a href="X">%s</a>'  # don't care href
-                           % _('Swap source and destination'))
+                                % _('Swap source and destination'))
         self.swaplabel.linkActivated.connect(self.swap)
         self.layout().addWidget(self.swaplabel)
 
@@ -70,7 +70,7 @@ class RebaseDialog(QDialog):
         self.keepbrancheschk.setChecked(opts.get('keepbranches', False))
         self.layout().addWidget(self.keepbrancheschk)
 
-        self.collapsechk = QCheckBox(_('Collapse the rebased changesets '))
+        self.collapsechk = QCheckBox(_('Collapse the rebased changesets'))
         self.collapsechk.setChecked(opts.get('collapse', False))
         self.layout().addWidget(self.collapsechk)
 
@@ -79,8 +79,6 @@ class RebaseDialog(QDialog):
 
         self.autoresolvechk = QCheckBox(_('Automatically resolve merge '
                                           'conflicts where possible'))
-        self.autoresolvechk.setChecked(
-            repo.ui.configbool('tortoisehg', 'autoresolve', False))
         self.layout().addWidget(self.autoresolvechk)
 
         self.svnchk = QCheckBox(_('Rebase unpublished onto Subversion head '
@@ -125,10 +123,25 @@ class RebaseDialog(QDialog):
         self.setMaximumHeight(800)
         self.resize(0, 340)
         self.setWindowTitle(_('Rebase - %s') % repoagent.displayName())
+        self._readSettings()
 
     @property
     def repo(self):
         return self._repoagent.rawRepo()
+
+    def _readSettings(self):
+        qs = QSettings()
+        qs.beginGroup('rebase')
+        self.autoresolvechk.setChecked(
+            self.repo.ui.configbool('tortoisehg', 'autoresolve',
+                                    qs.value('autoresolve', True).toBool()))
+        qs.endGroup()
+
+    def _writeSettings(self):
+        qs = QSettings()
+        qs.beginGroup('rebase')
+        qs.setValue('autoresolve', self.autoresolvechk.isChecked())
+        qs.endGroup()
 
     @pyqtSlot(bool)
     def _onCheckFinished(self, clean):
@@ -191,8 +204,9 @@ class RebaseDialog(QDialog):
     def _runCommand(self, cmdline):
         assert self._cmdsession.isFinished()
         self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self._stbar.clearProgress)
         sess.outputReceived.connect(self._cmdlog.appendLog)
-        sess.progressReceived.connect(self._stbar.progress)
+        sess.progressReceived.connect(self._stbar.setProgress)
         cmdui.updateStatusMessage(self._stbar, sess)
         return sess
 
@@ -259,3 +273,7 @@ class RebaseDialog(QDialog):
                                         labels=labels, parent=self):
                 return
         super(RebaseDialog, self).reject()
+
+    def done(self, r):
+        self._writeSettings()
+        super(RebaseDialog, self).done(r)

@@ -1,5 +1,6 @@
 # Copyright (c) 2009-2010 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
+# Copyright 2010 Steve Borho <steve@borho.org>
 #
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +20,6 @@ from mercurial import error
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import htmldelegate, qtlib, repomodel
-from tortoisehg.hgqt.logcolumns import ColumnSelectDialog
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -30,9 +30,9 @@ class HgRepoView(QTableView):
     revisionAltClicked = pyqtSignal(object)
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
-    revisionSelectionChanged = pyqtSignal(QItemSelection, QItemSelection)
     menuRequested = pyqtSignal(QPoint, object)
     showMessage = pyqtSignal(unicode)
+    columnsVisibilityChanged = pyqtSignal()
 
     def __init__(self, repo, cfgname, colselect, parent=None):
         QTableView.__init__(self, parent)
@@ -49,17 +49,16 @@ class HgRepoView(QTableView):
 
         header = self.horizontalHeader()
         header.setClickable(False)
+        header.setMovable(True)
         # AlignBottom because RepoWidget steals top of header space for InfoBar
         header.setDefaultAlignment(Qt.AlignLeft | Qt.AlignBottom)
         header.setHighlightSections(False)
         header.setContextMenuPolicy(Qt.CustomContextMenu)
         header.customContextMenuRequested.connect(self.headerMenuRequest)
+        header.sectionMoved.connect(self.columnsVisibilityChanged)
 
         self.createActions()
-
-        self.standardDelegate = self.itemDelegate()
-        self.htmlDelegate = htmldelegate.HTMLDelegate(self)
-        self.graphDelegate = GraphDelegate(self)
+        self._initDelegates()
 
         self.setAcceptDrops(True)
         if PYQT_VERSION >= 0x40700:
@@ -104,26 +103,73 @@ class HgRepoView(QTableView):
         self.headermenu.exec_(self.horizontalHeader().mapToGlobal(point))
 
     def setHistoryColumns(self):
-        dlg = ColumnSelectDialog(self.colselect[0], self.colselect[1],
-                                 self.model())
+        dlg = ColumnSelectDialog(self.colselect[1],
+                                 self.model(), self.visibleColumns())
         if dlg.exec_() == QDialog.Accepted:
-            self.model().updateColumns()
+            self.setVisibleColumns(dlg.selectedColumns())
             self.resizeColumns()
+            self._saveColumnSettings()  # for new repository tab
+
+    def _loadColumnSettings(self):
+        model = self.model()
+        s = QSettings()
+        s.beginGroup(self.colselect[0])
+        cols = s.value('columns').toStringList()
+        cols = [str(col) for col in cols]
+        # Fixup older names for columns
+        if 'Log' in cols:
+            cols[cols.index('Log')] = 'Description'
+            s.setValue('columns', cols)
+        if 'ID' in cols:
+            cols[cols.index('ID')] = 'Rev'
+            s.setValue('columns', cols)
+        s.endGroup()
+        allcolumns = repomodel.ALLCOLUMNS[:model.columnCount()]
+        validcols = [col for col in cols if col in allcolumns]
+        if not validcols:
+            validcols = model._defaultcolumns
+        self.setVisibleColumns(validcols)
+
+    def _saveColumnSettings(self):
+        s = QSettings()
+        s.beginGroup(self.colselect[0])
+        s.setValue('columns', self.visibleColumns())
+        s.endGroup()
+
+    def visibleColumns(self):
+        hh = self.horizontalHeader()
+        return [repomodel.ALLCOLUMNS[hh.logicalIndex(visualindex)]
+                for visualindex in xrange(hh.count() - hh.hiddenSectionCount())]
+
+    def setVisibleColumns(self, visiblecols):
+        if not self.model() or visiblecols == self.visibleColumns():
+            return
+        hh = self.horizontalHeader()
+        hh.sectionMoved.disconnect(self.columnsVisibilityChanged)
+        allcolumns = repomodel.ALLCOLUMNS[:self.model().columnCount()]
+        for logicalindex, colname in enumerate(allcolumns):
+            hh.setSectionHidden(logicalindex, colname not in visiblecols)
+        for newvisualindex, colname in enumerate(visiblecols):
+            logicalindex = allcolumns.index(colname)
+            hh.moveSection(hh.visualIndex(logicalindex), newvisualindex)
+        hh.sectionMoved.connect(self.columnsVisibilityChanged)
+        self.columnsVisibilityChanged.emit()
 
     def setModel(self, model):
+        oldmodel = self.model()
         QTableView.setModel(self, model)
+        if type(oldmodel) is not type(model):
+            # logical columns are vary by model class
+            self._loadColumnSettings()
         #Check if the font contains the glyph needed by the model
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
             model.unicodestar = False
         if not QFontMetrics(self.font()).inFont(QString(u'\u2327').at(0)):
             model.unicodexinabox = False
         self.selectionModel().currentRowChanged.connect(self.onRowChange)
-        self.selectionModel().selectionChanged.connect(self.revisionSelectionChanged)
-        self.resetDelegate()
         self._rev_history = []
         self._rev_pos = -1
         self._in_history = False
-        model.layoutChanged.connect(self.resetDelegate)
 
     def resetBrowseHistory(self, revs, reselrev=None):
         graph = self.model().graph
@@ -134,20 +180,13 @@ class HgRepoView(QTableView):
             self._rev_pos = -1
         self.forward()
 
-    def resetDelegate(self):
-        # Model column layout has changed so we need to move
-        # our column delegate to correct location
-        if not self.model():
-            return
-        model = self.model()
-
-        for c in range(model.columnCount(QModelIndex())):
-            if model._columns[c] in ['Description', 'Changes']:
-                self.setItemDelegateForColumn(c, self.htmlDelegate)
-            elif model._columns[c] == 'Graph':
-                self.setItemDelegateForColumn(c, self.graphDelegate)
-            else:
-                self.setItemDelegateForColumn(c, self.standardDelegate)
+    def _initDelegates(self):
+        htmlDelegate = htmldelegate.HTMLDelegate(self)
+        graphDelegate = GraphDelegate(self)
+        for column, delegate in [(repomodel.DescColumn, htmlDelegate),
+                                 (repomodel.ChangesColumn, htmlDelegate),
+                                 (repomodel.GraphColumn, graphDelegate)]:
+            self.setItemDelegateForColumn(column, delegate)
 
     def resizeColumns(self):
         if not self.model():
@@ -167,18 +206,12 @@ class HgRepoView(QTableView):
         """Return list of recommended widths of all columns"""
         model = self.model()
         fontm = QFontMetrics(self.font())
-        widths = [-1 for _i in xrange(model.columnCount(QModelIndex()))]
+        widths = [-1 for _i in xrange(model.columnCount())]
 
         key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
         col_widths = [int(w) for w in QSettings().value(key).toStringList()]
 
-        if len(model._columns) <> len(col_widths):
-            # If the columns and widths don't match, use the calculated
-            # widths as they will probably be a better fit (likely because
-            # columns were changed without updating the widths)
-            col_widths = []
-
-        for c in range(model.columnCount(QModelIndex())):
+        for c in range(model.columnCount()):
             if c < len(col_widths) and col_widths[c] > 0:
                 w = col_widths[c]
             else:
@@ -301,7 +334,7 @@ class HgRepoView(QTableView):
             s = QSettings()
 
         col_widths = []
-        for c in range(self.model().columnCount(QModelIndex())):
+        for c in range(self.model().columnCount()):
             col_widths.append(self.columnWidth(c))
 
         try:
@@ -310,6 +343,8 @@ class HgRepoView(QTableView):
         except EnvironmentError:
             pass
 
+        self._saveColumnSettings()
+
     def resizeEvent(self, e):
         # re-size columns the smart way: the column holding Description
         # is re-sized according to the total widget size.
@@ -317,8 +352,8 @@ class HgRepoView(QTableView):
             model = self.model()
             total_width = stretch_col = 0
 
-            for c in range(model.columnCount(QModelIndex())):
-                if model._columns[c] in model._stretchs:
+            for c in range(model.columnCount()):
+                if c == repomodel.DescColumn:
                     #save the description column
                     stretch_col = c
                 else:
@@ -407,3 +442,55 @@ class GraphDelegate(QStyledItemDelegate):
             return QPixmap(graph).size()
         else:
             return QSize(0, 0)
+
+class ColumnSelectDialog(QDialog):
+    def __init__(self, name, model, curcolumns, parent=None):
+        QDialog.__init__(self, parent)
+        all = repomodel.ALLCOLUMNS[:model.columnCount()]
+        colnames = dict(repomodel.COLUMNHEADERS)
+
+        self.setWindowTitle(name)
+        self.setWindowFlags(self.windowFlags() & \
+                            ~Qt.WindowContextHelpButtonHint)
+        self.setMinimumSize(250, 265)
+
+        disabled = [c for c in all if c not in curcolumns]
+
+        layout = QVBoxLayout()
+        layout.setContentsMargins(5, 5, 5, 5)
+        self.setLayout(layout)
+
+        list = QListWidget()
+        # enabled cols are listed in sorted order, disabled are listed last
+        for c in curcolumns + disabled:
+            item = QListWidgetItem(colnames[c])
+            item.columnid = c
+            item.setFlags(Qt.ItemIsSelectable |
+                          Qt.ItemIsEnabled |
+                          Qt.ItemIsDragEnabled |
+                          Qt.ItemIsUserCheckable)
+            if c in curcolumns:
+                item.setCheckState(Qt.Checked)
+            else:
+                item.setCheckState(Qt.Unchecked)
+            list.addItem(item)
+        list.setDragDropMode(QListView.InternalMove)
+        layout.addWidget(list)
+        self.list = list
+
+        layout.addWidget(QLabel(_('Drag to change order')))
+
+        # dialog buttons
+        BB = QDialogButtonBox
+        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb.accepted.connect(self.accept)
+        bb.rejected.connect(self.reject)
+        layout.addWidget(bb)
+
+    def selectedColumns(self):
+        cols = []
+        for i in xrange(self.list.count()):
+            item = self.list.item(i)
+            if item.checkState() == Qt.Checked:
+                cols.append(item.columnid)
+        return cols

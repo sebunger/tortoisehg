@@ -218,7 +218,7 @@ class ShellConfigWindow(QDialog):
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         for cmd, info in menuthg.thgcmenu.items():
             label = info['label']
-            item = QListWidgetItem(hglib.tounicode(label['str']))
+            item = QListWidgetItem(label['str'].decode('utf-8'))
             item._id = label['id']
             if cmd in promoted:
                 self.topmenulist.addItem(item)

@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import weakref
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
@@ -82,13 +84,26 @@ class ThgStatusBar(QStatusBar):
         else:
             self.lbl.setStyleSheet('')
 
-    def clear(self):
+    @pyqtSlot()
+    def clearProgress(self):
         keys = self.topics.keys()
         for key in keys:
-            pm = self.topics[key]
-            self.removeWidget(pm)
-            del self.topics[key]
+            self._removeProgress(key)
 
+    @pyqtSlot(unicode)
+    def clearRepoProgress(self, root):
+        root = unicode(root)
+        keys = [k for k in self.topics if k[0] == root]
+        for key in keys:
+            self._removeProgress(key)
+
+    def _removeProgress(self, key):
+        pm = self.topics[key]
+        self.removeWidget(pm)
+        pm.setParent(None)
+        del self.topics[key]
+
+    # TODO: migrate to setProgress() API
     @pyqtSlot(QString, object, QString, QString, object)
     def progress(self, topic, pos, item, unit, total, root=None):
         'Progress signal received from repowidget'
@@ -99,15 +114,10 @@ class ThgStatusBar(QStatusBar):
         # total is the highest expected pos
         #
         # All topics should be marked closed by setting pos to None
-        if root:
-            key = (root, topic)
-        else:
-            key = topic
+        key = (root, topic)
         if pos is None or (not pos and not total):
             if key in self.topics:
-                pm = self.topics[key]
-                self.removeWidget(pm)
-                del self.topics[key]
+                self._removeProgress(key)
             return
         if key not in self.topics:
             pm = ProgressMonitor(topic, self)
@@ -127,6 +137,15 @@ class ThgStatusBar(QStatusBar):
                 item = item[-30:]
             pm.status.setText('%s %s' % (unicode(pos), item))
             pm.unknown()
+
+    @pyqtSlot(cmdcore.ProgressMessage)
+    def setProgress(self, progress):
+        self.progress(*progress)
+
+    @pyqtSlot(unicode, cmdcore.ProgressMessage)
+    def setRepoProgress(self, root, progress):
+        self.progress(*(progress + (unicode(root),)))
+
 
 def updateStatusMessage(stbar, session):
     """Update status bar to show the status of the given session"""
@@ -209,6 +228,97 @@ class LogWidget(qscilib.ScintillaCompat):
         super(LogWidget, self).keyPressEvent(event)
 
 
+class InteractiveUiHandler(cmdcore.UiHandler):
+    """Handle user interaction of Mercurial commands with GUI prompt"""
+
+    # "uiparent" exists for CmdAgent to create default handler not owned
+    # by the parent widget.  use "parent" in other cases.
+    def __init__(self, parent=None, uiparent=None):
+        super(InteractiveUiHandler, self).__init__(parent)
+        self._prompttext = ''
+        self._promptmode = cmdcore.UiHandler.NoInput
+        self._promptdefault = ''
+        self._uiparentref = uiparent and weakref.ref(uiparent)
+
+    def setPrompt(self, text, mode, default=None):
+        self._prompttext = unicode(text)
+        self._promptmode = mode
+        self._promptdefault = unicode(default or '')
+
+    def getLineInput(self):
+        mode = self._promptmode
+        if mode == cmdcore.UiHandler.TextInput:
+            return self._getTextInput(QLineEdit.Normal)
+        elif mode == cmdcore.UiHandler.PasswordInput:
+            return self._getTextInput(QLineEdit.Password)
+        elif mode == cmdcore.UiHandler.ChoiceInput:
+            return self._getChoiceInput()
+        else:
+            return ''
+
+    def _getTextInput(self, echomode):
+        text, ok = qtlib.getTextInput(self._parentWidget(),
+                                      _('TortoiseHg Prompt'),
+                                      self._prompttext, echomode)
+        if ok:
+            return text
+
+    def _getChoiceInput(self):
+        parts = self._prompttext.split('$$')
+        msg = parts[0].rstrip(' ')
+        choices = [p.strip(' ') for p in parts[1:]]
+        resps = [p[p.index('&') + 1].lower() for p in choices]
+        dlg = QMessageBox(QMessageBox.Question, _('TortoiseHg Prompt'), msg,
+                          QMessageBox.NoButton, self._parentWidget())
+        dlg.setWindowFlags(Qt.Sheet)
+        dlg.setWindowModality(Qt.WindowModal)
+        for r, t in zip(resps, choices):
+            button = dlg.addButton(t, QMessageBox.ActionRole)
+            button.response = r
+            if r == self._promptdefault:
+                dlg.setDefaultButton(button)
+        dlg.exec_()
+        button = dlg.clickedButton()
+        if button:
+            return button.response
+
+    def _parentWidget(self):
+        p = self._uiparentref and self._uiparentref() or self.parent()
+        while p and not p.isWidgetType():
+            p = p.parent()
+        return p
+
+
+class PasswordUiHandler(cmdcore.UiHandler):
+    """Handle no user interaction of Mercurial commands but password input"""
+
+    def __init__(self, parent=None):
+        super(PasswordUiHandler, self).__init__(parent)
+        if parent is not None and not isinstance(parent, QWidget):
+            raise ValueError('parent must be a QWidget')
+        self._prompt = None
+
+    def setPrompt(self, text, mode, default=None):
+        if mode == cmdcore.UiHandler.PasswordInput:
+            self._prompt = unicode(text)
+        else:
+            self._prompt = None
+
+    def getLineInput(self):
+        if self._prompt is None:
+            return ''
+        text, ok = qtlib.getTextInput(self.parent(), _('TortoiseHg Prompt'),
+                                      self._prompt, QLineEdit.Password)
+        if ok:
+            return text
+
+
+_detailbtntextmap = {
+    # current state: action text
+    False: _('Show Detail'),
+    True: _('Hide Detail')}
+
+
 class CmdSessionControlWidget(QWidget):
     """Helper widget to implement dialog to run Mercurial commands"""
 
@@ -245,7 +355,7 @@ class CmdSessionControlWidget(QWidget):
         self._closeBtn = buttons.addButton(QDialogButtonBox.Close)
         self._closeBtn.clicked.connect(self.reject)
 
-        self._detailBtn = buttons.addButton(_('Detail'),
+        self._detailBtn = buttons.addButton(_detailbtntextmap[logVisible],
                                             QDialogButtonBox.ResetRole)
         self._detailBtn.setAutoDefault(False)
         self._detailBtn.setCheckable(True)
@@ -257,6 +367,7 @@ class CmdSessionControlWidget(QWidget):
 
         self._session = cmdcore.nullCmdSession()
         self._stbar.hide()
+        self._updateSizePolicy()
         self._updateUi()
 
     def session(self):
@@ -266,9 +377,9 @@ class CmdSessionControlWidget(QWidget):
         """Start watching the given command session"""
         assert self._session.isFinished()
         self._session = sess
-        sess.commandFinished.connect(self._updateStatus)
+        sess.commandFinished.connect(self._onCommandFinished)
         sess.outputReceived.connect(self._outputLog.appendLog)
-        sess.progressReceived.connect(self._stbar.progress)
+        sess.progressReceived.connect(self._stbar.setProgress)
         self._cancelBtn.setEnabled(True)
         self._updateStatus()
 
@@ -276,6 +387,11 @@ class CmdSessionControlWidget(QWidget):
     def abortCommand(self):
         self._session.abort()
         self._cancelBtn.setDisabled(True)
+
+    @pyqtSlot()
+    def _onCommandFinished(self):
+        self._updateStatus()
+        self._stbar.clearProgress()
 
     def addButton(self, text, role):
         """Add custom button which will typically start Mercurial command"""
@@ -303,6 +419,8 @@ class CmdSessionControlWidget(QWidget):
             return
         self._outputLog.setVisible(visible)
         self._detailBtn.setChecked(visible)
+        self._detailBtn.setText(_detailbtntextmap[visible])
+        self._updateSizePolicy()
         self.logVisibilityChanged.emit(visible)
 
     @pyqtSlot()
@@ -320,9 +438,16 @@ class CmdSessionControlWidget(QWidget):
 
         self.finished.emit(self._session.exitCode())
 
-    @pyqtSlot()
+    def _updateSizePolicy(self):
+        if self.testAttribute(Qt.WA_WState_OwnSizePolicy):
+            return
+        if self.isLogVisible():
+            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        else:
+            self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setAttribute(Qt.WA_WState_OwnSizePolicy, False)
+
     def _updateStatus(self):
-        updateStatusMessage(self._stbar, self._session)
         self._stbar.show()
         self._updateUi()
 
@@ -330,18 +455,6 @@ class CmdSessionControlWidget(QWidget):
         updateStatusMessage(self._stbar, self._session)
         self._cancelBtn.setVisible(not self._session.isFinished())
         self._closeBtn.setVisible(self._session.isFinished())
-
-
-def adjustWindowHeightConstraint(window, cmdcontrol):
-    """Mimic SetFizedSize constraint vertically if command log is hidden"""
-    assert window.isWindow() and window.isAncestorOf(cmdcontrol)
-    if cmdcontrol.isLogVisible():
-        window.setMaximumHeight(qtlib.QWIDGETSIZE_MAX)
-    else:
-        # recalculate size constraints
-        cmdcontrol.adjustSize()
-        window.layout().activate()
-        window.setMaximumHeight(window.minimumHeight())
 
 
 class AbstractCmdWidget(QWidget):
@@ -386,12 +499,12 @@ class CmdControlDialog(QDialog):
                             & ~Qt.WindowContextHelpButtonHint)
 
         vbox = QVBoxLayout()
+        vbox.setSizeConstraint(QLayout.SetMinAndMaxSize)
         self.setLayout(vbox)
 
         self.__cmdwidget = None
 
         self.__cmdcontrol = cmd = CmdSessionControlWidget(self)
-        cmd.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Maximum)
         cmd.finished.connect(self.done)
         vbox.addWidget(cmd)
         self.__runbutton = cmd.addButton(_('&Run'), QDialogButtonBox.AcceptRole)
@@ -545,10 +658,10 @@ class CmdSessionDialog(QDialog):
         vbox = QVBoxLayout()
         self.setLayout(vbox)
         vbox.setContentsMargins(5, 5, 5, 5)
+        vbox.setSizeConstraint(QLayout.SetMinAndMaxSize)
 
         self._cmdcontrol = cmd = CmdSessionControlWidget(self, logVisible=True)
         cmd.finished.connect(self.done)
-        cmd.logVisibilityChanged.connect(self._adjustHeightByLogVisibility)
         vbox.addWidget(cmd)
 
     def setSession(self, sess):
@@ -562,12 +675,6 @@ class CmdSessionDialog(QDialog):
     def setLogVisible(self, visible):
         """show/hide command output"""
         self._cmdcontrol.setLogVisible(visible)
-
-    @pyqtSlot(bool)
-    def _adjustHeightByLogVisibility(self, visible):
-        adjustWindowHeightConstraint(self, self._cmdcontrol)
-        if visible:
-            self.resize(self.width(), self.sizeHint().height())
 
     def reject(self):
         self._cmdcontrol.reject()

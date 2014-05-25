@@ -112,7 +112,7 @@ class ShelveDialog(QDialog):
         self.lefttbar.setStyleSheet(qtlib.tbstylesheet)
         self.tbarhbox.addWidget(self.lefttbar)
         self.deletea = a = QAction(_('Delete selected chunks'), self)
-        self.deletea.triggered.connect(self.browsea.deleteSelectedChunks)
+        self.deletea.triggered.connect(self.deleteChunksA)
         a.setIcon(qtlib.geticon('thg-shelve-delete-left'))
         self.lefttbar.addAction(self.deletea)
         self.allright = a = QAction(_('Move all files right'), self)
@@ -165,7 +165,7 @@ class ShelveDialog(QDialog):
         a.setIcon(qtlib.geticon('thg-shelve-move-left-all'))
         self.righttbar.addAction(self.allleft)
         self.deleteb = a = QAction(_('Delete selected chunks'), self)
-        self.deleteb.triggered.connect(self.browseb.deleteSelectedChunks)
+        self.deleteb.triggered.connect(self.deleteChunksB)
         a.setIcon(qtlib.geticon('thg-shelve-delete-right'))
         self.righttbar.addAction(self.deleteb)
 
@@ -245,6 +245,23 @@ class ShelveDialog(QDialog):
     def moveChunksLeft(self):
         file, chunks = self.browseb.getSelectedFileAndChunks()
         if self.browsea.mergeChunks(file, chunks):
+            self.browseb.deleteSelectedChunks()
+
+    @pyqtSlot()
+    def deleteChunksA(self):
+        if self.comboa.currentIndex() == 0:
+            msg = _('Delete selected chunks from working copy?')
+        else:
+            f = hglib.tounicode(os.path.basename(self.currentPatchA()))
+            msg = _('Delete selected chunks from shelf file %s?') % f
+        if qtlib.QuestionMsgBox(_('Are you sure?'), msg, parent=self):
+            self.browsea.deleteSelectedChunks()
+
+    @pyqtSlot()
+    def deleteChunksB(self):
+        f = hglib.tounicode(os.path.basename(self.currentPatchB()))
+        msg = _('Delete selected chunks from shelf file %s?') % f
+        if qtlib.QuestionMsgBox(_('Are you sure?'), msg, parent=self):
             self.browseb.deleteSelectedChunks()
 
     @pyqtSlot()
