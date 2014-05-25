@@ -1,8 +1,10 @@
-tortoisehg (2.11-1) UNRELEASED; urgency=medium
+tortoisehg (2.11-1) unstable; urgency=medium
 
   * Imported Upstream version 2.11 (Closes: #738816).
+  * Update dependency on mercurial.
+  * Update Standards-Version to 3.9.5.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Fri, 28 Feb 2014 22:46:04 -0800
+ -- Ludovico Cavedon <cavedon@debian.org>  Fri, 28 Feb 2014 22:58:31 -0800
 
 tortoisehg (2.10-1) unstable; urgency=low
 
