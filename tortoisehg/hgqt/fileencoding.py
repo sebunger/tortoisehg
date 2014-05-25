@@ -64,6 +64,10 @@ _SUBSTMAP = {
 # i18n: comma-separated list of common encoding names in your locale, e.g.
 # "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
 #
+# for the best guess, put structured encodings like "utf-8" in front, e.g.
+# "utf-8,iso8859-1" instead of "iso8859-1,utf-8" because "iso8859-1" can
+# decode arbitrary byte sequence and never fall back.
+#
 # pick from the following encodings:
 # utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
 # iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
@@ -91,7 +95,7 @@ def canonname(name):
     name = codecs.lookup(name).name
     return _SUBSTMAP.get(name, name)
 
-def contentencoding(ui):
+def contentencoding(ui, fallbackenc=None):
     """Preferred encoding of file contents in repository"""
     # assumes web.encoding is the content encoding, not the filename one
     enc = ui.config('web', 'encoding')
@@ -100,11 +104,47 @@ def contentencoding(ui):
             return canonname(enc)
         except LookupError:
             ui.debug('ignoring invalid web.encoding: %s\n' % enc)
-    return canonname(encoding.encoding)
+    return canonname(fallbackenc or encoding.encoding)
 
 def knownencodings():
     """List of encoding names which are likely used"""
     return [enc for enc, _region in _ENCODINGNAMES]
+
+def _localeencodings():
+    localeencs = []
+    if _LOCALEENCODINGS:
+        localeencs.extend(canonname(e) for e in _LOCALEENCODINGS.split(','))
+    else:
+        # utf-8 is widely used; also mimics pre-2.11 behavior (007047b54911)
+        localeencs.append('utf-8')
+    enc = canonname(encoding.encoding)
+    if enc not in localeencs:
+        localeencs.append(enc)
+    return localeencs
+
+def guessencoding(ui, data, fallbackenc=None):
+    """Guess encoding of the specified data from locale-specific candidates
+
+    This is faster than chardet.detect() and works well for structured
+    encodings like utf-8 or CJK's, but won't be possible to distinguish
+    iso8859 variant.  iso8859-1 can decode any byte sequence for example.
+    """
+    if not isinstance(data, str):
+        raise ValueError('data must be bytes')
+    candidateencs = _localeencodings()
+    prefenc = contentencoding(ui)
+    if prefenc not in candidateencs:
+        candidateencs.insert(0, prefenc)
+    for enc in candidateencs:
+        try:
+            data.decode(enc)
+            return enc
+        except UnicodeDecodeError:
+            pass
+    # fallbackenc can be better than prefenc since prefenc failed
+    if fallbackenc:
+        return canonname(fallbackenc)
+    return prefenc
 
 
 def createActionGroup(parent):
@@ -123,11 +163,7 @@ def addCustomAction(group, name):
     return a
 
 def addActionsToMenu(menu, group):
-    localeencs = set()
-    if _LOCALEENCODINGS:
-        localeencs.update(canonname(e) for e in _LOCALEENCODINGS.split(','))
-    localeencs.add(canonname(encoding.encoding))
-
+    localeencs = set(_localeencodings())
     localeacts = []
     otheracts = []
     for a in group.actions():

@@ -7,7 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 shortlicense = '''
-Copyright (C) 2008-2013 Steve Borho <steve@borho.org> and others.
+Copyright (C) 2008-2014 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
@@ -19,6 +19,7 @@ import subprocess
 
 import mercurial.ui as uimod
 from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
+from mercurial import pathutil
 
 from tortoisehg.hgqt.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
@@ -159,7 +160,7 @@ def get_files_from_listfile():
     files = []
     for f in lines:
         try:
-            cpath = hglib.canonpath(root, cwd, f)
+            cpath = pathutil.canonpath(root, cwd, f)
             # canonpath will abort on .hg/ paths
         except util.Abort:
             continue
@@ -400,13 +401,7 @@ def _filelog(ui, repoagent, *pats, **opts):
     return filedialogs.FileLogDialog(repoagent, filename)
 
 def _formatfilerevset(pats):
-    q = []
-    for f in pats:
-        pat = hglib.canonpaths([f])[0]
-        if os.path.isdir(f):
-            q.append('file("%s/**")' % pat)
-        elif os.path.isfile(f):
-            q.append('file("%s")' % pat)
+    q = ["file('path:%s')" % f for f in hglib.canonpaths(pats)]
     return ' or '.join(q)
 
 def _workbench(ui, *pats, **opts):
@@ -489,13 +484,18 @@ def backout(ui, repoagent, *pats, **opts):
         rev = pats[0]
     else:
         rev = 'tip'
+    repo = repoagent.rawRepo()
+    rev = scmutil.revsingle(repo, rev).rev()
+    msg = backoutmod.checkrev(repo, rev)
+    if msg:
+        raise util.Abort(hglib.fromunicode(msg))
     return backoutmod.BackoutDialog(repoagent, rev)
 
 @command('^bisect', [], _('thg bisect'))
 def bisect(ui, repoagent, *pats, **opts):
     """bisect dialog"""
     from tortoisehg.hgqt import bisect as bisectmod
-    return bisectmod.BisectDialog(repoagent, opts)
+    return bisectmod.BisectDialog(repoagent)
 
 @command('bookmarks|bookmark',
     [('r', 'rev', '', _('revision'))],
@@ -881,6 +881,8 @@ def merge(ui, repoagent, *pats, **opts):
         rev = pats[0]
     if not rev:
         raise util.Abort(_('Merge revision not specified or not found'))
+    repo = repoagent.rawRepo()
+    rev = scmutil.revsingle(repo, rev).rev()
     return mergemod.MergeDialog(repoagent, rev)
 
 @command('postreview',
@@ -946,9 +948,9 @@ def rename(ui, repoagent, source=None, dest=None, **opts):
     repo = repoagent.rawRepo()
     cwd = repo.getcwd()
     if source:
-        source = hglib.tounicode(hglib.canonpath(repo.root, cwd, source))
+        source = hglib.tounicode(pathutil.canonpath(repo.root, cwd, source))
     if dest:
-        dest = hglib.tounicode(hglib.canonpath(repo.root, cwd, dest))
+        dest = hglib.tounicode(pathutil.canonpath(repo.root, cwd, dest))
     iscopy = (opts.get('alias') == 'copy')
     return renamemod.RenameDialog(repoagent, None, source, dest, iscopy)
 

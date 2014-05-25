@@ -10,7 +10,7 @@ from mercurial import error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdcore, cmdui, status, resolve
+from tortoisehg.hgqt import qtlib, csinfo, cmdcore, cmdui, status, resolve
 from tortoisehg.hgqt import qscilib, thgrepo, messageentry, commit, wctxcleaner
 
 from PyQt4.QtCore import *
@@ -22,13 +22,9 @@ class MergeDialog(QWizard):
 
     def __init__(self, repoagent, otherrev, parent=None):
         super(MergeDialog, self).__init__(parent)
+        self._repoagent = repoagent
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-
-        repo = repoagent.rawRepo()
-        self.otherrev = str(otherrev)
-        self.localrev = str(repo['.'].rev())
-
         self.setWindowTitle(_('Merge - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-merge'))
         self.setOption(QWizard.NoBackButtonOnStartPage, True)
@@ -36,9 +32,9 @@ class MergeDialog(QWizard):
         self.setOption(QWizard.IndependentPages, True)
 
         # set pages
-        summarypage = SummaryPage(repoagent, self)
+        summarypage = SummaryPage(repoagent, str(otherrev), self)
         self.addPage(summarypage)
-        self.addPage(MergePage(repoagent, self))
+        self.addPage(MergePage(repoagent, str(otherrev), self))
         self.addPage(CommitPage(repoagent, self))
         self.addPage(ResultPage(repoagent, self))
         self.currentIdChanged.connect(self.pageChanged)
@@ -51,6 +47,26 @@ class MergeDialog(QWizard):
 
         repoagent.repositoryChanged.connect(self.repositoryChanged)
         repoagent.configChanged.connect(self.configChanged)
+
+        self._readSettings()
+
+    def _readSettings(self):
+        qs = QSettings()
+        qs.beginGroup('merge')
+        for n in ['autoadvance', 'skiplast']:
+            self.setField(n, qs.value(n, False))
+        repo = self._repoagent.rawRepo()
+        n = 'autoresolve'
+        self.setField(n, repo.ui.configbool('tortoisehg', n,
+                                            qs.value(n, True).toBool()))
+        qs.endGroup()
+
+    def _writeSettings(self):
+        qs = QSettings()
+        qs.beginGroup('merge')
+        for n in ['autoadvance', 'autoresolve', 'skiplast']:
+            qs.setValue(n, self.field(n))
+        qs.endGroup()
 
     @pyqtSlot()
     def repositoryChanged(self):
@@ -69,6 +85,10 @@ class MergeDialog(QWizard):
     def reject(self):
         if self.currentPage().canExit():
             super(MergeDialog, self).reject()
+
+    def done(self, r):
+        self._writeSettings()
+        super(MergeDialog, self).done(r)
 
 
 class BasePage(QWizardPage):
@@ -116,17 +136,12 @@ class BasePage(QWizardPage):
 class SummaryPage(BasePage):
     refreshFinished = pyqtSignal()
 
-    def __init__(self, repoagent, parent):
+    def __init__(self, repoagent, otherrev, parent):
         super(SummaryPage, self).__init__(repoagent, parent)
         self._wctxcleaner = wctxcleaner.WctxCleaner(repoagent, self)
         self._wctxcleaner.checkStarted.connect(self._onCheckStarted)
         self._wctxcleaner.checkFinished.connect(self._onCheckFinished)
 
-    ### Override Methods ###
-
-    def initializePage(self):
-        if self.layout():
-            return
         self.setTitle(_('Prepare to merge'))
         self.setSubTitle(_('Verify merge targets and ensure your working '
                            'directory is clean.'))
@@ -146,19 +161,14 @@ class SummaryPage(BasePage):
         ## merge target
         other_sep = qtlib.LabeledSeparator(_('Merge from (other revision)'))
         self.layout().addWidget(other_sep)
-        try:
-            otherCsInfo = create(self.wizard().otherrev)
-            self.layout().addWidget(otherCsInfo)
-            self.otherCsInfo = otherCsInfo
-        except error.RepoLookupError:
-            qtlib.InfoMsgBox(_('Unable to merge'),
-                             _('Merge revision not specified or not found'))
-            QTimer.singleShot(0, self.wizard().close)
+        otherCsInfo = create(otherrev)
+        self.layout().addWidget(otherCsInfo)
+        self.otherCsInfo = otherCsInfo
 
         ## current revision
         local_sep = qtlib.LabeledSeparator(_('Merge to (working directory)'))
         self.layout().addWidget(local_sep)
-        localCsInfo = create(self.wizard().localrev)
+        localCsInfo = create(str(repo['.'].rev()))
         self.layout().addWidget(localCsInfo)
         self.localCsInfo = localCsInfo
 
@@ -210,31 +220,20 @@ class SummaryPage(BasePage):
         self.groups.add(force_chk, 'dirty')
         wdbox.addWidget(force_chk)
 
-        ### options
-        expander = qtlib.ExpanderLabel(_('Options'), False)
-        expander.expanded.connect(self.toggleShowOptions)
-        self.layout().addWidget(expander)
-        self.expander = expander
-
         ### discard option
         discard_chk = QCheckBox(_('Discard all changes from merge target '
                                   '(other) revision'))
         self.registerField('discard', discard_chk)
         self.layout().addWidget(discard_chk)
-        self.discard_chk = discard_chk
 
         ## auto-resolve
         autoresolve_chk = QCheckBox(_('Automatically resolve merge conflicts '
                                       'where possible'))
-        autoresolve_chk.setChecked(
-            repo.ui.configbool('tortoisehg', 'autoresolve', False))
         self.registerField('autoresolve', autoresolve_chk)
         self.layout().addWidget(autoresolve_chk)
-        self.autoresolve_chk = autoresolve_chk
 
         self.groups.set_visible(False, 'dirty')
         self.groups.set_visible(False, 'merged')
-        self.toggleShowOptions(self.expander.is_expanded())
 
     def isComplete(self):
         'should Next button be sensitive?'
@@ -252,19 +251,14 @@ class SummaryPage(BasePage):
                       % (self.otherCsInfo.get_data('revid')),
                          labels=labels, parent=self):
                 return False
-        return super(SummaryPage, self).validatePage();
+        return super(SummaryPage, self).validatePage()
 
     ## custom methods ##
-
-    def toggleShowOptions(self, visible):
-        self.discard_chk.setShown(visible)
-        self.autoresolve_chk.setShown(visible)
 
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
         pctx = self.repo['.']
         self.localCsInfo.update(pctx)
-        self.wizard().localrev = str(pctx.rev())
 
     def canExit(self):
         'can merge tool be closed?'
@@ -309,8 +303,9 @@ class SummaryPage(BasePage):
 
 
 class MergePage(BasePage):
-    def __init__(self, repoagent, parent):
+    def __init__(self, repoagent, otherrev, parent):
         super(MergePage, self).__init__(repoagent, parent)
+        self._otherrev = otherrev
         self.mergecomplete = False
 
         self.setTitle(_('Merging...'))
@@ -326,27 +321,25 @@ class MergePage(BasePage):
         self.reslabel.setWordWrap(True)
         self.layout().addWidget(self.reslabel)
 
-        self.autonext = QCheckBox(_('Automatically advance to next page '
-                                    'when merge is complete.'))
-        checked = QSettings().value('merge/autoadvance', False).toBool()
-        self.autonext.setChecked(checked)
-        self.autonext.toggled.connect(self.tryAutoAdvance)
-        self.layout().addWidget(self.autonext)
+        autonext = QCheckBox(_('Automatically advance to next page '
+                               'when merge is complete.'))
+        autonext.clicked.connect(self.tryAutoAdvance)
+        self.registerField('autoadvance', autonext)
+        self.layout().addWidget(autonext)
 
     def currentPage(self):
         super(MergePage, self).currentPage()
         if self.field('discard').toBool():
             # '.' is safer than self.localrev, in case the user has
             # pulled a fast one on us and updated from the CLI
-            cmdline = ['debugsetparents', '.',
-                       hglib.tounicode(self.wizard().otherrev)]
+            cmdline = ['debugsetparents', '.', hglib.tounicode(self._otherrev)]
         else:
             cmdline = ['merge', '--verbose']
             if self.field('force').toBool():
                 cmdline.append('--force')
             tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
             cmdline += ['--tool=internal:' + tool]
-            cmdline.append(hglib.tounicode(self.wizard().otherrev))
+            cmdline.append(hglib.tounicode(self._otherrev))
 
         if len(self.repo.parents()) == 1:
             self._cmdlog.clearLog()
@@ -381,19 +374,17 @@ class MergePage(BasePage):
             self.reslabel.setText(_('No merge conflicts, ready to commit'))
         return True
 
+    @pyqtSlot(bool)
     def tryAutoAdvance(self, checked):
         if checked and self.isComplete():
             self.wizard().next()
-
-    def cleanupPage(self):
-        QSettings().setValue('merge/autoadvance', self.autonext.isChecked())
 
     @pyqtSlot(int)
     def onCommandFinished(self, ret):
         sess = self._cmdsession
         if ret in (0, 1):
             self.mergecomplete = True
-            if self.autonext.isChecked() and not sess.warningString():
+            if self.field('autoadvance').toBool() and not sess.warningString():
                 self.tryAutoAdvance(True)
             self.completeChanged.emit()
 
@@ -402,7 +393,7 @@ class MergePage(BasePage):
         if cmd == 'resolve':
             dlg = resolve.ResolveDialog(self._repoagent, self)
             dlg.exec_()
-            if self.autonext.isChecked():
+            if self.field('autoadvance').toBool():
                 self.tryAutoAdvance(True)
             self.completeChanged.emit()
 
@@ -500,11 +491,10 @@ class CommitPage(BasePage):
         actionEnter.triggered.connect(tryperform)
         self.addAction(actionEnter)
 
-        self.skiplast = QCheckBox(_('Skip final confirmation page, '
-                                    'close after commit.'))
-        checked = QSettings().value('merge/skiplast', False).toBool()
-        self.skiplast.setChecked(checked)
-        self.layout().addWidget(self.skiplast)
+        skiplast = QCheckBox(_('Skip final confirmation page, '
+                               'close after commit.'))
+        self.registerField('skiplast', skiplast)
+        self.layout().addWidget(skiplast)
 
         hblayout = QHBoxLayout()
         self.opts = commit.readopts(self.repo.ui)
@@ -532,7 +522,6 @@ class CommitPage(BasePage):
 
     def cleanupPage(self):
         s = QSettings()
-        s.setValue('merge/skiplast', self.skiplast.isChecked())
         self.msgEntry.saveSettings(s, 'merge/message')
 
     def currentPage(self):
@@ -540,17 +529,7 @@ class CommitPage(BasePage):
         self.wizard().setOption(QWizard.NoDefaultButton, True)
         self.mergeCsInfo.update()  # show post-merge state
 
-        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
-        wctx = self.repo[None]
-        if wctx.p1().branch() == wctx.p2().branch():
-            msgset = i18n.keepgettext()._('Merge')
-            text = engmsg and msgset['id'] or msgset['str']
-            text = unicode(text)
-        else:
-            msgset = i18n.keepgettext()._('Merge with %s')
-            text = engmsg and msgset['id'] or msgset['str']
-            text = unicode(text) % hglib.tounicode(wctx.p2().branch())
-        self.msgEntry.setText(text)
+        self.msgEntry.setText(commit.mergecommitmessage(self.repo))
         self.msgEntry.moveCursorToEnd()
 
     @pyqtSlot(QString)
@@ -569,7 +548,7 @@ class CommitPage(BasePage):
 
         if len(self.repo.parents()) == 1:
             # commit succeeded, repositoryChanged() called wizard().next()
-            if self.skiplast.isChecked():
+            if self.field('skiplast').toBool():
                 self.wizard().close()
             return True
 

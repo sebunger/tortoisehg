@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from mercurial import error, revset
+from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -36,7 +36,8 @@ class MatchDialog(QDialog):
         ### matched revision combo
         self.rev_combo = combo = QComboBox()
         combo.setEditable(True)
-        self.grid.addWidget(QLabel(_('Find revisions matching fields of:')), 0, 0)
+        self.grid.addWidget(QLabel(_('Find revisions matching fields of:')),
+                            0, 0)
         self.grid.addWidget(combo, 0, 1)
 
         # Give the combo box a minimum width that will ensure that the dialog is
@@ -68,7 +69,8 @@ class MatchDialog(QDialog):
         factory = csinfo.factory(self.repo, style=style)
         self.rev_to_match_info = factory()
         self.rev_to_match_info_lbl = QLabel(_('Revision to Match:'))
-        self.grid.addWidget(self.rev_to_match_info_lbl, 1, 0, Qt.AlignLeft | Qt.AlignTop)
+        self.grid.addWidget(self.rev_to_match_info_lbl, 1, 0,
+                            Qt.AlignLeft | Qt.AlignTop)
         self.grid.addWidget(self.rev_to_match_info, 1, 1)
         self.grid.addWidget(self.rev_to_match_info_text, 1, 1)
 
@@ -87,7 +89,8 @@ class MatchDialog(QDialog):
         self.desc_btngroup.setExclusive(False)
         self.desc_btngroup.addButton(self.summary_chk)
         self.desc_btngroup.addButton(self.description_chk)
-        self.desc_btngroup.buttonClicked.connect(self._selectSummaryOrDescription)
+        self.desc_btngroup.buttonClicked.connect(
+            self._selectSummaryOrDescription)
 
         self.author_chk = QCheckBox(_('Author'))
         self.date_chk = QCheckBox(_('Date'))
@@ -97,7 +100,8 @@ class MatchDialog(QDialog):
         self.branch_chk = QCheckBox(_('Branch'))
         self.parents_chk = QCheckBox(_('Parents'))
         self.phase_chk = QCheckBox(_('Phase'))
-        self._hideable_chks = (self.branch_chk, self.phase_chk, self.parents_chk,)
+        self._hideable_chks = (self.branch_chk, self.phase_chk,
+                               self.parents_chk)
 
         self.optbox.addWidget(self.summary_chk)
         self.optbox.addWidget(self.description_chk)
@@ -114,7 +118,8 @@ class MatchDialog(QDialog):
 
         #### Persisted Options
         self.summary_chk.setChecked(s.value('matching/summary', False).toBool())
-        self.description_chk.setChecked(s.value('matching/description', True).toBool())
+        self.description_chk.setChecked(
+            s.value('matching/description', True).toBool())
         self.author_chk.setChecked(s.value('matching/author', True).toBool())
         self.branch_chk.setChecked(s.value('matching/branch', False).toBool())
         self.date_chk.setChecked(s.value('matching/date', True).toBool())
@@ -122,7 +127,8 @@ class MatchDialog(QDialog):
         self.diff_chk.setChecked(s.value('matching/diff', False).toBool())
         self.parents_chk.setChecked(s.value('matching/parents', False).toBool())
         self.phase_chk.setChecked(s.value('matching/phase', False).toBool())
-        self.substate_chk.setChecked(s.value('matching/substate', False).toBool())
+        self.substate_chk.setChecked(
+            s.value('matching/substate', False).toBool())
 
         ## bottom buttons
         buttons = QDialogButtonBox()
@@ -178,7 +184,8 @@ class MatchDialog(QDialog):
         s.setValue('matching/phase', self.phase_chk.isChecked())
         s.setValue('matching/substate', self.substate_chk.isChecked())
 
-    def update_info(self, *args):
+    @pyqtSlot()
+    def update_info(self):
         def set_csinfo_mode(mode):
             """Show the csinfo widget or the info text label"""
             # hide first, then show
@@ -209,8 +216,7 @@ class MatchDialog(QDialog):
         # If we get this far, assume we are matching a revision set
         validrevset = False
         try:
-            func = revset.match(self.repo.ui, new_rev)
-            rset = [c for c in func(self.repo, list(self.repo))]
+            rset = self.repo.revs(new_rev)
             if len(rset) > 1:
                 self.rev_to_match_info_lbl.setText(_('Revisions to Match:'))
                 csinfo_set_text(_('Match any of <b><i>%d</i></b> revisions') \
@@ -221,12 +227,9 @@ class MatchDialog(QDialog):
             validrevset = True
         except (error.LookupError, error.RepoLookupError):
             csinfo_set_text(_('<b>Unknown revision!</b>'))
-        except (error.ParseError):
+        except error.ParseError:
             csinfo_set_text(_('<b>Parse Error!</b>'))
-        if validrevset:
-            self.match_btn.setEnabled(True)
-        else:
-            self.match_btn.setDisabled(True)
+        self.match_btn.setEnabled(validrevset)
 
     def match(self):
         self.saveSettings()
@@ -249,9 +252,10 @@ class MatchDialog(QDialog):
 
         rev = hglib.fromunicode(self.rev_combo.currentText())
         if fields:
-            self.revsetexpression = "matching(%s, '%s')" % (rev, ' '.join(fields))
+            self.revsetexpression = ("matching(%s, '%s')"
+                                     % (rev, ' '.join(fields)))
         else:
-            self.revsetexpression = "matching(%s)" % (rev)
+            self.revsetexpression = "matching(%s)" % rev
         self.accept()
 
     ### Signal Handlers ###
@@ -264,5 +268,5 @@ class MatchDialog(QDialog):
     def _selectSummaryOrDescription(self, btn):
         # Uncheck all other buttons
         for b in self.desc_btngroup.buttons():
-            if not (b is btn):
+            if b is not btn:
                 b.setChecked(False)

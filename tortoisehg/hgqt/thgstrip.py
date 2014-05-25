@@ -20,6 +20,7 @@ class StripWidget(cmdui.AbstractCmdWidget):
 
     def __init__(self, repoagent, rev=None, parent=None, opts={}):
         super(StripWidget, self).__init__(parent)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._repoagent = repoagent
 
         grid = QGridLayout()

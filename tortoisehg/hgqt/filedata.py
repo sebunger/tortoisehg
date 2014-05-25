@@ -168,6 +168,14 @@ class _AbstractFileData(object):
     def setTextEncoding(self, name):
         self._textencoding = fileencoding.canonname(name)
 
+    def detectTextEncoding(self):
+        ui = self._ctx._repo.ui
+        # use file content for better guess; diff may be mixed encoding or
+        # have immature multi-byte sequence
+        data = self.contents or self.diff or ''
+        fallbackenc = self._textencoding
+        self._textencoding = fileencoding.guessencoding(ui, data, fallbackenc)
+
     def _textToUnicode(self, s):
         return s.decode(self._textencoding, 'replace')
 

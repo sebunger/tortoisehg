@@ -728,6 +728,8 @@ class CustomToolConfigDialog(CustomConfigDialog):
             '- {ROOT}: The path to the current repository root.\n'
             '- {REV} / {REVID}: the selected revision number / '
             'hexadecimal revision id hash respectively.\n'
+            '- {SELECTEDFILES}: The list of files selected by the user on the '
+            'revision details file list.\n'
             '- {FILES}: The list of files touched by the selected revision.\n'
             '- {ALLFILES}: All the files tracked by Mercurial on the selected'
             ' revision.'))

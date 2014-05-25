@@ -58,26 +58,17 @@ class GraftDialog(QDialog):
         box.setContentsMargins(*(6,)*4)
         self.setLayout(box)
 
-        destrev = self.repo['.'].rev()
-        if len(self.sourcelist) > 1:
-            listlabel = qtlib.LabeledSeparator(
-                _('Graft %d changesets on top of changeset %s')
-                % (len(self.sourcelist), destrev))
-            self.layout().addWidget(listlabel)
-            self.cslist = cslist.ChangesetList(self.repo)
-            self.cslist.update(self.sourcelist)
-            self.layout().addWidget(self.cslist)
-
-        style = csinfo.panelstyle(selectable=True)
         self.srcb = srcb = QGroupBox()
         srcb.setLayout(QVBoxLayout())
         srcb.layout().setContentsMargins(*(2,)*4)
 
-        self.source = csinfo.create(self.repo, None, style, withupdate=True)
+        self.cslist = cslist.ChangesetList(self.repo)
         self._updateSource(0)
-        srcb.layout().addWidget(self.source)
+        srcb.layout().addWidget(self.cslist)
         self.layout().addWidget(srcb)
 
+        destrev = self.repo['.'].rev()
+        style = csinfo.panelstyle(selectable=True)
         destb = QGroupBox(_('To graft destination'))
         destb.setLayout(QVBoxLayout())
         destb.layout().setContentsMargins(*(2,)*4)
@@ -89,21 +80,16 @@ class GraftDialog(QDialog):
         sep = qtlib.LabeledSeparator(_('Options'))
         self.layout().addWidget(sep)
 
-        self.currentuservechk = QCheckBox(_('Use my user name instead of graft '
-                                            'committer user name'))
-        self.layout().addWidget(self.currentuservechk)
-
-        self.currentdatevechk = QCheckBox(_('Use current date'))
-        self.layout().addWidget(self.currentdatevechk)
-
-        self.logvechk = QCheckBox(_('Append graft info to log message'))
-        self.layout().addWidget(self.logvechk)
-
-        self.autoresolvechk = QCheckBox(_('Automatically resolve merge '
-                                          'conflicts where possible'))
-        self.autoresolvechk.setChecked(
-            self.repo.ui.configbool('tortoisehg', 'autoresolve', False))
-        self.layout().addWidget(self.autoresolvechk)
+        self._optchks = {}
+        for name, text in [
+                ('currentuser', _('Use my user name instead of graft '
+                                  'committer user name')),
+                ('currentdate', _('Use current date')),
+                ('log', _('Append graft info to log message')),
+                ('autoresolve', _('Automatically resolve merge conflicts '
+                                  'where possible'))]:
+            self._optchks[name] = w = QCheckBox(text)
+            self.layout().addWidget(w)
 
         self._cmdlog = cmdui.LogWidget(self)
         self._cmdlog.hide()
@@ -137,10 +123,30 @@ class GraftDialog(QDialog):
         self.setMaximumHeight(800)
         self.resize(0, 340)
         self.setWindowTitle(_('Graft - %s') % repoagent.displayName())
+        self._readSettings()
 
     @property
     def repo(self):
         return self._repoagent.rawRepo()
+
+    def _readSettings(self):
+        ui = self.repo.ui
+        qs = QSettings()
+        qs.beginGroup('graft')
+        for n, w in self._optchks.iteritems():
+            if n == 'autoresolve':
+                w.setChecked(ui.configbool('tortoisehg', n,
+                                           qs.value(n, True).toBool()))
+            else:
+                w.setChecked(qs.value(n).toBool())
+        qs.endGroup()
+
+    def _writeSettings(self):
+        qs = QSettings()
+        qs.beginGroup('graft')
+        for n, w in self._optchks.iteritems():
+            qs.setValue(n, w.isChecked())
+        qs.endGroup()
 
     def _updateSourceTitle(self, idx):
         numrevs = len(self.sourcelist)
@@ -152,7 +158,7 @@ class GraftDialog(QDialog):
 
     def _updateSource(self, idx):
         self._updateSourceTitle(idx)
-        self.source.update(self.repo[self.sourcelist[idx]])
+        self.cslist.update(self.sourcelist[idx:])
 
     @pyqtSlot(bool)
     def _onCheckFinished(self, clean):
@@ -169,11 +175,9 @@ class GraftDialog(QDialog):
     def graft(self):
         self.graftbtn.setEnabled(False)
         self.cancelbtn.setShown(False)
-        itool = self.autoresolvechk.isChecked() and 'merge' or 'fail'
-        opts = {'config': 'ui.merge=internal:%s' % itool,
-                'currentuser': self.currentuservechk.isChecked(),
-                'currentdate': self.currentdatevechk.isChecked(),
-                'log': self.logvechk.isChecked()}
+        opts = dict((n, w.isChecked()) for n, w in self._optchks.iteritems())
+        itool = opts.pop('autoresolve') and 'merge' or 'fail'
+        opts['config'] = 'ui.merge=internal:%s' % itool
         if os.path.exists(self._graftstatefile):
             opts['continue'] = True
             args = []
@@ -208,8 +212,9 @@ class GraftDialog(QDialog):
     def _runCommand(self, cmdline):
         assert self._cmdsession.isFinished()
         self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self._stbar.clearProgress)
         sess.outputReceived.connect(self._cmdlog.appendLog)
-        sess.progressReceived.connect(self._stbar.progress)
+        sess.progressReceived.connect(self._stbar.setProgress)
         cmdui.updateStatusMessage(self._stbar, sess)
         return sess
 
@@ -288,3 +293,7 @@ class GraftDialog(QDialog):
                                         labels=labels, parent=self):
                 return
         super(GraftDialog, self).reject()
+
+    def done(self, r):
+        self._writeSettings()
+        super(GraftDialog, self).done(r)

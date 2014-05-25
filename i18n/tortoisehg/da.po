@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
-"POT-Creation-Date: 2014-02-03 11:14-0200\n"
-"PO-Revision-Date: 2013-09-19 08:36+0000\n"
+"POT-Creation-Date: 2014-04-28 11:26-0300\n"
+"PO-Revision-Date: 2014-02-05 01:45+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-02-04 06:03+0000\n"
-"X-Generator: Launchpad (build 16916)\n"
+"X-Launchpad-Export-Date: 2014-04-29 05:55+0000\n"
+"X-Generator: Launchpad (build 16985)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg overlay-ikon server"
@@ -27,11 +27,11 @@ msgstr "Afslut"
 msgid "About"
 msgstr "Om"
 
-msgid "Copyright 2008-2013 Steve Borho and others"
-msgstr "Copyright 2008-2013 Steve Borho og andre"
+msgid "Copyright 2008-2014 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
-msgstr ""
+msgstr "Nogle af ikonerne kan vi takke TortoiseSVN og Tango projekterne for"
 
 msgid "You can visit our site here"
 msgstr "Du kan besøge vores hjemmeside her"
@@ -52,7 +52,7 @@ msgstr "med Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr ""
+msgstr "En ny version af TortoiseHg (%s) er klar til at blive hentet!"
 
 msgid "= Working Directory Parent ="
 msgstr "= Forælder til arbejdskataloget ="
@@ -115,7 +115,7 @@ msgid "Select Destination File"
 msgstr "Vælg mål-fil"
 
 msgid "All files (*)"
-msgstr ""
+msgstr "Alle filer (*)"
 
 msgid "Duplicate Name"
 msgstr "Duplikér navn"
@@ -158,6 +158,12 @@ msgstr "Arkiv - %s"
 msgid "&Archive"
 msgstr "&Arkiv"
 
+msgid "Backout requires a parent revision"
+msgstr ""
+
+msgid "Cannot backout change on a different branch"
+msgstr "Kan ikke omgøre en ændring på en anden gren"
+
 #, python-format
 msgid "Backout - %s"
 msgstr "Omgør - %s"
@@ -169,20 +175,8 @@ msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
 "Kontroller revisionen der skal omgøres og at dit arbejdskatalog er rent."
 
-msgid "Unable to backout"
-msgstr "Kan ikke omgøre"
-
-msgid "Backout revision not found"
-msgstr "Revision at omgøre ikke fundet"
-
 msgid "Backing out a parent revision is a single step operation"
 msgstr "At omgøre en forælder-revision tager kun et trin"
-
-msgid "Backout requires a parent revision"
-msgstr ""
-
-msgid "Cannot backout change on a different branch"
-msgstr "Kan ikke omgøre en ændring på en anden gren"
 
 msgid "Backout revision"
 msgstr "Revision at omgøre"
@@ -192,28 +186,6 @@ msgstr "Ikke et hoved, omgør vil lave et nyt hoved!"
 
 msgid "Current local revision"
 msgstr "Nuværende lokal revision"
-
-msgid "Merge parent to backout to"
-msgstr ""
-
-msgid ""
-"To backout a <b>merge</b> revision you must select which parent to backout "
-"to (i.e. whose changes will be <i>kept</i>)"
-msgstr ""
-
-#, python-format
-msgid "First Parent: revision %s (%s)"
-msgstr "Første forælder: Revision %s (%s)"
-
-msgid "Backout to the first parent of the merge revision"
-msgstr ""
-
-#, python-format
-msgid "Second Parent: revision %s (%s)"
-msgstr "Anden forælder: Revision %s (%s)"
-
-msgid "Backout to the second parent of the merge revision"
-msgstr ""
 
 msgid "Working directory status"
 msgstr "Status på arbejdskatalog"
@@ -277,9 +249,6 @@ msgstr "Integrationsmeddelelse"
 msgid "Skip final confirmation page, close after commit."
 msgstr "Spring over bekræftelsessiden, luk efter intetration."
 
-msgid "Backed out merge changeset: "
-msgstr ""
-
 msgid "Backed out changeset: "
 msgstr "Omgjort ændring: "
 
@@ -291,14 +260,6 @@ msgstr "Kassér nuværende omgørelsesbesked?"
 
 msgid "Use English backout message"
 msgstr "Brug engelsk omgørelsesbesked"
-
-#, python-format
-msgid "Backed out merge revision to its first parent (%s)"
-msgstr ""
-
-#, python-format
-msgid "Backed out merge revision to its second parent (%s)"
-msgstr ""
 
 msgid "Backing out and committing..."
 msgstr "Omgør og integrerer..."
@@ -332,16 +293,16 @@ msgid "Known bad revision:"
 msgstr "Kendt dårlig revision:"
 
 msgid "Discard local changes (revert --all)"
-msgstr ""
+msgstr "Forkast lokale ændringer (revert --all)"
 
 msgid "Revision is &Good"
-msgstr ""
+msgstr "Revision er &God"
 
 msgid "Revision is &Bad"
-msgstr ""
+msgstr "Revision er &Dårlig"
 
 msgid "&Skip this Revision"
-msgstr ""
+msgstr "&Spring over denne revision"
 
 msgid "Close"
 msgstr "Luk"
@@ -370,7 +331,7 @@ msgid "New Name:"
 msgstr "Nyt navn:"
 
 msgid "Activate:"
-msgstr ""
+msgstr "Aktivér:"
 
 msgid "&Add"
 msgstr "&Tilføj"
@@ -418,7 +379,7 @@ msgstr "Bogmærket '%s' er blevet omdøbt til '%s'"
 
 #, python-format
 msgid "%s - branch operation"
-msgstr ""
+msgstr "%s - gren operation"
 
 msgid "Select branch of merge commit"
 msgstr "Vælg gren til flet-integration"
@@ -442,7 +403,7 @@ msgstr ""
 "\">fejlhåndteringssystem</a>"
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr "Leder efter opdateringer..."
 
 msgid "Copy"
 msgstr "Kopier"
@@ -454,10 +415,10 @@ msgid "TortoiseHg Bug Report"
 msgstr "TortoiseHg fejlrapport"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr ""
+msgstr "Det er anbefalet at opgradere til en nyere version af TortoiseHg."
 
 msgid "Your TortoiseHg is up to date."
-msgstr ""
+msgstr "Din TortoiseHg er ajour."
 
 msgid "Save error report to"
 msgstr "Gem fejlrapport til"
@@ -597,15 +558,6 @@ msgstr "Fjernkommando:"
 msgid "Start revision:"
 msgstr "Start revision:"
 
-msgid "TortoiseHg Clone"
-msgstr "TortoiseHg klon"
-
-msgid "Error creating destination folder"
-msgstr "Fejl under oprettelse af destinationsmappe"
-
-msgid "Please specify a different path."
-msgstr "Angiv venligst en anden sti"
-
 msgid "Select source repository"
 msgstr "Vælg kildedepot"
 
@@ -628,16 +580,42 @@ msgstr "mislykkedes med at starte kommando\n"
 msgid "error while running command\n"
 msgstr "fejl under kørsel af kommando\n"
 
+#, python-format
+msgid "process exited unexpectedly with code %d"
+msgstr ""
+
+#, python-format
+msgid "timed out while reading: %r..."
+msgstr ""
+
+msgid "timed out waiting for message"
+msgstr ""
+
+#, python-format
+msgid "unexpected response on required channel %r"
+msgstr ""
+
+#, python-format
+msgid "invalid \"hello\" message: %r"
+msgstr ""
+
+msgid "no \"runcommand\" capability"
+msgstr ""
+
+#, python-format
+msgid "corrupted command result: %r"
+msgstr ""
+
 msgid "Terminated by user"
 msgstr "Termineret af bruger"
 
 #, python-format
 msgid "[command terminated by user %s]"
-msgstr ""
+msgstr "[kommando afsluttet af bruger %s]"
 
 #, python-format
 msgid "[command interrupted %s]"
-msgstr ""
+msgstr "[kommando  afbrudt %s]"
 
 #, python-format
 msgid "[command returned code %d %%s]"
@@ -649,7 +627,7 @@ msgstr "[kommando udført med succes %s]"
 
 #, python-format
 msgid "ignoring invalid cmdworker '%s'\n"
-msgstr ""
+msgstr "ignorerer ugyldig cmdworker '%s'\n"
 
 msgid "Running..."
 msgstr "Kører..."
@@ -658,10 +636,16 @@ msgid "Failed!"
 msgstr "Fejlede!"
 
 msgid "Clea&r Log"
+msgstr "&Slet log"
+
+msgid "TortoiseHg Prompt"
+msgstr "TortoiseHg prompt"
+
+msgid "Show Detail"
 msgstr ""
 
-msgid "Detail"
-msgstr "Detalje"
+msgid "Hide Detail"
+msgstr ""
 
 msgid "Confirm Exit"
 msgstr "Bekræft exit"
@@ -674,16 +658,23 @@ msgstr ""
 "Er du sikker på at du vil terminere?"
 
 msgid "&Run"
-msgstr ""
+msgstr "&Kør"
 
 msgid "TortoiseHg Command Dialog"
 msgstr "TortoiseHg kommandodialog"
 
 msgid "Command Error"
-msgstr ""
+msgstr "Kommandofejl"
 
 #, python-format
 msgid "[Code: %d]"
+msgstr "[Kode: %d]"
+
+msgid "Merge"
+msgstr "Flet"
+
+#, python-format
+msgid "Merge with %s"
 msgstr ""
 
 msgctxt "start progress"
@@ -822,8 +813,8 @@ msgstr ""
 msgid "&Replace"
 msgstr ""
 
-msgid "Nothing Commited"
-msgstr "Intet integreret"
+msgid "Nothing Committed"
+msgstr ""
 
 msgid "Please enter commit message"
 msgstr "Skriv integrationsbesked"
@@ -851,6 +842,9 @@ msgstr "Bekræft fjern"
 
 msgid "Remove selected deleted files?"
 msgstr "Fjern markerede slettede filer?"
+
+msgid "Nothing changed."
+msgstr ""
 
 msgctxt "window title"
 msgid "Commit"
@@ -1115,6 +1109,8 @@ msgid ""
 "- {ROOT}: The path to the current repository root.\n"
 "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
 "hash respectively.\n"
+"- {SELECTEDFILES}: The list of files selected by the user on the revision "
+"details file list.\n"
 "- {FILES}: The list of files touched by the selected revision.\n"
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
@@ -1225,16 +1221,34 @@ msgstr ""
 msgid "Show the history of the selected file"
 msgstr "Vis historikken for den valgte fil"
 
-msgid "Folder &History"
-msgstr ""
-
 msgid "Co&mpare File Revisions"
 msgstr ""
 
 msgid "Compare revisions of the selected file"
 msgstr "Sammenlign revisioner for den valgte fil"
 
+msgid "Filter Histor&y"
+msgstr ""
+
+msgid "Query about changesets affecting the selected files"
+msgstr ""
+
+msgid "Diff &Changeset to Parent"
+msgstr ""
+
+msgid "Diff Changeset to Loc&al"
+msgstr ""
+
+msgid "Diff Selected Cha&ngesets"
+msgstr ""
+
 msgid "&Diff to Parent"
+msgstr ""
+
+msgid "Cannot display visual diff"
+msgstr ""
+
+msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
 msgid "Diff to &Local"
@@ -1242,6 +1256,9 @@ msgstr ""
 
 msgid "View changes to current in external diff tool"
 msgstr "Vis ændringer til nuværende i eksternt diff-værktøj"
+
+msgid "Diff Selected &File Revisions"
+msgstr ""
 
 msgid "&View at Revision"
 msgstr ""
@@ -1254,6 +1271,9 @@ msgstr ""
 
 msgid "Save file as it appeared at this revision"
 msgstr ""
+
+msgid "Save file to"
+msgstr "Gem fil som"
 
 msgid "&Edit Local"
 msgstr ""
@@ -1286,18 +1306,6 @@ msgid "Open &Terminal"
 msgstr ""
 
 msgid "Open a shell terminal in the selected folder"
-msgstr ""
-
-msgid "File(s) not found"
-msgstr ""
-
-msgid "The selected files do not exist in the working directory"
-msgstr ""
-
-msgid "Cannot display visual diff"
-msgstr ""
-
-msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
 msgid "Display the file anyway"
@@ -1473,28 +1481,7 @@ msgstr "Tilbage"
 msgid "Forward"
 msgstr "Frem"
 
-msgid "&Diff Selected Changesets"
-msgstr ""
-
-msgid "Diff Selected &File Revisions"
-msgstr ""
-
-msgid "&Diff Changeset to Parent"
-msgstr ""
-
-msgid "Diff Changeset to &Local"
-msgstr ""
-
-msgid "Diff &File to Parent"
-msgstr ""
-
-msgid "Diff File to Lo&cal"
-msgstr ""
-
 msgid "Show Revision &Details"
-msgstr ""
-
-msgid "You must select two revisions to diff"
 msgstr ""
 
 msgid "Too many rows selected for menu"
@@ -1575,6 +1562,10 @@ msgstr ""
 #. i18n: comma-separated list of common encoding names in your locale, e.g.
 #. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
 #.
+#. for the best guess, put structured encodings like "utf-8" in front, e.g.
+#. "utf-8,iso8859-1" instead of "iso8859-1,utf-8" because "iso8859-1" can
+#. decode arbitrary byte sequence and never fall back.
+#.
 #. pick from the following encodings:
 #. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
 #. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
@@ -1583,10 +1574,6 @@ msgstr ""
 #. iso8859-10, iso8859-14, iso8859-16
 msgid "$FILE_ENCODINGS"
 msgstr ""
-
-msgctxt "column header"
-msgid "Filename"
-msgstr "Filnavn"
 
 msgid "View change as unified diff output"
 msgstr ""
@@ -1604,6 +1591,9 @@ msgid "Previous Diff"
 msgstr ""
 
 msgid "Open shelve tool"
+msgstr ""
+
+msgid "&Auto Detect"
 msgstr ""
 
 msgid "Show changes from first parent"
@@ -1699,10 +1689,6 @@ msgstr ""
 
 msgid "Continue or abort interrupted graft operation?"
 msgstr "Fortsæt eller annuler afbrudt podning?"
-
-#, python-format
-msgid "Graft %d changesets on top of changeset %s"
-msgstr "Pod %d ændringer på ændring %s"
 
 msgid "To graft destination"
 msgstr "Podningssted"
@@ -2213,10 +2199,6 @@ msgstr "Kunne ikke oprette en konfig-fil"
 msgid "Insufficient access rights."
 msgstr "Utilstrækkelige adgangsrettigheder"
 
-#, python-format
-msgid "?? Error: %s ??"
-msgstr "?? Fejl: %s ??"
-
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
 "make more efficient use of disk space by adding these files as largefiles, "
@@ -2233,12 +2215,6 @@ msgstr ""
 
 msgid "License"
 msgstr "Licens"
-
-msgid "Drag to change order"
-msgstr ""
-
-msgid "Workbench"
-msgstr "Arbejdsbord"
 
 msgid "Find revisions matching fields of:"
 msgstr ""
@@ -2323,12 +2299,6 @@ msgstr "Ikke en hovedrevision!"
 msgid "Merge from (other revision)"
 msgstr "Flet fra (anden revision)"
 
-msgid "Unable to merge"
-msgstr "Ude af stand til at flette"
-
-msgid "Merge revision not specified or not found"
-msgstr "Flette-revision ikke angivet eller ikke fundet"
-
 msgid "Merge to (working directory)"
 msgstr "Flet med (arbejdskatalog)"
 
@@ -2396,13 +2366,6 @@ msgid "Commit Now"
 msgstr ""
 
 msgid "Commit Later"
-msgstr ""
-
-msgid "Merge"
-msgstr "Flet"
-
-#, python-format
-msgid "Merge with %s"
 msgstr ""
 
 msgid "TortoiseHg Merge Commit"
@@ -3011,12 +2974,6 @@ msgstr "Vælg en visuel editor."
 msgid "Editor launch failure"
 msgstr ""
 
-msgid "Save file to"
-msgstr "Gem fil som"
-
-msgid "Unable to save file"
-msgstr "Kunne ikke gemme fil"
-
 msgid "Failed to open path in terminal"
 msgstr ""
 
@@ -3115,7 +3072,7 @@ msgstr ""
 msgid "Keep original branch names"
 msgstr ""
 
-msgid "Collapse the rebased changesets "
+msgid "Collapse the rebased changesets"
 msgstr ""
 
 msgid "Rebase entire source branch"
@@ -3336,6 +3293,10 @@ msgstr ""
 msgctxt "column header"
 msgid "Phase"
 msgstr "Fase"
+
+msgctxt "column header"
+msgid "Filename"
+msgstr "Filnavn"
 
 #, python-format
 msgid "filling (%d)"
@@ -3669,6 +3630,9 @@ msgstr ""
 msgid "Can't find revision '%s'"
 msgstr ""
 
+msgid "Drag to change order"
+msgstr ""
+
 msgid "Workbench Log Columns"
 msgstr "Arbejdsbord log kolonner"
 
@@ -3812,9 +3776,6 @@ msgid "Sync tab cannot exit"
 msgstr ""
 
 msgid "Search tab cannot exit"
-msgstr ""
-
-msgid "Repository command still running"
 msgstr ""
 
 msgid "Pus&h"
@@ -4054,8 +4015,14 @@ msgstr ""
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr ""
 
+msgid "Unable to merge"
+msgstr "Ude af stand til at flette"
+
 msgid "You cannot merge a revision with itself"
 msgstr ""
+
+msgid "Unable to backout"
+msgstr "Kan ikke omgøre"
 
 msgid "Write bundle"
 msgstr ""
@@ -4294,19 +4261,19 @@ msgstr ""
 msgid "File List Toolbar"
 msgstr ""
 
-msgid "Manifest Mode"
+msgid "Ma&nifest Mode"
 msgstr ""
 
-msgid "Show the full manifest in tree view"
+msgid "Show all version-controlled files in tree view"
 msgstr ""
 
-msgid "Fl&at List View"
+msgid "&Flat List"
 msgstr ""
 
 msgid "### filter text ###"
 msgstr ""
 
-msgid "&Changed by This Commit"
+msgid "Changed by &This Commit"
 msgstr ""
 
 msgid "Show files changed by this commit"
@@ -4321,7 +4288,13 @@ msgstr ""
 msgid "Toggle parent to be used as the base revision"
 msgstr ""
 
-msgid "&Filter by Status"
+msgid "List Optio&ns"
+msgstr ""
+
+msgid "File(s) not found"
+msgstr ""
+
+msgid "The selected files do not exist in the working directory"
 msgstr ""
 
 #, python-format
@@ -4845,6 +4818,9 @@ msgstr ""
 msgid "thg merge [[-r] REV]"
 msgstr "thg merge [[-r] REV]"
 
+msgid "Merge revision not specified or not found"
+msgstr "Flette-revision ikke angivet eller ikke fundet"
+
 msgid "a revision to post"
 msgstr ""
 
@@ -5269,8 +5245,11 @@ msgid ""
 "is not possible. When False, all files with changes on both sides of the "
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
-"to review and resolve changes manually. Default: False."
+"to review and resolve changes manually. Default: True."
 msgstr ""
+
+msgid "Workbench"
+msgstr "Arbejdsbord"
 
 msgid "Single Workbench Window"
 msgstr "Kun et arbejdsbordsvindue"
@@ -6357,6 +6336,16 @@ msgstr ""
 msgid "TortoiseHg Shelve - %s"
 msgstr ""
 
+msgid "Delete selected chunks from working copy?"
+msgstr ""
+
+#, python-format
+msgid "Delete selected chunks from shelf file %s?"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
 msgid "TortoiseHg New Shelf Name"
 msgstr "TortoiseHg Ny Hylde Navn"
 
@@ -6378,9 +6367,6 @@ msgstr "Der findes allerede en hylde-fil med det navn"
 
 msgid "New shelf created"
 msgstr "Ny hylde oprettet"
-
-msgid "Are you sure?"
-msgstr ""
 
 #, python-format
 msgid "Delete shelf file %s?"
@@ -6430,6 +6416,9 @@ msgid "Sign - %s"
 msgstr ""
 
 msgid "Signature has been added"
+msgstr ""
+
+msgid "Repository command still running"
 msgstr ""
 
 msgid "Filter:"
@@ -6518,11 +6507,11 @@ msgid "unknown"
 msgstr "ukendt"
 
 #, python-format
-msgid "%s is missing!"
+msgid "%s is deleted by non-hg command, but still tracked"
 msgstr ""
 
-msgid "deleted"
-msgstr ""
+msgid "missing"
+msgstr "mangler"
 
 #, python-format
 msgid "%s is ignored"
@@ -7128,9 +7117,6 @@ msgstr "svar forventet"
 msgid "password: "
 msgstr "kodeord: "
 
-msgid "TortoiseHg Prompt"
-msgstr "TortoiseHg prompt"
-
 msgid "abort: "
 msgstr "afbrudt: "
 
@@ -7220,6 +7206,9 @@ msgstr "Forælder 1:"
 
 msgid "Parent 2:"
 msgstr "Forælder 2:"
+
+msgid "Pull subrepos from:"
+msgstr ""
 
 msgid "List updated files (--verbose)"
 msgstr "Vis opdaterede filer (--verbose)"
@@ -8009,8 +7998,19 @@ msgid "Synchronize with dragged repository"
 msgstr "Synkroniser med indtrukket depot"
 
 #, python-format
+msgid "unrecognized response: %s"
+msgstr ""
+
+#, python-format
 msgid "repository %s not found"
 msgstr "depot %s ikke fundet"
+
+msgid "win32ill: cannot create window for messages"
+msgstr ""
+
+#, python-format
+msgid "win32ill: unsupported platform: %s\n"
+msgstr ""
 
 #~ msgid "edit failed"
 #~ msgstr "redigering fejlede"
@@ -8162,6 +8162,9 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "Save commit message at exit?"
 #~ msgstr "Gem integrationsbesked ved afslutning?"
+
+#~ msgid "Nothing Commited"
+#~ msgstr "Intet integreret"
 
 #~ msgid "Commit: Invalid username"
 #~ msgstr "Integrér: Ugyldigt brugernavn"
@@ -8386,6 +8389,9 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "Toggle _Wordwrap"
 #~ msgstr "Skifte _tekstombrydning"
+
+#~ msgid "TortoiseHg Clone"
+#~ msgstr "TortoiseHg klon"
 
 #~ msgid "Branch Operations"
 #~ msgstr "Grenoperationer"
@@ -9870,9 +9876,6 @@ msgstr "depot %s ikke fundet"
 #~ msgid "Toggle all selections"
 #~ msgstr "Vend markeringer"
 
-#~ msgid "missing"
-#~ msgstr "mangler"
-
 #~ msgid "Successfully"
 #~ msgstr "Fuldført"
 
@@ -10355,6 +10358,9 @@ msgstr "depot %s ikke fundet"
 
 #~ msgid "_Annotate Parent"
 #~ msgstr "_Annoter forælder"
+
+#~ msgid "Unable to save file"
+#~ msgstr "Kunne ikke gemme fil"
 
 #~ msgid "C_onfigure Format..."
 #~ msgstr "K_onfigurer format..."
@@ -11207,6 +11213,18 @@ msgstr "depot %s ikke fundet"
 #~ msgid "Use merge tool:"
 #~ msgstr "Brug flet-værktøj:"
 
+#~ msgid "Detail"
+#~ msgstr "Detalje"
+
+#~ msgid "Error creating destination folder"
+#~ msgstr "Fejl under oprettelse af destinationsmappe"
+
+#~ msgid "Please specify a different path."
+#~ msgstr "Angiv venligst en anden sti"
+
+#~ msgid "?? Error: %s ??"
+#~ msgstr "?? Fejl: %s ??"
+
 #~ msgid "Bookmark \"%s\" has been renamed to \"%s\""
 #~ msgstr "Bogmærke \"%s\" er blevet omdøbt til \"%s\""
 
@@ -11216,6 +11234,15 @@ msgstr "depot %s ikke fundet"
 #~ msgstr ""
 #~ "Ønsker du at folde følgende ikke-anvendte lapper ind i nuværende lap "
 #~ "'%(qtip)s'?"
+
+#~ msgid "Backout revision not found"
+#~ msgstr "Revision at omgøre ikke fundet"
+
+#~ msgid "Second Parent: revision %s (%s)"
+#~ msgstr "Anden forælder: Revision %s (%s)"
+
+#~ msgid "First Parent: revision %s (%s)"
+#~ msgstr "Første forælder: Revision %s (%s)"
 
 #~ msgctxt "changesets"
 #~ msgid "All"
@@ -11228,3 +11255,9 @@ msgstr "depot %s ikke fundet"
 #~ "Juster visningen af hovedværktøjslinjen i Depot Stifinderen. Værdier: "
 #~ "\"small\" (lille), \"large\" (stor), eller \"theme\" (følg tema). "
 #~ "Standard: theme"
+
+#~ msgid "Graft %d changesets on top of changeset %s"
+#~ msgstr "Pod %d ændringer på ændring %s"
+
+#~ msgid "Copyright 2008-2013 Steve Borho and others"
+#~ msgstr "Copyright 2008-2013 Steve Borho og andre"

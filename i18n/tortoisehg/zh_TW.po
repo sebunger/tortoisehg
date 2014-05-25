@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-02-03 11:14-0200\n"
-"PO-Revision-Date: 2014-01-03 15:42+0000\n"
+"POT-Creation-Date: 2014-04-28 11:26-0300\n"
+"PO-Revision-Date: 2014-04-09 07:11+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-02-04 06:08+0000\n"
-"X-Generator: Launchpad (build 16916)\n"
+"X-Launchpad-Export-Date: 2014-04-29 06:04+0000\n"
+"X-Generator: Launchpad (build 16985)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -27,11 +27,11 @@ msgstr "離開"
 msgid "About"
 msgstr "關於"
 
-msgid "Copyright 2008-2013 Steve Borho and others"
-msgstr "版權所有 2008-2013 Steve Borho 以及其他貢獻者"
+msgid "Copyright 2008-2014 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
-msgstr "一些icon是由TortoiseSVN and Tango projects 所提供"
+msgstr "許多圖示是由TortoiseSVN及Tango projects 所提供"
 
 msgid "You can visit our site here"
 msgstr "你可以從這裡拜訪我們的網站"
@@ -158,6 +158,12 @@ msgstr "封存 - %s"
 msgid "&Archive"
 msgstr "封存(&A)"
 
+msgid "Backout requires a parent revision"
+msgstr "回退需要一個母系修訂版"
+
+msgid "Cannot backout change on a different branch"
+msgstr "不能在不同的分支中回退變更"
+
 #, python-format
 msgid "Backout - %s"
 msgstr "回退 - %s"
@@ -168,20 +174,8 @@ msgstr "準備回退"
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr "驗證回退修訂版並確認你的工作目錄是乾淨的。"
 
-msgid "Unable to backout"
-msgstr "不能回退"
-
-msgid "Backout revision not found"
-msgstr "找不到要回退的修訂版"
-
 msgid "Backing out a parent revision is a single step operation"
 msgstr "回退母系修訂版是一個單步操作"
-
-msgid "Backout requires a parent revision"
-msgstr "回退需要一個母系修訂版"
-
-msgid "Cannot backout change on a different branch"
-msgstr "不能在不同的分支中回退變更"
 
 msgid "Backout revision"
 msgstr "回退修訂版"
@@ -191,30 +185,6 @@ msgstr "不是HEAD修訂版，回退操作將會建立新的Head修訂版！"
 
 msgid "Current local revision"
 msgstr "目前的本地工作複本所在的修訂版"
-
-msgid "Merge parent to backout to"
-msgstr "回退到合併的母系"
-
-msgid ""
-"To backout a <b>merge</b> revision you must select which parent to backout "
-"to (i.e. whose changes will be <i>kept</i>)"
-msgstr ""
-"要回退<b>合併</b>修訂版，你必須選擇需要回退到的母系（即：變更會<i>保留</i>"
-"的）"
-
-#, python-format
-msgid "First Parent: revision %s (%s)"
-msgstr "第一個母系: 修訂版 %s (%s)"
-
-msgid "Backout to the first parent of the merge revision"
-msgstr "回退到合併修訂版的第一個母系"
-
-#, python-format
-msgid "Second Parent: revision %s (%s)"
-msgstr "第二個母系: 修訂版 %s (%s)"
-
-msgid "Backout to the second parent of the merge revision"
-msgstr "回退到合併修訂版的第二個母系"
 
 msgid "Working directory status"
 msgstr "工作目錄狀態"
@@ -275,9 +245,6 @@ msgstr "提交訊息"
 msgid "Skip final confirmation page, close after commit."
 msgstr "提交後關閉，跳過最後的確認頁。"
 
-msgid "Backed out merge changeset: "
-msgstr "回退合併後的變更集： "
-
 msgid "Backed out changeset: "
 msgstr "回退的變更集： "
 
@@ -289,14 +256,6 @@ msgstr "丟棄目前的回退訊息?"
 
 msgid "Use English backout message"
 msgstr "使用英文回退訊息"
-
-#, python-format
-msgid "Backed out merge revision to its first parent (%s)"
-msgstr "回退合併的修訂版到他的第一個母系(%s)"
-
-#, python-format
-msgid "Backed out merge revision to its second parent (%s)"
-msgstr "回退合併的修訂版到他的第二個母系(%s)"
 
 msgid "Backing out and committing..."
 msgstr "回退並提交..."
@@ -330,16 +289,16 @@ msgid "Known bad revision:"
 msgstr "已知的不良修訂版"
 
 msgid "Discard local changes (revert --all)"
-msgstr ""
+msgstr "放棄本地工作複本的變更(revert -all)"
 
 msgid "Revision is &Good"
-msgstr ""
+msgstr "此修訂版良好(&G)"
 
 msgid "Revision is &Bad"
-msgstr ""
+msgstr "此修訂版不良(&B)"
 
 msgid "&Skip this Revision"
-msgstr ""
+msgstr "略過此修訂版(&S)"
 
 msgid "Close"
 msgstr "關閉"
@@ -358,7 +317,7 @@ msgstr "測試修訂版然後回報結果.  (良好/不良/跳過)"
 
 #, python-format
 msgid "%s (hint: %s)"
-msgstr "%s(暗示: %s)"
+msgstr "%s (提示: %s)"
 
 msgid "Bookmark:"
 msgstr "書籤:"
@@ -370,7 +329,7 @@ msgid "Activate:"
 msgstr "活動的:"
 
 msgid "&Add"
-msgstr "加入 [&A]"
+msgstr "加入(&A)"
 
 msgid "Re&name"
 msgstr "重新命名(&N)"
@@ -469,7 +428,7 @@ msgstr "TortoiseHg 錯誤"
 msgid ""
 "If you still have trouble, <a href=\"#bugreport\">please file a bug report</"
 "a>."
-msgstr "假如你仍然有麻煩,<a href=\"#bugreport\">請紀錄下bug report</a>."
+msgstr "假如你仍然有麻煩,<a href=\"#bugreport\">請提出問題回報</a>."
 
 msgid "Visual Diff"
 msgstr "圖形化差異比對"
@@ -493,7 +452,7 @@ msgid "Patch failed to apply"
 msgstr "套用補丁失敗"
 
 msgid "Manually resolve rejected chunks?"
-msgstr ""
+msgstr "手動解決被拒絕的區塊?"
 
 msgid "Edit patched file and rejects?"
 msgstr ""
@@ -590,15 +549,6 @@ msgstr "遠端命令:"
 msgid "Start revision:"
 msgstr "開始修訂版:"
 
-msgid "TortoiseHg Clone"
-msgstr "TortoiseHg 拓製"
-
-msgid "Error creating destination folder"
-msgstr "建立目標目錄時錯誤"
-
-msgid "Please specify a different path."
-msgstr "請指定一個不同的路徑."
-
 msgid "Select source repository"
 msgstr "選擇來源儲存庫"
 
@@ -620,6 +570,32 @@ msgstr "開始命令失敗了\n"
 
 msgid "error while running command\n"
 msgstr "執行命令時錯誤\n"
+
+#, python-format
+msgid "process exited unexpectedly with code %d"
+msgstr ""
+
+#, python-format
+msgid "timed out while reading: %r..."
+msgstr ""
+
+msgid "timed out waiting for message"
+msgstr ""
+
+#, python-format
+msgid "unexpected response on required channel %r"
+msgstr ""
+
+#, python-format
+msgid "invalid \"hello\" message: %r"
+msgstr ""
+
+msgid "no \"runcommand\" capability"
+msgstr ""
+
+#, python-format
+msgid "corrupted command result: %r"
+msgstr ""
 
 msgid "Terminated by user"
 msgstr "被使用者終止了"
@@ -651,10 +627,16 @@ msgid "Failed!"
 msgstr "失敗！"
 
 msgid "Clea&r Log"
-msgstr "(&r)清除Log"
+msgstr "清除紀錄(&r)"
 
-msgid "Detail"
-msgstr "細節"
+msgid "TortoiseHg Prompt"
+msgstr "TortoiseHg 提示字元"
+
+msgid "Show Detail"
+msgstr ""
+
+msgid "Hide Detail"
+msgstr ""
 
 msgid "Confirm Exit"
 msgstr "確認離開"
@@ -663,11 +645,11 @@ msgid ""
 "Mercurial command is still running.\n"
 "Are you sure you want to terminate?"
 msgstr ""
-"Mercurial 命令還在執行\n"
+"Mercurial命令還在執行\n"
 "你真的想終止?"
 
 msgid "&Run"
-msgstr ""
+msgstr "執行(&R)"
 
 msgid "TortoiseHg Command Dialog"
 msgstr "TortoiseHg 命令對話框"
@@ -677,7 +659,14 @@ msgstr "指令錯誤"
 
 #, python-format
 msgid "[Code: %d]"
-msgstr ""
+msgstr "[返回碼:%d]"
+
+msgid "Merge"
+msgstr "合併"
+
+#, python-format
+msgid "Merge with %s"
+msgstr "和 %s 合併"
 
 msgctxt "start progress"
 msgid "Commit"
@@ -689,7 +678,7 @@ msgstr ""
 
 msgctxt "start progress"
 msgid "Rollback"
-msgstr ""
+msgstr "回退"
 
 msgid "Commit Dialog Toolbar"
 msgstr "提交對話框工具列"
@@ -704,20 +693,20 @@ msgid "Copy one of the recent commit messages"
 msgstr "複製常用提交訊息中的一個"
 
 msgid "Show Issues"
-msgstr "顯示Issues"
+msgstr "顯示問題"
 
 msgid "Please wait..."
 msgstr "請等一下…"
 
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
-msgstr "載入 issue tracker '%s' 失敗 : %s"
+msgstr "載入問題追蹤系統 '%s' 失敗 : %s"
 
 msgid "Issue Tracker"
 msgstr "問題追蹤系統"
 
 msgid "Show Issues..."
-msgstr "顯示Issues..."
+msgstr "顯示問題..."
 
 msgid "Stop"
 msgstr "停止"
@@ -794,10 +783,10 @@ msgstr "關閉 %s 分支"
 
 #, python-format
 msgid "Rollback commit to revision %d"
-msgstr "Rollback提交到%d修訂版"
+msgstr "回退提交到%d修訂版"
 
 msgid "Confirm Undo"
-msgstr "確認復原(undo)"
+msgstr "確認復原"
 
 msgid "Discard current commit message?"
 msgstr "放棄目前的提交訊息？"
@@ -814,8 +803,8 @@ msgstr ""
 msgid "&Replace"
 msgstr "取代(&R)"
 
-msgid "Nothing Commited"
-msgstr "沒有任何變更被提交"
+msgid "Nothing Committed"
+msgstr ""
 
 msgid "Please enter commit message"
 msgstr "請輸入提交訊息"
@@ -825,8 +814,7 @@ msgid ""
 "contain an issue link.  Configure this in the 'Issue Tracking' section of "
 "the settings."
 msgstr ""
-"提交訊息裡面沒有 issue link.應該要有的,請到\"設定\"的'Issue Tracking'頁面進行"
-"設定"
+"提交訊息裡面沒有問題連結.應該要有的,請到\"設定\"的'問題追蹤'頁面進行設定"
 
 msgid "No files checked"
 msgstr "沒有檔案被檢查"
@@ -845,6 +833,9 @@ msgstr "確認移除"
 
 msgid "Remove selected deleted files?"
 msgstr "移除已選擇的刪除檔案嗎?"
+
+msgid "Nothing changed."
+msgstr ""
 
 msgctxt "window title"
 msgid "Commit"
@@ -876,7 +867,7 @@ msgid "Auto Includes:"
 msgstr "自動引入:"
 
 msgid "Recurse into subrepositories (--subrepos)"
-msgstr ""
+msgstr "遞迴到子儲存庫中(--subrepos)"
 
 msgid "Unable to save username"
 msgstr "不能儲存使用者名字"
@@ -1113,6 +1104,8 @@ msgid ""
 "- {ROOT}: The path to the current repository root.\n"
 "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
 "hash respectively.\n"
+"- {SELECTEDFILES}: The list of files selected by the user on the revision "
+"details file list.\n"
 "- {FILES}: The list of files touched by the selected revision.\n"
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
@@ -1164,7 +1157,7 @@ msgid ""
 msgstr ""
 
 msgid "Show Output Log"
-msgstr "顯示輸出log"
+msgstr "顯示輸出紀錄"
 
 msgid ""
 "When enabled, automatically show the Output Log when the command is run.\n"
@@ -1223,23 +1216,44 @@ msgstr "檔案歷史 (&H)"
 msgid "Show the history of the selected file"
 msgstr "顯示選擇檔案的歷史"
 
-msgid "Folder &History"
-msgstr "目錄歷史 (&H)"
-
 msgid "Co&mpare File Revisions"
 msgstr "比較檔案修訂版"
 
 msgid "Compare revisions of the selected file"
 msgstr "比對選擇的檔案的修訂版"
 
+msgid "Filter Histor&y"
+msgstr ""
+
+msgid "Query about changesets affecting the selected files"
+msgstr ""
+
+msgid "Diff &Changeset to Parent"
+msgstr ""
+
+msgid "Diff Changeset to Loc&al"
+msgstr ""
+
+msgid "Diff Selected Cha&ngesets"
+msgstr ""
+
 msgid "&Diff to Parent"
 msgstr "跟母系做差異比對(&D)"
+
+msgid "Cannot display visual diff"
+msgstr "不能顯示視覺化差異比對"
+
+msgid "Visual diffs are not supported for unapplied patches"
+msgstr ""
 
 msgid "Diff to &Local"
 msgstr "跟本地做差異比對"
 
 msgid "View changes to current in external diff tool"
 msgstr ""
+
+msgid "Diff Selected &File Revisions"
+msgstr "差異比對選擇的檔案修訂版"
 
 msgid "&View at Revision"
 msgstr "在修訂版中檢視(&V)"
@@ -1252,6 +1266,9 @@ msgstr "在修訂版中儲存(&S)"
 
 msgid "Save file as it appeared at this revision"
 msgstr ""
+
+msgid "Save file to"
+msgstr "儲存檔案至"
 
 msgid "&Edit Local"
 msgstr "編輯本地(&E)"
@@ -1285,18 +1302,6 @@ msgstr "開啟終端機(&T)"
 
 msgid "Open a shell terminal in the selected folder"
 msgstr "在選擇的目錄開啟終端機"
-
-msgid "File(s) not found"
-msgstr "檔案找不到"
-
-msgid "The selected files do not exist in the working directory"
-msgstr "選擇的檔案不在工作目錄裡"
-
-msgid "Cannot display visual diff"
-msgstr "不能顯示視覺化差異比對"
-
-msgid "Visual diffs are not supported for unapplied patches"
-msgstr ""
 
 msgid "Display the file anyway"
 msgstr ""
@@ -1429,7 +1434,7 @@ msgid "Error previewing subrepo: %s"
 msgstr "預覽子儲存庫錯誤:%s"
 
 msgid "Subrepo may be damaged or inaccessible."
-msgstr ""
+msgstr "子儲存庫損毀或不可存取"
 
 msgid "The subrepository is dirty."
 msgstr "子儲存庫是髒的"
@@ -1463,7 +1468,7 @@ msgstr "開啟..."
 
 #, python-format
 msgid "Hg file log viewer [%s] - %s"
-msgstr "hg 檔案log檢視器 [%s] - %s"
+msgstr "Hg 檔案紀錄檢視器 [%s] - %s"
 
 msgid "File History Log Columns"
 msgstr "檔案歷史紀錄欄位"
@@ -1474,29 +1479,8 @@ msgstr "上一個"
 msgid "Forward"
 msgstr "下一個"
 
-msgid "&Diff Selected Changesets"
-msgstr "差異比對選擇的變更集"
-
-msgid "Diff Selected &File Revisions"
-msgstr "差異比對選擇的檔案修訂版"
-
-msgid "&Diff Changeset to Parent"
-msgstr "跟母系變更集做差異比對(&D)"
-
-msgid "Diff Changeset to &Local"
-msgstr "跟本地做差異比對(&L)"
-
-msgid "Diff &File to Parent"
-msgstr "跟母系檔案做差異比對(&F)"
-
-msgid "Diff File to Lo&cal"
-msgstr ""
-
 msgid "Show Revision &Details"
 msgstr "顯示修訂版詳細資訊(&D)"
-
-msgid "You must select two revisions to diff"
-msgstr "你必須選擇兩個修訂版來比對差異"
 
 msgid "Too many rows selected for menu"
 msgstr ""
@@ -1511,70 +1495,74 @@ msgid "Previous diff"
 msgstr "上個差異"
 
 msgid "Unicode"
-msgstr ""
+msgstr "萬國碼"
 
 msgid "Western Europe"
-msgstr ""
+msgstr "西歐"
 
 msgid "Unified Chinese"
-msgstr ""
+msgstr "簡體中文"
 
 msgid "Traditional Chinese"
-msgstr ""
+msgstr "正體中文"
 
 msgid "Korean"
-msgstr ""
+msgstr "韓文"
 
 msgid "Japanese"
-msgstr ""
+msgstr "日文"
 
 msgid "Thai"
-msgstr ""
+msgstr "泰文"
 
 msgid "Central and Eastern Europe"
-msgstr ""
+msgstr "中歐與東歐"
 
 msgid "Cyrillic"
-msgstr ""
+msgstr "斯拉夫語系"
 
 msgid "Russian"
-msgstr ""
+msgstr "俄文"
 
 msgid "Ukrainian"
-msgstr ""
+msgstr "烏克蘭語"
 
 msgid "Greek"
-msgstr ""
+msgstr "希臘文"
 
 msgid "Turkish"
-msgstr ""
+msgstr "土耳其文"
 
 msgid "Arabic"
-msgstr ""
+msgstr "阿拉伯文"
 
 msgid "Hebrew"
-msgstr ""
+msgstr "希伯來文"
 
 msgid "Vietnamese"
-msgstr ""
+msgstr "越南文"
 
 msgid "Baltic"
-msgstr ""
+msgstr "波羅的海語系"
 
 msgid "Southern Europe"
-msgstr ""
+msgstr "南歐"
 
 msgid "Nordic"
-msgstr ""
+msgstr "北歐語系"
 
 msgid "Celtic"
-msgstr ""
+msgstr "塞爾特語"
 
 msgid "South-Eastern Europe"
-msgstr ""
+msgstr "東南歐語系"
 
 #. i18n: comma-separated list of common encoding names in your locale, e.g.
 #. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
+#.
+#. for the best guess, put structured encodings like "utf-8" in front, e.g.
+#. "utf-8,iso8859-1" instead of "iso8859-1,utf-8" because "iso8859-1" can
+#. decode arbitrary byte sequence and never fall back.
 #.
 #. pick from the following encodings:
 #. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
@@ -1585,10 +1573,6 @@ msgstr ""
 msgid "$FILE_ENCODINGS"
 msgstr ""
 
-msgctxt "column header"
-msgid "Filename"
-msgstr "檔名"
-
 msgid "View change as unified diff output"
 msgstr "用統一的差異格式顯示變更"
 
@@ -1596,16 +1580,19 @@ msgid "View change in context of file"
 msgstr "在檔案上下文檢視變更"
 
 msgid "Annotate with revision numbers"
-msgstr ""
+msgstr "加註修訂版號"
 
 msgid "Next Diff"
-msgstr ""
+msgstr "下個差異"
 
 msgid "Previous Diff"
-msgstr ""
+msgstr "上個差異"
 
 msgid "Open shelve tool"
 msgstr "開啟擱置工具"
+
+msgid "&Auto Detect"
+msgstr ""
 
 msgid "Show changes from first parent"
 msgstr "從第一個母系開始顯示變更"
@@ -1614,7 +1601,7 @@ msgid "Show changes from second parent"
 msgstr "從第二個母系開始顯示變更"
 
 msgid "E&ncoding"
-msgstr ""
+msgstr "編碼(&n)"
 
 msgid "&Search in Current File"
 msgstr "在目前的檔案裡面搜尋"
@@ -1623,11 +1610,11 @@ msgid "Search in All &History"
 msgstr "在所有的歷史裡面搜尋"
 
 msgid "Go to Line"
-msgstr ""
+msgstr "移至行號"
 
 #, python-format
 msgid "Enter line number (1 - %d)"
-msgstr ""
+msgstr "輸入行號 (1 - %d)"
 
 msgid "Show &Author"
 msgstr "顯示作者(&A)"
@@ -1639,7 +1626,7 @@ msgid "Show &Revision"
 msgstr "顯示修訂版(&R)"
 
 msgid "Annotate Op&tions"
-msgstr ""
+msgstr "加註選項(&t)"
 
 msgid "Search Selected Text"
 msgstr "搜尋選擇的文字"
@@ -1672,7 +1659,7 @@ msgid "&Local"
 msgstr "本地(&L)"
 
 msgid "&Parent Revision"
-msgstr ""
+msgstr "母系修訂版(&P)"
 
 #, python-format
 msgid "&Parent Revision (%d)"
@@ -1695,10 +1682,6 @@ msgid ""
 msgstr ""
 
 msgid "Continue or abort interrupted graft operation?"
-msgstr ""
-
-#, python-format
-msgid "Graft %d changesets on top of changeset %s"
 msgstr ""
 
 msgid "To graft destination"
@@ -1955,7 +1938,7 @@ msgid "Sending Email"
 msgstr "傳送電子郵件中..."
 
 msgid "Email"
-msgstr "電子信箱"
+msgstr "電子郵件"
 
 msgid "To:"
 msgstr "收件者:"
@@ -1964,7 +1947,7 @@ msgid "Cc:"
 msgstr "副本:"
 
 msgid "In-Reply-To:"
-msgstr ""
+msgstr "回覆至:"
 
 msgid "Message identifier to reply to, for threading"
 msgstr ""
@@ -2013,10 +1996,10 @@ msgid "Send single binary bundle, not patches"
 msgstr "傳送單一二進位包裹,而不是補丁"
 
 msgid "send patches as part of the email body"
-msgstr ""
+msgstr "將補丁作為電子郵件本文"
 
 msgid "body"
-msgstr ""
+msgstr "本文"
 
 msgid "send patches as attachments"
 msgstr "用附件傳送補丁"
@@ -2184,10 +2167,6 @@ msgstr "不能建立一個設定檔"
 msgid "Insufficient access rights."
 msgstr "存取權限不對"
 
-#, python-format
-msgid "?? Error: %s ??"
-msgstr "?? 錯誤: %s ??"
-
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
 "make more efficient use of disk space by adding these files as largefiles, "
@@ -2204,12 +2183,6 @@ msgstr "以一般檔案形式加入(&N)"
 
 msgid "License"
 msgstr "許可證"
-
-msgid "Drag to change order"
-msgstr "用拖拉來改變順序"
-
-msgid "Workbench"
-msgstr "工作台"
 
 msgid "Find revisions matching fields of:"
 msgstr ""
@@ -2248,7 +2221,7 @@ msgid "Phase"
 msgstr ""
 
 msgid "&Match"
-msgstr "符合 (&M)"
+msgstr "符合(&M)"
 
 #, python-format
 msgid "Find matches - %s"
@@ -2279,6 +2252,9 @@ msgid ""
 "\n"
 "To cancel the merge you can update to one of the merge parent revisions."
 msgstr ""
+"要完成合併,你必須提交工作目錄.\n"
+"\n"
+"要取消合併,你可以更新至其中一個母系修訂版."
 
 msgid "Prepare to merge"
 msgstr "準備合併"
@@ -2291,12 +2267,6 @@ msgstr "不是一個標頭修訂版(head revision)!"
 
 msgid "Merge from (other revision)"
 msgstr "合併從(其他修訂版)"
-
-msgid "Unable to merge"
-msgstr "不能合併"
-
-msgid "Merge revision not specified or not found"
-msgstr "合併的修訂版沒有描述或找不到"
 
 msgid "Merge to (working directory)"
 msgstr "合併到(工作目錄)"
@@ -2370,13 +2340,6 @@ msgstr "馬上提交"
 msgid "Commit Later"
 msgstr "稍候提交"
 
-msgid "Merge"
-msgstr "合併"
-
-#, python-format
-msgid "Merge with %s"
-msgstr "和 %s 合併"
-
 msgid "TortoiseHg Merge Commit"
 msgstr ""
 
@@ -2417,13 +2380,13 @@ msgid "&Purge Queue..."
 msgstr ""
 
 msgid "Create Patch Queue"
-msgstr ""
+msgstr "建立補丁序列"
 
 msgid "New patch queue name"
 msgstr "新的補丁佇列名字"
 
 msgid "Rename Patch Queue"
-msgstr ""
+msgstr "重新命名補丁佇列"
 
 #, python-format
 msgid "Rename patch queue '%s' to"
@@ -2433,7 +2396,7 @@ msgid "Rename"
 msgstr "更名"
 
 msgid "Delete Patch Queue"
-msgstr ""
+msgstr "刪除補丁序列"
 
 msgid "Delete reference to"
 msgstr ""
@@ -2442,7 +2405,7 @@ msgid "Delete"
 msgstr "刪除"
 
 msgid "Purge Patch Queue"
-msgstr ""
+msgstr "徹底清除補丁佇列"
 
 msgid "Remove patch directory of"
 msgstr ""
@@ -2484,7 +2447,7 @@ msgid "Configure guards for selected patch"
 msgstr ""
 
 msgid "&Delete Patches..."
-msgstr ""
+msgstr "刪除補丁(&D)..."
 
 msgid "Delete selected patches"
 msgstr "刪除選擇的補丁"
@@ -2835,47 +2798,47 @@ msgid "&Editor Options"
 msgstr "編輯器選項(&E)"
 
 msgid "&Wrap"
-msgstr ""
+msgstr "自動斷行(&W)"
 
 msgctxt "wrap mode"
 msgid "&None"
-msgstr ""
+msgstr "無(&N)"
 
 msgid "&Word"
-msgstr ""
+msgstr "單字(&W)"
 
 msgid "&Character"
-msgstr ""
+msgstr "字元(&C)"
 
 msgid "White&space"
-msgstr ""
+msgstr "空白字元(&s)"
 
 msgid "&Visible"
-msgstr ""
+msgstr "顯示(V)"
 
 msgid "&Invisible"
-msgstr ""
+msgstr "隱藏(&I)"
 
 msgid "&AfterIndent"
-msgstr ""
+msgstr "在縮排之後(&A)"
 
 msgid "&TAB Inserts"
-msgstr ""
+msgstr "插入TAB(&T)"
 
 msgid "&Auto"
-msgstr ""
+msgstr "自動(&A)"
 
 msgid "&TAB"
 msgstr ""
 
 msgid "&Spaces"
-msgstr ""
+msgstr "空格(&S)"
 
 msgid "EOL &Visibility"
-msgstr ""
+msgstr "顯示換行字元(&V)"
 
 msgid "EOL &Mode"
-msgstr ""
+msgstr "換行字元模式(&M)"
 
 msgid "&Windows"
 msgstr ""
@@ -2887,7 +2850,7 @@ msgid "&Mac"
 msgstr ""
 
 msgid "&Auto-Complete"
-msgstr ""
+msgstr "自動完成(&A)"
 
 msgid "### regular expression ###"
 msgstr "### 正規表示式 ###"
@@ -2899,10 +2862,10 @@ msgid "Wrap search"
 msgstr "包裝 (wrap) 搜尋"
 
 msgid "Prev"
-msgstr ""
+msgstr "上一個"
 
 msgid "Next"
-msgstr ""
+msgstr "下一個"
 
 msgid "Unable to read file"
 msgstr ""
@@ -2980,12 +2943,6 @@ msgstr "請配置一個視覺化編輯器"
 msgid "Editor launch failure"
 msgstr "啟動編輯器失敗"
 
-msgid "Save file to"
-msgstr "儲存檔案至"
-
-msgid "Unable to save file"
-msgstr "無法儲存檔案"
-
 msgid "Failed to open path in terminal"
 msgstr "不能在終端機中開啟此路徑"
 
@@ -3007,7 +2964,7 @@ msgid "A terminal shell must be configured"
 msgstr "必須要配置一個命令列終端機程式"
 
 msgid "Show Log"
-msgstr "顯示log"
+msgstr "顯示紀錄"
 
 msgid "Please enter a username"
 msgstr "請輸入一個使用者名字"
@@ -3050,7 +3007,7 @@ msgid "Force removal of modified files (--force)"
 msgstr ""
 
 msgid "Add &Largefiles"
-msgstr ""
+msgstr "增加大型檔案(&L)"
 
 msgid "No files selected"
 msgstr "沒有選擇檔案"
@@ -3084,7 +3041,7 @@ msgstr "保留原始變更集"
 msgid "Keep original branch names"
 msgstr "保持原始分支名稱"
 
-msgid "Collapse the rebased changesets "
+msgid "Collapse the rebased changesets"
 msgstr ""
 
 msgid "Rebase entire source branch"
@@ -3308,6 +3265,10 @@ msgctxt "column header"
 msgid "Phase"
 msgstr "階段"
 
+msgctxt "column header"
+msgid "Filename"
+msgstr "檔名"
+
 #, python-format
 msgid "filling (%d)"
 msgstr ""
@@ -3330,7 +3291,7 @@ msgid "Delete Group '%s' and all its entries?"
 msgstr ""
 
 msgid "Repository Registry"
-msgstr "儲存庫紀錄"
+msgstr "儲存庫登錄"
 
 msgid "Show &Paths"
 msgstr "顯示路徑(&P)"
@@ -3348,7 +3309,7 @@ msgid "&Refresh Repository List"
 msgstr "重新整理儲存庫列表(&R)"
 
 msgid "Refresh the Repository Registry list"
-msgstr "重新整理儲存庫紀錄列表"
+msgstr "重新整理儲存庫登錄列表"
 
 msgid "&Open"
 msgstr "開啟(&O)"
@@ -3378,7 +3339,7 @@ msgid "View the repository's settings"
 msgstr "檢視儲存庫的設定"
 
 msgid "Re&move from Registry"
-msgstr "從儲存庫紀錄中移除(&m)"
+msgstr "從儲存庫登錄中移除(&m)"
 
 msgid ""
 "Remove the node and all its subnodes. Repositories are not deleted from disk."
@@ -3442,7 +3403,7 @@ msgid "Order the subrepos as in .hgsub"
 msgstr ""
 
 msgid "Select repository directory to add"
-msgstr ""
+msgstr "選擇要加入的儲存庫目錄"
 
 msgid "Select an existing repository to add as a subrepo"
 msgstr ""
@@ -3500,7 +3461,7 @@ msgid "The .hgsub file already contains the line:<br><br>%s"
 msgstr ""
 
 msgid "Subrepo added to .hgsub file"
-msgstr ""
+msgstr "子儲存庫已加至.hgsub檔案中"
 
 #, python-format
 msgid ""
@@ -3588,7 +3549,7 @@ msgid "Loading repository %s"
 msgstr "載入 %s 儲存庫"
 
 msgid "Repository Registry updated"
-msgstr "儲存庫紀錄已被更新"
+msgstr "儲存庫登錄已被更新"
 
 msgid "&Sort"
 msgstr ""
@@ -3636,8 +3597,11 @@ msgstr ""
 msgid "Can't find revision '%s'"
 msgstr "找不到修訂版 '%s'"
 
+msgid "Drag to change order"
+msgstr "用拖拉來改變順序"
+
 msgid "Workbench Log Columns"
-msgstr "工作台Log欄位"
+msgstr "工作台紀錄欄位"
 
 msgctxt "tab tooltip"
 msgid "Revision details"
@@ -3727,7 +3691,7 @@ msgstr ""
 
 #, python-format
 msgid "%s - verify repository"
-msgstr ""
+msgstr "%s - 驗證儲存庫"
 
 #, python-format
 msgid "%s - recover repository"
@@ -3737,21 +3701,21 @@ msgid "No transaction available"
 msgstr ""
 
 msgid "There is no rollback transaction available"
-msgstr "沒有rollback交易可以用"
+msgstr "沒有回退交易可以用"
 
 msgid "Undo last commit?"
-msgstr "復原(Undo)最後的提交?"
+msgstr "復原最後的提交?"
 
 #, python-format
 msgid "Undo most recent commit (%d), preserving file changes?"
 msgstr ""
 
 msgid "Undo last transaction?"
-msgstr "復原(Undo)最後的交易?"
+msgstr "復原最後的交易?"
 
 #, python-format
 msgid "Rollback to revision %d (undo %s)?"
-msgstr "RollBack到%d修訂版(Undo %s)?"
+msgstr "回退到%d修訂版(復原%s)?"
 
 msgid "Unable to determine working copy revision\n"
 msgstr ""
@@ -3765,8 +3729,7 @@ msgid ""
 "uncommitted changes.\n"
 " Continue?"
 msgstr ""
-"你目前工作的修訂版(%d)將會經由這個RollBack操作而移除,回到未提交的變更.要繼續"
-"嗎?"
+"你目前工作的修訂版(%d)將會經由這個回退操作而移除,回到未提交的變更.要繼續嗎?"
 
 msgid "Repository stripped, incoming preview cleared"
 msgstr ""
@@ -3783,14 +3746,11 @@ msgstr "同步化分頁不能結束"
 msgid "Search tab cannot exit"
 msgstr "搜尋分頁不能結束"
 
-msgid "Repository command still running"
-msgstr "儲存庫命令還在執行"
-
 msgid "Pus&h"
-msgstr ""
+msgstr "推送(&h)"
 
 msgid "Push to &Here"
-msgstr ""
+msgstr "推送到這裡(&H)"
 
 msgid "Push Selected &Branch"
 msgstr "推送選擇的分支(&B)"
@@ -3829,10 +3789,10 @@ msgid "E&xport"
 msgstr "匯出(&x)"
 
 msgid "E&xport Patch..."
-msgstr "匯出補丁(&x)"
+msgstr "匯出補丁(&x)..."
 
 msgid "&Email Patch..."
-msgstr "郵寄補丁(&E)"
+msgstr "郵寄補丁(&E)..."
 
 msgid "&Archive..."
 msgstr "封存(&A)..."
@@ -3853,7 +3813,7 @@ msgid "Modi&fy History"
 msgstr "修改歷史紀錄(&f)"
 
 msgid "&Unapply Patch"
-msgstr ""
+msgstr "反套用補丁(&U)"
 
 msgid "Import to &MQ"
 msgstr "匯入到MQ(&M)"
@@ -3862,7 +3822,7 @@ msgid "&Finish Patch"
 msgstr "完成補丁(&F)"
 
 msgid "MQ &Options"
-msgstr ""
+msgstr "MQ選項(&O)"
 
 msgid "&Rebase..."
 msgstr ""
@@ -3898,16 +3858,16 @@ msgid "Export Selected..."
 msgstr "匯出選擇的..."
 
 msgid "Email Selected..."
-msgstr "Email選擇的"
+msgstr "郵寄選擇的..."
 
 msgid "Copy Selected as Patch"
 msgstr ""
 
 msgid "Export DAG Range..."
-msgstr "匯出DAG 範圍..."
+msgstr "匯出DAG範圍..."
 
 msgid "Email DAG Range..."
-msgstr ""
+msgstr "郵寄DAG範圍..."
 
 msgid "Bundle DAG Range..."
 msgstr "包裹DAG範圍..."
@@ -3937,13 +3897,13 @@ msgid "Post Selected to Review Board..."
 msgstr ""
 
 msgid "Apply patch"
-msgstr ""
+msgstr "套用補丁"
 
 msgid "Apply onto original parent"
-msgstr ""
+msgstr "套用至原始母系"
 
 msgid "Apply only this patch"
-msgstr ""
+msgstr "只套用此補丁"
 
 msgid "Fold patches..."
 msgstr "合併補丁..."
@@ -3964,7 +3924,7 @@ msgid "Export patch"
 msgstr "匯出補丁"
 
 msgid "Patch Files (*.patch)"
-msgstr ""
+msgstr "補丁檔案 (*.patch)"
 
 msgid "Cannot export revision"
 msgstr "不能匯出修訂版"
@@ -4022,14 +3982,20 @@ msgstr ""
 "\"file:///%s\">%s</a>"
 
 msgid "Patches exported"
-msgstr "補丁匯出了"
+msgstr "補丁已匯出"
 
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d個補丁已經匯出到<p><a href=\"file:///%s\">%s</a>"
 
+msgid "Unable to merge"
+msgstr "不能合併"
+
 msgid "You cannot merge a revision with itself"
 msgstr "你不能合併自己"
+
+msgid "Unable to backout"
+msgstr "不能回退"
 
 msgid "Write bundle"
 msgstr "寫進包裹"
@@ -4084,7 +4050,7 @@ msgid "&Force"
 msgstr ""
 
 msgid "Cannot import selected revision"
-msgstr ""
+msgstr "無法匯入選擇的修訂版"
 
 #, python-format
 msgid ""
@@ -4093,7 +4059,7 @@ msgid ""
 msgstr ""
 
 msgid "Invalid command"
-msgstr ""
+msgstr "無效的命令"
 
 msgid "The selected command is empty"
 msgstr "選擇的命令是空的"
@@ -4116,14 +4082,14 @@ msgstr ""
 
 #, python-format
 msgid "The command \"%s\" failed (code %d)."
-msgstr ""
+msgstr "命令\"%s\"失敗(返回碼 %d)."
 
 msgid "Failed to execute custom command"
 msgstr "自訂工具執行失敗"
 
 #, python-format
 msgid "The command \"%s\" could not be executed."
-msgstr ""
+msgstr "無法執行命令\"%s\""
 
 #, python-format
 msgid ""
@@ -4149,25 +4115,25 @@ msgid "Unresolved conflicts"
 msgstr "未解決的衝突"
 
 msgid "Mercurial Re&solve"
-msgstr ""
+msgstr "以Mercurial解決(&s)"
 
 msgid "Attempt automatic (trivial) merge"
 msgstr ""
 
 msgid "Tool &Resolve"
-msgstr ""
+msgstr "以工具解決(&R)"
 
 msgid "Merge using selected merge tool"
 msgstr "使用選擇的合併工具來合併"
 
 msgid "&Take Local"
-msgstr ""
+msgstr "選取本地(&T)"
 
 msgid "Accept the local file version (yours)"
 msgstr "接受本地工作複本的檔案版本(你的)"
 
 msgid "Take &Other"
-msgstr ""
+msgstr "選取其他(&O)"
 
 msgid "Accept the other file version (theirs)"
 msgstr "接受其他檔案版本(他們的)"
@@ -4194,10 +4160,10 @@ msgid "Edit resolved file"
 msgstr "編輯已解決的檔案"
 
 msgid "3-&Way Diff"
-msgstr "第三方差異比對"
+msgstr "三方差異比對(&W)"
 
 msgid "Visual three-way diff"
-msgstr "視覺化第三方差異比對"
+msgstr "視覺化三方差異比對"
 
 msgid "Visual diff between resolved file and first parent"
 msgstr "把解決衝突的檔案跟第一個母系進行視覺化差異比對"
@@ -4238,10 +4204,10 @@ msgid "There are no conflicting file merges."
 msgstr "沒有衝突的檔案"
 
 msgid "Exit without finishing resolve?"
-msgstr ""
+msgstr "沒有完成衝突解決就離開?"
 
 msgid "Unresolved conflicts remain. Are you sure?"
-msgstr ""
+msgstr "仍有未解決的衝突.你確定嗎?"
 
 msgid "E&xit"
 msgstr "結束(&x)"
@@ -4258,39 +4224,45 @@ msgstr "<預設>"
 msgid "File List Toolbar"
 msgstr "檔案列表工具列"
 
-msgid "Manifest Mode"
+msgid "Ma&nifest Mode"
 msgstr ""
 
-msgid "Show the full manifest in tree view"
+msgid "Show all version-controlled files in tree view"
 msgstr ""
 
-msgid "Fl&at List View"
+msgid "&Flat List"
 msgstr ""
 
 msgid "### filter text ###"
 msgstr "### 過濾條件文字 ###"
 
-msgid "&Changed by This Commit"
+msgid "Changed by &This Commit"
 msgstr ""
 
 msgid "Show files changed by this commit"
-msgstr ""
+msgstr "顯示被此次提交所改變的檔案"
 
 msgid "Compare to &1st Parent"
-msgstr ""
+msgstr "與第一母系比較(&1)"
 
 msgid "Compare to &2nd Parent"
-msgstr ""
+msgstr "與第二母系比較(&2)"
 
 msgid "Toggle parent to be used as the base revision"
+msgstr "切換作為基礎的母系修訂版"
+
+msgid "List Optio&ns"
 msgstr ""
 
-msgid "&Filter by Status"
-msgstr ""
+msgid "File(s) not found"
+msgstr "檔案找不到"
+
+msgid "The selected files do not exist in the working directory"
+msgstr "選擇的檔案不在工作目錄裡"
 
 #, python-format
 msgid "%s - Revision Details (%s)"
-msgstr ""
+msgstr "%s - 修訂版細節 (%s)"
 
 #, python-format
 msgid "Revert - %s"
@@ -4298,7 +4270,7 @@ msgstr "復原 - %s"
 
 #, python-format
 msgid "<b>Revert %s to its contents at the following revision?</b>"
-msgstr ""
+msgstr "<b>以下列修訂版的內容復原%s?</b>"
 
 #, python-format
 msgid "<b>Revert %d files to their contents at the following revision?</b>"
@@ -4484,10 +4456,10 @@ msgid ""
 msgstr ""
 
 msgid "Searching..."
-msgstr ""
+msgstr "搜尋中..."
 
 msgid "Running"
-msgstr ""
+msgstr "執行中"
 
 msgid "query"
 msgstr ""
@@ -4655,7 +4627,7 @@ msgid "include the specified changeset"
 msgstr ""
 
 msgid "clone only the specified branch"
-msgstr "只拓製已描述的分支"
+msgstr "只拓製特定的分支"
 
 msgid "use pull protocol to copy metadata"
 msgstr "使用 pull 通訊協定來複製 metadata"
@@ -4685,7 +4657,7 @@ msgid "thg drag_move SOURCE... DEST"
 msgstr ""
 
 msgid "a revision to send"
-msgstr ""
+msgstr "要傳送的修訂版"
 
 msgid "thg email [REVS]"
 msgstr ""
@@ -4721,19 +4693,19 @@ msgid "global options:"
 msgstr "全域選項:"
 
 msgid "use \"thg help\" for the full list of commands"
-msgstr ""
+msgstr "使用\"thg help\"列出所有的命令"
 
 msgid ""
 "use \"thg help\" for the full list of commands or \"thg -v\" for details"
-msgstr ""
+msgstr "使用\"thg help\"列出所有的命令或\"thg -v\"顯示細節"
 
 #, python-format
 msgid "use \"thg -v help%s\" to show aliases and global options"
-msgstr ""
+msgstr "使用\"thg -v help %s\"顯示別名及全域選項"
 
 #, python-format
 msgid "use \"thg -v help %s\" to show global options"
-msgstr ""
+msgstr "使用\"thg -v help %s\"顯示全域選項"
 
 msgid ""
 "list of commands:\n"
@@ -4802,6 +4774,9 @@ msgstr ""
 
 msgid "thg merge [[-r] REV]"
 msgstr ""
+
+msgid "Merge revision not specified or not found"
+msgstr "合併的修訂版沒有描述或找不到"
 
 msgid "a revision to post"
 msgstr ""
@@ -4997,7 +4972,7 @@ msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
 msgstr "TortoiseHg 對話框 (版本 %s), Mercurial (版本 %s)\n"
 
 msgid "Location:"
-msgstr ""
+msgstr "位置:"
 
 msgid "Update to:"
 msgstr "更新到:"
@@ -5034,17 +5009,17 @@ msgid "&Update"
 msgstr "更新(&U)"
 
 msgid "Log"
-msgstr ""
+msgstr "紀錄"
 
 msgid "Repositories"
-msgstr ""
+msgstr "儲存庫"
 
 #, python-format
 msgid "Running at %s"
-msgstr ""
+msgstr "執行於%s"
 
 msgid "Stopped"
-msgstr ""
+msgstr "已停止"
 
 msgid "TortoiseHg Web Server"
 msgstr "TortoiseHg網頁伺服器"
@@ -5053,13 +5028,13 @@ msgid "Web Server"
 msgstr "網頁伺服器"
 
 msgid "Port:"
-msgstr ""
+msgstr "連接埠:"
 
 msgid "Status:"
 msgstr "狀態："
 
 msgid "Start"
-msgstr ""
+msgstr "啟動"
 
 msgid "Settings"
 msgstr "設定"
@@ -5081,16 +5056,16 @@ msgid "%dpt"
 msgstr ""
 
 msgid "Bold"
-msgstr ""
+msgstr "粗體"
 
 msgid "Italic"
-msgstr ""
+msgstr "斜體"
 
 msgid "Strike"
-msgstr ""
+msgstr "刪除線"
 
 msgid "Underline"
-msgstr ""
+msgstr "底線"
 
 msgid "&Set..."
 msgstr "設定(&S)..."
@@ -5100,7 +5075,7 @@ msgstr "清除(&C)"
 
 #, python-format
 msgid "Failed to load issue tracker: '%s': %s. "
-msgstr ""
+msgstr "載入問題追蹤系統失敗: '%s': %s. "
 
 msgid "&Browse..."
 msgstr "瀏覽(&B)..."
@@ -5171,7 +5146,7 @@ msgid ""
 msgstr ""
 
 msgid "Force Repo Tab"
-msgstr ""
+msgstr "強制顯示儲存庫分頁"
 
 msgid "Always show repo tabs, even for a single repo. Default: False"
 msgstr "總是顯示儲存庫分頁,就算是目前只有一個儲存庫也一樣.預設:False"
@@ -5218,8 +5193,11 @@ msgid ""
 "is not possible. When False, all files with changes on both sides of the "
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
-"to review and resolve changes manually. Default: False."
+"to review and resolve changes manually. Default: True."
 msgstr ""
+
+msgid "Workbench"
+msgstr "工作台"
 
 msgid "Single Workbench Window"
 msgstr "單一工作台視窗"
@@ -5521,7 +5499,7 @@ msgid ""
 msgstr ""
 
 msgid "SSH Command"
-msgstr ""
+msgstr "SSH命令"
 
 msgid ""
 "Command to use for SSH connections.<p>Default: \"ssh\" or \"TortoisePlink."
@@ -5532,7 +5510,7 @@ msgid "Server"
 msgstr "伺服器"
 
 msgid "<b>Repository Details:</b>"
-msgstr ""
+msgstr "<b>儲存庫細節:</b>"
 
 msgid ""
 "Repository name to use in the web interface, and by TortoiseHg as a "
@@ -5667,7 +5645,7 @@ msgid "From"
 msgstr "寄件者"
 
 msgid "Email address to use in the \"From\" header and for the SMTP envelope"
-msgstr ""
+msgstr "被使用在\"From\"標頭及SMTP信封中的Email位置"
 
 msgid "To"
 msgstr "收件者"
@@ -5766,10 +5744,10 @@ msgid ""
 msgstr ""
 
 msgid "No Dates"
-msgstr "沒有細節"
+msgstr "沒有日期"
 
 msgid "Do not include modification dates in diff headers. Default: False"
-msgstr ""
+msgstr "在差異檔頭中不包含修改日期. 預設:否"
 
 msgid "Show Function"
 msgstr "顯示函式"
@@ -5797,7 +5775,7 @@ msgid "Ignore changes whose lines are all blank in diff views. Default: False"
 msgstr ""
 
 msgid "<b>Annotate:</b>"
-msgstr ""
+msgstr "<b>加註:</b>"
 
 msgid ""
 "Ignore white space when comparing lines in the annotate view. Default: False"
@@ -5837,7 +5815,7 @@ msgid "ChangeLog Font"
 msgstr "變更紀錄字型"
 
 msgid "Font used to display changelog data. Default: monospace 10"
-msgstr "顯示變更紀錄資料用的字型.預設 monospace 10"
+msgstr "顯示變更紀錄資料用的字型. 預設:monospace 10"
 
 msgid "Output Font"
 msgstr "輸出字型"
@@ -5855,7 +5833,7 @@ msgid "Hooks"
 msgstr "掛勾"
 
 msgid "Issue Tracking"
-msgstr ""
+msgstr "問題追蹤"
 
 msgid "Issue Regex"
 msgstr ""
@@ -5864,7 +5842,7 @@ msgid "Defines the regex to match when picking up issue numbers."
 msgstr ""
 
 msgid "Issue Link"
-msgstr ""
+msgstr "問題連結"
 
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
@@ -5898,7 +5876,7 @@ msgid ""
 msgstr ""
 
 msgid "Configure Issue Tracker"
-msgstr ""
+msgstr "設定問題追蹤系統"
 
 msgid "Configure the selected COM Bug Tracker plugin."
 msgstr ""
@@ -5914,7 +5892,7 @@ msgid ""
 msgstr ""
 
 msgid "Changeset Link"
-msgstr ""
+msgstr "連結變更集"
 
 msgid ""
 "A \"template string\" that, when set, turns the revision number and short "
@@ -6116,7 +6094,7 @@ msgid "Confirm Save"
 msgstr "確認儲存"
 
 msgid "Save changes before editing?"
-msgstr ""
+msgstr "編輯前儲存變更?"
 
 msgid "&Save"
 msgstr "儲存(&S)"
@@ -6138,26 +6116,26 @@ msgid "Insufficient access rights, reverting to read-only mode."
 msgstr ""
 
 msgid "Context Menu"
-msgstr ""
+msgstr "內容選單"
 
 msgid "Top menu items:"
-msgstr ""
+msgstr "上層選單項目:"
 
 msgid "Sub menu items:"
-msgstr ""
+msgstr "子選單項目:"
 
 msgid "Menu Behavior"
-msgstr ""
+msgstr "選單行為"
 
 msgid "Hide context menu outside repositories"
-msgstr ""
+msgstr "在儲存庫外隱藏內容選單"
 
 msgid ""
 "Do not show menu items on unversioned folders (use shift + click to override)"
 msgstr ""
 
 msgid "Icons"
-msgstr ""
+msgstr "圖示"
 
 msgid "Overlays"
 msgstr ""
@@ -6172,7 +6150,7 @@ msgid "Enabled Overlay Handlers"
 msgstr ""
 
 msgid "Warning: affects all Tortoises, logoff required after change"
-msgstr ""
+msgstr "注意:這會引響所有的Tortoise,變更後需要登出"
 
 msgid "Added"
 msgstr "已新增"
@@ -6193,7 +6171,7 @@ msgid "Deleted*"
 msgstr "刪除*"
 
 msgid "*: not used by TortoiseHg"
-msgstr ""
+msgstr "*:未被TortoiseHg使用"
 
 msgid "Taskbar"
 msgstr "任務列"
@@ -6211,10 +6189,10 @@ msgid "Clear"
 msgstr "清除"
 
 msgid "Clear the current shelf file"
-msgstr ""
+msgstr "清除目前的擱置檔"
 
 msgid "Delete the current shelf file"
-msgstr ""
+msgstr "刪除目前的擱置檔"
 
 msgid "Left Toolbar"
 msgstr "左邊工具列"
@@ -6241,7 +6219,7 @@ msgid "Refresh"
 msgstr "重新整理"
 
 msgid "New Shelf"
-msgstr ""
+msgstr "建立新的擱置檔"
 
 msgid "Right Toolbar"
 msgstr "右邊工具欄"
@@ -6262,51 +6240,58 @@ msgstr ""
 msgid "TortoiseHg Shelve - %s"
 msgstr ""
 
+msgid "Delete selected chunks from working copy?"
+msgstr ""
+
+#, python-format
+msgid "Delete selected chunks from shelf file %s?"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr "您確定嗎？"
+
 msgid "TortoiseHg New Shelf Name"
 msgstr ""
 
 msgid "Specify name of new shelf"
-msgstr ""
+msgstr "指定新的擱置檔名"
 
 msgid "Bad filename"
 msgstr ""
 
 #, python-format
 msgid "A shelf name cannot contain %s"
-msgstr ""
+msgstr "擱置檔名不能包含%s"
 
 msgid "File already exists"
 msgstr "檔案已經存在"
 
 msgid "A shelf file of that name already exists"
-msgstr ""
+msgstr "此擱置檔名已經存在"
 
 msgid "New shelf created"
-msgstr ""
-
-msgid "Are you sure?"
-msgstr "您確定嗎？"
+msgstr "新的擱置檔已建立"
 
 #, python-format
 msgid "Delete shelf file %s?"
-msgstr ""
+msgstr "刪除擱置檔%s?"
 
 msgid "Shelf deleted"
-msgstr ""
+msgstr "擱置檔已刪除"
 
 msgid "Revert all working copy changes?"
 msgstr "復原所有工作複本的變更嗎?"
 
 #, python-format
 msgid "Clear contents of shelf file %s?"
-msgstr ""
+msgstr "清除擱置檔%s的內容?"
 
 msgid "Shelf cleared"
-msgstr ""
+msgstr "擱置檔已清除"
 
 #, python-format
 msgid "Shelf: %s"
-msgstr ""
+msgstr "擱置: %s"
 
 #, python-format
 msgid "Patch: %s"
@@ -6337,6 +6322,9 @@ msgstr "簽名 - %s"
 msgid "Signature has been added"
 msgstr "簽名已被加入"
 
+msgid "Repository command still running"
+msgstr "儲存庫命令還在執行"
+
 msgid "Filter:"
 msgstr "篩選："
 
@@ -6364,7 +6352,7 @@ msgid "status"
 msgstr "狀態"
 
 msgid "Failed to refresh"
-msgstr ""
+msgstr "刷新失敗"
 
 msgid "No appropriate files"
 msgstr "沒有適當的檔案"
@@ -6389,7 +6377,7 @@ msgid "Checked count: %d"
 msgstr ""
 
 msgid ", resolved merge"
-msgstr ",以解決的合併"
+msgstr ",已解決的合併"
 
 msgid ", unresolved merge"
 msgstr ",未解決的合併"
@@ -6423,11 +6411,11 @@ msgid "unknown"
 msgstr "未知"
 
 #, python-format
-msgid "%s is missing!"
-msgstr "%s 遺失了!"
+msgid "%s is deleted by non-hg command, but still tracked"
+msgstr ""
 
-msgid "deleted"
-msgstr "已刪除"
+msgid "missing"
+msgstr "遺失"
 
 #, python-format
 msgid "%s is ignored"
@@ -6509,13 +6497,13 @@ msgid "bookmark: "
 msgstr "書籤: "
 
 msgid "Post Pull: "
-msgstr ""
+msgstr "拉收之後: "
 
 msgid "&Edit..."
 msgstr "編輯(&E)…"
 
 msgid "&Remove..."
-msgstr "移除...(&R)"
+msgstr "移除(&R)…"
 
 msgid "Repository not local"
 msgstr "儲存庫不是本地的"
@@ -6531,7 +6519,7 @@ msgid "Delete %s from your repo configuration file?"
 msgstr "從你的儲存庫設定檔裡刪除%s ?"
 
 msgid "No host specified"
-msgstr ""
+msgstr "沒有指定主機"
 
 msgid "Please set a valid URL to continue."
 msgstr "請選擇一個可用的URL來繼續"
@@ -6892,7 +6880,7 @@ msgid "Use English commit message"
 msgstr "使用英文提交訊息"
 
 msgid "local"
-msgstr "木機"
+msgstr "本地"
 
 msgid "Move"
 msgstr "搬移"
@@ -6959,7 +6947,7 @@ msgid "Preview:"
 msgstr "預覽："
 
 msgid "Shelf"
-msgstr ""
+msgstr "擱置"
 
 msgid "Checking working directory status..."
 msgstr "正在檢查工作目錄狀態..."
@@ -6974,7 +6962,7 @@ msgid "Select patches"
 msgstr "選擇補丁"
 
 msgid "Select Directory containing patches"
-msgstr ""
+msgstr "選擇包含補丁的目錄"
 
 #, python-format
 msgid "%s patches"
@@ -7008,16 +6996,16 @@ msgid "Detected uncommitted local changes."
 msgstr "偵測沒有提交的本地工作複本變更"
 
 msgid "Do you want to keep them or discard them?"
-msgstr ""
+msgstr "你想保留或放棄?"
 
 msgid "&Keep (--keep)"
-msgstr ""
+msgstr "保留(&K)(--keep)"
 
 msgid "&Discard (--force)"
 msgstr ""
 
 msgid "Confirm Strip"
-msgstr "剝除確認"
+msgstr "確認剝除"
 
 #, python-format
 msgid "Strip - %s"
@@ -7032,14 +7020,11 @@ msgstr ""
 msgid "password: "
 msgstr "密碼: "
 
-msgid "TortoiseHg Prompt"
-msgstr "TortoiseHg 提示字元"
-
 msgid "abort: "
 msgstr "中止: "
 
 msgid "hint: "
-msgstr ""
+msgstr "提示: "
 
 #, python-format
 msgid "HTTP Error: %d (%s)"
@@ -7086,7 +7071,7 @@ msgstr ""
 
 #, python-format
 msgid "abort: %s: %s\n"
-msgstr ""
+msgstr "中止: %s: %s\n"
 
 #, python-format
 msgid "abort: could not lock %s: %s\n"
@@ -7116,7 +7101,7 @@ msgstr ""
 
 #, python-format
 msgid "abort: error: %s\n"
-msgstr "退出: 錯誤: %s\n"
+msgstr "中止: 錯誤: %s\n"
 
 msgid "broken pipe\n"
 msgstr "管線中斷\n"
@@ -7126,6 +7111,9 @@ msgstr "母系 1:"
 
 msgid "Parent 2:"
 msgstr "母系 2:"
+
+msgid "Pull subrepos from:"
+msgstr ""
 
 msgid "List updated files (--verbose)"
 msgstr "列出被更新的檔案(--verbose)"
@@ -7192,7 +7180,7 @@ msgid "Update - %s"
 msgstr "更新 - %s"
 
 msgid "[non-existant]"
-msgstr ""
+msgstr "[不存在]"
 
 msgid "Tool launch failure"
 msgstr "啟動工具失敗"
@@ -7217,7 +7205,7 @@ msgid "Unable to find changeset"
 msgstr "不能找到變更集"
 
 msgid "You likely need to refresh this application"
-msgstr ""
+msgstr "你可能需要刷新程式"
 
 msgid "No file changes"
 msgstr "沒有檔案被變更"
@@ -7255,19 +7243,19 @@ msgid "Dir diff to p2"
 msgstr "目錄比對到p2"
 
 msgid "3-way dir diff"
-msgstr "3-way 目錄差異比對"
+msgstr "三方目錄差異比對"
 
 msgid "Directory diff"
 msgstr "目錄差異比對"
 
 msgid "&Edit"
-msgstr "編輯 (&E)"
+msgstr "編輯(&E)"
 
 msgid "E&xplore Subrepository"
 msgstr "瀏覽子儲存庫(&x)"
 
 msgid "&View Missing"
-msgstr ""
+msgstr "檢視遺失的檔案(&V)"
 
 msgid "&Revert..."
 msgstr "復原(&R)..."
@@ -7279,13 +7267,13 @@ msgid "Add &Largefiles..."
 msgstr "增加大檔案(&L)..."
 
 msgid "De&tect Renames..."
-msgstr "偵測更名(t)"
+msgstr "偵測更名(&t)"
 
 msgid "&Ignore..."
-msgstr "忽略(&l)"
+msgstr "忽略(&I)"
 
 msgid "Re&move Versioned"
-msgstr ""
+msgstr "移除受版本控管的檔案(&m)"
 
 msgid "&Delete Unversioned..."
 msgstr "刪除沒有受版本控管的檔案(&D)..."
@@ -7381,19 +7369,19 @@ msgid "Save hgweb config"
 msgstr "儲存hgweb設定"
 
 msgid "Path:"
-msgstr ""
+msgstr "路徑:"
 
 msgid "Local Path:"
-msgstr ""
+msgstr "本地路徑:"
 
 msgid "Select Repository"
 msgstr "選擇儲存庫"
 
 msgid "Add Path to Serve"
-msgstr ""
+msgstr "新增路徑至伺服器"
 
 msgid "Edit Path to Serve"
-msgstr ""
+msgstr "編輯路徑至伺服器"
 
 msgid "Local Path"
 msgstr ""
@@ -7459,7 +7447,7 @@ msgid "Show Output &Log"
 msgstr "顯示輸出記錄(&L)"
 
 msgid "R&epository Registry Options"
-msgstr "儲存庫紀錄選項(&e)"
+msgstr "儲存庫登錄選項(&e)"
 
 msgid "Save Open Repositories on E&xit"
 msgstr "結束時儲存已開啟的儲存庫(&x)"
@@ -7516,7 +7504,7 @@ msgid "&Workbench Toolbars"
 msgstr "工作台工具列(&W)"
 
 msgid "Update working directory or switch revisions"
-msgstr ""
+msgstr "更新工作目錄或轉移至修訂版"
 
 msgid "&Shelve..."
 msgstr "擱置(&S)..."
@@ -7528,7 +7516,7 @@ msgid "&Resolve..."
 msgstr "解決衝突(&R)..."
 
 msgid "R&ollback/Undo..."
-msgstr ""
+msgstr "回退/復原(&o)"
 
 msgid "&Purge..."
 msgstr "徹底清除(&P)..."
@@ -7684,7 +7672,7 @@ msgid ""
 msgstr ""
 
 msgid "Issue Tracker Plugin Error"
-msgstr ""
+msgstr "問題追蹤系統插件錯誤"
 
 msgid "Could not instantiate Issue Tracker plugin COM object"
 msgstr ""
@@ -7702,13 +7690,13 @@ msgid "Cannot open Plugin Options dialog"
 msgstr "不能開啟Plugin選項對話框"
 
 msgid "inotify is not supported on this platform"
-msgstr "這個平台不支援inotify技術"
+msgstr "這個平台不支援inotify"
 
 msgid "eol is incompatible with win32text"
-msgstr ""
+msgstr "eol與win32text不相容"
 
 msgid "win32text is incompatible with eol"
-msgstr ""
+msgstr "win32text與eol不相容"
 
 msgid "hgsubversion is incompatible with perfarce"
 msgstr "hgsubversion不相容perfarce"
@@ -7911,8 +7899,19 @@ msgid "Synchronize with dragged repository"
 msgstr ""
 
 #, python-format
+msgid "unrecognized response: %s"
+msgstr ""
+
+#, python-format
 msgid "repository %s not found"
 msgstr "找不到版本庫 %s"
+
+msgid "win32ill: cannot create window for messages"
+msgstr ""
+
+#, python-format
+msgid "win32ill: unsupported platform: %s\n"
+msgstr ""
 
 #~ msgid "edit failed"
 #~ msgstr "編輯失敗"
@@ -8042,6 +8041,9 @@ msgstr "找不到版本庫 %s"
 
 #~ msgid "create new MQ patch"
 #~ msgstr "建立新的 MQ patch"
+
+#~ msgid "Nothing Commited"
+#~ msgstr "沒有任何變更被提交"
 
 #~ msgid "Confirm Add/Remove"
 #~ msgstr "確認加入/移除"
@@ -8180,6 +8182,9 @@ msgstr "找不到版本庫 %s"
 
 #~ msgid "_File History"
 #~ msgstr "檔案歷史(_F)"
+
+#~ msgid "Unable to save file"
+#~ msgstr "無法儲存檔案"
 
 #~ msgid "Enable _Wordwrap"
 #~ msgstr "啟用自動換行(_W)"
@@ -8714,6 +8719,18 @@ msgstr "找不到版本庫 %s"
 #~ msgid "file %s already exists\n"
 #~ msgstr "\"%s\"檔案已經存在\n"
 
+#~ msgid "TortoiseHg Clone"
+#~ msgstr "TortoiseHg 拓製"
+
+#~ msgid "Error creating destination folder"
+#~ msgstr "建立目標目錄時錯誤"
+
+#~ msgid "Detail"
+#~ msgstr "細節"
+
+#~ msgid "?? Error: %s ??"
+#~ msgstr "?? 錯誤: %s ??"
+
 #~ msgid "Failed to clone"
 #~ msgstr "拓製失敗"
 
@@ -8847,6 +8864,9 @@ msgstr "找不到版本庫 %s"
 
 #~ msgid "Repository is empty"
 #~ msgstr "儲存庫是空的"
+
+#~ msgid "Please specify a different path."
+#~ msgstr "請指定一個不同的路徑."
 
 #~ msgid "Ambiguous Revision"
 #~ msgstr "曖昧不明的修訂版"
@@ -9055,9 +9075,6 @@ msgstr "找不到版本庫 %s"
 #~ msgid "Select files to remove"
 #~ msgstr "移除選擇的檔案"
 
-#~ msgid "missing"
-#~ msgstr "遺失"
-
 #~ msgid "[command interrupted]"
 #~ msgstr "[命令中斷了]"
 
@@ -9121,6 +9138,9 @@ msgstr "找不到版本庫 %s"
 
 #~ msgid "Shelf Preview"
 #~ msgstr "自我預覽"
+
+#~ msgid "%s is missing!"
+#~ msgstr "%s 遺失了!"
 
 #~ msgid "Finished pull"
 #~ msgstr "完成拉收"
@@ -9494,6 +9514,12 @@ msgstr "找不到版本庫 %s"
 #~ msgid "Mark as Bad"
 #~ msgstr "標記是壞的"
 
+#~ msgid "Second Parent: revision %s (%s)"
+#~ msgstr "第二個母系: 修訂版 %s (%s)"
+
+#~ msgid "First Parent: revision %s (%s)"
+#~ msgstr "第一個母系: 修訂版 %s (%s)"
+
 #~ msgid "Failed to strip"
 #~ msgstr "剝除失敗"
 
@@ -9526,6 +9552,9 @@ msgstr "找不到版本庫 %s"
 
 #~ msgid "_Export Patch..."
 #~ msgstr "匯出補丁(_E)"
+
+#~ msgid "deleted"
+#~ msgstr "已刪除"
 
 #~ msgid "R: removed"
 #~ msgstr "R:已移除"
@@ -9750,8 +9779,69 @@ msgstr "找不到版本庫 %s"
 #~ msgid "A new version of TortoiseHg is ready for download!"
 #~ msgstr "新版 TortoiseHg 已經可以下載了！"
 
+#~ msgid "Backout to the second parent of the merge revision"
+#~ msgstr "回退到合併修訂版的第二個母系"
+
+#~ msgid "Backout to the first parent of the merge revision"
+#~ msgstr "回退到合併修訂版的第一個母系"
+
+#~ msgid "Backout revision not found"
+#~ msgstr "找不到要回退的修訂版"
+
+#~ msgid "Merge parent to backout to"
+#~ msgstr "回退到合併的母系"
+
+#~ msgid ""
+#~ "To backout a <b>merge</b> revision you must select which parent to "
+#~ "backout to (i.e. whose changes will be <i>kept</i>)"
+#~ msgstr ""
+#~ "要回退<b>合併</b>修訂版，你必須選擇需要回退到的母系（即：變更會<i>保留</i>"
+#~ "的）"
+
+#~ msgid "Backed out merge changeset: "
+#~ msgstr "回退合併後的變更集： "
+
+#~ msgid "Backed out merge revision to its second parent (%s)"
+#~ msgstr "回退合併的修訂版到他的第二個母系(%s)"
+
+#~ msgid "Backed out merge revision to its first parent (%s)"
+#~ msgstr "回退合併的修訂版到他的第一個母系(%s)"
+
 #~ msgid "Several icons are courtesy of the TortoiseSVN project"
 #~ msgstr "一些圖示由 TortoiseSVN 項目友情提供"
 
 #~ msgid "Backout..."
 #~ msgstr "回退 ..."
+
+#~ msgid "Folder &History"
+#~ msgstr "目錄歷史 (&H)"
+
+#~ msgid "&Diff Selected Changesets"
+#~ msgstr "差異比對選擇的變更集"
+
+#~ msgid "&Diff Changeset to Parent"
+#~ msgstr "跟母系變更集做差異比對(&D)"
+
+#~ msgid "Diff &File to Parent"
+#~ msgstr "跟母系檔案做差異比對(&F)"
+
+#~ msgid "You must select two revisions to diff"
+#~ msgstr "你必須選擇兩個修訂版來比對差異"
+
+#~ msgid "Copyright 2008-2013 Steve Borho and others"
+#~ msgstr "版權所有 2008-2013 Steve Borho 以及其他貢獻者"
+
+#~ msgid "Diff File to Lo&cal"
+#~ msgstr "跟本地檔案做差異比對(&c)"
+
+#~ msgid "Diff Changeset to &Local"
+#~ msgstr "跟本地變更集做差異比對(&L)"
+
+#~ msgid "&Filter by Status"
+#~ msgstr "依狀態篩選(&F)"
+
+#~ msgid "Fl&at List View"
+#~ msgstr "以清單檢視(&a)"
+
+#~ msgid "&Changed by This Commit"
+#~ msgstr "被此次提交變更(&C)"

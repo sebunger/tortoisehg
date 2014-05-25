@@ -10,18 +10,10 @@ import shlex
 import time
 
 from mercurial import ui, util, extensions, match
-from mercurial import encoding, templatefilters, filemerge, error, scmutil
+from mercurial import encoding, templatefilters, filemerge, error, pathutil
 from mercurial import dispatch as hgdispatch
 
-try:
-    from mercurial import pathutil
-    canonpath = pathutil.canonpath
-except (AttributeError, ImportError):
-    # hg<2.9 (f962870712da)
-    canonpath = scmutil.canonpath
-
 _encoding = encoding.encoding
-_encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
 
 # extensions which can cause problem with TortoiseHg
@@ -279,13 +271,14 @@ def canonpaths(list):
     root = paths.find_root(cwd)
     for f in list:
         try:
-            canonpats.append(canonpath(root, cwd, f))
+            canonpats.append(pathutil.canonpath(root, cwd, f))
         except util.Abort:
             # Attempt to resolve case folding conflicts.
             fu = f.upper()
             cwdu = cwd.upper()
             if fu.startswith(cwdu):
-                canonpats.append(canonpath(root, cwd, f[len(cwd+os.sep):]))
+                canonpats.append(
+                    pathutil.canonpath(root, cwd, f[len(cwd + os.sep):]))
             else:
                 # May already be canonical
                 canonpats.append(f)

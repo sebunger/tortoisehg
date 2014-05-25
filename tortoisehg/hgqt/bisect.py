@@ -15,7 +15,10 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, qtlib
 
 class BisectDialog(QDialog):
-    def __init__(self, repoagent, opts, parent=None):
+
+    newCandidate = pyqtSignal()
+
+    def __init__(self, repoagent, parent=None):
         super(BisectDialog, self).__init__(parent)
         self.setWindowTitle(_('Bisect - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-bisect'))
@@ -35,7 +38,6 @@ class BisectDialog(QDialog):
 
         hbox = QHBoxLayout()
         self._gle = gle = QLineEdit()
-        gle.setText(opts.get('good', ''))
         hbox.addWidget(gle, 1)
         self._gb = gb = QPushButton(_('Accept'))
         hbox.addWidget(gb)
@@ -43,11 +45,8 @@ class BisectDialog(QDialog):
 
         hbox = QHBoxLayout()
         self._ble = ble = QLineEdit()
-        ble.setText(opts.get('bad', ''))
-        ble.setEnabled(False)
         hbox.addWidget(ble, 1)
         self._bb = bb = QPushButton(_('Accept'))
-        bb.setEnabled(False)
         hbox.addWidget(bb)
         form.addRow(_('Known bad revision:'), hbox)
 
@@ -79,8 +78,8 @@ class BisectDialog(QDialog):
         hbox.addWidget(closeb)
         closeb.clicked.connect(self.reject)
 
-        self._nextbuttons.setEnabled(False)
         self.goodrev = self.badrev = self.lastrev = None
+        self.restart()
 
         gb.clicked.connect(self._verifyGood)
         bb.clicked.connect(self._verifyBad)
@@ -91,16 +90,31 @@ class BisectDialog(QDialog):
     def repo(self):
         return self._repoagent.rawRepo()
 
+    def restart(self, goodrev=None, badrev=None):
+        if not self._cmdsession.isFinished():
+            return
+        self._gle.setEnabled(True)
+        self._gle.setText(goodrev or '')
+        self._gb.setEnabled(True)
+        self._ble.setEnabled(False)
+        self._ble.setText(badrev or '')
+        self._bb.setEnabled(False)
+        self._nextbuttons.setEnabled(False)
+        self._cmdlog.clearLog()
+        self._stbar.showMessage('')
+        self.goodrev = self.badrev = self.lastrev = None
+
     def _setSession(self, sess):
         assert self._cmdsession.isFinished()
         self._cmdsession = sess
         sess.commandFinished.connect(self._cmdFinished)
         sess.outputReceived.connect(self._cmdlog.appendLog)
-        sess.progressReceived.connect(self._stbar.progress)
+        sess.progressReceived.connect(self._stbar.setProgress)
         cmdui.updateStatusMessage(self._stbar, sess)
 
     @pyqtSlot(int)
     def _cmdFinished(self, ret):
+        self._stbar.clearProgress()
         if ret != 0:
             self._stbar.showMessage(_('Error encountered.'), True)
             return
@@ -115,6 +129,7 @@ class BisectDialog(QDialog):
                                 % (_('Revision'), ctx.rev(), ctx,
                                    _('Test this revision and report findings. '
                                      '(good/bad/skip)')))
+        self.newCandidate.emit()
 
     def _lookupRevision(self, changeid):
         try:

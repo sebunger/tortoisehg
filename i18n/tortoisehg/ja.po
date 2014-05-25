@@ -9,16 +9,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-02-03 11:14-0200\n"
-"PO-Revision-Date: 2014-02-02 12:59+0000\n"
+"POT-Creation-Date: 2014-04-28 11:26-0300\n"
+"PO-Revision-Date: 2014-02-15 15:21+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-02-04 06:05+0000\n"
-"X-Generator: Launchpad (build 16916)\n"
+"X-Launchpad-Export-Date: 2014-04-29 05:57+0000\n"
+"X-Generator: Launchpad (build 16985)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
@@ -29,8 +29,8 @@ msgstr "終了"
 msgid "About"
 msgstr "バージョン情報"
 
-msgid "Copyright 2008-2013 Steve Borho and others"
-msgstr "Copyright 2008-2013 Steve Borho 他"
+msgid "Copyright 2008-2014 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "いくつかのアイコンは TortoiseSVN と Tango から無料提供されています。"
@@ -160,6 +160,12 @@ msgstr "アーカイブ - %s"
 msgid "&Archive"
 msgstr "アーカイブ(&A)"
 
+msgid "Backout requires a parent revision"
+msgstr "打ち消しには親リビジョンが必要です"
+
+msgid "Cannot backout change on a different branch"
+msgstr "他のブランチの変更は打ち消せません"
+
 #, python-format
 msgid "Backout - %s"
 msgstr "バックアウト - %s"
@@ -170,20 +176,8 @@ msgstr "バックアウトの準備"
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr "打ち消し対象のリビジョンと作業領域の状態を確認してください。"
 
-msgid "Unable to backout"
-msgstr "バックアウト失敗"
-
-msgid "Backout revision not found"
-msgstr "打ち消し対象リビジョンが存在しません"
-
 msgid "Backing out a parent revision is a single step operation"
 msgstr "親リビジョンの打ち消しは、単一の操作です"
-
-msgid "Backout requires a parent revision"
-msgstr "打ち消しには親リビジョンが必要です"
-
-msgid "Cannot backout change on a different branch"
-msgstr "他のブランチの変更は打ち消せません"
 
 msgid "Backout revision"
 msgstr "打ち消し対象リビジョン"
@@ -193,30 +187,6 @@ msgstr "ヘッドに居ないため、バックアウト後に新しいヘッド
 
 msgid "Current local revision"
 msgstr "現在のローカルリビジョン"
-
-msgid "Merge parent to backout to"
-msgstr "打ち消すマージリビジョンの親を選択"
-
-msgid ""
-"To backout a <b>merge</b> revision you must select which parent to backout "
-"to (i.e. whose changes will be <i>kept</i>)"
-msgstr ""
-"<b>マージ</b> リビジョンを打ち消すには、どの親を打ち消すか選択してください\n"
-" (つまり、どの変更を<i>残す</i>かです)"
-
-#, python-format
-msgid "First Parent: revision %s (%s)"
-msgstr "一番目の親: リビジョン %s (%s)"
-
-msgid "Backout to the first parent of the merge revision"
-msgstr "マージリビジョンの一番目の親を打ち消す"
-
-#, python-format
-msgid "Second Parent: revision %s (%s)"
-msgstr "二番目の親: リビジョン %s (%s)"
-
-msgid "Backout to the second parent of the merge revision"
-msgstr "マージリビジョンの二番目の親を打ち消す"
 
 msgid "Working directory status"
 msgstr "作業領域の状態"
@@ -279,9 +249,6 @@ msgstr "コミットメッセージ"
 msgid "Skip final confirmation page, close after commit."
 msgstr "最後の確認ページをスキップし、コミットの後にウィンドウを閉じます。"
 
-msgid "Backed out merge changeset: "
-msgstr "打ち消したマージチェンジセット: "
-
 msgid "Backed out changeset: "
 msgstr "バックアウトしたチェンジセット: "
 
@@ -293,14 +260,6 @@ msgstr "バックアウトメッセージを破棄してもよろしいですか
 
 msgid "Use English backout message"
 msgstr "英語メッセージを使用する"
-
-#, python-format
-msgid "Backed out merge revision to its first parent (%s)"
-msgstr "マージリビジョンの最初の親 (%s) を打ち消す"
-
-#, python-format
-msgid "Backed out merge revision to its second parent (%s)"
-msgstr "マージリビジョンの二番目の親 (%s) を打ち消す"
 
 msgid "Backing out and committing..."
 msgstr "打ち消した後、コミットしています..."
@@ -596,15 +555,6 @@ msgstr "リモートコマンド:"
 msgid "Start revision:"
 msgstr "指定リビジョンから:"
 
-msgid "TortoiseHg Clone"
-msgstr "TortoiseHg クローンツール"
-
-msgid "Error creating destination folder"
-msgstr "クローン先のフォルダを作成できませんでした"
-
-msgid "Please specify a different path."
-msgstr "違うパスを指定してください"
-
 msgid "Select source repository"
 msgstr "クローン元リポジトリを選んでください"
 
@@ -626,6 +576,32 @@ msgstr "コマンドの開始に失敗しました\n"
 
 msgid "error while running command\n"
 msgstr "コマンド実行中にエラーが起きました\n"
+
+#, python-format
+msgid "process exited unexpectedly with code %d"
+msgstr ""
+
+#, python-format
+msgid "timed out while reading: %r..."
+msgstr ""
+
+msgid "timed out waiting for message"
+msgstr ""
+
+#, python-format
+msgid "unexpected response on required channel %r"
+msgstr ""
+
+#, python-format
+msgid "invalid \"hello\" message: %r"
+msgstr ""
+
+msgid "no \"runcommand\" capability"
+msgstr ""
+
+#, python-format
+msgid "corrupted command result: %r"
+msgstr ""
 
 msgid "Terminated by user"
 msgstr "ユーザーによって中断されました"
@@ -659,8 +635,14 @@ msgstr "失敗!"
 msgid "Clea&r Log"
 msgstr "ログを削除(&R)"
 
-msgid "Detail"
-msgstr "詳細"
+msgid "TortoiseHg Prompt"
+msgstr "TortoiseHgプロンプト"
+
+msgid "Show Detail"
+msgstr ""
+
+msgid "Hide Detail"
+msgstr ""
 
 msgid "Confirm Exit"
 msgstr "終了"
@@ -684,6 +666,13 @@ msgstr "コマンドエラー"
 #, python-format
 msgid "[Code: %d]"
 msgstr "[終了値: %d]"
+
+msgid "Merge"
+msgstr "マージ"
+
+#, python-format
+msgid "Merge with %s"
+msgstr "%s とマージ"
 
 msgctxt "start progress"
 msgid "Commit"
@@ -823,8 +812,8 @@ msgstr ""
 msgid "&Replace"
 msgstr "置き換え(&R)"
 
-msgid "Nothing Commited"
-msgstr "何もコミットされませんでした"
+msgid "Nothing Committed"
+msgstr "コミットなし"
 
 msgid "Please enter commit message"
 msgstr "コミットメッセージを入力してください"
@@ -854,6 +843,9 @@ msgstr "削除の確認"
 
 msgid "Remove selected deleted files?"
 msgstr "削除されたファイルを登録除外しますか?"
+
+msgid "Nothing changed."
+msgstr "変更はありません。"
 
 msgctxt "window title"
 msgid "Commit"
@@ -1123,6 +1115,8 @@ msgid ""
 "- {ROOT}: The path to the current repository root.\n"
 "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
 "hash respectively.\n"
+"- {SELECTEDFILES}: The list of files selected by the user on the revision "
+"details file list.\n"
 "- {FILES}: The list of files touched by the selected revision.\n"
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
@@ -1250,23 +1244,44 @@ msgstr "ファイルの変更履歴(&H)"
 msgid "Show the history of the selected file"
 msgstr "選択したファイルの履歴を表示する"
 
-msgid "Folder &History"
-msgstr "フォルダの変更履歴(&H)"
-
 msgid "Co&mpare File Revisions"
 msgstr "ファイルのリビジョンを比較(&M)"
 
 msgid "Compare revisions of the selected file"
 msgstr "選択したファイルのリビジョンを比較する"
 
+msgid "Filter Histor&y"
+msgstr ""
+
+msgid "Query about changesets affecting the selected files"
+msgstr ""
+
+msgid "Diff &Changeset to Parent"
+msgstr ""
+
+msgid "Diff Changeset to Loc&al"
+msgstr ""
+
+msgid "Diff Selected Cha&ngesets"
+msgstr ""
+
 msgid "&Diff to Parent"
 msgstr "親リビジョンとの差分 (&diff)"
+
+msgid "Cannot display visual diff"
+msgstr "GUI差分を表示できません"
+
+msgid "Visual diffs are not supported for unapplied patches"
+msgstr "未適用のパッチに対するGUI差分はサポートされていません"
 
 msgid "Diff to &Local"
 msgstr "ローカルとの差分(&L) (diff)"
 
 msgid "View changes to current in external diff tool"
 msgstr "外部差分ツールで現在のリビジョンに対する差分を表示する"
+
+msgid "Diff Selected &File Revisions"
+msgstr "選択したリビジョンのファイル差分(&F)"
 
 msgid "&View at Revision"
 msgstr "このリビジョンを開く(&V)"
@@ -1279,6 +1294,9 @@ msgstr "このリビジョンを保存(&S)..."
 
 msgid "Save file as it appeared at this revision"
 msgstr "このリビジョン時点でのファイルを保存"
+
+msgid "Save file to"
+msgstr "ファイルに保存"
 
 msgid "&Edit Local"
 msgstr "ローカルファイルを編集(&E)"
@@ -1312,18 +1330,6 @@ msgstr "端末を開く(&T)"
 
 msgid "Open a shell terminal in the selected folder"
 msgstr "選択したフォルダーで端末を開きます。"
-
-msgid "File(s) not found"
-msgstr "ファイルがありません"
-
-msgid "The selected files do not exist in the working directory"
-msgstr "選択されたファイルが作業領域にありません"
-
-msgid "Cannot display visual diff"
-msgstr "GUI差分を表示できません"
-
-msgid "Visual diffs are not supported for unapplied patches"
-msgstr "未適用のパッチに対するGUI差分はサポートされていません"
 
 msgid "Display the file anyway"
 msgstr "ファイルを表示させる"
@@ -1501,29 +1507,8 @@ msgstr "戻る"
 msgid "Forward"
 msgstr "進む"
 
-msgid "&Diff Selected Changesets"
-msgstr "選択したリビジョンの差分 (&diff)"
-
-msgid "Diff Selected &File Revisions"
-msgstr "選択したリビジョンのファイル差分(&F)"
-
-msgid "&Diff Changeset to Parent"
-msgstr "親リビジョンとの差分 (&diff)"
-
-msgid "Diff Changeset to &Local"
-msgstr "ローカルとの差分(&L) (diff)"
-
-msgid "Diff &File to Parent"
-msgstr "親リビジョンとのファイル差分(&F)"
-
-msgid "Diff File to Lo&cal"
-msgstr "ローカルとのファイル差分(&C)"
-
 msgid "Show Revision &Details"
 msgstr "リビジョンの詳細を表示(&D)"
-
-msgid "You must select two revisions to diff"
-msgstr "差分を見るには２つのリビジョンを選択して下さい。"
 
 msgid "Too many rows selected for menu"
 msgstr ""
@@ -1603,6 +1588,10 @@ msgstr "南東欧"
 #. i18n: comma-separated list of common encoding names in your locale, e.g.
 #. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
 #.
+#. for the best guess, put structured encodings like "utf-8" in front, e.g.
+#. "utf-8,iso8859-1" instead of "iso8859-1,utf-8" because "iso8859-1" can
+#. decode arbitrary byte sequence and never fall back.
+#.
 #. pick from the following encodings:
 #. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
 #. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
@@ -1611,10 +1600,6 @@ msgstr "南東欧"
 #. iso8859-10, iso8859-14, iso8859-16
 msgid "$FILE_ENCODINGS"
 msgstr "utf-8,shift_jis,euc_jp,iso2022_jp"
-
-msgctxt "column header"
-msgid "Filename"
-msgstr "ファイル名"
 
 msgid "View change as unified diff output"
 msgstr "unified diff形式で表示"
@@ -1633,6 +1618,9 @@ msgstr "前の差分"
 
 msgid "Open shelve tool"
 msgstr "シェルフツールを開く"
+
+msgid "&Auto Detect"
+msgstr ""
 
 msgid "Show changes from first parent"
 msgstr "最初の親からの変更を表示"
@@ -1726,10 +1714,6 @@ msgstr ""
 
 msgid "Continue or abort interrupted graft operation?"
 msgstr "中断された移植を再開しますか？中止しますか？"
-
-#, python-format
-msgid "Graft %d changesets on top of changeset %s"
-msgstr "%d つのリビジョンを %s の続きへ移植"
 
 msgid "To graft destination"
 msgstr "移植先"
@@ -2239,10 +2223,6 @@ msgstr "設定ファイルを作れません"
 msgid "Insufficient access rights."
 msgstr "アクセス権限が足りません"
 
-#, python-format
-msgid "?? Error: %s ??"
-msgstr "?? エラー: %s ??"
-
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
 "make more efficient use of disk space by adding these files as largefiles, "
@@ -2263,12 +2243,6 @@ msgstr "通常ファイルとして追加 (&N)"
 
 msgid "License"
 msgstr "ライセンス"
-
-msgid "Drag to change order"
-msgstr "順番を変えるにはドラッグしてください"
-
-msgid "Workbench"
-msgstr "ワークベンチ"
 
 msgid "Find revisions matching fields of:"
 msgstr "フィールド検索元リビジョン:"
@@ -2354,12 +2328,6 @@ msgstr "HEAD リビジョンではありません！"
 msgid "Merge from (other revision)"
 msgstr "マージ元 (他のリビジョン)"
 
-msgid "Unable to merge"
-msgstr "マージできませんでした"
-
-msgid "Merge revision not specified or not found"
-msgstr "マージリビジョンが指定されていないか存在しません"
-
 msgid "Merge to (working directory)"
 msgstr "マージ先 (作業領域)"
 
@@ -2434,13 +2402,6 @@ msgstr "すぐにコミット"
 
 msgid "Commit Later"
 msgstr "後でコミット"
-
-msgid "Merge"
-msgstr "マージ"
-
-#, python-format
-msgid "Merge with %s"
-msgstr "%s とマージ"
 
 msgid "TortoiseHg Merge Commit"
 msgstr "TortoiseHg マージコミット"
@@ -3051,12 +3012,6 @@ msgstr "GUI エディタを設定してください"
 msgid "Editor launch failure"
 msgstr "GUIエディタの起動に失敗しました"
 
-msgid "Save file to"
-msgstr "ファイルに保存"
-
-msgid "Unable to save file"
-msgstr "ファイルを保存できません"
-
 msgid "Failed to open path in terminal"
 msgstr "ターミナルでパスを開けません"
 
@@ -3157,8 +3112,8 @@ msgstr "元のチェンジセットを保持"
 msgid "Keep original branch names"
 msgstr "元のブランチ名を保持"
 
-msgid "Collapse the rebased changesets "
-msgstr "移動後に移動リビジョンを単一化する "
+msgid "Collapse the rebased changesets"
+msgstr ""
 
 msgid "Rebase entire source branch"
 msgstr "元リビジョンのブランチ全体を移動"
@@ -3382,6 +3337,10 @@ msgstr "変換元"
 msgctxt "column header"
 msgid "Phase"
 msgstr "フェーズ"
+
+msgctxt "column header"
+msgid "Filename"
+msgstr "ファイル名"
 
 #, python-format
 msgid "filling (%d)"
@@ -3720,6 +3679,9 @@ msgstr ""
 msgid "Can't find revision '%s'"
 msgstr "リビジョン '%s'を見つけられません"
 
+msgid "Drag to change order"
+msgstr "順番を変えるにはドラッグしてください"
+
 msgid "Workbench Log Columns"
 msgstr "ワークベンチのログ"
 
@@ -3867,9 +3829,6 @@ msgstr "同期タブが終了できません"
 
 msgid "Search tab cannot exit"
 msgstr "検索タブが終了できません"
-
-msgid "Repository command still running"
-msgstr "リポジトリのコマンドがまだ動作しています"
 
 msgid "Pus&h"
 msgstr "履歴を反映 (pus&h)"
@@ -4116,8 +4075,14 @@ msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr ""
 "%d つのパッチを以下にエキスポートしました:<p><a href=\"file:///%s\">%s</a>"
 
+msgid "Unable to merge"
+msgstr "マージできませんでした"
+
 msgid "You cannot merge a revision with itself"
 msgstr ""
+
+msgid "Unable to backout"
+msgstr "バックアウト失敗"
 
 msgid "Write bundle"
 msgstr "バンドルを書く"
@@ -4364,20 +4329,20 @@ msgstr "<デフォルト>"
 msgid "File List Toolbar"
 msgstr "ファイルリストツールバー"
 
-msgid "Manifest Mode"
-msgstr "マニフェスト表示"
+msgid "Ma&nifest Mode"
+msgstr ""
 
-msgid "Show the full manifest in tree view"
-msgstr "マニフェストをツリー表示"
+msgid "Show all version-controlled files in tree view"
+msgstr ""
 
-msgid "Fl&at List View"
-msgstr "リスト表示(&A)"
+msgid "&Flat List"
+msgstr ""
 
 msgid "### filter text ###"
 msgstr "### 抽出する文字列 ###"
 
-msgid "&Changed by This Commit"
-msgstr "このリビジョンでの変更(&C)"
+msgid "Changed by &This Commit"
+msgstr ""
 
 msgid "Show files changed by this commit"
 msgstr "このリビジョンで変更されたファイルを表示"
@@ -4391,8 +4356,14 @@ msgstr "第&2親リビジョンと比較"
 msgid "Toggle parent to be used as the base revision"
 msgstr "比較元の親リビジョンを切り替え"
 
-msgid "&Filter by Status"
-msgstr "状態フィルター(&F)"
+msgid "List Optio&ns"
+msgstr ""
+
+msgid "File(s) not found"
+msgstr "ファイルがありません"
+
+msgid "The selected files do not exist in the working directory"
+msgstr "選択されたファイルが作業領域にありません"
 
 #, python-format
 msgid "%s - Revision Details (%s)"
@@ -4925,6 +4896,9 @@ msgstr "マージ対象のリビジョン"
 msgid "thg merge [[-r] REV]"
 msgstr "thg merge [[-r] リビジョン]"
 
+msgid "Merge revision not specified or not found"
+msgstr "マージリビジョンが指定されていないか存在しません"
+
 msgid "a revision to post"
 msgstr ""
 
@@ -5364,14 +5338,11 @@ msgid ""
 "is not possible. When False, all files with changes on both sides of the "
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
-"to review and resolve changes manually. Default: False."
+"to review and resolve changes manually. Default: True."
 msgstr ""
-"同じファイルに対する両方の親からの変更をTortoiseHgが自動的に解消し、自動的に"
-"解消できない場合のみユーザーに報告します。\r\n"
-"もし無効であれば、マージにおける両方の親からの変更があるファイルは、ファイル"
-"内の違う場所に対する変更でも衝突として報告されます。どちらの場合でも、衝突が"
-"起きた場合、ダイアログが開き、ユーザーは解消を手動で行う必要があります。デ"
-"フォルトは無効です。"
+
+msgid "Workbench"
+msgstr "ワークベンチ"
 
 msgid "Single Workbench Window"
 msgstr ""
@@ -6490,6 +6461,16 @@ msgstr "変更されたファイルは .hg/Trashcan/ にバックアップされ
 msgid "TortoiseHg Shelve - %s"
 msgstr "TortoiseHg シェルフ - %s"
 
+msgid "Delete selected chunks from working copy?"
+msgstr ""
+
+#, python-format
+msgid "Delete selected chunks from shelf file %s?"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr "本当に削除しますか?"
+
 msgid "TortoiseHg New Shelf Name"
 msgstr "TortoiseHg 新しいシェルフ名"
 
@@ -6511,9 +6492,6 @@ msgstr "その名前のシェルフファイルはすでに存在しています
 
 msgid "New shelf created"
 msgstr "新しいシェルフを作成しました"
-
-msgid "Are you sure?"
-msgstr "本当に削除しますか?"
 
 #, python-format
 msgid "Delete shelf file %s?"
@@ -6564,6 +6542,9 @@ msgstr "署名 - %s"
 
 msgid "Signature has been added"
 msgstr "署名しました"
+
+msgid "Repository command still running"
+msgstr "リポジトリのコマンドがまだ動作しています"
 
 msgid "Filter:"
 msgstr "フィルター:"
@@ -6651,11 +6632,11 @@ msgid "unknown"
 msgstr "不明"
 
 #, python-format
-msgid "%s is missing!"
-msgstr "%s は見つかりません!"
+msgid "%s is deleted by non-hg command, but still tracked"
+msgstr ""
 
-msgid "deleted"
-msgstr "削除"
+msgid "missing"
+msgstr "見つかりません"
 
 #, python-format
 msgid "%s is ignored"
@@ -7270,9 +7251,6 @@ msgstr "応答がありませんでした"
 msgid "password: "
 msgstr "パスワード: "
 
-msgid "TortoiseHg Prompt"
-msgstr "TortoiseHgプロンプト"
-
 msgid "abort: "
 msgstr "中止: "
 
@@ -7364,6 +7342,9 @@ msgstr "親リビジョン1:"
 
 msgid "Parent 2:"
 msgstr "親リビジョン2:"
+
+msgid "Pull subrepos from:"
+msgstr ""
 
 msgid "List updated files (--verbose)"
 msgstr "更新したファイルを表示 (--verbose)"
@@ -8165,8 +8146,19 @@ msgid "Synchronize with dragged repository"
 msgstr "ドラッグされたリポジトリと同期します"
 
 #, python-format
+msgid "unrecognized response: %s"
+msgstr ""
+
+#, python-format
 msgid "repository %s not found"
 msgstr "リポジトリ %s が見つかりません"
+
+msgid "win32ill: cannot create window for messages"
+msgstr ""
+
+#, python-format
+msgid "win32ill: unsupported platform: %s\n"
+msgstr ""
 
 #~ msgid "applying patch\n"
 #~ msgstr "パッチを適用中です\n"
@@ -8302,6 +8294,9 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "Errors during rollback!"
 #~ msgstr "ロールバック中にエラーが発生しました！"
+
+#~ msgid "Nothing Commited"
+#~ msgstr "何もコミットされませんでした"
 
 #~ msgid ""
 #~ "Your username has not been configured.\n"
@@ -8935,6 +8930,9 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "filtered status"
 #~ msgstr "フィルタ状態"
 
+#~ msgid "deleted"
+#~ msgstr "削除"
+
 #~ msgid "_Undo"
 #~ msgstr "取り消し(_U)"
 
@@ -9019,6 +9017,9 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "Visual Diffs"
 #~ msgstr "GUI 差分表示"
+
+#~ msgid "TortoiseHg Clone"
+#~ msgstr "TortoiseHg クローンツール"
 
 #~ msgid "Clone"
 #~ msgstr "クローン"
@@ -9789,9 +9790,6 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "invalid dialog result: %s"
 #~ msgstr "無効なダイアログ戻り値: %s"
-
-#~ msgid "missing"
-#~ msgstr "見つかりません"
 
 #~ msgid "Unable to annotate "
 #~ msgstr "履歴表示できません "
@@ -10886,6 +10884,9 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "Command Output"
 #~ msgstr "コマンド出力"
 
+#~ msgid "Unable to save file"
+#~ msgstr "ファイルを保存できません"
+
 #~ msgid "Commit Message"
 #~ msgstr "コミットメッセージ"
 
@@ -11091,6 +11092,9 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "Push new branch"
 #~ msgstr "新規ブランチをプッシュ"
 
+#~ msgid "Detail"
+#~ msgstr "詳細"
+
 #~ msgid "Backed out successfully, you must now commit the results"
 #~ msgstr "バックアウトしました。結果をコミットしてください。"
 
@@ -11105,6 +11109,9 @@ msgstr "リポジトリ %s が見つかりません"
 
 #~ msgid "Allow pushing a new branch"
 #~ msgstr "新規ブランチの反映を許可"
+
+#~ msgid "Backout revision not found"
+#~ msgstr "打ち消し対象リビジョンが存在しません"
 
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "%d番目のハンクが%d行目で適用済み(あいまいさは%d文字)\n"
@@ -11127,11 +11134,32 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "bad shelve backup directory name"
 #~ msgstr "バックアップファイルの保存先として利用できないディレクトリ名です"
 
+#~ msgid "Backed out merge changeset: "
+#~ msgstr "打ち消したマージチェンジセット: "
+
+#~ msgid "Error creating destination folder"
+#~ msgstr "クローン先のフォルダを作成できませんでした"
+
+#~ msgid "Please specify a different path."
+#~ msgstr "違うパスを指定してください"
+
 #~ msgid "delete of shelve backup failed"
 #~ msgstr "バックアップファイルを削除できません"
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "中断: バックアップの復元に失敗しました %s\n"
+
+#~ msgid "First Parent: revision %s (%s)"
+#~ msgstr "一番目の親: リビジョン %s (%s)"
+
+#~ msgid "Backout to the first parent of the merge revision"
+#~ msgstr "マージリビジョンの一番目の親を打ち消す"
+
+#~ msgid "Second Parent: revision %s (%s)"
+#~ msgstr "二番目の親: リビジョン %s (%s)"
+
+#~ msgid "Backout to the second parent of the merge revision"
+#~ msgstr "マージリビジョンの二番目の親を打ち消す"
 
 #~ msgid "file %s already exists\n"
 #~ msgstr "ファイル %s はすでに存在しています\n"
@@ -11142,6 +11170,23 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "bad hunk #%d %s (%d %d %d %d)"
 #~ msgstr "不正なハンク #%d %s (%d %d %d %d)"
 
+#~ msgid "Merge parent to backout to"
+#~ msgstr "打ち消すマージリビジョンの親を選択"
+
+#~ msgid ""
+#~ "To backout a <b>merge</b> revision you must select which parent to "
+#~ "backout to (i.e. whose changes will be <i>kept</i>)"
+#~ msgstr ""
+#~ "<b>マージ</b> リビジョンを打ち消すには、どの親を打ち消すか選択してくださ"
+#~ "い\n"
+#~ " (つまり、どの変更を<i>残す</i>かです)"
+
+#~ msgid "Backed out merge revision to its second parent (%s)"
+#~ msgstr "マージリビジョンの二番目の親 (%s) を打ち消す"
+
+#~ msgid "?? Error: %s ??"
+#~ msgstr "?? エラー: %s ??"
+
 #~ msgid "user quit"
 #~ msgstr "ユーザーによるキャンセル"
 
@@ -11151,14 +11196,81 @@ msgstr "リポジトリ %s が見つかりません"
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "バックアップを除去中: %r\n"
 
+#~ msgid "Backed out merge revision to its first parent (%s)"
+#~ msgstr "マージリビジョンの最初の親 (%s) を打ち消す"
+
+#~ msgid "%s is missing!"
+#~ msgstr "%s は見つかりません!"
+
 #~ msgid "Restart merge with"
 #~ msgstr "指定ツールで再マージ"
 
 #~ msgid "Restart Merge..."
 #~ msgstr "再マージ..."
 
+#~ msgid ""
+#~ "Indicates whether TortoiseHg should attempt to automatically resolve "
+#~ "changes from both sides to the same file, and only report merge conflicts "
+#~ "when this is not possible. When False, all files with changes on both "
+#~ "sides of the merge will report as conflicting, even if the edits are to "
+#~ "different parts of the file. In either case, when conflicts occur, the "
+#~ "user will be invited to review and resolve changes manually. Default: "
+#~ "False."
+#~ msgstr ""
+#~ "同じファイルに対する両方の親からの変更をTortoiseHgが自動的に解消し、自動的"
+#~ "に解消できない場合のみユーザーに報告します。\r\n"
+#~ "もし無効であれば、マージにおける両方の親からの変更があるファイルは、ファイ"
+#~ "ル内の違う場所に対する変更でも衝突として報告されます。どちらの場合でも、衝"
+#~ "突が起きた場合、ダイアログが開き、ユーザーは解消を手動で行う必要がありま"
+#~ "す。デフォルトは無効です。"
+
 #~ msgid "Mark resolved"
 #~ msgstr "衝突解消済み状態に設定"
 
 #~ msgid "Mark unresolved"
 #~ msgstr "衝突未解消状態に設定"
+
+#~ msgid "You must select two revisions to diff"
+#~ msgstr "差分を見るには２つのリビジョンを選択して下さい。"
+
+#~ msgid "Collapse the rebased changesets "
+#~ msgstr "移動後に移動リビジョンを単一化する "
+
+#~ msgid "Folder &History"
+#~ msgstr "フォルダの変更履歴(&H)"
+
+#~ msgid "Diff &File to Parent"
+#~ msgstr "親リビジョンとのファイル差分(&F)"
+
+#~ msgid "Diff File to Lo&cal"
+#~ msgstr "ローカルとのファイル差分(&C)"
+
+#~ msgid "Copyright 2008-2013 Steve Borho and others"
+#~ msgstr "Copyright 2008-2013 Steve Borho 他"
+
+#~ msgid "Manifest Mode"
+#~ msgstr "マニフェスト表示"
+
+#~ msgid "Diff Changeset to &Local"
+#~ msgstr "ローカルとの差分(&L) (diff)"
+
+#~ msgid "&Diff Selected Changesets"
+#~ msgstr "選択したリビジョンの差分 (&diff)"
+
+#~ msgid "&Diff Changeset to Parent"
+#~ msgstr "親リビジョンとの差分 (&diff)"
+
+#~ msgid "Graft %d changesets on top of changeset %s"
+#~ msgstr "%d つのリビジョンを %s の続きへ移植"
+
+#~ msgid "&Changed by This Commit"
+#~ msgstr "このリビジョンでの変更(&C)"
+
+#~ msgid "Fl&at List View"
+#~ msgstr "リスト表示(&A)"
+
+#~ msgid "&Filter by Status"
+#~ msgstr "状態フィルター(&F)"
+
+#~ msgid "Show the full manifest in tree view"
+#~ msgstr "マニフェストをツリー表示"

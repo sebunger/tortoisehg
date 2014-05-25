@@ -38,7 +38,6 @@ class patchctx(object):
         self._desc = ''
         self._branch = ''
         self._node = node.nullid
-        self._identity = node.nullid
         self._mtime = None
         self._fsize = 0
         self._parseerror = None
@@ -49,9 +48,6 @@ class patchctx(object):
             self._fsize = os.path.getsize(patchpath)
             ph = mq.patchheader(self._path)
             self._ph = ph
-            hash = util.sha1(self._path)
-            hash.update(str(self._mtime))
-            self._identity = hash.digest()
         except EnvironmentError:
             self._date = util.makedate()
             return
@@ -148,7 +144,6 @@ class patchctx(object):
     def thgmqpatchname(self):       return self._patchname
     def thgbranchhead(self):        return False
     def thgmqunappliedpatch(self):  return True
-    def thgid(self):                return self._identity
 
     # largefiles/kbfiles methods
     def hasStandin(self, file):     return False

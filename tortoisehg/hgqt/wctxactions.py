@@ -7,13 +7,13 @@
 
 import os
 
-from mercurial import util, error, merge, commands, extensions
+from mercurial import util, error, merge, commands
 from tortoisehg.hgqt import qtlib, htmlui, visdiff, lfprompt, customtools
 from tortoisehg.hgqt import filedialogs
 from tortoisehg.util import hglib, shlib
 from tortoisehg.hgqt.i18n import _
 
-from PyQt4.QtCore import Qt, QObject, QDir, pyqtSignal, pyqtSlot
+from PyQt4.QtCore import QObject, QDir, pyqtSignal, pyqtSlot
 from PyQt4.QtGui import *
 
 class WctxActions(QObject):
@@ -149,15 +149,13 @@ class WctxActions(QObject):
             slot=self._runCustomCommandByMenu)
 
         # Add 'was renamed from' actions for unknown files
-        t, path = selrows[0]
+        t, _path = selrows[0]
         wctx = self.repo[None]
         if t & frozenset('?') and wctx.deleted():
             rmenu = QMenu(_('Was renamed from'), self.parent())
+            rmenu.triggered.connect(self._renameFrom)
             for d in wctx.deleted()[:15]:
-                def mkaction(deleted):
-                    a = rmenu.addAction(hglib.tounicode(deleted))
-                    a.triggered.connect(lambda: renamefromto(repo, deleted, path))
-                mkaction(d)
+                rmenu.addAction(hglib.tounicode(d))
             menu.addSeparator()
             menu.addMenu(rmenu)
 
@@ -197,6 +195,10 @@ class WctxActions(QObject):
         cwd = os.getcwd()
         try:
             os.chdir(repo.root)
+            # cwd is a propertycache since hg e40520642e64
+            # TODO: runCommand() in place of calling command function directly
+            if '_cwd' in repo.dirstate.__dict__:
+                delattr(repo.dirstate, '_cwd')
             try:
                 # All operations should quietly succeed.  Any error should
                 # result in a message box
@@ -226,11 +228,13 @@ class WctxActions(QObject):
                 QMessageBox.critical(parent, name + _(' Aborted'), err)
         finally:
             os.chdir(cwd)
+            if '_cwd' in repo.dirstate.__dict__:
+                delattr(repo.dirstate, '_cwd')
 
         if notify:
             self.refreshNeeded.emit()
 
-    #@pyqtSlot()
+    @qtlib.senderSafeSlot()
     def runDialogAction(self):
         'run wrapper for modal dialog action methods'
 
@@ -244,13 +248,21 @@ class WctxActions(QObject):
             shlib.shell_notify(wfiles)
             self.refreshNeeded.emit()
 
-    #@pyqtSlot()
+    @qtlib.senderSafeSlot()
     def log(self):
         for path in self._filesForAction(self.sender()):
             self._filedialogs.open(path)
 
     def _createFileDialog(self, path):
         return filedialogs.FileLogDialog(self._repoagent, path)
+
+    @pyqtSlot(QAction)
+    def _renameFrom(self, action):
+        _t, path = self.selrows[0]
+        deleted = hglib.fromunicode(action.text())
+        renamefromto(self.repo, deleted, path)
+        self.refreshNeeded.emit()
+
 
 def renamefromto(repo, deleted, unknown):
     repo[None].copy(deleted, unknown)
@@ -389,7 +401,8 @@ def ignore(parent, repoagent, files):
     from tortoisehg.hgqt.hgignore import HgignoreDialog
     dlg = HgignoreDialog(repoagent, parent, *files)
     dlg.finished.connect(dlg.deleteLater)
-    return dlg.exec_() == QDialog.Accepted
+    dlg.exec_()
+    return True
 
 def remove(parent, ui, repo, files):
     commands.remove(ui, repo, *files)

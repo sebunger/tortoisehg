@@ -5,24 +5,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from mercurial import error
-
-from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 class HTMLDelegate(QStyledItemDelegate):
-    def __init__(self, parent=0, cols=None):
-        QStyledItemDelegate.__init__(self, parent)
-        self.cols = cols
 
     def paint(self, painter, option, index):
-        if self.cols and index.column() not in self.cols:
-            return QStyledItemDelegate.paint(self, painter, option, index)
-
         # draw selection
         option = QStyleOptionViewItemV4(option)
         self.parent().style().drawControl(QStyle.CE_ItemViewItem, option, painter)
@@ -53,12 +41,6 @@ class HTMLDelegate(QStyledItemDelegate):
         return QSize(doc.idealWidth() + 5, doc.size().height())
 
     def _builddoc(self, option, index):
-        try:
-            text = index.model().data(index, Qt.DisplayRole).toString()
-        except error.RevlogError, e:
-            # this can happen if revlog is being truncated while we read it
-            text = _('?? Error: %s ??') % hglib.tounicode(str(e))
-
         doc = QTextDocument(defaultFont=option.font)
-        doc.setHtml(text)
+        doc.setHtml(index.data().toString())
         return doc

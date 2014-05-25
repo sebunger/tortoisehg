@@ -165,7 +165,7 @@ class InitDialog(QDialog):
         try:
             # create the new repo
             hg.repository(_ui, dest, create=1)
-        except error.RepoError, inst:
+        except (EnvironmentError, error.RepoError), inst:
             qtlib.ErrorMsgBox(_('Error executing init'),
                     _('Unable to create new repository'),
                     hglib.tounicode(str(inst)))

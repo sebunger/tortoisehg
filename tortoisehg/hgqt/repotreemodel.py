@@ -315,7 +315,7 @@ class RepoTreeModel(QAbstractItemModel):
                 for e in getRepoItemList(self.rootItem, standalone)]
 
     def _indexFromItem(self, item, column=0):
-        if item:
+        if item and item is not self.rootItem:
             return self.createIndex(item.row(), column, item)
         else:
             return QModelIndex()
@@ -332,6 +332,22 @@ class RepoTreeModel(QAbstractItemModel):
         self.beginInsertRows(QModelIndex(), cc, cc + 1)
         ri.appendChild(repotreeitem.RepoGroupItem(name, ri))
         self.endInsertRows()
+
+    def itemPath(self, index):
+        """Virtual path of the item at the given index"""
+        if index.isValid():
+            item = index.internalPointer()
+        else:
+            item = self.rootItem
+        return repotreeitem.itempath(item)
+
+    def indexFromItemPath(self, path, column=0):
+        """Model index for the item specified by the given virtual path"""
+        try:
+            item = repotreeitem.findbyitempath(self.rootItem, unicode(path))
+        except ValueError:
+            return QModelIndex()
+        return self._indexFromItem(item, column)
 
     def write(self, fn):
         f = QFile(fn)

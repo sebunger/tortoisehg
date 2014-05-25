@@ -93,6 +93,9 @@ class QFoldDialog(QDialog):
         self.layout().addWidget(bbox)
         self.bbox = bbox
 
+        QShortcut('Ctrl+Return', self, self.accept)
+        QShortcut('Ctrl+Enter', self, self.accept)
+
         self._repoagent.configChanged.connect(self.configChanged)
 
         self._readsettings()

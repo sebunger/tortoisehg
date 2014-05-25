@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-02-03 11:14-0200\n"
+"POT-Creation-Date: 2014-04-28 11:26-0300\n"
 "PO-Revision-Date: 2013-07-16 10:52+0000\n"
 "Last-Translator: aangelo <Unknown>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-02-04 06:04+0000\n"
-"X-Generator: Launchpad (build 16916)\n"
+"X-Launchpad-Export-Date: 2014-04-29 05:57+0000\n"
+"X-Generator: Launchpad (build 16985)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Server icone di overlay di TortoiseHg"
@@ -27,8 +27,8 @@ msgstr "Esci"
 msgid "About"
 msgstr "Informazioni su..."
 
-msgid "Copyright 2008-2013 Steve Borho and others"
-msgstr "Copyright 2008-2013 Steve Borho e altri"
+msgid "Copyright 2008-2014 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr ""
@@ -158,6 +158,12 @@ msgstr "Archivia - %s"
 msgid "&Archive"
 msgstr "&Archivia"
 
+msgid "Backout requires a parent revision"
+msgstr ""
+
+msgid "Cannot backout change on a different branch"
+msgstr ""
+
 #, python-format
 msgid "Backout - %s"
 msgstr ""
@@ -168,19 +174,7 @@ msgstr ""
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
 
-msgid "Unable to backout"
-msgstr ""
-
-msgid "Backout revision not found"
-msgstr ""
-
 msgid "Backing out a parent revision is a single step operation"
-msgstr ""
-
-msgid "Backout requires a parent revision"
-msgstr ""
-
-msgid "Cannot backout change on a different branch"
 msgstr ""
 
 msgid "Backout revision"
@@ -191,28 +185,6 @@ msgstr ""
 
 msgid "Current local revision"
 msgstr "Revisione locale corrente"
-
-msgid "Merge parent to backout to"
-msgstr ""
-
-msgid ""
-"To backout a <b>merge</b> revision you must select which parent to backout "
-"to (i.e. whose changes will be <i>kept</i>)"
-msgstr ""
-
-#, python-format
-msgid "First Parent: revision %s (%s)"
-msgstr "Primo genitore: revisione %s (%s)"
-
-msgid "Backout to the first parent of the merge revision"
-msgstr ""
-
-#, python-format
-msgid "Second Parent: revision %s (%s)"
-msgstr "Secondo genitore: revisione %s (%s)"
-
-msgid "Backout to the second parent of the merge revision"
-msgstr ""
 
 msgid "Working directory status"
 msgstr "Status della cartella di lavoro"
@@ -271,9 +243,6 @@ msgstr "Messaggio di deposito"
 msgid "Skip final confirmation page, close after commit."
 msgstr "Salta la pagina finale di conferma, chiudi dopo la conferma"
 
-msgid "Backed out merge changeset: "
-msgstr ""
-
 msgid "Backed out changeset: "
 msgstr "Backout eseguito sul changeset: "
 
@@ -285,14 +254,6 @@ msgstr "Sovrascrivere messaggio di backout attuale"
 
 msgid "Use English backout message"
 msgstr "Usa messaggio di backout in inglese"
-
-#, python-format
-msgid "Backed out merge revision to its first parent (%s)"
-msgstr ""
-
-#, python-format
-msgid "Backed out merge revision to its second parent (%s)"
-msgstr ""
 
 msgid "Backing out and committing..."
 msgstr ""
@@ -589,15 +550,6 @@ msgstr "Comando remoto:"
 msgid "Start revision:"
 msgstr "Avvia revisione:"
 
-msgid "TortoiseHg Clone"
-msgstr "TortoiseHg Clonazione"
-
-msgid "Error creating destination folder"
-msgstr "Errore durante la creazione della cartella di destinazione"
-
-msgid "Please specify a different path."
-msgstr "Per piacere specifica un percorso differente."
-
 msgid "Select source repository"
 msgstr "Scegliere il repository di origine"
 
@@ -619,6 +571,32 @@ msgstr "fallito l'avvio del comando\n"
 
 msgid "error while running command\n"
 msgstr "errore durante l'esecuzione del comando\n"
+
+#, python-format
+msgid "process exited unexpectedly with code %d"
+msgstr ""
+
+#, python-format
+msgid "timed out while reading: %r..."
+msgstr ""
+
+msgid "timed out waiting for message"
+msgstr ""
+
+#, python-format
+msgid "unexpected response on required channel %r"
+msgstr ""
+
+#, python-format
+msgid "invalid \"hello\" message: %r"
+msgstr ""
+
+msgid "no \"runcommand\" capability"
+msgstr ""
+
+#, python-format
+msgid "corrupted command result: %r"
+msgstr ""
 
 msgid "Terminated by user"
 msgstr "Terminato dall'utente"
@@ -652,8 +630,14 @@ msgstr "Fallimento!"
 msgid "Clea&r Log"
 msgstr ""
 
-msgid "Detail"
-msgstr "Dettaglio"
+msgid "TortoiseHg Prompt"
+msgstr "TortoiseHg Prompt"
+
+msgid "Show Detail"
+msgstr ""
+
+msgid "Hide Detail"
+msgstr ""
 
 msgid "Confirm Exit"
 msgstr "Conferma uscita"
@@ -676,6 +660,13 @@ msgstr ""
 
 #, python-format
 msgid "[Code: %d]"
+msgstr ""
+
+msgid "Merge"
+msgstr "Merge"
+
+#, python-format
+msgid "Merge with %s"
 msgstr ""
 
 msgctxt "start progress"
@@ -816,8 +807,8 @@ msgstr ""
 msgid "&Replace"
 msgstr "&Sostituisci"
 
-msgid "Nothing Commited"
-msgstr "Commit non eseguito"
+msgid "Nothing Committed"
+msgstr ""
 
 msgid "Please enter commit message"
 msgstr "Si prega di inserire un messaggio di commit"
@@ -845,6 +836,9 @@ msgstr "Conferma eliminazione"
 
 msgid "Remove selected deleted files?"
 msgstr "Rimuovere i file cancellati, selezionati?"
+
+msgid "Nothing changed."
+msgstr ""
 
 msgctxt "window title"
 msgid "Commit"
@@ -1111,6 +1105,8 @@ msgid ""
 "- {ROOT}: The path to the current repository root.\n"
 "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
 "hash respectively.\n"
+"- {SELECTEDFILES}: The list of files selected by the user on the revision "
+"details file list.\n"
 "- {FILES}: The list of files touched by the selected revision.\n"
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
@@ -1223,22 +1219,43 @@ msgstr "&Storico file"
 msgid "Show the history of the selected file"
 msgstr "Mostra lo storico del file scelto"
 
-msgid "Folder &History"
-msgstr "Storico cartella"
-
 msgid "Co&mpare File Revisions"
 msgstr "Co&nfronta le revisioni del file"
 
 msgid "Compare revisions of the selected file"
 msgstr "Confronta le revisioni del file scelto"
 
+msgid "Filter Histor&y"
+msgstr ""
+
+msgid "Query about changesets affecting the selected files"
+msgstr ""
+
+msgid "Diff &Changeset to Parent"
+msgstr ""
+
+msgid "Diff Changeset to Loc&al"
+msgstr ""
+
+msgid "Diff Selected Cha&ngesets"
+msgstr ""
+
 msgid "&Diff to Parent"
 msgstr "&Differenze con il padre"
+
+msgid "Cannot display visual diff"
+msgstr "Impossibile visualizzare le differenze"
+
+msgid "Visual diffs are not supported for unapplied patches"
+msgstr ""
 
 msgid "Diff to &Local"
 msgstr "Differenze con la versione locale"
 
 msgid "View changes to current in external diff tool"
+msgstr ""
+
+msgid "Diff Selected &File Revisions"
 msgstr ""
 
 msgid "&View at Revision"
@@ -1252,6 +1269,9 @@ msgstr "&Salva alla revisione..."
 
 msgid "Save file as it appeared at this revision"
 msgstr "salva il file come appare a questa revisione"
+
+msgid "Save file to"
+msgstr "Salva con nome"
 
 msgid "&Edit Local"
 msgstr ""
@@ -1284,18 +1304,6 @@ msgid "Open &Terminal"
 msgstr "Apri &terminale"
 
 msgid "Open a shell terminal in the selected folder"
-msgstr ""
-
-msgid "File(s) not found"
-msgstr "File non trovato/i"
-
-msgid "The selected files do not exist in the working directory"
-msgstr "I file scelti non esistono nella cartella di lavoro"
-
-msgid "Cannot display visual diff"
-msgstr "Impossibile visualizzare le differenze"
-
-msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
 msgid "Display the file anyway"
@@ -1469,29 +1477,8 @@ msgstr ""
 msgid "Forward"
 msgstr ""
 
-msgid "&Diff Selected Changesets"
-msgstr ""
-
-msgid "Diff Selected &File Revisions"
-msgstr ""
-
-msgid "&Diff Changeset to Parent"
-msgstr ""
-
-msgid "Diff Changeset to &Local"
-msgstr ""
-
-msgid "Diff &File to Parent"
-msgstr ""
-
-msgid "Diff File to Lo&cal"
-msgstr ""
-
 msgid "Show Revision &Details"
 msgstr "Mostra i &dettagli della revisione"
-
-msgid "You must select two revisions to diff"
-msgstr "Devi scegliere due revisioni da confrontare"
 
 msgid "Too many rows selected for menu"
 msgstr "Troppe righe selezionate per il menu"
@@ -1571,6 +1558,10 @@ msgstr ""
 #. i18n: comma-separated list of common encoding names in your locale, e.g.
 #. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
 #.
+#. for the best guess, put structured encodings like "utf-8" in front, e.g.
+#. "utf-8,iso8859-1" instead of "iso8859-1,utf-8" because "iso8859-1" can
+#. decode arbitrary byte sequence and never fall back.
+#.
 #. pick from the following encodings:
 #. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
 #. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
@@ -1579,10 +1570,6 @@ msgstr ""
 #. iso8859-10, iso8859-14, iso8859-16
 msgid "$FILE_ENCODINGS"
 msgstr ""
-
-msgctxt "column header"
-msgid "Filename"
-msgstr "Nome file"
 
 msgid "View change as unified diff output"
 msgstr ""
@@ -1600,6 +1587,9 @@ msgid "Previous Diff"
 msgstr ""
 
 msgid "Open shelve tool"
+msgstr ""
+
+msgid "&Auto Detect"
 msgstr ""
 
 msgid "Show changes from first parent"
@@ -1690,10 +1680,6 @@ msgid ""
 msgstr ""
 
 msgid "Continue or abort interrupted graft operation?"
-msgstr ""
-
-#, python-format
-msgid "Graft %d changesets on top of changeset %s"
 msgstr ""
 
 msgid "To graft destination"
@@ -2197,10 +2183,6 @@ msgstr ""
 msgid "Insufficient access rights."
 msgstr ""
 
-#, python-format
-msgid "?? Error: %s ??"
-msgstr ""
-
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
 "make more efficient use of disk space by adding these files as largefiles, "
@@ -2216,12 +2198,6 @@ msgid "Add as &Normal Files"
 msgstr ""
 
 msgid "License"
-msgstr ""
-
-msgid "Drag to change order"
-msgstr ""
-
-msgid "Workbench"
 msgstr ""
 
 msgid "Find revisions matching fields of:"
@@ -2305,12 +2281,6 @@ msgstr "Non è una revisione di testa"
 msgid "Merge from (other revision)"
 msgstr ""
 
-msgid "Unable to merge"
-msgstr "Impossibile eseguire il merge"
-
-msgid "Merge revision not specified or not found"
-msgstr ""
-
 msgid "Merge to (working directory)"
 msgstr ""
 
@@ -2375,13 +2345,6 @@ msgid "Commit Now"
 msgstr ""
 
 msgid "Commit Later"
-msgstr ""
-
-msgid "Merge"
-msgstr "Merge"
-
-#, python-format
-msgid "Merge with %s"
 msgstr ""
 
 msgid "TortoiseHg Merge Commit"
@@ -2989,12 +2952,6 @@ msgstr "Si prega di configurare un editor."
 msgid "Editor launch failure"
 msgstr ""
 
-msgid "Save file to"
-msgstr "Salva con nome"
-
-msgid "Unable to save file"
-msgstr "Impossibile salvare il file"
-
 msgid "Failed to open path in terminal"
 msgstr ""
 
@@ -3093,7 +3050,7 @@ msgstr ""
 msgid "Keep original branch names"
 msgstr ""
 
-msgid "Collapse the rebased changesets "
+msgid "Collapse the rebased changesets"
 msgstr ""
 
 msgid "Rebase entire source branch"
@@ -3314,6 +3271,10 @@ msgstr ""
 msgctxt "column header"
 msgid "Phase"
 msgstr ""
+
+msgctxt "column header"
+msgid "Filename"
+msgstr "Nome file"
 
 #, python-format
 msgid "filling (%d)"
@@ -3643,6 +3604,9 @@ msgstr ""
 msgid "Can't find revision '%s'"
 msgstr ""
 
+msgid "Drag to change order"
+msgstr ""
+
 msgid "Workbench Log Columns"
 msgstr ""
 
@@ -3786,9 +3750,6 @@ msgid "Sync tab cannot exit"
 msgstr ""
 
 msgid "Search tab cannot exit"
-msgstr ""
-
-msgid "Repository command still running"
 msgstr ""
 
 msgid "Pus&h"
@@ -4028,7 +3989,13 @@ msgstr ""
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr ""
 
+msgid "Unable to merge"
+msgstr "Impossibile eseguire il merge"
+
 msgid "You cannot merge a revision with itself"
+msgstr ""
+
+msgid "Unable to backout"
 msgstr ""
 
 msgid "Write bundle"
@@ -4258,19 +4225,19 @@ msgstr ""
 msgid "File List Toolbar"
 msgstr ""
 
-msgid "Manifest Mode"
+msgid "Ma&nifest Mode"
 msgstr ""
 
-msgid "Show the full manifest in tree view"
+msgid "Show all version-controlled files in tree view"
 msgstr ""
 
-msgid "Fl&at List View"
+msgid "&Flat List"
 msgstr ""
 
 msgid "### filter text ###"
 msgstr ""
 
-msgid "&Changed by This Commit"
+msgid "Changed by &This Commit"
 msgstr ""
 
 msgid "Show files changed by this commit"
@@ -4285,8 +4252,14 @@ msgstr ""
 msgid "Toggle parent to be used as the base revision"
 msgstr ""
 
-msgid "&Filter by Status"
+msgid "List Optio&ns"
 msgstr ""
+
+msgid "File(s) not found"
+msgstr "File non trovato/i"
+
+msgid "The selected files do not exist in the working directory"
+msgstr "I file scelti non esistono nella cartella di lavoro"
 
 #, python-format
 msgid "%s - Revision Details (%s)"
@@ -4805,6 +4778,9 @@ msgstr ""
 msgid "thg merge [[-r] REV]"
 msgstr ""
 
+msgid "Merge revision not specified or not found"
+msgstr ""
+
 msgid "a revision to post"
 msgstr ""
 
@@ -5231,7 +5207,10 @@ msgid ""
 "is not possible. When False, all files with changes on both sides of the "
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
-"to review and resolve changes manually. Default: False."
+"to review and resolve changes manually. Default: True."
+msgstr ""
+
+msgid "Workbench"
 msgstr ""
 
 msgid "Single Workbench Window"
@@ -6314,6 +6293,16 @@ msgstr ""
 msgid "TortoiseHg Shelve - %s"
 msgstr ""
 
+msgid "Delete selected chunks from working copy?"
+msgstr ""
+
+#, python-format
+msgid "Delete selected chunks from shelf file %s?"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
 msgid "TortoiseHg New Shelf Name"
 msgstr ""
 
@@ -6334,9 +6323,6 @@ msgid "A shelf file of that name already exists"
 msgstr ""
 
 msgid "New shelf created"
-msgstr ""
-
-msgid "Are you sure?"
 msgstr ""
 
 #, python-format
@@ -6387,6 +6373,9 @@ msgid "Sign - %s"
 msgstr ""
 
 msgid "Signature has been added"
+msgstr ""
+
+msgid "Repository command still running"
 msgstr ""
 
 msgid "Filter:"
@@ -6475,11 +6464,11 @@ msgid "unknown"
 msgstr "sconosciuto"
 
 #, python-format
-msgid "%s is missing!"
+msgid "%s is deleted by non-hg command, but still tracked"
 msgstr ""
 
-msgid "deleted"
-msgstr "cancellati"
+msgid "missing"
+msgstr "mancante"
 
 #, python-format
 msgid "%s is ignored"
@@ -7085,9 +7074,6 @@ msgstr "risposta attesa"
 msgid "password: "
 msgstr "password: "
 
-msgid "TortoiseHg Prompt"
-msgstr "TortoiseHg Prompt"
-
 msgid "abort: "
 msgstr "interrotto: "
 
@@ -7177,6 +7163,9 @@ msgstr "Genitore 1:"
 
 msgid "Parent 2:"
 msgstr "Genitore 2:"
+
+msgid "Pull subrepos from:"
+msgstr ""
 
 msgid "List updated files (--verbose)"
 msgstr ""
@@ -7967,8 +7956,19 @@ msgid "Synchronize with dragged repository"
 msgstr "Sincronizza con il repository trascinato"
 
 #, python-format
+msgid "unrecognized response: %s"
+msgstr ""
+
+#, python-format
 msgid "repository %s not found"
 msgstr "repository %s non trovato"
+
+msgid "win32ill: cannot create window for messages"
+msgstr ""
+
+#, python-format
+msgid "win32ill: unsupported platform: %s\n"
+msgstr ""
 
 #~ msgid "_Undo"
 #~ msgstr "_Annulla"
@@ -8375,6 +8375,9 @@ msgstr "repository %s non trovato"
 #~ "Impossibile annullare!\n"
 #~ "\n"
 #~ "La revisione tip differisce dall'ultimo commit."
+
+#~ msgid "Nothing Commited"
+#~ msgstr "Commit non eseguito"
 
 #~ msgid "No regular expression given"
 #~ msgstr "Nessuna espressione regolare specificata"
@@ -8831,6 +8834,9 @@ msgstr "repository %s non trovato"
 #~ msgid "finding source of "
 #~ msgstr "ricerca in corso del file sorgente di "
 
+#~ msgid "TortoiseHg Clone"
+#~ msgstr "TortoiseHg Clonazione"
+
 #~ msgid "Toggle _Wordwrap"
 #~ msgstr "Inverti _Wordwrap"
 
@@ -8857,6 +8863,9 @@ msgstr "repository %s non trovato"
 
 #~ msgid "filtered status"
 #~ msgstr "stato file selezionati"
+
+#~ msgid "deleted"
+#~ msgstr "cancellati"
 
 #~ msgid "Skipped saving path with no alias"
 #~ msgstr "Nessun alias di percorso specificato"
@@ -9857,9 +9866,6 @@ msgstr "repository %s non trovato"
 #~ msgid "Select files to remove"
 #~ msgstr "Selezionare file da rimuovere"
 
-#~ msgid "missing"
-#~ msgstr "mancante"
-
 #~ msgid "Successfully"
 #~ msgstr "Eseguito con successo"
 
@@ -10558,6 +10564,9 @@ msgstr "repository %s non trovato"
 #~ msgid "Always show log"
 #~ msgstr "Mostra sempre il log"
 
+#~ msgid "Unable to save file"
+#~ msgstr "Impossibile salvare il file"
+
 #~ msgid "Failed to preview, a bundle file unrelated to this repository"
 #~ msgstr ""
 #~ "Anteprima fallita, il file di bundle non ha alcuna relazione con questo "
@@ -10955,6 +10964,15 @@ msgstr "repository %s non trovato"
 #~ msgid "File is binary.\n"
 #~ msgstr "Il file è binario.\n"
 
+#~ msgid "Detail"
+#~ msgstr "Dettaglio"
+
+#~ msgid "Error creating destination folder"
+#~ msgstr "Errore durante la creazione della cartella di destinazione"
+
+#~ msgid "Please specify a different path."
+#~ msgstr "Per piacere specifica un percorso differente."
+
 #~ msgid ", please refresh"
 #~ msgstr ", aggiorna"
 
@@ -10978,6 +10996,21 @@ msgstr "repository %s non trovato"
 
 #~ msgid "Show graph"
 #~ msgstr "Mostra grafico"
+
+#~ msgid "Copyright 2008-2013 Steve Borho and others"
+#~ msgstr "Copyright 2008-2013 Steve Borho e altri"
+
+#~ msgid "Second Parent: revision %s (%s)"
+#~ msgstr "Secondo genitore: revisione %s (%s)"
+
+#~ msgid "First Parent: revision %s (%s)"
+#~ msgstr "Primo genitore: revisione %s (%s)"
+
+#~ msgid "Folder &History"
+#~ msgstr "Storico cartella"
+
+#~ msgid "You must select two revisions to diff"
+#~ msgstr "Devi scegliere due revisioni da confrontare"
 
 #~ msgid "Starting Revision:"
 #~ msgstr "Revisione iniziale:"

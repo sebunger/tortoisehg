@@ -17,6 +17,12 @@ from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerPython
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+try:
+    _spanset = revset.spanset
+except AttributeError:
+    # hg<3.0 (a6cf48b2880d, a979078bd788, 9ad6dae67845)
+    _spanset = list
+
 # TODO:
 #  Connect to repoview revisionClicked events
 #  Shift-Click rev range -> revision range X:Y
@@ -388,8 +394,9 @@ class RevsetThread(QThread):
         cwd = os.getcwd()
         try:
             os.chdir(self.repo.root)
-            func = revset.match(self.repo.ui, self.text)
-            l = list(func(self.repo, list(self.repo)))
+            # repo.revs() cannot be used since we want to accept revsetalias
+            m = revset.match(self.repo.ui, self.text)
+            l = list(m(self.repo, _spanset(self.repo)))
             if len(l):
                 self.showMessage.emit(_('%d matches found') % len(l))
             else:

@@ -12,7 +12,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import cmdutil, commands
+from mercurial import cmdutil, commands, hg
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
@@ -23,11 +23,30 @@ def _startrev_available():
     longopts = set(e[1] for e in entry[1])
     return 'startrev' in longopts
 
+def _suggesteddest(src, basedest):
+    if '://' in basedest:
+        return basedest
+    try:
+        if not os.listdir(basedest):
+            # premade empty directory, just use it
+            return basedest
+    except OSError:
+        # guess existing base assuming "{basedest}/{name}"
+        basedest = os.path.dirname(basedest)
+    name = hglib.tounicode(hg.defaultdest(hglib.fromunicode(src, 'replace')))
+    if not name or name == '.':
+        return basedest
+    newdest = os.path.join(basedest, name)
+    if os.path.exists(newdest):
+        newdest += '-clone'
+    return newdest
+
 
 class CloneWidget(cmdui.AbstractCmdWidget):
 
     def __init__(self, ui, args=None, opts={}, parent=None):
         super(CloneWidget, self).__init__(parent)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._cmdagent = cmdcore.CmdAgent(ui, self)
         self.ui = ui
 
@@ -49,7 +68,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         ### source combo and button
         self.src_combo = QComboBox()
         self.src_combo.setEditable(True)
-        self.src_combo.setMinimumWidth(310)
+        self.src_combo.setMinimumContentsLength(30)  # cut long path
         self.src_btn = QPushButton(_('Browse...'))
         self.src_btn.setAutoDefault(False)
         self.src_btn.clicked.connect(self._browseSource)
@@ -61,7 +80,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         ### destination combo and button
         self.dest_combo = QComboBox()
         self.dest_combo.setEditable(True)
-        self.dest_combo.setMinimumWidth(310)
+        self.dest_combo.setMinimumContentsLength(30)  # cut long path
         self.dest_btn = QPushButton(_('Browse...'))
         self.dest_btn.setAutoDefault(False)
         self.dest_btn.clicked.connect(self._browseDestination)
@@ -143,11 +162,16 @@ class CloneWidget(cmdui.AbstractCmdWidget):
 
         self.hgcmd_txt = QLineEdit()
         self.hgcmd_txt.setReadOnly(True)
-        self.hgcmd_txt.setMinimumWidth(400)
         form.addRow(_('Hg command:'), self.hgcmd_txt)
 
         # connect extra signals
         self.src_combo.editTextChanged.connect(self._onSourceChanged)
+        self.src_combo.currentIndexChanged.connect(self._suggestDestination)
+        t = QTimer(self, interval=200, singleShot=True)
+        t.timeout.connect(self._suggestDestination)
+        le = self.src_combo.lineEdit()
+        le.editingFinished.connect(t.stop)  # only while it has focus
+        le.textEdited.connect(t.start)
         self.dest_combo.editTextChanged.connect(self._composeCommand)
         self.rev_chk.toggled.connect(self._composeCommand)
         self.rev_text.textChanged.connect(self._composeCommand)
@@ -213,6 +237,10 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         self.dest_combo.setEditText(url)
 
     @pyqtSlot()
+    def _suggestDestination(self):
+        self.setDestination(_suggesteddest(self.source(), self.destination()))
+
+    @pyqtSlot()
     def _composeCommand(self):
         opts = {
             'noupdate': self.noupdate_chk.isChecked(),
@@ -252,35 +280,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         return bool(src and dest and src != dest)
 
     def runCommand(self):
-        src, dest = self.source(), self.destination()
-
-        if not dest.startswith('ssh://'):
-            if not os.path.exists(dest):
-                try:
-                    os.mkdir(dest)
-                except EnvironmentError:
-                    qtlib.ErrorMsgBox(_('TortoiseHg Clone'),
-                    _('Error creating destination folder'),
-                    _('Please specify a different path.'))
-                    return cmdcore.nullCmdSession()
-
-        # verify input
-        if dest == os.getcwdu():
-            if os.listdir(dest):
-                # cur dir has files, specify no dest, let hg take
-                # basename
-                dest = ''
-            else:
-                dest = '.'
-        else:
-            abs = os.path.abspath(dest)
-            dirabs = os.path.dirname(abs)
-            if dirabs == src:
-                dest = os.path.join(os.path.dirname(dirabs), dest)
-
-        # prepare command line
-        self.src_combo.setEditText(src)
-        self.dest_combo.setEditText(dest)
+        src = self.source()
         cmdline = self._composeCommand()
         worker = src.startswith('p4://') and 'proc' or None
         return self._cmdagent.runCommand(cmdline, self, worker=worker)
@@ -293,6 +293,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             self.src_combo.currentText(), QFileDialog.ShowDirsOnly)
         if path:
             self.src_combo.setEditText(QDir.toNativeSeparators(path))
+            self._suggestDestination()
             self.dest_combo.setFocus()
 
     @pyqtSlot()
@@ -303,6 +304,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             self.dest_combo.currentText(), QFileDialog.ShowDirsOnly)
         if path:
             self.dest_combo.setEditText(QDir.toNativeSeparators(path))
+            self._suggestDestination()  # in case existing dir is selected
             self.dest_combo.setFocus()
 
     @pyqtSlot()
@@ -332,7 +334,6 @@ class CloneDialog(cmdui.CmdControlDialog):
         cwd = os.getcwd()
         ucwd = hglib.tounicode(cwd)
 
-        self.layout().setSizeConstraint(QLayout.SetFixedSize)
         self.setWindowTitle(_('Clone - %s') % ucwd)
         self.setWindowIcon(qtlib.geticon('hg-clone'))
         self.setObjectName('clone')

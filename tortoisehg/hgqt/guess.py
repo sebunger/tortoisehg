@@ -219,7 +219,7 @@ class DetectRenameDialog(QDialog):
         self.thread.start()
 
     def searchfinished(self):
-        self.stbar.clear()
+        self.stbar.clearProgress()
         for col in xrange(3):
             self.matchtv.resizeColumnToContents(col)
         self.findbtn.setEnabled(self.unrevlist.count())

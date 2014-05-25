@@ -827,7 +827,7 @@ class OptionsDialog(QDialog):
         self.bb = bb
         layout.addWidget(bb)
 
-    #@pyqtSlot()
+    @qtlib.senderSafeSlot()
     def _resolveopts(self):
         # cannot use both --force and --keep-changes
         exclmap = {self.forcecb: [self.keepcb],

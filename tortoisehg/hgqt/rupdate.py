@@ -172,7 +172,6 @@ def createRemoteUpdateDialog(repoagent, rev=None, parent=None):
     dlg = cmdui.CmdControlDialog(parent)
     dlg.setWindowTitle(_('Remote Update - %s') % repoagent.displayName())
     dlg.setWindowIcon(qtlib.geticon('hg-update'))
-    dlg.layout().setSizeConstraint(QLayout.SetMinAndMaxSize)
     dlg.setObjectName('rupdate')
     dlg.setRunButtonText(_('&Update'))
     dlg.setCommandWidget(RemoteUpdateWidget(repoagent, rev, dlg))

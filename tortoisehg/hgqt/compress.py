@@ -8,8 +8,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import revset
-
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import csinfo, cmdui, commit, wctxcleaner
 
@@ -25,11 +23,13 @@ class CompressDialog(QDialog):
         box = QVBoxLayout()
         box.setSpacing(8)
         box.setContentsMargins(*(6,)*4)
+        box.setSizeConstraint(QLayout.SetMinAndMaxSize)
         self.setLayout(box)
 
         style = csinfo.panelstyle(selectable=True)
 
         srcb = QGroupBox( _('Compress changesets up to and including'))
+        srcb.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         srcb.setLayout(QVBoxLayout())
         srcb.layout().setContentsMargins(*(2,)*4)
         source = csinfo.create(self.repo, revs[0], style, withupdate=True)
@@ -37,6 +37,7 @@ class CompressDialog(QDialog):
         self.layout().addWidget(srcb)
 
         destb = QGroupBox( _('Onto destination'))
+        destb.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         destb.setLayout(QVBoxLayout())
         destb.layout().setContentsMargins(*(2,)*4)
         dest = csinfo.create(self.repo, revs[1], style, withupdate=True)
@@ -47,7 +48,6 @@ class CompressDialog(QDialog):
         self._cmdcontrol = cmd = cmdui.CmdSessionControlWidget(self)
         cmd.finished.connect(self.done)
         cmd.setLogVisible(True)
-        cmd.logVisibilityChanged.connect(self._adjustHeightConstraint)
         self.compressbtn = cmd.addButton(_('Compress'),
                                          QDialogButtonBox.AcceptRole)
         self.compressbtn.setEnabled(False)
@@ -60,8 +60,7 @@ class CompressDialog(QDialog):
         cmd.linkActivated.connect(self._wctxcleaner.runCleaner)
         QTimer.singleShot(0, self._wctxcleaner.check)
 
-        self.setMinimumWidth(480)
-        self.resize(0, 340)
+        self.resize(480, 340)
         self.setWindowTitle(_('Compress - %s') % repoagent.displayName())
 
         self.restoreSettings()
@@ -100,9 +99,7 @@ class CompressDialog(QDialog):
 
     def commit(self):
         tip, base = self.revs
-        func = revset.match(self.repo.ui, '%s::%s' % (base, tip))
-        revcount = len(self.repo)
-        revs = [c for c in func(self.repo, range(revcount)) if c != base]
+        revs = [c for c in self.repo.revs('%s::%s' % (base, tip)) if c != base]
         descs = [self.repo[c].description() for c in revs]
         self.repo.opener('cur-message.txt', 'w').write('\n* * *\n'.join(descs))
 
@@ -121,10 +118,6 @@ class CompressDialog(QDialog):
     def restoreSettings(self):
         s = QSettings()
         self.restoreGeometry(s.value('compress/geometry').toByteArray())
-
-    @pyqtSlot()
-    def _adjustHeightConstraint(self):
-        cmdui.adjustWindowHeightConstraint(self, self._cmdcontrol)
 
     def reject(self):
         self._cmdcontrol.reject()

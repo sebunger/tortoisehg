@@ -11,7 +11,7 @@ import os
 import shlex, subprocess  # used by runCustomCommand
 import urllib
 import cStringIO
-from mercurial import revset, error, patch, phases, util, ui
+from mercurial import error, patch, phases, util, ui
 
 from tortoisehg.util import hglib, shlib, paths
 from tortoisehg.hgqt.i18n import _
@@ -505,8 +505,8 @@ class RepoWidget(QWidget):
 
     def acceptBundle(self):
         if self.bundle:
-            self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-            self.syncDemand.pullBundle(self.bundle, None, self.bundlesource)
+            w = self.syncDemand.get()
+            w.pullBundle(self.bundle, None, self.bundlesource)
 
     def pullBundleToRev(self):
         if self.bundle:
@@ -516,9 +516,8 @@ class RepoWidget(QWidget):
                 self._activeInfoBar.hide()
                 self._freeInfoBar()
 
-            self.taskTabsWidget.setCurrentIndex(self.syncTabIndex)
-            self.syncDemand.pullBundle(self.bundle, self.rev,
-                                       self.bundlesource)
+            w = self.syncDemand.get()
+            w.pullBundle(self.bundle, self.rev, self.bundlesource)
 
     def rejectBundle(self):
         self.clearBundle()
@@ -768,8 +767,12 @@ class RepoWidget(QWidget):
         self.repoview.forward()
 
     def bisect(self):
-        dlg = bisect.BisectDialog(self._repoagent, {}, self)
-        dlg.exec_()
+        self._dialogs.open(RepoWidget._createBisectDialog)
+
+    def _createBisectDialog(self):
+        dlg = bisect.BisectDialog(self._repoagent, self)
+        dlg.newCandidate.connect(self.gotoParent)
+        return dlg
 
     def resolve(self):
         dlg = resolve.ResolveDialog(self._repoagent, self)
@@ -844,7 +847,7 @@ class RepoWidget(QWidget):
                     _('Remove current working revision?'),
                     _('Your current working revision (%d) will be removed '
                       'by this rollback, leaving uncommitted changes.\n '
-                      'Continue?' % rev)):
+                      'Continue?') % rev):
                 return
         cmdline = ['rollback', '--verbose']
         sess = self._runCommand(cmdline)
@@ -857,6 +860,8 @@ class RepoWidget(QWidget):
         dlg.showMessage.connect(self.showMessage)
         dlg.progress.connect(self.progress)
         dlg.exec_()
+        # ignores result code of PurgeDialog because it's unreliable
+        self._refreshCommitTabIfNeeded()
 
     ## End workbench event forwards
 
@@ -871,7 +876,7 @@ class RepoWidget(QWidget):
     def setupModels(self):
         # Filter revision set in case revisions were removed
         self.revset = [r for r in self.revset if r < len(self.repo)]
-        self.repomodel = HgRepoListModel(self.repo, self.repoview.colselect[0],
+        self.repomodel = HgRepoListModel(self.repo,
                                          self.filterbar.branch(), self.revset,
                                          self.revsetfilter, self,
                                          self.filterbar.getShowHidden(),
@@ -932,6 +937,7 @@ class RepoWidget(QWidget):
         except (IndexError, error.RevlogError, error.Abort), e:
             self.showMessage(hglib.tounicode(str(e)))
 
+    @pyqtSlot()
     def gotoParent(self):
         self.goto('.')
 
@@ -1038,7 +1044,6 @@ class RepoWidget(QWidget):
             except (error.RevlogError, error.RepoError), e:
                 self.showMessage(hglib.tounicode(str(e)))
                 self.repomodel = HgRepoListModel(None,
-                                                 self.repoview.colselect[0],
                                                  None, None, False, self)
                 self.repoview.setModel(self.repomodel)
         else:
@@ -1098,6 +1103,15 @@ class RepoWidget(QWidget):
         QTimer.singleShot(0, lambda: self.toolbarVisibilityChanged.emit())
 
     def okToContinue(self):
+        if self._repoagent.isBusy():
+            r = QMessageBox.question(self, _('Confirm Exit'),
+                                     _('Mercurial command is still running.\n'
+                                       'Are you sure you want to terminate?'),
+                                     QMessageBox.Yes | QMessageBox.No,
+                                     QMessageBox.No)
+            if r == QMessageBox.Yes:
+                self._repoagent.abortCommands()
+            return False
         if not self.commitDemand.canExit():
             self.taskTabsWidget.setCurrentIndex(self.commitTabIndex)
             self.showMessage(_('Commit tab cannot exit'))
@@ -1109,9 +1123,6 @@ class RepoWidget(QWidget):
         if not self.grepDemand.canExit():
             self.taskTabsWidget.setCurrentIndex(self.grepTabIndex)
             self.showMessage(_('Search tab cannot exit'))
-            return False
-        if self._repoagent.isBusy():
-            self.showMessage(_('Repository command still running'))
             return False
         return True
 
@@ -1437,8 +1448,7 @@ class RepoWidget(QWidget):
                 B, A = self.menuselection
             else:
                 A, B = self.menuselection
-            func = revset.match(self.repo.ui, '%s::%s' % (A, B))
-            return [c for c in func(self.repo, range(len(self.repo)))]
+            return self.repo.revs('%s::%s' % (A, B))
 
         def exportPair():
             self.exportRevisions(self.menuselection)
@@ -1483,14 +1493,12 @@ class RepoWidget(QWidget):
                 self.bundleRevisions(base=l[0], tip=l[-1])
         def bisectNormal():
             revA, revB = self.menuselection
-            opts = {'good':str(revA), 'bad':str(revB)}
-            dlg = bisect.BisectDialog(self._repoagent, opts, self)
-            dlg.exec_()
+            dlg = self._dialogs.open(RepoWidget._createBisectDialog)
+            dlg.restart(str(revA), str(revB))
         def bisectReverse():
             revA, revB = self.menuselection
-            opts = {'good':str(revB), 'bad':str(revA)}
-            dlg = bisect.BisectDialog(self._repoagent, opts, self)
-            dlg.exec_()
+            dlg = self._dialogs.open(RepoWidget._createBisectDialog)
+            dlg.restart(str(revB), str(revA))
         def compressDlg():
             ctxa, ctxb = map(self.repo.hgchangectx, self.menuselection)
             if ctxa.ancestor(ctxb) == ctxb:
@@ -1753,7 +1761,9 @@ class RepoWidget(QWidget):
         if isinstance(self.rev, int):
             rev = hglib.getrevisionlabel(self.repo, self.rev)
         dlg = update.UpdateDialog(self._repoagent, rev, self)
-        dlg.exec_()
+        r = dlg.exec_()
+        if r in (0, 1):
+            self.gotoParent()
 
     def matchRevision(self):
         revlist = self.rev
@@ -1821,6 +1831,10 @@ class RepoWidget(QWidget):
             dlg.exec_()
 
     def backoutToRevision(self):
+        msg = backout.checkrev(self._repoagent.rawRepo(), self.rev)
+        if msg:
+            qtlib.InfoMsgBox(_('Unable to backout'), msg, parent=self)
+            return
         dlg = backout.BackoutDialog(self._repoagent, self.rev, self)
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
@@ -1889,7 +1903,10 @@ class RepoWidget(QWidget):
     def _buildPatch(self, command=None):
         if not command:
             # workingdir revision cannot be exported
-            command = self.rev and 'export' or 'diff'
+            if self.rev is None:
+                command = 'diff'
+            else:
+                command = 'export'
         assert command in ('export', 'diff')
 
         from mercurial import commands
@@ -1993,9 +2010,7 @@ class RepoWidget(QWidget):
 
         # Check whether there are existing patches in the MQ queue whose name
         # collides with the revisions that are going to be imported
-        func = revset.match(self.repo.ui, '%s::%s and not hidden()'
-                                          % (self.rev, endrev))
-        revList = [c for c in func(self.repo, range(len(self.repo)))]
+        revList = self.repo.revs('%s::%s and not hidden()' % (self.rev, endrev))
 
         if endrev and not revList:
             # There is a qparent but the revision list is empty

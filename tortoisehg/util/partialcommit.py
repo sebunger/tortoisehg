@@ -32,6 +32,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         ret = orig(ui, repo, *pats, **opts)
         if hasattr(repo, '_filestore'):
             store.close()
+            del repo._filestore
             wlock = repo.wlock()
             try:
                 # mark partially committed files for 'needing lookup' in

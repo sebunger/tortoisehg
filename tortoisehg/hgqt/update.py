@@ -33,6 +33,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         ### target revision combo
         self.rev_combo = combo = QComboBox()
         combo.setEditable(True)
+        combo.installEventFilter(qtlib.BadCompletionBlocker(combo))
         form.addRow(_('Update to:'), combo)
 
         # always include integer revision
@@ -77,6 +78,25 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
             self.p1_info = factory()
             form.addRow(_('Parent:'), self.p1_info)
 
+        # show a subrepo "pull path" combo, with the
+        # default path as the first (and default) path
+        self.path_combo_label = QLabel(_('Pull subrepos from:'))
+        self.path_combo = QComboBox(self)
+        syncpaths = dict(repo.ui.configitems('paths'))
+        aliases = sorted(syncpaths)
+        # make sure that the default path is the first one
+        if 'default' in aliases:
+            aliases.remove('default')
+            aliases.insert(0, 'default')
+        for n, alias in enumerate(aliases):
+            self.path_combo.addItem(hglib.tounicode(alias))
+            self.path_combo.setItemData(
+                n, hglib.tounicode(syncpaths[alias]))
+        self.path_combo.currentIndexChanged.connect(
+            self._updatePathComboTooltip)
+        self._updatePathComboTooltip(0)
+        form.addRow(self.path_combo_label, self.path_combo)
+
         ### options
         self.optbox = QVBoxLayout()
         self.optbox.setSpacing(6)
@@ -112,8 +132,8 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
     def readSettings(self, qs):
         self.merge_chk.setChecked(qs.value('merge').toBool())
         self.autoresolve_chk.setChecked(
-            self.repo.ui.configbool('tortoisehg', 'autoresolve')
-            or qs.value('autoresolve').toBool())
+            self.repo.ui.configbool('tortoisehg', 'autoresolve',
+                                    qs.value('autoresolve', True).toBool()))
         self.verbose_chk.setChecked(qs.value('verbose').toBool())
 
         # expand options if a hidden one is checked
@@ -123,8 +143,6 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         qs.setValue('merge', self.merge_chk.isChecked())
         qs.setValue('autoresolve', self.autoresolve_chk.isChecked())
         qs.setValue('verbose', self.verbose_chk.isChecked())
-
-    ### Private Methods ###
 
     @property
     def repo(self):
@@ -152,6 +170,12 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                 self.target_info.setText(_('(same as parent)'))
             else:
                 self.target_info.update(self.repo[new_rev])
+            # only show the path combo when there are multiple paths
+            # and the target revision has subrepos
+            showpathcombo = self.path_combo.count() > 1 and \
+                '.hgsubstate' in new_ctx
+            self.path_combo_label.setVisible(showpathcombo)
+            self.path_combo.setVisible(showpathcombo)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             self.target_info.setText(_('unknown revision!'))
         self.commandChanged.emit()
@@ -234,6 +258,18 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
 
         cmdline.append('--rev')
         cmdline.append(rev)
+
+        pullpathname = hglib.fromunicode(
+            self.path_combo.currentText())
+        if pullpathname and pullpathname != 'default':
+            # We must tell mercurial to pull any missing repository
+            # revisions from the selected path. The only way to do so is
+            # to temporarily set the default path to the selected path URL
+            pullpath = hglib.fromunicode(
+                self.path_combo.itemData(
+                    self.path_combo.currentIndex()).toString())
+            cmdline.append('--config')
+            cmdline.append('paths.default=%s' % pullpath)
 
         if self.discard_chk.isChecked():
             cmdline.append('--clean')
@@ -324,11 +360,14 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         cmdline = map(hglib.tounicode, cmdline)
         return self._repoagent.runCommand(cmdline, self)
 
-    ### Signal Handlers ###
-
+    @pyqtSlot(bool)
     def show_options(self, visible):
         self.merge_chk.setShown(visible)
         self.autoresolve_chk.setShown(visible)
+
+    @pyqtSlot(int)
+    def _updatePathComboTooltip(self, idx):
+        self.path_combo.setToolTip(self.path_combo.itemData(idx).toString())
 
 
 class UpdateDialog(cmdui.CmdControlDialog):
@@ -337,7 +376,6 @@ class UpdateDialog(cmdui.CmdControlDialog):
         super(UpdateDialog, self).__init__(parent)
         self._repoagent = repoagent
 
-        self.layout().setSizeConstraint(QLayout.SetMinAndMaxSize)
         self.setWindowTitle(_('Update - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-update'))
         self.setObjectName('update')
