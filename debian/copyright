@@ -4,7 +4,8 @@ Upstream-Contact: Maintainer: Steve Borho <steve@borho.org>, TK Soh <teekaysoh@g
 Source: http://bitbucket.org/tortoisehg/stable/downloads/
 
 Files: *
-Copyright: 2007-2010, Steve Borho <steve@borho.org>
+Copyright: 2007-2014, Steve Borho <steve@borho.org>
+           2005-2014, Matt Mackall
            2007-2008, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
@@ -55,7 +56,9 @@ Files: tortoisehg/util/colormap.py
 Copyright: 2005, Dan Loda <danloda@gmail.com>
 License: GPL-2+
 
-Files: tortoisehg/util/wconfig.py
+Files: tortoisehg/util/pipeui.py
+       tortoisehg/util/wconfig.py
+       tortoisehg/util/win32ill.py
 Copyright: 2010, Yuya Nishihara <yuya@tcha.org>
 License: GPL-2+
 
