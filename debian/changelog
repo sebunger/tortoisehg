@@ -1,6 +1,6 @@
-tortoisehg (3.1-1) UNRELEASED; urgency=medium
+tortoisehg (3.1-1) unstable; urgency=medium
 
-  * 
+  * Imported Upstream version 3.1 (Closes: #757346).
 
  -- Ludovico Cavedon <cavedon@debian.org>  Wed, 27 Aug 2014 00:08:53 -0700
 
