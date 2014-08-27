@@ -87,8 +87,7 @@ class PerforcePending(QDialog):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.showMessage.emit(_('Submitting p4 changelist...'))
-        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self,
-                                                             worker='proc')
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
         sess.commandFinished.connect(self.commandFinished)
 
     def revert(self):
@@ -100,8 +99,7 @@ class PerforcePending(QDialog):
         self.bb.button(QDialogButtonBox.Ok).setEnabled(False)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(False)
         self.showMessage.emit(_('Reverting p4 changelist...'))
-        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self,
-                                                             worker='proc')
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
         sess.commandFinished.connect(self.commandFinished)
 
     @pyqtSlot(int)

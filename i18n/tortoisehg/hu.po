@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-28 11:26-0300\n"
+"POT-Creation-Date: 2014-07-24 12:23-0300\n"
 "PO-Revision-Date: 2011-04-26 01:11+0000\n"
 "Last-Translator: Ákos Kovács <Unknown>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-04-29 05:56+0000\n"
-"X-Generator: Launchpad (build 16985)\n"
+"X-Launchpad-Export-Date: 2014-07-25 05:46+0000\n"
+"X-Generator: Launchpad (build 17114)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -39,9 +39,6 @@ msgstr "Itt látogathatja meg honlapunkat"
 msgid "&License"
 msgstr "&License"
 
-msgid "&Close"
-msgstr "&Bezár"
-
 #, python-format
 msgid "version %s"
 msgstr "Verzió: %s"
@@ -52,6 +49,9 @@ msgstr ""
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
+msgstr ""
+
+msgid "License"
 msgstr ""
 
 msgid "= Working Directory Parent ="
@@ -667,6 +667,12 @@ msgstr ""
 msgid "Merge with %s"
 msgstr ""
 
+msgid "Patch Name Required"
+msgstr ""
+
+msgid "You must enter a patch name"
+msgstr ""
+
 msgctxt "start progress"
 msgid "Commit"
 msgstr ""
@@ -709,6 +715,9 @@ msgstr ""
 
 msgid "Stop"
 msgstr "Leállítás"
+
+msgid "### patch name ###"
+msgstr ""
 
 msgid "Commit changes"
 msgstr ""
@@ -1190,9 +1199,6 @@ msgstr ""
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr ""
 
-msgid "Custom Tools"
-msgstr ""
-
 #, python-format
 msgid "command parse error: %s"
 msgstr ""
@@ -1228,25 +1234,13 @@ msgstr ""
 msgid "Diff Changeset to Loc&al"
 msgstr ""
 
-msgid "Diff Selected Cha&ngesets"
-msgstr ""
-
 msgid "&Diff to Parent"
-msgstr ""
-
-msgid "Cannot display visual diff"
-msgstr ""
-
-msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
 msgid "Diff to &Local"
 msgstr ""
 
 msgid "View changes to current in external diff tool"
-msgstr ""
-
-msgid "Diff Selected &File Revisions"
 msgstr ""
 
 msgid "&View at Revision"
@@ -1268,6 +1262,9 @@ msgid "&Edit Local"
 msgstr ""
 
 msgid "&Open Local"
+msgstr ""
+
+msgid "&Copy Patch"
 msgstr ""
 
 msgid "Copy &Path"
@@ -1295,6 +1292,99 @@ msgid "Open &Terminal"
 msgstr ""
 
 msgid "Open a shell terminal in the selected folder"
+msgstr ""
+
+msgid "Custom Tools"
+msgstr ""
+
+msgid "Diff &Local"
+msgstr ""
+
+msgid "&View Missing"
+msgstr ""
+
+msgid "View O&ther"
+msgstr ""
+
+msgid "Add &Largefiles..."
+msgstr ""
+
+msgid "&Forget"
+msgstr ""
+
+msgid "&Delete Unversioned..."
+msgstr ""
+
+msgid "Confirm Delete Unversioned"
+msgstr ""
+
+msgid "Delete the following unversioned files?"
+msgstr ""
+
+msgid "&Delete"
+msgstr ""
+
+msgid "Re&move Versioned"
+msgstr ""
+
+msgid "&Revert..."
+msgstr ""
+
+msgid "Uncommited merge - please select a parent revision"
+msgstr ""
+
+msgid "Revert files to local or other parent?"
+msgstr ""
+
+msgid "&Local"
+msgstr ""
+
+msgid "&Other"
+msgstr ""
+
+msgid "Confirm Revert"
+msgstr ""
+
+msgid "Revert local file changes?"
+msgstr ""
+
+msgid "&Revert with backup"
+msgstr ""
+
+msgid "&Discard changes"
+msgstr ""
+
+msgid "Revert the following files?"
+msgstr ""
+
+msgid "&Revert"
+msgstr ""
+
+msgid "&Copy..."
+msgstr ""
+
+msgid "Re&name..."
+msgstr ""
+
+msgid "&Ignore..."
+msgstr ""
+
+msgid "De&tect Renames..."
+msgstr ""
+
+msgid "&Mark Resolved"
+msgstr ""
+
+msgid "&Mark Unresolved"
+msgstr ""
+
+msgid "Restart Mer&ge"
+msgstr ""
+
+msgid "Was renamed from"
+msgstr ""
+
+msgid "Restart Merge &with"
 msgstr ""
 
 msgid "Display the file anyway"
@@ -1464,6 +1554,12 @@ msgid "Back"
 msgstr ""
 
 msgid "Forward"
+msgstr ""
+
+msgid "Diff Selected &Changesets"
+msgstr ""
+
+msgid "&Diff Selected File Revisions"
 msgstr ""
 
 msgid "Show Revision &Details"
@@ -1640,9 +1736,6 @@ msgid "Diff File to"
 msgstr ""
 
 msgid "&Originating Revision"
-msgstr ""
-
-msgid "&Local"
 msgstr ""
 
 msgid "&Parent Revision"
@@ -2047,6 +2140,9 @@ msgstr ""
 msgid "Send &Email"
 msgstr ""
 
+msgid "&Close"
+msgstr "&Bezár"
+
 #, python-format
 msgid "Ignore filter - %s"
 msgstr "Figyelmen kívülhagyott szűrő - %s"
@@ -2172,9 +2268,6 @@ msgid "Add as &Largefiles"
 msgstr ""
 
 msgid "Add as &Normal Files"
-msgstr ""
-
-msgid "License"
 msgstr ""
 
 msgid "Find revisions matching fields of:"
@@ -2347,6 +2440,10 @@ msgstr ""
 msgid "C&onfigure Format"
 msgstr ""
 
+#, python-format
+msgid "%s had rejected chunks, edit patched file together with rejects?"
+msgstr ""
+
 msgid "&Commit to Queue..."
 msgstr ""
 
@@ -2478,19 +2575,6 @@ msgid "Force push or pop (--force)"
 msgstr ""
 
 msgid "Tolerate non-conflicting local changes (--keep-changes)"
-msgstr ""
-
-msgid "### patch name ###"
-msgstr ""
-
-#, python-format
-msgid "%s had rejected chunks, edit patched file together with rejects?"
-msgstr ""
-
-msgid "Patch Name Required"
-msgstr ""
-
-msgid "You must enter a patch name"
 msgstr ""
 
 #, python-format
@@ -2774,9 +2858,6 @@ msgid "&Copy"
 msgstr ""
 
 msgid "&Paste"
-msgstr ""
-
-msgid "&Delete"
 msgstr ""
 
 msgid "&Editor Options"
@@ -3782,9 +3863,6 @@ msgstr ""
 msgid "&Bundle Rev and Descendants..."
 msgstr ""
 
-msgid "&Copy Patch"
-msgstr ""
-
 msgid "Change &Phase to"
 msgstr ""
 
@@ -4231,12 +4309,6 @@ msgstr ""
 msgid "List Optio&ns"
 msgstr ""
 
-msgid "File(s) not found"
-msgstr ""
-
-msgid "The selected files do not exist in the working directory"
-msgstr ""
-
 #, python-format
 msgid "%s - Revision Details (%s)"
 msgstr ""
@@ -4265,9 +4337,6 @@ msgid "revision %d's second parent (i.e. revision %d)"
 msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
-msgstr ""
-
-msgid "Confirm Revert"
 msgstr ""
 
 msgid ""
@@ -4441,18 +4510,16 @@ msgstr ""
 msgid "query"
 msgstr ""
 
-msgid "Parse Error: "
-msgstr ""
-
-msgid "Invalid query: "
-msgstr ""
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
 "\n"
 "Billentyűzet bevitel megszakít, leállít.\n"
+
+#, python-format
+msgid "failed to fork GUI process: %s\n"
+msgstr ""
 
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
@@ -4541,9 +4608,6 @@ msgstr ""
 msgid "open a new workbench window"
 msgstr ""
 
-msgid "requires a single filename"
-msgstr ""
-
 msgid "thg about"
 msgstr ""
 
@@ -4626,6 +4690,9 @@ msgstr "dátum kd használata mint jóváhagyási dátum"
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr ""
 
+msgid "thg debugblockmatcher"
+msgstr ""
+
 msgid "thg debugbugreport [TEXT]"
 msgstr ""
 
@@ -4642,6 +4709,18 @@ msgid "thg email [REVS]"
 msgstr ""
 
 msgid "use only one form to specify the revision"
+msgstr ""
+
+msgid "select the specified revision"
+msgstr ""
+
+msgid "side-by-side comparison of revisions"
+msgstr ""
+
+msgid "thg filelog [OPTION]... FILE"
+msgstr ""
+
+msgid "requires a single filename"
 msgstr ""
 
 msgid "thg forget [FILE]..."
@@ -5215,10 +5294,7 @@ msgstr ""
 msgid "Author Coloring"
 msgstr ""
 
-msgid ""
-"Color changesets by author name.  If not enabled, the changes are colored "
-"green for merge, red for non-trivial parents, black for normal. Default: "
-"False"
+msgid "Color changesets by author name. Default: False"
 msgstr ""
 
 msgid "Full Authorname"
@@ -5251,8 +5327,8 @@ msgid "Long Summary"
 msgstr ""
 
 msgid ""
-"If true, concatenate multiple lines of changeset summary until they reach 80 "
-"characters. Default: False"
+"If true, concatenate multiple lines of changeset summary and truncate them "
+"at 80 characters as necessary. Default: False"
 msgstr ""
 
 msgid "Log Batch Size"
@@ -5303,6 +5379,16 @@ msgid ""
 "<li><b>prompt</b>: The default. Show a prompt when updating to a revision "
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
+msgstr ""
+
+msgid "Show Family Line"
+msgstr ""
+
+msgid ""
+"Show indirect revision dependency on the revision graph when filtered by "
+"revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
+"some cases. This option is expected to be removed if the performance issue "
+"is solved."
 msgstr ""
 
 msgctxt "config item"
@@ -6314,6 +6400,12 @@ msgstr ""
 msgid "%s - status"
 msgstr ""
 
+msgid "Check"
+msgstr ""
+
+msgid "Uncheck"
+msgstr ""
+
 msgid "status"
 msgstr "státusz"
 
@@ -6984,90 +7076,6 @@ msgstr "vár válasz"
 msgid "password: "
 msgstr "jelszó: "
 
-msgid "abort: "
-msgstr "megszakadt: "
-
-msgid "hint: "
-msgstr ""
-
-#, python-format
-msgid "HTTP Error: %d (%s)"
-msgstr ""
-
-#, python-format
-msgid "URLError: %s"
-msgstr ""
-
-msgid "SSL: Server certificate verify failed"
-msgstr ""
-
-#, python-format
-msgid "SSL: unknown error %s:%s"
-msgstr ""
-
-#, python-format
-msgid "SSL error: %s"
-msgstr ""
-
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr ""
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: %s\n"
-msgstr ""
-
-msgid "abort: remote error:\n"
-msgstr ""
-
-#, python-format
-msgid "abort: %s"
-msgstr ""
-
-msgid " empty string\n"
-msgstr ""
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr ""
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr ""
-
-msgid "broken pipe\n"
-msgstr ""
-
 msgid "Parent 1:"
 msgstr ""
 
@@ -7206,111 +7214,6 @@ msgid "3-way dir diff"
 msgstr ""
 
 msgid "Directory diff"
-msgstr ""
-
-msgid "&Edit"
-msgstr ""
-
-msgid "E&xplore Subrepository"
-msgstr ""
-
-msgid "&View Missing"
-msgstr ""
-
-msgid "&Revert..."
-msgstr ""
-
-msgid "&Forget"
-msgstr ""
-
-msgid "Add &Largefiles..."
-msgstr ""
-
-msgid "De&tect Renames..."
-msgstr ""
-
-msgid "&Ignore..."
-msgstr ""
-
-msgid "Re&move Versioned"
-msgstr ""
-
-msgid "&Delete Unversioned..."
-msgstr ""
-
-msgid "&Mark Unresolved"
-msgstr ""
-
-msgid "&Mark Resolved"
-msgstr ""
-
-msgid "Check"
-msgstr ""
-
-msgid "Uncheck"
-msgstr ""
-
-msgid "View O&ther"
-msgstr ""
-
-msgid "&Copy..."
-msgstr ""
-
-msgid "Re&name..."
-msgstr ""
-
-msgid "Was renamed from"
-msgstr ""
-
-msgid "Restart Mer&ge"
-msgstr ""
-
-msgid "Restart Merge &with"
-msgstr ""
-
-msgid " errors"
-msgstr ""
-
-msgid " output"
-msgstr ""
-
-msgid " Aborted"
-msgstr " Megszakítva"
-
-msgid "Cannot open subrepository"
-msgstr ""
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr ""
-
-msgid "Uncommited merge - please select a parent revision"
-msgstr ""
-
-msgid "Revert files to local or other parent?"
-msgstr ""
-
-msgid "&Other"
-msgstr ""
-
-msgid "Revert local file changes?"
-msgstr ""
-
-msgid "&Revert with backup"
-msgstr ""
-
-msgid "&Discard changes"
-msgstr ""
-
-msgid "Revert the following files?"
-msgstr ""
-
-msgid "&Revert"
-msgstr ""
-
-msgid "Confirm Delete Unversioned"
-msgstr ""
-
-msgid "Delete the following unversioned files?"
 msgstr ""
 
 msgid "Confirm Discard"
@@ -7645,6 +7548,96 @@ msgid "Error executing \"commit finished\" trigger"
 msgstr ""
 
 msgid "Cannot open Plugin Options dialog"
+msgstr ""
+
+#, python-format
+msgid ""
+"hg: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: parse error at %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: parse error: %s\n"
+msgstr ""
+
+#, python-format
+msgid "timed out waiting for lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "abort: %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "abort: could not lock %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: %s\n"
+msgstr ""
+
+msgid "abort: remote error:\n"
+msgstr ""
+
+#, python-format
+msgid "abort: %s"
+msgstr ""
+
+msgid " empty string\n"
+msgstr ""
+
+#, python-format
+msgid "hg: unknown command '%s'\n"
+msgstr ""
+
+#, python-format
+msgid "abort: error: %s\n"
+msgstr ""
+
+msgid "broken pipe\n"
+msgstr ""
+
+msgid "abort: "
+msgstr "megszakadt: "
+
+msgid "hint: "
+msgstr ""
+
+#, python-format
+msgid "HTTP Error: %d (%s)"
+msgstr ""
+
+#, python-format
+msgid "URLError: %s"
+msgstr ""
+
+msgid "SSL: Server certificate verify failed"
+msgstr ""
+
+#, python-format
+msgid "SSL: unknown error %s:%s"
+msgstr ""
+
+#, python-format
+msgid "SSL error: %s"
+msgstr ""
+
+msgid "hgsubversion packaged with thg"
+msgstr ""
+
+msgid "hggit packaged with thg"
 msgstr ""
 
 msgid "inotify is not supported on this platform"
@@ -8390,6 +8383,9 @@ msgstr ""
 #~ msgid "Contents"
 #~ msgstr "Tartalom"
 
+#~ msgid " Aborted"
+#~ msgstr " Megszakítva"
+
 #~ msgid "_Help"
 #~ msgstr "_Súgó"
 
@@ -8918,12 +8914,3 @@ msgstr ""
 
 #~ msgid "File is larger than the specified max size.\n"
 #~ msgstr "Az állomány nagyobb a megadott maximumnál.\n"
-
-#~ msgid "Detail"
-#~ msgstr "Részlet"
-
-#~ msgid "Error creating destination folder"
-#~ msgstr "Hiba történt a célmappa létrehozásakor"
-
-#~ msgid "Please specify a different path."
-#~ msgstr "Kérem válasszon egy másik elérési utat"

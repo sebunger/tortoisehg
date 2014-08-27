@@ -105,10 +105,8 @@ class PurgeDialog(QDialog):
 
             def run(self):
                 try:
-                    repo.bfstatus = True
                     repo.lfstatus = True
                     stat = repo.status(ignored=True, unknown=True)
-                    repo.bfstatus = False
                     repo.lfstatus = False
                     trashcan = repo.join('Trashcan')
                     if os.path.isdir(trashcan):
@@ -230,13 +228,14 @@ class PurgeThread(QThread):
         self.showMessage.emit('')
         match = scmutil.matchall(repo)
         match.explicitdir = match.traversedir = directories.append
-        repo.bfstatus = True
         repo.lfstatus = True
         status = repo.status(match=match, ignored=opts['ignored'],
                              unknown=opts['unknown'], clean=False)
-        repo.bfstatus = False
         repo.lfstatus = False
-        files = status[4] + status[5]
+        files = []
+        for k, i in [('unknown', 4), ('ignored', 5)]:
+            if opts[k]:
+                files.extend(status[i])
 
         def remove(remove_func, name):
             try:

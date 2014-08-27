@@ -7,6 +7,9 @@
 
 import os
 from mercurial import patch, commands, extensions, context, util, node
+from tortoisehg.util import hgversion
+
+testedwith = hgversion.testedwith
 
 def partialcommit(orig, ui, repo, *pats, **opts):
     patchfilename = opts.get('partials', None)

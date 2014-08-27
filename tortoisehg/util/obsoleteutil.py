@@ -7,13 +7,16 @@
 #
 # This software may be used and distributed according to the terms
 # of the GNU General Public License, incorporated herein by reference.
+
+from mercurial import error
+
 def precursorsmarkers(obsstore, node):
     return obsstore.precursors.get(node, ())
 
 def successorsmarkers(obsstore, node):
     return obsstore.successors.get(node, ())
 
-def first_known_precursors(ctx, excluded=()):
+def first_known_precursors(ctx):
     obsstore = getattr(ctx._repo, 'obsstore', None)
     startnode = ctx.node()
     nm = ctx._repo.changelog.nodemap
@@ -30,15 +33,19 @@ def first_known_precursors(ctx, excluded=()):
             current = candidates.pop()
             # is this changeset in the displayed set ?
             crev = nm.get(current)
-            if crev is not None and crev not in excluded:
-                yield ctx._repo[crev]
+            if crev is not None:
+                try:
+                    yield ctx._repo[crev]
+                except error.RepoLookupError:
+                    # filtered-out changeset
+                    pass
             else:
                 for mark in precursorsmarkers(obsstore, current):
                     if mark[0] not in seen:
                         candidates.add(mark[0])
                         seen.add(mark[0])
 
-def first_known_successors(ctx, excluded=()):
+def first_known_successors(ctx):
     obsstore = getattr(ctx._repo, 'obsstore', None)
     startnode = ctx.node()
     nm = ctx._repo.changelog.nodemap
@@ -57,8 +64,12 @@ def first_known_successors(ctx, excluded=()):
             current = candidates.pop()
             # is this changeset in the displayed set ?
             crev = nm.get(current)
-            if crev is not None and crev not in excluded:
-                yield ctx._repo[crev]
+            if crev is not None:
+                try:
+                    yield ctx._repo[crev]
+                except error.RepoLookupError:
+                    # filtered-out changeset
+                    pass
             else:
                 for mark in successorsmarkers(obsstore, current):
                     for succ in mark[1]:

@@ -36,7 +36,8 @@ class ServeDialog(QDialog):
         # TODO: forget old logs?
         self._log_edit = cmdui.LogWidget(self)
         self._qui.details_tabs.addTab(self._log_edit, _('Log'))
-        self._agent = cmdcore.CmdAgent(ui, self)
+        # as of hg 3.0, hgweb does not cooperate with command-server channel
+        self._agent = cmdcore.CmdAgent(ui, self, worker='proc')
         self._agent.outputReceived.connect(self._log_edit.appendLog)
         self._agent.busyChanged.connect(self._updateform)
 
@@ -74,12 +75,11 @@ class ServeDialog(QDialog):
         if self.isstarted():
             return
 
-        self._agent.runCommand(map(hglib.tounicode, self._cmdargs()),
-                               worker='proc')
+        self._agent.runCommand(map(hglib.tounicode, self._cmdargs()))
 
     def _cmdargs(self):
         """Build command args to run server"""
-        a = ['serve', '--port', str(self.port), '--debug']
+        a = ['serve', '--port', str(self.port), '-v']
         if self._singlerepo:
             a += ['-R', self._singlerepo]
         else:

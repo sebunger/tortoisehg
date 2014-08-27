@@ -9,7 +9,7 @@ import os
 
 from mercurial import hg, ui, mdiff, similar, patch
 
-from tortoisehg.util import hglib, shlib, thread2
+from tortoisehg.util import hglib, thread2
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, htmlui, cmdui
@@ -166,7 +166,7 @@ class DetectRenameDialog(QDialog):
         self.repo.thginvalidate()
         self.repo.lfstatus = True
         wctx = self.repo[None]
-        wctx.status(unknown=True)
+        hglib.querywctxstatus(wctx, unknown=True)
         self.repo.lfstatus = False
         self.unrevlist.clear()
         dests = []
@@ -436,7 +436,7 @@ class RenameSearchThread(QThread):
         wctx = repo[None]
         pctx = repo['.']
         if self.copies:
-            wctx.status(clean=True)
+            hglib.querywctxstatus(wctx, clean=True)
             srcs = wctx.removed() + wctx.deleted()
             srcs += wctx.modified() + wctx.clean()
         else:

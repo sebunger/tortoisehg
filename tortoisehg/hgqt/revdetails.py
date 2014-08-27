@@ -12,7 +12,6 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.filelistview import HgFileListView
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
-from tortoisehg.hgqt import customtools
 from tortoisehg.hgqt import filectxactions, manifestmodel, qtlib, cmdui, status
 from tortoisehg.util import hglib
 
@@ -44,8 +43,6 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 
         self._repoagent = repoagent
         repo = repoagent.rawRepo()
-        # TODO: replace by repoagent if setRepo(bundlerepo) can be removed
-        self.repo = repo
         self.ctx = repo[rev]
         self.splitternames = []
 
@@ -59,9 +56,9 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._deschtmlize = qtlib.descriptionhtmlizer(repo.ui)
         repoagent.configChanged.connect(self._updatedeschtmlizer)
 
-    def setRepo(self, repo):
-        self.repo = repo
-        self.fileview.setRepo(repo)
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def setupUi(self):
         self.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
@@ -90,7 +87,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.filelistsplit.setChildrenCollapsible(False)
 
         self.filelisttbar = QToolBar(_('File List Toolbar'))
-        self.filelisttbar.setIconSize(QSize(16,16))
+        self.filelisttbar.setIconSize(qtlib.smallIconSize())
         self.filelist = HgFileListView(self)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.filelist.customContextMenuRequested.connect(self.menuRequest)
@@ -167,10 +164,8 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         model.revLoaded.connect(self._expandShortFileList)
         self.filelist.setModel(model)
 
-        # Because filelist.fileSelected, i.e. currentRowChanged, is emitted
-        # *before* selection changed, we cannot rely only on fileSelected.
-        # On fileSelected, getSelectedFiles() happens to return the previous
-        # selection, even though currentFile() works as expected.
+        # fileSelected is actually the wrapper of currentChanged, which is
+        # unrelated to the selection
         self.filelist.selectionModel().selectionChanged.connect(
             self.updateItemFileActions)
 
@@ -180,8 +175,11 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._parentToggleGroup.actions()[0].setChecked(True)
 
         self._fileactions = filectxactions.FilectxActions(self._repoagent, self)
+        self._fileactions.setupCustomToolsMenu('workbench.filelist.custom-menu')
         self._fileactions.linkActivated.connect(self.linkActivated)
         self._fileactions.filterRequested.connect(self.revsetFilterRequested)
+        self._fileactions.runCustomCommandRequested.connect(
+            self.runCustomCommandRequested)
         self.addActions(self._fileactions.actions())
 
     def _createFileListActions(self):
@@ -281,12 +279,11 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._actionParentToggle.setVisible(self._parentToggleGroup.isVisible())
 
         m = self.filelist.model()
-        # TODO: necessary because of setRepo(bundlerepo)
-        m._repoagent = ctx._repo._pyqtobj
 
         if len(ctx.parents()) != 2:
             m.setRawContext(ctx)
             m.setChangedFilesOnly(False)
+            self.updateItemFileActions()
             return
 
         parentmode = self._parentToggleGroup.checkedAction().data().toInt()[0]
@@ -295,6 +292,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
                              (1, False)][parentmode]
         m.setRev(ctx.rev(), ctx.parents()[pnum].rev())
         m.setChangedFilesOnly(changedonly)
+        self.updateItemFileActions()
 
     @pyqtSlot(QAction)
     def _selectParentRevision(self, action):
@@ -357,17 +355,16 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         index = self.filelist.currentIndex()
         model = self.filelist.model()
         self.fileview.display(model.fileData(index))
-        self.updateItemFileActions()
 
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
         contextmenu = QMenu(self)
-        if self.filelist.currentIndex().isValid():
+        if self.filelist.selectionModel().hasSelection():
             self._setupFileMenu(contextmenu)
-            self._setupCustomSubmenu(contextmenu)
             contextmenu.addSeparator()
-
-        m = contextmenu.addMenu(_('List Optio&ns'))
+            m = contextmenu.addMenu(_('List Optio&ns'))
+        else:
+            m = contextmenu
         m.addAction(self._actionManifestMode)
         m.addSeparator()
         m.addActions(self._fileStatusFilter.actions())
@@ -390,46 +387,18 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
             actnames = _fileactionsbytype['dir']
         else:
             actnames = _fileactionsbytype['file']
-        for act in actnames:
+        for act in actnames + [None, 'customToolsMenu']:
             if act:
                 contextmenu.addAction(self._fileactions.action(act))
             else:
                 contextmenu.addSeparator()
 
-    def _setupCustomSubmenu(self, menu):
-        def make(text, func, types=None, icon=None, inmenu=None):
-            action = inmenu.addAction(text)
-            if icon:
-                action.setIcon(qtlib.geticon(icon))
-            return action
-
-        menu.addSeparator()
-        customtools.addCustomToolsSubmenu(menu, self.repo.ui,
-            location='workbench.filelist.custom-menu',
-            make=make,
-            slot=self._runCustomCommandByMenu)
-
-    @pyqtSlot(QAction)
-    def _runCustomCommandByMenu(self, action):
-        model = self.filelist.model()
-        selmodel = self.filelist.selectionModel()
-        selfds = map(model.fileData, selmodel.selectedIndexes())
-        files = [fd.filePath() for fd in selfds
-                 if os.path.exists(fd.absoluteFilePath())]
-        if not files:
-            qtlib.WarningMsgBox(_('File(s) not found'),
-                _('The selected files do not exist in the working directory'))
-            return
-        self.runCustomCommandRequested.emit(
-            str(action.data().toString()), files)
-
     @pyqtSlot()
     def updateItemFileActions(self):
         model = self.filelist.model()
         selmodel = self.filelist.selectionModel()
-        curfd = model.fileData(selmodel.currentIndex())
         selfds = map(model.fileData, selmodel.selectedIndexes())
-        self._fileactions.setFileData(curfd, selfds)
+        self._fileactions.setFileDataList(selfds)
 
     @pyqtSlot()
     def _applyFileNameFilter(self):

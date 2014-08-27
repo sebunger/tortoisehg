@@ -495,16 +495,16 @@ class SearchToolBar(QToolBar):
     searchRequested = pyqtSignal(unicode, bool, bool, bool)
     """Emitted (pattern, icase, wrap, forward) when requested"""
 
-    def __init__(self, parent=None, hidable=False):
+    def __init__(self, parent=None):
         super(SearchToolBar, self).__init__(_('Search'), parent,
-                                            objectName='search',
-                                            iconSize=QSize(16, 16))
-        if hidable:
-            self._close_button = QToolButton(icon=qtlib.geticon('window-close'),
-                                             shortcut=Qt.Key_Escape)
-            self._close_button.clicked.connect(self.hide)
-            self.addWidget(self._close_button)
-            self.addWidget(qtlib.Spacer(2, 2))
+                                            objectName='search')
+        self.setIconSize(qtlib.smallIconSize())
+
+        a = self.addAction(qtlib.geticon('window-close'), '')
+        a.setShortcut(Qt.Key_Escape)
+        a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
+        a.triggered.connect(self.hide)
+        self.addWidget(qtlib.Spacer(2, 2))
 
         self._le = QLineEdit()
         if hasattr(self._le, 'setPlaceholderText'): # Qt >= 4.7
@@ -521,16 +521,19 @@ class SearchToolBar(QToolBar):
         self.addWidget(self._chk)
         self._wrapchk = QCheckBox(_('Wrap search'))
         self.addWidget(self._wrapchk)
-        self._btprev = QPushButton(_('Prev'), icon=qtlib.geticon('go-up'),
-                                   iconSize=QSize(16, 16))
-        self._btprev.clicked.connect(
-            lambda: self._emitSearchRequested(forward=False))
-        self.addWidget(self._btprev)
-        self._bt = QPushButton(_('Next'), icon=qtlib.geticon('go-down'),
-                               iconSize=QSize(16, 16))
-        self._bt.clicked.connect(self._emitSearchRequested)
+
+        self._prevact = self.addAction(qtlib.geticon('go-up'), _('Prev'))
+        self._prevact.setShortcuts(QKeySequence.FindPrevious)
+        self._nextact = self.addAction(qtlib.geticon('go-down'), _('Next'))
+        self._nextact.setShortcuts(QKeySequence.FindNext)
+        for a in [self._prevact, self._nextact]:
+            a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
+            a.triggered.connect(self._emitSearchRequested)
+            w = self.widgetForAction(a)
+            w.setAutoRaise(False)  # no flat button
+            w.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+
         self._le.textChanged.connect(self._updateSearchButtons)
-        self.addWidget(self._bt)
 
         self.setFocusProxy(self._le)
         self.setStyleSheet(qtlib.tbstylesheet)
@@ -547,22 +550,16 @@ class SearchToolBar(QToolBar):
         self._updateSearchButtons()
 
     def keyPressEvent(self, event):
-        if event.matches(QKeySequence.FindNext):
-            self._emitSearchRequested(forward=True)
-            return
-        if event.matches(QKeySequence.FindPrevious):
-            self._emitSearchRequested(forward=False)
-            return
         if event.key() in (Qt.Key_Enter, Qt.Key_Return):
             return  # handled by returnPressed
         super(SearchToolBar, self).keyPressEvent(event)
 
     def wheelEvent(self, event):
         if event.delta() > 0:
-            self._emitSearchRequested(forward=False)
+            self._prevact.trigger()
             return
         if event.delta() < 0:
-            self._emitSearchRequested(forward=True)
+            self._nextact.trigger()
             return
         super(SearchToolBar, self).wheelEvent(event)
 
@@ -586,16 +583,21 @@ class SearchToolBar(QToolBar):
         self.conditionChanged.emit(self.pattern(), self.caseInsensitive(),
                                    self.wrapAround())
 
-    @pyqtSlot()
-    def _emitSearchRequested(self, forward=True):
+    @qtlib.senderSafeSlot()
+    def _emitSearchRequested(self):
+        forward = self.sender() is not self._prevact
         self.searchRequested.emit(self.pattern(), self.caseInsensitive(),
                                   self.wrapAround(), forward)
+
+    def editorActions(self):
+        """List of actions that should be available in main editor widget"""
+        return [self._prevact, self._nextact]
 
     @pyqtSlot()
     def _updateSearchButtons(self):
         enabled = bool(self._le.text())
-        self._btprev.setEnabled(enabled)
-        self._bt.setEnabled(enabled)
+        for a in [self._prevact, self._nextact]:
+            a.setEnabled(enabled)
 
     def pattern(self):
         """Returns the current search pattern [unicode]"""
@@ -782,7 +784,7 @@ def fileEditor(filename, **opts):
         editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
     dialog.layout().addWidget(editor)
 
-    searchbar = SearchToolBar(dialog, hidable=True)
+    searchbar = SearchToolBar(dialog)
     searchbar.searchRequested.connect(editor.find)
     searchbar.conditionChanged.connect(editor.highlightText)
     searchbar.hide()
@@ -793,6 +795,7 @@ def fileEditor(filename, **opts):
         searchbar.show()
         searchbar.setFocus(Qt.OtherFocusReason)
     qtlib.newshortcutsforstdkey(QKeySequence.Find, dialog, showsearchbar)
+    dialog.addActions(searchbar.editorActions())
     dialog.layout().addWidget(searchbar)
 
     BB = QDialogButtonBox

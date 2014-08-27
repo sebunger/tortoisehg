@@ -29,7 +29,11 @@ class patchctx(object):
             The handle is NOT closed.
         """
         self._path = patchpath
-        self._patchname = os.path.basename(patchpath)
+        if rev:
+            assert isinstance(rev, str)
+            self._patchname = rev
+        else:
+            self._patchname = os.path.basename(patchpath)
         self._repo = repo
         self._rev = rev or 'patch'
         self._status = [[], [], []]

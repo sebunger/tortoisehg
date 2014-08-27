@@ -7,10 +7,8 @@
 
 import os, re, signal, struct, sys, time
 
-from PyQt4.QtCore import QIODevice, QObject, QProcess, QTimer
+from PyQt4.QtCore import QBuffer, QIODevice, QObject, QProcess, QTimer
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
-
-from mercurial import util
 
 from tortoisehg.util import hglib, paths, pipeui
 from tortoisehg.hgqt.i18n import _
@@ -19,7 +17,7 @@ from tortoisehg.hgqt import thread
 # TODO: should be moved from thread once CmdThread is superseded by CmdServer
 ProgressMessage = thread.ProgressMessage
 
-class UiHandler(QObject):
+class UiHandler(object):
     """Interface to handle user interaction of Mercurial commands"""
 
     NoInput = 0
@@ -27,12 +25,24 @@ class UiHandler(QObject):
     PasswordInput = 2
     ChoiceInput = 3
 
+    def __init__(self):
+        self._dataout = None
+
     def setPrompt(self, text, mode, default=None):
         pass
 
     def getLineInput(self):
         # '' to use default; None to abort
         return ''
+
+    def setDataOutputDevice(self, device):
+        # QIODevice to write data output; None to disable capturing
+        self._dataout = device
+
+    def writeOutput(self, data, label):
+        if not self._dataout or label.startswith('ui.') or ' ui.' in label:
+            return -1
+        return self._dataout.write(data)
 
 
 def _createDefaultUiHandler(uiparent):
@@ -45,7 +55,7 @@ def _createDefaultUiHandler(uiparent):
     # in place of
     #   cmdagent.runCommand(..., self)
     from tortoisehg.hgqt import cmdui
-    return cmdui.InteractiveUiHandler(None, uiparent)
+    return cmdui.InteractiveUiHandler(uiparent)
 
 
 class CmdWorker(QObject):
@@ -86,6 +96,9 @@ _localprocexts = [
     'tortoisehg.util.partialcommit',
     'tortoisehg.util.pipeui',
     ]
+_localserverexts = [
+    'tortoisehg.util.hgdispatch',
+    ]
 
 if os.name == 'nt':
     # to translate WM_CLOSE posted by QProcess.terminate()
@@ -100,6 +113,9 @@ else:
 
 def _fixprocenv(proc):
     env = os.environ.copy()
+    # disable flags and extensions that might break our output parsing
+    # (e.g. "defaults" arguments, "PAGER" of "email --test")
+    env['HGPLAINEXCEPT'] = 'alias,i18n'
     if not getattr(sys, 'frozen', False):
         # make sure hg process can look up our modules
         env['PYTHONPATH'] = (paths.get_prog_root() + os.pathsep
@@ -119,16 +135,18 @@ class CmdProc(CmdWorker):
 
     def __init__(self, parent=None, cwd=None):
         super(CmdProc, self).__init__(parent)
+        self._uihandler = None
         self._proc = proc = QProcess(self)
         _fixprocenv(proc)
         if cwd:
             proc.setWorkingDirectory(cwd)
-        proc.finished.connect(self.commandFinished)
+        proc.finished.connect(self._finish)
         proc.readyReadStandardOutput.connect(self._stdout)
         proc.readyReadStandardError.connect(self._stderr)
         proc.error.connect(self._handleerror)
 
     def startCommand(self, cmdline, uihandler):
+        self._uihandler = uihandler
         fullcmdline = _proccmdline(_localprocexts)
         fullcmdline.extend(cmdline)
         self._proc.start(fullcmdline[0], fullcmdline[1:], QIODevice.ReadOnly)
@@ -141,19 +159,27 @@ class CmdProc(CmdWorker):
     def isCommandRunning(self):
         return self._proc.state() != QProcess.NotRunning
 
+    @pyqtSlot(int)
+    def _finish(self, ret):
+        self._uihandler = None
+        self.commandFinished.emit(ret)
+
+    @pyqtSlot(QProcess.ProcessError)
     def _handleerror(self, error):
         if error == QProcess.FailedToStart:
             self.outputReceived.emit(_('failed to start command\n'),
                                      'ui.error')
-            self.commandFinished.emit(-1)
+            self._finish(-1)
         elif error != QProcess.Crashed:
             self.outputReceived.emit(_('error while running command\n'),
                                      'ui.error')
 
+    @pyqtSlot()
     def _stdout(self):
         data = self._proc.readAllStandardOutput().data()
         self._processRead(data, '')
 
+    @pyqtSlot()
     def _stderr(self):
         data = self._proc.readAllStandardError().data()
         self._processRead(data, 'ui.error')
@@ -161,6 +187,9 @@ class CmdProc(CmdWorker):
     def _processRead(self, fulldata, defaultlabel):
         for data in pipeui.splitmsgs(fulldata):
             msg, label = pipeui.unpackmsg(data)
+            if (not defaultlabel  # only stdout
+                and self._uihandler.writeOutput(msg, label) >= 0):
+                continue
             msg = hglib.tounicode(msg)
             if 'ui.progress' in label.split():
                 progress = ProgressMessage(*pipeui.unpackprogress(msg))
@@ -174,7 +203,7 @@ class CmdServer(CmdWorker):
 
     def __init__(self, parent=None, cwd=None):
         super(CmdServer, self).__init__(parent)
-        self._uihandler = None
+        self._uihandler = UiHandler()
         self._readchtable = self._idlechtable
         self._readq = []  # (ch, data or datasize), ...
         # deadline for arrival of hello message and immature data
@@ -208,7 +237,7 @@ class CmdServer(CmdWorker):
             self._changeServiceState(CmdWorker.Restarting)
 
     def _startService(self):
-        cmdline = _proccmdline(_localprocexts)
+        cmdline = _proccmdline(_localprocexts + _localserverexts)
         cmdline.extend(['serve', '--cmdserver', 'pipe',
                         '--config', 'ui.interactive=True'])
         self._readchtable = self._hellochtable
@@ -239,7 +268,7 @@ class CmdServer(CmdWorker):
 
     @pyqtSlot()
     def _onServiceFinished(self):
-        self._uihandler = None
+        self._uihandler = UiHandler()
         self._readchtable = self._idlechtable
         del self._readq[:]
         self._readtimer.stop()
@@ -269,7 +298,7 @@ class CmdServer(CmdWorker):
         _interruptproc(self._proc)
 
     def _finishCommand(self, ret):
-        self._uihandler = None
+        self._uihandler = UiHandler()
         self._readchtable = self._idlechtable
         self.commandFinished.emit(ret)
 
@@ -333,7 +362,7 @@ class CmdServer(CmdWorker):
                                       'channel %r') % ch)
                     self.stopService()
                     return
-                chfunc(self, dataorsize)
+                chfunc(self, ch, dataorsize)
         except Exception:
             self.stopService()
             raise
@@ -346,7 +375,7 @@ class CmdServer(CmdWorker):
             msg = hglib.tounicode(msg)
             self.outputReceived.emit(msg, label or 'ui.error')
 
-    def _processHello(self, data):
+    def _processHello(self, _ch, data):
         try:
             fields = dict(l.split(':', 1) for l in data.splitlines())
             capabilities = fields['capabilities'].split()
@@ -361,8 +390,10 @@ class CmdServer(CmdWorker):
         self._readchtable = self._idlechtable
         self._changeServiceState(CmdWorker.Ready)
 
-    def _processOutput(self, data):
+    def _processOutput(self, ch, data):
         msg, label = pipeui.unpackmsg(data)
+        if ch == 'o' and self._uihandler.writeOutput(msg, label) >= 0:
+            return
         msg = hglib.tounicode(msg)
         labelset = label.split()
         if 'ui.progress' in labelset:
@@ -380,18 +411,16 @@ class CmdServer(CmdWorker):
         else:
             self.outputReceived.emit(msg, label)
 
-    def _processCommandResult(self, data):
+    def _processCommandResult(self, _ch, data):
         try:
             ret, = struct.unpack('>i', data)
-            # command server returns raw result code in hg<3.0 (5d4606bec54c)
-            ret &= 255
         except struct.error:
             self._emitError(_('corrupted command result: %r') % data)
             self.stopService()
             return
         self._finishCommand(ret)
 
-    def _processLineRequest(self, size):
+    def _processLineRequest(self, _ch, size):
         text = self._uihandler.getLineInput()
         if text is None:
             self._writeBlock('')
@@ -464,6 +493,7 @@ class CmdSession(QObject):
     controlMessage = pyqtSignal(unicode)
     outputReceived = pyqtSignal(unicode, unicode)
     progressReceived = pyqtSignal(ProgressMessage)
+    readyRead = pyqtSignal()
 
     def __init__(self, cmdlines, uihandler, parent=None):
         super(CmdSession, self).__init__(parent)
@@ -474,12 +504,11 @@ class CmdSession(QObject):
         self._abortbyuser = False
         self._erroroutputs = []
         self._warningoutputs = []
+        self._dataoutrbuf = QBuffer(self)
         self._exitcode = 0
         if not cmdlines:
             # assumes null session is failure for convenience
             self._exitcode = -1
-
-    ### Public Methods ###
 
     def run(self, worker):
         '''Execute Mercurial command'''
@@ -510,9 +539,6 @@ class CmdSession(QObject):
 
     def isRunning(self):
         """True if a command is running; False if finished or not started yet"""
-        # keep "running" until just before emitting commandFinished. if worker
-        # is QThread, isRunning() is cleared earlier than _onCommandFinished,
-        # because inter-thread signal is queued.
         return bool(self._worker) and self._qnextp > 0
 
     def errorString(self):
@@ -530,7 +556,44 @@ class CmdSession(QObject):
         """Integer return code of the last command"""
         return self._exitcode
 
-    ### Private Method ###
+    def setCaptureOutput(self, enabled):
+        """If enabled, data outputs (without "ui.*" label) are queued and
+        outputReceived signal is not emitted in that case.  This is useful
+        for receiving data to be parsed or copied to the clipboard.
+        """
+        # pseudo FIFO between client "rbuf" and worker "wbuf"; not efficient
+        # for large data since all outputs will be stored in memory
+        if enabled:
+            self._dataoutrbuf.open(QIODevice.ReadOnly | QIODevice.Truncate)
+            dataoutwbuf = QBuffer(self._dataoutrbuf.buffer())
+            dataoutwbuf.bytesWritten.connect(self.readyRead)
+            dataoutwbuf.open(QIODevice.WriteOnly)
+        else:
+            self._dataoutrbuf.close()
+            dataoutwbuf = None
+        self.setOutputDevice(dataoutwbuf)
+
+    def setOutputDevice(self, device):
+        """If set, data outputs will be sent to the specified device"""
+        if self._worker or self._qnextp >= len(self._queue):
+            raise RuntimeError('command already running or finished')
+        self._uihandler.setDataOutputDevice(device)
+
+    def read(self, maxlen):
+        """Read output if capturing enabled; ui messages are not included"""
+        return self._dataoutrbuf.read(maxlen)
+
+    def readAll(self):
+        return self._dataoutrbuf.readAll()
+
+    def readLine(self, maxlen=0):
+        return self._dataoutrbuf.readLine(maxlen)
+
+    def canReadLine(self):
+        return self._dataoutrbuf.canReadLine()
+
+    def peek(self, maxlen):
+        return self._dataoutrbuf.peek(maxlen)
 
     def _connectWorker(self, worker):
         self._worker = worker
@@ -558,10 +621,6 @@ class CmdSession(QObject):
     def _runNext(self):
         cmdline = self._queue[self._qnextp]
         self._qnextp += 1
-
-        self._abortbyuser = False
-        del self._erroroutputs[:]
-        del self._warningoutputs[:]
         self._worker.startCommand(cmdline, self._uihandler)
         self._emitControlMessage('% hg ' + _prettifycmdline(cmdline))
 
@@ -570,8 +629,6 @@ class CmdSession(QObject):
         self._disconnectWorker()
         self._exitcode = ret
         self.commandFinished.emit(ret)
-
-    ### Signal Handlers ###
 
     @pyqtSlot(int)
     def _onWorkerStateChanged(self, state):
@@ -648,33 +705,22 @@ class CmdAgent(QObject):
     # isBusy() is False when the last commandFinished is emitted, but you
     # shouldn't rely on the emission order of busyChanged and commandFinished.
 
-    def __init__(self, ui, parent=None):
+    def __init__(self, ui, parent=None, cwd=None, worker=None):
         super(CmdAgent, self).__init__(parent)
         self._ui = ui
-        self._cwd = None
-        self._workers = {}
+        self._worker = self._createWorker(cwd, worker)
         self._sessqueue = []  # [active, waiting...]
         self._runlater = QTimer(self, interval=0, singleShot=True)
         self._runlater.timeout.connect(self._runNextSession)
 
-    def workingDirectory(self):
-        return self._cwd
-
-    def setWorkingDirectory(self, cwd):
-        if self._workers:
-            raise RuntimeError('cannot change working directory after run')
-        self._cwd = unicode(cwd)
-
     def isServiceRunning(self):
         stoppedstates = (CmdWorker.NoService, CmdWorker.NotRunning)
-        return util.any(worker.serviceState() not in stoppedstates
-                        for worker in self._workers.itervalues())
+        return self._worker.serviceState() not in stoppedstates
 
     def stopService(self):
         """Shut down back-end services so that this can be deleted safely or
         reconfigured; serviceStopped will be emitted asynchronously"""
-        for worker in self._workers.itervalues():
-            worker.stopService()
+        self._worker.stopService()
 
     @pyqtSlot()
     def _tryEmitServiceStopped(self):
@@ -684,8 +730,8 @@ class CmdAgent(QObject):
     def isBusy(self):
         return bool(self._sessqueue)
 
-    def _enqueueSession(self, sess, workername):
-        self._sessqueue.append((sess, workername))
+    def _enqueueSession(self, sess):
+        self._sessqueue.append(sess)
         if len(self._sessqueue) == 1:
             self.busyChanged.emit(self.isBusy())
             # make sure no command signals emitted in the current context
@@ -702,17 +748,17 @@ class CmdAgent(QObject):
 
     def _cleanupWaitingSession(self):
         for i in reversed(xrange(1, len(self._sessqueue))):
-            sess, _workername = self._sessqueue[i]
+            sess = self._sessqueue[i]
             if sess.isFinished():
                 del self._sessqueue[i]
                 sess.setParent(None)
 
-    def runCommand(self, cmdline, uihandler=None, worker=None):
+    def runCommand(self, cmdline, uihandler=None):
         """Executes a single Mercurial command asynchronously and returns
         new CmdSession object"""
-        return self.runCommandSequence([cmdline], uihandler, worker=worker)
+        return self.runCommandSequence([cmdline], uihandler)
 
-    def runCommandSequence(self, cmdlines, uihandler=None, worker=None):
+    def runCommandSequence(self, cmdlines, uihandler=None):
         """Executes a series of Mercurial commands asynchronously and returns
         new CmdSession object which will provide notification signals.
 
@@ -727,40 +773,34 @@ class CmdAgent(QObject):
         If one of the preceding command exits with non-zero status, the
         following commands won't be executed.
         """
-        if worker and worker not in _workertypes:
-            raise ValueError('invalid worker type: %r' % worker)
-        if not worker:
-            worker = self._defaultWorkerName()
         if not isinstance(uihandler, UiHandler):
             uihandler = _createDefaultUiHandler(uihandler)
         sess = CmdSession(cmdlines, uihandler, self)
         sess.commandFinished.connect(self._onCommandFinished)
         sess.controlMessage.connect(self._forwardControlMessage)
-        self._enqueueSession(sess, worker)
+        self._enqueueSession(sess)
         return sess
 
     def abortCommands(self):
         """Abort running and queued commands; all command sessions will emit
         commandFinished"""
-        for sess, _workername in self._sessqueue[:]:
+        for sess in self._sessqueue[:]:
             sess.abort()
 
     def _defaultWorkerName(self):
-        # hidden config for debugging or testing experimental worker
-        name = self._ui.config('tortoisehg', 'cmdworker', 'thread')
+        # hidden config to fall back to traditional thread in case of bug
+        name = self._ui.config('tortoisehg', 'cmdworker', 'server')
         if name not in _workertypes:
             self.outputReceived.emit(_("ignoring invalid cmdworker '%s'\n")
                                      % hglib.tounicode(name), 'ui.warning')
-            return 'thread'
+            return 'server'
         return name
 
-    def _prepareWorker(self, name):
-        worker = self._workers.get(name)
-        if worker:
-            assert not worker.isCommandRunning() or thread.HAVE_QTBUG_30251
-            return worker
+    def _createWorker(self, cwd, name):
+        if not name:
+            name = self._defaultWorkerName()
         self._ui.debug("creating cmdworker '%s'\n" % name)
-        self._workers[name] = worker = _workertypes[name](self, self._cwd)
+        worker = _workertypes[name](self, cwd)
         worker.serviceStateChanged.connect(self._tryEmitServiceStopped)
         worker.outputReceived.connect(self.outputReceived)
         worker.progressReceived.connect(self.progressReceived)
@@ -768,15 +808,16 @@ class CmdAgent(QObject):
 
     @pyqtSlot()
     def _runNextSession(self):
-        sess, workername = self._sessqueue[0]
-        worker = self._prepareWorker(workername)
+        sess = self._sessqueue[0]
+        worker = self._worker
+        assert not worker.isCommandRunning() or thread.HAVE_QTBUG_30251
         sess.run(worker)
         # start after connected to sess so that it can receive immediate error
         worker.startService()
 
     @pyqtSlot()
     def _onCommandFinished(self):
-        sess, _workername = self._sessqueue[0]
+        sess = self._sessqueue[0]
         if not sess.isFinished():
             # waiting session is aborted, just delete it
             self._cleanupWaitingSession()

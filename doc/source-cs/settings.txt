@@ -99,8 +99,8 @@ TortoiseHg
 .. module:: workbench.settings
 	:synopsis: Dialog used to set workbench specific preferences
 
-Workbench neboli Verpánek
--------------------------
+Verpánek
+--------
 
 :guilabel:`Jediné okno Verpánku:`
 	Není-li tato volba povolena, otevře se nový Verpánek pokaždé, když z kontextového menu vyberete "Hg Verpánek".
@@ -114,10 +114,10 @@ Workbench neboli Verpánek
 	Zabarvení changesetů podle jména autora. Není-li umožněno, jsou změny zabarveny zeleně pro sloučení, červeně pro netriviální rodiče a černě pro běžné případy. Implicitně je False.
 :guilabel:`Celé jméno autora:`
 	Není-li povoleno, zobrazí se ve zkrácené verzi.
-:guilabel:`Úkonová lišta:`
-	Orientace úkonové lišty (east, west, off).
+:guilabel:`Ouška úkonových karet:`
+	Orientace lišty (east, west, off) s oušky úkonových karet.
 :guilabel:`Pořadí úloh úkonové lišty:`
-	Výpisem názvů, oddělených separátorem "|" lze určit počet a pořadí nástrojů lišty. Platné názvy jsou: log, commit, mq, manifest, grep, pbranch a sync.	
+	Výpisem názvů lze určit počet a pořadí nástrojů lišty. Platné názvy jsou: log, commit, grep, pbranch a sync.	
 :guilabel:`Dlouhý souhrn:`
 	Zadáno-li true, spojují se řádky zpráv až do délky 80 znaků. Implicitně je False
 :guilabel:`Počet načtených revizí:`

@@ -531,10 +531,11 @@ class DiffBrowser(QFrame):
         w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
         w.linkActivated.connect(self.linkActivated)
 
-        self.searchbar = qscilib.SearchToolBar(hidable=True)
+        self.searchbar = qscilib.SearchToolBar()
         self.searchbar.hide()
         self.searchbar.searchRequested.connect(self.find)
         self.searchbar.conditionChanged.connect(self.highlightText)
+        self.addActions(self.searchbar.editorActions())
 
         guifont = qtlib.getfont('fontlist').font()
         self.sumlabel = QLabel()
@@ -554,7 +555,7 @@ class DiffBrowser(QFrame):
         self.actionFind.setToolTip(_('Toggle display of text search bar'))
         qtlib.newshortcutsforstdkey(QKeySequence.Find, self, self.searchbar.show)
         self.diffToolbar = QToolBar(_('Diff Toolbar'))
-        self.diffToolbar.setIconSize(QSize(16, 16))
+        self.diffToolbar.setIconSize(qtlib.smallIconSize())
         self.diffToolbar.setStyleSheet(qtlib.tbstylesheet)
         self.diffToolbar.addAction(self.actionFind)
         hbox.addWidget(self.diffToolbar)

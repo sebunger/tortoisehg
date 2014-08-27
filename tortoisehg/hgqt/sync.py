@@ -55,7 +55,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         self._repoagent = repoagent
         self._cmdsession = cmdcore.nullCmdSession()
-        self._cmdoutputs = []
         self._lasturl = None  # peer repository of last command
         self._lastbfile = None  # output bundle of last incoming command
         self.opts = {}
@@ -77,6 +76,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self._repoagent.configChanged.connect(self.reload)
 
         tb = QToolBar(self)
+        tb.setIconSize(qtlib.toolBarIconSize())
         tb.setStyleSheet(qtlib.tbstylesheet)
         self.layout().addWidget(tb)
         self.opbuttons = []
@@ -151,7 +151,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         self.pathEditToolbar = tbar = QToolBar(_('Path Edit Toolbar'))
         tbar.setStyleSheet(qtlib.tbstylesheet)
-        tbar.setIconSize(QSize(16, 16))
+        tbar.setIconSize(qtlib.smallIconSize())
         layout.addWidget(tbar)
 
         a = tbar.addAction(qtlib.geticon('thg-password'), _('Security'))
@@ -238,7 +238,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)),
                                  ('--rev', str(ctx.rev())))
 
-        for name in self.repo.namedbranches:
+        for name in hglib.namedbranches(self.repo):
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('branch: ') + uname, ('--branch', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name,
@@ -315,7 +315,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             else:
                 known.add(path)
         related = {}
-        for root, shortname in thgrepo.relatedRepositories(self.repo[0].node()):
+        repoid = hglib.repoidnode(self.repo)
+        for root, shortname in thgrepo.relatedRepositories(repoid):
             if root == self.repo.root:
                 continue
             abs = os.path.abspath(root).lower()
@@ -599,20 +600,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if not self.opts.get('mq'):
             cmdline.append(lurl)
         ucmdline = map(hglib.tounicode, cmdline)
-        worker = 'p4://' in lurl and 'proc' or None
+        overlay = ucmdline[0] not in ('incoming', 'pull')  # no incoming bundle
         self._cmdsession = sess = self._repoagent.runCommand(ucmdline, self,
-                                                             worker=worker)
+                                                             overlay=overlay)
         sess.commandFinished.connect(self._updateUi)
-        del self._cmdoutputs[:]
         self._lasturl = cururl
         self._updateUi()
         self.newCommand.emit(sess)
         return sess
-
-    @pyqtSlot(QString, QString)
-    def _captureOutput(self, msg, label):
-        if not label:
-            self._cmdoutputs.append(unicode(msg))
 
     ##
     ## Workbench toolbar buttons
@@ -649,7 +644,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         save = self.currentUrl()
         orev = self.opts.get('rev')
-        self.setEditUrl(hglib.tounicode(bundle))
+        self.setEditUrl(bundle)
         if rev is not None:
             self.opts['rev'] = str(rev)
         self.pullclicked(bsource)
@@ -754,8 +749,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if self.embedded and not self.opts.get('subrepos'):
             cmdline = ['outgoing', '--template', '{node}\n']
             sess = self.run(cmdline, ('force', 'branch', 'rev'))
+            sess.setCaptureOutput(True)
             sess.commandFinished.connect(self._onOutgoingFinished)
-            sess.outputReceived.connect(self._captureOutput)
         else:
             cmdline = ['outgoing']
             sess = self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
@@ -767,7 +762,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def _onOutgoingFinished(self, ret):
         link = self.linkifyWithTarget(self._lasturl)
         if ret == 0:
-            data = hglib.fromunicode(''.join(self._cmdoutputs), 'replace')
+            data = str(self._cmdsession.readAll())
             nodes = _extractnodeids(data)
             if nodes:
                 self.showMessage.emit(_('%d outgoing changesets to %s') %
@@ -784,15 +779,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def p4pending(self):
         sess = self.run(['p4pending', '--verbose'], ())
+        sess.setCaptureOutput(True)
         sess.commandFinished.connect(self._onP4pendingFinished)
-        sess.outputReceived.connect(self._captureOutput)
         self.showMessage.emit(_('Perforce pending...'))
 
     @pyqtSlot(int)
     def _onP4pendingFinished(self, ret):
         pending = {}
         if ret == 0:
-            output = hglib.fromunicode(''.join(self._cmdoutputs), 'replace')
+            output = str(self._cmdsession.readAll())
             for line in output.splitlines():
                 try:
                     hashes = line.split(' ')
@@ -930,15 +925,15 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def emailclicked(self):
         cmdline = ['outgoing', '--template', '{node}\n']
         sess = self.run(cmdline, ('force', 'branch', 'rev'))
+        sess.setCaptureOutput(True)
         sess.commandFinished.connect(self._onOutgoingEmailFinished)
-        sess.outputReceived.connect(self._captureOutput)
         self.showMessage.emit(_('Determining outgoing changesets to email...'))
 
     @pyqtSlot(int)
     def _onOutgoingEmailFinished(self, ret):
         if ret == 0:
             cmdline = self.lastcmdline
-            data = hglib.fromunicode(''.join(self._cmdoutputs), 'replace')
+            data = str(self._cmdsession.readAll())
             revs = tuple(self.repo[n].rev() for n in _extractnodeids(data))
             self.showMessage.emit(_('%d outgoing changesets') % len(revs))
             try:
@@ -1626,7 +1621,7 @@ class OptionsDialog(QDialog):
         form.addRow(lbl, self.branchle)
 
         BB = QDialogButtonBox
-        bb = QDialogButtonBox(BB.Ok|BB.Cancel)
+        bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         self.bb = bb

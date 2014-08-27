@@ -280,10 +280,8 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         return bool(src and dest and src != dest)
 
     def runCommand(self):
-        src = self.source()
         cmdline = self._composeCommand()
-        worker = src.startswith('p4://') and 'proc' or None
-        return self._cmdagent.runCommand(cmdline, self, worker=worker)
+        return self._cmdagent.runCommand(cmdline, self)
 
     @pyqtSlot()
     def _browseSource(self):

@@ -45,7 +45,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         except error.RepoLookupError:
             pass
 
-        combo.addItems(map(hglib.tounicode, repo.namedbranches))
+        combo.addItems(map(hglib.tounicode, hglib.namedbranches(repo)))
         tags = list(self.repo.tags()) + repo._bookmarks.keys()
         tags.sort(reverse=True)
         combo.addItems(map(hglib.tounicode, tags))

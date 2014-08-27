@@ -5,23 +5,12 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
-from mercurial import revset, hg, error
-
-from tortoisehg.hgqt import qtlib, cmdui
-from tortoisehg.util import hglib
+from tortoisehg.hgqt import qtlib, cmdcore, cmdui
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerPython
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-try:
-    _spanset = revset.spanset
-except AttributeError:
-    # hg<3.0 (a6cf48b2880d, a979078bd788, 9ad6dae67845)
-    _spanset = list
 
 # TODO:
 #  Connect to repoview revisionClicked events
@@ -127,6 +116,7 @@ class RevisionSetQuery(QDialog):
         QDialog.__init__(self, parent)
 
         self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
         # Since the revset dialot belongs to a repository, we display
         # the repository name in the dialog title
         self.setWindowTitle(_('Revision Set Query')
@@ -230,27 +220,30 @@ class RevisionSetQuery(QDialog):
         QShortcut(QKeySequence('Return'), self, self.returnPressed)
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
-        self.refreshing = None
-
     def runQuery(self):
-        if self.refreshing:
+        if not self._cmdsession.isFinished():
             return
         self.entry.setEnabled(False)
         self.showMessage.emit(_('Searching...'))
         self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
 
-        repo = self._repoagent.rawRepo()
-        self.refreshing = RevsetThread(repo, self.entry.text(), self)
-        self.refreshing.showMessage.connect(self.showMessage)
-        self.refreshing.queryIssued.connect(self.queryIssued)
-        self.refreshing.finished.connect(self.queryFinished)
-        self.refreshing.setCursorPosition.connect(self.entry.setCursorPosition)
-        self.refreshing.start()
+        cmdline = ['log', '-T', '{rev}\n', '-r', unicode(self.entry.text())]
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self.queryFinished)
 
-    def queryFinished(self):
-        self.refreshing.wait()
-        self.refreshing.setParent(None)  # assist garbage-collection
-        self.refreshing = None
+    @pyqtSlot(int)
+    def queryFinished(self, ret):
+        sess = self._cmdsession
+        if ret == 0:
+            revs = map(int, str(sess.readAll()).splitlines())
+            if revs:
+                self.showMessage.emit(_('%d matches found') % len(revs))
+            else:
+                self.showMessage.emit(_('No matches found'))
+            self.queryIssued.emit(self.entry.text(), revs)
+        else:
+            self.showMessage.emit(sess.errorString() or sess.warningString())
         self.entry.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Running')))
 
@@ -376,42 +369,3 @@ class RevsetEntry(QsciScintilla):
 
     def sizeHint(self):
         return QSize(10, self.fontMetrics().height())
-
-
-
-class RevsetThread(QThread):
-    queryIssued = pyqtSignal(QString, object)
-    showMessage = pyqtSignal(QString)
-    setCursorPosition = pyqtSignal(int, int)
-
-    def __init__(self, repo, query, parent):
-        super(RevsetThread, self).__init__(parent)
-        self.repo = hg.repository(repo.ui, repo.root)
-        self.text = hglib.fromunicode(query)
-        self.query = query
-
-    def run(self):
-        cwd = os.getcwd()
-        try:
-            os.chdir(self.repo.root)
-            # repo.revs() cannot be used since we want to accept revsetalias
-            m = revset.match(self.repo.ui, self.text)
-            l = list(m(self.repo, _spanset(self.repo)))
-            if len(l):
-                self.showMessage.emit(_('%d matches found') % len(l))
-            else:
-                self.showMessage.emit(_('No matches found'))
-            self.queryIssued.emit(self.query, l)
-        except error.ParseError, e:
-            if len(e.args) == 2:
-                msg, pos = e.args
-                self.setCursorPosition.emit(0, pos)
-            else:
-                msg = e.args[0]
-            self.showMessage.emit(_('Parse Error: ') + hglib.tounicode(msg))
-        except TypeError:
-            raise
-        except Exception, e:
-            self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
-
-        os.chdir(cwd)

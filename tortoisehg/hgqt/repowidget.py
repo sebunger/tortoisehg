@@ -21,7 +21,7 @@ from tortoisehg.hgqt.qtlib import DemandWidget
 from tortoisehg.hgqt.repomodel import HgRepoListModel
 from tortoisehg.hgqt import cmdcore, cmdui, update, tag, backout, merge, visdiff
 from tortoisehg.hgqt import archive, thgimport, thgstrip, purge, bookmark
-from tortoisehg.hgqt import bisect, rebase, resolve, thgrepo, compress, mq
+from tortoisehg.hgqt import bisect, rebase, resolve, compress, mq
 from tortoisehg.hgqt import shelve
 from tortoisehg.hgqt import matching, graft, hgemail, postreview, revdetails
 from tortoisehg.hgqt import sign
@@ -59,12 +59,8 @@ class RepoWidget(QWidget):
         QWidget.__init__(self, parent, acceptDrops=True)
 
         self._repoagent = repoagent
-        # TODO: use _repoagent where appropriate
-        self.repo = repo = repoagent.rawRepo()
-        repoagent.repositoryChanged.connect(self.repositoryChanged)
-        repoagent.configChanged.connect(self.configChanged)
+        repo = repoagent.rawRepo()
         self.revsetfilter = False
-        self.bundle = None  # bundle file name [local encoding]
         self.bundlesource = None  # source URL of incoming bundle [unicode]
         self.outgoingMode = False
         self.revset = []
@@ -126,17 +122,15 @@ class RepoWidget(QWidget):
             # Do not allow selecting the revision details widget when the
             # selected revision is the working directory pseudo-revision
             widgetDict['revdetails'] = self.commitTabIndex
+        self.taskTabsWidget.setCurrentIndex(widgetDict.get(defaultWidget, 0))
 
-        if defaultWidget in widgetDict:
-            widgetIndex = widgetDict[defaultWidget]
-            # Note: if the mq extension is not enabled, self.mqTabIndex will
-            #       be negative
-            if widgetIndex > 0:
-                self.taskTabsWidget.setCurrentIndex(widgetIndex)
+        # listen to change notification after initial settings are loaded
+        repoagent.repositoryChanged.connect(self.repositoryChanged)
+        repoagent.configChanged.connect(self.configChanged)
+        # restore column widths when model is initially loaded
+        QTimer.singleShot(0, self.repoview.resizeColumns)
 
     def setupUi(self):
-        SP = QSizePolicy
-
         self.repotabs_splitter = QSplitter(orientation=Qt.Vertical)
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
@@ -161,23 +155,25 @@ class RepoWidget(QWidget):
 
         self.layout().addWidget(self.repotabs_splitter)
 
+        # placeholder to shift repoview while infobar is overlaid
+        self._repoviewFrame = QWidget(self)
+        lay = QVBoxLayout()
+        lay.setSpacing(0)
+        lay.setContentsMargins(0, 0, 0, 0)
+        self._repoviewFrame.setLayout(lay)
+
         cs = ('workbench', _('Workbench Log Columns'))
-        self.repoview = view = HgRepoView(self.repo, 'repoWidget', cs, self)
+        self.repoview = view = HgRepoView(self._repoagent, 'repoWidget', cs,
+                                          self)
         view.revisionClicked.connect(self.onRevisionClicked)
         view.revisionSelected.connect(self.onRevisionSelected)
         view.revisionAltClicked.connect(self.onRevisionSelected)
         view.revisionActivated.connect(self.onRevisionActivated)
         view.showMessage.connect(self.showMessage)
         view.menuRequested.connect(self.viewMenuRequest)
+        lay.addWidget(view)
 
-        sp = SP(SP.Expanding, SP.Expanding)
-        sp.setHorizontalStretch(0)
-        sp.setVerticalStretch(1)
-        sp.setHeightForWidth(self.repoview.sizePolicy().hasHeightForWidth())
-        view.setSizePolicy(sp)
-        view.setFrameShape(QFrame.StyledPanel)
-
-        self.repotabs_splitter.addWidget(self.repoview)
+        self.repotabs_splitter.addWidget(self._repoviewFrame)
         self.repotabs_splitter.setCollapsible(0, True)
         self.repotabs_splitter.setStretchFactor(0, 1)
 
@@ -239,6 +235,10 @@ class RepoWidget(QWidget):
             if self.repotabs_splitter.sizes()[1] == 0:
                 self.repotabs_splitter.setSizes([1, 1])
 
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     def repoRootPath(self):
         return self._repoagent.rootPath()
 
@@ -248,7 +248,7 @@ class RepoWidget(QWidget):
     def title(self):
         """Returns the expected title for this widget [unicode]"""
         name = self._repoagent.shortName()
-        if self.bundle:
+        if self._repoagent.overlayUrl():
             return _('%s <incoming>') % name
         elif self.repomodel.branch():
             return u'%s [%s]' % (name, self.repomodel.branch())
@@ -302,7 +302,7 @@ class RepoWidget(QWidget):
         if not cleared:
             return
         w = cls(*args, **kwargs)
-        w.setParent(self)
+        w.setParent(self._repoviewFrame)
         w.finished.connect(self._freeInfoBar)
         w.linkActivated.connect(self._openLink)
         self._activeInfoBar = w
@@ -333,29 +333,33 @@ class RepoWidget(QWidget):
         self._activeInfoBar = None
 
         # clear margin for overlay
-        h = self.repoview.horizontalHeader()
-        if h.minimumSize() != QSize(0, 0):
-            h.setMinimumSize(0, 0)
-            h.geometriesChanged.emit()
+        self._repoviewFrame.layout().setContentsMargins(0, 0, 0, 0)
 
     def _updateInfoBarGeometry(self):
         if not self._activeInfoBar:
             return
         w = self._activeInfoBar
-        top = self.repoview.mapTo(self, QPoint(0, 0)).y()
-        w.setGeometry(0, top, self.width(), w.heightForWidth(self.width()))
+        f = self._repoviewFrame
+        w.setGeometry(0, 0, f.width(), w.heightForWidth(f.width()))
 
         # give margin to make header or first row accessible. without header,
         # column width cannot be changed while confirmation is presented.
-        if w.infobartype > qtlib.InfoBar.INFO:
-            h = self.repoview.horizontalHeader()
-            y = h.mapTo(self.repoview, QPoint(0, 0)).y()
-            if w.infobartype >= qtlib.InfoBar.CONFIRM:
-                xh = h.sizeHint().height()
-            else:
-                xh = 0
-            h.setMinimumSize(0, max(w.height() - y, 0) + xh)
-            h.geometriesChanged.emit()
+        #
+        #                  CONFIRM         ERROR           INFO
+        #   ____________   ....            ....            ____
+        #    :                  cmy        ____ cmy        ---- h.y
+        #    : w.height    ____            ---- h.y        ____ h.height
+        #   _:__________   ---- h.y        ____ h.height
+        #                  ____ h.height
+        #
+        h = self.repoview.header()
+        if w.infobartype >= qtlib.InfoBar.CONFIRM:
+            cmy = w.height() - h.y()
+        elif w.infobartype >= qtlib.InfoBar.ERROR:
+            cmy = w.height() - h.y() - h.height()
+        else:
+            cmy = 0
+        self._repoviewFrame.layout().setContentsMargins(0, max(cmy, 0), 0, 0)
 
     @pyqtSlot(unicode, unicode)
     def _showOutputOnInfoBar(self, msg, label, maxlines=2, maxwidth=140):
@@ -455,27 +459,19 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(QString, QString)
     def setBundle(self, bfile, bsource=None):
-        if self.bundle:
+        if self._repoagent.overlayUrl():
             self.clearBundle()
-        self.bundle = hglib.fromunicode(bfile)
         self.bundlesource = bsource and unicode(bsource) or None
         oldlen = len(self.repo)
-        self.repo = thgrepo.repository(self.repo.ui, self.repo.root,
-                                       bundle=self.bundle)
-        self.repoview.setRepo(self.repo)
-        self.revDetailsWidget.setRepo(self.repo)
-        self.filterbar.setQuery('incoming()')
-        self.filterbar.setEnableFilter(False)
+        # no "bundle:<bfile>" because bfile may contain "+" separator
+        self._repoagent.setOverlay(bfile)
+        self.filterbar.setQuery('bundle()')
+        self.filterbar.runQuery()
         self.titleChanged.emit(self.title())
         newlen = len(self.repo)
-        self.revset = range(oldlen, newlen)
-        self.repomodel.setRevset(self.revset)
-        self.reload(invalidate=False)
-        self.repoview.resetBrowseHistory(self.revset)
-        self._reload_rev = self.revset[0]
 
         w = self.setInfoBar(qtlib.ConfirmInfoBar,
-            _('Found %d incoming changesets') % len(self.revset))
+            _('Found %d incoming changesets') % (newlen - oldlen))
         assert w
         w.acceptButton.setText(_('Accept'))
         w.acceptButton.setToolTip(_('Pull incoming changesets into '
@@ -483,45 +479,39 @@ class RepoWidget(QWidget):
         w.rejectButton.setText(_('Reject'))
         w.rejectButton.setToolTip(_('Reject incoming changesets'))
         w.accepted.connect(self.acceptBundle)
-        w.rejected.connect(self.rejectBundle)
+        w.rejected.connect(self.clearBundle)
 
+    @pyqtSlot()
     def clearBundle(self):
-        self.filterbar.setEnableFilter(True)
-        self.filterbar.setQuery('')
-        self.revset = []
-        self.repomodel.setRevset(self.revset)
-        self.repoview.enablefilterpalette(False)
-        self.bundle = None
+        self.clearRevisionSet()
         self.bundlesource = None
+        self._repoagent.clearOverlay()
         self.titleChanged.emit(self.title())
-        self.repo = thgrepo.repository(self.repo.ui, self.repo.root)
-        self.repoview.setRepo(self.repo)
-        self.revDetailsWidget.setRepo(self.repo)
 
+    @pyqtSlot()
     def onPullCompleted(self):
-        if self.bundle:
+        if self._repoagent.overlayUrl():
             self.clearBundle()
-            self.reload(invalidate=False)
 
+    @pyqtSlot()
     def acceptBundle(self):
-        if self.bundle:
+        bundle = self._repoagent.overlayUrl()
+        if bundle:
             w = self.syncDemand.get()
-            w.pullBundle(self.bundle, None, self.bundlesource)
+            w.pullBundle(bundle, None, self.bundlesource)
 
+    @pyqtSlot()
     def pullBundleToRev(self):
-        if self.bundle:
-            # manually remove infobar to work around unwanted rejectBundle
+        bundle = self._repoagent.overlayUrl()
+        if bundle:
+            # manually remove infobar to work around unwanted clearBundle
             # during pull operation (issue #2596)
             if self._activeInfoBar:
                 self._activeInfoBar.hide()
                 self._freeInfoBar()
 
             w = self.syncDemand.get()
-            w.pullBundle(self.bundle, self.rev, self.bundlesource)
-
-    def rejectBundle(self):
-        self.clearBundle()
-        self.reload(invalidate=False)
+            w.pullBundle(bundle, self.rev, self.bundlesource)
 
     @pyqtSlot()
     def clearRevisionSet(self):
@@ -697,18 +687,13 @@ class RepoWidget(QWidget):
         QWidget.showEvent(self, event)
         self.showMessageSignal.emit(self.currentMessage)
         if self.dirty:
-            print 'page was dirty, reloading...'
+            self.repo.ui.debug('page was dirty, reloading...\n')
             self.reload()
             self.dirty = False
 
     def resizeEvent(self, event):
         QWidget.resizeEvent(self, event)
         self._updateInfoBarGeometry()
-
-    def event(self, event):
-        if event.type() == QEvent.LayoutRequest:
-            self._updateInfoBarGeometry()
-        return QWidget.event(self, event)
 
     def createActions(self):
         self._mqActions = None
@@ -813,37 +798,29 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def rollback(self):
-        def read_undo():
-            if os.path.exists(self.repo.sjoin('undo')):
-                try:
-                    args = self.repo.opener('undo.desc', 'r').read().splitlines()
-                    return args[1], int(args[0])
-                except (IOError, IndexError, ValueError):
-                    pass
-            return None
-        data = read_undo()
-        if data is None:
+        desc, oldlen = hglib.readundodesc(self.repo)
+        if not desc:
             InfoMsgBox(_('No transaction available'),
                        _('There is no rollback transaction available'))
             return
-        elif data[0] == 'commit':
+        elif desc == 'commit':
             if not QuestionMsgBox(_('Undo last commit?'),
                    _('Undo most recent commit (%d), preserving file changes?') %
-                   data[1]):
+                   oldlen):
                 return
         else:
             if not QuestionMsgBox(_('Undo last transaction?'),
                     _('Rollback to revision %d (undo %s)?') %
-                    (data[1]-1, data[0])):
+                    (oldlen - 1, desc)):
                 return
             try:
                 rev = self.repo['.'].rev()
-            except Exception, e:
+            except error.LookupError, e:
                 InfoMsgBox(_('Repository Error'),
                            _('Unable to determine working copy revision\n') +
                            hglib.tounicode(e))
                 return
-            if rev >= data[1] and not QuestionMsgBox(
+            if rev >= oldlen and not QuestionMsgBox(
                     _('Remove current working revision?'),
                     _('Your current working revision (%d) will be removed '
                       'by this rollback, leaving uncommitted changes.\n '
@@ -879,7 +856,6 @@ class RepoWidget(QWidget):
         self.repomodel = HgRepoListModel(self.repo,
                                          self.filterbar.branch(), self.revset,
                                          self.revsetfilter, self,
-                                         self.filterbar.getShowHidden(),
                                          self.filterbar.branchAncestorsIncluded(),
                                          self.filterbar.getShowGraftSource())
         self.repomodel.filled.connect(self.modelFilled)
@@ -897,7 +873,6 @@ class RepoWidget(QWidget):
     def modelFilled(self):
         'initial batch of revisions loaded'
         self.repoview.goto(self._reload_rev) # emits revisionSelected
-        self.repoview.resizeColumns()
 
     def modelLoaded(self):
         'all revisions loaded (graph generator completed)'
@@ -980,7 +955,7 @@ class RepoWidget(QWidget):
 
         if len(self.repo) < self.repolen:
             # repo has been stripped, invalidate active revision sets
-            if self.bundle:
+            if self._repoagent.overlayUrl():
                 self.clearBundle()
                 self.showMessage(_('Repository stripped, incoming preview '
                                    'cleared'))
@@ -989,7 +964,7 @@ class RepoWidget(QWidget):
                 self.filterbar.setQuery('')
                 self.repoview.enablefilterpalette(False)
                 self.showMessage(_('Repository stripped, revision set cleared'))
-        if not self.bundle:
+        if not self._repoagent.overlayUrl():
             self.repolen = len(self.repo)
 
         self._reload_rev = self.rev
@@ -1076,7 +1051,7 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(bool)
     def setShowHidden(self, showhidden):
-        self.repomodel.setShowHidden(showhidden)
+        self._repoagent.setHiddenRevsIncluded(showhidden)
         self._resetBrowseHistoryOnFilterChange()
 
     @pyqtSlot(bool)
@@ -1095,9 +1070,10 @@ class RepoWidget(QWidget):
 
     def loadSettings(self):
         s = QSettings()
-        repoid = str(self.repo[0])
+        repoid = hglib.shortrepoid(self.repo)
         self.revDetailsWidget.loadSettings(s)
         self.filterbar.loadSettings(s)
+        self._repoagent.setHiddenRevsIncluded(self.filterbar.getShowHidden())
         self.repotabs_splitter.restoreState(
             s.value('repowidget/splitter-'+repoid).toByteArray())
         QTimer.singleShot(0, lambda: self.toolbarVisibilityChanged.emit())
@@ -1133,7 +1109,7 @@ class RepoWidget(QWidget):
         s = QSettings()
         if self.isVisible():
             try:
-                repoid = str(self.repo[0])
+                repoid = hglib.shortrepoid(self.repo)
                 s.setValue('repowidget/splitter-'+repoid,
                            self.repotabs_splitter.saveState())
             except EnvironmentError:
@@ -1186,7 +1162,7 @@ class RepoWidget(QWidget):
             return
 
         self.menuselection = selection
-        if self.bundle:
+        if self._repoagent.overlayUrl():
             if len(selection) == 1:
                 self.bundlemenu.exec_(point)
             return
@@ -1461,16 +1437,13 @@ class RepoWidget(QWidget):
                                hglib.tounicode(os.path.join(root, filename)))
             if not file:
                 return
-            diff = self._buildPatch('diff')
-            try:
-                f = open(file, "wb")
-                try:
-                    f.write(diff)
-                finally:
-                    f.close()
-            except Exception, e:
+            f = QFile(file)
+            if not f.open(QIODevice.WriteOnly | QIODevice.Truncate):
                 WarningMsgBox(_('Repository Error'),
                               _('Unable to write diff file'))
+                return
+            sess = self._buildPatch('diff')
+            sess.setOutputDevice(f)
         def exportDagRange():
             l = dagrange()
             if l:
@@ -1889,8 +1862,7 @@ class RepoWidget(QWidget):
             return
 
         cmdline = ['bundle', '--verbose']
-        parents = [r.rev() == -1 and 'null' or str(r.rev())
-                   for r in self.repo[base].parents()]
+        parents = [hglib.escaperev(r.rev()) for r in self.repo[base].parents()]
         for p in parents:
             cmdline.extend(['--base', p])
         if tip:
@@ -1908,36 +1880,29 @@ class RepoWidget(QWidget):
             else:
                 command = 'export'
         assert command in ('export', 'diff')
-
-        from mercurial import commands
-        _ui = self.repo.ui
-        _ui.pushbuffer()
-        try:
-            if command == 'export':
-                # patches should be in chronological order
-                revs = sorted(self.menuselection)
-                commands.export(_ui, self.repo, rev=revs, output='')
-            else:
-                revs = self.rev and self.menuselection or None
-                commands.diff(_ui, self.repo, rev=revs)
-        except NameError:
-            raise
-        except Exception, e:
-            _ui.popbuffer()
-            self.showMessage(hglib.tounicode(str(e)))
-            if 'THGDEBUG' in os.environ:
-                import traceback
-                traceback.print_exc()
-            return
-        return _ui.popbuffer()
+        if command == 'export':
+            # patches should be in chronological order
+            revs = sorted(self.menuselection)
+            cmdline = hglib.buildcmdargs('export', rev=revs)
+        else:
+            revs = self.rev and self.menuselection or None
+            cmdline = hglib.buildcmdargs('diff', rev=revs)
+        return self._runCommand(cmdline)
 
     @pyqtSlot()
     def copyPatch(self):
-        output = self._buildPatch()
-        if output:
+        sess = self._buildPatch()
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._copyPatchOutputToClipboard)
+
+    @qtlib.senderSafeSlot(int)
+    def _copyPatchOutputToClipboard(self, ret):
+        if ret == 0:
+            sess = self.sender()
+            output = sess.readAll()
             mdata = QMimeData()
             mdata.setData('text/x-diff', output)  # for lossless import
-            mdata.setText(hglib.tounicode(output))
+            mdata.setText(hglib.tounicode(str(output)))
             QApplication.clipboard().setMimeData(mdata)
 
     def copyHash(self):
@@ -2187,7 +2152,7 @@ class RepoWidget(QWidget):
 
         # Otherwise, run the selected command in the background
         try:
-            res = subprocess.Popen(command, cwd=workingdir)
+            res = subprocess.Popen(command, cwd=workingdir, shell=True)
         except OSError, ex:
             res = 1
             qtlib.ErrorMsgBox(_('Failed to execute custom command'),

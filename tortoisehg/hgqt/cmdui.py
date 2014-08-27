@@ -231,10 +231,9 @@ class LogWidget(qscilib.ScintillaCompat):
 class InteractiveUiHandler(cmdcore.UiHandler):
     """Handle user interaction of Mercurial commands with GUI prompt"""
 
-    # "uiparent" exists for CmdAgent to create default handler not owned
-    # by the parent widget.  use "parent" in other cases.
-    def __init__(self, parent=None, uiparent=None):
-        super(InteractiveUiHandler, self).__init__(parent)
+    # Unlike QObject, "uiparent" does not own this handler
+    def __init__(self, uiparent=None):
+        super(InteractiveUiHandler, self).__init__()
         self._prompttext = ''
         self._promptmode = cmdcore.UiHandler.NoInput
         self._promptdefault = ''
@@ -277,40 +276,29 @@ class InteractiveUiHandler(cmdcore.UiHandler):
             button.response = r
             if r == self._promptdefault:
                 dlg.setDefaultButton(button)
+        # cancel button is necessary to close prompt dialog with empty response
+        dlg.addButton(QMessageBox.Cancel).hide()
         dlg.exec_()
         button = dlg.clickedButton()
-        if button:
+        if button and dlg.buttonRole(button) == QMessageBox.ActionRole:
             return button.response
 
     def _parentWidget(self):
-        p = self._uiparentref and self._uiparentref() or self.parent()
+        p = self._uiparentref and self._uiparentref()
         while p and not p.isWidgetType():
             p = p.parent()
         return p
 
 
-class PasswordUiHandler(cmdcore.UiHandler):
+class PasswordUiHandler(InteractiveUiHandler):
     """Handle no user interaction of Mercurial commands but password input"""
 
-    def __init__(self, parent=None):
-        super(PasswordUiHandler, self).__init__(parent)
-        if parent is not None and not isinstance(parent, QWidget):
-            raise ValueError('parent must be a QWidget')
-        self._prompt = None
-
-    def setPrompt(self, text, mode, default=None):
-        if mode == cmdcore.UiHandler.PasswordInput:
-            self._prompt = unicode(text)
-        else:
-            self._prompt = None
-
     def getLineInput(self):
-        if self._prompt is None:
+        mode = self._promptmode
+        if mode == cmdcore.UiHandler.PasswordInput:
+            return self._getTextInput(QLineEdit.Password)
+        else:
             return ''
-        text, ok = qtlib.getTextInput(self.parent(), _('TortoiseHg Prompt'),
-                                      self._prompt, QLineEdit.Password)
-        if ok:
-            return text
 
 
 _detailbtntextmap = {

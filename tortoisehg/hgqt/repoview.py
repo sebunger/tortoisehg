@@ -19,12 +19,12 @@ from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import htmldelegate, qtlib, repomodel
+from tortoisehg.hgqt import graph, qtlib, repomodel
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class HgRepoView(QTableView):
+class HgRepoView(QTreeView):
 
     revisionClicked = pyqtSignal(object)
     revisionAltClicked = pyqtSignal(object)
@@ -34,31 +34,26 @@ class HgRepoView(QTableView):
     showMessage = pyqtSignal(unicode)
     columnsVisibilityChanged = pyqtSignal()
 
-    def __init__(self, repo, cfgname, colselect, parent=None):
-        QTableView.__init__(self, parent)
-        self.repo = repo
+    def __init__(self, repoagent, cfgname, colselect, parent=None):
+        QTreeView.__init__(self, parent)
+        self._repoagent = repoagent
         self.current_rev = -1
         self.resized = False
         self.cfgname = cfgname
         self.colselect = colselect
-        self.setShowGrid(False)
 
-        vh = self.verticalHeader()
-        vh.hide()
-        vh.setDefaultSectionSize(20)
-
-        header = self.horizontalHeader()
+        header = self.header()
         header.setClickable(False)
         header.setMovable(True)
-        # AlignBottom because RepoWidget steals top of header space for InfoBar
-        header.setDefaultAlignment(Qt.AlignLeft | Qt.AlignBottom)
+        header.setDefaultAlignment(Qt.AlignLeft)
         header.setHighlightSections(False)
         header.setContextMenuPolicy(Qt.CustomContextMenu)
         header.customContextMenuRequested.connect(self.headerMenuRequest)
         header.sectionMoved.connect(self.columnsVisibilityChanged)
 
         self.createActions()
-        self._initDelegates()
+        self.setItemDelegateForColumn(repomodel.GraphColumn,
+                                      GraphDelegate(self))
 
         self.setAcceptDrops(True)
         if PYQT_VERSION >= 0x40700:
@@ -67,17 +62,22 @@ class HgRepoView(QTableView):
         self.setDropIndicatorShown(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
 
+        self.setAllColumnsShowFocus(True)
+        self.setItemsExpandable(False)
+        self.setRootIsDecorated(False)
+        self.setUniformRowHeights(True)
+
         self.setStyle(HgRepoViewStyle(self.style()))
         self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.doubleClicked.connect(self.revActivated)
         self.clicked.connect(self.revClicked)
 
-    def setRepo(self, repo):
-        self.repo = repo
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def mousePressEvent(self, event):
         index = self.indexAt(event.pos())
@@ -86,7 +86,7 @@ class HgRepoView(QTableView):
         if event.button() == Qt.MidButton:
             self.gotoAncestor(index)
             return
-        QTableView.mousePressEvent(self, event)
+        QTreeView.mousePressEvent(self, event)
 
     def contextMenuEvent(self, event):
         self.menuRequested.emit(event.globalPos(), self.selectedRevisions())
@@ -100,7 +100,7 @@ class HgRepoView(QTableView):
 
     @pyqtSlot(QPoint)
     def headerMenuRequest(self, point):
-        self.headermenu.exec_(self.horizontalHeader().mapToGlobal(point))
+        self.headermenu.exec_(self.header().mapToGlobal(point))
 
     def setHistoryColumns(self):
         dlg = ColumnSelectDialog(self.colselect[1],
@@ -137,14 +137,14 @@ class HgRepoView(QTableView):
         s.endGroup()
 
     def visibleColumns(self):
-        hh = self.horizontalHeader()
+        hh = self.header()
         return [repomodel.ALLCOLUMNS[hh.logicalIndex(visualindex)]
                 for visualindex in xrange(hh.count() - hh.hiddenSectionCount())]
 
     def setVisibleColumns(self, visiblecols):
         if not self.model() or visiblecols == self.visibleColumns():
             return
-        hh = self.horizontalHeader()
+        hh = self.header()
         hh.sectionMoved.disconnect(self.columnsVisibilityChanged)
         allcolumns = repomodel.ALLCOLUMNS[:self.model().columnCount()]
         for logicalindex, colname in enumerate(allcolumns):
@@ -157,7 +157,7 @@ class HgRepoView(QTableView):
 
     def setModel(self, model):
         oldmodel = self.model()
-        QTableView.setModel(self, model)
+        QTreeView.setModel(self, model)
         if type(oldmodel) is not type(model):
             # logical columns are vary by model class
             self._loadColumnSettings()
@@ -180,18 +180,11 @@ class HgRepoView(QTableView):
             self._rev_pos = -1
         self.forward()
 
-    def _initDelegates(self):
-        htmlDelegate = htmldelegate.HTMLDelegate(self)
-        graphDelegate = GraphDelegate(self)
-        for column, delegate in [(repomodel.DescColumn, htmlDelegate),
-                                 (repomodel.ChangesColumn, htmlDelegate),
-                                 (repomodel.GraphColumn, graphDelegate)]:
-            self.setItemDelegateForColumn(column, delegate)
-
+    @pyqtSlot()
     def resizeColumns(self):
         if not self.model():
             return
-        hh = self.horizontalHeader()
+        hh = self.header()
         hh.setStretchLastSection(False)
         self._resizeColumns()
         hh.setStretchLastSection(True)
@@ -199,34 +192,29 @@ class HgRepoView(QTableView):
 
     def _resizeColumns(self):
         # _resizeColumns misbehaves if called with last section streched
-        for c, w in enumerate(self._columnWidthHints()):
-            self.setColumnWidth(c, w)
-
-    def _columnWidthHints(self):
-        """Return list of recommended widths of all columns"""
+        hh = self.header()
         model = self.model()
         fontm = QFontMetrics(self.font())
-        widths = [-1 for _i in xrange(model.columnCount())]
 
-        key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
+        key = '%s/column_widths/%s' % (self.cfgname,
+                                       hglib.shortrepoid(self.repo))
         col_widths = [int(w) for w in QSettings().value(key).toStringList()]
 
         for c in range(model.columnCount()):
+            if hh.isSectionHidden(c):
+                continue
             if c < len(col_widths) and col_widths[c] > 0:
                 w = col_widths[c]
             else:
                 w = model.maxWidthValueForColumn(c)
 
             if isinstance(w, int):
-                widths[c] = w
+                pass
             elif w is not None:
                 w = fontm.width(hglib.tounicode(str(w)) + 'w')
-                widths[c] = w
             else:
                 w = super(HgRepoView, self).sizeHintForColumn(c)
-                widths[c] = w
-
-        return widths
+            self.setColumnWidth(c, w)
 
     def revFromindex(self, index):
         if not index.isValid():
@@ -294,7 +282,7 @@ class HgRepoView(QTableView):
         if self.canGoBack():
             self._rev_pos -= 1
             idx = self.model().indexFromRev(self._rev_history[self._rev_pos])
-            if idx is not None:
+            if idx.isValid():
                 self._in_history = True
                 self.setCurrentIndex(idx)
 
@@ -302,7 +290,7 @@ class HgRepoView(QTableView):
         if self.canGoForward():
             self._rev_pos += 1
             idx = self.model().indexFromRev(self._rev_history[self._rev_pos])
-            if idx is not None:
+            if idx.isValid():
                 self._in_history = True
                 self.setCurrentIndex(idx)
 
@@ -321,7 +309,7 @@ class HgRepoView(QTableView):
             self.showMessage.emit(hglib.tounicode(str(e)))
         else:
             idx = self.model().indexFromRev(rev)
-            if idx is not None:
+            if idx.isValid():
                 # avoid unwanted selection change (#1019)
                 if self.currentIndex().row() != idx.row():
                     flags = (QItemSelectionModel.ClearAndSelect
@@ -338,7 +326,8 @@ class HgRepoView(QTableView):
             col_widths.append(self.columnWidth(c))
 
         try:
-            key = '%s/column_widths/%s' % (self.cfgname, str(self.repo[0]))
+            key = '%s/column_widths/%s' % (self.cfgname,
+                                           hglib.shortrepoid(self.repo))
             s.setValue(key, col_widths)
         except EnvironmentError:
             pass
@@ -424,24 +413,196 @@ class HgRepoViewStyle(QStyle):
     def standardIconImplementation(self, *args):
         return self._style.standardIconImplementation(*args)
 
+
+def get_style(line_type, active):
+    if line_type == graph.LINE_TYPE_GRAFT:
+        return Qt.DashLine
+    if line_type == graph.LINE_TYPE_OBSOLETE:
+        return Qt.DotLine
+    return Qt.SolidLine
+
+def get_width(line_type, active):
+    if line_type >= graph.LINE_TYPE_FAMILY or not active:
+        return 1
+    return 2
+
+def _edge_color(edge, active):
+    if not active or edge.linktype == graph.LINE_TYPE_FAMILY:
+        return "gray"
+    else:
+        return repomodel.get_color(edge.color)
+
+
 class GraphDelegate(QStyledItemDelegate):
+
+    def __init__(self, parent):
+        super(GraphDelegate, self).__init__(parent)
+        assert isinstance(parent, QWidget)
+        # assumes 4px as text and decoration margins of other columns
+        fm = parent.fontMetrics()
+        self._rowheight = self._rowheighthint = max(fm.height() + 4, 16)
+
+    def _col2x(self, col):
+        maxradius = max(self._rowheight / 2, 1)
+        return maxradius * (col + 1)
+
+    def _colcount(self, width):
+        maxradius = max(self._rowheight / 2, 1)
+        return (width + maxradius - 1) // maxradius
+
+    def _dotradius(self):
+        return 0.4 * self._rowheight
 
     def paint(self, painter, option, index):
         QStyledItemDelegate.paint(self, painter, option, index)
-        graph = index.data(repomodel.GraphRole)
-        if graph:
-            # not grayed-out even if revisions are inactive
-            pix = QPixmap(graph)
-            dest = option.rect
-            src = QRect(0, 0, dest.width(), dest.height())
-            painter.drawPixmap(dest, pix, src)
+        # update to the actual height that should be the same for all rows
+        self._rowheight = option.rect.height()
+        visibleend = self._colcount(option.rect.width())
+        gnode = index.data(repomodel.GraphNodeRole).toPyObject()
+        painter.save()
+        try:
+            painter.setClipRect(option.rect)
+            painter.setRenderHint(QPainter.Antialiasing)
+            painter.translate(option.rect.topLeft())
+            self._drawEdges(painter, index, gnode, visibleend)
+            if gnode.x < visibleend:
+                self._drawNode(painter, index, gnode)
+        finally:
+            painter.restore()
+
+    def _drawEdges(self, painter, index, gnode, visibleend):
+        h = self._rowheight
+        dot_y = h / 2
+
+        def isactive(e):
+            m = index.model()
+            return m.isActiveRev(e.startrev) and m.isActiveRev(e.endrev)
+        def lineimportance(pe):
+            return isactive(pe[1]), pe[1].importance
+
+        for y1, y4, lines in ((dot_y, dot_y + h, gnode.bottomlines),
+                              (dot_y - h, dot_y, gnode.toplines)):
+            y2 = y1 + 1 * (y4 - y1)/4
+            ymid = (y1 + y4)/2
+            y3 = y1 + 3 * (y4 - y1)/4
+
+            # omit invisible lines
+            lines = [((start, end), e) for (start, end), e in lines
+                     if start < visibleend or end < visibleend]
+            # remove hidden lines that can be partly visible due to antialiasing
+            lines = dict(sorted(lines, key=lineimportance)).items()
+            # still necessary to sort by importance because lines can partially
+            # overlap near contact point
+            lines.sort(key=lineimportance)
+
+            for (start, end), e in lines:
+                active = isactive(e)
+                lpen = QPen(QColor(_edge_color(e, active)))
+                lpen.setStyle(get_style(e.linktype, active))
+                lpen.setWidth(get_width(e.linktype, active))
+                painter.setPen(lpen)
+                x1 = self._col2x(start)
+                x2 = self._col2x(end)
+                if x1 == x2:
+                    painter.drawLine(x1, y1, x2, y4)
+                else:
+                    path = QPainterPath()
+                    path.moveTo(x1, y1)
+                    path.cubicTo(x1, y2,
+                                 x1, y2,
+                                 (x1 + x2) / 2, ymid)
+                    path.cubicTo(x2, y3,
+                                 x2, y3,
+                                 x2, y4)
+                    painter.drawPath(path)
+
+    def _drawNode(self, painter, index, gnode):
+        m = index.model()
+        if not m.isActiveRev(gnode.rev):
+            dot_color = QColor("gray")
+            radius = self._dotradius() * 0.8
+        else:
+            dot_color = QBrush(index.data(Qt.ForegroundRole)).color()
+            radius = self._dotradius()
+        dotcolor = dot_color.lighter()
+        pencolor = dot_color.darker()
+        truewhite = QColor("white")
+        white = QColor("white")
+        fillcolor = gnode.rev is None and white or dotcolor
+
+        pen = QPen(pencolor)
+        pen.setWidthF(1.5)
+        painter.setPen(pen)
+
+        centre_x = self._col2x(gnode.x)
+        centre_y = self._rowheight / 2
+
+        def circle(r):
+            rect = QRectF(centre_x - r,
+                          centre_y - r,
+                          2 * r, 2 * r)
+            painter.drawEllipse(rect)
+
+        def closesymbol(s):
+            rect_ = QRectF(centre_x - 1.5 * s, centre_y - 0.5 * s, 3 * s, s)
+            painter.drawRect(rect_)
+
+        def diamond(r):
+            poly = QPolygonF([QPointF(centre_x - r, centre_y),
+                              QPointF(centre_x, centre_y - r),
+                              QPointF(centre_x + r, centre_y),
+                              QPointF(centre_x, centre_y + r),
+                              QPointF(centre_x - r, centre_y),])
+            painter.drawPolygon(poly)
+
+        hiddenrev = gnode.hidden
+        if hiddenrev:
+            painter.setBrush(truewhite)
+            white.setAlpha(64)
+            fillcolor.setAlpha(64)
+        if gnode.shape == graph.NODE_SHAPE_APPLIEDPATCH:
+            # diamonds for patches
+            symbolsize = radius / 1.5
+            if hiddenrev:
+                diamond(symbolsize)
+            if gnode.wdparent:
+                painter.setBrush(white)
+                diamond(2 * 0.9 * symbolsize)
+            painter.setBrush(fillcolor)
+            diamond(symbolsize)
+        elif gnode.shape == graph.NODE_SHAPE_UNAPPLIEDPATCH:
+            symbolsize = radius / 1.5
+            if hiddenrev:
+                diamond(symbolsize)
+            patchcolor = QColor('#dddddd')
+            painter.setBrush(patchcolor)
+            painter.setPen(patchcolor)
+            diamond(symbolsize)
+        elif gnode.shape == graph.NODE_SHAPE_CLOSEDBRANCH:
+            symbolsize = 0.5 * radius
+            if hiddenrev:
+                closesymbol(symbolsize)
+            painter.setBrush(fillcolor)
+            closesymbol(symbolsize)
+        else:  # circles for normal revisions
+            symbolsize = 0.5 * radius
+            if hiddenrev:
+                circle(symbolsize)
+            if gnode.wdparent:
+                painter.setBrush(white)
+                circle(0.9 * radius)
+            painter.setBrush(fillcolor)
+            circle(symbolsize)
 
     def sizeHint(self, option, index):
-        graph = index.data(repomodel.GraphRole)
-        if graph:
-            return QPixmap(graph).size()
+        gnode = index.data(repomodel.GraphNodeRole).toPyObject()
+        if gnode:
+            # return width for current height assuming that row height
+            # is calculated first (mimic width-for-height policy)
+            return QSize(self._col2x(gnode.cols), self._rowheighthint)
         else:
             return QSize(0, 0)
+
 
 class ColumnSelectDialog(QDialog):
     def __init__(self, name, model, curcolumns, parent=None):

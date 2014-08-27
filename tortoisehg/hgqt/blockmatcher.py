@@ -17,8 +17,6 @@
 """
 Qt4 widgets to display diffs as blocks
 """
-import sys, os
-
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -116,18 +114,37 @@ class BlockList(QWidget):
         w = self.width() - 1
         h = self.height()
         p = QPainter(self)
-        p.scale(1.0, float(h)/(self._maximum - self._minimum + self._pagestep))
+        contentheight = self._maximum - self._minimum + self._pagestep
+        yscale = float(h) / contentheight
+        p.scale(1.0, yscale)
         p.setPen(Qt.NoPen)
+
+        if yscale < 1.0:
+            minheight = 1.0 / yscale
+        else:
+            minheight = 1.0
+
+        def getmarkerrect(x, y, width, height):
+            """
+            return marker rect with making it's height at least `minheight`.
+            (`minheight` is the height that will be rendered as 1px)
+            """
+            if height < minheight:
+                height = minheight
+                if contentheight < y + minheight:
+                    y = contentheight - minheight
+            return QRectF(x, y, width, height)
+
         for typ, alo, ahi in self._blocks:
             p.save()
             p.setBrush(self.blockTypes[typ])
-            p.drawRect(1, alo, w-1, ahi-alo)
+            p.drawRect(getmarkerrect(1, alo, w - 1, ahi - alo))
             p.restore()
 
         p.save()
         p.setPen(self._vrectbordercolor)
         p.setBrush(self._vrectcolor)
-        p.drawRect(0, self._value, w, self._pagestep)
+        p.drawRect(getmarkerrect(0, self._value, w, self._pagestep))
         p.restore()
 
     def scrollToPos(self, y):
@@ -335,9 +352,9 @@ class BlockMatch(BlockList):
         self.pageStepChanged.connect(
                      lambda v, s: side==s and sb.setPageStep(v))
 
-if __name__ == '__main__':
-    a = QApplication([])
-    f = QFrame()
+
+def createTestWidget(ui, parent=None):
+    f = QFrame(parent)
     l = QHBoxLayout(f)
 
     sb1 = QScrollBar()
@@ -379,9 +396,7 @@ if __name__ == '__main__':
     w2.setRange(0, 1200)
     w2.setPageStep(100)
 
-    print "sb1=", sb1.minimum(), sb1.maximum(), sb1.pageStep()
-    print "sb2=", sb2.minimum(), sb2.maximum(), sb2.pageStep()
+    ui.status('sb1=%d %d %d\n' % (sb1.minimum(), sb1.maximum(), sb1.pageStep()))
+    ui.status('sb2=%d %d %d\n' % (sb2.minimum(), sb2.maximum(), sb2.pageStep()))
 
-    f.show()
-    a.exec_()
-
+    return f

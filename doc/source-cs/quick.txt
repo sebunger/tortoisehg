@@ -32,8 +32,8 @@ Příkazy Mercurialu jsou dostupné také z příkazového řádku příkazem :c
 .. note:: Při zadávání příkazu z příkazového řádku se předpokládá, že repozitórium je aktuálním adresářem příkazové konzoly.  
 
 
-Konfigurace programu
-====================
+Nastavení programu
+==================
 
 Nejprve se musíme do programu TortoiseHg řádně zapsat. Uděláme to tak, že otevřeme dialog pro globální nastavení.
 
@@ -85,7 +85,7 @@ Nastavené změny potvrdíme a okno zavřeme tlačítkem :command:`OK`.
 Status souboru
 ==============
 
-Při práci se soubory používá Mercuriál kategorizaci, jež spočívá v tom, že každý soubor má přířazený status, deklarovaný svým označením:
+Soubory, obsluhované Mercurialem, mají různý vztah k zapisované historii. Tento vztah je vyjádřen jako *status* souboru příslušným označením:
 
 * A (added)     přidaný do komitu - příkazem *hg add*
 * M (modified)  změněný

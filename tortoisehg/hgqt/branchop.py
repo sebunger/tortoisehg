@@ -52,7 +52,7 @@ class BranchOpDialog(QDialog):
             qtlib.allowCaseChangingInput(branchCombo)
 
             wbu = wctx.branch()
-            for name in repo.namedbranches:
+            for name in hglib.namedbranches(repo):
                 if name == wbu:
                     continue
                 branchCombo.addItem(hglib.tounicode(name))

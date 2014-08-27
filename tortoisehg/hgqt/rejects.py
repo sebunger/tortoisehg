@@ -39,7 +39,7 @@ class RejectsDialog(QDialog):
         editor.setMarkerBackgroundColor(QColor('lightblue'), self.baseLineColor)
         self.layout().addWidget(editor, 3)
 
-        searchbar = qscilib.SearchToolBar(self, hidable=True)
+        searchbar = qscilib.SearchToolBar(self)
         searchbar.searchRequested.connect(editor.find)
         searchbar.conditionChanged.connect(editor.highlightText)
         searchbar.hide()
@@ -47,6 +47,7 @@ class RejectsDialog(QDialog):
             searchbar.show()
             searchbar.setFocus(Qt.OtherFocusReason)
         qtlib.newshortcutsforstdkey(QKeySequence.Find, self, showsearchbar)
+        self.addActions(searchbar.editorActions())
         self.layout().addWidget(searchbar)
 
         hbox = QHBoxLayout()

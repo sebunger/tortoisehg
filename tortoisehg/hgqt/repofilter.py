@@ -84,7 +84,7 @@ class RepoFilterBar(QToolBar):
     def __init__(self, repoagent, parent=None):
         super(RepoFilterBar, self).__init__(parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
-        self.setIconSize(QSize(16,16))
+        self.setIconSize(qtlib.smallIconSize())
         self.setFloatable(False)
         self.setMovable(False)
         self._repoagent = repoagent
@@ -116,7 +116,7 @@ class RepoFilterBar(QToolBar):
         le.selectionChanged.connect(self.selectionChanged)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText(_('### revision set query ###'))
-        combo.activated.connect(self.runQuery)
+        combo.activated.connect(self._revsetHistoryActivated)
 
         self._revsettypelabel = QLabel(le)
         self._revsettypetimer = QTimer(self, interval=200, singleShot=True)
@@ -192,22 +192,15 @@ class RepoFilterBar(QToolBar):
             self.hide()
         self.clearRevisionSet.emit()
 
-    def setEnableFilter(self, enabled):
-        'Enable/disable the changing of the current filter'
-        self.revsetcombo.setEnabled(enabled)
-        self.clearBtn.setEnabled(enabled)
-        self.searchBtn.setEnabled(enabled)
-        self.editorBtn.setEnabled(enabled)
-        self.deleteBtn.setEnabled(enabled)
-        self._branchCombo.setEnabled(enabled)
-        self._branchLabel.setEnabled(enabled)
-        self.filterEnabled = enabled
-        self.showHiddenBtn.setEnabled(enabled)
-        self.showGraftSourceBtn.setEnabled(enabled)
-
     def selectionChanged(self):
         selection = self.revsetcombo.lineEdit().selectedText()
         self.deleteBtn.setEnabled(selection in self.revsethist)
+
+    @pyqtSlot()
+    def _revsetHistoryActivated(self):
+        # do not run query on focus out in the middle of history completion
+        if self.revsetcombo.hasFocus():
+            self.runQuery()
 
     def deleteFromHistory(self):
         selection = self.revsetcombo.lineEdit().selectedText()
@@ -221,7 +214,8 @@ class RepoFilterBar(QToolBar):
 
     def showEvent(self, event):
         super(RepoFilterBar, self).showEvent(event)
-        self.revsetcombo.setFocus()
+        if not event.spontaneous():
+            self.revsetcombo.setFocus()
 
     def eventFilter(self, watched, event):
         if watched is self.revsetcombo.lineEdit():
@@ -315,7 +309,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.setCurrentIndex(self.revsetcombo.findText(query))
 
     def loadSettings(self, s):
-        repoid = str(self._repo[0])
+        repoid = hglib.shortrepoid(self._repo)
         s.beginGroup('revset/' + repoid)
         self.entrydlg.restoreGeometry(s.value('geom').toByteArray())
         self.revsethist = list(s.value('queries').toStringList())
@@ -332,7 +326,7 @@ class RepoFilterBar(QToolBar):
 
     def saveSettings(self, s):
         try:
-            repoid = str(self._repo[0])
+            repoid = hglib.shortrepoid(self._repo)
         except EnvironmentError:
             return
         s.beginGroup('revset/' + repoid)
@@ -347,9 +341,8 @@ class RepoFilterBar(QToolBar):
 
     def _initBranchFilter(self):
         self._branchLabel = QToolButton(
-            text=_('Branch'), popupMode=QToolButton.MenuButtonPopup,
+            text=_('Branch'), popupMode=QToolButton.InstantPopup,
             statusTip=_('Display graph the named branch only'))
-        self._branchLabel.clicked.connect(self._branchLabel.showMenu)
         self._branchMenu = QMenu(self._branchLabel)
         self._abranchAction = self._branchMenu.addAction(
             _('Display only active branches'), self.refresh)
@@ -402,7 +395,7 @@ class RepoFilterBar(QToolBar):
         elif self._cbranchAction.isChecked():
             branches = sorted(self._repo.branchmap())
         else:
-            branches = self._repo.namedbranches
+            branches = hglib.namedbranches(self._repo)
 
         # easy access to common branches (Python sorted() is stable)
         priomap = {self._repo.dirstate.branch(): -2, 'default': -1}

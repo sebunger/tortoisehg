@@ -25,6 +25,8 @@ from tortoisehg.util import hglib
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+DEFAULTICONNAME = 'tools-spanner-hammer'
+
 
 class ToolsFrame(QFrame):
     def __init__(self, ini, parent=None, **opts):
@@ -165,7 +167,7 @@ class ToolsFrame(QFrame):
                 toolname, toolconfig = td.value()
                 icon = toolconfig.get('icon', '')
                 if not icon:
-                    icon = td._defaulticonname
+                    icon = DEFAULTICONNAME
                 item = QListWidgetItem(qtlib.geticon(icon), toolname)
                 gtl.takeItem(row)
                 gtl.insertItem(row, item)
@@ -553,7 +555,7 @@ class ToolListBox(QListWidget):
             item = text
         else:
             if not icon:
-                icon = CustomToolConfigDialog._defaulticonname
+                icon = DEFAULTICONNAME
             if isinstance(icon, str):
                 icon = qtlib.geticon(icon)
             item = QListWidgetItem(icon, text)
@@ -698,14 +700,13 @@ class CustomToolConfigDialog(CustomConfigDialog):
                        (_('Applied patches'), 'applied'),
                        (_('Applied patches or qparent'), 'qgoto'),
                        ]
-    _defaulticonname = 'tools-spanner-hammer'
     _defaulticonstring = _('<default icon>')
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
         super(CustomToolConfigDialog, self).__init__(parent,
             dialogname='customtools',
             windowTitle=_('Configure Custom Tool'),
-            windowIcon=qtlib.geticon(self._defaulticonname))
+            windowIcon=qtlib.geticon(DEFAULTICONNAME))
 
         vbox = self.formvbox
 
@@ -757,7 +758,7 @@ class CustomToolConfigDialog(CustomConfigDialog):
             ico = self._defaulticonstring
         elif ico not in iconnames:
             combo.addItem(qtlib.geticon(ico), ico)
-        combo.addItem(qtlib.geticon(self._defaulticonname),
+        combo.addItem(qtlib.geticon(DEFAULTICONNAME),
                       self._defaulticonstring)
         for name in iconnames:
             combo.addItem(qtlib.geticon(name), name)
@@ -874,40 +875,3 @@ class HookConfigDialog(CustomConfigDialog):
         if not command:
             return _('You must set a command to run.')
         return '' # No error
-
-
-def addCustomToolsSubmenu(menu,
-        ui, location, make, slot, label=_('Custom Tools')):
-    '''
-    Add a custom tools submenu to an existing menus
-
-    This can be used, for example, to add the custom tools submenu to the
-    different file context menus
-    '''
-    tools, toollist = hglib.tortoisehgtools(ui,
-        selectedlocation=location)
-    if not tools:
-        return
-    submenu = menu.addMenu(label)
-    submenu.triggered.connect(slot)
-    emptysubmenu = True
-    for name in toollist:
-        if name == '|':
-            submenu.addSeparator()
-            continue
-        info = tools.get(name, None)
-        if info is None:
-            continue
-        command = info.get('command', None)
-        if not command:
-            continue
-        label = info.get('label', name)
-        icon = info.get('icon', CustomToolConfigDialog._defaulticonname)
-        status = info.get('status', 'MAR!C?S')
-        a = make(label, None, frozenset(status),
-            icon=icon, inmenu=submenu)
-        if a is not None:
-            a.setData(name)
-            emptysubmenu = False
-    if emptysubmenu:
-        menu.removeAction(submenu.menuAction())

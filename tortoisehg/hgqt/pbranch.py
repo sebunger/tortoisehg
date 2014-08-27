@@ -52,6 +52,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
 
         def Toolbar():
             tb = QToolBar(_("Patch Branch Toolbar"), self)
+            tb.setIconSize(qtlib.toolBarIconSize())
             tb.setEnabled(True)
             tb.setObjectName("toolBar_patchbranch")
             tb.setFloatable(False)

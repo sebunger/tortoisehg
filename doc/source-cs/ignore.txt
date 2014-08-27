@@ -9,7 +9,7 @@ Seznam ignorovaných souborů
 	:alt: Ignore filter dialog
 	
 	
-Seznam ignorovaných souborů `.hgignore` je uložen v repozitóriu. Tento ručně vytvořený soubor se edituje pomocí  dialogového okna, které lze spustit z kontextové nabídky :guilabel:`TortoiseHg > Upravit filtr Ignoruj`. Přepínač :guilabel:`Glob` umožňuje přepínat mezi glob a regexp vzory.
+Seznam ignorovaných souborů `.hgignore` je uložen v repozitóriu. Tento ručně vytvořený soubor se edituje pomocí  dialogového okna, které lze spustit z kontextové nabídky :guilabel:`TortoiseHg > Ignorované soubory...`. Přepínač :guilabel:`Glob` umožňuje přepínat mezi glob a regexp vzory.
 
 Tlačítkem `Přidat` potvrzujeme přidávanou položku seznamu, kterou zapíšeme do textového pole vlevo.
  

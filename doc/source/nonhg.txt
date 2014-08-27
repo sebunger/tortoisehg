@@ -112,17 +112,12 @@ conversions of Subversion repositories into Mercurial.
 
 *Installation*
 
-TortoiseHg Windows installers come with the python-svn bindings that
-hgsubversion requires, so one only needs to clone the hgsubversion
-repository to your local computer::
-
-	hg clone https://bitbucket.org/durin42/hgsubversion/ C:\hgsvn
-
-Then enable the extension in your Mercurial.ini file, specifying the
-hgsubversion folder inside the cloned repository::
+TortoiseHg Windows installers come with the python-svn bindings and
+hgsubversion. One only needs to enable the extension via the settings
+tool or manually::
 
 	[extensions]
-	hgsubversion = C:\hgsvn\hgsubversion
+	hgsubversion =
 
 You can verify that worked by typing :command:`hg help hgsubversion`
 
@@ -155,21 +150,13 @@ of Git repositories into Mercurial.
 *Installation*
 
 TortoiseHg Windows installers come with the python-git bindings (named
-dulwich) that hg-git requires, so one only needs to clone the
-hg-git repository to your local computer::
-
-	hg clone https://bitbucket.org/durin42/hg-git/ C:\hg-git
-
-Then enable hggit in your Mercurial.ini file::
+dulwich) and hg-git. It can be enabled via the settings tool or
+manually::
 
 	[extensions]
-	hggit = C:\hg-git\hggit
+	hggit =
 
 You can verify that worked by typing :command:`hg help hggit`
-
-Current versions of TortoiseHg include dulwich version 0.7.0.  We
-recommend to use hg-git version 0.2.6 with this version of dulwich
-and Mercurial 1.8.
 
 See the hggit documentation for details of use.
 

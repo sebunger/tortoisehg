@@ -1,3 +1,5 @@
+# graph.py - helper functions and classes to ease hg revision graph building
+#
 # Copyright (c) 2003-2010 LOGILAB S.A. (Paris, FRANCE).
 # http://www.logilab.fr/ -- mailto:contact@logilab.fr
 #
@@ -5,14 +7,6 @@
 # the terms of the GNU General Public License as published by the Free Software
 # Foundation; either version 2 of the License, or (at your option) any later
 # version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along with
-# this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """helper functions and classes to ease hg revision graph building
 
@@ -122,38 +116,402 @@ E. Grafted line has different color from source, destination, and
     | 1
     |/b
     0
+
+Family line implementation
+==========================
+Terms
+-----
+Edge
+  line which connect two revisions directly
+
+Path
+  unbranched line which connect two revisions directly or indirectly.
+  (Intermediate revisions can exist on the path)
+
+Parent line
+  Edge between revision and its direct parent
+
+Family line
+  Extension edge to complete revision depencency on the filtered graph.
+
+Next visible ancestor(s)
+  Next visible ancestors of rev.X means the ancestor revisions that are
+  neighboring with rev.X when ignoring hidden revisions.
+
+Description
+-----------
+In the filtered dag with family line support, we must show at least one path
+between any visible revision and any ancestor of it.
+
+Examples
+--------
+Legends
+~~~~~~~
+o, 0, 1, 2, ..., 9
+    visible revision
+x
+    hidden revision
+`|<`
+    family line
+
+Simple cases
+~~~~~~~~~~~~
+
+.. code::
+
+    ALL  FILTERED      ALL    FILTERED       ALL    FILTERED
+     3      3           4        4            4        4
+     |      |<          |\       |\<          |\       |\
+     x  ->  |<          | x      | |<         | 3      | 3
+     |      |<          | |  ->  | |<         | |  ->  | |<
+     1      1           | 2      | 2          | x      | |<
+                        |/       |/           |/       |/<
+                        1        1            1        1
+Advanced cases
+~~~~~~~~~~~~~~
+
+..code::
+
+    ALL       FILTERED
+     3         3
+     |\        |        No family line is drawn at 3-1
+     | x       |        because there is already parent line.
+     |/        |
+     1         1
+
+    ALL       FILTERED
+     6           6
+     |\          |      1 and 3 are next visible ancestors of 6,
+     5 |         5      but no family lines are drawn at 6-3 and 6-1,
+     | x         |      because 6-3 and 6-1 path already exist (6-5-3-1)
+     |/|    ->   |
+     3 |         3
+     | x         |
+     |/          |
+     1           1
+
+    ALL       FILTERED
+     5           5
+     |\          |<     Both 1 and 2 are next visible ancestors of 5,
+     x |         |<     but no family line is drawn at 5-1 because 5-2 edge
+     | x   ->    |<     completes 5-1 path at the same time.
+     2 |         2
+     |/          |
+     1           1
+
+Given such cases, we can determine family line location as below:
+
+    If Rev-X and Rev-Y (X > Y) meets these all conditions, family line
+    will be drawn between X and Y.
+
+    1. X and Y are both visible (not hidden)
+    2. Y is ancestor of X
+    3. Revisions in DAG between X and Y are all hidden
+    4. Y is *NOT* ancestor of visible parents of X
+    5. Y is *NOT* ancestor of any other lower-end revisions of family line
+       from X
 """
 
 import time
 import os
 import itertools
+import collections
 
-from mercurial import repoview
+from mercurial import error, revset as revsetmod
 
 from tortoisehg.util import obsoleteutil
 
 LINE_TYPE_PARENT = 0
-LINE_TYPE_GRAFT = 1
-LINE_TYPE_OBSOLETE = 2
+LINE_TYPE_FAMILY = 1
+LINE_TYPE_GRAFT = 2
+LINE_TYPE_OBSOLETE = 3
+
+NODE_SHAPE_REVISION = 0
+NODE_SHAPE_CLOSEDBRANCH = 1
+NODE_SHAPE_APPLIEDPATCH = 2
+NODE_SHAPE_UNAPPLIEDPATCH = 3
+
+
+class StandardDag(object):
+    """Generate DAG for grapher
+
+    Public fields:
+        repo        The repository
+        start_rev   Tip-most revision of range to graph
+                    This can be None, which means workingtree
+        stop_rev    0-most revision of range to graph
+        branch      If set, then only revisions in this branch only iterated.
+        allparents  If set in addition to branch, then cset outside the
+                    branch that are ancestors to some cset inside the branch
+                    is also iterated
+        showgraftsource
+                    If set, return graft relations additionally
+        visiblerev  The function to determine revision visiblity,
+                    which accepts one argument(revno) and return bool value
+                    (True if visible)
+
+    walk() iterates visible nodes with this form (ctx is changectx or filectx):
+        `(ctx, [(parent ctx, line type, p1 or not), ...])`
+    """
+    def __init__(self, repo, start_rev, stop_rev, branch, allparents,
+                 showgraftsource, visiblerev):
+        assert start_rev is None or start_rev >= stop_rev
+        self.repo = repo
+        self.start_rev = start_rev
+        self.stop_rev = stop_rev
+        self.branch = branch
+        self.allparents = allparents
+        self.showgraftsource = showgraftsource
+        self.visiblerev = visiblerev
+        if self.allparents or not branch:
+            def visiblectx(ctx):
+                return bool(ctx)
+        else:
+            def visiblectx(ctx):
+                return ctx and ctx.branch() == branch
+        self.visiblectx = visiblectx
+
+    def _iter_revs(self, repo, visiblerev):
+        stop_rev = self.stop_rev
+        curr_rev = self.start_rev
+        if curr_rev is None:
+            if visiblerev(curr_rev):
+                yield repo[curr_rev]
+            curr_rev = len(repo) - 1
+        for curr_rev in revsetmod.spanset(repo, curr_rev, stop_rev - 1):
+            if visiblerev(curr_rev):
+                yield repo[curr_rev]
+
+    def _append_graft_source(self, ctx, parents):
+        src_rev_str = ctx.extra().get('source')
+        if src_rev_str is not None and src_rev_str in self.repo:
+            src = self.repo[src_rev_str]
+            src_rev = src.rev()
+            if self.stop_rev <= src_rev < ctx.rev() and \
+                    self.visiblerev(src_rev) and self.visiblectx(src):
+                parents.append((src, LINE_TYPE_GRAFT, False))
+        for octx in obsoleteutil.first_known_precursors(ctx):
+            src_rev = octx.rev()
+            if self.stop_rev <= src_rev < ctx.rev() and \
+                    self.visiblerev(src_rev) and self.visiblectx(octx):
+                parents.append((octx, LINE_TYPE_OBSOLETE, False))
+
+    def walk(self):
+        repo = self.repo
+        branch = self.branch
+        showgraftsource = self.showgraftsource
+        visiblerev = self.visiblerev
+        visiblectx = self.visiblectx
+
+        upcomingparents = set()
+        for ctx in self._iter_revs(repo, visiblerev):
+            if ctx.rev() not in upcomingparents:
+                if branch and ctx.branch() != branch:
+                    continue
+            else:
+                upcomingparents.remove(ctx.rev())
+
+            parents = [(p, LINE_TYPE_PARENT, i == 0)
+                       for i, p in enumerate(filter(visiblectx, ctx.parents()))
+                       if visiblerev(p.rev())]
+            if showgraftsource:
+                self._append_graft_source(ctx, parents)
+
+            upcomingparents.update([p[0].rev() for p in parents])
+
+            yield ctx, parents
+
+
+class _FamilyLineRev(object):
+    r"""Revision information for building family line relations
+
+    Public fields:
+        rev     Revision number. Can be None (means workingdir)
+        visible True if self should be shown
+        destinations
+                List of parent/family line edge destinations.
+                Each elements are tuple:
+                    revno       revision number of edge destination edge
+                    linetype    LINE_TYPE_PARENT or LINE_TYPE_FAMILY
+                    is_p1       True if revno is in ancestors(p1(self.rev))
+        next_descendants
+                dictionary:
+                key     _FamilyLineRev which can be upper-end of family line
+                        edge to self.rev
+                value   True if self.rev is in ancestors(p1(key.rev))
+        excluded_descendants
+                frozenset of _FamilyLineRev.
+                Revisions which are excluded from next_descendants.
+                family line is *NOT* drawn between self and these revisions.
+        pending
+                Number of unclosed edges of which upper-end is self.rev
+                Initial value is number of hidden parents(set by proceed()),
+                and incremented or decremented with proceeding DAG scan.
+                It will become 0 when all NVAs of self are determined.
+
+    This is illustration of relations between instances
+
+      :           +--------------------------------------+
+      o           |        upper visible revision        |
+      |           +--------------------------------------+
+      x          next_descendants ^  | destinations    ^
+      |\                          |  v (FAMILY)        |
+      | |                    +--------------+          |
+      @ |                    |     self     |          | next_descendants
+      | |                    +--------------+          | excluded_descendants
+      | x    excluded_descendants ^  | destinations    |
+      | |                    (*1) |  v (PARENT)        |
+      |/          +--------------------------------------+
+      o           |       lower visible revision         |
+      :           +--------------------------------------+
+
+        (*1) because here is parent line, not family line
+    """
+    __slots__ = ["rev", "visible", "next_descendants", "excluded_descendants",
+                 "pending", "destinations"]
+
+    def __init__(self, rev, visible):
+        self.rev = rev
+        self.visible = visible
+        self.next_descendants = {}
+        self.excluded_descendants = set()
+        self.pending = 0
+        self.destinations = []
+
+    def proceed(self, parents):
+        next_descendants = self.next_descendants
+        excluded_descendants = self.excluded_descendants
+        excluded_descendants.difference_update([r for r in excluded_descendants
+                                                if not r.pending])
+
+        # decrement `pending` of each next_descendants regardless of
+        # self.visible once.
+        # (it will be reincremented if self is hidden and self has parents)
+        for nd in next_descendants:
+            nd.pending -= 1
+            assert nd.pending >= 0
+
+        if excluded_descendants:
+            next_descendants = dict(kv for kv in next_descendants.items()
+                                    if kv[0] not in excluded_descendants)
+
+        if self.visible:
+            for nd, is_p1 in next_descendants.iteritems():
+                nd.destinations.append((self.rev, LINE_TYPE_FAMILY, is_p1))
+
+            # `next_descendants` are also excluded from next_descendants
+            # of parents because of definition #4
+            parent_ed = excluded_descendants.union(next_descendants)
+            for i, p in enumerate(parents):
+                p.add_excluded_descendants(parent_ed)
+                if p.visible:
+                    self.destinations.append((p.rev, LINE_TYPE_PARENT, i == 0))
+                    p.add_excluded_descendants([self])
+                else:
+                    p.add_next_descendants({self: i == 0})
+        else:
+            # just pass to parents
+            for p in parents:
+                p.add_next_descendants(next_descendants)
+                p.add_excluded_descendants(excluded_descendants)
+
+        # these are no longer needed
+        self.next_descendants = self.excluded_descendants = None
+
+    def add_next_descendants(self, descendants):
+        for d, is_p1 in descendants.iteritems():
+            if d in self.next_descendants:
+                self.next_descendants[d] |= is_p1
+            else:
+                d.pending += 1
+                self.next_descendants[d] = is_p1
+
+    def add_excluded_descendants(self, descendants):
+        self.excluded_descendants.update(descendants)
+
+    def __hash__(self):
+        return hash(self.rev)
+
+    def __eq__(self, other):
+        return isinstance(other, _FamilyLineRev) and self.rev == other.rev
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __repr__(self):
+        if self.rev is None:
+            return "_FamilyLineRev(+)"
+        else:
+            return "_FamilyLineRev(%d)" % self.rev
+
+
+class FamilyLineDag(StandardDag):
+    """Generate filtered DAG with family lines for grapher"""
+
+    def walk(self):
+        repo = self.repo
+        stop_rev = self.stop_rev
+        showgraftsource = self.showgraftsource
+        upcomingrevs = {}
+        visiblerev = self.visiblerev
+        visiblectx = self.visiblectx
+
+        def get_or_create_rev(ctx):
+            rev = ctx.rev()
+            ret = upcomingrevs.get(rev)
+            if not ret:
+                ret = upcomingrevs[rev] = \
+                    _FamilyLineRev(rev, visiblerev(rev) and visiblectx(ctx))
+            return ret
+
+        queue = collections.deque()
+        for ctx in self._iter_revs(repo, lambda rev: True):
+            rev = upcomingrevs.pop(ctx.rev(), None)
+            if not rev:
+                if not visiblerev(ctx.rev()) or not visiblectx(ctx):
+                    continue
+                rev = _FamilyLineRev(ctx.rev(), True)
+
+            parents = [get_or_create_rev(p) for p in ctx.parents()
+                       if p.rev() >= stop_rev]
+            rev.proceed(parents)
+            if not rev.visible:
+                continue
+            # yield after rev.pending becomes 0
+            queue.append(rev)
+            while queue and not queue[0].pending:
+                r = queue.popleft()
+                # order by p1 -> p2, small rev -> large rev
+                destinations = sorted(r.destinations,
+                                      key=lambda e: (not e[2], e[0]))
+                parents = [(repo[pno], linktype, is_p1)
+                           for (pno, linktype, is_p1) in destinations]
+                rctx = repo[r.rev]
+                if showgraftsource:
+                    self._append_graft_source(rctx, parents)
+                yield rctx, parents
+
+        assert not queue
+
 
 def revision_grapher(repo, opts):
     """incremental revision grapher
 
     param repo       The repository
-    opt   start_rev  Tip-most revision of range to graph
-    opt   stop_rev   0-most revision of range to graph
-    opt   follow     True means graph only ancestors of start_rev
     opt   revset     set of revisions to graph.
-                     If used, then start_rev, stop_rev, and follow is ignored
     opt   branch     Only graph this branch
     opt   allparents If set in addition to branch, then cset outside the
                      branch that are ancestors to some cset inside the branch
                      is also graphed
+    opt   showfamilyline
+                     If set in addition to revset, then family line will be
+                     shown between descendants and ancestors
 
-    This generator function walks through the revision history from
-    revision start_rev to revision stop_rev (which must be less than
-    or equal to start_rev) and for each revision emits tuples with the
-    following elements:
+    This generator function walks through the revision range in descending
+    order.
+    When revset is specified, range is from max(revset) to min(revset),
+    otherwise from working tree(pseudo revision) to rev0.
+    For each revision emits tuples with the following elements:
 
       - current revision
       - column of the current node in the set of ongoing edges
@@ -162,82 +520,43 @@ def revision_grapher(repo, opts):
         defining the edges between the current row and the next row
       - parent revisions of current revision
     """
-
-    revset = opts.get('revset', None)
-    branch = opts.get('branch', None)
-    showhidden = opts.get('showhidden', None)
-    showgraftsource = opts.get('showgraftsource', None)
-    if showhidden:
-        revhidden = []
-    else:
-        revhidden = repoview.filterrevs(repo, 'visible')
+    revset = opts.get('revset')
     if revset:
         start_rev = max(revset)
         stop_rev = min(revset)
-        follow = False
-        hidden = lambda rev: (rev not in revset) or (rev in revhidden)
+        visiblerev = lambda rev: rev in revset
     else:
-        start_rev = opts.get('start_rev', None)
-        stop_rev = opts.get('stop_rev', 0)
-        follow = opts.get('follow', False)
-        hidden = lambda rev: rev in revhidden
+        start_rev = None
+        stop_rev = 0
+        visiblerev = lambda rev: True
+    if revset and opts.get('showfamilyline'):
+        cls = FamilyLineDag
+    else:
+        cls = StandardDag
 
-    assert start_rev is None or start_rev >= stop_rev
+    dag = cls(repo, start_rev, stop_rev,
+              opts.get('branch'), opts.get('allparents'),
+              opts.get('showgraftsource'), visiblerev)
+    return _iter_graphnodes(dag, GraphNode.fromchangectx)
 
-    curr_rev = start_rev
+
+def _iter_graphnodes(dag, nodefactory):
     revs = []
     activeedges = []  # order is not important
 
-    if opts.get('allparents') or not branch:
-        def getparents(ctx):
-            return [x for x in ctx.parents() if x]
-    else:
-        def getparents(ctx):
-            return [x for x in ctx.parents()
-                    if x and x.branch() == branch]
+    rev_color = RevColorPalette()
 
-    rev_color = RevColorPalette(getparents)
-
-    while curr_rev is None or curr_rev >= stop_rev:
-        if hidden(curr_rev):
-            curr_rev -= 1
-            continue
-
+    for ctx, parents in dag.walk():
+        curr_rev = ctx.rev()
         # Compute revs and next_revs.
-        ctx = repo[curr_rev]
         if curr_rev not in revs:
-            if branch and ctx.branch() != branch:
-                if curr_rev is None:
-                    curr_rev = len(repo) - 1
-                else:
-                    curr_rev -= 1
-                yield None
-                continue
-
             # New head.
-            if start_rev and follow and curr_rev != start_rev:
-                curr_rev -= 1
-                continue
             revs.append(curr_rev)
         rev_index = revs.index(curr_rev)
         next_revs = revs[:]
         activeedges = [e for e in activeedges if e.endrev < curr_rev]
 
         # Add parents to next_revs.
-        parents = [(p, LINE_TYPE_PARENT, i == 0)
-                   for i, p in enumerate(getparents(ctx))
-                   if not hidden(p.rev())]
-        if showgraftsource:
-            src_rev_str = ctx.extra().get('source')
-            if src_rev_str is not None and src_rev_str in repo:
-                src = repo[src_rev_str]
-                src_rev = src.rev()
-                if stop_rev <= src_rev < curr_rev and not hidden(src_rev):
-                    parents.append((src, LINE_TYPE_GRAFT, False))
-            for octx in obsoleteutil.first_known_precursors(ctx):
-                src_rev = octx.rev()
-                if stop_rev <= src_rev < curr_rev and not hidden(src_rev):
-                    parents.append((octx, LINE_TYPE_OBSOLETE, False))
         parents_to_add = []
         for pctx, link_type, is_p1 in parents:
             parent = pctx.rev()
@@ -257,7 +576,6 @@ def revision_grapher(repo, opts):
                 color = rev_color[pctx]
             activeedges.append(GraphEdge(curr_rev, parent, color, link_type))
 
-        # parents_to_add.sort()
         next_revs[rev_index:rev_index + 1] = parents_to_add
 
         lines = []
@@ -269,12 +587,8 @@ def revision_grapher(repo, opts):
             p = (revs.index(r), next_revs.index(e.endrev))
             lines.append((p, e))
 
-        yield GraphNode(curr_rev, rev_index, lines)
+        yield nodefactory(ctx, rev_index, lines)
         revs = next_revs
-        if curr_rev is None:
-            curr_rev = len(repo) - 1
-        else:
-            curr_rev -= 1
 
 
 def filelog_grapher(repo, path):
@@ -282,89 +596,60 @@ def filelog_grapher(repo, path):
     Graph the ancestry of a single file (log).  Deletions show
     up as breaks in the graph.
     '''
-    filerev = len(repo.file(path)) - 1
-    fctx = repo.filectx(path, fileid=filerev)
-    rev = fctx.rev()
+    dag = FileDag(repo, path)
+    return _iter_graphnodes(dag, GraphNode.fromfilectx)
 
-    flog = fctx.filelog()
-    heads = [repo.filectx(path, fileid=flog.rev(x)).rev() for x in flog.heads()]
-    assert rev in heads
-    heads.remove(rev)
 
-    revs = []
-    activeedges = []  # order is not important
-    rev_color = {}
-    nextcolor = 0
-    _paths = {}
+class FileDag(object):
+    def __init__(self, repo, path):
+        self.repo = repo
+        self.path = path
 
-    while rev >= 0:
-        # Compute revs and next_revs
-        if rev not in revs:
-            revs.append(rev)
-            rev_color[rev] = nextcolor ; nextcolor += 1
-        curcolor = rev_color[rev]
-        index = revs.index(rev)
-        next_revs = revs[:]
-        activeedges = [e for e in activeedges if e.endrev < rev]
+    def walk(self):
+        repo = self.repo
+        path = self.path
 
-        # Add parents to next_revs
-        fctx = repo.filectx(_paths.get(rev, path), changeid=rev)
-        for pfctx in fctx.parents():
-            _paths[pfctx.rev()] = pfctx.path()
-        parents = [pfctx.rev() for pfctx in fctx.parents()]
-                   # if f.path() == path]
-        parents_to_add = []
-        for pno, parent in enumerate(parents):
-            if parent not in next_revs:
-                parents_to_add.append(parent)
-                if pno == 0:
-                    rev_color[parent] = curcolor
-                else:
-                    rev_color[parent] = nextcolor ; nextcolor += 1
+        filerev = len(repo.file(path)) - 1
+        fctx = repo.filectx(path, fileid=filerev)
+        rev = fctx.rev()
+
+        flog = fctx.filelog()
+        heads = [repo.filectx(path, fileid=flog.rev(x)).rev()
+                 for x in flog.heads()]
+        assert rev in heads
+        heads.remove(rev)
+
+        _paths = {}
+
+        while rev >= 0:
+            revpath = _paths.pop(rev, path)
+
+            # Add parents to next_revs
+            fctx = repo.filectx(revpath, changeid=rev)
+            for pfctx in fctx.parents():
+                _paths[pfctx.rev()] = pfctx.path()
+            parents = [(pfctx, LINE_TYPE_PARENT, i == 0)
+                       for i, pfctx in enumerate(fctx.parents())]
+
+            yield fctx, parents
+
+            if _paths:
+                rev = max(_paths)
             else:
-                # at the branch point, we should choose lower color
-                # because lower color line is longer than higher one,
-                # and probably longer line is major line.
-                if pno == 0 and curcolor < rev_color[parent]:
-                    rev_color[parent] = curcolor
-            if pno == 0:
-                color = curcolor
-            else:
-                color = rev_color[parent]
-            activeedges.append(GraphEdge(rev, parent, color))
-        parents_to_add.sort()
-        next_revs[index:index + 1] = parents_to_add
+                rev = -1
+            if heads and rev <= heads[-1]:
+                rev = heads.pop()
 
-        lines = []
-        for e in activeedges:
-            if e.startrev == rev:
-                r = e.startrev
-            else:
-                r = e.endrev
-            p = (revs.index(r), next_revs.index(e.endrev))
-            lines.append((p, e))
-
-        yield GraphNode(fctx.rev(), index, lines,
-                        extra=[_paths.get(fctx.rev(), path)])
-        revs = next_revs
-
-        if revs:
-            rev = max(revs)
-        else:
-            rev = -1
-        if heads and rev <= heads[-1]:
-            rev = heads.pop()
 
 def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
     for patchname in reversed(repo.thgmqunappliedpatches):
-        yield GraphNode(patchname, 0, [])
+        yield GraphNode(patchname, NODE_SHAPE_UNAPPLIEDPATCH, 0, [])
 
 class RevColorPalette(object):
     """Assign node and line colors for each revision"""
 
-    def __init__(self, getparents):
-        self._getparents = getparents
+    def __init__(self):
         self._pendingheads = []
         self._knowncolors = {}
         self._curcolor = -1
@@ -389,7 +674,7 @@ class RevColorPalette(object):
             if rev0 in self._knowncolors:
                 return
             self._knowncolors[rev0] = curcolor
-            p_ctxs = self._getparents(ctx0)
+            p_ctxs = ctx0.parents()
 
     def nextcolor(self):
         self._curcolor += 1
@@ -402,7 +687,7 @@ class RevColorPalette(object):
             if rev not in self._knowncolors:
                 color = self.nextcolor()
                 self._knowncolors[rev] = color
-                p_ctxs = self._getparents(ctx)
+                p_ctxs = ctx.parents()
                 self._pendingheads.append((p_ctxs, color))
         return self._knowncolors[rev]
 
@@ -437,12 +722,47 @@ class GraphNode(object):
     Simple class to encapsulate a hg node in the revision graph. Does
     nothing but declaring attributes.
     """
-    __slots__ = ["rev", "x", "bottomlines", "toplines", "extra"]
-    def __init__(self, rev, xposition, lines, extra=None):
+    __slots__ = ["rev", "shape", "x", "bottomlines", "toplines", "hidden",
+                 "wdparent", "extra"]
+
+    @classmethod
+    def fromchangectx(cls, ctx, xposition, lines):
+        if ctx.thgmqappliedpatch():
+            shape = NODE_SHAPE_APPLIEDPATCH
+        elif ctx.extra().get('close'):
+            shape = NODE_SHAPE_CLOSEDBRANCH
+        else:
+            shape = NODE_SHAPE_REVISION
+        return cls(ctx.rev(), shape, xposition, lines, ctx.hidden(),
+                   ctx.thgwdparent())
+
+    @classmethod
+    def fromfilectx(cls, fctx, xposition, lines):
+        try:
+            ctx = fctx._repo[fctx.rev()]  # get changectx wrapped by thgrepo
+            if ctx.thgmqappliedpatch():
+                shape = NODE_SHAPE_APPLIEDPATCH
+            else:
+                shape = NODE_SHAPE_REVISION
+            hidden = ctx.hidden()
+            wdparent = ctx.thgwdparent()
+        except error.RepoLookupError:
+            # linkrev may point to hidden revision
+            shape = NODE_SHAPE_REVISION
+            hidden = True
+            wdparent = False
+        return cls(fctx.rev(), shape, xposition, lines, hidden, wdparent,
+                   [fctx.path()])
+
+    def __init__(self, rev, shape, xposition, lines, hidden=False,
+                 wdparent=False, extra=None):
         self.rev = rev
+        self.shape = shape
         self.x = xposition
         self.bottomlines = lines
         self.toplines = []
+        self.hidden = hidden
+        self.wdparent = wdparent
         self.extra = extra
     @property
     def cols(self):
@@ -460,7 +780,6 @@ class Graph(object):
 
     def __init__(self, repo, grapher, include_mq=False):
         self.repo = repo
-        self.maxlog = len(repo)
         if include_mq:
             patch_grapher = mq_patch_grapher(self.repo)
             self.grapher = itertools.chain(patch_grapher, grapher)
@@ -468,7 +787,6 @@ class Graph(object):
             self.grapher = grapher
         self.nodes = []
         self.nodesdict = {}
-        self.max_cols = 0
 
     def __getitem__(self, idx):
         if isinstance(idx, slice):
@@ -506,18 +824,12 @@ class Graph(object):
             startsec = timer()
 
         stopped = False
-        mcol = set([self.max_cols])
 
         for gnode in self.grapher:
-            if gnode is None:
-                continue
-            if not type(gnode.rev) == str and gnode.rev >= self.maxlog:
-                continue
             if self.nodes:
                 gnode.toplines = self.nodes[-1].bottomlines
             self.nodes.append(gnode)
             self.nodesdict[gnode.rev] = gnode
-            mcol.add(gnode.cols)
             if (rev is not None and isinstance(gnode.rev, int)
                 and gnode.rev <= rev):
                 rev = None # we reached rev, switching to nnode counter
@@ -534,7 +846,6 @@ class Graph(object):
             self.grapher = None
             stopped = True
 
-        self.max_cols = max(mcol)
         return not stopped
 
     def isfilled(self):

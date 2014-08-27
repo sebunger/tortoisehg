@@ -185,10 +185,8 @@ class QuickOpDialog(QDialog):
                                 _('No operation to perform'),
                                 parent=self)
             return
-        self.repo.bfstatus = True
         self.repo.lfstatus = True
         repostate = self.repo.status()
-        self.repo.bfstatus = False
         self.repo.lfstatus = False
         if self.command == 'remove':
             if not self.chk.isChecked():

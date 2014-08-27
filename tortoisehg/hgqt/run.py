@@ -33,8 +33,8 @@ except ImportError:
     config_nofork = None
 
 console_commands = 'help thgstatus version'
-nonrepo_commands = '''userconfig shellconfig clone init debugbugreport
-about help version thgstatus serve rejects log'''
+nonrepo_commands = '''userconfig shellconfig clone init debugblockmatcher
+debugbugreport about help version thgstatus serve rejects log'''
 
 def dispatch(args, u=None):
     """run the command specified in args"""
@@ -72,7 +72,11 @@ def portable_fork(ui, opts):
             return
     elif config_nofork:
         return
-    portable_start_fork()
+    try:
+        portable_start_fork()
+    except OSError, inst:
+        ui.warn(_('failed to fork GUI process: %s\n') % inst.strerror)
+        return
     sys.exit(0)
 
 def portable_start_fork(extraargs=None):
@@ -393,13 +397,6 @@ globalopts = [
 
 # common command functions
 
-def _filelog(ui, repoagent, *pats, **opts):
-    from tortoisehg.hgqt import filedialogs
-    if len(pats) != 1:
-        raise util.Abort(_('requires a single filename'))
-    filename = hglib.canonpaths(pats)[0]
-    return filedialogs.FileLogDialog(repoagent, filename)
-
 def _formatfilerevset(pats):
     q = ["file('path:%s')" % f for f in hglib.canonpaths(pats)]
     return ' or '.join(q)
@@ -446,11 +443,8 @@ def add(ui, repoagent, *pats, **opts):
 def annotate(ui, repoagent, *pats, **opts):
     """annotate dialog"""
     from tortoisehg.hgqt import fileview
-    repo = repoagent.rawRepo()
-    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
-    dlg = _filelog(ui, repoagent, *pats, **opts)
+    dlg = filelog(ui, repoagent, *pats, **opts)
     dlg.setFileViewMode(fileview.AnnMode)
-    dlg.goto(rev)
     if opts.get('line'):
         try:
             lineno = int(opts['line'])
@@ -539,6 +533,12 @@ def commit(ui, repoagent, *pats, **opts):
     os.chdir(repo.root)
     return commitmod.CommitDialog(repoagent, pats, opts)
 
+@command('debugblockmatcher', [], _('thg debugblockmatcher'))
+def debugblockmatcher(ui, *pats, **opts):
+    """show blockmatcher widget"""
+    from tortoisehg.hgqt import blockmatcher
+    return blockmatcher.createTestWidget(ui)
+
 @command('debugbugreport', [], _('thg debugbugreport [TEXT]'))
 def debugbugreport(ui, *pats, **opts):
     """open bugreport dialog by exception"""
@@ -571,6 +571,25 @@ def email(ui, repoagent, *revs, **opts):
     repo = repoagent.rawRepo()
     revs = scmutil.revrange(repo, revs)
     return hgemail.EmailDialog(repoagent, revs)
+
+@command('^filelog',
+    [('r', 'rev', '', _('select the specified revision')),
+     ('', 'compare', False, _('side-by-side comparison of revisions'))],
+    _('thg filelog [OPTION]... FILE'))
+def filelog(ui, repoagent, *pats, **opts):
+    """show history of the specified file"""
+    from tortoisehg.hgqt import filedialogs
+    if len(pats) != 1:
+        raise util.Abort(_('requires a single filename'))
+    repo = repoagent.rawRepo()
+    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    filename = hglib.canonpaths(pats)[0]
+    if opts.get('compare'):
+        dlg = filedialogs.FileDiffDialog(repoagent, filename)
+    else:
+        dlg = filedialogs.FileLogDialog(repoagent, filename)
+    dlg.goto(rev)
+    return dlg
 
 @command('forget', [], _('thg forget [FILE]...'))
 def forget(ui, repoagent, *pats, **opts):
@@ -817,7 +836,7 @@ def log(ui, *pats, **opts):
         # TODO: do not instantiate repo here
         repo = thgrepo.repository(ui, root)
         repoagent = repo._pyqtobj
-        return _filelog(ui, repoagent, *pats, **opts)
+        return filelog(ui, repoagent, *pats, **opts)
 
     # Before starting the workbench, we must check if we must try to reuse an
     # existing workbench window (we don't by default)

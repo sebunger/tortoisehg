@@ -21,13 +21,13 @@ Výčet prvků nástrojové lišty úlohy komit:
 		Pole pro zadání filtrovacího řetězce pro vyhledání souborů.
 	:guilabel:`Status`
 		Rozvinovací seznam různých módů souborů. V seznamu souborů se zobrazí pouze ty soubory, jejichž stavy jsou v seznamu Status zatrženy:
-	* *upravený* ( **M** odified) znamená, že sledovaný soubor byl změněn.
-	* *přidaný* ( **A** dded) znamená, že nesledovaný soubor byl přidán ke sledování.
-	* *odebraný* ( **R** emoved) znamená, že sledovaný soubor byl odebrán příkazem :guilabel:`hg remove`.
+	* *upravený* ( **M** odified ) znamená, že sledovaný soubor byl změněn.
+	* *přidaný* ( **A** dded ) znamená, že nesledovaný soubor byl přidán ke sledování.
+	* *odebraný* ( **R** emoved ) znamená, že sledovaný soubor byl odebrán příkazem :guilabel:`hg remove`.
 	* *chybějící* ( **!** ) znamená, že Mercurial soubor postrádá. Když napřiklad přejmenujete nebo smažete sledovaný soubor v Exploreru, objeví se jako chybějící a jeho nové jméno jako neznámé. Pravým poklepem na novém názvu vyvoláme dialog, ve kterém lze přejmenování odhalit porovnáním obsahů a označit starý soubor jako odstraněný, nový soubor jako přidaný a zapsat celou operaci jako přejmenování.
 	* *neznámý* ( **?** ) patří souborům, které Mercurial nesleduje, ani nejsou uvedeny v seznamu ignorovaných souborů. Toto označení je implicitní pro soubory, které mají být do správy revizí teprve přídány. Kontextové menu neznámého souboru obsahuje volbu "Ignore", která otevře dialogové okno pro podrobnější nastavení volby.
 	* *ignorovaný* ( **I** ) patří nesledovaným souborům, které jsou uvedeny v seznamu ignorovaných souborů.
-	* *čistý* ( **C** lean) platí pro sledované soubory, které nebyly editovány.
+	* *čistý* ( **C** lean ) platí pro sledované soubory, které nebyly editovány.
 
 	:guilabel:`Refresh`
 		Znovu načíst seznam souborů.

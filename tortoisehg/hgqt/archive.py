@@ -84,7 +84,8 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         # set default values
         self.prevtarget = None
         self.rev_combo.addItem(WD_PARENT)
-        self.rev_combo.addItems(map(hglib.tounicode, self.repo.namedbranches))
+        self.rev_combo.addItems(map(hglib.tounicode,
+                                    hglib.namedbranches(self.repo)))
         tags = list(self.repo.tags())
         tags.sort(reverse=True)
         for t in tags:
