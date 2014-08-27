@@ -20,7 +20,7 @@ Chtěli jsme mít jedinou aplikaci, která by měla přístup k téměř všem f
 
 Verpánek podporuje otevření a zobrazení více než jednoho repozitáře na kartách, aktivovaných poklepem na položce seznamu v panelu :guilabel:`Seznam repozitářů`.
 
-Každá repozitářová karta je propojena s úkonovými kartami (Podrobnosti revizí, Commit, Synchronizace, Manifest, Hledat), které se zobrazují v úkonové ploše pod Přehledem revizí. Tyto karty se přepínají poklepem na ouška, ikonami v manipulační liště nebo výpěrem nabídky v roletce :guilabel:`View`.
+Každá repozitářová karta je propojena s úkonovými kartami (Podrobnosti revizí, Commit, Synchronizace, Hledat), které se zobrazují v úkonové ploše pod Přehledem revizí. Tyto karty se přepínají poklepem na ouška, ikonami v úkonové liště nebo výběrem nabídky v roletce :guilabel:`View`.
 
 K disposici jsou také tři parkovatelné panely - *Seznam repozitářů*, *Patch Queue* a *Output Log*. První zobrazuje stromovou strukturu lokálních repozitářů v počítači, druhý panel se použije při manipulaci s oprávkami (patches) a třetí panel zobrazuje aktuálně prováděné příkazy a lze jej použít jako konzolu pro zadávání příkazů. 
 

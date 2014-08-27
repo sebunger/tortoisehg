@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
-"POT-Creation-Date: 2014-04-28 11:26-0300\n"
-"PO-Revision-Date: 2014-02-05 01:45+0000\n"
+"POT-Creation-Date: 2014-07-24 12:23-0300\n"
+"PO-Revision-Date: 2014-07-28 14:58+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-04-29 05:55+0000\n"
-"X-Generator: Launchpad (build 16985)\n"
+"X-Launchpad-Export-Date: 2014-07-29 06:06+0000\n"
+"X-Generator: Launchpad (build 17131)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg overlay-ikon server"
@@ -39,9 +39,6 @@ msgstr "Du kan besøge vores hjemmeside her"
 msgid "&License"
 msgstr "&Licens"
 
-msgid "&Close"
-msgstr "&Luk"
-
 #, python-format
 msgid "version %s"
 msgstr "version %s"
@@ -53,6 +50,9 @@ msgstr "med Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
 msgstr "En ny version af TortoiseHg (%s) er klar til at blive hentet!"
+
+msgid "License"
+msgstr "Licens"
 
 msgid "= Working Directory Parent ="
 msgstr "= Forælder til arbejdskataloget ="
@@ -677,6 +677,12 @@ msgstr "Flet"
 msgid "Merge with %s"
 msgstr ""
 
+msgid "Patch Name Required"
+msgstr "Navn på lap påkrævet"
+
+msgid "You must enter a patch name"
+msgstr "Du skal indtaste et navn på lap"
+
 msgctxt "start progress"
 msgid "Commit"
 msgstr "Integrér"
@@ -719,6 +725,9 @@ msgstr ""
 
 msgid "Stop"
 msgstr "Stop"
+
+msgid "### patch name ###"
+msgstr ""
 
 msgid "Commit changes"
 msgstr "Integrer ændringer"
@@ -1162,7 +1171,7 @@ msgid ""
 msgstr ""
 
 msgid "Show Output Log"
-msgstr ""
+msgstr "Vis log for uddata"
 
 msgid ""
 "When enabled, automatically show the Output Log when the command is run.\n"
@@ -1201,9 +1210,6 @@ msgstr ""
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr ""
 
-msgid "Custom Tools"
-msgstr ""
-
 #, python-format
 msgid "command parse error: %s"
 msgstr "kommando-fortolkningsfejl: %s"
@@ -1239,16 +1245,7 @@ msgstr ""
 msgid "Diff Changeset to Loc&al"
 msgstr ""
 
-msgid "Diff Selected Cha&ngesets"
-msgstr ""
-
 msgid "&Diff to Parent"
-msgstr ""
-
-msgid "Cannot display visual diff"
-msgstr ""
-
-msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
 msgid "Diff to &Local"
@@ -1256,9 +1253,6 @@ msgstr ""
 
 msgid "View changes to current in external diff tool"
 msgstr "Vis ændringer til nuværende i eksternt diff-værktøj"
-
-msgid "Diff Selected &File Revisions"
-msgstr ""
 
 msgid "&View at Revision"
 msgstr ""
@@ -1279,6 +1273,9 @@ msgid "&Edit Local"
 msgstr ""
 
 msgid "&Open Local"
+msgstr ""
+
+msgid "&Copy Patch"
 msgstr ""
 
 msgid "Copy &Path"
@@ -1306,6 +1303,99 @@ msgid "Open &Terminal"
 msgstr ""
 
 msgid "Open a shell terminal in the selected folder"
+msgstr ""
+
+msgid "Custom Tools"
+msgstr ""
+
+msgid "Diff &Local"
+msgstr ""
+
+msgid "&View Missing"
+msgstr ""
+
+msgid "View O&ther"
+msgstr ""
+
+msgid "Add &Largefiles..."
+msgstr ""
+
+msgid "&Forget"
+msgstr ""
+
+msgid "&Delete Unversioned..."
+msgstr ""
+
+msgid "Confirm Delete Unversioned"
+msgstr ""
+
+msgid "Delete the following unversioned files?"
+msgstr ""
+
+msgid "&Delete"
+msgstr ""
+
+msgid "Re&move Versioned"
+msgstr ""
+
+msgid "&Revert..."
+msgstr ""
+
+msgid "Uncommited merge - please select a parent revision"
+msgstr "Ikke-integreret flet - vælg en forælderrevision"
+
+msgid "Revert files to local or other parent?"
+msgstr "Tilbagefør filer til lokal eller anden forælder?"
+
+msgid "&Local"
+msgstr "&Lokal"
+
+msgid "&Other"
+msgstr "&Andet"
+
+msgid "Confirm Revert"
+msgstr "Bekræft tilbagefør"
+
+msgid "Revert local file changes?"
+msgstr ""
+
+msgid "&Revert with backup"
+msgstr ""
+
+msgid "&Discard changes"
+msgstr ""
+
+msgid "Revert the following files?"
+msgstr ""
+
+msgid "&Revert"
+msgstr ""
+
+msgid "&Copy..."
+msgstr ""
+
+msgid "Re&name..."
+msgstr ""
+
+msgid "&Ignore..."
+msgstr ""
+
+msgid "De&tect Renames..."
+msgstr ""
+
+msgid "&Mark Resolved"
+msgstr ""
+
+msgid "&Mark Unresolved"
+msgstr ""
+
+msgid "Restart Mer&ge"
+msgstr ""
+
+msgid "Was renamed from"
+msgstr ""
+
+msgid "Restart Merge &with"
 msgstr ""
 
 msgid "Display the file anyway"
@@ -1480,6 +1570,12 @@ msgstr "Tilbage"
 
 msgid "Forward"
 msgstr "Frem"
+
+msgid "Diff Selected &Changesets"
+msgstr ""
+
+msgid "&Diff Selected File Revisions"
+msgstr ""
 
 msgid "Show Revision &Details"
 msgstr ""
@@ -1656,9 +1752,6 @@ msgstr ""
 
 msgid "&Originating Revision"
 msgstr ""
-
-msgid "&Local"
-msgstr "&Lokal"
 
 msgid "&Parent Revision"
 msgstr ""
@@ -2082,6 +2175,9 @@ msgstr "&Indstillinger"
 msgid "Send &Email"
 msgstr "Send &e-post"
 
+msgid "&Close"
+msgstr "&Luk"
+
 #, python-format
 msgid "Ignore filter - %s"
 msgstr "Ignoreringsmønster - %s"
@@ -2212,9 +2308,6 @@ msgstr ""
 
 msgid "Add as &Normal Files"
 msgstr ""
-
-msgid "License"
-msgstr "Licens"
 
 msgid "Find revisions matching fields of:"
 msgstr ""
@@ -2392,6 +2485,10 @@ msgstr "An&vend format"
 msgid "C&onfigure Format"
 msgstr "K&onfigurér format"
 
+#, python-format
+msgid "%s had rejected chunks, edit patched file together with rejects?"
+msgstr ""
+
 msgid "&Commit to Queue..."
 msgstr ""
 
@@ -2524,19 +2621,6 @@ msgstr ""
 
 msgid "Tolerate non-conflicting local changes (--keep-changes)"
 msgstr ""
-
-msgid "### patch name ###"
-msgstr ""
-
-#, python-format
-msgid "%s had rejected chunks, edit patched file together with rejects?"
-msgstr ""
-
-msgid "Patch Name Required"
-msgstr "Navn på lap påkrævet"
-
-msgid "You must enter a patch name"
-msgstr "Du skal indtaste et navn på lap"
 
 #, python-format
 msgid "Pending Perforce Changelists - %s"
@@ -2822,9 +2906,6 @@ msgstr ""
 msgid "&Paste"
 msgstr ""
 
-msgid "&Delete"
-msgstr ""
-
 msgid "&Editor Options"
 msgstr ""
 
@@ -2951,7 +3032,7 @@ msgid "Operation aborted:<br><br>%(arg0)s."
 msgstr ""
 
 msgid "Repository is locked"
-msgstr ""
+msgstr "Depot er låst"
 
 msgid "hint:"
 msgstr ""
@@ -3230,13 +3311,13 @@ msgid "Display graph the named branch only"
 msgstr ""
 
 msgid "Display only active branches"
-msgstr ""
+msgstr "Vis kun aktive grene"
 
 msgid "Display closed branches"
 msgstr "Vis lukkede grene"
 
 msgid "Include all ancestors"
-msgstr ""
+msgstr "Inkluder alle forgængere"
 
 msgctxt "column header"
 msgid "Graph"
@@ -3344,7 +3425,7 @@ msgid "&Open"
 msgstr ""
 
 msgid "Open the repository in a new tab"
-msgstr ""
+msgstr "Åben depot på fane"
 
 msgid "&Open All"
 msgstr ""
@@ -3396,7 +3477,7 @@ msgid "&Add Repository..."
 msgstr ""
 
 msgid "Add a repository to this group"
-msgstr ""
+msgstr "Tilføj et depot til denne gruppe"
 
 msgid "A&dd Subrepository..."
 msgstr ""
@@ -3624,7 +3705,7 @@ msgstr ""
 
 #, python-format
 msgid "Goto ancestor of %s and %s"
-msgstr ""
+msgstr "Gå til forgænger for %s og %s"
 
 #, python-format
 msgid "Can't find revision '%s'"
@@ -3832,9 +3913,6 @@ msgstr ""
 msgid "&Bundle Rev and Descendants..."
 msgstr ""
 
-msgid "&Copy Patch"
-msgstr ""
-
 msgid "Change &Phase to"
 msgstr "Ret &Fase til"
 
@@ -3917,7 +3995,7 @@ msgid "Rebase..."
 msgstr ""
 
 msgid "Goto common ancestor"
-msgstr ""
+msgstr "Gå tl fælles forgænger"
 
 msgid "Similar revisions..."
 msgstr ""
@@ -4182,10 +4260,10 @@ msgid "Mark this file as resolved"
 msgstr ""
 
 msgid "Diff &Local to Ancestor"
-msgstr ""
+msgstr "Diff &Lokal til forgænger"
 
 msgid "&Diff Other to Ancestor"
-msgstr ""
+msgstr "&Diff Anden til forgænger"
 
 msgid "Resolved conflicts"
 msgstr ""
@@ -4291,12 +4369,6 @@ msgstr ""
 msgid "List Optio&ns"
 msgstr ""
 
-msgid "File(s) not found"
-msgstr ""
-
-msgid "The selected files do not exist in the working directory"
-msgstr ""
-
 #, python-format
 msgid "%s - Revision Details (%s)"
 msgstr ""
@@ -4326,9 +4398,6 @@ msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
 msgstr ""
-
-msgid "Confirm Revert"
-msgstr "Bekræft tilbagefør"
 
 msgid ""
 "Reverting all files will discard changes and leave affected files in a "
@@ -4390,7 +4459,7 @@ msgid ""
 msgstr ""
 
 msgid "Greatest common ancestor of the two changesets."
-msgstr ""
+msgstr "Største fælles forgænger til de to ændringer"
 
 msgid ""
 "Find revisions that \"match\" one or more fields of the given set of "
@@ -4424,7 +4493,7 @@ msgid "Changesets which are descendants of changesets in set."
 msgstr ""
 
 msgid "Changesets that are ancestors of a changeset in set."
-msgstr ""
+msgstr "Ændringer som er forgængere til en ændring i mængden"
 
 msgid "Child changesets of changesets in set."
 msgstr ""
@@ -4501,18 +4570,16 @@ msgstr "Kører"
 msgid "query"
 msgstr ""
 
-msgid "Parse Error: "
-msgstr ""
-
-msgid "Invalid query: "
-msgstr ""
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
 "\n"
 "Fangede tastaturafbrydelse, afbryder.\n"
+
+#, python-format
+msgid "failed to fork GUI process: %s\n"
+msgstr ""
 
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
@@ -4603,9 +4670,6 @@ msgstr "læs fil-liste fra fil med utf-8 kodning"
 msgid "open a new workbench window"
 msgstr "åben et nyt arbejdsbordsvindue"
 
-msgid "requires a single filename"
-msgstr ""
-
 msgid "thg about"
 msgstr "thg about"
 
@@ -4688,6 +4752,9 @@ msgstr "noter dato som integrationsdato"
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr "thg commit [FLAG] [FIL]..."
 
+msgid "thg debugblockmatcher"
+msgstr ""
+
 msgid "thg debugbugreport [TEXT]"
 msgstr ""
 
@@ -4705,6 +4772,18 @@ msgstr "thg email [REVS]"
 
 msgid "use only one form to specify the revision"
 msgstr "brug kun én formular til at angive revisionen"
+
+msgid "select the specified revision"
+msgstr ""
+
+msgid "side-by-side comparison of revisions"
+msgstr ""
+
+msgid "thg filelog [OPTION]... FILE"
+msgstr ""
+
+msgid "requires a single filename"
+msgstr ""
 
 msgid "thg forget [FILE]..."
 msgstr "thg forget [FIL]..."
@@ -5288,14 +5367,8 @@ msgstr ""
 msgid "Author Coloring"
 msgstr "Forfatterfarver"
 
-msgid ""
-"Color changesets by author name.  If not enabled, the changes are colored "
-"green for merge, red for non-trivial parents, black for normal. Default: "
-"False"
+msgid "Color changesets by author name. Default: False"
 msgstr ""
-"Farvelæg ændringer ud fra forfatternavn. Hvis ikke aktiveret vil ændringer "
-"blive farvet grøn for flet, rød for ikke-trivielle forældre og sort for "
-"normal. Standard: Falsk"
 
 msgid "Full Authorname"
 msgstr ""
@@ -5327,11 +5400,9 @@ msgid "Long Summary"
 msgstr "Langt uddrag"
 
 msgid ""
-"If true, concatenate multiple lines of changeset summary until they reach 80 "
-"characters. Default: False"
+"If true, concatenate multiple lines of changeset summary and truncate them "
+"at 80 characters as necessary. Default: False"
 msgstr ""
-"Hvis sand bliver uddraget sammensat af de første 80 tegn af "
-"integrationsbeskeden. Standard: Falsk"
 
 msgid "Log Batch Size"
 msgstr "Batchstørrelse for log"
@@ -5388,6 +5459,16 @@ msgid ""
 "<li><b>prompt</b>: The default. Show a prompt when updating to a revision "
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
+msgstr ""
+
+msgid "Show Family Line"
+msgstr ""
+
+msgid ""
+"Show indirect revision dependency on the revision graph when filtered by "
+"revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
+"some cases. This option is expected to be removed if the performance issue "
+"is solved."
 msgstr ""
 
 msgctxt "config item"
@@ -6444,6 +6525,12 @@ msgstr ""
 msgid "%s - status"
 msgstr ""
 
+msgid "Check"
+msgstr ""
+
+msgid "Uncheck"
+msgstr ""
+
 msgid "status"
 msgstr "status"
 
@@ -7117,90 +7204,6 @@ msgstr "svar forventet"
 msgid "password: "
 msgstr "kodeord: "
 
-msgid "abort: "
-msgstr "afbrudt: "
-
-msgid "hint: "
-msgstr ""
-
-#, python-format
-msgid "HTTP Error: %d (%s)"
-msgstr ""
-
-#, python-format
-msgid "URLError: %s"
-msgstr ""
-
-msgid "SSL: Server certificate verify failed"
-msgstr "SSL: Kontrol af server certificate fejlede"
-
-#, python-format
-msgid "SSL: unknown error %s:%s"
-msgstr "SSL: ukendt fejl %s:%s"
-
-#, python-format
-msgid "SSL error: %s"
-msgstr "SSL fejl: %s"
-
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr ""
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: %s\n"
-msgstr ""
-
-msgid "abort: remote error:\n"
-msgstr ""
-
-#, python-format
-msgid "abort: %s"
-msgstr ""
-
-msgid " empty string\n"
-msgstr ""
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr ""
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr ""
-
-msgid "broken pipe\n"
-msgstr ""
-
 msgid "Parent 1:"
 msgstr "Forælder 1:"
 
@@ -7341,111 +7344,6 @@ msgstr "3-vejs dir katalog diff"
 msgid "Directory diff"
 msgstr "Katalog diff"
 
-msgid "&Edit"
-msgstr ""
-
-msgid "E&xplore Subrepository"
-msgstr ""
-
-msgid "&View Missing"
-msgstr ""
-
-msgid "&Revert..."
-msgstr ""
-
-msgid "&Forget"
-msgstr ""
-
-msgid "Add &Largefiles..."
-msgstr ""
-
-msgid "De&tect Renames..."
-msgstr ""
-
-msgid "&Ignore..."
-msgstr ""
-
-msgid "Re&move Versioned"
-msgstr ""
-
-msgid "&Delete Unversioned..."
-msgstr ""
-
-msgid "&Mark Unresolved"
-msgstr ""
-
-msgid "&Mark Resolved"
-msgstr ""
-
-msgid "Check"
-msgstr ""
-
-msgid "Uncheck"
-msgstr ""
-
-msgid "View O&ther"
-msgstr ""
-
-msgid "&Copy..."
-msgstr ""
-
-msgid "Re&name..."
-msgstr ""
-
-msgid "Was renamed from"
-msgstr ""
-
-msgid "Restart Mer&ge"
-msgstr ""
-
-msgid "Restart Merge &with"
-msgstr ""
-
-msgid " errors"
-msgstr ""
-
-msgid " output"
-msgstr ""
-
-msgid " Aborted"
-msgstr " Afbrudt"
-
-msgid "Cannot open subrepository"
-msgstr "Kan ikke åbne underdepot"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "Det valgte underdepot findes ikke i arbejdskataloget"
-
-msgid "Uncommited merge - please select a parent revision"
-msgstr "Ikke-integreret flet - vælg en forælderrevision"
-
-msgid "Revert files to local or other parent?"
-msgstr "Tilbagefør filer til lokal eller anden forælder?"
-
-msgid "&Other"
-msgstr "&Andet"
-
-msgid "Revert local file changes?"
-msgstr ""
-
-msgid "&Revert with backup"
-msgstr ""
-
-msgid "&Discard changes"
-msgstr ""
-
-msgid "Revert the following files?"
-msgstr ""
-
-msgid "&Revert"
-msgstr ""
-
-msgid "Confirm Delete Unversioned"
-msgstr ""
-
-msgid "Delete the following unversioned files?"
-msgstr ""
-
 msgid "Confirm Discard"
 msgstr "Bekræft forkastning"
 
@@ -7492,10 +7390,10 @@ msgid "New &Workbench"
 msgstr "Nyt &Arbejdsbord"
 
 msgid "&New Repository..."
-msgstr ""
+msgstr "&Nyt depot..."
 
 msgid "Clon&e Repository..."
-msgstr ""
+msgstr "&Klon depot..."
 
 msgid "&Open Repository..."
 msgstr "&Åben depot..."
@@ -7531,7 +7429,7 @@ msgid "&Close Repository"
 msgstr "&Luk depot"
 
 msgid "Sh&ow Repository Registry"
-msgstr ""
+msgstr "Vis depot&liste"
 
 msgid "Show &Patch Queue"
 msgstr ""
@@ -7779,6 +7677,96 @@ msgid "Error executing \"commit finished\" trigger"
 msgstr ""
 
 msgid "Cannot open Plugin Options dialog"
+msgstr ""
+
+#, python-format
+msgid ""
+"hg: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: parse error at %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: parse error: %s\n"
+msgstr ""
+
+#, python-format
+msgid "timed out waiting for lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "abort: %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "abort: could not lock %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: %s\n"
+msgstr ""
+
+msgid "abort: remote error:\n"
+msgstr ""
+
+#, python-format
+msgid "abort: %s"
+msgstr ""
+
+msgid " empty string\n"
+msgstr ""
+
+#, python-format
+msgid "hg: unknown command '%s'\n"
+msgstr ""
+
+#, python-format
+msgid "abort: error: %s\n"
+msgstr ""
+
+msgid "broken pipe\n"
+msgstr ""
+
+msgid "abort: "
+msgstr "afbrudt: "
+
+msgid "hint: "
+msgstr ""
+
+#, python-format
+msgid "HTTP Error: %d (%s)"
+msgstr ""
+
+#, python-format
+msgid "URLError: %s"
+msgstr ""
+
+msgid "SSL: Server certificate verify failed"
+msgstr "SSL: Kontrol af server certificate fejlede"
+
+#, python-format
+msgid "SSL: unknown error %s:%s"
+msgstr "SSL: ukendt fejl %s:%s"
+
+#, python-format
+msgid "SSL error: %s"
+msgstr "SSL fejl: %s"
+
+msgid "hgsubversion packaged with thg"
+msgstr ""
+
+msgid "hggit packaged with thg"
 msgstr ""
 
 msgid "inotify is not supported on this platform"
@@ -8501,6 +8489,9 @@ msgstr ""
 
 #~ msgid "Unable to annotate "
 #~ msgstr "Kan ikke annotere "
+
+#~ msgid " Aborted"
+#~ msgstr " Afbrudt"
 
 #~ msgid " Messages and Errors"
 #~ msgstr " Meddelelser og fejl"
@@ -9275,6 +9266,22 @@ msgstr ""
 #~ msgstr ""
 #~ "Omdiriger stderr til en buffer som bliver gennemgået ved "
 #~ "processafslutning for kørselsfejl. Standard: Sand"
+
+#~ msgid ""
+#~ "Color changesets by author name.  If not enabled, the changes are colored "
+#~ "green for merge, red for non-trivial parents, black for normal. Default: "
+#~ "False"
+#~ msgstr ""
+#~ "Farvelæg ændringer ud fra forfatternavn. Hvis ikke aktiveret vil "
+#~ "ændringer blive farvet grøn for flet, rød for ikke-trivielle forældre og "
+#~ "sort for normal. Standard: Falsk"
+
+#~ msgid ""
+#~ "If true, concatenate multiple lines of changeset summary until they reach "
+#~ "80 characters. Default: False"
+#~ msgstr ""
+#~ "Hvis sand bliver uddraget sammensat af de første 80 tegn af "
+#~ "integrationsbeskeden. Standard: Falsk"
 
 #~ msgid ""
 #~ "Repository name to use in the web interface. Default is the working "
@@ -11213,18 +11220,6 @@ msgstr ""
 #~ msgid "Use merge tool:"
 #~ msgstr "Brug flet-værktøj:"
 
-#~ msgid "Detail"
-#~ msgstr "Detalje"
-
-#~ msgid "Error creating destination folder"
-#~ msgstr "Fejl under oprettelse af destinationsmappe"
-
-#~ msgid "Please specify a different path."
-#~ msgstr "Angiv venligst en anden sti"
-
-#~ msgid "?? Error: %s ??"
-#~ msgstr "?? Fejl: %s ??"
-
 #~ msgid "Bookmark \"%s\" has been renamed to \"%s\""
 #~ msgstr "Bogmærke \"%s\" er blevet omdøbt til \"%s\""
 
@@ -11234,15 +11229,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Ønsker du at folde følgende ikke-anvendte lapper ind i nuværende lap "
 #~ "'%(qtip)s'?"
-
-#~ msgid "Backout revision not found"
-#~ msgstr "Revision at omgøre ikke fundet"
-
-#~ msgid "Second Parent: revision %s (%s)"
-#~ msgstr "Anden forælder: Revision %s (%s)"
-
-#~ msgid "First Parent: revision %s (%s)"
-#~ msgstr "Første forælder: Revision %s (%s)"
 
 #~ msgctxt "changesets"
 #~ msgid "All"
@@ -11255,9 +11241,3 @@ msgstr ""
 #~ "Juster visningen af hovedværktøjslinjen i Depot Stifinderen. Værdier: "
 #~ "\"small\" (lille), \"large\" (stor), eller \"theme\" (følg tema). "
 #~ "Standard: theme"
-
-#~ msgid "Graft %d changesets on top of changeset %s"
-#~ msgstr "Pod %d ændringer på ændring %s"
-
-#~ msgid "Copyright 2008-2013 Steve Borho and others"
-#~ msgstr "Copyright 2008-2013 Steve Borho og andre"

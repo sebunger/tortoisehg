@@ -1,7 +1,7 @@
 Serve
 =====
 
-Mercurial přichází s vestavěným, úsporným serverem, který je schopný zprostředkovat jedno spojení pro jeden repozitář. Server neprovádí ověření uživatele ale poskytuje vhodnou, ad-hoc metodu pro synchronizaci repozitářů v rámci lokální sítě.
+Mercurial poskytuje  vestavěný, úsporný server, který je schopný zprostředkovat jedno spojení pro jeden repozitář. Server neprovádí ověření uživatele ale nabízí vhodnou, ad-hoc metodu pro synchronizaci repozitářů v rámci lokální sítě.
 
 Bližší informaci o publikování repozitářů lze nalézt v článku `Publishing Repositories <http://mercurial.selenic.com/wiki/PublishingRepositories>`_. 
 

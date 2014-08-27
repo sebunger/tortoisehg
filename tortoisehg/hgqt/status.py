@@ -11,7 +11,7 @@ from mercurial import hg, util, error, context, merge, scmutil
 
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, wctxactions, cmdui, filedata, fileview
+from tortoisehg.hgqt import qtlib, cmdui, filectxactions, filedata, fileview
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -126,7 +126,7 @@ class StatusWidget(QWidget):
             self.checkAllNoneBtn.clicked.connect(self.checkAllNone)
 
         self.filelistToolbar = QToolBar(_('Status File List Toolbar'))
-        self.filelistToolbar.setIconSize(QSize(16,16))
+        self.filelistToolbar.setIconSize(qtlib.smallIconSize())
         self.filelistToolbar.setStyleSheet(qtlib.tbstylesheet)
         hbox.addWidget(self.filelistToolbar)
         if self.checkable:
@@ -139,11 +139,14 @@ class StatusWidget(QWidget):
             createStatusFilterMenuButton(self.statusfilter, self))
         self.filelistToolbar.addSeparator()
         self.filelistToolbar.addWidget(self.refreshBtn)
-        self.actions = wctxactions.WctxActions(self._repoagent, self, checkable)
-        self.actions.refreshNeeded.connect(self.refreshWctx)
-        self.actions.runCustomCommandRequested.connect(
+        self._fileactions = filectxactions.WctxActions(self._repoagent, self)
+        self._fileactions.setupCustomToolsMenu('workbench.commit.custom-menu')
+        self._fileactions.linkActivated.connect(self.linkActivated)
+        self._fileactions.refreshNeeded.connect(self.refreshWctx)
+        self._fileactions.runCustomCommandRequested.connect(
             self.runCustomCommandRequested)
-        tv = WctxFileTree(self.repo, checkable=checkable)
+        self.addActions(self._fileactions.actions())
+        tv = WctxFileTree(self)
         vbox.addLayout(hbox)
         vbox.addWidget(tv)
         split.addWidget(frame)
@@ -153,18 +156,28 @@ class StatusWidget(QWidget):
         self.clearPatternBtn.clicked.connect(self.clearPattern)
         self.clearPatternBtn.setVisible(bool(self.pats))
 
+        tv.setAllColumnsShowFocus(True)
+        tv.setContextMenuPolicy(Qt.CustomContextMenu)
+        tv.setDragDropMode(QTreeView.DragOnly)
         tv.setItemsExpandable(False)
         tv.setRootIsDecorated(False)
+        tv.setSelectionMode(QTreeView.ExtendedSelection)
+        tv.setTextElideMode(Qt.ElideLeft)
         tv.sortByColumn(COL_STATUS, Qt.AscendingOrder)
-        tv.clicked.connect(self.onRowClicked)
         tv.doubleClicked.connect(self.onRowDoubleClicked)
-        tv.menuRequest.connect(self.onMenuRequest)
+        tv.customContextMenuRequested.connect(self.onMenuRequest)
         le.textEdited.connect(self.setFilter)
 
         self.statusfilter.statusChanged.connect(self.setStatusFilter)
 
         self.tv = tv
         self.le = le
+        self._tvpaletteswitcher = qtlib.PaletteSwitcher(tv)
+
+        self._togglefileshortcut = a = QShortcut(Qt.Key_Space, tv)
+        a.setContext(Qt.WidgetShortcut)
+        a.setEnabled(False)
+        a.activated.connect(self._toggleSelectedFiles)
 
         # Diff panel side of splitter
         vbox = QVBoxLayout()
@@ -185,7 +198,6 @@ class StatusWidget(QWidget):
         self.fileview.linkActivated.connect(self.linkActivated)
         self.fileview.fileDisplayed.connect(self.fileDisplayed)
         self.fileview.shelveToolExited.connect(self.refreshWctx)
-        self.fileview.newChunkList.connect(self.updatePartials)
         self.fileview.chunkSelectionChanged.connect(self.chunkSelectionChanged)
         self.fileview.grepRequested.connect(self.grepRequested)
         self.fileview.setMinimumSize(QSize(16, 16))
@@ -240,8 +252,7 @@ class StatusWidget(QWidget):
         self.fileview.saveSettings(qs, prefix+'/fileview')
         qs.setValue(prefix+'/state', self.split.saveState())
 
-    @pyqtSlot(QString, object)
-    def updatePartials(self, wfile, changes):
+    def _updatePartials(self, fd):
         # remove files from the partials dictionary if they are not partial
         # selections, in order to simplify refresh.
         dels = []
@@ -256,7 +267,8 @@ class StatusWidget(QWidget):
         for file in dels:
             del self.partials[file]
 
-        wfile = hglib.fromunicode(wfile)
+        wfile = hglib.fromunicode(fd.filePath())
+        changes = fd.changes
         if changes is None:
             if wfile in self.partials:
                 del self.partials[wfile]
@@ -269,14 +281,14 @@ class StatusWidget(QWidget):
             oldstates = dict([(c.fromline, c.excluded) for c in oldhunks])
             for chunk in changes.hunks:
                 if chunk.fromline in oldstates:
-                    self.fileview.updateChunk(chunk, oldstates[chunk.fromline])
+                    fd.setChunkExcluded(chunk, oldstates[chunk.fromline])
         else:
             # the file was not in the partials dictionary, so it is either
             # checked (all changes enabled) or unchecked (all changes
             # excluded).
             if wfile not in self.getChecked():
                 for chunk in changes.hunks:
-                    self.fileview.updateChunk(chunk, True)
+                    fd.setChunkExcluded(chunk, True)
         self.chunkSelectionChanged()
         self.partials[wfile] = changes
 
@@ -289,10 +301,48 @@ class StatusWidget(QWidget):
             model.layoutChanged.emit()
             model.checkCountChanged.emit()
 
-    @pyqtSlot(QPoint, object)
-    def onMenuRequest(self, point, selected):
-        menu = self.actions.makeMenu(selected)
-        menu.exec_(point)
+    @pyqtSlot(QPoint)
+    def onMenuRequest(self, point):
+        menu = QMenu(self)
+        selmodel = self.tv.selectionModel()
+        if selmodel and selmodel.hasSelection():
+            self._setupFileMenu(menu)
+            menu.addSeparator()
+            optmenu = menu.addMenu(_('List Optio&ns'))
+        else:
+            optmenu = menu
+        optmenu.addActions(self.statusfilter.actions())
+
+        menu.setAttribute(Qt.WA_DeleteOnClose)
+        menu.popup(self.tv.viewport().mapToGlobal(point))
+
+    def _setupFileMenu(self, menu):
+        self._addFileActionsToMenu(menu, [
+            'visualDiffFile', 'visualDiffLocalFile', 'copyPatch',
+            'editLocalFile', 'openLocalFile',
+            None, 'openSubrepo', 'explore', 'terminal', None, 'copyPath',
+            'editMissingFile', None, 'revertWorkingFile', None,
+            'navigateFileLog', None, 'forgetFile', 'addFile', 'addLargefile',
+            'guessRename', 'editHgignore', 'removeFile', 'purgeFile', None,
+            'markFileAsUnresolved', 'markFileAsResolved'])
+        if self.checkable:
+            menu.addSeparator()
+            # no &-shortcut because check/uncheck can be done by space key
+            menu.addAction(_('Check'), self._checkSelectedFiles)
+            menu.addAction(_('Uncheck'), self._uncheckSelectedFiles)
+        self._addFileActionsToMenu(menu, [
+            'editOtherFile', None, 'copyFile', 'renameFile', None,
+            'customToolsMenu', None, 'renameFileMenu', None, 'remergeFile',
+            None, 'remergeFileMenu'])
+
+    def _addFileActionsToMenu(self, menu, actnames):
+        for name in actnames:
+            if not name:
+                menu.addSeparator()
+                continue
+            action = self._fileactions.action(name)
+            if action.isEnabled():
+                menu.addAction(action)
 
     def setPatchContext(self, pctx):
         if pctx != self.pctx:
@@ -370,8 +420,8 @@ class StatusWidget(QWidget):
                                     _('No files found for this operation'),
                                     parent=self)
         ms = merge.mergestate(self.repo)
-        tm = WctxModel(wctx, ms, self.pctx, self.savechecks, self.opts,
-                       checked, self, checkable=self.checkable,
+        tm = WctxModel(self._repoagent, wctx, ms, self.pctx, self.savechecks,
+                       self.opts, checked, self, checkable=self.checkable,
                        defcheck=self.defcheck)
         if self.checkable:
             tm.checkToggled.connect(self.checkToggled)
@@ -416,27 +466,23 @@ class StatusWidget(QWidget):
         selmodel.selectionChanged.connect(self.onSelectionChange)
         if curidx and curidx.isValid():
             selmodel.setCurrentIndex(curidx, QItemSelectionModel.Current)
-        self.onSelectionChange(None, None)
+        self.onSelectionChange()
 
-    # Disabled decorator because of bug in older PyQt releases
-    #@pyqtSlot(QModelIndex)
-    def onRowClicked(self, index):
-        'tree view emitted a clicked signal, index guarunteed valid'
-        if index.column() == COL_PATH:
-            self.tv.model().toggleRows([index])
+        self._togglefileshortcut.setEnabled(True)
 
     # Disabled decorator because of bug in older PyQt releases
     #@pyqtSlot(QModelIndex)
     def onRowDoubleClicked(self, index):
         'tree view emitted a doubleClicked signal, index guarunteed valid'
-        path, status, mst, u, ext, sz = self.tv.model().getRow(index)
-        if status in 'MAR!':
-            self.actions.allactions[0].trigger()
-        elif status == 'S':
-            self.linkActivated.emit(
-                u'repo:' + hglib.tounicode(self.repo.wjoin(path)))
-        elif status in 'C?':
-            qtlib.editfiles(self.repo, [path])
+        fd = self.tv.model().fileData(index)
+        if fd.subrepoType():
+            self._fileactions.openSubrepo()
+        elif fd.mergeStatus() == 'U':
+            self._fileactions.remergeFile()
+        elif fd.fileStatus() in set('MAR!'):
+            self._fileactions.visualDiffFile()
+        elif fd.fileStatus() in set('C?'):
+            self._fileactions.editLocalFile()
 
     @pyqtSlot(str)
     def setStatusFilter(self, status):
@@ -451,7 +497,7 @@ class StatusWidget(QWidget):
         model = self.tv.model()
         if model:
             model.setFilter(match)
-            self.tv.enablefilterpalette(bool(match))
+            self._tvpaletteswitcher.enablefilterpalette(bool(match))
 
     @pyqtSlot()
     def clearPattern(self):
@@ -480,11 +526,9 @@ class StatusWidget(QWidget):
         'user has toggled a checkbox, update partial chunk selection status'
         wfile = hglib.fromunicode(wfile)
         if wfile in self.partials:
+            del self.partials[wfile]
             if wfile == hglib.fromunicode(self.fileview.filePath()):
-                for chunk in self.partials[wfile].hunks:
-                    self.fileview.updateChunk(chunk, not checked)
-            else:
-                del self.partials[wfile]
+                self.onCurrentChange(self.tv.currentIndex())
 
     def checkAll(self):
         model = self.tv.model()
@@ -525,31 +569,49 @@ class StatusWidget(QWidget):
         else:
             return []
 
-    # Disabled decorator because of bug in older PyQt releases
-    #@pyqtSlot(QItemSelection, QItemSelection)
-    def onSelectionChange(self, selected, deselected):
-        selrows = []
-        for index in self.tv.selectedRows():
-            path, status, mst, u, ext, sz = self.tv.model().getRow(index)
-            selrows.append((set(status+mst.lower()), path))
-        self.actions.updateActionSensitivity(selrows)
+    @pyqtSlot()
+    def onSelectionChange(self):
+        model = self.tv.model()
+        selmodel = self.tv.selectionModel()
+        selfds = map(model.fileData, selmodel.selectedRows())
+        self._fileactions.setFileDataList(selfds)
 
     # Disabled decorator because of bug in older PyQt releases
-    #@pyqtSlot(QModelIndex, QModelIndex)
-    def onCurrentChange(self, index, old):
+    #@pyqtSlot(QModelIndex)
+    def onCurrentChange(self, index):
         'Connected to treeview "currentChanged" signal'
-        row = index.model().getRow(index)
-        if row is None:
-            return
-        path, status, mst, upath, ext, sz = row
-        wfile = util.pconvert(path)
-        ctx = self.repo[None]
-        pctx = self.pctx and self.pctx.p1() or ctx.p1()
-        if status == 'S':
-            fd = filedata.createSubrepoData(ctx, pctx, wfile)
-        else:
-            fd = filedata.createFileData(ctx, pctx, wfile, status)
+        changeselect = self.fileview.isChangeSelectionEnabled()
+        model = self.tv.model()
+        fd = model.fileData(index)
+        fd.load(changeselect)
+        if changeselect and not fd.isNull() and not fd.subrepoType():
+            self._updatePartials(fd)
         self.fileview.display(fd)
+
+    def _setCheckStateOfSelectedFiles(self, value):
+        model = self.tv.model()
+        selmodel = self.tv.selectionModel()
+        for index in selmodel.selectedRows(COL_PATH):
+            model.setData(index, value, Qt.CheckStateRole)
+
+    @pyqtSlot()
+    def _checkSelectedFiles(self):
+        self._setCheckStateOfSelectedFiles(Qt.Checked)
+
+    @pyqtSlot()
+    def _uncheckSelectedFiles(self):
+        self._setCheckStateOfSelectedFiles(Qt.Unchecked)
+
+    @pyqtSlot()
+    def _toggleSelectedFiles(self):
+        model = self.tv.model()
+        selmodel = self.tv.selectionModel()
+        for index in selmodel.selectedRows(COL_PATH):
+            if model.data(index, Qt.CheckStateRole) == Qt.Checked:
+                newvalue = Qt.Unchecked
+            else:
+                newvalue = Qt.Checked
+            model.setData(index, newvalue, Qt.CheckStateRole)
 
 
 class StatusThread(QThread):
@@ -580,10 +642,8 @@ class StatusThread(QThread):
                     # status and commit only pre-check MAR files
                     precheckfn = lambda x: x < 4
                 m = scmutil.match(self.repo[None], self.pats)
-                self.repo.bfstatus = True
                 self.repo.lfstatus = True
                 status = self.repo.status(match=m, **stopts)
-                self.repo.bfstatus = False
                 self.repo.lfstatus = False
                 # Record all matched files as initially checked
                 for i, stat in enumerate(StatusType.preferredOrder):
@@ -596,19 +656,15 @@ class StatusThread(QThread):
                 wctx = context.workingctx(self.repo, changes=status)
                 self.patchecked = patchecked
             elif self.pctx:
-                self.repo.bfstatus = True
                 self.repo.lfstatus = True
                 status = self.repo.status(node1=self.pctx.p1().node(), **stopts)
-                self.repo.bfstatus = False
                 self.repo.lfstatus = False
                 wctx = context.workingctx(self.repo, changes=status)
             else:
-                wctx = self.repo[None]
-                self.repo.bfstatus = True
                 self.repo.lfstatus = True
-                wctx.status(**stopts)
-                self.repo.bfstatus = False
+                status = self.repo.status(**stopts)
                 self.repo.lfstatus = False
+                wctx = context.workingctx(self.repo, changes=status)
             self.wctx = wctx
 
             wctx.dirtySubrepos = []
@@ -629,16 +685,6 @@ class StatusThread(QThread):
 
 
 class WctxFileTree(QTreeView):
-    menuRequest = pyqtSignal(QPoint, object)
-
-    def __init__(self, repo, parent=None, checkable=True):
-        QTreeView.__init__(self, parent)
-        self.repo = repo
-        self.setSelectionMode(QTreeView.ExtendedSelection)
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.menuRequested)
-        self.setTextElideMode(Qt.ElideLeft)
-        self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
     def scrollTo(self, index, hint=QAbstractItemView.EnsureVisible):
         # don't update horizontal position by selection change
@@ -646,62 +692,16 @@ class WctxFileTree(QTreeView):
         super(WctxFileTree, self).scrollTo(index, hint)
         self.horizontalScrollBar().setValue(orighoriz)
 
-    def keyPressEvent(self, event):
-        if event.key() == 32:
-            self.model().toggleRows(self.selectedRows())
-        return super(WctxFileTree, self).keyPressEvent(event)
-
-    def dragObject(self):
-        urls = []
-        for index in self.selectedRows():
-            path = self.model().getRow(index)[COL_PATH]
-            urls.append(QUrl.fromLocalFile(self.repo.wjoin(path)))
-        if urls:
-            drag = QDrag(self)
-            data = QMimeData()
-            data.setUrls(urls)
-            drag.setMimeData(data)
-            drag.start(Qt.CopyAction)
-
-    def mousePressEvent(self, event):
-        self.pressPos = event.pos()
-        self.pressTime = QTime.currentTime()
-        return QTreeView.mousePressEvent(self, event)
-
-    def mouseMoveEvent(self, event):
-        d = event.pos() - self.pressPos
-        if d.manhattanLength() < QApplication.startDragDistance():
-            return QTreeView.mouseMoveEvent(self, event)
-        elapsed = self.pressTime.msecsTo(QTime.currentTime())
-        if elapsed < QApplication.startDragTime():
-            return QTreeView.mouseMoveEvent(self, event)
-        self.dragObject()
-        return QTreeView.mouseMoveEvent(self, event)
-
-    def menuRequested(self, point):
-        selrows = []
-        for index in self.selectedRows():
-            path, status, mst, u, ext, sz = self.model().getRow(index)
-            selrows.append((set(status+mst.lower()), path))
-        if selrows:
-            self.menuRequest.emit(self.viewport().mapToGlobal(point), selrows)
-
-    def selectedRows(self):
-        if self.selectionModel():
-            return self.selectionModel().selectedRows()
-        # Invalid selectionModel found
-        return []
-
-    def enablefilterpalette(self, enable):
-        self._paletteswitcher.enablefilterpalette(enable)
 
 class WctxModel(QAbstractTableModel):
     checkCountChanged = pyqtSignal()
     checkToggled = pyqtSignal(QString, bool)
 
-    def __init__(self, wctx, ms, pctx, savechecks, opts, checked, parent,
-                 checkable=True, defcheck='MAR!S'):
+    def __init__(self, repoagent, wctx, ms, pctx, savechecks, opts, checked,
+                 parent, checkable=True, defcheck='MAR!S'):
         QAbstractTableModel.__init__(self, parent)
+        self._repoagent = repoagent
+        self._pctx = pctx
         self.partials = parent.partials
         self.checkCount = 0
         rows = []
@@ -779,14 +779,6 @@ class WctxModel(QAbstractTableModel):
             return 0 # no child
         return len(self.rows)
 
-    def check(self, files, state):
-        for f in files:
-            assert f in self.checked
-            self.checked[f] = state
-            self.checkToggled.emit(f, state)
-        self.layoutChanged.emit()
-        self.checkCountChanged.emit()
-
     def checkAll(self, state):
         for data in self.rows:
             self.checked[data[0]] = state
@@ -840,6 +832,25 @@ class WctxModel(QAbstractTableModel):
         '''
         return QVariant()
 
+    def setData(self, index, value, role=Qt.EditRole):
+        if not index.isValid():
+            return False
+        if (index.column() == COL_PATH and role == Qt.CheckStateRole
+            and self.checkable):
+            if self.data(index, role) == value:
+                return True
+            if value not in (Qt.Checked, Qt.Unchecked):
+                # Qt.PartiallyChecked cannot be set explicitly
+                return False
+            path = self.rows[index.row()][COL_PATH]
+            upath = self.rows[index.row()][COL_PATH_DISPLAY]
+            self.checked[path] = checked = (value == Qt.Checked)
+            self.checkToggled.emit(upath, checked)
+            self.checkCountChanged.emit()
+            self.dataChanged.emit(index, index)
+            return True
+        return False
+
     def headerData(self, col, orientation, role):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
             return QVariant()
@@ -852,6 +863,21 @@ class WctxModel(QAbstractTableModel):
             flags |= Qt.ItemIsUserCheckable
         return flags
 
+    def mimeTypes(self):
+        return ['text/uri-list']
+
+    def mimeData(self, indexes):
+        repo = self._repoagent.rawRepo()
+        urls = []
+        for index in indexes:
+            if index.column() != 0:
+                continue
+            path = self.rows[index.row()][COL_PATH]
+            urls.append(QUrl.fromLocalFile(hglib.tounicode(repo.wjoin(path))))
+        data = QMimeData()
+        data.setUrls(urls)
+        return data
+
     # Custom methods
 
     def anyMerge(self):
@@ -860,6 +886,20 @@ class WctxModel(QAbstractTableModel):
                 return True
         return False
 
+    def fileData(self, index):
+        """Returns the displayable file data at the given index"""
+        repo = self._repoagent.rawRepo()
+        if not index.isValid():
+            return filedata.createNullData(repo)
+        path, status, mst, upath, ext, sz = self.rows[index.row()]
+        wfile = util.pconvert(path)
+        ctx = repo[None]
+        pctx = self._pctx and self._pctx.p1() or ctx.p1()
+        if status == 'S':
+            return filedata.createSubrepoData(ctx, pctx, wfile)
+        else:
+            return filedata.createFileData(ctx, pctx, wfile, status, None, mst)
+
     def getRow(self, index):
         assert index.isValid()
         return self.rows[index.row()]
@@ -867,29 +907,6 @@ class WctxModel(QAbstractTableModel):
     def getAllRows(self):
         for row in self.rows:
             yield row
-
-    def toggleRows(self, indexes):
-        'Connected to "activated" signal, emitted by dbl-click or enter'
-        if QApplication.keyboardModifiers() & Qt.ControlModifier:
-            # ignore Ctrl-Enter events, the user does not want a row
-            # toggled just as they are committing.
-            return
-        self.layoutAboutToBeChanged.emit()
-        for index in indexes:
-            assert index.isValid()
-            fname = self.rows[index.row()][COL_PATH]
-            uname = self.rows[index.row()][COL_PATH_DISPLAY]
-            if fname in self.partials:
-                checked = 0
-                changes = self.partials[fname]
-                if changes.excludecount < len(changes.hunks):
-                    checked = 1
-            else:
-                checked = self.checked[fname]
-            self.checked[fname] = not checked
-            self.checkToggled.emit(uname, self.checked[fname])
-        self.layoutChanged.emit()
-        self.checkCountChanged.emit()
 
     def sort(self, col, order):
         self.layoutAboutToBeChanged.emit()

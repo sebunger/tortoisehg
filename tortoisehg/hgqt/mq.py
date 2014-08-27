@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import os
+import os, re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -15,8 +15,23 @@ from mercurial import error, util
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdcore, qtlib, cmdui
-from tortoisehg.hgqt import commit, qdelete, qfold, qrename, mqutil
-from tortoisehg.hgqt.qtlib import geticon
+from tortoisehg.hgqt import commit, qdelete, qfold, qrename, rejects
+
+def _checkForRejects(repo, rawoutput, parent=None):
+    """Parse output of qpush/qpop to resolve hunk failure manually"""
+    rejre = re.compile('saving rejects to file (.*).rej')
+    rejfiles = [m.group(1) for m in rejre.finditer(rawoutput)
+                if os.path.exists(repo.wjoin(m.group(1)))]
+    for wfile in rejfiles:
+        ufile = hglib.tounicode(wfile)
+        if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
+                                _('%s had rejected chunks, edit patched '
+                                  'file together with rejects?') % ufile,
+                                parent=parent):
+            dlg = rejects.RejectsDialog(repo.ui, repo.wjoin(wfile), parent)
+            dlg.exec_()
+
+    return len(rejfiles)
 
 class QueueManagementActions(QObject):
     """Container for patch queue management actions"""
@@ -128,7 +143,7 @@ class QueueManagementActions(QObject):
 
     def _existingNames(self):
         assert self._repoagent
-        return mqutil.getQQueues(self._repoagent.rawRepo())
+        return hglib.getqqueues(self._repoagent.rawRepo())
 
     def _getNewName(self, title, labeltext, oktext):
         dlg = QInputDialog(self.parent())
@@ -312,7 +327,7 @@ class PatchQueueActions(QObject):
         if ret == 2 and self._repoagent:
             repo = self._repoagent.rawRepo()
             output = hglib.fromunicode(self._cmdsession.warningString())
-            if mqutil.checkForRejects(repo, output, self.parent()) > 0:
+            if _checkForRejects(repo, output, self.parent()) > 0:
                 ret = 0  # no further error dialog
         if ret != 0:
             cmdui.errorMessageBox(self._cmdsession, self.parent())
@@ -527,26 +542,26 @@ class MQPatchesWidget(QDockWidget):
 
         # TODO: move QAction instances to PatchQueueActions
         self.qpushAllAct = a = QAction(
-            geticon('hg-qpush-all'), _('Push all', 'MQ QPush'), self)
+            qtlib.geticon('hg-qpush-all'), _('Push all', 'MQ QPush'), self)
         a.setToolTip(_('Apply all patches'))
         self.qpushAct = a = QAction(
-            geticon('hg-qpush'), _('Push', 'MQ QPush'), self)
+            qtlib.geticon('hg-qpush'), _('Push', 'MQ QPush'), self)
         a.setToolTip(_('Apply one patch'))
         self.setGuardsAct = a = QAction(
-            geticon('hg-qguard'), _('Set &Guards...'), self)
+            qtlib.geticon('hg-qguard'), _('Set &Guards...'), self)
         a.setToolTip(_('Configure guards for selected patch'))
         self.qdeleteAct = a = QAction(
-            geticon('hg-qdelete'), _('&Delete Patches...'), self)
+            qtlib.geticon('hg-qdelete'), _('&Delete Patches...'), self)
         a.setToolTip(_('Delete selected patches'))
         self.qpopAct = a = QAction(
-            geticon('hg-qpop'), _('Pop'), self)
+            qtlib.geticon('hg-qpop'), _('Pop'), self)
         a.setToolTip(_('Unapply one patch'))
         self.qpopAllAct = a = QAction(
-            geticon('hg-qpop-all'), _('Pop all'), self)
+            qtlib.geticon('hg-qpop-all'), _('Pop all'), self)
         a.setToolTip(_('Unapply all patches'))
         self.qrenameAct = QAction(_('Re&name Patch...'), self)
         self.qtbar = tbar = QToolBar(_('Patch Queue Actions Toolbar'))
-        tbar.setIconSize(QSize(18, 18))
+        tbar.setIconSize(qtlib.smallIconSize())
         tbarhbox.addWidget(tbar)
         tbar.addAction(self.qpushAct)
         tbar.addAction(self.qpushAllAct)
@@ -583,7 +598,7 @@ class MQPatchesWidget(QDockWidget):
         self.queueListWidget = QListView(self)
         self.queueListWidget.setDragDropMode(QAbstractItemView.InternalMove)
         self.queueListWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.queueListWidget.setIconSize(QSize(12, 12))
+        self.queueListWidget.setIconSize(qtlib.smallIconSize() * 0.75)
         self.queueListWidget.setSelectionMode(
             QAbstractItemView.ExtendedSelection)
         self.queueListWidget.setContextMenuPolicy(Qt.CustomContextMenu)
@@ -765,7 +780,7 @@ class MQPatchesWidget(QDockWidget):
         repo = self.repo
         combo = self.qqueueComboWidget
         combo.clear()
-        combo.addItems(mqutil.getQQueues(repo))
+        combo.addItems(hglib.getqqueues(repo))
 
     def refreshSelectedGuards(self):
         total = len(self.allguards)

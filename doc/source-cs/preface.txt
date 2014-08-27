@@ -114,9 +114,9 @@ Z toho vyplývá, že bez znalosti jistého množství anglických slov se při 
 
 Slova patch a hunk překládám jako oprávka a porce, Workbench jako Verpánek a nadpis Shelve (odložení na polici) překládám pro pobavení čtenáře jako Almárka.
 
-Kde si nevím rady, ponechávám text rovněž nepřeložený, za což se laskavému čtenáři omlouvám.
+Kde si nevím rady, ponechávám text nepřeložený, za což se laskavému čtenáři omlouvám.
 
-Považuji za vhodné vymezit význam slova pracovní adresář. **Pracovní adresář** je pomyslný útvar, který svůj obsah odvozuje z aktuálně nastavené aktuální revize. 
+Považuji za vhodné vymezit význam slova pracovní adresář. **Pracovní adresář** je virtuální složka, která svůj obsah odvozuje z aktuálně nastavené aktuální revize.  
 
 Kořenový adresář projeku, který obsahuje složku s názvem *.hg* neboli **repozitář** je rovněž dynamický útvar a v tomto textu bude označován jako **repozitórium**). Pro každou revizi může mít repozitórium jiné složení souborů!
 

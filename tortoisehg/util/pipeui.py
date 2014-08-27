@@ -38,7 +38,10 @@ import time
 
 from mercurial import util
 
+from tortoisehg.util import hgversion
 from tortoisehg.util.i18n import agettext as _
+
+testedwith = hgversion.testedwith
 
 class _labeledstr(str):
     r"""
@@ -196,6 +199,10 @@ def _extenduiclass(parcls):
         _lastprogresstime = 0
 
         def write(self, *args, **opts):
+            if self._buffers:
+                # do not label buffered data because it can be written later
+                super(pipeui, self).write(*args, **opts)
+                return
             label = opts.get('label', '')
             super(pipeui, self).write(*_packmsgs(args, label), **opts)
 

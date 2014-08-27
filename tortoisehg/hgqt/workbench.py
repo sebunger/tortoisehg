@@ -81,6 +81,7 @@ class Workbench(QMainWindow):
         self.restoreSettings()
         self.repoTabChanged()
         self.setAcceptDrops(True)
+        self.setIconSize(qtlib.toolBarIconSize())
         if os.name == 'nt':
             # Allow CTRL+Q to close Workbench on Windows
             QShortcut(QKeySequence('CTRL+Q'), self, self.close)
@@ -109,8 +110,6 @@ class Workbench(QMainWindow):
     def setupUi(self):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.8)
-
-        self.setWindowIcon(qtlib.geticon('hg-log'))
 
         self.repoTabsWidget = tw = QTabWidget()
         # FIXME setTabBar() is protected method
@@ -677,10 +676,11 @@ class Workbench(QMainWindow):
                     return
             try:
                 repoagent = self._repomanager.openRepoAgent(root)
-                self.addRepoTab(repoagent, bundle)
             except RepoError, e:
                 qtlib.WarningMsgBox(_('Failed to open repository'),
                                     hglib.tounicode(str(e)), parent=self)
+                return
+            self.addRepoTab(repoagent, bundle)
 
     @pyqtSlot(QString)
     def closeRepo(self, root):

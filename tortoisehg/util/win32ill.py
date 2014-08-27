@@ -38,7 +38,10 @@ import atexit, ctypes, os, threading
 
 from mercurial import util
 
+from tortoisehg.util import hgversion
 from tortoisehg.util.i18n import agettext as _
+
+testedwith = hgversion.testedwith
 
 _CTRL_C_EVENT = 0
 _WM_APP = 0x8000

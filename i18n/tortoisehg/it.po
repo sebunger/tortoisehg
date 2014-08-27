@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-28 11:26-0300\n"
+"POT-Creation-Date: 2014-07-24 12:23-0300\n"
 "PO-Revision-Date: 2013-07-16 10:52+0000\n"
 "Last-Translator: aangelo <Unknown>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-04-29 05:57+0000\n"
-"X-Generator: Launchpad (build 16985)\n"
+"X-Launchpad-Export-Date: 2014-07-25 05:47+0000\n"
+"X-Generator: Launchpad (build 17114)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Server icone di overlay di TortoiseHg"
@@ -39,9 +39,6 @@ msgstr "Puoi visitare il nostro sito qui"
 msgid "&License"
 msgstr "&Licenza"
 
-msgid "&Close"
-msgstr "&Chiudi"
-
 #, python-format
 msgid "version %s"
 msgstr "versione %s"
@@ -52,6 +49,9 @@ msgstr "con Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
+msgstr ""
+
+msgid "License"
 msgstr ""
 
 msgid "= Working Directory Parent ="
@@ -669,6 +669,12 @@ msgstr "Merge"
 msgid "Merge with %s"
 msgstr ""
 
+msgid "Patch Name Required"
+msgstr ""
+
+msgid "You must enter a patch name"
+msgstr ""
+
 msgctxt "start progress"
 msgid "Commit"
 msgstr "Inserisci"
@@ -711,6 +717,9 @@ msgstr "Mostra segnalazioni..."
 
 msgid "Stop"
 msgstr "Stop"
+
+msgid "### patch name ###"
+msgstr ""
 
 msgid "Commit changes"
 msgstr "Conferma cambiamenti"
@@ -1199,9 +1208,6 @@ msgstr ""
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr ""
 
-msgid "Custom Tools"
-msgstr "Strumenti personalizzati"
-
 #, python-format
 msgid "command parse error: %s"
 msgstr ""
@@ -1237,25 +1243,13 @@ msgstr ""
 msgid "Diff Changeset to Loc&al"
 msgstr ""
 
-msgid "Diff Selected Cha&ngesets"
-msgstr ""
-
 msgid "&Diff to Parent"
 msgstr "&Differenze con il padre"
-
-msgid "Cannot display visual diff"
-msgstr "Impossibile visualizzare le differenze"
-
-msgid "Visual diffs are not supported for unapplied patches"
-msgstr ""
 
 msgid "Diff to &Local"
 msgstr "Differenze con la versione locale"
 
 msgid "View changes to current in external diff tool"
-msgstr ""
-
-msgid "Diff Selected &File Revisions"
 msgstr ""
 
 msgid "&View at Revision"
@@ -1277,6 +1271,9 @@ msgid "&Edit Local"
 msgstr ""
 
 msgid "&Open Local"
+msgstr ""
+
+msgid "&Copy Patch"
 msgstr ""
 
 msgid "Copy &Path"
@@ -1304,6 +1301,101 @@ msgid "Open &Terminal"
 msgstr "Apri &terminale"
 
 msgid "Open a shell terminal in the selected folder"
+msgstr ""
+
+msgid "Custom Tools"
+msgstr "Strumenti personalizzati"
+
+msgid "Diff &Local"
+msgstr ""
+
+msgid "&View Missing"
+msgstr ""
+
+msgid "View O&ther"
+msgstr ""
+
+msgid "Add &Largefiles..."
+msgstr ""
+
+msgid "&Forget"
+msgstr ""
+
+msgid "&Delete Unversioned..."
+msgstr ""
+
+msgid "Confirm Delete Unversioned"
+msgstr ""
+
+msgid "Delete the following unversioned files?"
+msgstr ""
+
+msgid "&Delete"
+msgstr ""
+
+msgid "Re&move Versioned"
+msgstr ""
+
+msgid "&Revert..."
+msgstr ""
+
+msgid "Uncommited merge - please select a parent revision"
+msgstr ""
+"Merge di cui non si è effettuato il commit - si prega di selezionare una "
+"revisione genitore"
+
+msgid "Revert files to local or other parent?"
+msgstr "Ripristina i file al genitore locale o l'altro"
+
+msgid "&Local"
+msgstr "&Locale"
+
+msgid "&Other"
+msgstr "&Altro"
+
+msgid "Confirm Revert"
+msgstr "Conferma ripristino"
+
+msgid "Revert local file changes?"
+msgstr ""
+
+msgid "&Revert with backup"
+msgstr ""
+
+msgid "&Discard changes"
+msgstr ""
+
+msgid "Revert the following files?"
+msgstr ""
+
+msgid "&Revert"
+msgstr ""
+
+msgid "&Copy..."
+msgstr ""
+
+msgid "Re&name..."
+msgstr ""
+
+msgid "&Ignore..."
+msgstr ""
+
+msgid "De&tect Renames..."
+msgstr ""
+
+msgid "&Mark Resolved"
+msgstr ""
+
+msgid "&Mark Unresolved"
+msgstr ""
+
+msgid "Restart Mer&ge"
+msgstr ""
+
+msgid "Was renamed from"
+msgstr ""
+
+msgid "Restart Merge &with"
 msgstr ""
 
 msgid "Display the file anyway"
@@ -1475,6 +1567,12 @@ msgid "Back"
 msgstr ""
 
 msgid "Forward"
+msgstr ""
+
+msgid "Diff Selected &Changesets"
+msgstr ""
+
+msgid "&Diff Selected File Revisions"
 msgstr ""
 
 msgid "Show Revision &Details"
@@ -1652,9 +1750,6 @@ msgstr ""
 
 msgid "&Originating Revision"
 msgstr ""
-
-msgid "&Local"
-msgstr "&Locale"
 
 msgid "&Parent Revision"
 msgstr ""
@@ -2070,6 +2165,9 @@ msgstr "Impo&stazioni"
 msgid "Send &Email"
 msgstr "Invia &e-mail"
 
+msgid "&Close"
+msgstr "&Chiudi"
+
 #, python-format
 msgid "Ignore filter - %s"
 msgstr "Filtro file da ignorare - %s"
@@ -2195,9 +2293,6 @@ msgid "Add as &Largefiles"
 msgstr ""
 
 msgid "Add as &Normal Files"
-msgstr ""
-
-msgid "License"
 msgstr ""
 
 msgid "Find revisions matching fields of:"
@@ -2371,6 +2466,10 @@ msgstr "App&lica formato"
 msgid "C&onfigure Format"
 msgstr "C&onfigura formato"
 
+#, python-format
+msgid "%s had rejected chunks, edit patched file together with rejects?"
+msgstr ""
+
 msgid "&Commit to Queue..."
 msgstr ""
 
@@ -2502,19 +2601,6 @@ msgid "Force push or pop (--force)"
 msgstr ""
 
 msgid "Tolerate non-conflicting local changes (--keep-changes)"
-msgstr ""
-
-msgid "### patch name ###"
-msgstr ""
-
-#, python-format
-msgid "%s had rejected chunks, edit patched file together with rejects?"
-msgstr ""
-
-msgid "Patch Name Required"
-msgstr ""
-
-msgid "You must enter a patch name"
 msgstr ""
 
 #, python-format
@@ -2798,9 +2884,6 @@ msgid "&Copy"
 msgstr ""
 
 msgid "&Paste"
-msgstr ""
-
-msgid "&Delete"
 msgstr ""
 
 msgid "&Editor Options"
@@ -3806,9 +3889,6 @@ msgstr ""
 msgid "&Bundle Rev and Descendants..."
 msgstr ""
 
-msgid "&Copy Patch"
-msgstr ""
-
 msgid "Change &Phase to"
 msgstr ""
 
@@ -4255,12 +4335,6 @@ msgstr ""
 msgid "List Optio&ns"
 msgstr ""
 
-msgid "File(s) not found"
-msgstr "File non trovato/i"
-
-msgid "The selected files do not exist in the working directory"
-msgstr "I file scelti non esistono nella cartella di lavoro"
-
 #, python-format
 msgid "%s - Revision Details (%s)"
 msgstr ""
@@ -4290,9 +4364,6 @@ msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
 msgstr ""
-
-msgid "Confirm Revert"
-msgstr "Conferma ripristino"
 
 msgid ""
 "Reverting all files will discard changes and leave affected files in a "
@@ -4465,18 +4536,16 @@ msgstr "In esecuzione"
 msgid "query"
 msgstr ""
 
-msgid "Parse Error: "
-msgstr ""
-
-msgid "Invalid query: "
-msgstr ""
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
 "\n"
 "Arrivato interrupt da tastiera, annullamento in corso.\n"
+
+#, python-format
+msgid "failed to fork GUI process: %s\n"
+msgstr ""
 
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
@@ -4565,9 +4634,6 @@ msgstr ""
 msgid "open a new workbench window"
 msgstr ""
 
-msgid "requires a single filename"
-msgstr ""
-
 msgid "thg about"
 msgstr ""
 
@@ -4650,6 +4716,9 @@ msgstr "registra il datecode come data del commit"
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr ""
 
+msgid "thg debugblockmatcher"
+msgstr ""
+
 msgid "thg debugbugreport [TEXT]"
 msgstr ""
 
@@ -4666,6 +4735,18 @@ msgid "thg email [REVS]"
 msgstr ""
 
 msgid "use only one form to specify the revision"
+msgstr ""
+
+msgid "select the specified revision"
+msgstr ""
+
+msgid "side-by-side comparison of revisions"
+msgstr ""
+
+msgid "thg filelog [OPTION]... FILE"
+msgstr ""
+
+msgid "requires a single filename"
 msgstr ""
 
 msgid "thg forget [FILE]..."
@@ -5250,14 +5331,8 @@ msgstr ""
 msgid "Author Coloring"
 msgstr "Colora per autore"
 
-msgid ""
-"Color changesets by author name.  If not enabled, the changes are colored "
-"green for merge, red for non-trivial parents, black for normal. Default: "
-"False"
+msgid "Color changesets by author name. Default: False"
 msgstr ""
-"Colora i changesets in base al nome autore. Se non abilitato, i changeset "
-"sono verde per le fusioni, rosso per i non semplici genitori, nero per i "
-"normali. Default: Falso"
 
 msgid "Full Authorname"
 msgstr ""
@@ -5289,11 +5364,9 @@ msgid "Long Summary"
 msgstr "Sommario lungo"
 
 msgid ""
-"If true, concatenate multiple lines of changeset summary until they reach 80 "
-"characters. Default: False"
+"If true, concatenate multiple lines of changeset summary and truncate them "
+"at 80 characters as necessary. Default: False"
 msgstr ""
-"Se vero, concatena più righe del sommario del changeset fino a raggiungere "
-"80 caratteri. Default: Falso"
 
 msgid "Log Batch Size"
 msgstr "Lunghezza gruppo cronologia"
@@ -5345,6 +5418,16 @@ msgid ""
 "<li><b>prompt</b>: The default. Show a prompt when updating to a revision "
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
+msgstr ""
+
+msgid "Show Family Line"
+msgstr ""
+
+msgid ""
+"Show indirect revision dependency on the revision graph when filtered by "
+"revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
+"some cases. This option is expected to be removed if the performance issue "
+"is solved."
 msgstr ""
 
 msgctxt "config item"
@@ -6401,6 +6484,12 @@ msgstr ""
 msgid "%s - status"
 msgstr ""
 
+msgid "Check"
+msgstr ""
+
+msgid "Uncheck"
+msgstr ""
+
 msgid "status"
 msgstr "stato file"
 
@@ -7074,90 +7163,6 @@ msgstr "risposta attesa"
 msgid "password: "
 msgstr "password: "
 
-msgid "abort: "
-msgstr "interrotto: "
-
-msgid "hint: "
-msgstr ""
-
-#, python-format
-msgid "HTTP Error: %d (%s)"
-msgstr ""
-
-#, python-format
-msgid "URLError: %s"
-msgstr ""
-
-msgid "SSL: Server certificate verify failed"
-msgstr "SSL: Verifica del certificato server fallita"
-
-#, python-format
-msgid "SSL: unknown error %s:%s"
-msgstr "SSL: errore sconosciuto %s:%s"
-
-#, python-format
-msgid "SSL error: %s"
-msgstr "errore SSL: %s"
-
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr ""
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: %s\n"
-msgstr ""
-
-msgid "abort: remote error:\n"
-msgstr ""
-
-#, python-format
-msgid "abort: %s"
-msgstr "interrotto: %s"
-
-msgid " empty string\n"
-msgstr ""
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr ""
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr ""
-
-msgid "broken pipe\n"
-msgstr ""
-
 msgid "Parent 1:"
 msgstr "Genitore 1:"
 
@@ -7297,113 +7302,6 @@ msgstr "Comparazione directory a 3 vie"
 
 msgid "Directory diff"
 msgstr "Comparazione directory"
-
-msgid "&Edit"
-msgstr ""
-
-msgid "E&xplore Subrepository"
-msgstr ""
-
-msgid "&View Missing"
-msgstr ""
-
-msgid "&Revert..."
-msgstr ""
-
-msgid "&Forget"
-msgstr ""
-
-msgid "Add &Largefiles..."
-msgstr ""
-
-msgid "De&tect Renames..."
-msgstr ""
-
-msgid "&Ignore..."
-msgstr ""
-
-msgid "Re&move Versioned"
-msgstr ""
-
-msgid "&Delete Unversioned..."
-msgstr ""
-
-msgid "&Mark Unresolved"
-msgstr ""
-
-msgid "&Mark Resolved"
-msgstr ""
-
-msgid "Check"
-msgstr ""
-
-msgid "Uncheck"
-msgstr ""
-
-msgid "View O&ther"
-msgstr ""
-
-msgid "&Copy..."
-msgstr ""
-
-msgid "Re&name..."
-msgstr ""
-
-msgid "Was renamed from"
-msgstr ""
-
-msgid "Restart Mer&ge"
-msgstr ""
-
-msgid "Restart Merge &with"
-msgstr ""
-
-msgid " errors"
-msgstr ""
-
-msgid " output"
-msgstr ""
-
-msgid " Aborted"
-msgstr " Interrotto"
-
-msgid "Cannot open subrepository"
-msgstr "Impossibile aprire subrepository"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "Il subrepository selezionato non esiste nella cartella di lavoro"
-
-msgid "Uncommited merge - please select a parent revision"
-msgstr ""
-"Merge di cui non si è effettuato il commit - si prega di selezionare una "
-"revisione genitore"
-
-msgid "Revert files to local or other parent?"
-msgstr "Ripristina i file al genitore locale o l'altro"
-
-msgid "&Other"
-msgstr "&Altro"
-
-msgid "Revert local file changes?"
-msgstr ""
-
-msgid "&Revert with backup"
-msgstr ""
-
-msgid "&Discard changes"
-msgstr ""
-
-msgid "Revert the following files?"
-msgstr ""
-
-msgid "&Revert"
-msgstr ""
-
-msgid "Confirm Delete Unversioned"
-msgstr ""
-
-msgid "Delete the following unversioned files?"
-msgstr ""
 
 msgid "Confirm Discard"
 msgstr "Conferma lo scarto"
@@ -7737,6 +7635,96 @@ msgid "Error executing \"commit finished\" trigger"
 msgstr ""
 
 msgid "Cannot open Plugin Options dialog"
+msgstr ""
+
+#, python-format
+msgid ""
+"hg: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: parse error at %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: parse error: %s\n"
+msgstr ""
+
+#, python-format
+msgid "timed out waiting for lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "abort: %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "abort: could not lock %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: %s\n"
+msgstr ""
+
+msgid "abort: remote error:\n"
+msgstr ""
+
+#, python-format
+msgid "abort: %s"
+msgstr "interrotto: %s"
+
+msgid " empty string\n"
+msgstr ""
+
+#, python-format
+msgid "hg: unknown command '%s'\n"
+msgstr ""
+
+#, python-format
+msgid "abort: error: %s\n"
+msgstr ""
+
+msgid "broken pipe\n"
+msgstr ""
+
+msgid "abort: "
+msgstr "interrotto: "
+
+msgid "hint: "
+msgstr ""
+
+#, python-format
+msgid "HTTP Error: %d (%s)"
+msgstr ""
+
+#, python-format
+msgid "URLError: %s"
+msgstr ""
+
+msgid "SSL: Server certificate verify failed"
+msgstr "SSL: Verifica del certificato server fallita"
+
+#, python-format
+msgid "SSL: unknown error %s:%s"
+msgstr "SSL: errore sconosciuto %s:%s"
+
+#, python-format
+msgid "SSL error: %s"
+msgstr "errore SSL: %s"
+
+msgid "hgsubversion packaged with thg"
+msgstr ""
+
+msgid "hggit packaged with thg"
 msgstr ""
 
 msgid "inotify is not supported on this platform"
@@ -8181,6 +8169,9 @@ msgstr ""
 
 #~ msgid "Source path is empty"
 #~ msgstr "Percorso sorgente non specificato"
+
+#~ msgid " Aborted"
+#~ msgstr " Interrotto"
 
 #~ msgid "Invalid path"
 #~ msgstr "Percorso non valido"
@@ -8777,6 +8768,15 @@ msgstr ""
 #~ msgstr "File non riconosciuti"
 
 #~ msgid ""
+#~ "Color changesets by author name.  If not enabled, the changes are colored "
+#~ "green for merge, red for non-trivial parents, black for normal. Default: "
+#~ "False"
+#~ msgstr ""
+#~ "Colora i changesets in base al nome autore. Se non abilitato, i changeset "
+#~ "sono verde per le fusioni, rosso per i non semplici genitori, nero per i "
+#~ "normali. Default: Falso"
+
+#~ msgid ""
 #~ "Show the diff panel below the file list in status, shelve, and commit "
 #~ "dialogs. Default: False (show diffs to right of file list)"
 #~ msgstr ""
@@ -8863,9 +8863,6 @@ msgstr ""
 
 #~ msgid "filtered status"
 #~ msgstr "stato file selezionati"
-
-#~ msgid "deleted"
-#~ msgstr "cancellati"
 
 #~ msgid "Skipped saving path with no alias"
 #~ msgstr "Nessun alias di percorso specificato"
@@ -10008,6 +10005,13 @@ msgstr ""
 #~ "Il genitore è cambiato dall'ultimo aggiornamento visualizzazione.\n"
 #~ "Continuare comunque?"
 
+#~ msgid ""
+#~ "If true, concatenate multiple lines of changeset summary until they reach "
+#~ "80 characters. Default: False"
+#~ msgstr ""
+#~ "Se vero, concatena più righe del sommario del changeset fino a "
+#~ "raggiungere 80 caratteri. Default: Falso"
+
 #~ msgid "Maximum number of changes to list on the changelog."
 #~ msgstr "Numero massimo di modifiche da mostrare nella cronologia"
 
@@ -10964,15 +10968,6 @@ msgstr ""
 #~ msgid "File is binary.\n"
 #~ msgstr "Il file è binario.\n"
 
-#~ msgid "Detail"
-#~ msgstr "Dettaglio"
-
-#~ msgid "Error creating destination folder"
-#~ msgstr "Errore durante la creazione della cartella di destinazione"
-
-#~ msgid "Please specify a different path."
-#~ msgstr "Per piacere specifica un percorso differente."
-
 #~ msgid ", please refresh"
 #~ msgstr ", aggiorna"
 
@@ -10996,21 +10991,6 @@ msgstr ""
 
 #~ msgid "Show graph"
 #~ msgstr "Mostra grafico"
-
-#~ msgid "Copyright 2008-2013 Steve Borho and others"
-#~ msgstr "Copyright 2008-2013 Steve Borho e altri"
-
-#~ msgid "Second Parent: revision %s (%s)"
-#~ msgstr "Secondo genitore: revisione %s (%s)"
-
-#~ msgid "First Parent: revision %s (%s)"
-#~ msgstr "Primo genitore: revisione %s (%s)"
-
-#~ msgid "Folder &History"
-#~ msgstr "Storico cartella"
-
-#~ msgid "You must select two revisions to diff"
-#~ msgstr "Devi scegliere due revisioni da confrontare"
 
 #~ msgid "Starting Revision:"
 #~ msgstr "Revisione iniziale:"

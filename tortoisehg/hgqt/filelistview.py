@@ -15,6 +15,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from tortoisehg.util import hglib
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
@@ -35,7 +36,7 @@ class HgFileListView(QTreeView):
         self.setTextElideMode(Qt.ElideLeft)
 
         # give consistent height and enable optimization
-        self.setIconSize(QSize(16, 16))
+        self.setIconSize(qtlib.smallIconSize())
         self.setUniformRowHeights(True)
 
     def setModel(self, model):

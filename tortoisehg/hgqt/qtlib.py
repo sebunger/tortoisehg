@@ -279,6 +279,7 @@ _thgstyles = {
    'log.modified': 'black #ffddaa_background',
    'log.added': 'black #aaffaa_background',
    'log.removed': 'black #ffcccc_background',
+   'log.warning': 'black #ffcccc_background',
    'status.deleted': 'red bold',
    'ui.error': 'red bold #ffcccc_background',
    'ui.warning': 'black bold #ffffaa_background',
@@ -335,8 +336,15 @@ def geteffect(labels):
                 effects.append('color: ' + e)
     return ';'.join(effects)
 
-def applyeffects(chars, effects):
-    return '<span style="white-space: pre;%s">%s</span>' % (effects, chars)
+def gettextcoloreffect(labels):
+    """Map labels like "log.date" to foreground color if available"""
+    for l in str(labels).split():
+        if not l:
+            continue
+        for e in _styles.get(l, '').split():
+            if e.startswith('#') or e in QColor.colorNames():
+                return QColor(e)
+    return QColor()
 
 def getbgcoloreffect(labels):
     """Map labels like "log.date" to background color if available
@@ -581,6 +589,21 @@ def getcheckboxpixmap(state, bgcolor, widget):
     option.state |= state
     style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
     return pix
+
+def smallIconSize():
+    style = QApplication.style()
+    s = style.pixelMetric(QStyle.PM_SmallIconSize)
+    return QSize(s, s)
+
+def toolBarIconSize():
+    if sys.platform == 'darwin':
+        # most Mac users will have laptop-sized screens and prefer a smaller
+        # toolbar to preserve vertical space.
+        style = QCommonStyle()
+    else:
+        style = QApplication.style()
+    s = style.pixelMetric(QStyle.PM_ToolBarIconSize)
+    return QSize(s, s)
 
 class ThgFont(QObject):
     changed = pyqtSignal(QFont)
@@ -1026,7 +1049,7 @@ class InfoBar(QFrame):
 
         self.layout().addStretch()
         self._closebutton = QPushButton(self, flat=True, autoDefault=False,
-            icon=self.style().standardIcon(QStyle.SP_DockWidgetCloseButton))
+            icon=self.style().standardIcon(QStyle.SP_TitleBarCloseButton))
         self._closebutton.clicked.connect(self.close)
         self.layout().addWidget(self._closebutton)
 

@@ -74,21 +74,15 @@ class AboutDialog(QDialog):
         self.blancline_lbl = QLabel()
         self.vbox.addWidget(self.blancline_lbl)
 
-        self.hbox = QHBoxLayout()
-        self.license_btn = QPushButton()
-        self.license_btn.setText(_('&License'))
+        bbox = QDialogButtonBox(self)
+        self.license_btn = bbox.addButton(_('&License'),
+                                          QDialogButtonBox.ResetRole)
         self.license_btn.setAutoDefault(False)
         self.license_btn.clicked.connect(self.showLicense)
-        self.hspacer = QSpacerItem(40, 20,
-                QSizePolicy.Expanding, QSizePolicy.Minimum)
-        self.close_btn = QPushButton()
-        self.close_btn.setText(_('&Close'))
+        self.close_btn = bbox.addButton(QDialogButtonBox.Close)
         self.close_btn.setDefault(True)
         self.close_btn.clicked.connect(self.close)
-        self.hbox.addWidget(self.license_btn)
-        self.hbox.addItem(self.hspacer)
-        self.hbox.addWidget(self.close_btn)
-        self.vbox.addLayout(self.hbox)
+        self.vbox.addWidget(bbox)
 
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
@@ -161,9 +155,8 @@ class AboutDialog(QDialog):
             self.download_url_lbl.setText(urldata)
 
     def showLicense(self):
-        from tortoisehg.hgqt import license
-        ld = license.LicenseDialog(self)
-        ld.show()
+        ld = LicenseDialog(self)
+        ld.exec_()
 
     def closeEvent(self, event):
         if self._newverreply:
@@ -178,3 +171,48 @@ class AboutDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('about/geom', self.saveGeometry())
+
+
+class LicenseDialog(QDialog):
+    """Dialog for showing the TortoiseHg license"""
+    def __init__(self, parent=None):
+        super(LicenseDialog, self).__init__(parent)
+
+        self.setWindowIcon(qtlib.geticon('thg_logo'))
+        self.setWindowTitle(_('License'))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.resize(700, 400)
+
+        self.lic_txt = QPlainTextEdit()
+        self.lic_txt.setFont(QFont('Monospace'))
+        self.lic_txt.setTextInteractionFlags(
+                Qt.TextSelectableByKeyboard|Qt.TextSelectableByMouse)
+        try:
+            lic = open(paths.get_license_path(), 'rb').read()
+            self.lic_txt.setPlainText(lic)
+        except (IOError):
+            pass
+
+        bbox = QDialogButtonBox(self)
+        self.close_btn = bbox.addButton(QDialogButtonBox.Close)
+        self.close_btn.clicked.connect(self.close)
+
+        self.vbox = QVBoxLayout()
+        self.vbox.setSpacing(6)
+        self.vbox.addWidget(self.lic_txt)
+        self.vbox.addWidget(bbox)
+
+        self.setLayout(self.vbox)
+        self._readsettings()
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(LicenseDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('license/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('license/geom', self.saveGeometry())

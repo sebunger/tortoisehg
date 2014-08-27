@@ -254,8 +254,7 @@ class HgignoreDialog(QDialog):
         try:
             self.repo.thginvalidate()
             self.repo.lfstatus = True
-            wctx = self.repo[None]
-            wctx.status(unknown=True)
+            self.lclunknowns = self.repo.status(unknown=True)[4]
             self.repo.lfstatus = False
         except (EnvironmentError, error.RepoError), e:
             qtlib.WarningMsgBox(_('Unable to read repository status'),
@@ -276,7 +275,6 @@ class HgignoreDialog(QDialog):
                          for i in self.unknownlist.selectedIndexes()]
             except IndexError:
                 self.pats = []
-        self.lclunknowns = wctx.unknown()
         self.unknownlist.clear()
         self.unknownlist.addItems([uni(u) for u in self.lclunknowns])
         for i, u in enumerate(self.lclunknowns):

@@ -105,6 +105,10 @@ class _AbstractFileData(object):
                                posixpath.join(self._rpath, self._wfile),
                                self._ctx)
 
+    def isLoaded(self):
+        loadables = [self.contents, self.ucontents, self.error, self.diff]
+        return util.any(e is not None for e in loadables)
+
     def isNull(self):
         return self._ctx.rev() == nullrev and not self._wfile
 
@@ -116,6 +120,10 @@ class _AbstractFileData(object):
 
     def baseRev(self):
         return self._pctx.rev()
+
+    def parentRevs(self):
+        # may contain nullrev, which allows "nullrev in parentRevs()"
+        return [p.rev() for p in self._ctx.parents()]
 
     def rawContext(self):
         return self._ctx
@@ -159,6 +167,9 @@ class _AbstractFileData(object):
     def isDir(self):
         return not self._wfile
 
+    def mergeStatus(self):
+        pass
+
     def subrepoType(self):
         pass
 
@@ -187,6 +198,10 @@ class _AbstractFileData(object):
 
 
 class FileData(_AbstractFileData):
+
+    def __init__(self, ctx, pctx, path, status=None, rpath=None, mstatus=None):
+        super(FileData, self).__init__(ctx, pctx, path, status, rpath)
+        self._mstatus = mstatus
 
     def load(self, changeselect=False, force=False):
         if self.rev() == nullrev:
@@ -386,7 +401,7 @@ class FileData(_AbstractFileData):
             # feed diffs through record.parsepatch() for more fine grained
             # chunk selection
             filediffs = record.parsepatch(fp)
-            if filediffs:
+            if filediffs and filediffs[0].hunks:
                 self.changes = filediffs[0]
             else:
                 self.diff = ''
@@ -420,11 +435,25 @@ class FileData(_AbstractFileData):
             else:
                 self.diff = ''
 
+    def mergeStatus(self):
+        return self._mstatus
+
     def diffText(self):
         udiff = self._textToUnicode(self.diff or '')
         if self.changes:
             return udiff
         return _trimdiffheader(udiff)
+
+    def setChunkExcluded(self, chunk, exclude):
+        assert chunk in self.changes.hunks
+        if chunk.excluded == exclude:
+            return
+        if exclude:
+            chunk.excluded = True
+            self.changes.excludecount += 1
+        else:
+            chunk.excluded = False
+            self.changes.excludecount -= 1
 
 
 class DirData(_AbstractFileData):
@@ -751,10 +780,12 @@ class SubrepoData(_AbstractFileData):
         return self._subkind
 
 
-def createFileData(ctx, ctx2, wfile, status=None, rpath=None):
+def createFileData(ctx, ctx2, wfile, status=None, rpath=None, mstatus=None):
     if isinstance(ctx, patchctx.patchctx):
+        if mstatus:
+            raise ValueError('invalid merge status for patch: %r' % mstatus)
         return PatchFileData(ctx, ctx2, wfile, status, rpath)
-    return FileData(ctx, ctx2, wfile, status, rpath)
+    return FileData(ctx, ctx2, wfile, status, rpath, mstatus)
 
 def createDirData(ctx, pctx, path, rpath=None):
     if isinstance(ctx, patchctx.patchctx):

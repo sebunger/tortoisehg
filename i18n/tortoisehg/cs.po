@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-28 11:26-0300\n"
-"PO-Revision-Date: 2014-03-30 23:42+0000\n"
+"POT-Creation-Date: 2014-07-24 12:23-0300\n"
+"PO-Revision-Date: 2014-05-18 01:20+0000\n"
 "Last-Translator: Tovim <Unknown>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2014-04-29 05:54+0000\n"
-"X-Generator: Launchpad (build 16985)\n"
+"X-Launchpad-Export-Date: 2014-07-25 05:44+0000\n"
+"X-Generator: Launchpad (build 17114)\n"
 "Language: cs\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
@@ -42,9 +42,6 @@ msgstr "Naše stránky můžete navštívit zde"
 msgid "&License"
 msgstr "&Licence"
 
-msgid "&Close"
-msgstr "&Zavřít"
-
 #, python-format
 msgid "version %s"
 msgstr "verze %s"
@@ -56,6 +53,9 @@ msgstr "plus Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
 msgstr "Nová verze TortoiseHg (%s) je připravena ke stažení!"
+
+msgid "License"
+msgstr "Licence"
 
 msgid "= Working Directory Parent ="
 msgstr "= Rodič pracovního adresáře ="
@@ -581,22 +581,22 @@ msgstr "chyba při provádění příkazu\n"
 
 #, python-format
 msgid "process exited unexpectedly with code %d"
-msgstr ""
+msgstr "proces nečekaně ukončen kódem %d"
 
 #, python-format
 msgid "timed out while reading: %r..."
-msgstr ""
+msgstr "čas vypršel při čtení: %r..."
 
 msgid "timed out waiting for message"
-msgstr ""
+msgstr "čas vypršel při čekání na zprávu"
 
 #, python-format
 msgid "unexpected response on required channel %r"
-msgstr ""
+msgstr "nečekaná odezva na požadovaném kanálu %r"
 
 #, python-format
 msgid "invalid \"hello\" message: %r"
-msgstr ""
+msgstr "neplatná zpráva \"hello\": %r"
 
 msgid "no \"runcommand\" capability"
 msgstr ""
@@ -676,6 +676,12 @@ msgstr "Sloučit"
 msgid "Merge with %s"
 msgstr "Sloučit s %s"
 
+msgid "Patch Name Required"
+msgstr "Požadován název oprávky"
+
+msgid "You must enter a patch name"
+msgstr "Musíte uvést název oprávky"
+
 msgctxt "start progress"
 msgid "Commit"
 msgstr "Commit"
@@ -718,6 +724,9 @@ msgstr "Ukázat problémy..."
 
 msgid "Stop"
 msgstr "Zastavit"
+
+msgid "### patch name ###"
+msgstr "### patch name ###"
 
 msgid "Commit changes"
 msgstr "Komitovat změny"
@@ -1231,9 +1240,6 @@ msgstr "Nutno zadat platný typ hooku."
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "Název hooku nesmí obsahovat mezery, tabulátory nebo znaky '='."
 
-msgid "Custom Tools"
-msgstr "Uživatelské nástroje"
-
 #, python-format
 msgid "command parse error: %s"
 msgstr "command parse error: %s"
@@ -1269,17 +1275,8 @@ msgstr ""
 msgid "Diff Changeset to Loc&al"
 msgstr ""
 
-msgid "Diff Selected Cha&ngesets"
-msgstr ""
-
 msgid "&Diff to Parent"
 msgstr ""
-
-msgid "Cannot display visual diff"
-msgstr "Nejde zobrazit vizuální diff"
-
-msgid "Visual diffs are not supported for unapplied patches"
-msgstr "Zobrazení diffů není pro neaplikované oprávky podporováno"
 
 msgid "Diff to &Local"
 msgstr ""
@@ -1287,9 +1284,6 @@ msgstr ""
 msgid "View changes to current in external diff tool"
 msgstr ""
 "Zobrazit změny oproti stávající (revizi) v externím diffovém prohlížeči"
-
-msgid "Diff Selected &File Revisions"
-msgstr ""
 
 msgid "&View at Revision"
 msgstr "&Zobrazit verzi souboru"
@@ -1310,6 +1304,9 @@ msgid "&Edit Local"
 msgstr ""
 
 msgid "&Open Local"
+msgstr ""
+
+msgid "&Copy Patch"
 msgstr ""
 
 msgid "Copy &Path"
@@ -1338,6 +1335,99 @@ msgstr ""
 
 msgid "Open a shell terminal in the selected folder"
 msgstr "Otevřít terminál ve vybrané složce"
+
+msgid "Custom Tools"
+msgstr "Uživatelské nástroje"
+
+msgid "Diff &Local"
+msgstr ""
+
+msgid "&View Missing"
+msgstr ""
+
+msgid "View O&ther"
+msgstr ""
+
+msgid "Add &Largefiles..."
+msgstr ""
+
+msgid "&Forget"
+msgstr "&Zapomenout (forget)"
+
+msgid "&Delete Unversioned..."
+msgstr ""
+
+msgid "Confirm Delete Unversioned"
+msgstr "Potvrdit smazání neverzovaných"
+
+msgid "Delete the following unversioned files?"
+msgstr "Smazat následující neverzované soubory?"
+
+msgid "&Delete"
+msgstr "&Delete"
+
+msgid "Re&move Versioned"
+msgstr "Odebrat verzovaný soubor"
+
+msgid "&Revert..."
+msgstr "&Vrátit (revert)..."
+
+msgid "Uncommited merge - please select a parent revision"
+msgstr "Nekomitované sloučení - vyberte prosím rodičovskou revizi"
+
+msgid "Revert files to local or other parent?"
+msgstr "Vrátit soubory ke stavu lokálního či jihého rodiče?"
+
+msgid "&Local"
+msgstr "&Lokální"
+
+msgid "&Other"
+msgstr "&Jiný"
+
+msgid "Confirm Revert"
+msgstr "Potvrdit navrácení"
+
+msgid "Revert local file changes?"
+msgstr "Vrátit změny lokálních souborů?"
+
+msgid "&Revert with backup"
+msgstr "&Návrat do předchozího stavu se zálohou"
+
+msgid "&Discard changes"
+msgstr "&Vyřadit změny"
+
+msgid "Revert the following files?"
+msgstr "Vrátit (revert) změny následujících suborů?"
+
+msgid "&Revert"
+msgstr ""
+
+msgid "&Copy..."
+msgstr "&Copy..."
+
+msgid "Re&name..."
+msgstr ""
+
+msgid "&Ignore..."
+msgstr "&Ignorovat..."
+
+msgid "De&tect Renames..."
+msgstr ""
+
+msgid "&Mark Resolved"
+msgstr ""
+
+msgid "&Mark Unresolved"
+msgstr ""
+
+msgid "Restart Mer&ge"
+msgstr ""
+
+msgid "Was renamed from"
+msgstr "Byl přejmenován z"
+
+msgid "Restart Merge &with"
+msgstr ""
 
 msgid "Display the file anyway"
 msgstr "Přesto ten soubor zobrazit"
@@ -1524,6 +1614,12 @@ msgstr "Zpět"
 msgid "Forward"
 msgstr "Vpřed"
 
+msgid "Diff Selected &Changesets"
+msgstr ""
+
+msgid "&Diff Selected File Revisions"
+msgstr ""
+
 msgid "Show Revision &Details"
 msgstr "Zobrazit podrobnosti revizí"
 
@@ -1699,9 +1795,6 @@ msgstr ""
 
 msgid "&Originating Revision"
 msgstr ""
-
-msgid "&Local"
-msgstr "&Lokální"
 
 msgid "&Parent Revision"
 msgstr ""
@@ -2123,6 +2216,9 @@ msgstr "&Settings"
 msgid "Send &Email"
 msgstr "Send &Email"
 
+msgid "&Close"
+msgstr "&Zavřít"
+
 #, python-format
 msgid "Ignore filter - %s"
 msgstr "Seznam ignorovaných souborů - %s"
@@ -2260,9 +2356,6 @@ msgstr ""
 
 msgid "Add as &Normal Files"
 msgstr ""
-
-msgid "License"
-msgstr "Licence"
 
 msgid "Find revisions matching fields of:"
 msgstr "Nalézt shodná pole revizí:"
@@ -2449,6 +2542,12 @@ msgstr "Použít formát"
 msgid "C&onfigure Format"
 msgstr "Nastavit formát"
 
+#, python-format
+msgid "%s had rejected chunks, edit patched file together with rejects?"
+msgstr ""
+"%s měl odmítnuté porce (chunks), editovat oprávkované (patched) soubory "
+"společně s odmíntutými?"
+
 msgid "&Commit to Queue..."
 msgstr ""
 
@@ -2581,21 +2680,6 @@ msgstr "Vynutit push nebo pop (--force)"
 
 msgid "Tolerate non-conflicting local changes (--keep-changes)"
 msgstr "Tolerovat nekonfliktní lokální změny (--keep-changes)"
-
-msgid "### patch name ###"
-msgstr "### patch name ###"
-
-#, python-format
-msgid "%s had rejected chunks, edit patched file together with rejects?"
-msgstr ""
-"%s měl odmítnuté porce (chunks), editovat oprávkované (patched) soubory "
-"společně s odmíntutými?"
-
-msgid "Patch Name Required"
-msgstr "Požadován název oprávky"
-
-msgid "You must enter a patch name"
-msgstr "Musíte uvést název oprávky"
 
 #, python-format
 msgid "Pending Perforce Changelists - %s"
@@ -2890,9 +2974,6 @@ msgstr ""
 
 msgid "&Paste"
 msgstr ""
-
-msgid "&Delete"
-msgstr "&Delete"
 
 msgid "&Editor Options"
 msgstr ""
@@ -3699,7 +3780,7 @@ msgstr ""
 
 #, python-format
 msgid "Local Repository %s"
-msgstr "Lokální repo %s"
+msgstr "Lokální repozitář %s"
 
 #, python-format
 msgid ""
@@ -3943,9 +4024,6 @@ msgid "&Archive..."
 msgstr ""
 
 msgid "&Bundle Rev and Descendants..."
-msgstr ""
-
-msgid "&Copy Patch"
 msgstr ""
 
 msgid "Change &Phase to"
@@ -4400,7 +4478,7 @@ msgid "Ext"
 msgstr "Ext"
 
 msgid "Repository"
-msgstr "Repo"
+msgstr "Repozitář"
 
 msgid "<default>"
 msgstr "<"
@@ -4438,12 +4516,6 @@ msgstr "Přepnout na rodiče, který má být použit jako bázová revize"
 msgid "List Optio&ns"
 msgstr ""
 
-msgid "File(s) not found"
-msgstr "Soubor(y) nenalezen(y)"
-
-msgid "The selected files do not exist in the working directory"
-msgstr "Vybrané soubory se v pracovním adresáři nenacházejí"
-
 #, python-format
 msgid "%s - Revision Details (%s)"
 msgstr "%s - Podrobnosti revize (%s)"
@@ -4474,9 +4546,6 @@ msgstr "druhý rodič revize %d (revize %d)"
 
 msgid "null revision (i.e. remove file(s))"
 msgstr "nulová revize (to jest odebrat soubor(y))"
-
-msgid "Confirm Revert"
-msgstr "Potvrdit navrácení"
 
 msgid ""
 "Reverting all files will discard changes and leave affected files in a "
@@ -4666,18 +4735,16 @@ msgstr "Běžící"
 msgid "query"
 msgstr "query"
 
-msgid "Parse Error: "
-msgstr ""
-
-msgid "Invalid query: "
-msgstr "Neplatný dotaz: "
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
 "\n"
 "Zachyceno přerušení klávesnicí, ruší se.\n"
+
+#, python-format
+msgid "failed to fork GUI process: %s\n"
+msgstr ""
 
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
@@ -4709,7 +4776,7 @@ msgstr "zrušit: %s!\n"
 
 #, python-format
 msgid "abort: %s\n"
-msgstr "abort: %s\n"
+msgstr "zrušit: %s\n"
 
 #, python-format
 msgid "(%s)\n"
@@ -4767,9 +4834,6 @@ msgstr "read file list from file encoding utf-8"
 
 msgid "open a new workbench window"
 msgstr "otevřte nové okno verpánku"
-
-msgid "requires a single filename"
-msgstr ""
 
 msgid "thg about"
 msgstr "thg about"
@@ -4855,6 +4919,9 @@ msgstr "zapsat datumový kód jako datum komitu"
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr "thg commit [OPTIONS] [FILE]..."
 
+msgid "thg debugblockmatcher"
+msgstr ""
+
 msgid "thg debugbugreport [TEXT]"
 msgstr ""
 
@@ -4872,6 +4939,18 @@ msgstr "thg email [REVS]"
 
 msgid "use only one form to specify the revision"
 msgstr "pro označení revize použijte jen jeden způsob"
+
+msgid "select the specified revision"
+msgstr ""
+
+msgid "side-by-side comparison of revisions"
+msgstr ""
+
+msgid "thg filelog [OPTION]... FILE"
+msgstr ""
+
+msgid "requires a single filename"
+msgstr ""
 
 msgid "thg forget [FILE]..."
 msgstr "thg forget [FILE]..."
@@ -5435,6 +5514,11 @@ msgid ""
 "of the file. In either case, when conflicts occur, the user will be invited "
 "to review and resolve changes manually. Default: True."
 msgstr ""
+"Určuje, zda se má TortoiseHg pokusit automaticky řešit změny z obou stran "
+"téhož souboru a při nezdaru oznámit slučovací potíže. Při False jsou "
+"ohlášeny jako konfliktní všechny soubory se změnami na obou stranách i když "
+"se tyto změny nacházejí na odlišných místech souborů. Při výskytu konfliktů "
+"je uživatel vyznán k jejich ručnímu řešení. Implicitně: True"
 
 msgid "Workbench"
 msgstr "Verpánek"
@@ -5488,14 +5572,8 @@ msgstr ""
 msgid "Author Coloring"
 msgstr "Zabarvení podle autora"
 
-msgid ""
-"Color changesets by author name.  If not enabled, the changes are colored "
-"green for merge, red for non-trivial parents, black for normal. Default: "
-"False"
+msgid "Color changesets by author name. Default: False"
 msgstr ""
-"Zabarvit changesety podle jména autora. Není-li povoleno, jsou normální "
-"změny zabarveny černě, změny netriviálních rodičů červeně a změny pro "
-"sloučení zeleně. Implicitně je False"
 
 msgid "Full Authorname"
 msgstr "Celé jméno autora"
@@ -5508,14 +5586,13 @@ msgstr ""
 "zkrácené verzi, obvykle jenom jméno bez emailové adresy. Implicitně: False"
 
 msgid "Task Tabs"
-msgstr "Úkonová lišta"
+msgstr "Ouška úkonových karet"
 
 msgid ""
 "Show tabs along the side of the bottom half of each repo widget allowing one "
 "to switch task tabs without using the toolbar. Default: off"
 msgstr ""
-"Orientace úkonové lišty (east, west, off) pro snadné přepínání úkonových "
-"karet. Implicitně: off"
+"Orientace lišty (east, west, off) s oušky úkonových karet. Implicitně: off"
 
 msgid "Task Toolbar Order"
 msgstr "Pořadí úloh úkonové lišty"
@@ -5534,11 +5611,9 @@ msgid "Long Summary"
 msgstr "Dlouhý souhrn"
 
 msgid ""
-"If true, concatenate multiple lines of changeset summary until they reach 80 "
-"characters. Default: False"
+"If true, concatenate multiple lines of changeset summary and truncate them "
+"at 80 characters as necessary. Default: False"
 msgstr ""
-"Je-li zadáno True, jsou řádky sumární zprávy changesetu spojovány až od "
-"celkové délky 80 znaků. Implicitně je False"
 
 msgid "Log Batch Size"
 msgstr "Počet načtených revizí"
@@ -5607,6 +5682,16 @@ msgstr ""
 "<li><b>prompt</b>: Implicitní nastavení. Zobrazit výzvu při aktualizaci k "
 "revizi, která má jednu či více záložek.<li><b>never</b>: Nikdy nezobrazovat "
 "žádnou výzvu pro aktivaci záložek.</ul><p>Implicitně: prompt"
+
+msgid "Show Family Line"
+msgstr ""
+
+msgid ""
+"Show indirect revision dependency on the revision graph when filtered by "
+"revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
+"some cases. This option is expected to be removed if the performance issue "
+"is solved."
+msgstr ""
 
 msgctxt "config item"
 msgid "Commit"
@@ -6044,6 +6129,8 @@ msgstr "SMTP TLS"
 
 msgid "Method to enable TLS when connecting to mail server. Default: none"
 msgstr ""
+"Metoda pro povolení protokolu TLS při připojení k mailovému serveru. "
+"Implicitně: none"
 
 msgid "SMTP Username"
 msgstr "Uživatel SMTP"
@@ -6660,11 +6747,11 @@ msgid "TortoiseHg Shelve - %s"
 msgstr "TortoiseHg Shelve - %s"
 
 msgid "Delete selected chunks from working copy?"
-msgstr ""
+msgstr "Smazat vybrané porce (chunks) z pracovní kopie?"
 
 #, python-format
 msgid "Delete selected chunks from shelf file %s?"
-msgstr ""
+msgstr "Smazat vybrané porce (chunks) z šelfového souboru %s?"
 
 msgid "Are you sure?"
 msgstr "Jste si jistý?"
@@ -6766,6 +6853,12 @@ msgstr "%s - status (výběr filtrován)"
 #, python-format
 msgid "%s - status"
 msgstr "%s - status"
+
+msgid "Check"
+msgstr "Označit"
+
+msgid "Uncheck"
+msgstr "Odznačit"
 
 msgid "status"
 msgstr "status"
@@ -7471,92 +7564,6 @@ msgstr "očekávána odpověď"
 msgid "password: "
 msgstr "heslo: "
 
-msgid "abort: "
-msgstr "zrušit: "
-
-msgid "hint: "
-msgstr ""
-
-#, python-format
-msgid "HTTP Error: %d (%s)"
-msgstr "HTTP Error: %d (%s)"
-
-#, python-format
-msgid "URLError: %s"
-msgstr "URLError: %s"
-
-msgid "SSL: Server certificate verify failed"
-msgstr "SSL: Ověření certifikátu serveru se nezdařilo"
-
-#, python-format
-msgid "SSL: unknown error %s:%s"
-msgstr "SSL: neznámá chyba %s:%s"
-
-#, python-format
-msgid "SSL error: %s"
-msgstr "SSL chyba: %s"
-
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
-msgstr ""
-"hg: příkaz '%s' je víceznačný:\n"
-"    %s\n"
-
-#, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr "hg: parse error at %s: %s\n"
-
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr "hg: parse error: %s\n"
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr "vypršení času čekáním na zámek držený %s"
-
-#, python-format
-msgid "lock held by %s"
-msgstr "lock held by %s"
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr "abort: %s: %s\n"
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr "abort: could not lock %s: %s\n"
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: %s\n"
-msgstr ""
-
-msgid "abort: remote error:\n"
-msgstr ""
-
-#, python-format
-msgid "abort: %s"
-msgstr "abort: %s"
-
-msgid " empty string\n"
-msgstr " prázdný řetězec\n"
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr ""
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr "abort: error: %s\n"
-
-msgid "broken pipe\n"
-msgstr "broken pipe\n"
-
 msgid "Parent 1:"
 msgstr "Rodič 1:"
 
@@ -7695,121 +7702,16 @@ msgid "Select Tool:"
 msgstr "Select Tool:"
 
 msgid "Dir diff to p1"
-msgstr "Diff adr. k  p1"
+msgstr "Diff vůči p1"
 
 msgid "Dir diff to p2"
-msgstr "Diff adr. k  p2"
+msgstr "Diff vůči  p2"
 
 msgid "3-way dir diff"
-msgstr "Trojný diff adresáře"
+msgstr "Trojný diff"
 
 msgid "Directory diff"
 msgstr "Diff adresářů"
-
-msgid "&Edit"
-msgstr ""
-
-msgid "E&xplore Subrepository"
-msgstr ""
-
-msgid "&View Missing"
-msgstr ""
-
-msgid "&Revert..."
-msgstr "&Vrátit (revert)..."
-
-msgid "&Forget"
-msgstr "&Zapomenout (forget)"
-
-msgid "Add &Largefiles..."
-msgstr ""
-
-msgid "De&tect Renames..."
-msgstr ""
-
-msgid "&Ignore..."
-msgstr "&Ignorovat..."
-
-msgid "Re&move Versioned"
-msgstr "Odebrat verzovaný soubor"
-
-msgid "&Delete Unversioned..."
-msgstr ""
-
-msgid "&Mark Unresolved"
-msgstr ""
-
-msgid "&Mark Resolved"
-msgstr ""
-
-msgid "Check"
-msgstr "Označit"
-
-msgid "Uncheck"
-msgstr "Odznačit"
-
-msgid "View O&ther"
-msgstr ""
-
-msgid "&Copy..."
-msgstr "&Copy..."
-
-msgid "Re&name..."
-msgstr ""
-
-msgid "Was renamed from"
-msgstr "Byl přejmenován z"
-
-msgid "Restart Mer&ge"
-msgstr ""
-
-msgid "Restart Merge &with"
-msgstr ""
-
-msgid " errors"
-msgstr " chyby"
-
-msgid " output"
-msgstr ""
-
-msgid " Aborted"
-msgstr " Zrušeno"
-
-msgid "Cannot open subrepository"
-msgstr "Nejde otevřít subrepozitář"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "Vybraný subrepozitář v pracovním prostoru neexistuje."
-
-msgid "Uncommited merge - please select a parent revision"
-msgstr "Nekomitované sloučení - vyberte prosím rodičovskou revizi"
-
-msgid "Revert files to local or other parent?"
-msgstr "Vrátit soubory ke stavu lokálního či jihého rodiče?"
-
-msgid "&Other"
-msgstr "&Jiný"
-
-msgid "Revert local file changes?"
-msgstr "Vrátit změny lokálních souborů?"
-
-msgid "&Revert with backup"
-msgstr "&Návrat do předchozího stavu se zálohou"
-
-msgid "&Discard changes"
-msgstr "&Vyřadit změny"
-
-msgid "Revert the following files?"
-msgstr "Vrátit (revert) změny následujících suborů?"
-
-msgid "&Revert"
-msgstr ""
-
-msgid "Confirm Delete Unversioned"
-msgstr "Potvrdit smazání neverzovaných"
-
-msgid "Delete the following unversioned files?"
-msgstr "Smazat následující neverzované soubory?"
 
 msgid "Confirm Discard"
 msgstr "Potvrdit vyřazení"
@@ -7872,7 +7774,7 @@ msgid "&View"
 msgstr "&View"
 
 msgid "&Repository"
-msgstr "&Repo"
+msgstr "&Repozitář"
 
 msgid "&Help"
 msgstr "&Help"
@@ -8159,6 +8061,98 @@ msgstr "Chyba při běhu spouštěče (trigger) \"commit finished\""
 msgid "Cannot open Plugin Options dialog"
 msgstr "Nejde otevřít dialog Plugin Options"
 
+#, python-format
+msgid ""
+"hg: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+"hg: příkaz '%s' je víceznačný:\n"
+"    %s\n"
+
+#, python-format
+msgid "hg: parse error at %s: %s\n"
+msgstr "hg: parse error at %s: %s\n"
+
+#, python-format
+msgid "hg: parse error: %s\n"
+msgstr "hg: parse error: %s\n"
+
+#, python-format
+msgid "timed out waiting for lock held by %s"
+msgstr "vypršení času čekáním na zámek držený %s"
+
+#, python-format
+msgid "lock held by %s"
+msgstr "lock held by %s"
+
+#, python-format
+msgid "abort: %s: %s\n"
+msgstr "abort: %s: %s\n"
+
+#, python-format
+msgid "abort: could not lock %s: %s\n"
+msgstr "abort: could not lock %s: %s\n"
+
+#, python-format
+msgid "hg %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: %s\n"
+msgstr ""
+
+msgid "abort: remote error:\n"
+msgstr ""
+
+#, python-format
+msgid "abort: %s"
+msgstr "abort: %s"
+
+msgid " empty string\n"
+msgstr " prázdný řetězec\n"
+
+#, python-format
+msgid "hg: unknown command '%s'\n"
+msgstr ""
+
+#, python-format
+msgid "abort: error: %s\n"
+msgstr "abort: error: %s\n"
+
+msgid "broken pipe\n"
+msgstr "broken pipe\n"
+
+msgid "abort: "
+msgstr "zrušit: "
+
+msgid "hint: "
+msgstr ""
+
+#, python-format
+msgid "HTTP Error: %d (%s)"
+msgstr "HTTP Error: %d (%s)"
+
+#, python-format
+msgid "URLError: %s"
+msgstr "URLError: %s"
+
+msgid "SSL: Server certificate verify failed"
+msgstr "SSL: Ověření certifikátu serveru se nezdařilo"
+
+#, python-format
+msgid "SSL: unknown error %s:%s"
+msgstr "SSL: neznámá chyba %s:%s"
+
+#, python-format
+msgid "SSL error: %s"
+msgstr "SSL chyba: %s"
+
+msgid "hgsubversion packaged with thg"
+msgstr ""
+
+msgid "hggit packaged with thg"
+msgstr ""
+
 msgid "inotify is not supported on this platform"
 msgstr "inotify není na této platformě podporováno"
 
@@ -8377,18 +8371,18 @@ msgstr "Synchronizovat s přetaženým repozitářem"
 
 #, python-format
 msgid "unrecognized response: %s"
-msgstr ""
+msgstr "neuznaná odezva: %s"
 
 #, python-format
 msgid "repository %s not found"
 msgstr "repozitář %s nenalezen"
 
 msgid "win32ill: cannot create window for messages"
-msgstr ""
+msgstr "win32ill: nejde vytvořit okno pro zprávy"
 
 #, python-format
 msgid "win32ill: unsupported platform: %s\n"
-msgstr ""
+msgstr "win32ill: nepodporovaná platforma: %s\n"
 
 #~ msgid "limit number of changes displayed"
 #~ msgstr "omezit počet zobrazených změn"
@@ -8659,6 +8653,9 @@ msgstr ""
 
 #~ msgid "Contents"
 #~ msgstr "Obsah"
+
+#~ msgid " Aborted"
+#~ msgstr " Zrušeno"
 
 #~ msgid " Messages and Errors"
 #~ msgstr " Zprávy a chyby"
@@ -9604,6 +9601,15 @@ msgstr ""
 
 #~ msgid "Name associated with commits"
 #~ msgstr "Jméno spojované s komity"
+
+#~ msgid ""
+#~ "Color changesets by author name.  If not enabled, the changes are colored "
+#~ "green for merge, red for non-trivial parents, black for normal. Default: "
+#~ "False"
+#~ msgstr ""
+#~ "Zabarvit changesety podle jména autora. Není-li povoleno, jsou normální "
+#~ "změny zabarveny černě, změny netriviálních rodičů červeně a změny pro "
+#~ "sloučení zeleně. Implicitně je False"
 
 #~ msgid "Use Expander"
 #~ msgstr "Použít expandér"
@@ -11539,36 +11545,8 @@ msgstr ""
 #~ msgid "abandon failed\n"
 #~ msgstr "opuštění selhalo\n"
 
-#~ msgid "Detail"
-#~ msgstr "Detail"
-
 #~ msgid "%s will be imported to the repository"
 #~ msgstr "%s bude importován do repozitáře"
-
-#~ msgid "Error creating destination folder"
-#~ msgstr "Chyba při vytváření cílové složky"
-
-#~ msgid "Please specify a different path."
-#~ msgstr "Určete prosím jinou cestu."
-
-#~ msgid "?? Error: %s ??"
-#~ msgstr "?? Error: %s ??"
-
-#~ msgid ""
-#~ "Indicates whether TortoiseHg should attempt to automatically resolve "
-#~ "changes from both sides to the same file, and only report merge conflicts "
-#~ "when this is not possible. When False, all files with changes on both "
-#~ "sides of the merge will report as conflicting, even if the edits are to "
-#~ "different parts of the file. In either case, when conflicts occur, the "
-#~ "user will be invited to review and resolve changes manually. Default: "
-#~ "False."
-#~ msgstr ""
-#~ "Určuje, zda se má TortoiseHg pokusit automaticky řešit změny téhož "
-#~ "souboru přicházející z obou stran a hlásit slučovací konflikty jen tehdy, "
-#~ "pokud si sám neví rady. Nastaveno-li False, budou se všechny soubory se "
-#~ "změnami z obou stran sloučení hlásit jako konfliktní, i když se úpravy "
-#~ "týkají různých částí souboru. V obou případech je uživatel při výskytu "
-#~ "konfliktů přizván k ručnímu řešení změn. Implicitně: False."
 
 #~ msgid ""
 #~ "Commit message text for new changeset that reverses the effect of the "
@@ -11701,37 +11679,6 @@ msgstr ""
 #~ msgid "Abandon Error"
 #~ msgstr "Abandon Error"
 
-#~ msgid "Backout revision not found"
-#~ msgstr "Revize backoutu nenalezena"
-
-#~ msgid ""
-#~ "To backout a <b>merge</b> revision you must select which parent to "
-#~ "backout to (i.e. whose changes will be <i>kept</i>)"
-#~ msgstr ""
-#~ "Pro anulování (backout) slučovací (<b>merge</b>) revize  musíte vybrat "
-#~ "rodiče, jehož změny mají být zachovány."
-
-#~ msgid "First Parent: revision %s (%s)"
-#~ msgstr "První rodič: revize %s (%s)"
-
-#~ msgid "Second Parent: revision %s (%s)"
-#~ msgstr "Druhý rodič: revize %s (%s)"
-
-#~ msgid "Backed out merge changeset: "
-#~ msgstr "Anulovaný slučovací changeset: "
-
-#~ msgid "Backed out merge revision to its first parent (%s)"
-#~ msgstr "Anulovaná slučovací revize ke svému prvnímu rodiči (%s)"
-
-#~ msgid "Backed out merge revision to its second parent (%s)"
-#~ msgstr "Anulovaná slučovací revize ke svému druhému rodiči(%s)"
-
-#~ msgid "Collapse the rebased changesets "
-#~ msgstr "Shluknout (collapse) přeskupené changesety "
-
-#~ msgid "%s is missing!"
-#~ msgstr "%s chybí!"
-
 #~ msgid "View missing"
 #~ msgstr "Zobrazit chybějící soubor"
 
@@ -11757,52 +11704,12 @@ msgstr ""
 #~ msgid "Verify"
 #~ msgstr "Ověřit repo"
 
-#~ msgid "Graft %d changesets on top of changeset %s"
-#~ msgstr "Gráftovat %d changesety(ů) nad changeset %s"
-
 #~ msgid "Backout..."
 #~ msgstr "Backout (anulovat)..."
 
-#~ msgid "You must select two revisions to diff"
-#~ msgstr "K provedení diffu musíte vybrat dvě revize"
-
-#~ msgid "Merge parent to backout to"
-#~ msgstr "Rodič sloučení k němuž provést zpětnou akci (backout)"
-
-#~ msgid "Backout to the first parent of the merge revision"
-#~ msgstr "Vrátit se (backout) k prvnímu rodiči slučovací revize"
-
-#~ msgid "Backout to the second parent of the merge revision"
-#~ msgstr "Vrátit se (backout) ke druhému rodiči slučovací revize"
-
 #~ msgid ""
-#~ "The command that will be executed.\n"
-#~ "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
-#~ "executable command.\n"
-#~ "You can use several {VARIABLES} to compose your command:\n"
-#~ "- {ROOT}: The path to the current repository root.\n"
-#~ "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
-#~ "hash respectively.\n"
-#~ "- {FILES}: The list of files touched by the selected revision.\n"
-#~ "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
+#~ "If true, concatenate multiple lines of changeset summary until they reach "
+#~ "80 characters. Default: False"
 #~ msgstr ""
-#~ "Přikaz, který bude proveden.\n"
-#~ " Ke spuštění příkazu Mercurialu použijte \"hg\" (nikoliv \"hg.exe\").\n"
-#~ "K vytvoření příkazu můžete použít několik proměnných {VARIABLES}:\n"
-#~ "- {ROOT}: Cesta k aktuálnímu kořenu repozitáře.\n"
-#~ "- {REV} / {REVID}: vybrané číslo revize / případně hexadecimální id hash "
-#~ "revize.\n"
-#~ "- {FILES}: Seznam souborů, dotčených vybranou revizí.\n"
-#~ "- {ALLFILES}: Všechny soubory sledované Mercurialem ve vybrané revizi."
-
-#~ msgid "Folder &History"
-#~ msgstr "&Historie složky"
-
-#~ msgid "deleted"
-#~ msgstr "smazaný"
-
-#~ msgid "Fl&at List View"
-#~ msgstr "Prostý seznam souborů"
-
-#~ msgid "&Filter by Status"
-#~ msgstr "&Filtrovat dle zařazení"
+#~ "Je-li zadáno True, jsou řádky sumární zprávy changesetu spojovány až od "
+#~ "celkové délky 80 znaků. Implicitně je False"

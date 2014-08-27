@@ -9,16 +9,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-28 11:26-0300\n"
-"PO-Revision-Date: 2014-02-15 15:21+0000\n"
+"POT-Creation-Date: 2014-07-24 12:23-0300\n"
+"PO-Revision-Date: 2014-07-10 14:21+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-04-29 05:57+0000\n"
-"X-Generator: Launchpad (build 16985)\n"
+"X-Launchpad-Export-Date: 2014-07-25 05:47+0000\n"
+"X-Generator: Launchpad (build 17114)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
@@ -41,9 +41,6 @@ msgstr "最新情報はこちら"
 msgid "&License"
 msgstr "ライセンス(&L)"
 
-msgid "&Close"
-msgstr "閉じる(&C)"
-
 #, python-format
 msgid "version %s"
 msgstr "バージョン %s"
@@ -55,6 +52,9 @@ msgstr "Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
 msgstr "新しいバージョンの TortoiseHg (%s) がダウンロードできます。"
+
+msgid "License"
+msgstr "ライセンス"
 
 msgid "= Working Directory Parent ="
 msgstr "= 作業領域の親リビジョン ="
@@ -674,6 +674,12 @@ msgstr "マージ"
 msgid "Merge with %s"
 msgstr "%s とマージ"
 
+msgid "Patch Name Required"
+msgstr "パッチ名が必要です"
+
+msgid "You must enter a patch name"
+msgstr "パッチ名を入力して下さい"
+
 msgctxt "start progress"
 msgid "Commit"
 msgstr "コミット"
@@ -716,6 +722,9 @@ msgstr "課題を表示..."
 
 msgid "Stop"
 msgstr "中止"
+
+msgid "### patch name ###"
+msgstr "### パッチ名 ###"
 
 msgid "Commit changes"
 msgstr "変更をコミット"
@@ -1224,9 +1233,6 @@ msgstr "正しいフックタイプを指定して下さい。"
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "フック名に空白・タブ・「=」は使えません。"
 
-msgid "Custom Tools"
-msgstr "カスタムツール"
-
 #, python-format
 msgid "command parse error: %s"
 msgstr "コマンドの解釈時エラー: %s"
@@ -1262,26 +1268,14 @@ msgstr ""
 msgid "Diff Changeset to Loc&al"
 msgstr ""
 
-msgid "Diff Selected Cha&ngesets"
-msgstr ""
-
 msgid "&Diff to Parent"
 msgstr "親リビジョンとの差分 (&diff)"
-
-msgid "Cannot display visual diff"
-msgstr "GUI差分を表示できません"
-
-msgid "Visual diffs are not supported for unapplied patches"
-msgstr "未適用のパッチに対するGUI差分はサポートされていません"
 
 msgid "Diff to &Local"
 msgstr "ローカルとの差分(&L) (diff)"
 
 msgid "View changes to current in external diff tool"
 msgstr "外部差分ツールで現在のリビジョンに対する差分を表示する"
-
-msgid "Diff Selected &File Revisions"
-msgstr "選択したリビジョンのファイル差分(&F)"
 
 msgid "&View at Revision"
 msgstr "このリビジョンを開く(&V)"
@@ -1303,6 +1297,9 @@ msgstr "ローカルファイルを編集(&E)"
 
 msgid "&Open Local"
 msgstr "ローカルファイルを開く(&O)"
+
+msgid "&Copy Patch"
+msgstr "パッチをコピー(&C)"
 
 msgid "Copy &Path"
 msgstr "パスをコピー(&P)"
@@ -1330,6 +1327,99 @@ msgstr "端末を開く(&T)"
 
 msgid "Open a shell terminal in the selected folder"
 msgstr "選択したフォルダーで端末を開きます。"
+
+msgid "Custom Tools"
+msgstr "カスタムツール"
+
+msgid "Diff &Local"
+msgstr ""
+
+msgid "&View Missing"
+msgstr "不明ファイルを表示(&V)"
+
+msgid "View O&ther"
+msgstr "他を表示(&T)"
+
+msgid "Add &Largefiles..."
+msgstr "大容量ファイルを追加(&L)..."
+
+msgid "&Forget"
+msgstr "登録除外 (&forget)"
+
+msgid "&Delete Unversioned..."
+msgstr "未バージョン管理を削除(&D)..."
+
+msgid "Confirm Delete Unversioned"
+msgstr "未バージョン管理ファイルの削除確認"
+
+msgid "Delete the following unversioned files?"
+msgstr "未バージョン管理のファイルを削除しますか?"
+
+msgid "&Delete"
+msgstr "削除(&D)"
+
+msgid "Re&move Versioned"
+msgstr "削除(&M)"
+
+msgid "&Revert..."
+msgstr "復旧 (&revert)..."
+
+msgid "Uncommited merge - please select a parent revision"
+msgstr "未コミットマージ - 親リビジョンを選択してください"
+
+msgid "Revert files to local or other parent?"
+msgstr "ファイルをローカルまたは他の親リビジョンの状態に復旧しますか？"
+
+msgid "&Local"
+msgstr "ローカル(&L)"
+
+msgid "&Other"
+msgstr "その他(&O)"
+
+msgid "Confirm Revert"
+msgstr "復旧の確認"
+
+msgid "Revert local file changes?"
+msgstr "ローカルのファイル変更を復旧しますか?"
+
+msgid "&Revert with backup"
+msgstr "変更をバックアップして復旧する (&R)"
+
+msgid "&Discard changes"
+msgstr "変更を破棄 (&D)"
+
+msgid "Revert the following files?"
+msgstr "これらのファイルを復旧しますか?"
+
+msgid "&Revert"
+msgstr "復旧 (&Revert)"
+
+msgid "&Copy..."
+msgstr "コピー (&copy)..."
+
+msgid "Re&name..."
+msgstr "名前変更 (re&name)..."
+
+msgid "&Ignore..."
+msgstr "無視(&I)..."
+
+msgid "De&tect Renames..."
+msgstr "名前の変更を検出(&T)..."
+
+msgid "&Mark Resolved"
+msgstr ""
+
+msgid "&Mark Unresolved"
+msgstr ""
+
+msgid "Restart Mer&ge"
+msgstr "再マージ (mer&ge)"
+
+msgid "Was renamed from"
+msgstr ""
+
+msgid "Restart Merge &with"
+msgstr "指定ツールで再マージ(&W)"
 
 msgid "Display the file anyway"
 msgstr "ファイルを表示させる"
@@ -1507,6 +1597,12 @@ msgstr "戻る"
 msgid "Forward"
 msgstr "進む"
 
+msgid "Diff Selected &Changesets"
+msgstr ""
+
+msgid "&Diff Selected File Revisions"
+msgstr ""
+
 msgid "Show Revision &Details"
 msgstr "リビジョンの詳細を表示(&D)"
 
@@ -1682,9 +1778,6 @@ msgstr "ファイル差分"
 
 msgid "&Originating Revision"
 msgstr "由来リビジョン(&O)"
-
-msgid "&Local"
-msgstr "ローカル(&L)"
 
 msgid "&Parent Revision"
 msgstr "親リビジョン(&P)"
@@ -2102,6 +2195,9 @@ msgstr "設定(&S)"
 msgid "Send &Email"
 msgstr "メール送信(&E)"
 
+msgid "&Close"
+msgstr "閉じる(&C)"
+
 #, python-format
 msgid "Ignore filter - %s"
 msgstr "無視ファイルフィルタ - %s"
@@ -2240,9 +2336,6 @@ msgstr "大容量ファイルとして追加 (&L)"
 
 msgid "Add as &Normal Files"
 msgstr "通常ファイルとして追加 (&N)"
-
-msgid "License"
-msgstr "ライセンス"
 
 msgid "Find revisions matching fields of:"
 msgstr "フィールド検索元リビジョン:"
@@ -2427,6 +2520,12 @@ msgstr "フォーマットを適用(&l)"
 msgid "C&onfigure Format"
 msgstr "フォーマットを設定(&C)"
 
+#, python-format
+msgid "%s had rejected chunks, edit patched file together with rejects?"
+msgstr ""
+"%s に失敗したチャンクがあります。パッチが成功したファイルと一緒に失敗したチャ"
+"ンクも編集しますか?"
+
 msgid "&Commit to Queue..."
 msgstr "キューをコミット(&C)..."
 
@@ -2559,21 +2658,6 @@ msgstr "作業領域の変更をそのままでパッチを適用 (--force)"
 
 msgid "Tolerate non-conflicting local changes (--keep-changes)"
 msgstr "衝突しない作業領域中の変更を許容 (--keep-changes)"
-
-msgid "### patch name ###"
-msgstr "### パッチ名 ###"
-
-#, python-format
-msgid "%s had rejected chunks, edit patched file together with rejects?"
-msgstr ""
-"%s に失敗したチャンクがあります。パッチが成功したファイルと一緒に失敗したチャ"
-"ンクも編集しますか?"
-
-msgid "Patch Name Required"
-msgstr "パッチ名が必要です"
-
-msgid "You must enter a patch name"
-msgstr "パッチ名を入力して下さい"
 
 #, python-format
 msgid "Pending Perforce Changelists - %s"
@@ -2855,9 +2939,6 @@ msgstr "コピー(&C)"
 
 msgid "&Paste"
 msgstr "貼り付け(&P)"
-
-msgid "&Delete"
-msgstr "削除(&D)"
 
 msgid "&Editor Options"
 msgstr "エディタオプション(&E)"
@@ -3790,7 +3871,7 @@ msgstr "直前のコミットを取り消しますか？"
 
 #, python-format
 msgid "Undo most recent commit (%d), preserving file changes?"
-msgstr "直前のコミット(%d)を取り消し、変更を保存しますか?"
+msgstr "ファイルの変更はそのままに、直前のコミット(%d)を取り消しますか?"
 
 msgid "Undo last transaction?"
 msgstr "最後の操作を取り消しますか?"
@@ -3883,9 +3964,6 @@ msgstr "アーカイブ (&archive)..."
 
 msgid "&Bundle Rev and Descendants..."
 msgstr "リビジョンと子孫をバンドル生成 (&bundle)..."
-
-msgid "&Copy Patch"
-msgstr "パッチをコピー(&C)"
 
 msgid "Change &Phase to"
 msgstr "フェーズを変更 (&P)"
@@ -4359,12 +4437,6 @@ msgstr "比較元の親リビジョンを切り替え"
 msgid "List Optio&ns"
 msgstr ""
 
-msgid "File(s) not found"
-msgstr "ファイルがありません"
-
-msgid "The selected files do not exist in the working directory"
-msgstr "選択されたファイルが作業領域にありません"
-
 #, python-format
 msgid "%s - Revision Details (%s)"
 msgstr "%s - リビジョンの詳細 (%s)"
@@ -4394,9 +4466,6 @@ msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
 msgstr ""
-
-msgid "Confirm Revert"
-msgstr "復旧の確認"
 
 msgid ""
 "Reverting all files will discard changes and leave affected files in a "
@@ -4579,18 +4648,16 @@ msgstr "実行中"
 msgid "query"
 msgstr "クエリー"
 
-msgid "Parse Error: "
-msgstr "解釈エラー: "
-
-msgid "Invalid query: "
-msgstr "無効なクエリー: "
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
 "\n"
 "キーボード入力によって中断されました。\n"
+
+#, python-format
+msgid "failed to fork GUI process: %s\n"
+msgstr ""
 
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
@@ -4681,9 +4748,6 @@ msgstr "UTF-8でファイルリストを読み込む"
 msgid "open a new workbench window"
 msgstr "新しいworkbenchウィンドウを開く"
 
-msgid "requires a single filename"
-msgstr ""
-
 msgid "thg about"
 msgstr "thgについて"
 
@@ -4766,6 +4830,9 @@ msgstr "日付をコミット日時として記録する"
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr "thg commit [オプション] [ファイル]..."
 
+msgid "thg debugblockmatcher"
+msgstr ""
+
 msgid "thg debugbugreport [TEXT]"
 msgstr "thg debugbugreport [TEXT]"
 
@@ -4783,6 +4850,18 @@ msgstr "thg email [リビジョン]"
 
 msgid "use only one form to specify the revision"
 msgstr "このリビジョンを指定するにはフォームを一つだけ使って下さい。"
+
+msgid "select the specified revision"
+msgstr ""
+
+msgid "side-by-side comparison of revisions"
+msgstr ""
+
+msgid "thg filelog [OPTION]... FILE"
+msgstr ""
+
+msgid "requires a single filename"
+msgstr ""
 
 msgid "thg forget [FILE]..."
 msgstr "thg forget [ファイル]..."
@@ -5392,14 +5471,8 @@ msgstr ""
 msgid "Author Coloring"
 msgstr "コミッタの色分け"
 
-msgid ""
-"Color changesets by author name.  If not enabled, the changes are colored "
-"green for merge, red for non-trivial parents, black for normal. Default: "
-"False"
+msgid "Color changesets by author name. Default: False"
 msgstr ""
-"チェンジセットをコミッタごとに色分けします。このオプションが無効の場合、マー"
-"ジされたチェンジセットは緑に、子を2つ以上持つチェンジセットは赤、通常のチェン"
-"ジセットは黒です。デフォルトでは無効です。"
 
 msgid "Full Authorname"
 msgstr ""
@@ -5433,11 +5506,9 @@ msgid "Long Summary"
 msgstr "長めの要約行"
 
 msgid ""
-"If true, concatenate multiple lines of changeset summary until they reach 80 "
-"characters. Default: False"
+"If true, concatenate multiple lines of changeset summary and truncate them "
+"at 80 characters as necessary. Default: False"
 msgstr ""
-"True にするとコミットメッセージの改行を無視して複数の行を1行あたり80文字にな"
-"るまで連結して表示します。デフォルトでは無効。"
 
 msgid "Log Batch Size"
 msgstr "ログ読み込み件数"
@@ -5488,6 +5559,16 @@ msgid ""
 "<li><b>prompt</b>: The default. Show a prompt when updating to a revision "
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
+msgstr ""
+
+msgid "Show Family Line"
+msgstr ""
+
+msgid ""
+"Show indirect revision dependency on the revision graph when filtered by "
+"revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
+"some cases. This option is expected to be removed if the performance issue "
+"is solved."
 msgstr ""
 
 msgctxt "config item"
@@ -6569,6 +6650,12 @@ msgstr "%s - 状態 (選択がフィルター済み)"
 msgid "%s - status"
 msgstr "%s - 状態"
 
+msgid "Check"
+msgstr "チェック"
+
+msgid "Uncheck"
+msgstr "チェックを外す"
+
 msgid "status"
 msgstr "状態"
 
@@ -6636,7 +6723,7 @@ msgid "%s is deleted by non-hg command, but still tracked"
 msgstr ""
 
 msgid "missing"
-msgstr "見つかりません"
+msgstr "紛失"
 
 #, python-format
 msgid "%s is ignored"
@@ -7251,92 +7338,6 @@ msgstr "応答がありませんでした"
 msgid "password: "
 msgstr "パスワード: "
 
-msgid "abort: "
-msgstr "中止: "
-
-msgid "hint: "
-msgstr "ヒント: "
-
-#, python-format
-msgid "HTTP Error: %d (%s)"
-msgstr "HTTPエラー: %d (%s)"
-
-#, python-format
-msgid "URLError: %s"
-msgstr "URLエラー: %s"
-
-msgid "SSL: Server certificate verify failed"
-msgstr "SSL: サーバー証明書の確認が失敗しました"
-
-#, python-format
-msgid "SSL: unknown error %s:%s"
-msgstr "SSL: 不明なエラー %s:%s"
-
-#, python-format
-msgid "SSL error: %s"
-msgstr "SSLエラー: %s"
-
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
-msgstr ""
-"hg: コマンド指定 '%s' は曖昧です\n"
-"    %s\n"
-
-#, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr "hg: %s での解析エラー: %s\n"
-
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr "hg: 解析エラー: %s\n"
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr "%s のロック解放待ちを断念"
-
-#, python-format
-msgid "lock held by %s"
-msgstr "%s によってロックされています"
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr "中止: %s: %s\n"
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr "中止: ロックできません %s:%s\n"
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr "hg %s: %s\n"
-
-#, python-format
-msgid "hg: %s\n"
-msgstr "hg: %s\n"
-
-msgid "abort: remote error:\n"
-msgstr "中止: 連携エラー:\n"
-
-#, python-format
-msgid "abort: %s"
-msgstr "中止： %s"
-
-msgid " empty string\n"
-msgstr " 空の文字列\n"
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr "hg: 未知のコマンド '%s'\n"
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr "中止: エラー: %s\n"
-
-msgid "broken pipe\n"
-msgstr "パイプ破壊(EPIPE)\n"
-
 msgid "Parent 1:"
 msgstr "親リビジョン1:"
 
@@ -7481,111 +7482,6 @@ msgstr "3-way ディレクトリ差分"
 
 msgid "Directory diff"
 msgstr "ディレクトリ差分"
-
-msgid "&Edit"
-msgstr "編集(&E)"
-
-msgid "E&xplore Subrepository"
-msgstr "サブリポジトリのフォルダを開く(&X)"
-
-msgid "&View Missing"
-msgstr "不明ファイルを表示(&V)"
-
-msgid "&Revert..."
-msgstr "復旧 (&revert)..."
-
-msgid "&Forget"
-msgstr "登録除外 (&forget)"
-
-msgid "Add &Largefiles..."
-msgstr "大容量ファイルを追加(&L)..."
-
-msgid "De&tect Renames..."
-msgstr "名前の変更を検出(&T)..."
-
-msgid "&Ignore..."
-msgstr "無視(&I)..."
-
-msgid "Re&move Versioned"
-msgstr "削除(&M)"
-
-msgid "&Delete Unversioned..."
-msgstr "未バージョン管理を削除(&D)..."
-
-msgid "&Mark Unresolved"
-msgstr ""
-
-msgid "&Mark Resolved"
-msgstr ""
-
-msgid "Check"
-msgstr "チェック"
-
-msgid "Uncheck"
-msgstr "チェックを外す"
-
-msgid "View O&ther"
-msgstr "他を表示(&T)"
-
-msgid "&Copy..."
-msgstr "コピー (&copy)..."
-
-msgid "Re&name..."
-msgstr "名前変更 (re&name)..."
-
-msgid "Was renamed from"
-msgstr ""
-
-msgid "Restart Mer&ge"
-msgstr "再マージ (mer&ge)"
-
-msgid "Restart Merge &with"
-msgstr "指定ツールで再マージ(&W)"
-
-msgid " errors"
-msgstr " エラー"
-
-msgid " output"
-msgstr " アウトプット"
-
-msgid " Aborted"
-msgstr " が中断されました"
-
-msgid "Cannot open subrepository"
-msgstr "サブディレクトリを開けません"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "作業領域には選択したサブリポジトリがありません"
-
-msgid "Uncommited merge - please select a parent revision"
-msgstr "未コミットマージ - 親リビジョンを選択してください"
-
-msgid "Revert files to local or other parent?"
-msgstr "ファイルをローカルまたは他の親リビジョンの状態に復旧しますか？"
-
-msgid "&Other"
-msgstr "その他(&O)"
-
-msgid "Revert local file changes?"
-msgstr "ローカルのファイル変更を復旧しますか?"
-
-msgid "&Revert with backup"
-msgstr "変更をバックアップして復旧する (&R)"
-
-msgid "&Discard changes"
-msgstr "変更を破棄 (&D)"
-
-msgid "Revert the following files?"
-msgstr "これらのファイルを復旧しますか?"
-
-msgid "&Revert"
-msgstr "復旧 (&Revert)"
-
-msgid "Confirm Delete Unversioned"
-msgstr "未バージョン管理ファイルの削除確認"
-
-msgid "Delete the following unversioned files?"
-msgstr "未バージョン管理のファイルを削除しますか?"
 
 msgid "Confirm Discard"
 msgstr "破棄の確認"
@@ -7934,6 +7830,98 @@ msgstr ""
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "プラグインオプションダイアログを開けません"
+
+#, python-format
+msgid ""
+"hg: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+"hg: コマンド指定 '%s' は曖昧です\n"
+"    %s\n"
+
+#, python-format
+msgid "hg: parse error at %s: %s\n"
+msgstr "hg: %s での解析エラー: %s\n"
+
+#, python-format
+msgid "hg: parse error: %s\n"
+msgstr "hg: 解析エラー: %s\n"
+
+#, python-format
+msgid "timed out waiting for lock held by %s"
+msgstr "%s のロック解放待ちを断念"
+
+#, python-format
+msgid "lock held by %s"
+msgstr "%s によってロックされています"
+
+#, python-format
+msgid "abort: %s: %s\n"
+msgstr "中止: %s: %s\n"
+
+#, python-format
+msgid "abort: could not lock %s: %s\n"
+msgstr "中止: ロックできません %s:%s\n"
+
+#, python-format
+msgid "hg %s: %s\n"
+msgstr "hg %s: %s\n"
+
+#, python-format
+msgid "hg: %s\n"
+msgstr "hg: %s\n"
+
+msgid "abort: remote error:\n"
+msgstr "中止: 連携エラー:\n"
+
+#, python-format
+msgid "abort: %s"
+msgstr "中止： %s"
+
+msgid " empty string\n"
+msgstr " 空の文字列\n"
+
+#, python-format
+msgid "hg: unknown command '%s'\n"
+msgstr "hg: 未知のコマンド '%s'\n"
+
+#, python-format
+msgid "abort: error: %s\n"
+msgstr "中止: エラー: %s\n"
+
+msgid "broken pipe\n"
+msgstr "パイプ破壊(EPIPE)\n"
+
+msgid "abort: "
+msgstr "中止: "
+
+msgid "hint: "
+msgstr "ヒント: "
+
+#, python-format
+msgid "HTTP Error: %d (%s)"
+msgstr "HTTPエラー: %d (%s)"
+
+#, python-format
+msgid "URLError: %s"
+msgstr "URLエラー: %s"
+
+msgid "SSL: Server certificate verify failed"
+msgstr "SSL: サーバー証明書の確認が失敗しました"
+
+#, python-format
+msgid "SSL: unknown error %s:%s"
+msgstr "SSL: 不明なエラー %s:%s"
+
+#, python-format
+msgid "SSL error: %s"
+msgstr "SSLエラー: %s"
+
+msgid "hgsubversion packaged with thg"
+msgstr ""
+
+msgid "hggit packaged with thg"
+msgstr ""
 
 msgid "inotify is not supported on this platform"
 msgstr ""
@@ -8771,6 +8759,15 @@ msgstr ""
 #~ msgstr "コミット時に使用する名前"
 
 #~ msgid ""
+#~ "Color changesets by author name.  If not enabled, the changes are colored "
+#~ "green for merge, red for non-trivial parents, black for normal. Default: "
+#~ "False"
+#~ msgstr ""
+#~ "チェンジセットをコミッタごとに色分けします。このオプションが無効の場合、"
+#~ "マージされたチェンジセットは緑に、子を2つ以上持つチェンジセットは赤、通常"
+#~ "のチェンジセットは黒です。デフォルトでは無効です。"
+
+#~ msgid ""
 #~ "Repository name to use in the web interface. Default is the working "
 #~ "directory."
 #~ msgstr ""
@@ -8929,9 +8926,6 @@ msgstr ""
 
 #~ msgid "filtered status"
 #~ msgstr "フィルタ状態"
-
-#~ msgid "deleted"
-#~ msgstr "削除"
 
 #~ msgid "_Undo"
 #~ msgstr "取り消し(_U)"
@@ -10796,6 +10790,13 @@ msgstr ""
 #~ msgid "TortoiseHg Configure User-Global Settings"
 #~ msgstr "TortoiseHg ユーザ設定"
 
+#~ msgid ""
+#~ "If true, concatenate multiple lines of changeset summary until they reach "
+#~ "80 characters. Default: False"
+#~ msgstr ""
+#~ "True にするとコミットメッセージの改行を無視して複数の行を1行あたり80文字に"
+#~ "なるまで連結して表示します。デフォルトでは無効。"
+
 #~ msgid "Specify the visual editor used to view files, etc"
 #~ msgstr "ファイルを表示するための GUI エディタを指定してください。"
 
@@ -11092,9 +11093,6 @@ msgstr ""
 #~ msgid "Push new branch"
 #~ msgstr "新規ブランチをプッシュ"
 
-#~ msgid "Detail"
-#~ msgstr "詳細"
-
 #~ msgid "Backed out successfully, you must now commit the results"
 #~ msgstr "バックアウトしました。結果をコミットしてください。"
 
@@ -11109,9 +11107,6 @@ msgstr ""
 
 #~ msgid "Allow pushing a new branch"
 #~ msgstr "新規ブランチの反映を許可"
-
-#~ msgid "Backout revision not found"
-#~ msgstr "打ち消し対象リビジョンが存在しません"
 
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "%d番目のハンクが%d行目で適用済み(あいまいさは%d文字)\n"
@@ -11134,32 +11129,14 @@ msgstr ""
 #~ msgid "bad shelve backup directory name"
 #~ msgstr "バックアップファイルの保存先として利用できないディレクトリ名です"
 
-#~ msgid "Backed out merge changeset: "
-#~ msgstr "打ち消したマージチェンジセット: "
-
-#~ msgid "Error creating destination folder"
-#~ msgstr "クローン先のフォルダを作成できませんでした"
-
-#~ msgid "Please specify a different path."
-#~ msgstr "違うパスを指定してください"
-
 #~ msgid "delete of shelve backup failed"
 #~ msgstr "バックアップファイルを削除できません"
 
+#~ msgid " Aborted"
+#~ msgstr " が中断されました"
+
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "中断: バックアップの復元に失敗しました %s\n"
-
-#~ msgid "First Parent: revision %s (%s)"
-#~ msgstr "一番目の親: リビジョン %s (%s)"
-
-#~ msgid "Backout to the first parent of the merge revision"
-#~ msgstr "マージリビジョンの一番目の親を打ち消す"
-
-#~ msgid "Second Parent: revision %s (%s)"
-#~ msgstr "二番目の親: リビジョン %s (%s)"
-
-#~ msgid "Backout to the second parent of the merge revision"
-#~ msgstr "マージリビジョンの二番目の親を打ち消す"
 
 #~ msgid "file %s already exists\n"
 #~ msgstr "ファイル %s はすでに存在しています\n"
@@ -11170,23 +11147,6 @@ msgstr ""
 #~ msgid "bad hunk #%d %s (%d %d %d %d)"
 #~ msgstr "不正なハンク #%d %s (%d %d %d %d)"
 
-#~ msgid "Merge parent to backout to"
-#~ msgstr "打ち消すマージリビジョンの親を選択"
-
-#~ msgid ""
-#~ "To backout a <b>merge</b> revision you must select which parent to "
-#~ "backout to (i.e. whose changes will be <i>kept</i>)"
-#~ msgstr ""
-#~ "<b>マージ</b> リビジョンを打ち消すには、どの親を打ち消すか選択してくださ"
-#~ "い\n"
-#~ " (つまり、どの変更を<i>残す</i>かです)"
-
-#~ msgid "Backed out merge revision to its second parent (%s)"
-#~ msgstr "マージリビジョンの二番目の親 (%s) を打ち消す"
-
-#~ msgid "?? Error: %s ??"
-#~ msgstr "?? エラー: %s ??"
-
 #~ msgid "user quit"
 #~ msgstr "ユーザーによるキャンセル"
 
@@ -11196,81 +11156,14 @@ msgstr ""
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "バックアップを除去中: %r\n"
 
-#~ msgid "Backed out merge revision to its first parent (%s)"
-#~ msgstr "マージリビジョンの最初の親 (%s) を打ち消す"
-
-#~ msgid "%s is missing!"
-#~ msgstr "%s は見つかりません!"
-
 #~ msgid "Restart merge with"
 #~ msgstr "指定ツールで再マージ"
 
 #~ msgid "Restart Merge..."
 #~ msgstr "再マージ..."
 
-#~ msgid ""
-#~ "Indicates whether TortoiseHg should attempt to automatically resolve "
-#~ "changes from both sides to the same file, and only report merge conflicts "
-#~ "when this is not possible. When False, all files with changes on both "
-#~ "sides of the merge will report as conflicting, even if the edits are to "
-#~ "different parts of the file. In either case, when conflicts occur, the "
-#~ "user will be invited to review and resolve changes manually. Default: "
-#~ "False."
-#~ msgstr ""
-#~ "同じファイルに対する両方の親からの変更をTortoiseHgが自動的に解消し、自動的"
-#~ "に解消できない場合のみユーザーに報告します。\r\n"
-#~ "もし無効であれば、マージにおける両方の親からの変更があるファイルは、ファイ"
-#~ "ル内の違う場所に対する変更でも衝突として報告されます。どちらの場合でも、衝"
-#~ "突が起きた場合、ダイアログが開き、ユーザーは解消を手動で行う必要がありま"
-#~ "す。デフォルトは無効です。"
-
 #~ msgid "Mark resolved"
 #~ msgstr "衝突解消済み状態に設定"
 
 #~ msgid "Mark unresolved"
 #~ msgstr "衝突未解消状態に設定"
-
-#~ msgid "You must select two revisions to diff"
-#~ msgstr "差分を見るには２つのリビジョンを選択して下さい。"
-
-#~ msgid "Collapse the rebased changesets "
-#~ msgstr "移動後に移動リビジョンを単一化する "
-
-#~ msgid "Folder &History"
-#~ msgstr "フォルダの変更履歴(&H)"
-
-#~ msgid "Diff &File to Parent"
-#~ msgstr "親リビジョンとのファイル差分(&F)"
-
-#~ msgid "Diff File to Lo&cal"
-#~ msgstr "ローカルとのファイル差分(&C)"
-
-#~ msgid "Copyright 2008-2013 Steve Borho and others"
-#~ msgstr "Copyright 2008-2013 Steve Borho 他"
-
-#~ msgid "Manifest Mode"
-#~ msgstr "マニフェスト表示"
-
-#~ msgid "Diff Changeset to &Local"
-#~ msgstr "ローカルとの差分(&L) (diff)"
-
-#~ msgid "&Diff Selected Changesets"
-#~ msgstr "選択したリビジョンの差分 (&diff)"
-
-#~ msgid "&Diff Changeset to Parent"
-#~ msgstr "親リビジョンとの差分 (&diff)"
-
-#~ msgid "Graft %d changesets on top of changeset %s"
-#~ msgstr "%d つのリビジョンを %s の続きへ移植"
-
-#~ msgid "&Changed by This Commit"
-#~ msgstr "このリビジョンでの変更(&C)"
-
-#~ msgid "Fl&at List View"
-#~ msgstr "リスト表示(&A)"
-
-#~ msgid "&Filter by Status"
-#~ msgstr "状態フィルター(&F)"
-
-#~ msgid "Show the full manifest in tree view"
-#~ msgstr "マニフェストをツリー表示"

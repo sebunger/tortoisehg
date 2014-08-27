@@ -9,14 +9,14 @@ Obecné vlastnosti
 Zobrazení rozdílů
 -----------------
 
-.. figure:: figures/visual-diff.jpg
+.. figure:: figures/visual-diff.png
    :alt: Visual Diff Window
 
-Okno pro zobrazení rozdílů 
+Okno pro zobrazení rozdílů pro changeset, který má dva rodiče (p1, p2)
 
-V TortoiseHg 1.0 byla vizuální (externí) diffová infrastruktura zcela přepracována. Nový systém používá popisy nástrojů v :file:`mergetools.rc` k detekci nejběžnějších diffových nástrojů ve vašem počítači (včetně KDiff3, který je dodáván s instalací TortoiseHg) a k výběru nejvhodnějšího z nich.
+V TortoiseHg 1.0 byla vizuální (externí) diffová infrastruktura) zcela přepracována. Nový systém používá popisy nástrojů v :file:`mergetools.rc` k detekci nejběžnějších diffových nástrojů ve vašem počítači (včetně KDiff3, který je dodáván s instalací TortoiseHg) a k výběru nejvhodnějšího z nich.
 
-Pokud si uživatel vybral slučovací nástroj (:menuselection:`Setting > TortoiseHg > Nástroj pro sloučení`), je výběrový proces vynechán. Uživatel si ale stejně může vybrat separátní nástroj (:menuselection:`TortoiseHg > Nástroj Visual Diff`) pro zobrazení diffů. 
+Pokud si uživatel vybral slučovací nástroj (:menuselection:`Setting > TortoiseHg > Nástroj pro sloučení`), je tento nástroj použit a výběrový proces je vynechán. Uživatel si ale stejně může vybrat separátní nástroj (:menuselection:`TortoiseHg > Nástroj Visual Diff`) pro zobrazení diffů. 
 
 Konfigurační soubor slučovacího nástroje obsahuje optimální příkazové řádky pro každý nástroj, takže další konfigurace uživatelem není potřebná. Stačí si vybrat žádaný nástroj nebo přijmout implicitní nastavení.
 

@@ -11,10 +11,10 @@ Verpánek neboli Workbench je primární aplikace TortoiseHg. Umožňuje prochá
 
 
 
-Pod klasickou lištou hlavního menu (File, View, Repozitář, Help) se nachází poutec s nástrojovými lištami (Editovací, Parkovací, Synchronizační, Úkonová, Uživatelská). Složení jednotlivých lišt bude uvedeno níže.
+Pod klasickou lištou hlavního menu (File, View, Repozitář, Help) se nachází poutec s nástrojovými lištami (Editovací, Parkovací, Úkonová, Uživatelská). Složení jednotlivých lišt bude uvedeno níže.
 
-Trvale rezidentní plocha Verpánku má dvě části - Přehled revizí nahoře a společná plocha pro úkonové karty dole.
-Obsah "úkonové plochy" se mění v závislosti na vybrané úloze v Manipulační nebo Úkonové liště, případně na vybrané revizi. 
+V základní konfiguraci (s vypnutými nástroji Parkovací lišty) má okno Verpánku dvě části - Přehled revizí nahoře a Úkonovou plochu dole. Konfigurace úkonové plochy se mění podle právě aktivovaného úkonu (Podrobnosti revizí, Commit, Hledat a Synchronizovat).
+
 
 K uvedeným rezidentním plochám lze ve Verpánku aktivovat tři přemistitelné panely - Seznam repozitářů, Fronta oprávek (Patch Queue) a Output Log. 
 
@@ -25,18 +25,19 @@ Hlavní panely (widgety) Verpánku jsou tyto:
   Panel pro zobrazení vícero repozitářů v kartách. Ve sloupcích jsou uváděny
   základní informace o každém changesetu neboli revizi. Lze si nastavit,
   které sloupce mají být viditelné (:menuselection:`View >
-  Vybrat sloupce přehledu...`) a v jakém pořadí. Je to hlavní,
-  zobrazených větví. 
+  Vybrat sloupce přehledu...`) a v jakém pořadí. 
 :guilabel:`Seznam repozitářů - repozitórií`
-  ikonou nebo volbou :menuselection:`View > Zobrazit seznam
+  Lze aktivovat ikonou nebo volbou :menuselection:`View > Zobrazit seznam
   repozitářů`. Volba :menuselection:`View >Nastavení seznamu
-  repozitářů > Show Paths` umožní zobrazení nejenom jmen
+  repozitářů > Show Paths`  umožní zobrazení nejenom jmen
   repozitářů ale i cest k nim.
 :guilabel:`Úkonová plocha`
-  Karty úkonové plochy se ovládají ikonami Podrobnosti revizí,
-  Commit, Manifest, Hledat, Synchronizovat),
-  umístěnými v manipulační liště vpravo nahoře a v úkonové
-  liště, umístěné na okraji úkonové plochy. Polohu této lišty lze měnit.
+  Nástroje úkonové plochy lze aktivovat ze třech míst:
+
+  * jako položku roletky *View*
+  * výběrem ikony v Úkonové nástrojové liště
+  * výběrem ouška na okraji Úkonové plochy - zobrazení oušek lze 
+    zapnout/vypnout  v prostředí *File > Settings > Verpánek > Úkonová lišta*
 :guilabel:`Output Log`
   Tento přemístitelný panel, který vyvoláme tlačítkem s ikonou
   nebo výběrem :menuselection:`View > Show Outpt Log` poskytuje
@@ -46,7 +47,6 @@ Hlavní panely (widgety) Verpánku jsou tyto:
   určitých situacích také zobrazuje chybová hlášení. Okno
   panelu se smaže zavřením Verpánku.	 
 	 
-Úkonová lišta a dále popsaná Manipulační lišta otevírají stejnou sestavu karet. Odlišný název mají jenom pro snazší odlišení při popisu prostředí Verpánku. 
   
 Hlavní menu
 -----------
@@ -79,8 +79,6 @@ Editovací lišta
     .. figure:: figures/edit-toolbar.png
         :alt: Edit Toolbar
 
-
-
 :guilabel:`Refresh current repository`
   Znovu načíst (refresh) přehled revizí aktuálního repozitáře.
 :guilabel:`Přejít k aktuální revizi`:
@@ -93,10 +91,11 @@ Editovací lišta
   Přejít k následné revizi. 
 :guilabel:`Pracovní lišta filtru`
   Ukázat a aktivovat nástrojovou lištu pro editaci filtru.
-	 
+:guilabel:`Aktualizace pracovního adresáře`
+  Dialog pro aktualizaci zadané revize.	 
 
 Pracovní lišta filtru
-----------------------
+--------------------
 
 Tato lišta slouží pro zadávání vyhledávacích vzorů při vyhledávání specifikovaných revizí.
   
@@ -149,9 +148,6 @@ Tato lišta zobrazí nebo skryje hlavní panely Verpánku.
    .. figure:: figures/dock-toolbar.png
        :alt: Dock Toolbar
 
-
-
-
 :guilabel:`Zobrazit seznam repozitářů`
      Ve skutečnosti jde o seznam repozitórií
 :guilabel:`Show Patch Queue`
@@ -160,42 +156,15 @@ Tato lišta zobrazí nebo skryje hlavní panely Verpánku.
      Zobrazit panel, který zaznamenává probíhající akce 
  
 
-Synchronizační lišta
---------------------
 
-Tato lišta slouží pro synchronizaci se vzdálenými repozitáři. Jednotlivé její ikony aktivují úlohy Příchozí, Pull, Odchozí, Push.
-
-   .. figure:: figures/sync-toolbar.png
-       :alt: Sync Toolbar
-   
-
-
-:guilabel:`Ověřit příchozí změny`
-	 Načte případné změny (changesety) ze vzdáleného
-	 repozitáře, uloží je v dočasném svazku souborů a zobrazí je.
-	 Zobrazení těchto changesetů je normální, zatímco zobrazení
-	 ostatních revizí je šedivé. Nad přehledem revizí se vynoří tlačítka 
-	 :guilabel:`Accept` a :guilabel:`Reject`.
-  
-:guilabel:`Převzít  příchozí změny`
-	 Stáhne (pulls) příchozí changesety ze vzdáleného repozitáře a potom
-	 uplatní některý z "after-pull" procedur (update, fetch nebo rebase), pokud jsou nastaveny. 
-:guilabel:`Zjistit odchozí změny`
-	 Určí případné změny (changesety), které by mohly být odeslány do
-	 vzdáleného repozitáře. Odchozí changesety se zobrazí normálně,
-	 zatímco zobrazení ostatních revizí je šedivé.
-:guilabel:`Předat odchozí změny`
-	 Odešle (pushes) odchozí chanchesety do vzdáleného repozitáře. 
-
-
-Manipulační lišta
-------------------
+Úkonová lišta
+-------------
 
    .. figure:: figures/task-toolbar.png
        :alt: Task Toolbar
 
 Lišta (vpravo nahoře) je sestavena z ikon, které otevírají úkonové karty v úkonové ploše.
-Při volbě Podrobnosti revizí a Commit se úkonová plocha rozdělí vertikálně na dvě části - Seznam souborů vlevo a pracovní plochy vybraného úkonu vpravo. Zbývající úkony (Synchronizovat, Manifest a Hledat) mají rovněž své vlastní členění úkonové plochy.
+Při volbě Podrobnosti revizí a Commit se úkonová plocha rozdělí vertikálně na dvě části - Seznam souborů vlevo a pracovní plochy vybraného úkonu vpravo. Zbývající úkony (Synchronizovat a Hledat) mají rovněž své vlastní členění úkonové plochy.
 
 :guilabel:`Podrobnosti revizí`
    Pracovní plocha této karty  se zkládá ze třech polí:
@@ -220,24 +189,12 @@ Při volbě Podrobnosti revizí a Commit se úkonová plocha rozdělí vertikál
 .. figure:: figures/sync-tasktab.png
 	:alt: Synchronise Task Tab
 
-:guilabel:`Manifest`
-    Zobrazí úplnou informaci o obsahu repozitória pro zadanou revizi. 
-    Lze vidět obsah souborů nebo jejich anotace. V seznamu souborů a
-    složek je k disposici kontextové menu pro další podrobné zkoumání.
-    Dokonce lze odtud porovnávat soubory z různých revizí. 
-
-.. figure:: figures/manifest-tasktab.png
-	:alt: Manifest Task Tab
-
 
 :guilabel:`Hledat`
      Slouží pro vyhledávání zadaného textu v souboru. 
 
 .. figure:: figures/search-tasktab.png
 	:alt: Search Task Tab
-
-
-
 
 
 Mezi vybranou revizí nebo oprávkou v Přehledu revizí a úkonovou kartou Commit či Podrobnosti revizí existují tyto relace:

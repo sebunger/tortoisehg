@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-28 11:26-0300\n"
+"POT-Creation-Date: 2014-07-24 12:23-0300\n"
 "PO-Revision-Date: 2013-02-27 15:09+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2014-04-29 05:59+0000\n"
-"X-Generator: Launchpad (build 16985)\n"
+"X-Launchpad-Export-Date: 2014-07-25 05:49+0000\n"
+"X-Generator: Launchpad (build 17114)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Serwer nakładek na ikony TortoiseHg"
@@ -40,9 +40,6 @@ msgstr "Tu możesz odwiedzić naszą stronę"
 msgid "&License"
 msgstr "&Licencja"
 
-msgid "&Close"
-msgstr "&Zamknij"
-
 #, python-format
 msgid "version %s"
 msgstr "wersja %s"
@@ -54,6 +51,9 @@ msgstr "z Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
 msgstr ""
+
+msgid "License"
+msgstr "Licencja"
 
 msgid "= Working Directory Parent ="
 msgstr "= Nadzędny Katalog Roboczy ="
@@ -679,6 +679,12 @@ msgstr "Scal"
 msgid "Merge with %s"
 msgstr "Scal z %s"
 
+msgid "Patch Name Required"
+msgstr "Nazwa dla patcha jest wymagana"
+
+msgid "You must enter a patch name"
+msgstr "Musisz podać nazwę patcha"
+
 msgctxt "start progress"
 msgid "Commit"
 msgstr "Commit"
@@ -721,6 +727,9 @@ msgstr ""
 
 msgid "Stop"
 msgstr "Stop"
+
+msgid "### patch name ###"
+msgstr "### nazwa patcha ###"
 
 msgid "Commit changes"
 msgstr "Commituj zmiany"
@@ -1204,9 +1213,6 @@ msgstr ""
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr ""
 
-msgid "Custom Tools"
-msgstr ""
-
 #, python-format
 msgid "command parse error: %s"
 msgstr "błąd parsowania komendy: %s"
@@ -1242,16 +1248,7 @@ msgstr ""
 msgid "Diff Changeset to Loc&al"
 msgstr ""
 
-msgid "Diff Selected Cha&ngesets"
-msgstr ""
-
 msgid "&Diff to Parent"
-msgstr ""
-
-msgid "Cannot display visual diff"
-msgstr "Nie można pokazać wizualnego diffa"
-
-msgid "Visual diffs are not supported for unapplied patches"
 msgstr ""
 
 msgid "Diff to &Local"
@@ -1259,9 +1256,6 @@ msgstr ""
 
 msgid "View changes to current in external diff tool"
 msgstr "Pokaż zmiany do bieżącego w zewn. narzędziu diff"
-
-msgid "Diff Selected &File Revisions"
-msgstr ""
 
 msgid "&View at Revision"
 msgstr ""
@@ -1282,6 +1276,9 @@ msgid "&Edit Local"
 msgstr ""
 
 msgid "&Open Local"
+msgstr ""
+
+msgid "&Copy Patch"
 msgstr ""
 
 msgid "Copy &Path"
@@ -1310,6 +1307,99 @@ msgstr ""
 
 msgid "Open a shell terminal in the selected folder"
 msgstr "Otwórz powłokę syst. w wybranym katalogu"
+
+msgid "Custom Tools"
+msgstr ""
+
+msgid "Diff &Local"
+msgstr ""
+
+msgid "&View Missing"
+msgstr ""
+
+msgid "View O&ther"
+msgstr ""
+
+msgid "Add &Largefiles..."
+msgstr ""
+
+msgid "&Forget"
+msgstr "Zapomnij"
+
+msgid "&Delete Unversioned..."
+msgstr ""
+
+msgid "Confirm Delete Unversioned"
+msgstr "Potwierdź usunięcie nieśledzonych plików"
+
+msgid "Delete the following unversioned files?"
+msgstr "Usunąć poniższe pliki spoza syst. kontroli wersji?"
+
+msgid "&Delete"
+msgstr "Usuń"
+
+msgid "Re&move Versioned"
+msgstr ""
+
+msgid "&Revert..."
+msgstr "Odrzuć..."
+
+msgid "Uncommited merge - please select a parent revision"
+msgstr ""
+
+msgid "Revert files to local or other parent?"
+msgstr ""
+
+msgid "&Local"
+msgstr "&Lokalny"
+
+msgid "&Other"
+msgstr "&Inny"
+
+msgid "Confirm Revert"
+msgstr "Potwierdź przywrócenie"
+
+msgid "Revert local file changes?"
+msgstr "Odrzucić lokalne zmiany?"
+
+msgid "&Revert with backup"
+msgstr "P&rzywróć z backupem"
+
+msgid "&Discard changes"
+msgstr "O&drzuć zmiany"
+
+msgid "Revert the following files?"
+msgstr ""
+
+msgid "&Revert"
+msgstr ""
+
+msgid "&Copy..."
+msgstr "Kopiuj..."
+
+msgid "Re&name..."
+msgstr ""
+
+msgid "&Ignore..."
+msgstr "&Ignoruj..."
+
+msgid "De&tect Renames..."
+msgstr ""
+
+msgid "&Mark Resolved"
+msgstr ""
+
+msgid "&Mark Unresolved"
+msgstr ""
+
+msgid "Restart Mer&ge"
+msgstr ""
+
+msgid "Was renamed from"
+msgstr ""
+
+msgid "Restart Merge &with"
+msgstr ""
 
 msgid "Display the file anyway"
 msgstr ""
@@ -1488,6 +1578,12 @@ msgstr "Cofnij"
 msgid "Forward"
 msgstr "Naprzód"
 
+msgid "Diff Selected &Changesets"
+msgstr ""
+
+msgid "&Diff Selected File Revisions"
+msgstr ""
+
 msgid "Show Revision &Details"
 msgstr ""
 
@@ -1663,9 +1759,6 @@ msgstr ""
 
 msgid "&Originating Revision"
 msgstr ""
-
-msgid "&Local"
-msgstr "&Lokalny"
 
 msgid "&Parent Revision"
 msgstr ""
@@ -2070,6 +2163,9 @@ msgstr "Ustawienia"
 msgid "Send &Email"
 msgstr "Wyślij maila"
 
+msgid "&Close"
+msgstr "&Zamknij"
+
 #, python-format
 msgid "Ignore filter - %s"
 msgstr "Filtr ignorowania - %s"
@@ -2196,9 +2292,6 @@ msgstr ""
 
 msgid "Add as &Normal Files"
 msgstr ""
-
-msgid "License"
-msgstr "Licencja"
 
 msgid "Find revisions matching fields of:"
 msgstr ""
@@ -2383,6 +2476,10 @@ msgstr "Zastosuj &format"
 msgid "C&onfigure Format"
 msgstr "K&onfiguruj format"
 
+#, python-format
+msgid "%s had rejected chunks, edit patched file together with rejects?"
+msgstr ""
+
 msgid "&Commit to Queue..."
 msgstr ""
 
@@ -2515,19 +2612,6 @@ msgstr ""
 
 msgid "Tolerate non-conflicting local changes (--keep-changes)"
 msgstr ""
-
-msgid "### patch name ###"
-msgstr "### nazwa patcha ###"
-
-#, python-format
-msgid "%s had rejected chunks, edit patched file together with rejects?"
-msgstr ""
-
-msgid "Patch Name Required"
-msgstr "Nazwa dla patcha jest wymagana"
-
-msgid "You must enter a patch name"
-msgstr "Musisz podać nazwę patcha"
 
 #, python-format
 msgid "Pending Perforce Changelists - %s"
@@ -2817,9 +2901,6 @@ msgstr ""
 
 msgid "&Paste"
 msgstr ""
-
-msgid "&Delete"
-msgstr "Usuń"
 
 msgid "&Editor Options"
 msgstr ""
@@ -3833,9 +3914,6 @@ msgstr ""
 msgid "&Bundle Rev and Descendants..."
 msgstr ""
 
-msgid "&Copy Patch"
-msgstr ""
-
 msgid "Change &Phase to"
 msgstr ""
 
@@ -4287,12 +4365,6 @@ msgstr ""
 msgid "List Optio&ns"
 msgstr ""
 
-msgid "File(s) not found"
-msgstr ""
-
-msgid "The selected files do not exist in the working directory"
-msgstr ""
-
 #, python-format
 msgid "%s - Revision Details (%s)"
 msgstr ""
@@ -4322,9 +4394,6 @@ msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
 msgstr ""
-
-msgid "Confirm Revert"
-msgstr "Potwierdź przywrócenie"
 
 msgid ""
 "Reverting all files will discard changes and leave affected files in a "
@@ -4502,15 +4571,13 @@ msgstr "Wykonywanie"
 msgid "query"
 msgstr ""
 
-msgid "Parse Error: "
-msgstr "Błąd parsowania: "
-
-msgid "Invalid query: "
-msgstr "Niepoprawne zapytanie: "
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
+msgstr ""
+
+#, python-format
+msgid "failed to fork GUI process: %s\n"
 msgstr ""
 
 #, python-format
@@ -4598,9 +4665,6 @@ msgstr "czytaj listę plików z pliku o kodowaniu utf-8"
 msgid "open a new workbench window"
 msgstr ""
 
-msgid "requires a single filename"
-msgstr ""
-
 msgid "thg about"
 msgstr "thg about"
 
@@ -4683,6 +4747,9 @@ msgstr ""
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr "thg commit [OPTIONS] [FILE]..."
 
+msgid "thg debugblockmatcher"
+msgstr ""
+
 msgid "thg debugbugreport [TEXT]"
 msgstr ""
 
@@ -4699,6 +4766,18 @@ msgid "thg email [REVS]"
 msgstr "thg email [REVS]"
 
 msgid "use only one form to specify the revision"
+msgstr ""
+
+msgid "select the specified revision"
+msgstr ""
+
+msgid "side-by-side comparison of revisions"
+msgstr ""
+
+msgid "thg filelog [OPTION]... FILE"
+msgstr ""
+
+msgid "requires a single filename"
 msgstr ""
 
 msgid "thg forget [FILE]..."
@@ -5294,10 +5373,7 @@ msgstr ""
 msgid "Author Coloring"
 msgstr "Kolorowanie wg autorów"
 
-msgid ""
-"Color changesets by author name.  If not enabled, the changes are colored "
-"green for merge, red for non-trivial parents, black for normal. Default: "
-"False"
+msgid "Color changesets by author name. Default: False"
 msgstr ""
 
 msgid "Full Authorname"
@@ -5330,8 +5406,8 @@ msgid "Long Summary"
 msgstr "Długie podsumowanie"
 
 msgid ""
-"If true, concatenate multiple lines of changeset summary until they reach 80 "
-"characters. Default: False"
+"If true, concatenate multiple lines of changeset summary and truncate them "
+"at 80 characters as necessary. Default: False"
 msgstr ""
 
 msgid "Log Batch Size"
@@ -5382,6 +5458,16 @@ msgid ""
 "<li><b>prompt</b>: The default. Show a prompt when updating to a revision "
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
+msgstr ""
+
+msgid "Show Family Line"
+msgstr ""
+
+msgid ""
+"Show indirect revision dependency on the revision graph when filtered by "
+"revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
+"some cases. This option is expected to be removed if the performance issue "
+"is solved."
 msgstr ""
 
 msgctxt "config item"
@@ -6404,6 +6490,12 @@ msgstr ""
 msgid "%s - status"
 msgstr "%s - status"
 
+msgid "Check"
+msgstr "Zaznacz"
+
+msgid "Uncheck"
+msgstr "Odznacz"
+
 msgid "status"
 msgstr "status"
 
@@ -7085,90 +7177,6 @@ msgstr "oczekiwano odpowiedzi"
 msgid "password: "
 msgstr "hasło: "
 
-msgid "abort: "
-msgstr "anulowane: "
-
-msgid "hint: "
-msgstr "podp: "
-
-#, python-format
-msgid "HTTP Error: %d (%s)"
-msgstr "Błąd HTTP: %d (%s)"
-
-#, python-format
-msgid "URLError: %s"
-msgstr "Błąd HTTP: %s"
-
-msgid "SSL: Server certificate verify failed"
-msgstr "SSL: Weryfikacja certyfikatu serwera nie powiodła się"
-
-#, python-format
-msgid "SSL: unknown error %s:%s"
-msgstr "SSL: nieznany błąd %s:%s"
-
-#, python-format
-msgid "SSL error: %s"
-msgstr "Błąd SSL: %s"
-
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr "hg: błąd parsowania: %s\n"
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr "anulowane: %s: %s\n"
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: %s\n"
-msgstr ""
-
-msgid "abort: remote error:\n"
-msgstr ""
-
-#, python-format
-msgid "abort: %s"
-msgstr "anulowane: %s"
-
-msgid " empty string\n"
-msgstr " pusty ciąg\n"
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr ""
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr ""
-
-msgid "broken pipe\n"
-msgstr ""
-
 msgid "Parent 1:"
 msgstr "Rodzic 1:"
 
@@ -7310,111 +7318,6 @@ msgstr ""
 
 msgid "Directory diff"
 msgstr ""
-
-msgid "&Edit"
-msgstr ""
-
-msgid "E&xplore Subrepository"
-msgstr ""
-
-msgid "&View Missing"
-msgstr ""
-
-msgid "&Revert..."
-msgstr "Odrzuć..."
-
-msgid "&Forget"
-msgstr "Zapomnij"
-
-msgid "Add &Largefiles..."
-msgstr ""
-
-msgid "De&tect Renames..."
-msgstr ""
-
-msgid "&Ignore..."
-msgstr "&Ignoruj..."
-
-msgid "Re&move Versioned"
-msgstr ""
-
-msgid "&Delete Unversioned..."
-msgstr ""
-
-msgid "&Mark Unresolved"
-msgstr ""
-
-msgid "&Mark Resolved"
-msgstr ""
-
-msgid "Check"
-msgstr "Zaznacz"
-
-msgid "Uncheck"
-msgstr "Odznacz"
-
-msgid "View O&ther"
-msgstr ""
-
-msgid "&Copy..."
-msgstr "Kopiuj..."
-
-msgid "Re&name..."
-msgstr ""
-
-msgid "Was renamed from"
-msgstr ""
-
-msgid "Restart Mer&ge"
-msgstr ""
-
-msgid "Restart Merge &with"
-msgstr ""
-
-msgid " errors"
-msgstr " błędów"
-
-msgid " output"
-msgstr ""
-
-msgid " Aborted"
-msgstr " Przerwane"
-
-msgid "Cannot open subrepository"
-msgstr "Nie można otworzyć subrepo"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "Wybrane subrepozytorium nie istnieje w katalogu roboczym"
-
-msgid "Uncommited merge - please select a parent revision"
-msgstr ""
-
-msgid "Revert files to local or other parent?"
-msgstr ""
-
-msgid "&Other"
-msgstr "&Inny"
-
-msgid "Revert local file changes?"
-msgstr "Odrzucić lokalne zmiany?"
-
-msgid "&Revert with backup"
-msgstr "P&rzywróć z backupem"
-
-msgid "&Discard changes"
-msgstr "O&drzuć zmiany"
-
-msgid "Revert the following files?"
-msgstr ""
-
-msgid "&Revert"
-msgstr ""
-
-msgid "Confirm Delete Unversioned"
-msgstr "Potwierdź usunięcie nieśledzonych plików"
-
-msgid "Delete the following unversioned files?"
-msgstr "Usunąć poniższe pliki spoza syst. kontroli wersji?"
 
 msgid "Confirm Discard"
 msgstr "Potwierdź odrzucenie"
@@ -7752,6 +7655,96 @@ msgid "Error executing \"commit finished\" trigger"
 msgstr ""
 
 msgid "Cannot open Plugin Options dialog"
+msgstr ""
+
+#, python-format
+msgid ""
+"hg: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: parse error at %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: parse error: %s\n"
+msgstr "hg: błąd parsowania: %s\n"
+
+#, python-format
+msgid "timed out waiting for lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "abort: %s: %s\n"
+msgstr "anulowane: %s: %s\n"
+
+#, python-format
+msgid "abort: could not lock %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: %s\n"
+msgstr ""
+
+msgid "abort: remote error:\n"
+msgstr ""
+
+#, python-format
+msgid "abort: %s"
+msgstr "anulowane: %s"
+
+msgid " empty string\n"
+msgstr " pusty ciąg\n"
+
+#, python-format
+msgid "hg: unknown command '%s'\n"
+msgstr ""
+
+#, python-format
+msgid "abort: error: %s\n"
+msgstr ""
+
+msgid "broken pipe\n"
+msgstr ""
+
+msgid "abort: "
+msgstr "anulowane: "
+
+msgid "hint: "
+msgstr "podp: "
+
+#, python-format
+msgid "HTTP Error: %d (%s)"
+msgstr "Błąd HTTP: %d (%s)"
+
+#, python-format
+msgid "URLError: %s"
+msgstr "Błąd HTTP: %s"
+
+msgid "SSL: Server certificate verify failed"
+msgstr "SSL: Weryfikacja certyfikatu serwera nie powiodła się"
+
+#, python-format
+msgid "SSL: unknown error %s:%s"
+msgstr "SSL: nieznany błąd %s:%s"
+
+#, python-format
+msgid "SSL error: %s"
+msgstr "Błąd SSL: %s"
+
+msgid "hgsubversion packaged with thg"
+msgstr ""
+
+msgid "hggit packaged with thg"
 msgstr ""
 
 msgid "inotify is not supported on this platform"
@@ -8200,45 +8193,11 @@ msgstr ""
 #~ msgid " %s is larger than the specified max diff size"
 #~ msgstr " %s jest większe niż ustalony maksymalny rozmiar różnicy"
 
-#~ msgid "Backout revision not found"
-#~ msgstr "Wycofywana rewizja nie mogła być znaleziona"
-
-#~ msgid "Merge parent to backout to"
-#~ msgstr "Scal rodzica aby wycofać do"
-
-#~ msgid ""
-#~ "To backout a <b>merge</b> revision you must select which parent to "
-#~ "backout to (i.e. whose changes will be <i>kept</i>)"
-#~ msgstr ""
-#~ "Aby wycofać rewizję <b>scalającą</b>, musisz wybrać, do którego rodzica "
-#~ "się wycofać (tzn. które zmiany mają zostać <i>zatrzymane</i>)"
-
-#~ msgid "First Parent: revision %s (%s)"
-#~ msgstr "Pierwszy Rodzic: rewizja %s (%s)"
-
-#~ msgid "Backout to the first parent of the merge revision"
-#~ msgstr "Wycofaj do pierwszego rodzica wybranej rewizji scalającej"
-
-#~ msgid "Second Parent: revision %s (%s)"
-#~ msgstr "Drugi rodzic: rewizja %s (%s)"
-
-#~ msgid "Backout to the second parent of the merge revision"
-#~ msgstr "Wycofaj do drugiego rodzica tej rewizji scalającej"
-
-#~ msgid "Error creating destination folder"
-#~ msgstr "Błąd przy tworzenia docelowego katalogu"
-
-#~ msgid "Please specify a different path."
-#~ msgstr "Proszę prowadzić inną ścieżkę."
-
 #~ msgid "Nothing Commited"
 #~ msgstr "Nic nie wcommitowano"
 
 #~ msgid "File is binary.\n"
 #~ msgstr "Plik jest binarny.\n"
-
-#~ msgid "?? Error: %s ??"
-#~ msgstr "?? Błąd: %s ??"
 
 #~ msgid "Undo"
 #~ msgstr "Cofnij"
@@ -8281,6 +8240,9 @@ msgstr ""
 
 #~ msgid "Rename..."
 #~ msgstr "Zmień nazwę..."
+
+#~ msgid " Aborted"
+#~ msgstr " Przerwane"
 
 #~ msgid "Verify"
 #~ msgstr "Weryfikuj"
@@ -9278,12 +9240,6 @@ msgstr ""
 #~ msgid "#"
 #~ msgstr "#"
 
-#~ msgid "%s is missing!"
-#~ msgstr "%s jest brakujący!"
-
-#~ msgid "deleted"
-#~ msgstr "usunięty"
-
 #~ msgid "Copy file to"
 #~ msgstr "Kopiuj plik do"
 
@@ -9380,15 +9336,6 @@ msgstr ""
 #~ msgid "hg unshelve [OPTION]... [FILE]..."
 #~ msgstr "hg unshelve [OPTION]... [FILE]..."
 
-#~ msgid "Backed out merge changeset: "
-#~ msgstr "Wycofane scalone zestawy zmian: "
-
-#~ msgid "Backed out merge revision to its first parent (%s)"
-#~ msgstr "Wycofana scalona rewizja do pierwszego rodzica (%s)"
-
-#~ msgid "Backed out merge revision to its second parent (%s)"
-#~ msgstr "Wycofana scalona rewizja do drugiego rodzica (%s)"
-
 #~ msgid "_Visual Diff"
 #~ msgstr "Wizualny Diff"
 
@@ -9431,9 +9378,6 @@ msgstr ""
 #~ msgid "_Test"
 #~ msgstr "_Test"
 
-#~ msgid "Detail"
-#~ msgstr "Szczegóły"
-
 #~ msgid "Serve"
 #~ msgstr "Web Server"
 
@@ -9467,6 +9411,3 @@ msgstr ""
 
 #~ msgid "File is larger than the specified max size.\n"
 #~ msgstr "Plik jest większy niż określony maksymalny rozmiar.\n"
-
-#~ msgid "Copyright 2008-2013 Steve Borho and others"
-#~ msgstr "Copyright 2008-2013 Steve Borho i inni"

@@ -61,12 +61,12 @@ def readXml(source, rootElementName):
                   "(was looking for %s)" % (ele, rootElementName)
             return
     if xr.hasError():
-        print str(xr.errorString())
+        print hglib.fromunicode(xr.errorString(), 'replace')
     if xr.readNextStartElement():
         itemread = repotreeitem.undumpObject(xr)
         xr.skipCurrentElement()
     if xr.hasError():
-        print str(xr.errorString())
+        print hglib.fromunicode(xr.errorString(), 'replace')
     return itemread
 
 def iterRepoItemFromXml(source):
@@ -418,7 +418,7 @@ class RepoTreeModel(QAbstractItemModel):
         repo = self._repomanager.repoAgent(uroot).rawRepo()
         it = self.getRepoItem(hglib.fromunicode(uroot))
         if it:
-            it.setBaseNode(repo[0].node())
+            it.setBaseNode(hglib.repoidnode(repo))
 
     @pyqtSlot(unicode)
     def _updateItem(self, uroot):

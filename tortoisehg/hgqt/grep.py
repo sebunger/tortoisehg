@@ -143,7 +143,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             incle.setText(','.join(upats[1:]))
         chk.setChecked(opts.get('ignorecase', False))
 
-        repoid = str(repo[0])
+        repoid = hglib.shortrepoid(repo)
         s = QSettings()
         sh = list(s.value('grep/search-'+repoid).toStringList())
         ph = list(s.value('grep/paths-'+repoid).toStringList())
@@ -262,7 +262,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         return True
 
     def saveSettings(self, s):
-        repoid = str(self.repo[0])
+        repoid = hglib.shortrepoid(self.repo)
         s.setValue('grep/search-'+repoid, self.searchhistory)
         s.setValue('grep/paths-'+repoid, self.pathshistory)
 
@@ -545,6 +545,7 @@ class MatchTree(QTableView):
         self.selectedRows = ()
 
         self.delegate = htmldelegate.HTMLDelegate(self)
+        self.setDragDropMode(QTableView.DragOnly)
         self.setItemDelegateForColumn(COL_TEXT, self.delegate)
         self.setSelectionMode(QTableView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -575,50 +576,12 @@ class MatchTree(QTableView):
         self.activated.connect(self.onRowActivated)
         self.customContextMenuRequested.connect(self.menuRequest)
 
-        self.setModel(MatchModel(self))
+        self.setModel(MatchModel(repoagent, self))
         self.selectionModel().selectionChanged.connect(self.onSelectionChanged)
 
     @property
     def repo(self):
         return self._repoagent.rawRepo()
-
-    def dragObject(self):
-        snapshots = {}
-        for index in self.selectionModel().selectedRows():
-            path, line, rev, user, text = self.model().getRow(index)
-            if rev not in snapshots:
-                snapshots[rev] = [path]
-            else:
-                snapshots[rev].append(path)
-        urls = []
-        for rev, paths in snapshots.iteritems():
-            if rev is not None:
-                base, _ = visdiff.snapshot(self.repo, paths, self.repo[rev])
-            else:
-                base = self.repo.root
-            for p in paths:
-                urls.append(QUrl.fromLocalFile(os.path.join(base, path)))
-        if urls:
-            d = QDrag(self)
-            m = QMimeData()
-            m.setUrls(urls)
-            d.setMimeData(m)
-            d.start(Qt.CopyAction)
-
-    def mousePressEvent(self, event):
-        self.pressPos = event.pos()
-        self.pressTime = QTime.currentTime()
-        return QTableView.mousePressEvent(self, event)
-
-    def mouseMoveEvent(self, event):
-        d = event.pos() - self.pressPos
-        if d.manhattanLength() < QApplication.startDragDistance():
-            return QTableView.mouseMoveEvent(self, event)
-        elapsed = self.pressTime.msecsTo(QTime.currentTime())
-        if elapsed < QApplication.startDragTime():
-            return QTableView.mouseMoveEvent(self, event)
-        self.dragObject()
-        return QTableView.mouseMoveEvent(self, event)
 
     def menuRequest(self, point):
         if not self.selectionModel().selectedRows():
@@ -734,8 +697,9 @@ class MatchTree(QTableView):
 
 
 class MatchModel(QAbstractTableModel):
-    def __init__(self, parent):
+    def __init__(self, repoagent, parent):
         QAbstractTableModel.__init__(self, parent)
+        self._repoagent = repoagent
         self.rows = []
         self.headers = (_('File'), _('Line'), _('Rev'), _('User'),
                         _('Match Text'))
@@ -762,6 +726,34 @@ class MatchModel(QAbstractTableModel):
     def flags(self, index):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled
         return flags
+
+    def mimeTypes(self):
+        return ['text/uri-list']
+
+    def mimeData(self, indexes):
+        snapshots = {}
+        for index in indexes:
+            if index.column() != 0:
+                continue
+            path, line, rev, user, text = self.rows[index.row()]
+            if rev not in snapshots:
+                snapshots[rev] = [path]
+            else:
+                snapshots[rev].append(path)
+        urls = []
+        for rev, paths in snapshots.iteritems():
+            if rev is not None:
+                repo = self._repoagent.rawRepo()
+                lpaths = map(hglib.fromunicode, paths)
+                lbase, _ = visdiff.snapshot(repo, lpaths, repo[rev])
+                base = hglib.tounicode(lbase)
+            else:
+                base = self._repoagent.rootPath()
+            for p in paths:
+                urls.append(QUrl.fromLocalFile(os.path.join(base, p)))
+        m = QMimeData()
+        m.setUrls(urls)
+        return m
 
     def sort(self, col, order):
         self.layoutAboutToBeChanged.emit()

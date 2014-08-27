@@ -18,9 +18,8 @@ import time
 from PyQt4.QtCore import *
 
 from mercurial import hg, util, error, bundlerepo, extensions, filemerge, node
-from mercurial import merge, subrepo
+from mercurial import localrepo, merge, subrepo
 from mercurial import ui as uimod
-from mercurial.util import propertycache
 from hgext import mq
 
 from tortoisehg.util import hglib, paths
@@ -31,33 +30,19 @@ _repocache = {}
 _kbfregex = re.compile(r'^\.kbf/')
 _lfregex = re.compile(r'^\.hglf/')
 
-if 'THGDEBUG' in os.environ:
-    def dbgoutput(*args):
-        sys.stdout.write(' '.join([str(a) for a in args])+'\n')
-else:
-    def dbgoutput(*args):
-        pass
-
 # thgrepo.repository() will be deprecated
-def repository(_ui=None, path='', bundle=None):
+def repository(_ui=None, path=''):
     '''Returns a subclassed Mercurial repository to which new
     THG-specific methods have been added. The repository object
     is obtained using mercurial.hg.repository()'''
-    if bundle:
-        if _ui is None:
-            _ui = uimod.ui()
-        repo = bundlerepo.bundlerepository(_ui, path, bundle)
-        repo.__class__ = _extendrepo(repo)
-        agent = RepoAgent(repo)
-        return agent.rawRepo()
     if path not in _repocache:
         if _ui is None:
             _ui = uimod.ui()
         try:
             repo = hg.repository(_ui, path)
-            # get unfiltered repo in version safe manner
-            repo = getattr(repo, 'unfiltered', lambda: repo)()
+            repo = repo.unfiltered()
             repo.__class__ = _extendrepo(repo)
+            repo = repo.filtered('visible')
             agent = RepoAgent(repo)
             _repocache[path] = agent.rawRepo()
             return agent.rawRepo()
@@ -69,6 +54,13 @@ def repository(_ui=None, path='', bundle=None):
         raise error.RepoError('%s is not a valid repository' % path)
     return _repocache[path]
 
+def _filteredrepo(repo, hiddenincluded):
+    if hiddenincluded:
+        return repo.unfiltered()
+    else:
+        return repo.filtered('visible')
+
+
 class _LockStillHeld(Exception):
     'Raised to abort status check due to lock existence'
 
@@ -79,10 +71,18 @@ class RepoWatcher(QObject):
     repositoryChanged = pyqtSignal()
     repositoryDestroyed = pyqtSignal()
     workingBranchChanged = pyqtSignal()
+    workingStateChanged = pyqtSignal()
+
+    # Maybe repositoryChanged, workingBranchChanged and workingStateChanged
+    # should be merged into repositoryChanged(flags), so that client widgets
+    # and models can tune their reloader.
+    # For example, flags=WorkingParent will redraw graph but not for other
+    # columns, flags=WorkingState will trigger refreshWctx, etc.
 
     def __init__(self, repo, parent=None):
         super(RepoWatcher, self).__init__(parent)
         self.repo = repo
+        self._ui = repo.ui
         self._fswatcher = None
         self.recordState()
         self._uimtime = time.time()
@@ -114,7 +114,7 @@ class RepoWatcher(QObject):
         # ".hg/store" from the list, but actually they are not watched.
         # Thus, they cannot be watched again by the same fswatcher instance.
         if self._fswatcher.directories() or self._fswatcher.files():
-            dbgoutput('failed to remove paths - destroying watcher')
+            self._ui.debug('failed to remove paths - destroying watcher\n')
             self._fswatcher.setParent(None)
             self._fswatcher = None
 
@@ -139,29 +139,29 @@ class RepoWatcher(QObject):
         files = [unicode(f) for f in self._fswatcher.files()]
         for f in existing:
             if hglib.tounicode(f) not in files:
-                dbgoutput('add file to watcher:', f)
+                self._ui.debug('add file to watcher: %s\n' % f)
                 self._fswatcher.addPath(hglib.tounicode(f))
         for f in self.repo.uifiles():
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
-                dbgoutput('add ui file to watcher:', f)
+                self._ui.debug('add ui file to watcher: %s\n' % f)
                 self._fswatcher.addPath(hglib.tounicode(f))
 
     def pollStatus(self):
         if not os.path.exists(self.repo.path):
-            dbgoutput('Repository destroyed', self.repo.root)
+            self._ui.debug('repository destroyed: %s\n' % self.repo.root)
             self.repositoryDestroyed.emit()
             return
         if self.locked():
-            dbgoutput('locked, aborting')
+            self._ui.debug('locked, aborting\n')
             return
         try:
             if self._checkdirstate():
-                dbgoutput('dirstate changed, exiting')
+                self._ui.debug('dirstate changed, exiting\n')
                 return
             self._checkrepotime()
             self._checkuimtime()
         except _LockStillHeld:
-            dbgoutput('lock still held - ignoring for now')
+            self._ui.debug('lock still held - ignoring for now\n')
 
     def locked(self):
         if os.path.lexists(self.repo.join('wlock')):
@@ -222,7 +222,7 @@ class RepoWatcher(QObject):
     def _checkrepotime(self):
         'Check for new changelog entries, or MQ status changes'
         if self._repomtime < self._getrepomtime():
-            dbgoutput('detected repository change')
+            self._ui.debug('detected repository change\n')
             if self.locked():
                 raise _LockStillHeld
             self.recordState()
@@ -237,13 +237,18 @@ class RepoWatcher(QObject):
         if mtime <= self._dirstatemtime:
             return False
         changed = self._checkparentchanges() or self._checkbranch()
+        if not changed:
+            # returns False because in this case it's still necessary to check
+            # repo mtime in order to emit repositoryChanged appropriately
+            self._ui.debug('working directory status may be changed\n')
+            self.workingStateChanged.emit()
         self._dirstatemtime = mtime
         return changed
 
     def _checkparentchanges(self):
         nodes = self._getrawparents()
         if nodes != self._parentnodes:
-            dbgoutput('dirstate change found')
+            self._ui.debug('dirstate change found\n')
             if self.locked():
                 raise _LockStillHeld
             self.recordState()
@@ -268,7 +273,7 @@ class RepoWatcher(QObject):
         except EnvironmentError:
             return False
         if newbranch != self._rawbranch:
-            dbgoutput('branch time change')
+            self._ui.debug('branch time change\n')
             if self.locked():
                 raise _LockStillHeld
             self._rawbranch = newbranch
@@ -282,7 +287,7 @@ class RepoWatcher(QObject):
             files = self.repo.uifiles()
             mtime = max(os.path.getmtime(f) for f in files if os.path.isfile(f))
             if mtime > self._uimtime:
-                dbgoutput('config change detected')
+                self._ui.debug('config change detected\n')
                 self._uimtime = mtime
                 self.configChanged.emit()
         except (EnvironmentError, ValueError):
@@ -292,6 +297,8 @@ class RepoWatcher(QObject):
 class RepoAgent(QObject):
     """Proxy access to repository and keep its states up-to-date"""
 
+    # change notifications are not emitted while command is running because
+    # repository files are likely to be modified
     configChanged = pyqtSignal()
     repositoryChanged = pyqtSignal()
     repositoryDestroyed = pyqtSignal()
@@ -306,19 +313,26 @@ class RepoAgent(QObject):
 
     def __init__(self, repo):
         QObject.__init__(self)
-        self._repo = repo
+        self._repo = self._baserepo = repo
         # TODO: remove repo-to-agent references later; all widgets should own
         # RepoAgent instead of thgrepository.
         repo._pyqtobj = self
+        # base repository for bundle or union (set in dispatch._dispatch)
+        repo.ui.setconfig('bundle', 'mainreporoot', repo.root)
+        # keep url separately from repo.url() because it is abbreviated to
+        # relative path to cwd in bundle or union repo
+        self._overlayurl = ''
+        self._repochanging = False
 
         self._watcher = watcher = RepoWatcher(repo, self)
         watcher.configChanged.connect(self._onConfigChanged)
         watcher.repositoryChanged.connect(self._onRepositoryChanged)
         watcher.repositoryDestroyed.connect(self._onRepositoryDestroyed)
         watcher.workingBranchChanged.connect(self._onWorkingBranchChanged)
+        watcher.workingStateChanged.connect(self._onWorkingStateChanged)
 
-        self._cmdagent = cmdagent = cmdcore.CmdAgent(repo.ui, self)
-        cmdagent.setWorkingDirectory(self.rootPath())
+        self._cmdagent = cmdagent = cmdcore.CmdAgent(repo.ui, self,
+                                                     cwd=self.rootPath())
         cmdagent.outputReceived.connect(self.outputReceived)
         cmdagent.progressReceived.connect(self.progressReceived)
         cmdagent.serviceStopped.connect(self._tryEmitServiceStopped)
@@ -331,16 +345,17 @@ class RepoAgent(QObject):
         """Start filesystem monitoring on repository open by RepoManager or
         running command finished"""
         repo = self._repo
+        ui = repo.ui
         monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'localonly')
         if monitorrepo == 'never':
-            dbgoutput('watching of F/S events is disabled by configuration')
-        elif isinstance(repo, bundlerepo.bundlerepository):
-            dbgoutput('not watching F/S events for bundle repository')
+            ui.debug('watching of F/S events is disabled by configuration\n')
+        elif self._overlayurl:
+            ui.debug('not watching F/S events for overlay repository\n')
         elif (monitorrepo == 'localonly'
               and not paths.is_on_fixed_drive(repo.path)):
-            dbgoutput('not watching F/S events for network drive')
+            ui.debug('not watching F/S events for network drive\n')
         elif self.isBusy():
-            dbgoutput('not watching F/S events while busy')
+            ui.debug('not watching F/S events while busy\n')
         else:
             self._watcher.startMonitoring()
 
@@ -380,11 +395,66 @@ class RepoAgent(QObject):
         else:
             return os.path.basename(self.rootPath())
 
+    def hiddenRevsIncluded(self):
+        return self._repo.filtername != 'visible'
+
+    def setHiddenRevsIncluded(self, included):
+        """Switch visibility of hidden (i.e. pruned) changesets"""
+        if self.hiddenRevsIncluded() == included:
+            return
+        self._changeRepo(_filteredrepo(self._repo, included))
+        self._flushRepositoryChanged()
+
+    def overlayUrl(self):
+        return self._overlayurl
+
+    def setOverlay(self, url):
+        """Switch to bundle or union repository overlaying this"""
+        url = unicode(url)
+        if self._overlayurl == url:
+            return
+        repo = hg.repository(self._baserepo.ui, hglib.fromunicode(url))
+        if repo.root != self._baserepo.root:
+            raise ValueError('invalid overlay repository: %s' % url)
+        repo = repo.unfiltered()
+        repo.__class__ = _extendrepo(repo)
+        repo._pyqtobj = self  # TODO: remove repo-to-agent references
+        repo = repo.filtered('visible')
+        self._changeRepo(_filteredrepo(repo, self.hiddenRevsIncluded()))
+        self._overlayurl = url
+        self._watcher.stopMonitoring()
+        self._flushRepositoryChanged()
+
+    def clearOverlay(self):
+        if not self._overlayurl:
+            return
+        repo = self._baserepo
+        repo.thginvalidate()  # take changes during overlaid
+        self._changeRepo(_filteredrepo(repo, self.hiddenRevsIncluded()))
+        self._overlayurl = ''
+        self.pollStatus()
+        self.startMonitoringIfEnabled()
+
+    def _changeRepo(self, repo):
+        self._repochanging = True
+        self._repo = repo
+
+    def _emitRepositoryChanged(self):
+        self._repochanging = False
+        self.repositoryChanged.emit()
+
+    def _flushRepositoryChanged(self):
+        if self._cmdagent.isBusy():
+            return  # delayed until _onBusyChanged(False)
+        if self._repochanging:
+            self._emitRepositoryChanged()
+
     def pollStatus(self):
         """Force checking changes to emit corresponding signals"""
         if self._cmdagent.isBusy():
             return  # delayed until _onBusyChanged(False)
         self._watcher.pollStatus()
+        self._flushRepositoryChanged()
 
     @pyqtSlot()
     def _onConfigChanged(self):
@@ -396,7 +466,7 @@ class RepoAgent(QObject):
     @pyqtSlot()
     def _onRepositoryChanged(self):
         self._repo.thginvalidate()
-        self.repositoryChanged.emit()
+        self._emitRepositoryChanged()
 
     @pyqtSlot()
     def _onRepositoryDestroyed(self):
@@ -410,6 +480,10 @@ class RepoAgent(QObject):
     def _onWorkingBranchChanged(self):
         self._repo.thginvalidate()
         self.workingBranchChanged.emit()
+
+    @pyqtSlot()
+    def _onWorkingStateChanged(self):
+        self._repo.thginvalidate()
 
     def isBusy(self):
         return self._cmdagent.isBusy()
@@ -426,17 +500,26 @@ class RepoAgent(QObject):
         if busy:
             self._watcher.stopMonitoring()
         else:
-            self._watcher.pollStatus()
+            self.pollStatus()
             self.startMonitoringIfEnabled()
         self.busyChanged.emit(busy)
 
-    def runCommand(self, cmdline, uihandler=None, worker=None):
+    def runCommand(self, cmdline, uihandler=None, overlay=True):
         """Executes a single command asynchronously in this repository"""
-        return self._cmdagent.runCommand(cmdline, uihandler, worker)
+        cmdline = self._extendCmdline(cmdline, overlay)
+        return self._cmdagent.runCommand(cmdline, uihandler)
 
-    def runCommandSequence(self, cmdlines, uihandler=None, worker=None):
+    def runCommandSequence(self, cmdlines, uihandler=None, overlay=True):
         """Executes a series of commands asynchronously in this repository"""
-        return self._cmdagent.runCommandSequence(cmdlines, uihandler, worker)
+        cmdlines = [self._extendCmdline(l, overlay) for l in cmdlines]
+        return self._cmdagent.runCommandSequence(cmdlines, uihandler)
+
+    def _extendCmdline(self, cmdline, overlay):
+        if self.hiddenRevsIncluded():
+            cmdline = ['--hidden'] + cmdline
+        if overlay and self._overlayurl:
+            cmdline = ['-R', self._overlayurl] + cmdline
+        return cmdline
 
     def abortCommands(self):
         """Abort running and queued commands"""
@@ -609,9 +692,8 @@ class RepoManager(QObject):
 
 _uiprops = '''_uifiles postpull tabwidth maxdiff
               deadbranches _exts _thghiddentags summarylen
-              mergetools namedbranches'''.split()
-_thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches
-                   _branchheads'''.split()
+              mergetools'''.split()
+_thgrepoprops = '''_thgmqpatchnames thgmqunappliedpatches'''.split()
 
 def _extendrepo(repo):
     class thgrepository(repo.__class__):
@@ -652,12 +734,12 @@ def _extendrepo(repo):
             # thgrepository and thgchangectx should be removed in some way.
             return super(thgrepository, self).__getitem__(changeid)
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def _thghiddentags(self):
             ht = self.ui.config('tortoisehg', 'hidetags', '')
             return [t.strip() for t in ht.split()]
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def thgmqunappliedpatches(self):
             '''Returns a list of (patch name, patch path) of all self's
             unapplied MQ patches, in patch series order, first unapplied
@@ -669,7 +751,7 @@ def _extendrepo(repo):
 
             return [pname for pname in q.series if not pname in applied]
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def _thgmqpatchnames(self):
             '''Returns all tag names used by MQ patches. Returns []
             if MQ not in use.'''
@@ -680,7 +762,7 @@ def _extendrepo(repo):
             '''Currenty-active qqueue name (see hgext/mq.py:qqueue)'''
             return hglib.getcurrentqqueue(self)
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def _uifiles(self):
             cfg = self.ui._ucfg
             files = set()
@@ -690,7 +772,7 @@ def _extendrepo(repo):
             files.add(self.join('hgrc'))
             return files
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def _exts(self):
             lclexts = []
             allexts = [n for n,m in extensions.extensions()]
@@ -701,14 +783,14 @@ def _extendrepo(repo):
                     lclexts.append(name)
             return lclexts
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def postpull(self):
             pp = self.ui.config('tortoisehg', 'postpull')
             if pp in ('rebase', 'update', 'fetch', 'updateorrebase'):
                 return pp
             return 'none'
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def tabwidth(self):
             tw = self.ui.config('tortoisehg', 'tabwidth')
             try:
@@ -718,7 +800,7 @@ def _extendrepo(repo):
             except (ValueError, TypeError):
                 return 8
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def maxdiff(self):
             maxdiff = self.ui.config('tortoisehg', 'maxdiff')
             try:
@@ -729,7 +811,7 @@ def _extendrepo(repo):
                 maxdiff = 1024 # 1MB by default
             return maxdiff * 1024
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def summarylen(self):
             slen = self.ui.config('tortoisehg', 'summarylen')
             try:
@@ -740,12 +822,12 @@ def _extendrepo(repo):
                 slen = 80
             return slen
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def deadbranches(self):
             db = self.ui.config('tortoisehg', 'deadbranch', '')
             return [b.strip() for b in db.split(',')]
 
-        @propertycache
+        @localrepo.unfilteredpropertycache
         def mergetools(self):
             seen, installed = [], []
             for key, value in self.ui.configitems('merge-tools'):
@@ -755,21 +837,6 @@ def _extendrepo(repo):
                     if filemerge._findtool(self.ui, t):
                         installed.append(t)
             return installed
-
-        @propertycache
-        def namedbranches(self):
-            branchmap = self.branchmap()
-            dead = self.deadbranches
-            return sorted(br for br, _heads, _tip, isclosed
-                          in branchmap.iterbranches()
-                          if not isclosed and br not in dead)
-
-        @propertycache
-        def _branchheads(self):
-            heads = []
-            for branchname, nodes in self.branchmap().iteritems():
-                heads.extend(nodes)
-            return heads
 
         def uifiles(self):
             'Returns complete list of config files'
@@ -810,19 +877,21 @@ def _extendrepo(repo):
                 self.invalidate()
             # mq.queue.invalidate does not handle queue changes, so force
             # the queue object to be rebuilt
-            if 'mq' in self.__dict__:
-                delattr(self, 'mq')
+            if localrepo.hasunfilteredcache(self, 'mq'):
+                delattr(self.unfiltered(), 'mq')
             for a in _thgrepoprops + _uiprops:
-                if a in self.__dict__:
-                    delattr(self, a)
+                if localrepo.hasunfilteredcache(self, a):
+                    delattr(self.unfiltered(), a)
 
         def invalidateui(self):
             'Should be called when mtime of ui files are changed'
+            origui = self.ui
             self.ui = uimod.ui()
             self.ui.readconfig(self.join('hgrc'))
+            hglib.copydynamicconfig(origui, self.ui)
             for a in _uiprops:
-                if a in self.__dict__:
-                    delattr(self, a)
+                if localrepo.hasunfilteredcache(self, a):
+                    delattr(self.unfiltered(), a)
 
         def thgbackup(self, path):
             'Make a backup of the given file in the repository "trashcan"'
@@ -874,10 +943,9 @@ def _createchangectxcls(parentcls):
             srepo = super(thgchangectx, self).sub(path)
             if isinstance(srepo, subrepo.hgsubrepo):
                 r = srepo._repo
-                # get unfiltered repo in version safe manner
-                r = getattr(r, 'unfiltered', lambda: r)()
+                r = r.unfiltered()
                 r.__class__ = _extendrepo(r)
-                srepo._repo = r
+                srepo._repo = r.filtered('visible')
             return srepo
 
         def thgtags(self):
@@ -912,7 +980,7 @@ def _createchangectxcls(parentcls):
 
         def thgbranchhead(self):
             '''True if self is a branch head'''
-            return self.node() in self._repo._branchheads
+            return self.node() in hglib.branchheads(self._repo)
 
         def thgmqoriginalparent(self):
             '''The revisionid of the original patch parent'''

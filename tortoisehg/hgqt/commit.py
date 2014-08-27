@@ -8,8 +8,10 @@
 import os
 import re
 import tempfile
+import time
 
 from mercurial import util, error, scmutil, phases
+from mercurial import obsolete  # delete if obsolete becomes enabled by default
 
 from tortoisehg.util import hglib, partialcommit, shlib, wconfig
 
@@ -17,7 +19,7 @@ from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
 from tortoisehg.hgqt import cmdcore, cmdui
 from tortoisehg.hgqt import qtlib, qscilib, status, branchop, revpanel
-from tortoisehg.hgqt import hgrcutil, mqutil, lfprompt, i18n
+from tortoisehg.hgqt import hgrcutil, lfprompt, i18n
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -72,6 +74,47 @@ def mergecommitmessage(repo):
         text = unicode(text) % hglib.tounicode(wctx.p2().branch())
     return text
 
+def _getUserOptions(opts, *optionlist):
+    out = []
+    for opt in optionlist:
+        if opt not in opts:
+            continue
+        val = opts[opt]
+        if val is False:
+            continue
+        elif val is True:
+            out.append('--' + opt)
+        else:
+            out.append('--' + opt)
+            out.append(val)
+    return out
+
+def _mqNewRefreshCommand(repo, isnew, stwidget, pnwidget, message, opts, olist):
+    if isnew:
+        name = hglib.fromunicode(pnwidget.text())
+        if not name:
+            qtlib.ErrorMsgBox(_('Patch Name Required'),
+                              _('You must enter a patch name'))
+            pnwidget.setFocus()
+            return
+        cmdline = ['qnew', name]
+    else:
+        cmdline = ['qrefresh']
+    if message:
+        cmdline += ['--message=' + hglib.fromunicode(message)]
+    cmdline += _getUserOptions(opts, *olist)
+    files = ['--'] + [repo.wjoin(x) for x in stwidget.getChecked()]
+    addrem = [repo.wjoin(x) for x in stwidget.getChecked('!?')]
+    if len(files) > 1:
+        cmdline += files
+    else:
+        cmdline += ['--exclude', repo.root]
+    if addrem:
+        cmdlines = [['addremove'] + addrem, cmdline]
+    else:
+        cmdlines = [cmdline]
+    return cmdlines
+
 _topicmap = {
     'amend': _('Commit', 'start progress'),
     'commit': _('Commit', 'start progress'),
@@ -108,10 +151,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self._cmdsession = cmdcore.nullCmdSession()
         self._rev = rev
         self.lastAction = None
-        # Dictionary storing the last "commit messages"
+        # Dictionary storing the last (commit message, modified flag)
         # 'commit' is used for 'commit' and 'qnew', while
         # 'amend' is used for 'amend' and 'qrefresh'
-        self.lastCommitMsgs = {'commit': '', 'amend': ''}
+        self.lastCommitMsgs = {'commit': ('', False), 'amend': ('', False)}
         self.currentAction = None
 
         self.opts = opts = readopts(repo.ui) # user, date
@@ -153,10 +196,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         self.recentMessagesButton = QToolButton(
             text=_('Copy message'),
-            popupMode=QToolButton.MenuButtonPopup,
+            popupMode=QToolButton.InstantPopup,
             toolTip=_('Copy one of the recent commit messages'))
-        self.recentMessagesButton.clicked.connect(
-            self.recentMessagesButton.showMenu)
         m = QMenu(self.recentMessagesButton)
         m.triggered.connect(self.msgSelected)
         self.recentMessagesButton.setMenu(m)
@@ -164,7 +205,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.updateRecentMessages()
 
         tbar.addAction(_('Options')).triggered.connect(self.details)
-        tbar.setIconSize(QSize(16,16))
+        tbar.setIconSize(qtlib.smallIconSize())
 
         if _hasbugtraq and self.opts['bugtraqplugin'] != None:
             # We create the "Show Issues" button, but we delay its setup
@@ -212,7 +253,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             pnhbox = QHBoxLayout()
             self.pnlabel = QLabel()
             pnhbox.addWidget(self.pnlabel)
-            self.pnedit = mqutil.getPatchNameLineEdit()
+            self.pnedit = QLineEdit()
+            if hasattr(self.pnedit, 'setPlaceholderText'):  # Qt >= 4.7
+                self.pnedit.setPlaceholderText(_('### patch name ###'))
             self.pnedit.setMaximumWidth(250)
             pnhbox.addWidget(self.pnedit)
             pnhbox.addStretch()
@@ -310,7 +353,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             ctx = r.changectx('.')
             return (ctx.phase() != phases.public) \
                 and len(r.changectx(None).parents()) < 2 \
-                and not ctx.children()
+                and (obsolete._enabled or not ctx.children())
 
         acts = [
             ('commit', _('Commit changes'), _('Commit'), notpatch),
@@ -396,7 +439,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.pnlabel.setVisible(True)
             self.pnedit.setVisible(True)
             self.pnedit.setFocus()
-            self.pnedit.setText(mqutil.defaultNewPatchName(self.repo))
+            pn = time.strftime('%Y-%m-%d_%H-%M-%S')
+            pn += '_r%d+.diff' % self.repo['.'].rev()
+            self.pnedit.setText(pn)
             self.pnedit.selectAll()
             self.stwidget.setPatchContext(None)
             refreshwctx = refresh and oldpctx is not None
@@ -423,16 +468,17 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 allowcs = len(self.repo.parents()) == 1
         if curraction._name in ('qref', 'amend'):
             if self.lastAction not in ('qref', 'amend'):
-                self.lastCommitMsgs['commit'] = self.msgte.text()
-            if self.lastCommitMsgs['amend']:
-                msg = self.lastCommitMsgs['amend']
+                self.lastCommitMsgs['commit'] = (self.msgte.text(),
+                                                 self.msgte.isModified())
+            if self.lastCommitMsgs['amend'][0]:
+                self.setMessage(*self.lastCommitMsgs['amend'])
             else:
-                msg = hglib.tounicode(pctx.description())
-            self.setMessage(msg)
+                self.setMessage(hglib.tounicode(pctx.description()))
         else:
             if self.lastAction in ('qref', 'amend'):
-                self.lastCommitMsgs['amend'] = self.msgte.text()
-                self.setMessage(self.lastCommitMsgs['commit'])
+                self.lastCommitMsgs['amend'] = (self.msgte.text(),
+                                                self.msgte.isModified())
+                self.setMessage(*self.lastCommitMsgs['commit'])
             elif len(self.repo[None].parents()) > 1:
                 self.setMessage(mergecommitmessage(self.repo))
         if curraction._name == 'amend':
@@ -509,11 +555,11 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             wholecmdlines.extend(cmdlines)
 
         olist = ('user', 'date')
-        cmdlines = mqutil.mqNewRefreshCommand(self.repo,
-                                              curraction._name == 'qnew',
-                                              self.stwidget, self.pnedit,
-                                              self.msgte.text(), self.opts,
-                                              olist)
+        cmdlines = _mqNewRefreshCommand(self.repo,
+                                        curraction._name == 'qnew',
+                                        self.stwidget, self.pnedit,
+                                        self.msgte.text(), self.opts,
+                                        olist)
         if not cmdlines:
             return
         wholecmdlines.extend(cmdlines)
@@ -601,7 +647,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot()
     def repositoryChanged(self):
         'Repository has detected a changelog / dirstate change'
-        self.lastCommitMsgs['amend'] = ''  # avoid loading stale cache
+        curraction = self.mqgroup.checkedAction()
+        if curraction._name == 'commit' and not self.msgte.isModified():
+            # default merge or close-branch message is outdated if new commit
+            # was made by other widget or process
+            self.msgte.clear()
+        self.lastCommitMsgs['amend'] = ('', False)  # avoid loading stale cache
         # refresh() may load/save the stale 'amend' message in commitSetAction()
         self.refresh()
         self.stwidget.refreshWctx() # Trigger reload of working context
@@ -610,7 +661,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         # in which we may write a commit message first, modify the repository
         # (e.g. amend or update and merge uncommitted changes) and then do the
         # actual commit
-        self.lastCommitMsgs['amend'] = ''  # clear saved stale cache
+        self.lastCommitMsgs['amend'] = ('', False)  # clear saved stale cache
 
     @pyqtSlot()
     def refreshWctx(self):
@@ -688,14 +739,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def canUndo(self):
         'Returns undo description or None if not valid'
-        if os.path.exists(self.repo.sjoin('undo')):
-            try:
-                args = self.repo.opener('undo.desc', 'r').read().splitlines()
-                if args[1] != 'commit':
-                    return None
-                return _('Rollback commit to revision %d') % (int(args[0]) - 1)
-            except (IOError, IndexError, ValueError):
-                pass
+        desc, oldlen = hglib.readundodesc(self.repo)
+        if desc == 'commit':
+            return _('Rollback commit to revision %d') % (oldlen - 1)
         return None
 
     def rollback(self):
@@ -739,10 +785,10 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.setMessage(message)
         self.msgte.setFocus()
 
-    def setMessage(self, msg):
+    def setMessage(self, msg, modified=False):
         self.msgte.setText(msg)
         self.msgte.moveCursorToEnd()
-        self.msgte.setModified(False)
+        self.msgte.setModified(modified)
 
     def canExit(self):
         if not self.stwidget.canExit():
@@ -751,7 +797,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def loadSettings(self, s, prefix):
         'Load history, etc, from QSettings instance'
-        repoid = str(self.repo[0])
+        repoid = hglib.shortrepoid(self.repo)
         lpref = prefix + '/commit/' # local settings (splitter, etc)
         gpref = 'commit/'           # global settings (history, etc)
         # message history is stored in unicode
@@ -778,7 +824,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
     def saveSettings(self, s, prefix):
         'Save history, etc, in QSettings instance'
         try:
-            repoid = str(self.repo[0])
+            repoid = hglib.shortrepoid(self.repo)
             lpref = prefix + '/commit/'
             gpref = 'commit/'
             s.setValue(lpref+'split', self.split.saveState())
@@ -834,9 +880,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         linkmandatory = self.repo.ui.configbool('tortoisehg',
                                                 'issue.linkmandatory', False)
         if linkmandatory:
-            issueregex = self.repo.ui.config('tortoisehg', 'issue.regex')
+            issueregex = None
+            s = self.repo.ui.config('tortoisehg', 'issue.regex')
+            if s:
+                try:
+                    issueregex = re.compile(s)
+                except re.error:
+                    pass
             if issueregex:
-                m = re.search(issueregex, msg)
+                m = issueregex.search(msg)
                 if not m:
                     qtlib.WarningMsgBox(_('Nothing Committed'),
                                         _('No issue link was found in the '
@@ -909,11 +961,13 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                         return
                     checkedUnknowns, lfiles = result
                     if lfiles:
-                        cmd = ['add', '--large'] + \
-                            [repo.wjoin(f) for f in lfiles]
+                        cmd = ['add', '--large', '--']
+                        cmd.extend(map(hglib.escapepath, lfiles))
                         commandlines.append(cmd)
-                cmd = ['add'] + [repo.wjoin(f) for f in checkedUnknowns]
-                commandlines.append(cmd)
+                if checkedUnknowns:
+                    cmd = ['add', '--']
+                    cmd.extend(map(hglib.escapepath, checkedUnknowns))
+                    commandlines.append(cmd)
             else:
                 return
         checkedMissing = self.stwidget.getChecked('!')
@@ -929,7 +983,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             else:
                 res = 0
             if res == 0:
-                cmd = ['remove'] + [repo.wjoin(f) for f in checkedMissing]
+                cmd = ['remove', '--']
+                cmd.extend(map(hglib.escapepath, checkedMissing))
                 commandlines.append(cmd)
             else:
                 return
@@ -983,12 +1038,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             assert not self.stwidget.partials
 
         cmdline.append('--')
-        cmdline.extend([repo.wjoin(f) for f in self.files])
+        cmdline.extend(map(hglib.escapepath, self.files))
         if len(repo.parents()) == 1:
             for fname in self.opts.get('autoinc', '').split(','):
                 fname = fname.strip()
                 if fname:
-                    cmdline.append(repo.wjoin(fname))
+                    cmdline.append('glob:%s' % fname)
         commandlines.append(cmdline)
 
         if self.opts.get('pushafter'):
@@ -1023,7 +1078,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.branchop = None
             umsg = self.msgte.text()
             if self.currentAction not in ('qref', 'amend'):
-                self.lastCommitMsgs['commit'] = ''
+                self.lastCommitMsgs['commit'] = ('', False)
                 if self.currentAction == 'commit':
                     # capture last message for BugTraq plugin
                     self.lastmessage = self.getMessage(True)

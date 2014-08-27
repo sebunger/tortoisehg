@@ -7,16 +7,13 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import Queue
-import urllib2, urllib
-import socket
-import errno
 
 from PyQt4.QtCore import *
 
-from mercurial import util, error, subrepo
+from mercurial import util
 from mercurial import ui as uimod
 
-from tortoisehg.util import thread2, hglib
+from tortoisehg.util import thread2, hgdispatch, hglib
 from tortoisehg.hgqt.i18n import _, localgettext
 
 local = localgettext()
@@ -55,7 +52,7 @@ class ProgressMessage(tuple):
 
 
 class UiSignal(QObject):
-    writeSignal = pyqtSignal(QString, QString)
+    writeSignal = pyqtSignal(QByteArray, QString)
     progressSignal = pyqtSignal(QString, object, QString, QString, object)
     interactSignal = pyqtSignal(DataWrapper)
 
@@ -64,14 +61,14 @@ class UiSignal(QObject):
         self.responseq = responseq
 
     def write(self, *args, **opts):
-        msg = hglib.tounicode(''.join(args))
+        msg = QByteArray(''.join(args))
         label = hglib.tounicode(opts.get('label', ''))
         self.writeSignal.emit(msg, label)
 
     def write_err(self, *args, **opts):
-        msg = hglib.tounicode(''.join(args))
-        label = hglib.tounicode(opts.get('label', 'ui.error'))
-        self.writeSignal.emit(msg, label)
+        msg = QByteArray(''.join(args))
+        label = hglib.tounicode(opts.get('label', ''))
+        self.writeSignal.emit(msg, label or 'ui.error')
 
     def prompt(self, msg, default):
         try:
@@ -123,6 +120,9 @@ class QtUi(uimod.ui):
 
         self.setconfig('ui', 'interactive', 'on')
         self.setconfig('progress', 'disable', 'True')
+
+    def plain(self, feature=None):
+        return feature not in ('alias', 'i18n')
 
     def write(self, *args, **opts):
         if self._buffers:
@@ -246,8 +246,11 @@ class CmdThread(QThread):
                 self.progressReceived.emit(progress)
             self.topics = {}
 
-    @pyqtSlot(QString, QString)
+    @pyqtSlot(QByteArray, QString)
     def output_handler(self, msg, label):
+        if self._uihandler.writeOutput(msg, unicode(label)) >= 0:
+            return
+        msg = hglib.tounicode(str(msg))
         if label == self.curlabel:
             self.curstrs.append(msg)
         else:
@@ -272,6 +275,8 @@ class CmdThread(QThread):
             r = uihandler.getLineInput()
             if r is None:
                 self.responseq.put(None)
+            elif not r:
+                self.responseq.put(default)
             else:
                 self.responseq.put(resps.index(r))
         else:
@@ -294,119 +299,14 @@ class CmdThread(QThread):
             # save thread id in order to terminate by KeyboardInterrupt
             self.thread_id = int(QThread.currentThreadId())
 
-            for k, v in ui.configitems('defaults'):
-                ui.setconfig('defaults', k, '')
             # disable worker because it only works in main thread:
             #   signal.signal(signal.SIGINT, signal.SIG_IGN)
             #   ValueError: signal only works in main thread
             ui.setconfig('worker', 'numcpus', 1)
             self.ret = 255
-            self.ret = hglib.dispatch(ui, self.cmdline) or 0
-        except subrepo.SubrepoAbort, e:
-            errormsg = str(e)
-            label = 'ui.error'
-            if e.subrepo:
-                label += ' subrepo=%s' % urllib.quote(e.subrepo)
-            ui.write_err(local._('abort: ') + errormsg + '\n', label=label)
-            if e.hint:
-                ui.write_err(local._('hint: ') + str(e.hint) + '\n', label=label)
-        except util.Abort, e:
-            ui.write_err(local._('abort: ') + str(e) + '\n')
-            if e.hint:
-                ui.write_err(local._('hint: ') + str(e.hint) + '\n')
-        except error.RepoError, e:
-            ui.write_err(str(e) + '\n')
-        except urllib2.HTTPError, e:
-            err = local._('HTTP Error: %d (%s)') % (e.code, e.msg)
-            ui.write_err(err + '\n')
-        except urllib2.URLError, e:
-            err = local._('URLError: %s') % str(e.reason)
-            try:
-                import ssl # Python 2.6 or backport for 2.5
-                if isinstance(e.args[0], ssl.SSLError):
-                    parts = e.args[0].strerror.split(':')
-                    if len(parts) == 7:
-                        file, line, level, _errno, lib, func, reason = parts
-                        if func == 'SSL3_GET_SERVER_CERTIFICATE':
-                            err = local._('SSL: Server certificate verify failed')
-                        elif _errno == '00000000':
-                            err = local._('SSL: unknown error %s:%s') % (file, line)
-                        else:
-                            err = local._('SSL error: %s') % reason
-            except ImportError:
-                pass
-            ui.write_err(err + '\n')
-        except error.AmbiguousCommand, inst:
-            ui.warn(local._("hg: command '%s' is ambiguous:\n    %s\n") %
-                    (inst.args[0], " ".join(inst.args[1])))
-        except error.ParseError, inst:
-            if len(inst.args) > 1:
-                ui.warn(local._("hg: parse error at %s: %s\n") %
-                                (inst.args[1], inst.args[0]))
-            else:
-                ui.warn(local._("hg: parse error: %s\n") % inst.args[0])
-        except error.LockHeld, inst:
-            if inst.errno == errno.ETIMEDOUT:
-                reason = local._('timed out waiting for lock held by %s') % inst.locker
-            else:
-                reason = local._('lock held by %s') % inst.locker
-            ui.warn(local._("abort: %s: %s\n") % (inst.desc or inst.filename, reason))
-        except error.LockUnavailable, inst:
-            ui.warn(local._("abort: could not lock %s: %s\n") %
-                (inst.desc or inst.filename, inst.strerror))
-        except error.CommandError, inst:
-            if inst.args[0]:
-                ui.warn(local._("hg %s: %s\n") % (inst.args[0], inst.args[1]))
-            else:
-                ui.warn(local._("hg: %s\n") % inst.args[1])
-        except error.OutOfBandError, inst:
-            ui.warn(local._("abort: remote error:\n"))
-            ui.warn(''.join(inst.args))
-        except error.RepoError, inst:
-            ui.warn(local._("abort: %s!\n") % inst)
-        except error.ResponseError, inst:
-            ui.warn(local._("abort: %s") % inst.args[0])
-            if not isinstance(inst.args[1], basestring):
-                ui.warn(" %r\n" % (inst.args[1],))
-            elif not inst.args[1]:
-                ui.warn(local._(" empty string\n"))
-            else:
-                ui.warn("\n%r\n" % util.ellipsis(inst.args[1]))
-        except error.RevlogError, inst:
-            ui.warn(local._("abort: %s!\n") % inst)
-        except error.UnknownCommand, inst:
-            ui.warn(local._("hg: unknown command '%s'\n") % inst.args[0])
-        except error.InterventionRequired, inst:
-            ui.warn("%s\n" % inst)
-            self.ret = 1
-        except socket.error, inst:
-            ui.warn(local._("abort: %s!\n") % str(inst))
-        except IOError, inst:
-            if hasattr(inst, "code"):
-                ui.warn(local._("abort: %s\n") % inst)
-            elif hasattr(inst, "reason"):
-                try: # usually it is in the form (errno, strerror)
-                    reason = inst.reason.args[1]
-                except: # it might be anything, for example a string
-                    reason = inst.reason
-                ui.warn(local._("abort: error: %s\n") % reason)
-            elif hasattr(inst, "args") and inst.args[0] == errno.EPIPE:
-                if ui.debugflag:
-                    ui.warn(local._("broken pipe\n"))
-            elif getattr(inst, "strerror", None):
-                if getattr(inst, "filename", None):
-                    ui.warn(local._("abort: %s: %s\n") % (inst.strerror, inst.filename))
-                else:
-                    ui.warn(local._("abort: %s\n") % inst.strerror)
-            else:
-                raise
-        except OSError, inst:
-            if getattr(inst, "filename", None):
-                ui.warn(local._("abort: %s: %s\n") % (inst.strerror, inst.filename))
-            else:
-                ui.warn(local._("abort: %s\n") % inst.strerror)
+            self.ret = hgdispatch.dispatch(ui, self.cmdline)
         except Exception, inst:
-            ui.write_err(str(inst) + '\n')
+            ui.write_err(str(inst) + '\n', label='ui.error')
             raise
         except KeyboardInterrupt:
             self.ret = -1

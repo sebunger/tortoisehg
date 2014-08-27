@@ -51,7 +51,6 @@ class HgFileView(QFrame):
     showMessage = pyqtSignal(QString)
     revisionSelected = pyqtSignal(int)
     shelveToolExited = pyqtSignal()
-    newChunkList = pyqtSignal(QString, object)
     chunkSelectionChanged = pyqtSignal()
 
     grepRequested = pyqtSignal(unicode, dict)
@@ -68,8 +67,6 @@ class HgFileView(QFrame):
 
         self._repoagent = repoagent
         repo = repoagent.rawRepo()
-        # TODO: replace by repoagent if setRepo(bundlerepo) can be removed
-        self.repo = repo
 
         self.topLayout = QVBoxLayout()
 
@@ -79,7 +76,7 @@ class HgFileView(QFrame):
         self.topLayout.addLayout(hbox)
 
         self.diffToolbar = QToolBar(_('Diff Toolbar'))
-        self.diffToolbar.setIconSize(QSize(16,16))
+        self.diffToolbar.setIconSize(qtlib.smallIconSize())
         self.diffToolbar.setStyleSheet(qtlib.tbstylesheet)
         hbox.addWidget(self.diffToolbar)
 
@@ -131,10 +128,11 @@ class HgFileView(QFrame):
         self.sci.setMarginType(0, qsci.SymbolMargin)
         self.sci.setMarginWidth(0, 0)
 
-        self.searchbar = qscilib.SearchToolBar(hidable=True)
+        self.searchbar = qscilib.SearchToolBar()
         self.searchbar.hide()
         self.searchbar.searchRequested.connect(self.find)
         self.searchbar.conditionChanged.connect(self.highlightText)
+        self.addActions(self.searchbar.editorActions())
         self.layout().addWidget(self.searchbar)
 
         self._fd = self._nullfd = filedata.createNullData(repo)
@@ -173,7 +171,7 @@ class HgFileView(QFrame):
         annotatec.setSourceRequested.connect(self._setSource)
         annotatec.visualDiffRevisionRequested.connect(self._visualDiffRevision)
         annotatec.visualDiffToLocalRequested.connect(self._visualDiffToLocal)
-        chunkselc = _ChunkSelectionViewControl(self.sci, self)
+        chunkselc = _ChunkSelectionViewControl(self.sci, self._fd, self)
         chunkselc.chunkSelectionChanged.connect(self.chunkSelectionChanged)
 
         self._activeViewControls = []
@@ -240,6 +238,10 @@ class HgFileView(QFrame):
         repoagent.configChanged.connect(self._applyRepoConfig)
         self._applyRepoConfig()
 
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     @pyqtSlot()
     def _launchShelve(self):
         from tortoisehg.hgqt import shelve
@@ -278,10 +280,6 @@ class HgFileView(QFrame):
         enc = fileencoding.contentencoding(self.repo.ui, self._textEncoding())
         self._changeTextEncoding(enc)
 
-    def setRepo(self, repo):
-        self.repo = repo
-        self.sci.repo = repo
-
     def isChangeSelectionEnabled(self):
         chunkselc = self._chunkSelectionViewControl
         controls = self._modeViewControlsMap[DiffMode]
@@ -302,19 +300,12 @@ class HgFileView(QFrame):
         if self._effectiveMode() == DiffMode:
             self._changeEffectiveMode(DiffMode)
 
-    def updateChunk(self, chunk, exclude):
-        'change chunk exclusion state, update display when necessary'
-        self._chunkSelectionViewControl.updateChunk(chunk, exclude)
-
     @pyqtSlot(QAction)
     def _setModeByAction(self, action):
         'One of the mode toolbar buttons has been toggled'
         mode = action.data().toInt()[0]
         self._lostMode = _NullMode
         self._changeEffectiveMode(mode)
-        # TODO: delete fd.load(), which is necessary because ChunkSelection
-        # view cannot start with chunk.excluded = True
-        self._fd.load(self.isChangeSelectionEnabled())
         self._displayLoaded(self._fd)
 
     def _effectiveMode(self):
@@ -465,7 +456,8 @@ class HgFileView(QFrame):
         self._displayLoaded(self._fd)
 
     def display(self, fd):
-        fd.load(self.isChangeSelectionEnabled())
+        if not fd.isLoaded():
+            fd.load(self.isChangeSelectionEnabled())
         fd.setTextEncoding(self._textEncoding())
         if self._autoTextEncoding():
             fd.detectTextEncoding()
@@ -517,11 +509,6 @@ class HgFileView(QFrame):
 
         for c in self._activeViewControls:
             c.display(fd)
-
-        if self._effectiveMode() == DiffMode and fd.isValid():
-            self.newChunkList.emit(fd.filePath(), fd.changes)
-        else:
-            self.newChunkList.emit(fd.filePath(), None)
 
         self.highlightText(*self._lastSearch)
         self.fileDisplayed.emit(fd.filePath(), fd.fileText())
@@ -1286,7 +1273,7 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
 
     chunkSelectionChanged = pyqtSignal()
 
-    def __init__(self, sci, parent=None):
+    def __init__(self, sci, fd, parent=None):
         super(_ChunkSelectionViewControl, self).__init__(parent)
         self._sci = sci
         p = qtlib.getcheckboxpixmap(QStyle.State_On, QColor('#B0FFA0'), sci)
@@ -1320,7 +1307,7 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
         a.setEnabled(False)
         a.activated.connect(self._toggleCurrentChunk)
 
-        self._changes = None
+        self._fd = fd
         self._chunkatline = {}
 
     def open(self):
@@ -1332,23 +1319,23 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
         self._toggleshortcut.setEnabled(False)
 
     def display(self, fd):
-        self._changes = None
+        self._fd = fd
         self._chunkatline.clear()
         if not fd.changes:
             return
-        self._changes = fd.changes
         for chunk in fd.changes.hunks:
             self._chunkatline[chunk.lineno] = chunk
-            self._sci.markerAdd(chunk.lineno, _IncludedChunkStartMarker)
+            self._updateMarker(chunk)
 
-    def updateChunk(self, chunk, exclude):
-        if chunk.excluded == exclude:
-            return
+    def _updateMarker(self, chunk):
         excludemsg = ' ' + _('(excluded from the next commit)')
-        if exclude:
-            chunk.excluded = True
-            self._changes.excludecount += 1
+        # markerAdd() does not check if the specified marker is already
+        # present, but markerDelete() does
+        m = self._sci.markersAtLine(chunk.lineno)
+        inclmarked = m & (1 << _IncludedChunkStartMarker)
+        exclmarked = m & (1 << _ExcludedChunkStartMarker)
 
+        if chunk.excluded and not exclmarked:
             self._sci.setReadOnly(False)
             llen = self._sci.lineLength(chunk.lineno)  # in bytes
             self._sci.insertAt(excludemsg, chunk.lineno, llen - 1)
@@ -1361,10 +1348,8 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
             self._sci.fillIndicatorRange(chunk.lineno + 1, 0,
                                          chunk.lineno + chunk.linecount, 0,
                                          self._excludeindicator)
-        else:
-            chunk.excluded = False
-            self._changes.excludecount -= 1
 
+        if not chunk.excluded and exclmarked:
             self._sci.setReadOnly(False)
             llen = self._sci.lineLength(chunk.lineno)  # in bytes
             mlen = len(excludemsg.encode('utf-8'))  # in bytes
@@ -1374,6 +1359,7 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
             self._sci.SendScintilla(qsci.SCI_REPLACETARGET, 0, '')
             self._sci.setReadOnly(True)
 
+        if not chunk.excluded and not inclmarked:
             self._sci.markerDelete(chunk.lineno, _ExcludedChunkStartMarker)
             self._sci.markerAdd(chunk.lineno, _IncludedChunkStartMarker)
             for i in xrange(chunk.linecount - 1):
@@ -1411,7 +1397,9 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
 
     def _setChunkAtLines(self, lines, excluded):
         for l in lines:
-            self.updateChunk(self._chunkatline[l], excluded)
+            chunk = self._chunkatline[l]
+            self._fd.setChunkExcluded(chunk, excluded)
+            self._updateMarker(chunk)
         self.chunkSelectionChanged.emit()
 
     def _toggleChunkAtLine(self, line):

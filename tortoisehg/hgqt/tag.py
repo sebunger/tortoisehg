@@ -255,7 +255,7 @@ class TagDialog(QDialog):
                 self.set_status(_('uncommitted merge'), False)
                 return
             p1 = parents[0]
-            if not force and p1.node() not in self.repo._branchheads:
+            if not force and p1.node() not in hglib.branchheads(self.repo):
                 self.set_status(_('not at a branch head (use force)'), False)
                 return
             if not message:
@@ -308,7 +308,7 @@ class TagDialog(QDialog):
                 self.set_status(_('uncommitted merge'), False)
                 return
             p1 = parents[0]
-            if not force and p1.node() not in self.repo._branchheads:
+            if not force and p1.node() not in hglib.branchheads(self.repo):
                 self.set_status(_('not at a branch head (use force)'), False)
                 return
             if not message:

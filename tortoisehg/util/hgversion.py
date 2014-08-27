@@ -16,19 +16,19 @@ except AttributeError:
     from mercurial import version
     hgversion = version.get_version()
 
+testedwith = '3.0 3.1'
+
 def checkhgversion(v):
     """range check the Mercurial version"""
-    reqver = ['3', '0']
+    reqvers = testedwith.split()
     v = v.split('+')[0]
     if not v or v == 'unknown' or len(v) >= 12:
         # can't make any intelligent decisions about unknown or hashes
         return
     vers = re.split(r'\.|-', v)[:2]
-    if vers == reqver or len(vers) < 2:
+    if len(vers) < 2:
         return
-    nextver = map(str, divmod(int(reqver[0]) * 10 + int(reqver[1]) + 1, 10))
-    if vers == nextver:
+    if '.'.join(vers) in reqvers:
         return
-    return (('This version of TortoiseHg requires Mercurial '
-                       'version %s.n to %s.n, but found %s') %
-                       ('.'.join(reqver), '.'.join(nextver), v))
+    return ('This version of TortoiseHg requires Mercurial version %s.n to '
+            '%s.n, but found %s') % (reqvers[0], reqvers[-1], v)

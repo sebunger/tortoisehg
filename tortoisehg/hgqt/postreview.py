@@ -257,7 +257,8 @@ class PostReviewDialog(QDialog):
         if (len(self.selectedRevs) > 1):
             #Set the parent to the revision below the last one on the list
             #so all checked revisions are included in the request
-            opts['parent'] = str(self.selectedRevs[0] - 1)
+            ctx = self.repo[self.selectedRevs[0]]
+            opts['parent'] = str(ctx.p1().rev())
 
         # Always use the upstream repo to determine the parent diff base
         # without the diff uploaded to review board dies
@@ -334,8 +335,6 @@ class PostReviewDialog(QDialog):
                         args += ['--%s' % k.replace('_', '-'), e]
 
             return args
-
-        hglib.loadextension(self.ui, 'reviewboard')
 
         opts = self.postReviewOpts()
 

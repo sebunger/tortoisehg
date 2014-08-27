@@ -13,7 +13,7 @@ from PyQt4.QtGui import *
 from mercurial import error, util
 from tortoisehg.util import hglib
 from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, lexers, qtlib
+from tortoisehg.hgqt import cmdcore, cmdui, lexers, qtlib
 from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
@@ -32,6 +32,7 @@ class EmailDialog(QDialog):
         super(EmailDialog, self).__init__(parent)
         self.setWindowFlags(Qt.Window)
         self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
         self._outgoing = outgoing
         self._outgoingrevs = outgoingrevs or []
 
@@ -52,13 +53,6 @@ class EmailDialog(QDialog):
         self._readsettings()
         QShortcut(QKeySequence('CTRL+Return'), self, self.accept)
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
-
-        # The email dialog is available no matter if patchbomb extension isn't
-        # enabled.  The extension name makes it unlikely first-time users
-        # would discover that Mercurial ships with a functioning patch MTA.
-        # Since patchbomb doesn't monkey patch any Mercurial code, it's safe
-        # to enable it on demand.
-        hglib.loadextension(self._ui, 'patchbomb')
 
     def closeEvent(self, event):
         self._writesettings()
@@ -215,6 +209,13 @@ class EmailDialog(QDialog):
             opts['desc'] = writetempfile(
                 hglib.fromunicode(self._qui.body_edit.toPlainText()))
 
+        # The email dialog is available no matter if patchbomb extension isn't
+        # enabled.  The extension name makes it unlikely first-time users
+        # would discover that Mercurial ships with a functioning patch MTA.
+        # Since patchbomb doesn't monkey patch any Mercurial code, it's safe
+        # to enable it on demand.
+        opts['config'] = 'extensions.patchbomb='
+
         return opts
 
     def _isvalid(self):
@@ -321,17 +322,14 @@ class EmailDialog(QDialog):
 
         self._qui.preview_edit.clear()
         opts = self._patchbombopts(test=True)
-        # TODO: fix hgext.patchbomb's implementation instead
-        if 'PAGER' in os.environ:
-            del os.environ['PAGER']
         cmdline = hglib.buildcmdargs('email', **opts)
-        sess = self._repoagent.runCommand(cmdline)
-        sess.outputReceived.connect(self._capturepreview)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline)
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._updatepreview)
 
-    @pyqtSlot(unicode, unicode)
-    def _capturepreview(self, msg, label):
-        if label:
-            return  # ignore ui or control message
+    @pyqtSlot()
+    def _updatepreview(self):
+        msg = hglib.tounicode(str(self._cmdsession.readAll()))
         self._qui.preview_edit.append(msg)
 
     def _previewtabindex(self):

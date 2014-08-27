@@ -651,9 +651,7 @@ INFO = (
           'Default: True'),
         globalonly=True),
     _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolRBGroup,
-        _('Color changesets by author name.  If not enabled, '
-          'the changes are colored green for merge, red for '
-          'non-trivial parents, black for normal. '
+        _('Color changesets by author name. '
           'Default: False')),
     _fi(_('Full Authorname'), 'tortoisehg.fullauthorname', genBoolRBGroup,
         _('Show full authorname in Logview. If not enabled, '
@@ -674,7 +672,7 @@ INFO = (
         restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
-          'until they reach 80 characters. '
+          'and truncate them at 80 characters as necessary. '
           'Default: False')),
     _fi(_('Log Batch Size'), 'tortoisehg.graphlimit', genIntEditCombo,
         _('The number of revisions to read and display in the '
@@ -709,6 +707,12 @@ INFO = (
           '<li><b>never</b>: Never show any prompt to activate any bookmarks.'
           '</ul><p>'
           'Default: prompt')),
+    _fi(_('Show Family Line'), 'tortoisehg.showfamilyline', genBoolRBGroup,
+        _('Show indirect revision dependency on the revision graph '
+          'when filtered by revset. Default: True<p>'
+          '<b>Note</b>: Calculating family line may be slow in some cases. '
+          'This option is expected to be removed if the performance issue is '
+          'solved.')),
     )),
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'},
  (

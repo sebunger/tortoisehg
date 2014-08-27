@@ -43,8 +43,8 @@ class StripWidget(cmdui.AbstractCmdWidget):
             rev = str(rev)
         combo.addItem(hglib.tounicode(rev))
         combo.setCurrentIndex(0)
-        for name in self.repo.namedbranches:
-            combo.addItem(name)
+        for name in hglib.namedbranches(self.repo):
+            combo.addItem(hglib.tounicode(name))
 
         tags = list(self.repo.tags())
         tags.sort(reverse=True)
@@ -134,14 +134,7 @@ class StripWidget(cmdui.AbstractCmdWidget):
         return self.get_rev() is not None
 
     def runCommand(self):
-        # Note that we have discussed that --hidden should only be passed to
-        # mercurial commands when hidden revisions are shown.
-        # However in the case of strip we can always pass it --hidden safely,
-        # since strip will always strip all the descendants of a revision.
-        # Thus in this case --hidden will just let us choose a hidden revision
-        # as the base revision to strip.
         opts = {'verbose': True,
-                'hidden': True,
                 'force': self.discard_chk.isChecked(),
                 'nobackup': self.nobackup_chk.isChecked(),
                 }

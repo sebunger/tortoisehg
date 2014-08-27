@@ -6,12 +6,16 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import sys
 import shlex
 import time
 
-from mercurial import ui, util, extensions, match
+from mercurial import ui, util, extensions
 from mercurial import encoding, templatefilters, filemerge, error, pathutil
-from mercurial import dispatch as hgdispatch
+from mercurial import dispatch as dispatchmod
+from mercurial import revset as revsetmod
+from mercurial.node import nullrev
+from hgext import mq as mqmod
 
 _encoding = encoding.encoding
 _fallbackencoding = encoding.fallbackencoding
@@ -92,6 +96,38 @@ def fromutf(s):
         # can't round-trip
         return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
+
+def branchheads(repo):
+    heads = []
+    for branchname, nodes in repo.branchmap().iteritems():
+        heads.extend(nodes)
+    return heads
+
+def namedbranches(repo):
+    branchmap = repo.branchmap()
+    dead = repo.deadbranches
+    return sorted(br for br, _heads, _tip, isclosed
+                  in branchmap.iterbranches()
+                  if not isclosed and br not in dead)
+
+def _firstchangectx(repo):
+    try:
+        # try fast path, which may be hidden
+        return repo[0]
+    except error.RepoLookupError:
+        pass
+    for rev in revsetmod.spanset(repo):
+        return repo[rev]
+    return repo[nullrev]
+
+def shortrepoid(repo):
+    """Short hash of the first root changeset; can be used for settings key"""
+    return str(_firstchangectx(repo))
+
+def repoidnode(repo):
+    """Hash of the first root changeset in binary form"""
+    return _firstchangectx(repo).node()
+
 def _getfirstrevisionlabel(repo, ctx):
     # see context.changectx for look-up order of labels
 
@@ -124,6 +160,14 @@ def getrevisionlabel(repo, rev):
         return label
 
     return str(rev)
+
+def querywctxstatus(wctx, ignored=False, clean=False, unknown=False):
+    """Do expensive status query to update corresponding attributes"""
+    try:
+        wctx.status(listignored=ignored, listclean=clean, listunknown=unknown)
+    except TypeError:
+        # hg<3.1 (aca692aa0712)
+        wctx.status(ignored=ignored, clean=clean, unknown=unknown)
 
 def getmqpatchtags(repo):
     '''Returns all tag names used by MQ patches, or []'''
@@ -163,6 +207,18 @@ def _applymovemqpatches(q, after, patches):
     q.parseseries()
     q.seriesdirty = True
 
+def getqqueues(repo):
+    ui = repo.ui.copy()
+    ui.quiet = True  # don't append "(active)"
+    ui.pushbuffer()
+    try:
+        opts = {'list': True}
+        mqmod.qqueue(ui, repo, None, **opts)
+        qqueues = tounicode(ui.popbuffer()).splitlines()
+    except (util.Abort, EnvironmentError):
+        qqueues = []
+    return qqueues
+
 # maybe this can be implemented as hg extension
 def movemqpatches(repo, after, patches):
     """Move the given patches after the specified patch, or to the beginning
@@ -196,6 +252,16 @@ def movemqpatches(repo, after, patches):
     finally:
         wlock.release()
 
+def readundodesc(repo):
+    """Read short description and changelog size of last transaction"""
+    if os.path.exists(repo.sjoin('undo')):
+        try:
+            args = repo.opener('undo.desc', 'r').read().splitlines()
+            return args[1], int(args[0])
+        except (IOError, IndexError, ValueError):
+            pass
+    return '', len(repo)
+
 def enabledextensions():
     """Return the {name: shortdesc} dict of enabled extensions
 
@@ -215,6 +281,11 @@ def allextensions():
     disabledexts = disabledextensions()
     exts = (disabledexts or {}).copy()
     exts.update(enabledexts)
+    if hasattr(sys, "frozen"):
+        if 'hgsubversion' not in exts:
+            exts['hgsubversion'] = _('hgsubversion packaged with thg')
+        if 'hggit' not in exts:
+            exts['hggit'] = _('hggit packaged with thg')
     return exts
 
 def validateextensions(enabledexts):
@@ -235,16 +306,6 @@ def validateextensions(enabledexts):
     if 'hgsubversion' in enabledexts:
         exts['perfarce'] = _('perfarce is incompatible with hgsubversion')
     return exts
-
-def loadextension(ui, name):
-    # Between Mercurial revisions 1.2 and 1.3, extensions.load() stopped
-    # calling uisetup() after loading an extension.  This could do
-    # unexpected things if you use an hg version < 1.3
-    extensions.load(ui, name, None)
-    mod = extensions.find(name)
-    uisetup = getattr(mod, 'uisetup', None)
-    if uisetup:
-        uisetup(ui)
 
 def _loadextensionwithblacklist(orig, ui, name, path):
     if name.startswith('hgext.') or name.startswith('hgext/'):
@@ -283,28 +344,6 @@ def canonpaths(list):
                 # May already be canonical
                 canonpats.append(f)
     return canonpats
-
-def escapepath(path):
-    'Before passing a file path to hg API, it may need escaping'
-    p = path
-    if '[' in p or '{' in p or '*' in p or '?' in p:
-        return 'path:' + p
-    else:
-        return p
-
-def normpats(pats):
-    'Normalize file patterns'
-    normpats = []
-    for pat in pats:
-        kind, p = match._patsplit(pat, None)
-        if kind:
-            normpats.append(pat)
-        else:
-            if '[' in p or '{' in p or '*' in p or '?' in p:
-                normpats.append('glob:' + p)
-            else:
-                normpats.append('path:' + p)
-    return normpats
 
 
 def mergetools(ui, values=None):
@@ -530,6 +569,30 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         toollist.append(name)
     return selectedtools, toollist
 
+def copydynamicconfig(srcui, destui):
+    """Copy config values that come from command line or code
+
+    >>> srcui = ui.ui()
+    >>> srcui.setconfig('paths', 'default', 'http://example.org/',
+    ...                 '/repo/.hg/hgrc:2')
+    >>> srcui.setconfig('patch', 'eol', 'auto', 'eol')
+    >>> destui = ui.ui()
+    >>> copydynamicconfig(srcui, destui)
+    >>> destui.config('paths', 'default') is None
+    True
+    >>> destui.config('patch', 'eol'), destui.configsource('patch', 'eol')
+    ('auto', 'eol')
+    """
+    for section, name, value in srcui.walkconfig():
+        source = srcui.configsource(section, name)
+        if ':' in source:
+            # path:line
+            continue
+        if source == 'none':
+            # ui.configsource returns 'none' by default
+            source = ''
+        destui.setconfig(section, name, value, source)
+
 def shortreponame(ui):
     name = ui.config('web', 'name')
     if not name:
@@ -694,14 +757,38 @@ def parseconfigopts(ui, args):
     >>> u.config('extensions', 'mq')
     '!'
     """
-    config = hgdispatch._earlygetopt(['--config'], args)
-    return hgdispatch._parseconfig(ui, config)
+    config = dispatchmod._earlygetopt(['--config'], args)
+    return dispatchmod._parseconfig(ui, config)
 
-def dispatch(ui, args):
-    req = hgdispatch.request(args, ui)
-    # since hg 2.8 (09573ad59f7b), --config is parsed prior to _dispatch()
-    parseconfigopts(req.ui, req.args)
-    return hgdispatch._dispatch(req)
+
+# (unicode, QString) -> unicode, otherwise -> str
+_stringify = '%s'.__mod__
+
+def escapepath(path):
+    r"""Convert path to command-line-safe string; path must be relative to
+    the repository root
+
+    >>> from PyQt4.QtCore import QString
+    >>> escapepath('foo/[bar].txt')
+    'path:foo/[bar].txt'
+    >>> escapepath(QString(u'\xc0'))
+    u'\xc0'
+    """
+    p = _stringify(path)
+    if '[' in p or '{' in p or '*' in p or '?' in p:
+        # bare path is expanded by scmutil.expandpats() on Windows
+        return 'path:' + p
+    else:
+        return p
+
+def escaperev(rev):
+    """Convert revision number to command-line-safe string"""
+    if rev is None:
+        return None
+    if rev == nullrev:
+        return 'null'
+    assert rev >= 0
+    return '%d' % rev
 
 def buildcmdargs(name, *args, **opts):
     r"""Build list of command-line arguments
@@ -710,6 +797,8 @@ def buildcmdargs(name, *args, **opts):
     ['push', '--branch', 'foo']
     >>> buildcmdargs('graft', r=['0', '1'])
     ['graft', '-r', '0', '-r', '1']
+    >>> buildcmdargs('diff', r=[0, None])
+    ['diff', '-r', '0']
     >>> buildcmdargs('log', no_merges=True, quiet=False, limit=None)
     ['log', '--no-merges']
     >>> buildcmdargs('commit', user='')
@@ -738,9 +827,7 @@ def buildcmdargs(name, *args, **opts):
     >>> buildcmdargs(QString('tag'), QString(u'\xc0'), message=QString(u'\xc1'))
     [u'tag', '--message', u'\xc1', u'\xc0']
     """
-    stringfy = '%s'.__mod__  # (unicode, QString) -> unicode, otherwise -> str
-
-    fullargs = [stringfy(name)]
+    fullargs = [_stringify(name)]
     for k, v in opts.iteritems():
         if v is None:
             continue
@@ -754,13 +841,15 @@ def buildcmdargs(name, *args, **opts):
                 fullargs.append(aname)
         elif isinstance(v, list):
             for e in v:
+                if e is None:
+                    continue
                 fullargs.append(aname)
-                fullargs.append(stringfy(e))
+                fullargs.append(_stringify(e))
         else:
             fullargs.append(aname)
-            fullargs.append(stringfy(v))
+            fullargs.append(_stringify(v))
 
-    args = [stringfy(v) for v in args if v is not None]
+    args = [_stringify(v) for v in args if v is not None]
     if util.any(e.startswith('-') for e in args):
         fullargs.append('--')
     fullargs.extend(args)

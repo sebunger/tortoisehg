@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-04-28 11:26-0300\n"
-"PO-Revision-Date: 2014-04-09 07:11+0000\n"
+"POT-Creation-Date: 2014-07-24 12:23-0300\n"
+"PO-Revision-Date: 2014-06-30 06:05+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-04-29 06:04+0000\n"
-"X-Generator: Launchpad (build 16985)\n"
+"X-Launchpad-Export-Date: 2014-07-25 05:53+0000\n"
+"X-Generator: Launchpad (build 17114)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -39,9 +39,6 @@ msgstr "你可以從這裡拜訪我們的網站"
 msgid "&License"
 msgstr "授權(&L)"
 
-msgid "&Close"
-msgstr "關閉(&C)"
-
 #, python-format
 msgid "version %s"
 msgstr "版本 %s"
@@ -53,6 +50,9 @@ msgstr "附 Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
 msgstr "一個新的TortoiseHg版本(%s)可以下載了"
+
+msgid "License"
+msgstr "許可證"
 
 msgid "= Working Directory Parent ="
 msgstr "=工作目錄的上層目錄="
@@ -573,14 +573,14 @@ msgstr "執行命令時錯誤\n"
 
 #, python-format
 msgid "process exited unexpectedly with code %d"
-msgstr ""
+msgstr "程序意外結束,代碼 %d"
 
 #, python-format
 msgid "timed out while reading: %r..."
-msgstr ""
+msgstr "讀取逾時: %r ..."
 
 msgid "timed out waiting for message"
-msgstr ""
+msgstr "等待訊息的時候逾時了"
 
 #, python-format
 msgid "unexpected response on required channel %r"
@@ -588,7 +588,7 @@ msgstr ""
 
 #, python-format
 msgid "invalid \"hello\" message: %r"
-msgstr ""
+msgstr "無效的\"hello\"訊息:%r"
 
 msgid "no \"runcommand\" capability"
 msgstr ""
@@ -633,10 +633,10 @@ msgid "TortoiseHg Prompt"
 msgstr "TortoiseHg 提示字元"
 
 msgid "Show Detail"
-msgstr ""
+msgstr "顯示詳細資料"
 
 msgid "Hide Detail"
-msgstr ""
+msgstr "隱藏詳細資料"
 
 msgid "Confirm Exit"
 msgstr "確認離開"
@@ -667,6 +667,12 @@ msgstr "合併"
 #, python-format
 msgid "Merge with %s"
 msgstr "和 %s 合併"
+
+msgid "Patch Name Required"
+msgstr "需要補丁名字"
+
+msgid "You must enter a patch name"
+msgstr "你需要輸入一個補丁名字"
 
 msgctxt "start progress"
 msgid "Commit"
@@ -710,6 +716,9 @@ msgstr "顯示問題..."
 
 msgid "Stop"
 msgstr "停止"
+
+msgid "### patch name ###"
+msgstr "### 補丁名字 ###"
 
 msgid "Commit changes"
 msgstr "提交變更"
@@ -804,7 +813,7 @@ msgid "&Replace"
 msgstr "取代(&R)"
 
 msgid "Nothing Committed"
-msgstr ""
+msgstr "沒有提交任何東西"
 
 msgid "Please enter commit message"
 msgstr "請輸入提交訊息"
@@ -835,7 +844,7 @@ msgid "Remove selected deleted files?"
 msgstr "移除已選擇的刪除檔案嗎?"
 
 msgid "Nothing changed."
-msgstr ""
+msgstr "沒有東西被改變"
 
 msgctxt "window title"
 msgid "Commit"
@@ -1162,7 +1171,7 @@ msgstr "顯示輸出紀錄"
 msgid ""
 "When enabled, automatically show the Output Log when the command is run.\n"
 "Default: False."
-msgstr ""
+msgstr "如果啟動這個選項,那麼當執行命令的時候自動顯示Output Log"
 
 msgid "You must set a tool name."
 msgstr "你必須設定一個工具名字"
@@ -1195,9 +1204,6 @@ msgstr "你必須設定一個有效的掛勾類型"
 
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "掛勾名子不能包含任何空白,Tab 或'='符號"
-
-msgid "Custom Tools"
-msgstr "自訂工具"
 
 #, python-format
 msgid "command parse error: %s"
@@ -1234,26 +1240,14 @@ msgstr ""
 msgid "Diff Changeset to Loc&al"
 msgstr ""
 
-msgid "Diff Selected Cha&ngesets"
-msgstr ""
-
 msgid "&Diff to Parent"
 msgstr "跟母系做差異比對(&D)"
-
-msgid "Cannot display visual diff"
-msgstr "不能顯示視覺化差異比對"
-
-msgid "Visual diffs are not supported for unapplied patches"
-msgstr ""
 
 msgid "Diff to &Local"
 msgstr "跟本地做差異比對"
 
 msgid "View changes to current in external diff tool"
 msgstr ""
-
-msgid "Diff Selected &File Revisions"
-msgstr "差異比對選擇的檔案修訂版"
 
 msgid "&View at Revision"
 msgstr "在修訂版中檢視(&V)"
@@ -1275,6 +1269,9 @@ msgstr "編輯本地(&E)"
 
 msgid "&Open Local"
 msgstr "開啟本地(&O)"
+
+msgid "&Copy Patch"
+msgstr "複製補丁(&C)"
 
 msgid "Copy &Path"
 msgstr "複製路徑(&P)"
@@ -1302,6 +1299,99 @@ msgstr "開啟終端機(&T)"
 
 msgid "Open a shell terminal in the selected folder"
 msgstr "在選擇的目錄開啟終端機"
+
+msgid "Custom Tools"
+msgstr "自訂工具"
+
+msgid "Diff &Local"
+msgstr ""
+
+msgid "&View Missing"
+msgstr "檢視遺失的檔案(&V)"
+
+msgid "View O&ther"
+msgstr ""
+
+msgid "Add &Largefiles..."
+msgstr "增加大檔案(&L)..."
+
+msgid "&Forget"
+msgstr "忘記(&F)"
+
+msgid "&Delete Unversioned..."
+msgstr "刪除沒有受版本控管的檔案(&D)..."
+
+msgid "Confirm Delete Unversioned"
+msgstr "確認刪除沒有受版本控管的檔案"
+
+msgid "Delete the following unversioned files?"
+msgstr "刪除下列未受版本控管的檔案嗎?"
+
+msgid "&Delete"
+msgstr "刪除(&D)"
+
+msgid "Re&move Versioned"
+msgstr "移除受版本控管的檔案(&m)"
+
+msgid "&Revert..."
+msgstr "復原(&R)..."
+
+msgid "Uncommited merge - please select a parent revision"
+msgstr "未提交的合併 - 請選擇一個母系修訂版"
+
+msgid "Revert files to local or other parent?"
+msgstr "復原檔案到本地工作複本或其他的母系?"
+
+msgid "&Local"
+msgstr "本地(&L)"
+
+msgid "&Other"
+msgstr "其它(&O)"
+
+msgid "Confirm Revert"
+msgstr "確認復原"
+
+msgid "Revert local file changes?"
+msgstr "復原本地工作複本的檔案變更?"
+
+msgid "&Revert with backup"
+msgstr "&復原並且備份"
+
+msgid "&Discard changes"
+msgstr "放棄變更(&D)"
+
+msgid "Revert the following files?"
+msgstr "復原下列檔案?"
+
+msgid "&Revert"
+msgstr "復原(&R)"
+
+msgid "&Copy..."
+msgstr "複製(&C)..."
+
+msgid "Re&name..."
+msgstr "重新命名(&n)..."
+
+msgid "&Ignore..."
+msgstr "忽略(&I)"
+
+msgid "De&tect Renames..."
+msgstr "偵測更名(&t)"
+
+msgid "&Mark Resolved"
+msgstr "標示為已解決(&M)"
+
+msgid "&Mark Unresolved"
+msgstr "標示為未解決(&M)"
+
+msgid "Restart Mer&ge"
+msgstr "重新開始合併(&g)"
+
+msgid "Was renamed from"
+msgstr ""
+
+msgid "Restart Merge &with"
+msgstr "重新開始合併與(&w)"
 
 msgid "Display the file anyway"
 msgstr ""
@@ -1479,6 +1569,12 @@ msgstr "上一個"
 msgid "Forward"
 msgstr "下一個"
 
+msgid "Diff Selected &Changesets"
+msgstr ""
+
+msgid "&Diff Selected File Revisions"
+msgstr ""
+
 msgid "Show Revision &Details"
 msgstr "顯示修訂版詳細資訊(&D)"
 
@@ -1592,7 +1688,7 @@ msgid "Open shelve tool"
 msgstr "開啟擱置工具"
 
 msgid "&Auto Detect"
-msgstr ""
+msgstr "自動偵測(&A)"
 
 msgid "Show changes from first parent"
 msgstr "從第一個母系開始顯示變更"
@@ -1654,9 +1750,6 @@ msgstr ""
 
 msgid "&Originating Revision"
 msgstr "原始修訂版(&O)"
-
-msgid "&Local"
-msgstr "本地(&L)"
 
 msgid "&Parent Revision"
 msgstr "母系修訂版(&P)"
@@ -2054,6 +2147,9 @@ msgstr "設定(&S)"
 msgid "Send &Email"
 msgstr "傳送電子郵件(&E)"
 
+msgid "&Close"
+msgstr "關閉(&C)"
+
 #, python-format
 msgid "Ignore filter - %s"
 msgstr "忽略過濾器 - %s"
@@ -2180,9 +2276,6 @@ msgstr "以大型檔案方式加入(&L)"
 
 msgid "Add as &Normal Files"
 msgstr "以一般檔案形式加入(&N)"
-
-msgid "License"
-msgstr "許可證"
 
 msgid "Find revisions matching fields of:"
 msgstr ""
@@ -2364,6 +2457,10 @@ msgstr "套用格式(&l)"
 msgid "C&onfigure Format"
 msgstr "配置格式(&C)"
 
+#, python-format
+msgid "%s had rejected chunks, edit patched file together with rejects?"
+msgstr ""
+
 msgid "&Commit to Queue..."
 msgstr ""
 
@@ -2496,19 +2593,6 @@ msgstr "強制推入或拉出(--force)"
 
 msgid "Tolerate non-conflicting local changes (--keep-changes)"
 msgstr ""
-
-msgid "### patch name ###"
-msgstr "### 補丁名字 ###"
-
-#, python-format
-msgid "%s had rejected chunks, edit patched file together with rejects?"
-msgstr ""
-
-msgid "Patch Name Required"
-msgstr "需要補丁名字"
-
-msgid "You must enter a patch name"
-msgstr "你需要輸入一個補丁名字"
 
 #, python-format
 msgid "Pending Perforce Changelists - %s"
@@ -2790,9 +2874,6 @@ msgstr "複製(&C)"
 
 msgid "&Paste"
 msgstr ""
-
-msgid "&Delete"
-msgstr "刪除(&D)"
 
 msgid "&Editor Options"
 msgstr "編輯器選項(&E)"
@@ -3800,9 +3881,6 @@ msgstr "封存(&A)..."
 msgid "&Bundle Rev and Descendants..."
 msgstr "包裹此修訂版跟其衍生(&B)..."
 
-msgid "&Copy Patch"
-msgstr "複製補丁(&C)"
-
 msgid "Change &Phase to"
 msgstr "變更階段至(&P)"
 
@@ -4254,12 +4332,6 @@ msgstr "切換作為基礎的母系修訂版"
 msgid "List Optio&ns"
 msgstr ""
 
-msgid "File(s) not found"
-msgstr "檔案找不到"
-
-msgid "The selected files do not exist in the working directory"
-msgstr "選擇的檔案不在工作目錄裡"
-
 #, python-format
 msgid "%s - Revision Details (%s)"
 msgstr "%s - 修訂版細節 (%s)"
@@ -4289,9 +4361,6 @@ msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
 msgstr ""
-
-msgid "Confirm Revert"
-msgstr "確認復原"
 
 msgid ""
 "Reverting all files will discard changes and leave affected files in a "
@@ -4464,15 +4533,13 @@ msgstr "執行中"
 msgid "query"
 msgstr ""
 
-msgid "Parse Error: "
-msgstr "剖析錯誤: "
-
-msgid "Invalid query: "
-msgstr ""
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
+msgstr ""
+
+#, python-format
+msgid "failed to fork GUI process: %s\n"
 msgstr ""
 
 #, python-format
@@ -4562,9 +4629,6 @@ msgstr ""
 msgid "open a new workbench window"
 msgstr "開啟一個新的工作台視窗"
 
-msgid "requires a single filename"
-msgstr ""
-
 msgid "thg about"
 msgstr ""
 
@@ -4647,6 +4711,9 @@ msgstr ""
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr ""
 
+msgid "thg debugblockmatcher"
+msgstr ""
+
 msgid "thg debugbugreport [TEXT]"
 msgstr ""
 
@@ -4663,6 +4730,18 @@ msgid "thg email [REVS]"
 msgstr ""
 
 msgid "use only one form to specify the revision"
+msgstr ""
+
+msgid "select the specified revision"
+msgstr ""
+
+msgid "side-by-side comparison of revisions"
+msgstr ""
+
+msgid "thg filelog [OPTION]... FILE"
+msgstr ""
+
+msgid "requires a single filename"
 msgstr ""
 
 msgid "thg forget [FILE]..."
@@ -5236,10 +5315,7 @@ msgstr ""
 msgid "Author Coloring"
 msgstr "作者色彩"
 
-msgid ""
-"Color changesets by author name.  If not enabled, the changes are colored "
-"green for merge, red for non-trivial parents, black for normal. Default: "
-"False"
+msgid "Color changesets by author name. Default: False"
 msgstr ""
 
 msgid "Full Authorname"
@@ -5273,9 +5349,9 @@ msgid "Long Summary"
 msgstr "支援長摘要"
 
 msgid ""
-"If true, concatenate multiple lines of changeset summary until they reach 80 "
-"characters. Default: False"
-msgstr "假如是 true的話,串聯多行的變更摘要,直到他們達到80個字符 預設:False"
+"If true, concatenate multiple lines of changeset summary and truncate them "
+"at 80 characters as necessary. Default: False"
+msgstr ""
 
 msgid "Log Batch Size"
 msgstr ""
@@ -5325,6 +5401,16 @@ msgid ""
 "<li><b>prompt</b>: The default. Show a prompt when updating to a revision "
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
+msgstr ""
+
+msgid "Show Family Line"
+msgstr ""
+
+msgid ""
+"Show indirect revision dependency on the revision graph when filtered by "
+"revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
+"some cases. This option is expected to be removed if the performance issue "
+"is solved."
 msgstr ""
 
 msgctxt "config item"
@@ -6348,6 +6434,12 @@ msgstr ""
 msgid "%s - status"
 msgstr "%s - 狀態"
 
+msgid "Check"
+msgstr "勾選"
+
+msgid "Uncheck"
+msgstr "取消勾選"
+
 msgid "status"
 msgstr "狀態"
 
@@ -7020,92 +7112,6 @@ msgstr ""
 msgid "password: "
 msgstr "密碼: "
 
-msgid "abort: "
-msgstr "中止: "
-
-msgid "hint: "
-msgstr "提示: "
-
-#, python-format
-msgid "HTTP Error: %d (%s)"
-msgstr "HTTP 錯誤: %d (%s)"
-
-#, python-format
-msgid "URLError: %s"
-msgstr "URL錯誤: %s"
-
-msgid "SSL: Server certificate verify failed"
-msgstr "SSL:伺服器憑證驗證失敗"
-
-#, python-format
-msgid "SSL: unknown error %s:%s"
-msgstr "SSL: 未知的錯誤 %s:%s"
-
-#, python-format
-msgid "SSL error: %s"
-msgstr "SSL 錯誤: %s"
-
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
-msgstr ""
-"hg 命令 '%s' 曖昧不明:\n"
-"%s\n"
-
-#, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr "hg: 剖析錯誤在%s: %s\n"
-
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr "hg: 剖析錯誤: %s\n"
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "lock held by %s"
-msgstr ""
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr "中止: %s: %s\n"
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr "中止: 不能鎖住%s: %s\n"
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr ""
-
-#, python-format
-msgid "hg: %s\n"
-msgstr ""
-
-msgid "abort: remote error:\n"
-msgstr "中止:遠端錯誤:\n"
-
-#, python-format
-msgid "abort: %s"
-msgstr "中止:%s"
-
-msgid " empty string\n"
-msgstr " 空字串\n"
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr ""
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr "中止: 錯誤: %s\n"
-
-msgid "broken pipe\n"
-msgstr "管線中斷\n"
-
 msgid "Parent 1:"
 msgstr "母系 1:"
 
@@ -7247,111 +7253,6 @@ msgstr "三方目錄差異比對"
 
 msgid "Directory diff"
 msgstr "目錄差異比對"
-
-msgid "&Edit"
-msgstr "編輯(&E)"
-
-msgid "E&xplore Subrepository"
-msgstr "瀏覽子儲存庫(&x)"
-
-msgid "&View Missing"
-msgstr "檢視遺失的檔案(&V)"
-
-msgid "&Revert..."
-msgstr "復原(&R)..."
-
-msgid "&Forget"
-msgstr "忘記(&F)"
-
-msgid "Add &Largefiles..."
-msgstr "增加大檔案(&L)..."
-
-msgid "De&tect Renames..."
-msgstr "偵測更名(&t)"
-
-msgid "&Ignore..."
-msgstr "忽略(&I)"
-
-msgid "Re&move Versioned"
-msgstr "移除受版本控管的檔案(&m)"
-
-msgid "&Delete Unversioned..."
-msgstr "刪除沒有受版本控管的檔案(&D)..."
-
-msgid "&Mark Unresolved"
-msgstr "標示為未解決(&M)"
-
-msgid "&Mark Resolved"
-msgstr "標示為已解決(&M)"
-
-msgid "Check"
-msgstr "勾選"
-
-msgid "Uncheck"
-msgstr "取消勾選"
-
-msgid "View O&ther"
-msgstr ""
-
-msgid "&Copy..."
-msgstr "複製(&C)..."
-
-msgid "Re&name..."
-msgstr "重新命名(&n)..."
-
-msgid "Was renamed from"
-msgstr ""
-
-msgid "Restart Mer&ge"
-msgstr "重新開始合併(&g)"
-
-msgid "Restart Merge &with"
-msgstr "重新開始合併與(&w)"
-
-msgid " errors"
-msgstr ""
-
-msgid " output"
-msgstr ""
-
-msgid " Aborted"
-msgstr " 失敗"
-
-msgid "Cannot open subrepository"
-msgstr "不能開啟子儲存庫"
-
-msgid "The selected subrepository does not exist on the working directory"
-msgstr "選擇的子儲存庫不在工作目錄上"
-
-msgid "Uncommited merge - please select a parent revision"
-msgstr "未提交的合併 - 請選擇一個母系修訂版"
-
-msgid "Revert files to local or other parent?"
-msgstr "復原檔案到本地工作複本或其他的母系?"
-
-msgid "&Other"
-msgstr "其它(&O)"
-
-msgid "Revert local file changes?"
-msgstr "復原本地工作複本的檔案變更?"
-
-msgid "&Revert with backup"
-msgstr "&復原並且備份"
-
-msgid "&Discard changes"
-msgstr "放棄變更(&D)"
-
-msgid "Revert the following files?"
-msgstr "復原下列檔案?"
-
-msgid "&Revert"
-msgstr "復原(&R)"
-
-msgid "Confirm Delete Unversioned"
-msgstr "確認刪除沒有受版本控管的檔案"
-
-msgid "Delete the following unversioned files?"
-msgstr "刪除下列未受版本控管的檔案嗎?"
 
 msgid "Confirm Discard"
 msgstr "確認丟棄"
@@ -7688,6 +7589,98 @@ msgstr ""
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "不能開啟Plugin選項對話框"
+
+#, python-format
+msgid ""
+"hg: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+"hg 命令 '%s' 曖昧不明:\n"
+"%s\n"
+
+#, python-format
+msgid "hg: parse error at %s: %s\n"
+msgstr "hg: 剖析錯誤在%s: %s\n"
+
+#, python-format
+msgid "hg: parse error: %s\n"
+msgstr "hg: 剖析錯誤: %s\n"
+
+#, python-format
+msgid "timed out waiting for lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "lock held by %s"
+msgstr ""
+
+#, python-format
+msgid "abort: %s: %s\n"
+msgstr "中止: %s: %s\n"
+
+#, python-format
+msgid "abort: could not lock %s: %s\n"
+msgstr "中止: 不能鎖住%s: %s\n"
+
+#, python-format
+msgid "hg %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "hg: %s\n"
+msgstr ""
+
+msgid "abort: remote error:\n"
+msgstr "中止:遠端錯誤:\n"
+
+#, python-format
+msgid "abort: %s"
+msgstr "中止:%s"
+
+msgid " empty string\n"
+msgstr " 空字串\n"
+
+#, python-format
+msgid "hg: unknown command '%s'\n"
+msgstr ""
+
+#, python-format
+msgid "abort: error: %s\n"
+msgstr "中止: 錯誤: %s\n"
+
+msgid "broken pipe\n"
+msgstr "管線中斷\n"
+
+msgid "abort: "
+msgstr "中止: "
+
+msgid "hint: "
+msgstr "提示: "
+
+#, python-format
+msgid "HTTP Error: %d (%s)"
+msgstr "HTTP 錯誤: %d (%s)"
+
+#, python-format
+msgid "URLError: %s"
+msgstr "URL錯誤: %s"
+
+msgid "SSL: Server certificate verify failed"
+msgstr "SSL:伺服器憑證驗證失敗"
+
+#, python-format
+msgid "SSL: unknown error %s:%s"
+msgstr "SSL: 未知的錯誤 %s:%s"
+
+#, python-format
+msgid "SSL error: %s"
+msgstr "SSL 錯誤: %s"
+
+msgid "hgsubversion packaged with thg"
+msgstr ""
+
+msgid "hggit packaged with thg"
+msgstr ""
 
 msgid "inotify is not supported on this platform"
 msgstr "這個平台不支援inotify"
@@ -8228,6 +8221,9 @@ msgstr ""
 #~ msgid "Index"
 #~ msgstr "索引"
 
+#~ msgid " Aborted"
+#~ msgstr " 失敗"
+
 #~ msgid " Messages and Errors"
 #~ msgstr " 訊息及錯誤"
 
@@ -8722,15 +8718,6 @@ msgstr ""
 #~ msgid "TortoiseHg Clone"
 #~ msgstr "TortoiseHg 拓製"
 
-#~ msgid "Error creating destination folder"
-#~ msgstr "建立目標目錄時錯誤"
-
-#~ msgid "Detail"
-#~ msgstr "細節"
-
-#~ msgid "?? Error: %s ??"
-#~ msgstr "?? 錯誤: %s ??"
-
 #~ msgid "Failed to clone"
 #~ msgstr "拓製失敗"
 
@@ -8864,9 +8851,6 @@ msgstr ""
 
 #~ msgid "Repository is empty"
 #~ msgstr "儲存庫是空的"
-
-#~ msgid "Please specify a different path."
-#~ msgstr "請指定一個不同的路徑."
 
 #~ msgid "Ambiguous Revision"
 #~ msgstr "曖昧不明的修訂版"
@@ -9139,9 +9123,6 @@ msgstr ""
 #~ msgid "Shelf Preview"
 #~ msgstr "自我預覽"
 
-#~ msgid "%s is missing!"
-#~ msgstr "%s 遺失了!"
-
 #~ msgid "Finished pull"
 #~ msgstr "完成拉收"
 
@@ -9321,6 +9302,11 @@ msgstr ""
 
 #~ msgid "Do you want to close?"
 #~ msgstr "你想關閉嗎?"
+
+#~ msgid ""
+#~ "If true, concatenate multiple lines of changeset summary until they reach "
+#~ "80 characters. Default: False"
+#~ msgstr "假如是 true的話,串聯多行的變更摘要,直到他們達到80個字符 預設:False"
 
 #~ msgid "Verify"
 #~ msgstr "驗證"
@@ -9514,12 +9500,6 @@ msgstr ""
 #~ msgid "Mark as Bad"
 #~ msgstr "標記是壞的"
 
-#~ msgid "Second Parent: revision %s (%s)"
-#~ msgstr "第二個母系: 修訂版 %s (%s)"
-
-#~ msgid "First Parent: revision %s (%s)"
-#~ msgstr "第一個母系: 修訂版 %s (%s)"
-
 #~ msgid "Failed to strip"
 #~ msgstr "剝除失敗"
 
@@ -9552,9 +9532,6 @@ msgstr ""
 
 #~ msgid "_Export Patch..."
 #~ msgstr "匯出補丁(_E)"
-
-#~ msgid "deleted"
-#~ msgstr "已刪除"
 
 #~ msgid "R: removed"
 #~ msgstr "R:已移除"
@@ -9779,69 +9756,8 @@ msgstr ""
 #~ msgid "A new version of TortoiseHg is ready for download!"
 #~ msgstr "新版 TortoiseHg 已經可以下載了！"
 
-#~ msgid "Backout to the second parent of the merge revision"
-#~ msgstr "回退到合併修訂版的第二個母系"
-
-#~ msgid "Backout to the first parent of the merge revision"
-#~ msgstr "回退到合併修訂版的第一個母系"
-
-#~ msgid "Backout revision not found"
-#~ msgstr "找不到要回退的修訂版"
-
-#~ msgid "Merge parent to backout to"
-#~ msgstr "回退到合併的母系"
-
-#~ msgid ""
-#~ "To backout a <b>merge</b> revision you must select which parent to "
-#~ "backout to (i.e. whose changes will be <i>kept</i>)"
-#~ msgstr ""
-#~ "要回退<b>合併</b>修訂版，你必須選擇需要回退到的母系（即：變更會<i>保留</i>"
-#~ "的）"
-
-#~ msgid "Backed out merge changeset: "
-#~ msgstr "回退合併後的變更集： "
-
-#~ msgid "Backed out merge revision to its second parent (%s)"
-#~ msgstr "回退合併的修訂版到他的第二個母系(%s)"
-
-#~ msgid "Backed out merge revision to its first parent (%s)"
-#~ msgstr "回退合併的修訂版到他的第一個母系(%s)"
-
 #~ msgid "Several icons are courtesy of the TortoiseSVN project"
 #~ msgstr "一些圖示由 TortoiseSVN 項目友情提供"
 
 #~ msgid "Backout..."
 #~ msgstr "回退 ..."
-
-#~ msgid "Folder &History"
-#~ msgstr "目錄歷史 (&H)"
-
-#~ msgid "&Diff Selected Changesets"
-#~ msgstr "差異比對選擇的變更集"
-
-#~ msgid "&Diff Changeset to Parent"
-#~ msgstr "跟母系變更集做差異比對(&D)"
-
-#~ msgid "Diff &File to Parent"
-#~ msgstr "跟母系檔案做差異比對(&F)"
-
-#~ msgid "You must select two revisions to diff"
-#~ msgstr "你必須選擇兩個修訂版來比對差異"
-
-#~ msgid "Copyright 2008-2013 Steve Borho and others"
-#~ msgstr "版權所有 2008-2013 Steve Borho 以及其他貢獻者"
-
-#~ msgid "Diff File to Lo&cal"
-#~ msgstr "跟本地檔案做差異比對(&c)"
-
-#~ msgid "Diff Changeset to &Local"
-#~ msgstr "跟本地變更集做差異比對(&L)"
-
-#~ msgid "&Filter by Status"
-#~ msgstr "依狀態篩選(&F)"
-
-#~ msgid "Fl&at List View"
-#~ msgstr "以清單檢視(&a)"
-
-#~ msgid "&Changed by This Commit"
-#~ msgstr "被此次提交變更(&C)"
