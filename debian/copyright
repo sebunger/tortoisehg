@@ -27,22 +27,18 @@ Files: tortoisehg/hgqt/modeltest.py
 Copyright: 2007, Trolltech ASA
 License: GPL-2
 
-Files: tortoisehg/hgqt/workbench.py
-       tortoisehg/hgqt/repoview.py
-       tortoisehg/hgqt/filelistmodel.py
-       tortoisehg/hgqt/fileview.py
-       tortoisehg/hgqt/repofilter.py
-       tortoisehg/hgqt/manifestmodel.py
-       tortoisehg/hgqt/blockmatcher.py
-       tortoisehg/hgqt/manifestdialog.py
-       tortoisehg/hgqt/filerevmodel.py
-       tortoisehg/hgqt/repowidget.py
-       tortoisehg/hgqt/repomodel.py
-       tortoisehg/hgqt/graph.py
-       tortoisehg/hgqt/revpanel.py
-       tortoisehg/hgqt/quickbar.py
-       tortoisehg/hgqt/filelistview.py
+Files: tortoisehg/hgqt/blockmatcher.py
        tortoisehg/hgqt/filedialogs.py
+       tortoisehg/hgqt/filelistview.py
+       tortoisehg/hgqt/graph.py
+       tortoisehg/hgqt/manifestmodel.py
+       tortoisehg/hgqt/repofilter.py
+       tortoisehg/hgqt/repomodel.py
+       tortoisehg/hgqt/repoview.py
+       tortoisehg/hgqt/repowidget.py
+       tortoisehg/hgqt/revdetails.py
+       tortoisehg/hgqt/revpanel.py
+       tortoisehg/hgqt/workbench.py
 Copyright: 2007-2010, Logilab
            2010, Yuya Nishihara <yuya@tcha.org>
            2010, Adrian Buehlmann <adrian@cadifra.com>
@@ -76,7 +72,7 @@ Copyright: 2009, Steve Borho <steve@borho.org>
            Tango Desktop Project
 License: GPL-2
 
-Files: icons/reviewboard.png
+Files: icons/16x16/apps/reviewboard.png
 Copyright: Review Board project
 License: MIT
  Permission is hereby granted, free of charge, to any person obtaining a copy
