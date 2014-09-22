@@ -1,12 +1,15 @@
-tortoisehg (3.1.1-1) UNRELEASED; urgency=medium
+tortoisehg (3.1.1-1) unstable; urgency=low
 
   * Imported Upstream version 3.1.1.
+  * Add tortoisehg-nautilus dependency on gnome-icon-theme-full (Ubuntu) or
+    gnome-icon-theme (Debian) (LP: #1295579).
+  * Update copyright.
 
  -- Ludovico Cavedon <cavedon@debian.org>  Sun, 21 Sep 2014 20:18:55 -0700
 
 tortoisehg (3.1-1) unstable; urgency=medium
 
-  * Imported Upstream version 3.1 (Closes: #757346).
+  * Imported Upstream version 3.1 (Closes: #757346, LP: #1366300).
 
  -- Ludovico Cavedon <cavedon@debian.org>  Wed, 27 Aug 2014 00:08:53 -0700
 
