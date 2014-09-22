@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-07-24 12:23-0300\n"
+"POT-Creation-Date: 2014-08-18 14:01-0300\n"
 "PO-Revision-Date: 2013-04-18 11:34+0000\n"
 "Last-Translator: NO vCJD <Unknown>\n"
 "Language-Team: Korean <ko@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-07-25 05:47+0000\n"
-"X-Generator: Launchpad (build 17114)\n"
+"X-Launchpad-Export-Date: 2014-08-19 06:17+0000\n"
+"X-Generator: Launchpad (build 17156)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg 오버레이 아이콘 서버"
@@ -1370,6 +1370,12 @@ msgstr ""
 msgid "&Ignore..."
 msgstr ""
 
+msgid "Edit Re&jects"
+msgstr ""
+
+msgid "Manually resolve rejected patch chunks"
+msgstr ""
+
 msgid "De&tect Renames..."
 msgstr ""
 
@@ -2394,6 +2400,10 @@ msgstr ""
 msgid ""
 "%d files were modified on both branches and must be <a href=\"resolve"
 "\"><b>resolved</b></a>"
+msgstr ""
+
+msgid ""
+"No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
 msgstr ""
 
 msgid "Commit merge results"
@@ -7865,6 +7875,9 @@ msgstr ""
 
 #, python-format
 msgid "win32ill: unsupported platform: %s\n"
+msgstr ""
+
+msgid "win32ill: interrupted while stopping message loop\n"
 msgstr ""
 
 #~ msgid "(version %s)"

@@ -154,6 +154,7 @@ class StatusWidget(QWidget):
         self.clearPatternBtn = QPushButton(_('Remove filter, show root'))
         vbox.addWidget(self.clearPatternBtn)
         self.clearPatternBtn.clicked.connect(self.clearPattern)
+        self.clearPatternBtn.setAutoDefault(False)
         self.clearPatternBtn.setVisible(bool(self.pats))
 
         tv.setAllColumnsShowFocus(True)
@@ -319,7 +320,7 @@ class StatusWidget(QWidget):
     def _setupFileMenu(self, menu):
         self._addFileActionsToMenu(menu, [
             'visualDiffFile', 'visualDiffLocalFile', 'copyPatch',
-            'editLocalFile', 'openLocalFile',
+            'editLocalFile', 'openLocalFile', 'editRejects',
             None, 'openSubrepo', 'explore', 'terminal', None, 'copyPath',
             'editMissingFile', None, 'revertWorkingFile', None,
             'navigateFileLog', None, 'forgetFile', 'addFile', 'addLargefile',

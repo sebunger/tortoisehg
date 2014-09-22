@@ -55,15 +55,15 @@ Tato extenze je dokumentována v odstavci :ref:`perfarce-perforce` kapitoly :doc
 Mercurial-Keyring
 =================
 
+Extenze `keyring` slouží k bezpečnému ukládání hesel pro spojení přes HTTP a SMTP. Tato extenze používá služby knihovny `Python Keyring Lib`.
+
 * `Mercurial Keyring <http://pypi.python.org/pypi/mercurial_keyring>`_ home page
 * `Keyring Extension <http://mercurial.selenic.com/wiki/KeyringExtension>`_ wiki page
-
-Extenze keyring používají své knihovny pro bezpečné uložení hesel (HTTP/HTTPS a SMTP) s použitím určité databáze (Gnome Keyring, KDE KWallet, OSXKeyChain, zaměřená řešení pro Win32 a příkazový řádek).
 
 
 **Co se provádí**
 
-Při první akci pull/push do/z daného vzdáleného repozitáře požádá extenze o heslo HTTP a uloží jej (zadané v kombinaci jména uživatele a URL vzdáleného repozitáře) do databáze hesel. Při další akci hledá jméno uživatele v .hg/hgrc a heslo v databázi a tyto důvěrné údaje použje, pokud je nalezne.
+Při první akci pull/push z/do vzdáleného repozitáře požádá extenze o heslo pro HTTP a uloží jej do databáze hesel. Při další akci hledá jméno uživatele v .hg/hgrc a heslo v databázi a tyto důvěrné údaje použje, pokud je nalezne.
 
 Podobně při posílání e-mailu přes SMTP server, který vyžaduje autorizaci, požádá o zadání hesla při prvním použití serveru, uloží jej do databáze a při dalších použitích jej opět použije.
 
@@ -71,18 +71,16 @@ Stane-li se heslo nesprávné (protože bylo neplatné, nebo že bylo změněno)
 
 **Instalace**
 
-Nejprve musí být umožněna extenze v souboru Mercurial.ini::
+Nejprve musí být povolena extenze v souboru Mercurial.ini::
 
 	[extensions]
 	mercurial_keyring=
 
-**Password backend configuration**
+**Konfigurace uložiště hesla**
 
-The most appropriate password backend should usually be picked automatically,
-without configuration. Still, if necessary, it can be configured using
-~/keyringrc.cfg file (keyringrc.cfg in the home directory of the current user).
-Refer to `keyring docs <http://pypi.python.org/pypi/keyring>`_
-for more details.
+Nejvhodnější zázemí (backend) hesla by obvykle mělo být výbráno automaticky, bez konfigurace. Lze jej ovšem konfigurovat s použitím souboru ~/keyringrc.cfg (keyringrc.cfg in the home directory of the current user).
+Podrobnosti viz `keyring docs <http://pypi.python.org/pypi/keyring>`_
+.
 
 .. note::
 	On Windows XP and above, your encrypted passwords are stored in the
@@ -95,7 +93,7 @@ for more details.
 
 **Konfigurace repozitáře (HTTP)**
 
-Editujte repozitář -> lokální -> .hg/hgrc a ulož tam cestu ke vzdálenému repozitáři, jméno uživatele, nikoli však heslo. Na příklad::
+Editujte  `.hg/hgrc` lokálního repozitáře a uložte tam cestu ke vzdálenému repozitáři, jméno uživatele, nikoli však heslo. Na příklad::
 
 	[paths]
 	myremote = https://my.server.com/hgrepo/someproject
@@ -111,13 +109,13 @@ Jednodušší forma s vloženým názvem url může být také použita::
 	bitbucket = https://User@bitbucket.org/User/project_name/
 
 .. note::
-	Je-li v :file:`.hg/hgrc` zadáno jméno uživatele i heslo, potom je extenze použije bez použití heslové databáze. Není-li jméno uživatele uvedeno, extenze bude pokaždé vyžadovat osobní údaje, také bez uložení hesla. Takže v obou případech je účinné se vrátit k implicitnímu chování.
+	Je-li v :file:`.hg/hgrc` zadáno jméno uživatele i heslo, potom je extenze použije bez použití heslové databáze. Není-li jméno uživatele uvedeno, extenze bude pokaždé vyžadovat osobní údaje, také bez uložení hesla. Takže se v obou případech vlastně vracíme k implicitnímu chování.
 	
 Podrobnější informace získáte v `[auth] <http://www.selenic.com/mercurial/hgrc.5.html#auth>`_.
 
 **Konfigurace repozitáře (SMTP)**
 
-Editujte buď repozitář -> lokální -> .hg/hgrc nebo ~/.hgrc (vhodnější je obvykle ten druhý)  a zadejte tam všechny standardní vlastnosti pro email a smtp, včetně názvu uživatele smtp ale bez hesla pro smtp. Na příklad::
+Editujte buď  `.hg/hgrc` nebo `~/.hgrc` (vhodnější je obvykle ten druhý)  a zadejte tam všechny standardní vlastnosti pro email a smtp, včetně názvu uživatele smtp ale bez hesla pro smtp. Na příklad::
 
 	[email]
 	method = smtp
@@ -133,14 +131,14 @@ Stejně jako v případě HTTP, musíte zadat jméno uživatele ale nesmíte zde
 
 **Použití**
 
-Konfigurujte repozitář jak výše uvedeno, pak už jen stahujte a vysílejte (pull a push) nebo emailujte. Na heslo byste měl být tázán pouze jednou (pro každou kombinaci jména uživatele a remote_repository_url).
+Konfigurujte repozitář jak výše uvedeno, pak už jen stahujte a vysílejte (pull a push) nebo emailujte. Na heslo byste měl být tázán pouze jednou (pro každou kombinaci jména uživatele a URL vzdáleného repozitáře).
 
 .. vim: noet ts=4
 
 projrc
 ======
 
-`projrc <http://mercurial.selenic.com/wiki/ProjrcExtension>`_ je extenze, která prozkoumá soubor .hg/projrc, hledaje další konfigurační možnosti. Soubor se přenese klonováním a stažením (pull) ze seznamu serverů, který  '''musí ''' být nakonfigurován uživatelem. Z bezpečnostních důvodů '''musí ''' být také uvedeno, která konfigurační nastavení ''`projrc''` mají být přenesena (implicitně se žádná nastavení ze žádného serveru nepřenášejí).
+`projrc <http://mercurial.selenic.com/wiki/ProjrcExtension>`_ je extenze, která prozkoumá soubor .hg/projrc, hledaje další konfigurační možnosti. Soubor se přenese klonováním a stažením (pull) ze seznamu serverů, který  musí být nakonfigurován uživatelem. Z bezpečnostních důvodů musí  být také uvedeno, která konfigurační nastavení `projrc` mají být přenesena (implicitně se žádná nastavení ze žádného serveru nepřenášejí).
 Uživatel také může nastavit extenzi tak, že automaticky zahrne všechny změny do souboru .hg/projrc.
 
 To je důležité pro centralizovaná nastavení, kde chcete distribuovat konfigurační nastavení do všech repozitářů s minimálním úsilím. Zejména to lze použít pro přemapování subrepozitářových zdrojů, jak je vysvětleno v textu 
@@ -152,32 +150,33 @@ Tato extenze (jako většina jiných) je implicitně nepovolena. Abyste ji mohli
 
 Je-li extenze povolena, vidíte nový vstup "Projrc" v dialogu pro nastavení. Zde můžete extenzi konfigurovat úpravou následujících položek:
 
-	:guilabel:`Request confirmation`
+:guilabel:`Request confirmation`
         Je-li True (implicitně), jste vyzván k potvrzení kdykoliv extenze zaznamená změny v souboru .hg/projrc vzdáleného serveru.
         Je-li False, extenze automaticky přijme všechny změny souboru .hg/projrc vzdáleného serveru.
 
-    :guilabel:`Servers`
+:guilabel:`Servers`
         Toto nastavení je seznam čárkami oddělených globů, které se shodují s názvy serverů, z nichž bude soubor projrc stažen (pulled).
-		Pokud není toto nastvení zadáno, žádné soubory .hg/projrc se nikdy ze žádného serveru nepřenesou.
+	Pokud není toto nastvení zadáno, žádné soubory .hg/projrc se nikdy ze žádného serveru nepřenesou.
 		
-    :guilabel:`Include`
-        Tímto klíčem určíte, které sekce a které klíče budou přijaty ze vzdálených souborů projrc.
-		Je to seznam čárkami oddělených globů, které se shodují s názvy sekcí nebo klíčů, které mohou být připojeny.
-		Názvy klíčů musí být určeny názvem jejich sekce následovaným tečkou, následovanou názvem klíče (např. "''`diff.git`''").
+:guilabel:`Include`
+    Tímto klíčem určíte, které sekce a které klíče budou přijaty ze vzdálených souborů projrc.
+    Je to seznam čárkami oddělených globů, které se shodují s názvy sekcí nebo klíčů, které mohou být připojeny.
 
-        Všechny sekce a klíče povolíte zadáním "*" (bez uvozovek).
+    Názvy klíčů musí být určeny názvem jejich sekce následovaným tečkou, následovanou názvem klíče (např. `diff.git`).
 
-    :guilabel:`Exclude`
-        Toto nastavení je podobné nastavení "''`Include`''" ale má opačný účinek. Deklaruje seznam nastavení, která nebudou přenesena ze společných soubofů projrc. 
+    Všechny sekce a klíče povolíte zadáním "*" (bez uvozovek).
 
-        Seznam "exclude" má stejnou skladbu jako seznam "include". Je-li zadán exkluzivní seznam ale inkluzivní seznam je prázdný nebo neexistuje, budou připojeny všechny nevyloučené klíče.
+:guilabel:`Exclude`
+    Toto nastavení je podobné nastavení `Include` ale má opačný účinek. Deklaruje seznam nastavení, která nebudou přenesena ze společných soubofů projrc. 
+
+    Seznam "exclude" má stejnou skladbu jako seznam "include". Je-li zadán exkluzivní seznam ale inkluzivní seznam je prázdný nebo neexistuje, budou připojeny všechny nevyloučené klíče.
 
 Jsou-li zadány oba seznamy a klíč nalézá shodu v obou seznamech, má prioritu nejvíce explicitní shoda v následujícím pořadí:
 
-    * za nejvíce explicitní jsou považovány přesné shody pro klíče   např. "''`ui.merge`''");
-    * následují shody vzorů (globů) (např.     "''`auth.bitbucket.com.*`''"), přičemž nejvíce explicitní je nejdelší vzor shody;
-    * shody na úrovni sekcí (e.g. "''`ui`''");
-    * globální ("''`*`''") shody.
+    * za nejvíce explicitní jsou považovány přesné shody pro klíče   (např. `ui.merge`;
+    * následují shody vzorů (globů) (např.     `auth.bitbucket.com.*`), přičemž nejvíce explicitní je nejdelší vzor shody;
+    * shody na úrovni sekcí (e.g. `ui`);
+    * globální (`*`) shody.
 
 Shoduje-li se klíč stejnou délkou jak s exkluzivními, tak s inkluzivními vzory, je klíč "zahrnut" (to jest, inkluze má přednost pře exkluzí).
 
@@ -206,49 +205,8 @@ pbranch
 =======
 
 Extenze `pbranch
-<http://mercurial.selenic.com/wiki/PatchBranchExtension>`_ (patch brances) slouží ke správě oprávek coby tematických větví (alternativa k mq).
+<http://mercurial.selenic.com/wiki/PatchBranchExtension>`_ (patch branch) sloužila ke správě oprávek coby tematických větví (alternativa k mq). Bohužel, tato extenze přestala být v roce 2012 aktualizována a je proto nekompatibilní s novějšími verzemi Mercurialu.
 
-Takto spravované oprávky lze rozvíjet kolektivně ve speciálních tematických větvích v dočasných klonech hlavního repozitáře. 
 
-`Podrobný návod <http://arrenbrecht.ch/mercurial/pbranch/>`_ je na webu.
-
-Následující seznam lze vyvolat příkazem :command:`hg help pbranch`::
-
- pbackout       - backs out the current patch branch (undoes all its changes)
- pdiff          - prints the final diff for the current or given patch branch
- peditmessage   - edit the patch message
- pemail         - send patches by email
- pexport        - exports patches
- pextdiff       - combines pdiff and extdiff
- pgraph         - print an ASCII art rendering of the patch dependency graph
- pmerge         - merge pending heads from dependencies into patch branches
- pmessage       - print the patch message(s)
- pnew           - start a new patch branch
- pstatus        - print status of current (or given) patch branch
- reapply        - reverts the working copy of all files touched by REV to REV
- 
-TortoiseHg poskytne novou úkonovou kartu se zobrazením grafu závislosti oprávek.
-
- .. figure:: figures/pbranch.png
-	:alt: Pbranch task tab
-
-	Pbranch task tab
-
-**Instalace**
-
-Protože tato extenze není v TortoiseHg implicitně nainstalována, musíte si stáhnout plugin `pbranch.py` z `<http://bitbucket.org/parren/hg-pbranch>`_. Ujistěte se, že stahujete správnou verzi s ohledem na verzi Mercurialu, spojeného s TortoiseHg (viz stránku wiki zdrojového situ).
- 
-Abyste mohli stažený plugin používat, musíte jej někam umístit příkazem::
-
-	hg --config "extensions.pbranch=C:\path\to\pbranch.py" pstatus
-
-Případně jej můžete do vhodného místa (např. C:\Program Files/TortoiseHg/contrib/pbranch.py) vložit ručně.
-
-Do konfiguračního souboru Mercurial.ini nebo repozitářového souboru .hgrc jej můžete zařadit následovně::
-
-	[extensions]
-	pbranch = C:\path\to\pbranch.py
- 
-Pokud tak učiníte, můžete vypustit příkaz s opcí --config.
  
 .. vim: noet ts=4

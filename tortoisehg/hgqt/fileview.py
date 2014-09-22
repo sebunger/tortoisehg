@@ -1202,6 +1202,9 @@ class _AnnotateViewControl(_AbstractViewControl):
         lastclick = self._lastmarginclick
         if (state == Qt.ControlModifier
             or lastclick.elapsed() < QApplication.doubleClickInterval()):
+            if line >= len(self._links):
+                # empty line next to the last line
+                return
             fctx, line = self._links[line]
             self.setSourceRequested.emit(
                 hglib.tounicode(fctx.path()), fctx.rev(), line)

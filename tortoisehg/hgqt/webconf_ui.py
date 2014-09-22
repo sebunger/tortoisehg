@@ -2,27 +2,18 @@
 
 # Form implementation generated from reading ui file '/Users/steve/repos/thg/tortoisehg/hgqt/webconf.ui'
 #
-# Created: Tue Mar  4 09:08:57 2014
-#      by: PyQt4 UI code generator 4.10.3
+# Created: Mon Sep  1 12:45:11 2014
+#      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from PyQt4 import QtCore, QtGui
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
-    def _fromUtf8(s):
-        return s
-
-try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
-except AttributeError:
-    def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+    _fromUtf8 = lambda s: s
 
 class Ui_WebconfForm(object):
     def setupUi(self, WebconfForm):

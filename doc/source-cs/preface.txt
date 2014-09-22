@@ -112,16 +112,13 @@ Program TortoiseHg lze aktivovat buď jako kontextové menu v Průzkumníku Wind
 
 Z toho vyplývá, že bez znalosti jistého množství anglických slov se při používání TortoiseHg nelze obejít. Proto jsem si dovolil mnohá slova v manuálu i v lokalizaci nepřekládat.
 
-Slova patch a hunk překládám jako oprávka a porce, Workbench jako Verpánek a nadpis Shelve (odložení na polici) překládám pro pobavení čtenáře jako Almárka.
+Slova patch a hunk překládám jako oprávka a porce, Workbench jako Verpánek.
 
-Kde si nevím rady, ponechávám text nepřeložený, za což se laskavému čtenáři omlouvám.
+Považuji za vhodné vymezit význam slova pracovní adresář. **Pracovní adresář** je pomyslná složka, která svůj obsah odvozuje z aktuálně nastavené aktuální revize.  
 
-Považuji za vhodné vymezit význam slova pracovní adresář. **Pracovní adresář** je virtuální složka, která svůj obsah odvozuje z aktuálně nastavené aktuální revize.  
+Kořenový adresář projeku, který obsahuje složku s názvem *.hg* neboli **repozitář** je rovněž dynamický útvar a v tomto textu bude označován jako **repozitórium**. Pro každou revizi může mít repozitórium jiné složení souborů!
 
-Kořenový adresář projeku, který obsahuje složku s názvem *.hg* neboli **repozitář** je rovněž dynamický útvar a v tomto textu bude označován jako **repozitórium**). Pro každou revizi může mít repozitórium jiné složení souborů!
-
-Nutno dodat, že pojem *repozitář* se často používá i pro *repozitórium*; termín *repozitórium* používám zejména tam,
-kde poslouží k lepšímu rozlišení popisovaných objektů.
+Nutno dodat, že pojem *repozitář* se často (nepřesně) používá i pro *repozitórium*.
 
 Termíny changeset a revize jsou prakticky zaměnitelné. 
  

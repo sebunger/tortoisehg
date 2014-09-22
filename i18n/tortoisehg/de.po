@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-07-24 12:23-0300\n"
+"POT-Creation-Date: 2014-08-18 14:01-0300\n"
 "PO-Revision-Date: 2014-06-28 14:51+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-07-25 05:45+0000\n"
-"X-Generator: Launchpad (build 17114)\n"
+"X-Launchpad-Export-Date: 2014-08-19 06:15+0000\n"
+"X-Generator: Launchpad (build 17156)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHG-Symbolüberblendungsdienst"
@@ -1452,6 +1452,12 @@ msgstr "&Umbenennen..."
 msgid "&Ignore..."
 msgstr "&Ausschließen..."
 
+msgid "Edit Re&jects"
+msgstr ""
+
+msgid "Manually resolve rejected patch chunks"
+msgstr ""
+
 msgid "De&tect Renames..."
 msgstr "Umbenennungen &erkennen..."
 
@@ -2569,6 +2575,10 @@ msgid ""
 msgstr ""
 "%d Dateien wurden in beiden Zweigen geändert und müssen <a href=\"resolve"
 "\"><b>aufgelöst</b></a> werden."
+
+msgid ""
+"No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
+msgstr ""
 
 msgid "Commit merge results"
 msgstr "Zusammenführungsergebnisse übernehmen"
@@ -8635,6 +8645,9 @@ msgstr "Win-32-Problem: Kann keine Fenster für Hinweise öffnen"
 #, python-format
 msgid "win32ill: unsupported platform: %s\n"
 msgstr "Win-32-Problem: nicht unterstützte Plattform: %s\n"
+
+msgid "win32ill: interrupted while stopping message loop\n"
+msgstr ""
 
 #~ msgid "this is a binary file\n"
 #~ msgstr "das ist eine binäre Datei\n"

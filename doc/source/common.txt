@@ -67,7 +67,7 @@ When the visual diff window is used to compare working copy files, it
 always directly diffs against the working copy files since it always
 operates on a single file at a time.
 
-.. note::
+.. deprecated:: 1.0
 	The :menuselection:`TortoiseHg --> Skip Diff Window` configurable
 	has been removed because it is now redundant.
 

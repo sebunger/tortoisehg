@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-07-24 12:23-0300\n"
-"PO-Revision-Date: 2014-07-30 14:51+0000\n"
+"POT-Creation-Date: 2014-08-18 14:01-0300\n"
+"PO-Revision-Date: 2014-08-06 09:33+0000\n"
 "Last-Translator: onekosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2014-07-31 06:35+0000\n"
-"X-Generator: Launchpad (build 17131)\n"
+"X-Launchpad-Export-Date: 2014-08-19 06:22+0000\n"
+"X-Generator: Launchpad (build 17156)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
@@ -65,13 +65,13 @@ msgid "Tar archives"
 msgstr "Архіви tar"
 
 msgid "Uncompressed tar archive"
-msgstr "Не стиснутий tar архів"
+msgstr "Не стиснений, tar архів"
 
 msgid "Bzip2 tar archives"
 msgstr "Архіви bzip2 tar"
 
 msgid "Tar archive compressed using bzip2"
-msgstr "Архів tar, стиснути bzip2?"
+msgstr "Архів tar, стиснений bzip2?"
 
 msgid "Gzip tar archives"
 msgstr "Архіви gzip tar"
@@ -86,7 +86,7 @@ msgid "Uncompressed zip archive"
 msgstr "Не стиснений zip архів"
 
 msgid "Zip archive compressed using deflate"
-msgstr "Архів zip, стиснутий deflate"
+msgstr "Архів zip, стиснений deflate"
 
 msgid "Only files modified/created in this revision"
 msgstr "Лише файли змінені/створенні в цій ревізії"
@@ -207,7 +207,7 @@ msgid "Automatically resolve merge conflicts where possible"
 msgstr "За можливістю, розв'язувати конфлікти злиття автоматично"
 
 msgid "<b>Uncommitted local changes are detected</b>"
-msgstr "<b>Виявлені незафіксовані локальні зміни</b>"
+msgstr "<b>Виявлено незафіксовані локальні зміни</b>"
 
 msgid "Clean"
 msgstr "Чистий"
@@ -274,7 +274,7 @@ msgid "Committing..."
 msgstr "Фіксувати..."
 
 msgid "Please wait while committing merged files."
-msgstr "Будь ласка, зачекайте виконується фіксація злитих файлів."
+msgstr "Будь ласка, зачекайте доки фіксуються злиті файли."
 
 msgid "Finished"
 msgstr "Завершено"
@@ -415,7 +415,7 @@ msgid "TortoiseHg Bug Report"
 msgstr "Звіт про помилку TortoiseHg"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr "Оновіться до нової версії TortoiseHg."
+msgstr "Оновіться до нової версії TortoiseHg це рекомендується."
 
 msgid "Your TortoiseHg is up to date."
 msgstr "Наразі у Вас остання версія TortoiseHg."
@@ -461,7 +461,7 @@ msgid "Patch failed to apply"
 msgstr "Не вдалось застосувати латку"
 
 msgid "Manually resolve rejected chunks?"
-msgstr "Відхиляти кусні в ручну?"
+msgstr "Вручну владнати відхилені кусні?"
 
 msgid "Edit patched file and rejects?"
 msgstr "Правити латаний файл та відхилити?"
@@ -479,10 +479,10 @@ msgid "No chunks remain"
 msgstr "Куснів більше не залишилось"
 
 msgid "file has been deleted, refresh"
-msgstr "файл був знищений, освіжіть"
+msgstr "файл було знищено, освіжіть"
 
 msgid "file has been modified, refresh"
-msgstr "файл був змінений, освіжіть"
+msgstr "файл було змінено, освіжіть"
 
 msgid "Unable to merge chunks"
 msgstr "Не вдалось злити кусні"
@@ -520,7 +520,7 @@ msgid "Chunks selected: %d / %d"
 msgstr "Куснів обрано: %d / %d"
 
 msgid "Please wait while the file is opened ..."
-msgstr "Будь ласка зачекайте доки файл відкриється ..."
+msgstr "Зачекайте відкриття файлу ..."
 
 msgid "Source:"
 msgstr "Взяти з:"
@@ -575,25 +575,25 @@ msgid "&Clone"
 msgstr "Клонувати"
 
 msgid "failed to start command\n"
-msgstr "не вдалося започаткувати команду\n"
+msgstr "не вдалось започаткувати команду\n"
 
 msgid "error while running command\n"
 msgstr "помилка виконання команди\n"
 
 #, python-format
 msgid "process exited unexpectedly with code %d"
-msgstr "процес завершується несподівано з кодом %d"
+msgstr "процес несподівано завершено з кодом %d"
 
 #, python-format
 msgid "timed out while reading: %r..."
-msgstr "закінчився час відведений на читання: %r..."
+msgstr "завершився час відведений на читання: %r..."
 
 msgid "timed out waiting for message"
-msgstr "закінчився час очікування повідомлення"
+msgstr "завершився час очікування повідомлення"
 
 #, python-format
 msgid "unexpected response on required channel %r"
-msgstr "неспожівана відповідь з очікуваного каналу %r"
+msgstr "несподівана відповідь з очікуваного каналу %r"
 
 #, python-format
 msgid "invalid \"hello\" message: %r"
@@ -604,7 +604,7 @@ msgstr "не \"runcommand\" здатність"
 
 #, python-format
 msgid "corrupted command result: %r"
-msgstr "пощкоджено результат команди: %r"
+msgstr "результат команди пощкоджено: %r"
 
 msgid "Terminated by user"
 msgstr "Перервано користувачем"
@@ -615,7 +615,7 @@ msgstr "[команда перервана користувачем %s]"
 
 #, python-format
 msgid "[command interrupted %s]"
-msgstr "[пошкоджена команда %s]"
+msgstr "[команда %s пошкоджена]"
 
 #, python-format
 msgid "[command returned code %d %%s]"
@@ -623,7 +623,7 @@ msgstr "[команда повернула код %d %%s]"
 
 #, python-format
 msgid "[command completed successfully %s]"
-msgstr "[%s команда успішно виконана]"
+msgstr "[команда %s успішно виконана]"
 
 #, python-format
 msgid "ignoring invalid cmdworker '%s'\n"
@@ -633,7 +633,7 @@ msgid "Running..."
 msgstr "Виконання..."
 
 msgid "Failed!"
-msgstr "Не вдалося!"
+msgstr "Не вдалось!"
 
 msgid "Clea&r Log"
 msgstr "Очистити журнал"
@@ -715,7 +715,7 @@ msgstr "Зачекайте..."
 
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
-msgstr "Не вдалося завантажити систему контролю проблем '%s': %s"
+msgstr "Не вдалось завантажити систему контролю проблем '%s': %s"
 
 msgid "Issue Tracker"
 msgstr "Система контролю питань"
@@ -758,7 +758,8 @@ msgstr "Підтвердіть зміну гілки"
 
 #, python-format
 msgid "Named branch \"%s\" already exists, last used in revision %d\n"
-msgstr "Назва гілки \"%s\" вже існує, в останне використана у ревізії %d\n"
+msgstr ""
+"Назва гілки \"%s\" вже існує, в останне використовувалась у ревізії %d\n"
 
 msgid "Restart &Branch"
 msgstr "Перезапустити гілку"
@@ -774,7 +775,7 @@ msgstr "Підтвердження для нової гілки"
 
 #, python-format
 msgid "Create new named branch \"%s\" with this commit?\n"
-msgstr "Створити нову гілку з назвою \"%s\" при фіксації?\n"
+msgstr "Створити нову іменовану гілку \"%s\" з цієї фіксації?\n"
 
 msgid "Create &Branch"
 msgstr "Так, створити"
@@ -840,7 +841,7 @@ msgstr ""
 "проблем'."
 
 msgid "No files checked"
-msgstr "Відсутні файли для перевірки"
+msgstr "Відсутні файли для відмічування"
 
 msgid "No modified files checkmarked for commit"
 msgstr "Відсутні змінені файли, які були б відмічені для фіксації"
@@ -896,7 +897,7 @@ msgid "Unable to save username"
 msgstr "Неможливо зберегти ім'я користувача"
 
 msgid "Iniparse must be installed."
-msgstr "Знаряддя обробки ini-файлів повинно бути встановлено."
+msgstr "Знаряддя обробки ini-файлів має бути встановлено."
 
 msgid "Unable to write configuration file"
 msgstr "Не можливо записати налаштування у файл"
@@ -950,7 +951,7 @@ msgid "You may continue the compress"
 msgstr "Ви маєте продовжити стискання"
 
 msgid "Changes have been moved, you must now commit"
-msgstr "Зміни будуть втрачені, Ви повинні зараз їх зафіксувати"
+msgstr "Зміни будуть втрачені, Ви маєте зараз їх зафіксувати"
 
 msgctxt "action button"
 msgid "Commit"
@@ -1134,8 +1135,8 @@ msgid ""
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
 "Команди, які будуть виконуватись.\n"
-"Для виконання Mercurial використовує команду \"hg\" (а не \"hg.exe\"), як "
-"команду виконання.\n"
+"Для виконання Mercurial використовуйте команду \"hg\" (а не \"hg.exe\"), як "
+"виконувану команду.\n"
 "Ви можете використовувати кілька {VARIABLES} для створення команди:\n"
 "- {ROOT}: Шлях до поточного кореню сховища.\n"
 "- {REV} / {REVID}: вибраний номер ревізії/шістнадцяткового ідентифікатора "
@@ -1153,8 +1154,8 @@ msgid ""
 msgstr ""
 "Тека, в якій буде виконана команда.\n"
 "В разі не встановлення буде використаний корінець поточного сховища.\n"
-"Ви можете використовувати ті ж {VARIABLES} як і в налаштуваннях \"Command"
-"\".\n"
+"Ви можете використовувати ті ж самі {VARIABLES} як і в налаштуваннях "
+"\"Command\".\n"
 
 msgid "Tool label"
 msgstr "Мітка знаряддя"
@@ -1424,6 +1425,12 @@ msgstr "Перейменувати..."
 
 msgid "&Ignore..."
 msgstr "Ігнорувати..."
+
+msgid "Edit Re&jects"
+msgstr ""
+
+msgid "Manually resolve rejected patch chunks"
+msgstr ""
 
 msgid "De&tect Renames..."
 msgstr "Виявлення змін назв..."
@@ -2517,6 +2524,10 @@ msgid ""
 msgstr ""
 "%d файл(-ів) мають зміни у обох гілках і це потребує <a href=\"resolve"
 "\"><b>розв'язування</b></a>"
+
+msgid ""
+"No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
+msgstr ""
 
 msgid "Commit merge results"
 msgstr "Зафіксувати результати злиття"
@@ -8449,6 +8460,9 @@ msgstr "win32ill: не можливо створити вікно повідом
 #, python-format
 msgid "win32ill: unsupported platform: %s\n"
 msgstr "win32ill: непідтримувана платформа: %s\n"
+
+msgid "win32ill: interrupted while stopping message loop\n"
+msgstr ""
 
 #~ msgid "(version %s)"
 #~ msgstr "(версія %s)"

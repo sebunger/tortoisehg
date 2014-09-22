@@ -354,22 +354,28 @@ class MergePage(BasePage):
         'should Next button be sensitive?'
         if not self.mergecomplete:
             return False
-        count = 0
+        ucount = 0
+        rcount = 0
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
             if status == 'u':
-                count += 1
-        if count:
+                ucount += 1
+            if status == 'r':
+                rcount += 1
+        if ucount:
             if self.field('autoresolve').toBool():
                 # if autoresolve is enabled, we know these were real conflicts
                 self.reslabel.setText(_('%d files have <b>merge conflicts</b> '
                                         'that must be <a href="resolve">'
-                                        '<b>resolved</b></a>') % count)
+                                        '<b>resolved</b></a>') % ucount)
             else:
                 # else give a calmer indication of conflicts
                 self.reslabel.setText(_('%d files were modified on both '
                                         'branches and must be <a href="resolve">'
-                                        '<b>resolved</b></a>') % count)
+                                        '<b>resolved</b></a>') % ucount)
             return False
+        elif rcount:
+            self.reslabel.setText(_('No merge conflicts, ready to commit or '
+                                    '<a href="resolve"><b>review</b></a>'))
         else:
             self.reslabel.setText(_('No merge conflicts, ready to commit'))
         return True

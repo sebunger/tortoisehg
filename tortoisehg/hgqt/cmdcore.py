@@ -575,8 +575,8 @@ class CmdSession(QObject):
 
     def setOutputDevice(self, device):
         """If set, data outputs will be sent to the specified device"""
-        if self._worker or self._qnextp >= len(self._queue):
-            raise RuntimeError('command already running or finished')
+        if self.isRunning():
+            raise RuntimeError('command already running')
         self._uihandler.setDataOutputDevice(device)
 
     def read(self, maxlen):
@@ -681,6 +681,11 @@ def nullCmdSession():
     >>> sess.abort()  # should not change flags
     >>> sess.isFinished(), sess.isRunning(), sess.isAborted(), sess.exitCode()
     (True, False, False, -1)
+
+    Null session can be set up just like one made by runCommand().  It can be
+    used as an object representing failure or canceled operation.
+
+    >>> sess.setOutputDevice(QBuffer())
     """
     return CmdSession([], UiHandler())
 
@@ -766,6 +771,10 @@ class CmdAgent(QObject):
         If uihandler does not implement UiHandler interface, it will be used
         as the parent widget of the default InteractiveUiHandler.  If uihandler
         is None, no interactive prompt will be displayed.
+
+        If the specified uihandler is a UiHandler object, it should be created
+        per request in order to avoid sharing the same uihandler across several
+        CmdSession objects.
 
         CmdSession object will be disowned on command finished.  The specified
         uihandler is unrelated to the lifetime of CmdSession object.

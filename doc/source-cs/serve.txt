@@ -14,7 +14,7 @@ Spuštění z TortoiseHg
 .. figure:: figures/serve.png
 	:alt: Web server dialog
 
-Nástroj Serve je prostředníkem pro vestavěný webový server Mercurialu. Jakmile je spuštěn, může se počítač připojit k portu http a procházet vašimi repozitáři, provádět úkony clone, pull, či dokonce push, pokud to konfigurace vašeho serveru dovoluje. Webový server může být spuštěn buď z Verpánku - Repozitář > **Start Web Server** nebo z kontextové nabídky Exploreru - TortoiseHg > **Webový server**.
+Nástroj Serve je prostředníkem pro vestavěný webový server Mercurialu. Jakmile je spuštěn, může se počítač připojit k portu http a procházet vašimi repozitáři, provádět úkony clone, pull, či dokonce push, pokud to konfigurace vašeho serveru dovoluje. Webový server může být spuštěn buď z Verpánku - Repozitář > **Web Server** nebo z kontextové nabídky Exploreru - TortoiseHg > **Webový server**.
 
 Tlačítka nástrojové lišty:
 

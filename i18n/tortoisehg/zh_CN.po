@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-07-24 12:23-0300\n"
+"POT-Creation-Date: 2014-08-18 14:01-0300\n"
 "PO-Revision-Date: 2014-05-31 22:35+0000\n"
 "Last-Translator: yfdyh000 <yfdyh000@gmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-07-25 05:53+0000\n"
-"X-Generator: Launchpad (build 17114)\n"
+"X-Launchpad-Export-Date: 2014-08-19 06:24+0000\n"
+"X-Generator: Launchpad (build 17156)\n"
 "Language: zh_CN\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -1393,6 +1393,12 @@ msgstr "重命名(&N)..."
 msgid "&Ignore..."
 msgstr "忽略(&I)..."
 
+msgid "Edit Re&jects"
+msgstr ""
+
+msgid "Manually resolve rejected patch chunks"
+msgstr ""
+
 msgid "De&tect Renames..."
 msgstr "检测重命名(&T)..."
 
@@ -2452,6 +2458,10 @@ msgid ""
 msgstr ""
 "%d个文件在两个分支中均被修改，您需要<a href=\"resolve\"><b>解决合并冲突</b></"
 "a>"
+
+msgid ""
+"No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
+msgstr ""
 
 msgid "Commit merge results"
 msgstr "提交合并结果"
@@ -8004,6 +8014,9 @@ msgstr "win32ill: 无法为消息创建窗口"
 #, python-format
 msgid "win32ill: unsupported platform: %s\n"
 msgstr "win32ill: 不支持的平台: %s\n"
+
+msgid "win32ill: interrupted while stopping message loop\n"
+msgstr ""
 
 #~ msgid "Source path is empty"
 #~ msgstr "源路径为空"

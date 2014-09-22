@@ -1,5 +1,5 @@
-Shelve - Almárka
-================
+Shelve
+======
 
 .. module:: shelve.dialog
     :synopsis: Dialog used to perform shelve/unshelve operations

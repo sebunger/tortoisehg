@@ -242,5 +242,11 @@ def uisetup(ui):
         return
     # message loop is per process
     sv = messageserver(_openlogfile(ui))
-    atexit.register(sv.stop)
+    def stop():
+        try:
+            sv.stop()
+        except KeyboardInterrupt:
+            # can happen if command finished just before WM_CLOSE request
+            ui.warn(_('win32ill: interrupted while stopping message loop\n'))
+    atexit.register(stop)
     sv.start()

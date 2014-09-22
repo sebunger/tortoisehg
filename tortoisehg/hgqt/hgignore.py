@@ -52,6 +52,7 @@ class HgignoreDialog(QDialog):
         le.returnPressed.connect(self.addEntry)
 
         add = QPushButton(_('Add'))
+        add.setAutoDefault(False)
         add.clicked.connect(self.addEntry)
         hbox.addWidget(add, 0)
 
@@ -72,6 +73,7 @@ class HgignoreDialog(QDialog):
         self.ignorefile = ignorefiles[0]
 
         edit = QPushButton(_('Edit File'))
+        edit.setAutoDefault(False)
         edit.clicked.connect(self.editClicked)
         hbox.addWidget(edit)
         hbox.addStretch(1)
@@ -110,6 +112,7 @@ class HgignoreDialog(QDialog):
         # layer 4 - dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Close)
+        bb.button(BB.Close).setAutoDefault(False)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         vbox.addWidget(bb)

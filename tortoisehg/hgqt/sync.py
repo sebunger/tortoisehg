@@ -32,7 +32,9 @@ def linkify(url):
     else:
         return url
 
-_extractnodeids = re.compile(r'^[0-9a-f]{40}$', re.MULTILINE).findall
+# ignore preceding white spaces because ui.prompt() for username/password
+# writes extra " "s to the output channel. (hg 3.1)
+_extractnodeids = re.compile(r'^\s*([0-9a-f]{40})$', re.MULTILINE).findall
 
 class SyncWidget(QWidget, qtlib.TaskWidget):
     newCommand = pyqtSignal(cmdcore.CmdSession)

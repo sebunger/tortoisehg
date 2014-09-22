@@ -475,10 +475,10 @@ class FamilyLineDag(StandardDag):
             parents = [get_or_create_rev(p) for p in ctx.parents()
                        if p.rev() >= stop_rev]
             rev.proceed(parents)
-            if not rev.visible:
-                continue
+            if rev.visible:
+                queue.append(rev)
+
             # yield after rev.pending becomes 0
-            queue.append(rev)
             while queue and not queue[0].pending:
                 r = queue.popleft()
                 # order by p1 -> p2, small rev -> large rev

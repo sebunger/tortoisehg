@@ -25,7 +25,7 @@ Systém vizuálních diffů použije každou existující konfiguraci extdiff, k
 Vizuální diffový systém použije přímo vybraný diffový nástroj, pokud prováděná akce nepožaduje použití dialogového okna (TortoiseHg) pro vizuální diff. Jde o tyto situace:
 
 1. Výběr porovnávaných souborů vyžaduje více nástrojů
-2. Vybraný nástroj štěpí (forks) oddělené procesy na pozadí
+2. Vybraný nástroj štěpí oddělené procesy na pozadí
 3. Vybraný nástroj nepodporuje požadované diffy adresářů
 4. Vybraný nástroj nepodporuje 'three way' porovnávání
 5. Změny souborů zahrnují přejmenování nebo kopie
