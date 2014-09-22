@@ -31,8 +31,12 @@ Description: Graphical tool for working with Mercurial
 
 Package: tortoisehg-nautilus
 Architecture: all
-Depends: tortoisehg (>= ${source:Version}), python-nautilus (>= 1.1-2),
- python-gi, ${misc:Depends}, ${python:Depends}
+Depends: gnome-icon-theme-full | gnome-icon-theme,
+         python-gi,
+         python-nautilus (>= 1.1-2),
+         tortoisehg (>= ${source:Version}),
+         ${misc:Depends},
+         ${python:Depends}
 Recommends: ssh-askpass-gnome | ssh-askpass
 Description: Graphical tool for working with Mercurial (Nautilus extension)
  TortoiseHg provides a graphical tool for interacting with the distributed
