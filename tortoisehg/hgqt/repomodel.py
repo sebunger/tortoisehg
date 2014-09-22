@@ -131,7 +131,7 @@ def _parsebranchcolors(value):
 def _renderlabels(labels, margin=2):
     if not labels:
         return
-    font = QFont()
+    font = QApplication.font('QAbstractItemView')
     fm = QFontMetrics(font, None)  # screen-compatible (i.e. QPixmap) metrics
     twidths = [fm.width(t) for t, _s in labels]
     th = fm.height()
@@ -385,7 +385,7 @@ class HgRepoListModel(QAbstractTableModel):
             if index.column() in (NodeColumn, ConvertedColumn):
                 return QFont("Monospace")
             if index.column() == DescColumn and gnode.wdparent:
-                font = QFont()
+                font = QApplication.font('QAbstractItemView')
                 font.setBold(True)
                 return font
         if role == Qt.ForegroundRole:

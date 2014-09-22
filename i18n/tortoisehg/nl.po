@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-07-24 12:23-0300\n"
-"PO-Revision-Date: 2014-07-10 06:15+0000\n"
+"POT-Creation-Date: 2014-08-18 14:01-0300\n"
+"PO-Revision-Date: 2014-08-29 09:03+0000\n"
 "Last-Translator: Aldwoni <aldwoni@gmail.com>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-07-25 05:44+0000\n"
-"X-Generator: Launchpad (build 17114)\n"
+"X-Launchpad-Export-Date: 2014-08-30 07:03+0000\n"
+"X-Generator: Launchpad (build 17176)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -220,7 +220,7 @@ msgstr "Alle bestanden met conflicten zullen als onopgelost gemarkeerd worden."
 
 msgid "Automatically advance to next page when backout and merge are complete."
 msgstr ""
-"Ga automatisch naar de volgende pagina als backout en samenvoegen afgewerkt "
+"Ga automatisch naar de volgende pagina als backout en samenvoegen voltooid "
 "zijn."
 
 #, python-format
@@ -628,7 +628,7 @@ msgstr "[opdracht resultaat code %d %%s]"
 
 #, python-format
 msgid "[command completed successfully %s]"
-msgstr "[opdracht succesvol afgewerkt %s]"
+msgstr "[opdracht succesvol voltooid  %s]"
 
 #, python-format
 msgid "ignoring invalid cmdworker '%s'\n"
@@ -1426,6 +1426,12 @@ msgstr "Her&noemen..."
 msgid "&Ignore..."
 msgstr "Negeren..."
 
+msgid "Edit Re&jects"
+msgstr ""
+
+msgid "Manually resolve rejected patch chunks"
+msgstr ""
+
 msgid "De&tect Renames..."
 msgstr "Hernoemingen De&tecteren..."
 
@@ -1643,7 +1649,7 @@ msgid "Previous diff"
 msgstr "Vorig verschil"
 
 msgid "Unicode"
-msgstr ""
+msgstr "Unicode"
 
 msgid "Western Europe"
 msgstr "West-Europa"
@@ -1893,7 +1899,7 @@ msgid "You may continue the graft"
 msgstr "U mag de graft verderzetten"
 
 msgid "Exiting with an unfinished graft is not recommended."
-msgstr "Het is niet aangeraden om te eindigen met een onafgewerkte graft."
+msgstr "Het is niet aangeraden om te eindigen met een onvoltooide graft."
 
 msgid "Consider aborting the graft first."
 msgstr "Overweeg om de graft eerst af te breken."
@@ -2513,7 +2519,7 @@ msgstr "Bezig met samenvoegen..."
 
 msgid "Automatically advance to next page when merge is complete."
 msgstr ""
-"Ga automatisch verder naar de volgende pagina als het samenvoegen afgewerkt "
+"Ga automatisch verder naar de volgende pagina als het samenvoegen voltooid "
 "is."
 
 #, python-format
@@ -2523,6 +2529,10 @@ msgid ""
 msgstr ""
 "%d bestanden gewijzigd in beide takken moeten <a href=\"resolve"
 "\"><b>opgelost</b></a> worden"
+
+msgid ""
+"No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
+msgstr ""
 
 msgid "Commit merge results"
 msgstr "Commit resultaten van het samenvoegen"
@@ -3070,7 +3080,7 @@ msgid "Could not open the specified file for reading."
 msgstr "Kan het specifieke bestand niet openen om te lezen."
 
 msgid "This appears to be a binary file."
-msgstr ""
+msgstr "Dit blijkt een binary bestand te zijn."
 
 msgid "An error occurred while reading the file."
 msgstr ""
@@ -3271,7 +3281,7 @@ msgid "You may continue the rebase"
 msgstr "U mag de rebase verderzetten"
 
 msgid "Rebase is complete"
-msgstr "Rebase is afgewerkt"
+msgstr "Rebase is voltooid"
 
 msgid "Rebase failed"
 msgstr "Rebase is mislukt"
@@ -3287,7 +3297,7 @@ msgstr ""
 "\"\"resolve\"><b>opgelost</b></a> worden"
 
 msgid "Exiting with an unfinished rebase is not recommended."
-msgstr "Eindigen met een onafgewerkte rebase is niet aangeraden."
+msgstr "Eindigen met een onvoltooide rebase is niet aangeraden."
 
 msgid "Consider aborting the rebase first."
 msgstr "Overweeg om eerst de rebase af te breken."
@@ -7204,7 +7214,7 @@ msgstr "Bezig met push naar %s..."
 
 #, python-format
 msgid "Push to %s completed"
-msgstr "Push naar %s is afgewerkt"
+msgstr "Push naar %s is voltooid"
 
 #, python-format
 msgid "Push to %s aborted, ret %d"
@@ -8405,6 +8415,9 @@ msgstr ""
 
 #, python-format
 msgid "win32ill: unsupported platform: %s\n"
+msgstr ""
+
+msgid "win32ill: interrupted while stopping message loop\n"
 msgstr ""
 
 #~ msgid "(version %s)"

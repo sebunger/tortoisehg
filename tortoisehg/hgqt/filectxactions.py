@@ -7,7 +7,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
+import os, re
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -15,7 +15,7 @@ from PyQt4.QtGui import *
 from mercurial import util
 
 from tortoisehg.hgqt import cmdcore, cmdui, lfprompt, qtlib, revert, visdiff
-from tortoisehg.hgqt import customtools
+from tortoisehg.hgqt import customtools, rejects
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib, shlib
 
@@ -29,6 +29,9 @@ def _anydeleted(fds):
     return []
 def _committed(fds):
     return [e for e in fds if e.rev() is not None and e.rev() >= 0]
+def _filepath(pat):
+    patre = re.compile(pat)
+    return lambda fds: [e for e in fds if patre.search(e.filePath())]
 def _filestatus(s):
     s = frozenset(s)
     # include directory since its status is unknown
@@ -261,7 +264,7 @@ class FilectxActions(QObject):
         self._visualDiff(fds, _lcanonpaths(fds), rev=['rev(%d)' % fds[0].rev()])
 
     def _visualDiffToBase(self, fds, filenames):
-        if fds[0].baseRev() in fds[0].parentRevs():
+        if fds[0].baseRev() == fds[0].parentRevs()[0]:
             self._visualDiff(fds, filenames, change=fds[0].rev())  # can 3-way
         else:
             revs = [fds[0].baseRev()]
@@ -624,6 +627,15 @@ class WctxActions(FilectxActions):
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
         self._notifyChanges()
+
+    @actionSlot(_('Edit Re&jects'), None, None,
+                _('Manually resolve rejected patch chunks'),
+                (_single, _isfile, _filestatus('?I'), _filepath(r'\.rej$')))
+    def editRejects(self, fds):
+        lpath = hglib.fromunicode(fds[0].absoluteFilePath()[:-4])  # drop .rej
+        dlg = rejects.RejectsDialog(self._ui, lpath, self.parent())
+        if dlg.exec_():
+            self._notifyChanges()
 
     @actionSlot(_('De&tect Renames...'), 'detect_rename', None, '',
                 (_isfile, _filestatus('A?!')))

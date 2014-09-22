@@ -9,10 +9,18 @@ from PyQt4.QtCore import QObject, QThread
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
 from PyQt4.QtGui import QMessageBox, QWidget
 
-from mercurial import hg
+from mercurial import cmdutil, hg, util
 
 from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, qtlib, thgrepo
+
+def _checkchanged(repo):
+    try:
+        cmdutil.bailifchanged(repo)
+        return False
+    except util.Abort:
+        return True
+
 
 class CheckThread(QThread):
     def __init__(self, repo, parent):
@@ -33,7 +41,7 @@ class CheckThread(QThread):
                 break
         wctx = self.repo[None]
         try:
-            dirty = bool(wctx.dirty()) or unresolved
+            dirty = _checkchanged(self.repo) or unresolved
             self.results = (dirty, len(wctx.parents()))
         except EnvironmentError:
             self.results = (True, len(wctx.parents()))

@@ -208,7 +208,8 @@ class build_qt(Command):
         # Search for pyuic4 in python bin dir, then in the $Path.
         if py_file is None:
             py_file = splitext(ui_file)[0] + "_ui.py"
-        if not(self.force or newer(ui_file, py_file)):
+        # setup.py is the source of "from i18n import _" line
+        if not (self.force or newer_group([ui_file, __file__], py_file)):
             return
         try:
             from PyQt4 import uic

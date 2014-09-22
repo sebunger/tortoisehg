@@ -92,12 +92,6 @@ TortoiseHg
 	TortoiseHg will use the selected merge tool. Failing that it uses
 	the first applicable tool it finds.
 
-:guilabel:`Skip Diff Window:`
-	Bypass the builtin visual diff dialog and directly use your
-	visual diff tool's directory diff feature.  Only enable this
-	feature if you know your diff tool has a valid extdiff
-	configuration.  Default: False.
-
 :guilabel:`Visual Editor:`
 	Specify the visual editor used to view files, etc.
 
