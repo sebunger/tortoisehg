@@ -14,7 +14,7 @@ from hgext import record
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, lexers, visdiff, revert, rejects
 from tortoisehg.hgqt import filelistview, filedata, blockmatcher, manifestmodel
 
@@ -755,9 +755,7 @@ class DiffBrowser(QFrame):
             chunk.selected = False
             chunk.write(buf)
             chunk.lines = buf.getvalue().splitlines()
-            utext += [l.decode(fd.textEncoding(), 'replace')
-                      for l in chunk.lines]
-            utext.append('')
+            utext.append(buf.getvalue().decode(fd.textEncoding(), 'replace'))
         self.sci.setText(u'\n'.join(utext))
 
         start = 0

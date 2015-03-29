@@ -13,13 +13,13 @@ import time
 from mercurial import util, error, scmutil, phases
 from mercurial import obsolete  # delete if obsolete becomes enabled by default
 
-from tortoisehg.util import hglib, partialcommit, shlib, wconfig
+from tortoisehg.util import hglib, i18n, shlib, wconfig
+from tortoisehg.util.i18n import _
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.messageentry import MessageEntry
-from tortoisehg.hgqt import cmdcore, cmdui
+from tortoisehg.hgqt import cmdcore, cmdui, thgrepo
 from tortoisehg.hgqt import qtlib, qscilib, status, branchop, revpanel
-from tortoisehg.hgqt import hgrcutil, lfprompt, i18n
+from tortoisehg.hgqt import hgrcutil, lfprompt
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -145,7 +145,6 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         repoagent.configChanged.connect(self.refresh)
         repoagent.repositoryChanged.connect(self.repositoryChanged)
-        repoagent.workingBranchChanged.connect(self.refresh)
         self._repoagent = repoagent
         repo = repoagent.rawRepo()
         self._cmdsession = cmdcore.nullCmdSession()
@@ -472,7 +471,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                  self.msgte.isModified())
             if self.lastCommitMsgs['amend'][0]:
                 self.setMessage(*self.lastCommitMsgs['amend'])
-            else:
+            elif oldpctx is None or oldpctx.node() != pctx.node():
+                # pctx must be refreshed if hash changes
                 self.setMessage(hglib.tounicode(pctx.description()))
         else:
             if self.lastAction in ('qref', 'amend'):
@@ -570,7 +570,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         'Status widget is displaying a new file'
         if not (wfile and contents):
             return
-        if self.msgte.autoCompletionThreshold() < 0:
+        if self.msgte.autoCompletionThreshold() <= 0:
             # do not search for tokens if auto completion is disabled
             # pygments has several infinite loop problems we'd like to avoid
             return
@@ -644,9 +644,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.opts.update(dlg.outopts)
             self.refresh()
 
-    @pyqtSlot()
-    def repositoryChanged(self):
-        'Repository has detected a changelog / dirstate change'
+    @pyqtSlot(int)
+    def repositoryChanged(self, flags):
+        if flags & thgrepo.WorkingParentChanged:
+            self._refreshWorkingState()
+        elif flags & thgrepo.WorkingBranchChanged:
+            self.refresh()
+
+    def _refreshWorkingState(self):
         curraction = self.mqgroup.checkedAction()
         if curraction._name == 'commit' and not self.msgte.isModified():
             # default merge or close-branch message is outdated if new commit
@@ -1009,8 +1014,6 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         cmdline += dcmd + brcmd
 
         if partials:
-            partialcommit.uisetup(repo.ui)
-
             # write patch for partial change selections to temp file
             fd, tmpname = tempfile.mkstemp(prefix='thg-patch-')
             fp = os.fdopen(fd, 'wb')

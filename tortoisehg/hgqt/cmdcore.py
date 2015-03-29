@@ -5,17 +5,41 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, re, signal, struct, sys, time
+import os, signal, struct, sys, time
 
 from PyQt4.QtCore import QBuffer, QIODevice, QObject, QProcess, QTimer
 from PyQt4.QtCore import pyqtSignal, pyqtSlot
 
 from tortoisehg.util import hglib, paths, pipeui
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import thread
+from tortoisehg.util.i18n import _
 
-# TODO: should be moved from thread once CmdThread is superseded by CmdServer
-ProgressMessage = thread.ProgressMessage
+class ProgressMessage(tuple):
+    __slots__ = ()
+
+    def __new__(cls, topic, pos, item='', unit='', total=None):
+        return tuple.__new__(cls, (topic, pos, item, unit, total))
+
+    @property
+    def topic(self):
+        return self[0]  # unicode
+    @property
+    def pos(self):
+        return self[1]  # int or None
+    @property
+    def item(self):
+        return self[2]  # unicode
+    @property
+    def unit(self):
+        return self[3]  # unicode
+    @property
+    def total(self):
+        return self[4]  # int or None
+
+    def __repr__(self):
+        names = ('topic', 'pos', 'item', 'unit', 'total')
+        fields = ('%s=%r' % (n, v) for n, v in zip(names, self))
+        return '%s(%s)' % (self.__class__.__name__, ', '.join(fields))
+
 
 class UiHandler(object):
     """Interface to handle user interaction of Mercurial commands"""
@@ -93,6 +117,7 @@ class CmdWorker(QObject):
 
 
 _localprocexts = [
+    'tortoisehg.util.hgcommands',
     'tortoisehg.util.partialcommit',
     'tortoisehg.util.pipeui',
     ]
@@ -123,18 +148,23 @@ def _fixprocenv(proc):
     # not using setProcessEnvironment() for compatibility with PyQt 4.6
     proc.setEnvironment([hglib.tounicode('%s=%s' % p) for p in env.iteritems()])
 
-def _proccmdline(exts):
-    cmdline = map(hglib.tounicode, paths.get_hg_command())
-    for e in exts:
-        cmdline.extend(('--config', 'extensions.%s=' % e))
-    return cmdline
+def _proccmdline(ui, exts):
+    configs = [(section, name, value)
+               for section, name, value in ui.walkconfig()
+               if ui.configsource(section, name) == '--config']
+    configs.extend(('extensions', e, '') for e in exts)
+    cmdline = list(paths.get_hg_command())
+    for section, name, value in configs:
+        cmdline.extend(('--config', '%s.%s=%s' % (section, name, value)))
+    return map(hglib.tounicode, cmdline)
 
 
 class CmdProc(CmdWorker):
     'Run mercurial command in separate process'
 
-    def __init__(self, parent=None, cwd=None):
+    def __init__(self, ui, parent=None, cwd=None):
         super(CmdProc, self).__init__(parent)
+        self._ui = ui
         self._uihandler = None
         self._proc = proc = QProcess(self)
         _fixprocenv(proc)
@@ -147,7 +177,7 @@ class CmdProc(CmdWorker):
 
     def startCommand(self, cmdline, uihandler):
         self._uihandler = uihandler
-        fullcmdline = _proccmdline(_localprocexts)
+        fullcmdline = _proccmdline(self._ui, _localprocexts)
         fullcmdline.extend(cmdline)
         self._proc.start(fullcmdline[0], fullcmdline[1:], QIODevice.ReadOnly)
 
@@ -191,6 +221,7 @@ class CmdProc(CmdWorker):
                 and self._uihandler.writeOutput(msg, label) >= 0):
                 continue
             msg = hglib.tounicode(msg)
+            label = hglib.tounicode(label)
             if 'ui.progress' in label.split():
                 progress = ProgressMessage(*pipeui.unpackprogress(msg))
                 self.progressReceived.emit(progress)
@@ -201,16 +232,21 @@ class CmdProc(CmdWorker):
 class CmdServer(CmdWorker):
     """Run Mercurial commands in command server process"""
 
-    def __init__(self, parent=None, cwd=None):
+    def __init__(self, ui, parent=None, cwd=None):
         super(CmdServer, self).__init__(parent)
+        self._ui = ui
         self._uihandler = UiHandler()
         self._readchtable = self._idlechtable
         self._readq = []  # (ch, data or datasize), ...
         # deadline for arrival of hello message and immature data
-        self._readtimer = QTimer(self, interval=5000, singleShot=True)
+        sec = ui.configint('tortoisehg', 'cmdserver.readtimeout', 5)
+        self._readtimer = QTimer(self, interval=sec * 1000, singleShot=True)
         self._readtimer.timeout.connect(self._onReadTimeout)
+        self._proc = self._createProc(cwd)
+        self._servicestate = CmdWorker.NotRunning
 
-        self._proc = proc = QProcess(self)
+    def _createProc(self, cwd):
+        proc = QProcess(self)
         _fixprocenv(proc)
         if cwd:
             proc.setWorkingDirectory(cwd)
@@ -219,7 +255,7 @@ class CmdServer(CmdWorker):
         proc.setReadChannel(QProcess.StandardOutput)
         proc.readyRead.connect(self._onReadyRead)
         proc.readyReadStandardError.connect(self._onReadyReadError)
-        self._servicestate = CmdWorker.NotRunning
+        return proc
 
     def serviceState(self):
         return self._servicestate
@@ -237,7 +273,14 @@ class CmdServer(CmdWorker):
             self._changeServiceState(CmdWorker.Restarting)
 
     def _startService(self):
-        cmdline = _proccmdline(_localprocexts + _localserverexts)
+        if self._proc.bytesToWrite() > 0:
+            # QTBUG-44517: recreate QProcess to discard remainder of last
+            # request; otherwise it would be written to new process
+            oldproc = self._proc
+            self._proc = self._createProc(oldproc.workingDirectory())
+            oldproc.setParent(None)
+
+        cmdline = _proccmdline(self._ui, _localprocexts + _localserverexts)
         cmdline.extend(['serve', '--cmdserver', 'pipe',
                         '--config', 'ui.interactive=True'])
         self._readchtable = self._hellochtable
@@ -286,7 +329,12 @@ class CmdServer(CmdWorker):
     def startCommand(self, cmdline, uihandler):
         assert self._servicestate == CmdWorker.Ready
         assert not self.isCommandRunning()
-        data = hglib.fromunicode('\0'.join(cmdline))
+        try:
+            data = hglib.fromunicode('\0'.join(cmdline))
+        except UnicodeEncodeError, inst:
+            self._emitError(_('failed to encode command: %s') % inst)
+            self._finishCommand(-1)
+            return
         self._uihandler = uihandler
         self._readchtable = self._runcommandchtable
         self._proc.write('runcommand\n')
@@ -373,6 +421,7 @@ class CmdServer(CmdWorker):
         for data in pipeui.splitmsgs(fulldata):
             msg, label = pipeui.unpackmsg(data)
             msg = hglib.tounicode(msg)
+            label = hglib.tounicode(label)
             self.outputReceived.emit(msg, label or 'ui.error')
 
     def _processHello(self, _ch, data):
@@ -395,6 +444,7 @@ class CmdServer(CmdWorker):
         if ch == 'o' and self._uihandler.writeOutput(msg, label) >= 0:
             return
         msg = hglib.tounicode(msg)
+        label = hglib.tounicode(label)
         labelset = label.split()
         if 'ui.progress' in labelset:
             progress = ProgressMessage(*pipeui.unpackprogress(msg))
@@ -425,7 +475,12 @@ class CmdServer(CmdWorker):
         if text is None:
             self._writeBlock('')
             return
-        data = hglib.fromunicode(text) + '\n'
+        try:
+            data = hglib.fromunicode(text) + '\n'
+        except UnicodeEncodeError, inst:
+            self._emitError(_('failed to encode input: %s') % inst)
+            self.abortCommand()
+            return
         for start in xrange(0, len(data), size):
             self._writeBlock(data[start:start + size])
 
@@ -449,40 +504,10 @@ class CmdServer(CmdWorker):
 
 
 _workertypes = {
-    'thread': thread.CmdThread,
     'proc': CmdProc,
     'server': CmdServer,
     }
 
-
-_urlpassre = re.compile(r'^([a-zA-Z0-9+.\-]+://[^:@/]*):[^@/]+@')
-
-def _reprcmdarg(arg):
-    arg = _urlpassre.sub(r'\1:***@', arg)
-    arg = arg.replace('\n', '^M')
-
-    # only for display; no use to construct command string for os.system()
-    if not arg or ' ' in arg or '\\' in arg or '"' in arg:
-        return '"%s"' % arg.replace('"', '\\"')
-    else:
-        return arg
-
-def _prettifycmdline(cmdline):
-    r"""Build pretty command-line string for display
-
-    >>> _prettifycmdline(['log', 'foo\\bar', '', 'foo bar', 'foo"bar'])
-    'log "foo\\bar" "" "foo bar" "foo\\"bar"'
-    >>> _prettifycmdline(['log', '--template', '{node}\n'])
-    'log --template {node}^M'
-
-    mask password in url-like string:
-
-    >>> _prettifycmdline(['push', 'http://foo123:bar456@example.org/'])
-    'push http://foo123:***@example.org/'
-    >>> _prettifycmdline(['clone', 'svn+http://:bar@example.org:8080/trunk/'])
-    'clone svn+http://:***@example.org:8080/trunk/'
-    """
-    return ' '.join(_reprcmdarg(e) for e in cmdline)
 
 class CmdSession(QObject):
     """Run Mercurial commands in a background thread or process"""
@@ -621,8 +646,8 @@ class CmdSession(QObject):
     def _runNext(self):
         cmdline = self._queue[self._qnextp]
         self._qnextp += 1
+        self._emitControlMessage('% hg ' + hglib.prettifycmdline(cmdline))
         self._worker.startCommand(cmdline, self._uihandler)
-        self._emitControlMessage('% hg ' + _prettifycmdline(cmdline))
 
     def _finish(self, ret):
         self._qnextp = len(self._queue)
@@ -713,7 +738,7 @@ class CmdAgent(QObject):
     def __init__(self, ui, parent=None, cwd=None, worker=None):
         super(CmdAgent, self).__init__(parent)
         self._ui = ui
-        self._worker = self._createWorker(cwd, worker)
+        self._worker = self._createWorker(cwd, worker or 'server')
         self._sessqueue = []  # [active, waiting...]
         self._runlater = QTimer(self, interval=0, singleShot=True)
         self._runlater.timeout.connect(self._runNextSession)
@@ -796,20 +821,9 @@ class CmdAgent(QObject):
         for sess in self._sessqueue[:]:
             sess.abort()
 
-    def _defaultWorkerName(self):
-        # hidden config to fall back to traditional thread in case of bug
-        name = self._ui.config('tortoisehg', 'cmdworker', 'server')
-        if name not in _workertypes:
-            self.outputReceived.emit(_("ignoring invalid cmdworker '%s'\n")
-                                     % hglib.tounicode(name), 'ui.warning')
-            return 'server'
-        return name
-
     def _createWorker(self, cwd, name):
-        if not name:
-            name = self._defaultWorkerName()
         self._ui.debug("creating cmdworker '%s'\n" % name)
-        worker = _workertypes[name](self, cwd)
+        worker = _workertypes[name](self._ui, self, cwd)
         worker.serviceStateChanged.connect(self._tryEmitServiceStopped)
         worker.outputReceived.connect(self.outputReceived)
         worker.progressReceived.connect(self.progressReceived)
@@ -819,7 +833,7 @@ class CmdAgent(QObject):
     def _runNextSession(self):
         sess = self._sessqueue[0]
         worker = self._worker
-        assert not worker.isCommandRunning() or thread.HAVE_QTBUG_30251
+        assert not worker.isCommandRunning()
         sess.run(worker)
         # start after connected to sess so that it can receive immediate error
         worker.startService()

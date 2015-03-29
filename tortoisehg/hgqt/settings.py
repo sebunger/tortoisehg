@@ -11,7 +11,7 @@ from mercurial import ui, util, error, extensions, scmutil, phases
 
 from tortoisehg.util import hglib, paths, wconfig, i18n, editor
 from tortoisehg.util import terminal, gpg
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools, fileencoding
 
 from PyQt4.QtCore import *
@@ -402,7 +402,9 @@ class PathBrowser(QWidget):
         self.opts = opts
 
         self.lineEdit = QLineEdit()
-        completer = QCompleter(self)
+        # use QCompleter(model, parent) to avoid ownership bug of
+        # QCompleter(parent /TransferBack/) in PyQt<4.11.4
+        completer = QCompleter(None, self)
         completer.setModel(QDirModel(completer))
         self.lineEdit.setCompleter(completer)
 
@@ -582,7 +584,8 @@ INFO = (
         _('Specify the command to launch your preferred terminal shell '
           'application. If the value includes the string %(reponame)s, the '
           'name of the repository will be substituted in place of '
-          '%(reponame)s. (restart needed)<br>'
+          '%(reponame)s. Similarly, %(root)s will be the full path to the '
+          'repository. (restart needed)<br>'
           'Default, Windows: cmd.exe /K title %(reponame)s<br>'
           'Default, OS X: not set<br>'
           'Default, other: xterm -T "%(reponame)s"'),
@@ -622,6 +625,10 @@ INFO = (
           'even if the edits are to different parts of the file. In either '
           'case, when conflicts occur, the user will be invited to review and '
           'resolve changes manually. Default: True.')),
+    _fi(_('New Repo Skeleton'), 'tortoisehg.initskel', genPathBrowser,
+        _('If specified, files in the directory, e.g. .hgignore, are copied '
+          'to the newly-created repository.'),
+        globalonly=True),
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
@@ -690,7 +697,7 @@ INFO = (
           '@ character, and \\n to a linefeed. '
           'Default: None (leave blank)')),
     _fi(_('Hide Tags'), 'tortoisehg.hidetags', genEditCombo,
-        _('Space separated list of tags that will not be shown.'
+        _('Space separated list of tags that will not be shown. '
           'Useful example: Specify "qbase qparent qtip" to hide the '
           'standard tags inserted by the Mercurial Queues Extension. '
           'Default: None (leave blank)')),
@@ -1013,7 +1020,7 @@ INFO = (
           'You may include groups in issue.regex, and corresponding {n} '
           'tokens in issue.link (where n is a non-negative integer). '
           '{0} refers to the entire string matched by issue.regex, '
-          'while {1} refers to the first group and so on. If no {n} tokens'
+          'while {1} refers to the first group and so on. If no {n} tokens '
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
     _fi(_('Inline Tags'), 'tortoisehg.issue.inlinetags', genBoolRBGroup,
@@ -1117,7 +1124,7 @@ INFO = (
     _fi(_('Servers'), 'projrc.servers', genEditCombo,
         _('List of Servers from which "projrc" configuration files must be '
           'pulled. Set it to "*" to pull from all servers. Set it to "default" '
-          'to pull from the default sync path.'
+          'to pull from the default sync path. '
           'Default is pull from NO servers.')),
     _fi(_('Include'), 'projrc.include', genEditCombo,
         _('List of settings that will be pulled from the project configuration '

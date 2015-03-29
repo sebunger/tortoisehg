@@ -11,7 +11,7 @@ from mercurial import node
 from mercurial import ui, hg, util, error
 
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, hgrcutil
 
 from PyQt4.QtCore import *
@@ -239,12 +239,15 @@ class RepoTreeItem(object):
 class RepoItem(RepoTreeItem):
     xmltagname = 'repo'
 
-    def __init__(self, root, shortname=None, basenode=None, parent=None):
+    def __init__(self, root, shortname=None, basenode=None, sharedpath=None,
+                 parent=None):
         RepoTreeItem.__init__(self, parent)
         self._root = root
         self._shortname = shortname or u''
         self._basenode = basenode or node.nullid
-        self._valid = True  # expensive check is done at appendSubrepos()
+        # expensive check is done at appendSubrepos()
+        self._sharedpath = sharedpath or ''
+        self._valid = True
 
     def isRepo(self):
         return True
@@ -282,6 +285,8 @@ class RepoItem(RepoTreeItem):
             ico = qtlib.geticon(baseiconname)
             if not self._valid:
                 ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
+            elif self._sharedpath:
+                ico = qtlib.getoverlaidicon(ico, qtlib.geticon('hg-sharedrepo'))
             return ico
         elif role in (Qt.DisplayRole, Qt.EditRole):
             return [self.shortname, self.shortpath][column]()
@@ -324,6 +329,8 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
+        if self._sharedpath:
+            xw.writeAttribute('sharedpath', self._sharedpath)
         _dumpChild(xw, parent=self)
 
     @classmethod
@@ -331,7 +338,8 @@ class RepoItem(RepoTreeItem):
         a = xr.attributes()
         obj = cls(hglib.fromunicode(a.value('', 'root').toString()),
                   unicode(a.value('', 'shortname').toString()),
-                  node.bin(str(a.value('', 'basenode').toString())))
+                  node.bin(str(a.value('', 'basenode').toString())),
+                  unicode(a.value('', 'sharedpath').toString()))
         _undumpChild(xr, parent=obj, undump=_undumpSubrepoItem)
         return obj
 
@@ -339,6 +347,7 @@ class RepoItem(RepoTreeItem):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
     def appendSubrepos(self, repo=None):
+        self._sharedpath = ''
         invalidRepoList = []
         try:
             sri = None
@@ -346,9 +355,13 @@ class RepoItem(RepoTreeItem):
                 if not os.path.exists(self._root):
                     self._valid = False
                     return [self._root]
-                elif not os.path.exists(os.path.join(self._root, '.hgsub')):
+                elif (not os.path.exists(os.path.join(self._root, '.hgsub'))
+                      and not os.path.exists(
+                          os.path.join(self._root, '.hg', 'sharedpath'))):
                     return []  # skip repo creation, which is expensive
                 repo = hg.repository(ui.ui(), self._root)
+            if repo.sharedpath != repo.path:
+                self._sharedpath = hglib.tounicode(repo.sharedpath)
             wctx = repo['.']
             sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
             for subpath in sorted(wctx.substate, key=sortkey):

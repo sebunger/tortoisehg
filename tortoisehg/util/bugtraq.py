@@ -7,7 +7,7 @@ from comtypes.client import CreateObject
 from comtypes.automation import _midlSAFEARRAY
 from _winreg import *
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 
 class IBugTraqProvider(IUnknown):
     _iid_ = GUID("{298B927C-7220-423C-B7B4-6E241F00CD93}")

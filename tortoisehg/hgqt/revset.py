@@ -5,15 +5,14 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from tortoisehg.hgqt import qtlib, cmdcore, cmdui
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.hgqt import qtlib, cmdui
+from tortoisehg.util.i18n import _
 
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerPython
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # TODO:
-#  Connect to repoview revisionClicked events
 #  Shift-Click rev range -> revision range X:Y
 #  Ctrl-Click two revs -> DAG range X::Y
 #  QFontMetrics.elidedText for help label
@@ -107,16 +106,13 @@ _logical = (
 )
 
 class RevisionSetQuery(QDialog):
-    # Emit query string and resulting revision set
-    queryIssued = pyqtSignal(QString, object)
-    showMessage = pyqtSignal(QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
+
+    queryIssued = pyqtSignal(QString)
 
     def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
 
         self._repoagent = repoagent
-        self._cmdsession = cmdcore.nullCmdSession()
         # Since the revset dialot belongs to a repository, we display
         # the repository name in the dialog title
         self.setWindowTitle(_('Revision Set Query')
@@ -141,8 +137,6 @@ class RevisionSetQuery(QDialog):
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
         self.stbar.lbl.setOpenExternalLinks(True)
-        self.showMessage.connect(self.stbar.showMessage)
-        self.progress.connect(self.stbar.progress)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*(0,)*4)
@@ -221,31 +215,7 @@ class RevisionSetQuery(QDialog):
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
     def runQuery(self):
-        if not self._cmdsession.isFinished():
-            return
-        self.entry.setEnabled(False)
-        self.showMessage.emit(_('Searching...'))
-        self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
-
-        cmdline = ['log', '-T', '{rev}\n', '-r', unicode(self.entry.text())]
-        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
-        sess.setCaptureOutput(True)
-        sess.commandFinished.connect(self.queryFinished)
-
-    @pyqtSlot(int)
-    def queryFinished(self, ret):
-        sess = self._cmdsession
-        if ret == 0:
-            revs = map(int, str(sess.readAll()).splitlines())
-            if revs:
-                self.showMessage.emit(_('%d matches found') % len(revs))
-            else:
-                self.showMessage.emit(_('No matches found'))
-            self.queryIssued.emit(self.entry.text(), revs)
-        else:
-            self.showMessage.emit(sess.errorString() or sess.warningString())
-        self.entry.setEnabled(True)
-        self.progress.emit(*cmdui.stopProgress(_('Running')))
+        self.queryIssued.emit(self.entry.text())
 
     def returnPressed(self):
         if self.entry.hasSelectedText():

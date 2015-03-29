@@ -15,10 +15,12 @@
 # this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from math import sin, cos, pi
+
 from mercurial import error
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import graph, qtlib, repomodel
 
 from PyQt4.QtCore import *
@@ -26,8 +28,6 @@ from PyQt4.QtGui import *
 
 class HgRepoView(QTreeView):
 
-    revisionClicked = pyqtSignal(object)
-    revisionAltClicked = pyqtSignal(object)
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
     menuRequested = pyqtSignal(QPoint, object)
@@ -50,10 +50,15 @@ class HgRepoView(QTreeView):
         header.setContextMenuPolicy(Qt.CustomContextMenu)
         header.customContextMenuRequested.connect(self.headerMenuRequest)
         header.sectionMoved.connect(self.columnsVisibilityChanged)
+        header.sectionMoved.connect(self._saveColumnSettings)
 
         self.createActions()
         self.setItemDelegateForColumn(repomodel.GraphColumn,
                                       GraphDelegate(self))
+        self.setItemDelegateForColumn(repomodel.DescColumn,
+                                      LabeledDelegate(self))
+        self.setItemDelegateForColumn(repomodel.ChangesColumn,
+                                      LabeledDelegate(self, margin=0))
 
         self.setAcceptDrops(True)
         if PYQT_VERSION >= 0x40700:
@@ -130,6 +135,7 @@ class HgRepoView(QTreeView):
             validcols = model._defaultcolumns
         self.setVisibleColumns(validcols)
 
+    @pyqtSlot()
     def _saveColumnSettings(self):
         s = QSettings()
         s.beginGroup(self.colselect[0])
@@ -170,15 +176,6 @@ class HgRepoView(QTreeView):
         self._rev_history = []
         self._rev_pos = -1
         self._in_history = False
-
-    def resetBrowseHistory(self, revs, reselrev=None):
-        graph = self.model().graph
-        self._rev_history = [r for r in revs if r in graph.nodesdict]
-        if reselrev is not None and reselrev in self._rev_history:
-            self._rev_pos = self._rev_history.index(reselrev)
-        else:
-            self._rev_pos = -1
-        self.forward()
 
     @pyqtSlot()
     def resizeColumns(self):
@@ -233,10 +230,6 @@ class HgRepoView(QTreeView):
         if rev is not None:
             clip = QApplication.clipboard()
             clip.setText(str(self.repo[rev]), QClipboard.Selection)
-        if QApplication.keyboardModifiers() & Qt.AltModifier:
-            self.revisionAltClicked.emit(rev)
-        else:
-            self.revisionClicked.emit(rev)
 
     def revActivated(self, index):
         rev = self.revFromindex(index)
@@ -310,11 +303,9 @@ class HgRepoView(QTreeView):
         else:
             idx = self.model().indexFromRev(rev)
             if idx.isValid():
-                # avoid unwanted selection change (#1019)
-                if self.currentIndex().row() != idx.row():
-                    flags = (QItemSelectionModel.ClearAndSelect
-                             | QItemSelectionModel.Rows)
-                    self.selectionModel().setCurrentIndex(idx, flags)
+                flags = (QItemSelectionModel.ClearAndSelect
+                         | QItemSelectionModel.Rows)
+                self.selectionModel().setCurrentIndex(idx, flags)
                 self.scrollTo(idx)
 
     def saveSettings(self, s = None):
@@ -430,17 +421,15 @@ def _edge_color(edge, active):
     if not active or edge.linktype == graph.LINE_TYPE_FAMILY:
         return "gray"
     else:
-        return repomodel.get_color(edge.color)
+        colors = repomodel.COLORS
+        return colors[edge.color % len(colors)]
 
 
 class GraphDelegate(QStyledItemDelegate):
 
-    def __init__(self, parent):
+    def __init__(self, parent=None):
         super(GraphDelegate, self).__init__(parent)
-        assert isinstance(parent, QWidget)
-        # assumes 4px as text and decoration margins of other columns
-        fm = parent.fontMetrics()
-        self._rowheight = self._rowheighthint = max(fm.height() + 4, 16)
+        self._rowheight = 16  # updated to the actual height on paint()
 
     def _col2x(self, col):
         maxradius = max(self._rowheight / 2, 1)
@@ -547,6 +536,17 @@ class GraphDelegate(QStyledItemDelegate):
             rect_ = QRectF(centre_x - 1.5 * s, centre_y - 0.5 * s, 3 * s, s)
             painter.drawRect(rect_)
 
+        def polygon(r, sides, shift=0):
+            """draw a regular poligon, pointing upward"""
+            phaseincr = (2 * pi / sides)
+            phaseshift = phaseincr * shift
+            phases = [phaseshift + phaseincr * n for n in range(sides)]
+            points = [QPointF(centre_x + r * -sin(p), centre_y + r * -cos(p))
+                      for p in phases]
+            points.append(points[-1])
+            poly = QPolygonF(points)
+            painter.drawPolygon(poly)
+
         def diamond(r):
             poly = QPolygonF([QPointF(centre_x - r, centre_y),
                               QPointF(centre_x, centre_y - r),
@@ -555,53 +555,163 @@ class GraphDelegate(QStyledItemDelegate):
                               QPointF(centre_x - r, centre_y),])
             painter.drawPolygon(poly)
 
-        hiddenrev = gnode.hidden
-        if hiddenrev:
-            painter.setBrush(truewhite)
-            white.setAlpha(64)
-            fillcolor.setAlpha(64)
+        def square(r):
+            rect = QRectF(centre_x - r,
+                          centre_y - r,
+                          2 * r, 2 * r)
+            painter.drawRect(rect)
+
         if gnode.shape == graph.NODE_SHAPE_APPLIEDPATCH:
-            # diamonds for patches
             symbolsize = radius / 1.5
-            if hiddenrev:
-                diamond(symbolsize)
-            if gnode.wdparent:
-                painter.setBrush(white)
-                diamond(2 * 0.9 * symbolsize)
-            painter.setBrush(fillcolor)
-            diamond(symbolsize)
+            symbol = diamond
         elif gnode.shape == graph.NODE_SHAPE_UNAPPLIEDPATCH:
             symbolsize = radius / 1.5
-            if hiddenrev:
-                diamond(symbolsize)
-            patchcolor = QColor('#dddddd')
-            painter.setBrush(patchcolor)
-            painter.setPen(patchcolor)
-            diamond(symbolsize)
+            fillcolor = QColor('#dddddd')
+            painter.setPen(fillcolor)
+            symbol = diamond
         elif gnode.shape == graph.NODE_SHAPE_CLOSEDBRANCH:
             symbolsize = 0.5 * radius
-            if hiddenrev:
-                closesymbol(symbolsize)
-            painter.setBrush(fillcolor)
-            closesymbol(symbolsize)
-        else:  # circles for normal revisions
+            symbol = closesymbol
+        elif gnode.shape == graph.NODE_SHAPE_REVISION_SECRET:
+            symbolsize = 0.45 * radius
+            symbol = square
+        elif gnode.shape == graph.NODE_SHAPE_REVISION_DRAFT:
+            symbolsize = 0.57 * radius
+            symbol = lambda size: polygon(size, 5)
+        else:
             symbolsize = 0.5 * radius
-            if hiddenrev:
-                circle(symbolsize)
-            if gnode.wdparent:
-                painter.setBrush(white)
-                circle(0.9 * radius)
-            painter.setBrush(fillcolor)
-            circle(symbolsize)
+            symbol = circle
+
+        if gnode.faded:
+            painter.setBrush(truewhite)
+            painter.setPen(truewhite)
+            white.setAlpha(64)
+            fillcolor.setAlpha(64)
+            symbol(symbolsize)
+            pencolor.setAlpha(64)
+            pen.setColor(pencolor)
+            painter.setPen(pen)
+        if gnode.wdparent and gnode.shape != graph.NODE_SHAPE_CLOSEDBRANCH:
+            painter.setBrush(white)
+            symbol(2 * 0.9 * symbolsize)
+        painter.setBrush(fillcolor)
+        symbol(symbolsize)
 
     def sizeHint(self, option, index):
+        size = super(GraphDelegate, self).sizeHint(option, index)
         gnode = index.data(repomodel.GraphNodeRole).toPyObject()
         if gnode:
             # return width for current height assuming that row height
             # is calculated first (mimic width-for-height policy)
-            return QSize(self._col2x(gnode.cols), self._rowheighthint)
+            return QSize(self._col2x(gnode.cols), max(size.height(), 16))
         else:
-            return QSize(0, 0)
+            return size
+
+
+class _LabelsLayout(object):
+    """Lay out and render text labels"""
+
+    def __init__(self, labels, font, margin=2):
+        self._labels = labels
+        self._margin = margin
+        if font.bold():
+            # cancel bold of working-directory row
+            font = QFont(font)
+            font.setBold(False)
+        self._font = font
+        fm = QFontMetrics(font)
+        self._twidths = [fm.width(t) for t, _s in labels]
+        self._th = fm.height()
+        self._padw = 2
+        self._padh = 1  # may overwrite horizontal frame to fit row
+
+    def width(self):
+        space = 2 * self._padw + self._margin
+        return sum(self._twidths) + len(self._labels) * space - self._margin
+
+    def height(self):
+        return self._th + 2 * self._padh
+
+    def draw(self, painter, pos):
+        painter.save()
+        try:
+            painter.translate(pos)
+            self._drawLabels(painter)
+        finally:
+            painter.restore()
+
+    def _drawLabels(self, painter):
+        th = self._th
+        padw = self._padw
+        padh = self._padh
+
+        painter.setFont(self._font)
+        x = 0
+        for (text, style), tw in zip(self._labels, self._twidths):
+            lw = tw + 2 * padw
+            lh = th + 2 * padh
+            # draw bevel, background and text in order
+            bg = qtlib.getbgcoloreffect(style)
+            painter.fillRect(x, 0, lw, lh, bg.darker(110))
+            painter.fillRect(x + 1, 1, lw - 2, lh - 2, bg.lighter(110))
+            painter.fillRect(x + 2, 2, lw - 4, lh - 4, bg)
+            painter.setPen(qtlib.gettextcoloreffect(style))
+            painter.drawText(x + padw, padh, tw, th, 0, text)
+            x += lw + self._margin
+
+
+class LabeledDelegate(QStyledItemDelegate):
+    """Render text labels in place of icon/pixmap decoration"""
+
+    def __init__(self, parent=None, margin=2):
+        super(LabeledDelegate, self).__init__(parent)
+        self._margin = margin
+
+    def _makeLabelsLayout(self, labels, option):
+        return _LabelsLayout(labels, option.font, self._margin)
+
+    def initStyleOption(self, option, index):
+        super(LabeledDelegate, self).initStyleOption(option, index)
+        labels = index.data(repomodel.LabelsRole).toPyObject()
+        if not labels:
+            return
+        lay = self._makeLabelsLayout(labels, option)
+        option.decorationSize = QSize(lay.width(), lay.height())
+        if isinstance(option, QStyleOptionViewItemV2):
+            option.features |= QStyleOptionViewItemV2.HasDecoration
+
+    def paint(self, painter, option, index):
+        super(LabeledDelegate, self).paint(painter, option, index)
+        labels = index.data(repomodel.LabelsRole).toPyObject()
+        if not labels:
+            return
+
+        option = QStyleOptionViewItemV4(option)
+        self.initStyleOption(option, index)
+        if option.widget:
+            style = option.widget.style()
+        else:
+            style = QApplication.style()
+        rect = style.subElementRect(QStyle.SE_ItemViewItemDecoration, option,
+                                    option.widget)
+
+        # for maximum readability, use vivid color regardless of option.state
+        lay = self._makeLabelsLayout(labels, option)
+        painter.save()
+        try:
+            painter.setClipRect(option.rect)
+            lay.draw(painter, rect.topLeft())
+        finally:
+            painter.restore()
+
+    def sizeHint(self, option, index):
+        size = super(LabeledDelegate, self).sizeHint(option, index)
+        # give additional margins for each row (even if it has no labels
+        # because uniformRowHeights is enabled)
+        option = QStyleOptionViewItemV4(option)
+        self.initStyleOption(option, index)
+        lay = self._makeLabelsLayout([], option)
+        return QSize(size.width(), max(size.height(), lay.height() + 2))
 
 
 class ColumnSelectDialog(QDialog):

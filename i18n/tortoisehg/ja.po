@@ -9,22 +9,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-08-18 14:01-0300\n"
-"PO-Revision-Date: 2014-07-10 14:21+0000\n"
+"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"PO-Revision-Date: 2015-01-31 04:22+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-08-19 06:17+0000\n"
-"X-Generator: Launchpad (build 17156)\n"
+"X-Launchpad-Export-Date: 2015-02-20 05:15+0000\n"
+"X-Generator: Launchpad (build 17341)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
 
 msgid "Exit"
 msgstr "終了"
+
+msgid "hg lighthg"
+msgstr ""
 
 msgid "About"
 msgstr "バージョン情報"
@@ -582,6 +585,10 @@ msgid "process exited unexpectedly with code %d"
 msgstr ""
 
 #, python-format
+msgid "failed to encode command: %s"
+msgstr ""
+
+#, python-format
 msgid "timed out while reading: %r..."
 msgstr ""
 
@@ -603,6 +610,10 @@ msgstr ""
 msgid "corrupted command result: %r"
 msgstr ""
 
+#, python-format
+msgid "failed to encode input: %s"
+msgstr ""
+
 msgid "Terminated by user"
 msgstr "ユーザーによって中断されました"
 
@@ -622,10 +633,6 @@ msgstr "[コマンドの返り値 %d %%s]"
 msgid "[command completed successfully %s]"
 msgstr "[コマンドが成功しました %s]"
 
-#, python-format
-msgid "ignoring invalid cmdworker '%s'\n"
-msgstr "無効な cmdworker 「%s」を無視\n"
-
 msgid "Running..."
 msgstr "実行中..."
 
@@ -639,10 +646,10 @@ msgid "TortoiseHg Prompt"
 msgstr "TortoiseHgプロンプト"
 
 msgid "Show Detail"
-msgstr ""
+msgstr "詳細を表示"
 
 msgid "Hide Detail"
-msgstr ""
+msgstr "詳細を隠す"
 
 msgid "Confirm Exit"
 msgstr "終了"
@@ -1241,11 +1248,11 @@ msgstr "コマンドの解釈時エラー: %s"
 msgid "no matches found: %s"
 msgstr "見つかりません: %s"
 
-msgid "Output Log"
-msgstr "コマンドログ"
+msgid "Console"
+msgstr "コンソール"
 
-msgid "File &History"
-msgstr "ファイルの変更履歴(&H)"
+msgid "File &History / Annotate"
+msgstr "ファイルの変更履歴・由来情報(&H)"
 
 msgid "Show the history of the selected file"
 msgstr "選択したファイルの履歴を表示する"
@@ -2260,70 +2267,29 @@ msgstr ""
 msgid "Unable to write .hgignore file"
 msgstr ".hgignoreファイルに書き込めません"
 
+msgid "Copy working directory files from skeleton"
+msgstr ""
+
 msgid "Add special files (.hgignore, ...)"
 msgstr "特殊ファイルを追加する (.hgignoreなど)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Mercurial 1.7 互換のリポジトリを作成"
 
-msgid "Show in Workbench after init"
-msgstr "作成後にWorkbenchに追加する"
-
-msgid "Create"
-msgstr "作成"
-
 msgid "New Repository"
 msgstr "リポジトリを作成"
 
-msgid "Error executing init"
-msgstr "作成でエラーが起きました"
-
-msgid "Destination path is empty"
-msgstr "リポジトリを作成する場所を指定してください"
-
-msgid "Please enter the directory path"
-msgstr "ディレクトリパスを入力してください"
-
-msgid "Init"
-msgstr "リポジトリを作成"
-
-#, python-format
-msgid "Are you sure about adding the new repository %d extra levels deep?"
-msgstr ""
-"%d 段階も深いパスに、本当に新しいリポジトリを追加しますか？\r\n"
-"(作成する場合上位フォルダも作成されます)"
-
-#, python-format
-msgid ""
-"Path exists up to:\n"
-"%s\n"
-"and you asked for:\n"
-"%s"
-msgstr ""
-"このパスはすでに存在しています:\n"
-"%s\n"
-"入力したパス:\n"
-"%s"
-
-#, python-format
-msgid "Cannot create folder %s"
-msgstr "%s というフォルダを作成できません"
-
-msgid "Unable to create new repository"
-msgstr "新しいリポジトリの作成に失敗しました"
-
-msgid "Error when creating repository"
-msgstr "リポジトリ作成中にエラーが発生しました"
-
-#, python-format
-msgid "<p>Repository successfully created at</p><p>%s</p>"
-msgstr "<p>以下の場所にリポジトリを作成しました</p><p>%s</p>"
+msgid "&Create"
+msgstr "作成(&C)"
 
 msgid "Unable to create a config file"
 msgstr "設定ファイルを作れません"
 
 msgid "Insufficient access rights."
 msgstr "アクセス権限が足りません"
+
+msgid "Show Log"
+msgstr "ログを見る"
 
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
@@ -2511,7 +2477,7 @@ msgstr "TortoiseHg マージコミット"
 
 #, python-format
 msgid ""
-"Error creating interpreting commit date (%s).\n"
+"Error interpreting commit date (%s).\n"
 "Using current date instead."
 msgstr ""
 
@@ -2556,6 +2522,9 @@ msgstr "キューを作成"
 
 msgid "New patch queue name"
 msgstr "作成するパッチキューの名前"
+
+msgid "Create"
+msgstr "作成"
 
 msgid "Rename Patch Queue"
 msgstr "キュー名を変更"
@@ -2826,6 +2795,16 @@ msgstr "レビューボードに接続中..."
 msgid "Post &Review"
 msgstr "レビューを投稿(&R)"
 
+msgid "Target:"
+msgstr "対象:"
+
+#, python-format
+msgid "Prune - %s"
+msgstr ""
+
+msgid "&Prune"
+msgstr ""
+
 msgid "No unknown files found"
 msgstr "不明なファイルはありません"
 
@@ -3085,12 +3064,6 @@ msgstr "リポジトリはロックされています"
 msgid "hint:"
 msgstr "ヒント:"
 
-msgid "Keyboard Interrupt"
-msgstr ""
-
-msgid "Close this application?"
-msgstr "このアプリケーションを終了しますか？"
-
 msgid "Repository Error"
 msgstr "リポジトリエラー"
 
@@ -3122,9 +3095,6 @@ msgstr "シェルが設定されていません"
 
 msgid "A terminal shell must be configured"
 msgstr "ターミナルシェルは設定されている必要があります"
-
-msgid "Show Log"
-msgstr "ログを見る"
 
 msgid "Please enter a username"
 msgstr "ユーザー名を入力してください"
@@ -3302,8 +3272,8 @@ msgstr "元ファイルの選択"
 msgid "Select Source Folder"
 msgstr "クローン元"
 
-msgid "Source does not exists."
-msgstr "元ファイルが存在しません"
+msgid "Source does not exist."
+msgstr ""
 
 msgid "The source must be within the repository tree."
 msgstr "元ファイルはこのリポジトリツリーの中になくてはいけません"
@@ -3432,6 +3402,9 @@ msgstr "フェーズ"
 msgctxt "column header"
 msgid "Filename"
 msgstr "ファイル名"
+
+msgid "Searching..."
+msgstr "検索中..."
 
 #, python-format
 msgid "filling (%d)"
@@ -3723,6 +3696,27 @@ msgstr "リポジトリ %s を読み込んでいます"
 msgid "Repository Registry updated"
 msgstr "リポジトリ一覧の更新完了"
 
+msgid "Close tab"
+msgstr "タブを閉じる"
+
+msgid "Close other tabs"
+msgstr "他のタブを閉じる"
+
+msgid "Undo close tab"
+msgstr "閉じたタブを開く"
+
+msgid "Reopen last closed tab"
+msgstr "最後に閉じたタブを開く"
+
+msgid "Undo close other tabs"
+msgstr "閉じた他のタブを開く"
+
+msgid "Reopen last closed tab group"
+msgstr "最後に閉じたタブグループを開く"
+
+msgid "Failed to open repository"
+msgstr "リポジトリを開けません"
+
 msgid "&Sort"
 msgstr "並び替え(&S)"
 
@@ -3785,12 +3779,16 @@ msgid "Commit"
 msgstr "コミット"
 
 msgctxt "tab tooltip"
-msgid "Synchronize"
-msgstr "同期"
-
-msgctxt "tab tooltip"
 msgid "Search"
 msgstr "検索"
+
+msgctxt "tab tooltip"
+msgid "Console log"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Synchronize"
+msgstr "同期"
 
 msgctxt "tab tooltip"
 msgid "Patch Branch"
@@ -3906,20 +3904,8 @@ msgstr ""
 "トしていない変更はそのまま残されます。\n"
 "続けますか？"
 
-msgid "Repository stripped, incoming preview cleared"
+msgid "Tab cannot exit"
 msgstr ""
-
-msgid "Repository stripped, revision set cleared"
-msgstr ""
-
-msgid "Commit tab cannot exit"
-msgstr "コミットタブが終了できません"
-
-msgid "Sync tab cannot exit"
-msgstr "同期タブが終了できません"
-
-msgid "Search tab cannot exit"
-msgstr "検索タブが終了できません"
 
 msgid "Pus&h"
 msgstr "履歴を反映 (pus&h)"
@@ -3999,6 +3985,9 @@ msgstr "MQ オプション(&O)"
 msgid "&Rebase..."
 msgstr "移動 (&rebase)..."
 
+msgid "&Prune..."
+msgstr ""
+
 msgid "&Strip..."
 msgstr "除外 (&strip)..."
 
@@ -4064,6 +4053,9 @@ msgstr "類似のリビジョン..."
 
 msgid "Graft Selected to local..."
 msgstr "選択リビジョンをローカルへ移植..."
+
+msgid "&Prune Selected..."
+msgstr ""
 
 msgid "Post Selected to Review Board..."
 msgstr "選択した部分をレビューボードに投稿..."
@@ -4291,6 +4283,15 @@ msgstr ""
 "\n"
 "コマンドパスが正しいことと、正しいアプリケーションであることを確認してくださ"
 "い。"
+
+msgid "&Edit Toolbar"
+msgstr "編集ツールバー(&E)"
+
+msgid "&Refresh"
+msgstr "再読み込み (&R)"
+
+msgid "&Filter Toolbar"
+msgstr "フィルターツールバー(&F)"
 
 #, python-format
 msgid "Resolve Conflicts - %s"
@@ -4649,15 +4650,6 @@ msgstr ""
 "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">指定方法につい"
 "て</a>"
 
-msgid "Searching..."
-msgstr "検索中..."
-
-msgid "Running"
-msgstr "実行中"
-
-msgid "query"
-msgstr "クエリー"
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
@@ -4737,6 +4729,9 @@ msgstr "ヘルプを表示して終了する"
 msgid "set/override config option (use 'section.name=value')"
 msgstr ""
 
+msgid "enable debugging output"
+msgstr ""
+
 msgid "start debugger"
 msgstr "デバッガを開始"
 
@@ -4754,9 +4749,6 @@ msgstr "ファイルリストをファイルから読み込む"
 
 msgid "read file list from file encoding utf-8"
 msgstr "UTF-8でファイルリストを読み込む"
-
-msgid "open a new workbench window"
-msgstr "新しいworkbenchウィンドウを開く"
 
 msgid "thg about"
 msgstr "thgについて"
@@ -4845,6 +4837,18 @@ msgstr ""
 
 msgid "thg debugbugreport [TEXT]"
 msgstr "thg debugbugreport [TEXT]"
+
+msgid "thg debugconsole"
+msgstr ""
+
+msgid "thg debuglighthg"
+msgstr ""
+
+msgid "thg debugruncommand -- COMMAND [ARGUMENT]..."
+msgstr ""
+
+msgid "no command specified"
+msgstr ""
 
 msgid "thg drag_copy SOURCE... DEST"
 msgstr "thg drag_copy SOURCE... DEST"
@@ -4967,11 +4971,20 @@ msgstr "thg import [オプション] [ソース]..."
 msgid "thg init [DEST]"
 msgstr "thg init [作成先ディレクトリ]"
 
+msgid "search for a given text or revset"
+msgstr ""
+
 msgid "(DEPRECATED)"
 msgstr "(非推奨)"
 
+msgid "open a new workbench window"
+msgstr "新しいworkbenchウィンドウを開く"
+
 msgid "thg log [OPTIONS] [FILE]"
 msgstr "thg log [オプション] [ファイル]"
+
+msgid "cannot specify both -k/--query and filenames"
+msgstr ""
 
 msgid "revision to display"
 msgstr "表示するリビジョン"
@@ -4995,6 +5008,12 @@ msgid "thg postreview [-r] REV..."
 msgstr "thg postreview [-r] REV..."
 
 msgid "no revisions specified"
+msgstr ""
+
+msgid "revisions to prune"
+msgstr ""
+
+msgid "thg prune [-r] REV..."
 msgstr ""
 
 msgid "thg purge"
@@ -5111,11 +5130,14 @@ msgstr "リビジョンを強制的に削除し、未コミット変更内容を
 msgid "do not back up stripped revisions"
 msgstr "バックアップ作成の抑止(非推奨)"
 
+msgid "do not modify working copy during strip"
+msgstr ""
+
 msgid "revision to strip"
 msgstr "stripするリビジョン"
 
-msgid "thg strip [-f] [-n] [[-r] REV]"
-msgstr "thg strip [-f] [-n] [[-r] リビジョン]"
+msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
+msgstr ""
 
 msgid "thg sync [PEER]"
 msgstr "thg sync [PEER]"
@@ -5186,9 +5208,6 @@ msgstr "場所:"
 
 msgid "Update to:"
 msgstr "更新先:"
-
-msgid "Target:"
-msgstr "対象:"
 
 msgid "Options:"
 msgstr "オプション:"
@@ -5343,9 +5362,10 @@ msgstr "シェル"
 msgid ""
 "Specify the command to launch your preferred terminal shell application. If "
 "the value includes the string %(reponame)s, the name of the repository will "
-"be substituted in place of %(reponame)s. (restart needed)<br>Default, "
-"Windows: cmd.exe /K title %(reponame)s<br>Default, OS X: not set<br>Default, "
-"other: xterm -T \"%(reponame)s\""
+"be substituted in place of %(reponame)s. Similarly, %(root)s will be the "
+"full path to the repository. (restart needed)<br>Default, Windows: cmd.exe /"
+"K title %(reponame)s<br>Default, OS X: not set<br>Default, other: xterm -T "
+"\"%(reponame)s\""
 msgstr ""
 
 msgid "Immediate Operations"
@@ -5428,6 +5448,14 @@ msgid ""
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
 "to review and resolve changes manually. Default: True."
+msgstr ""
+
+msgid "New Repo Skeleton"
+msgstr ""
+
+msgid ""
+"If specified, files in the directory, e.g. .hgignore, are copied to the "
+"newly-created repository."
 msgstr ""
 
 msgid "Workbench"
@@ -5552,7 +5580,7 @@ msgid "Hide Tags"
 msgstr "非表示タグ"
 
 msgid ""
-"Space separated list of tags that will not be shown.Useful example: Specify "
+"Space separated list of tags that will not be shown. Useful example: Specify "
 "\"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial "
 "Queues Extension. Default: None (leave blank)"
 msgstr ""
@@ -6151,7 +6179,8 @@ msgid ""
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
 "(where n is a non-negative integer). {0} refers to the entire string matched "
 "by issue.regex, while {1} refers to the first group and so on. If no {n} "
-"tokensare found in issue.link, the entire matched string is appended instead."
+"tokens are found in issue.link, the entire matched string is appended "
+"instead."
 msgstr ""
 
 msgid "Inline Tags"
@@ -6201,9 +6230,9 @@ msgid ""
 "hashes that are shown on the revision panels into links.<br>The \"template "
 "string\" uses a \"mercurial template\"-like syntax that currently accepts "
 "two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported).<li>"
-"{rev} : replaced by the revision number.</ul>For example, in order to link "
-"to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
+"revision id (note that {node} on its own is currently unsupported)."
+"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
 "tortoisehg/thg/commits/{node|short}"
 msgstr ""
 
@@ -6308,7 +6337,7 @@ msgstr "サーバー"
 msgid ""
 "List of Servers from which \"projrc\" configuration files must be pulled. "
 "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull from "
-"the default sync path.Default is pull from NO servers."
+"the default sync path. Default is pull from NO servers."
 msgstr ""
 
 msgid "Include"
@@ -6494,8 +6523,19 @@ msgstr "トレイアイコンの表示"
 msgid "Highlight Icon"
 msgstr "トレイアイコンの点滅"
 
-msgid "TortoiseHg Shell Configuration"
-msgstr "TortoiseHg シェル拡張設定"
+#. i18n: URL of TortoiseSVN documentation
+msgid ""
+"http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
+"html#tsvn-dug-settings-icon-set"
+msgstr ""
+
+#, python-format
+msgid ""
+"You can change the icon set from <a href=\"%s\">TortoiseSVN's Settings</a>"
+msgstr ""
+
+msgid "Explorer Extension Settings - TortoiseHg"
+msgstr ""
 
 msgid "Clear"
 msgstr ""
@@ -6804,15 +6844,15 @@ msgstr "リポジトリで設定されているパス:"
 msgid "Related Paths:"
 msgstr "関連パス:"
 
-#, python-format
-msgid "rev: %d (%s)"
-msgstr "リビジョン: %d (%s)"
-
 msgid "branch: "
 msgstr "ブランチ: "
 
 msgid "bookmark: "
 msgstr "ブックマーク: "
+
+#, python-format
+msgid "rev: %d (%s)"
+msgstr "リビジョン: %d (%s)"
 
 msgid "Post Pull: "
 msgstr "プル後の処理: "
@@ -6910,10 +6950,6 @@ msgid "%d outgoing changesets to %s"
 msgstr "%d 件のチェンジセットを %s に送信できます"
 
 #, python-format
-msgid "outgoing changesets to %s found"
-msgstr "%s に送信できるチェンジセットがあります"
-
-#, python-format
 msgid "No outgoing changesets to %s"
 msgstr "%s に送信できるチェンジセットはありません"
 
@@ -7008,12 +7044,6 @@ msgstr "バンドルファイル (*.hg)"
 
 msgid "Unable to remove URL"
 msgstr "URLを削除できません"
-
-msgid "TortoiseHg Sync"
-msgstr "TortoiseHg 同期"
-
-msgid "Are you sure that you want to cancel synchronization?"
-msgstr "本当に同期をキャンセルしますか?"
 
 msgid "Post Pull Behavior"
 msgstr "プル後の処理"
@@ -7214,16 +7244,6 @@ msgid "Move"
 msgstr "移動"
 
 #, python-format
-msgid "Tag '%s' already exists"
-msgstr "'%s' タグはすでにあります"
-
-msgid "uncommitted merge"
-msgstr "コミットされていないマージ"
-
-msgid "not at a branch head (use force)"
-msgstr "ブランチのHEADではありません(forceを使ってください)"
-
-#, python-format
 msgid "Moved tag %s to changeset %s (from changeset %s)"
 msgstr "タグ %s をチェンジセット %s に (チェンジセット%sから) 移動しました"
 
@@ -7238,14 +7258,6 @@ msgstr "'%s' タグを移動しました"
 #, python-format
 msgid "Tag '%s' has been added"
 msgstr "タグ '%s' を追加しました"
-
-#, python-format
-msgid "tag '%s' is not a local tag"
-msgstr "タグ '%s' はローカルタグではありません"
-
-#, python-format
-msgid "tag '%s' is not a global tag"
-msgstr "タグ '%s' はローカルタグです"
 
 #, python-format
 msgid "Removed tag %s"
@@ -7312,6 +7324,9 @@ msgstr "ローカルの変更を破棄する (バックアップなし, -f/--for
 msgid "No backup (-n/--nobackup)"
 msgstr "バックアップなし (-n/--nobackup)"
 
+msgid "Do not modify working copy during strip (-k/--keep)"
+msgstr ""
+
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
 msgid_plural "<b>%d changesets</b> will be stripped"
@@ -7341,12 +7356,6 @@ msgstr "リビジョンの削除 - %s"
 
 msgid "&Strip"
 msgstr "削除(&S)"
-
-msgid "response expected"
-msgstr "応答がありませんでした"
-
-msgid "password: "
-msgstr "パスワード: "
 
 msgid "Parent 1:"
 msgstr "親リビジョン1:"
@@ -7559,9 +7568,6 @@ msgstr "リポジトリ(&R)"
 msgid "&Help"
 msgstr "ヘルプ(&H)"
 
-msgid "&Edit Toolbar"
-msgstr "編集ツールバー(&E)"
-
 msgid "&Dock Toolbar"
 msgstr "ドックツールバー(&D)"
 
@@ -7583,14 +7589,20 @@ msgstr "リポジトリ一覧を表示(&O)"
 msgid "Show &Patch Queue"
 msgstr "パッチキューを表示(&P)"
 
-msgid "Show Output &Log"
-msgstr "コマンドログを表示(&L)"
+msgid "Show Conso&le"
+msgstr ""
+
+msgid "Place Console in Doc&k Area"
+msgstr ""
 
 msgid "R&epository Registry Options"
 msgstr "リポジトリ一覧のオプション(&E)"
 
 msgid "Save Open Repositories on E&xit"
 msgstr "終了時に開いているリポジトリを保存(&X)"
+
+msgid "Sa&ve Current Sync Paths on Exit"
+msgstr ""
 
 msgid "&Commit"
 msgstr "コミット(&C)"
@@ -7606,9 +7618,6 @@ msgstr "検索(&S)"
 
 msgid "S&ynchronize"
 msgstr "同期(&Y)"
-
-msgid "&Refresh"
-msgstr "再読み込み (&R)"
 
 msgid "Refresh current repository"
 msgstr "現在のリポジトリを再読み込み"
@@ -7633,9 +7642,6 @@ msgstr "リビジョンへ移動(&G)..."
 
 msgid "Go to a specific revision"
 msgstr "指定のリビジョンに移動"
-
-msgid "&Filter Toolbar"
-msgstr "フィルターツールバー(&F)"
 
 msgid "Filter graph with revision sets or branches"
 msgstr "リビジョンセットやブランチで履歴をフィルター"
@@ -7758,29 +7764,8 @@ msgstr ""
 msgid "Execute custom tool '%s'"
 msgstr "カスタムツール '%s' を実行"
 
-msgid "Close tab"
-msgstr "タブを閉じる"
-
-msgid "Close other tabs"
-msgstr "他のタブを閉じる"
-
-msgid "Undo close tab"
-msgstr "閉じたタブを開く"
-
-msgid "Reopen last closed tab"
-msgstr "最後に閉じたタブを開く"
-
-msgid "Undo close other tabs"
-msgstr "閉じた他のタブを開く"
-
-msgid "Reopen last closed tab group"
-msgstr "最後に閉じたタブグループを開く"
-
 msgid "Custom Toolbar &Settings"
 msgstr "カスタムツールバーの設定(&S)"
-
-msgid "Failed to open repository"
-msgstr "リポジトリを開けません"
 
 msgid "TortoiseHg Workbench"
 msgstr "TortoiseHg Workbench"
@@ -7792,13 +7777,6 @@ msgstr "%s - TortoiseHg Workbench - %s"
 #, python-format
 msgid "%s - TortoiseHg Workbench"
 msgstr "%s - TortoiseHg Workbench"
-
-msgid "Reopening tabs"
-msgstr "タブを再度開いています"
-
-#, python-format
-msgid "Reopening repository %s"
-msgstr "リポジトリ %s を再度開いています"
 
 msgid "Goto revision"
 msgstr "指定のリビジョンに移動"
@@ -7841,66 +7819,27 @@ msgstr ""
 msgid "Cannot open Plugin Options dialog"
 msgstr "プラグインオプションダイアログを開けません"
 
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
+msgid "move after the specified patch"
 msgstr ""
-"hg: コマンド指定 '%s' は曖昧です\n"
-"    %s\n"
+
+msgid "[--after PATCH] PATCH..."
+msgstr ""
+
+msgid "unknown patch to move specified"
+msgstr ""
+
+msgid "invalid patch position specified"
+msgstr ""
+
+msgid "cannot move applied patches"
+msgstr ""
 
 #, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr "hg: %s での解析エラー: %s\n"
+msgid "patch %s not in series"
+msgstr ""
 
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr "hg: 解析エラー: %s\n"
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr "%s のロック解放待ちを断念"
-
-#, python-format
-msgid "lock held by %s"
-msgstr "%s によってロックされています"
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr "中止: %s: %s\n"
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr "中止: ロックできません %s:%s\n"
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr "hg %s: %s\n"
-
-#, python-format
-msgid "hg: %s\n"
-msgstr "hg: %s\n"
-
-msgid "abort: remote error:\n"
-msgstr "中止: 連携エラー:\n"
-
-#, python-format
-msgid "abort: %s"
-msgstr "中止： %s"
-
-msgid " empty string\n"
-msgstr " 空の文字列\n"
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr "hg: 未知のコマンド '%s'\n"
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr "中止: エラー: %s\n"
-
-msgid "broken pipe\n"
-msgstr "パイプ破壊(EPIPE)\n"
+msgid "cannot move into applied patches"
+msgstr ""
 
 msgid "abort: "
 msgstr "中止: "
@@ -8147,6 +8086,9 @@ msgstr "ドラッグされたリポジトリと同期します"
 msgid "unrecognized response: %s"
 msgstr ""
 
+msgid "password: "
+msgstr "パスワード: "
+
 #, python-format
 msgid "repository %s not found"
 msgstr "リポジトリ %s が見つかりません"
@@ -8268,6 +8210,9 @@ msgstr ""
 
 #~ msgid "shelve can only be run interactively"
 #~ msgstr "シェルフは対話的な動作のみ可能です"
+
+#~ msgid "response expected"
+#~ msgstr "応答がありませんでした"
 
 #~ msgid "Backout"
 #~ msgstr "バックアウト"
@@ -8428,6 +8373,12 @@ msgstr ""
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Mercurial 1.0 互換のリポジトリを作成"
+
+#~ msgid "Destination path is empty"
+#~ msgstr "リポジトリを作成する場所を指定してください"
+
+#~ msgid "Please enter the directory path"
+#~ msgstr "ディレクトリパスを入力してください"
 
 #~ msgid "unknown patch content: %r"
 #~ msgstr "不明なパッチ内容です: %r"
@@ -9429,6 +9380,12 @@ msgstr ""
 
 #~ msgid "revision to merge with"
 #~ msgstr "このリビジョンとマージ"
+
+#~ msgid "Unable to create new repository"
+#~ msgstr "新しいリポジトリの作成に失敗しました"
+
+#~ msgid "Error when creating repository"
+#~ msgstr "リポジトリ作成中にエラーが発生しました"
 
 #~ msgid "There is no Mercurial repository here (.hg not found)"
 #~ msgstr "Mercurial リポジトリがありません (.hg ファイルが見つかりません)"
@@ -10520,6 +10477,9 @@ msgstr ""
 #~ msgid "Rev/ID"
 #~ msgstr "リビジョン"
 
+#~ msgid "TortoiseHg Shell Configuration"
+#~ msgstr "TortoiseHg シェル拡張設定"
+
 #~ msgid "Changelist:"
 #~ msgstr "変更一覧:"
 
@@ -10959,8 +10919,14 @@ msgstr ""
 #~ msgid "Message Line Length"
 #~ msgstr "コミットログ文字数"
 
+#~ msgid "tag '%s' is not a local tag"
+#~ msgstr "タグ '%s' はローカルタグではありません"
+
 #~ msgid "tag '%s' does not exist"
 #~ msgstr "タグ '%s' は存在しません"
+
+#~ msgid "tag '%s' is not a global tag"
+#~ msgstr "タグ '%s' はローカルタグです"
 
 #~ msgid "Bundle from here to selected..."
 #~ msgstr "この範囲をバンドルファイルに保存..."
@@ -11142,6 +11108,9 @@ msgstr ""
 #~ msgid "bad shelve backup directory name"
 #~ msgstr "バックアップファイルの保存先として利用できないディレクトリ名です"
 
+#~ msgid "Source does not exists."
+#~ msgstr "元ファイルが存在しません"
+
 #~ msgid "delete of shelve backup failed"
 #~ msgstr "バックアップファイルを削除できません"
 
@@ -11150,6 +11119,12 @@ msgstr ""
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "中断: バックアップの復元に失敗しました %s\n"
+
+#~ msgid "TortoiseHg Sync"
+#~ msgstr "TortoiseHg 同期"
+
+#~ msgid "outgoing changesets to %s found"
+#~ msgstr "%s に送信できるチェンジセットがあります"
 
 #~ msgid "file %s already exists\n"
 #~ msgstr "ファイル %s はすでに存在しています\n"
@@ -11168,6 +11143,9 @@ msgstr ""
 
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "バックアップを除去中: %r\n"
+
+#~ msgid "Are you sure that you want to cancel synchronization?"
+#~ msgstr "本当に同期をキャンセルしますか?"
 
 #~ msgid "Restart merge with"
 #~ msgstr "指定ツールで再マージ"

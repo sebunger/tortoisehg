@@ -12,7 +12,7 @@ from PyQt4.QtGui import *
 from hgext import mq
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qscilib, qtlib, messageentry
 
 class QFoldDialog(QDialog):

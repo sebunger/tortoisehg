@@ -10,7 +10,6 @@ import os
 import sys
 import time
 import threading
-from mercurial.i18n import _
 from mercurial import hg
 
 def get_system_times():

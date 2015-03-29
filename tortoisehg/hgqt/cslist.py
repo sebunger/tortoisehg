@@ -11,7 +11,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from tortoisehg.hgqt import csinfo, qtlib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.util.patchctx import patchctx
 
 _SPACING = 6
@@ -65,7 +65,7 @@ class ChangesetList(QWidget):
         self.scrollarea.setWidget(self.scrollbox)
 
         # signal handlers
-        self.compactchk.toggled.connect(lambda *a: self.update(self.curitems))
+        self.compactchk.toggled.connect(self._updateView)
 
         # csetinfo
         def datafunc(widget, item, ctx):
@@ -124,7 +124,7 @@ class ChangesetList(QWidget):
         self.csvbox.addWidget(info, Qt.AlignTop)
 
     def updatestatus(self):
-        if self.curitems is None:
+        if not self.curitems:
             text = _('No items to display')
         else:
             num = dict(count=len(self.showitems), total=len(self.curitems))
@@ -173,3 +173,7 @@ class ChangesetList(QWidget):
             self.insertcs(lastitem)
         self.updatestatus()
         return True
+
+    @pyqtSlot()
+    def _updateView(self):
+        self.update(self.curitems)

@@ -7,13 +7,14 @@
 
 import os
 import difflib
+import cPickle as pickle
 import re
 
-from mercurial import util, patch
+from mercurial import util
 
-from tortoisehg.util import hglib, colormap, thread2
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qscilib, qtlib, blockmatcher, lexers
+from tortoisehg.util import hglib, colormap
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qscilib, qtlib, blockmatcher, cmdcore, lexers
 from tortoisehg.hgqt import visdiff, filedata, fileencoding
 
 from PyQt4.QtCore import *
@@ -163,7 +164,7 @@ class HgFileView(QFrame):
         filec.chunkMarkersBuilt.connect(self._updateDiffActions)
         messagec = _MessageViewControl(self.sci, self)
         messagec.forceDisplayRequested.connect(self._forceDisplayFile)
-        annotatec = _AnnotateViewControl(repo.ui, self.sci, self._fd, self)
+        annotatec = _AnnotateViewControl(repoagent, self.sci, self._fd, self)
         annotatec.showMessage.connect(self.showMessage)
         annotatec.editSelectedRequested.connect(self._editSelected)
         annotatec.grepRequested.connect(self.grepRequested)
@@ -919,8 +920,10 @@ class _AnnotateViewControl(_AbstractViewControl):
     visualDiffRevisionRequested = pyqtSignal(unicode, int)
     visualDiffToLocalRequested = pyqtSignal(unicode, int)
 
-    def __init__(self, ui, sci, fd, parent=None):
+    def __init__(self, repoagent, sci, fd, parent=None):
         super(_AnnotateViewControl, self).__init__(parent)
+        self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
         self._sci = sci
         self._sci.setMarginType(_AnnotateMargin, qsci.TextMarginRightJustified)
         self._sci.setMarginSensitivity(_AnnotateMargin, True)
@@ -934,28 +937,17 @@ class _AnnotateViewControl(_AbstractViewControl):
         self._lastmarginclick = QTime.currentTime()
         self._lastmarginclick.addMSecs(-QApplication.doubleClickInterval())
 
-        diffopts = patch.diffopts(ui, section='annotate')
-        self._thread = AnnotateThread(self, diffopts=diffopts)
-        self._thread.finished.connect(self.fillModel)
-
-        self._abortshortcut = a = QShortcut(Qt.Key_Escape, sci)
-        a.setContext(Qt.WidgetShortcut)
-        a.setEnabled(False)
-        a.activated.connect(self._thread.abort)
-
         self._initAnnotateOptionActions()
         self._loadAnnotateSettings()
 
     def open(self):
         self._sci.viewport().installEventFilter(self)
-        self._abortshortcut.setEnabled(True)
 
     def close(self):
         self._sci.viewport().removeEventFilter(self)
         self._sci.setMarginWidth(_AnnotateMargin, 0)
         self._sci.markerDeleteAll()
-        self._abortshortcut.setEnabled(False)
-        self._thread.abort()
+        self._cmdsession.abort()
 
     def eventFilter(self, watched, event):
         # Python wrapper is deleted immediately before QEvent.Destroy
@@ -1032,17 +1024,20 @@ class _AnnotateViewControl(_AbstractViewControl):
                     for fctx in uniqfctxs)
 
     def _emitRevisionHintAtLine(self, line):
-        if line < 0:
+        if line < 0 or line >= len(self._links):
             return
-        try:
-            fctx = self._links[line][0]
-            if fctx.rev() != self._lastrev:
-                filename = hglib.fromunicode(self._fd.canonicalFilePath())
-                s = hglib.get_revision_desc(fctx, filename)
-                self.showMessage.emit(s)
-                self._lastrev = fctx.rev()
-        except IndexError:
-            pass
+        fctx = self._links[line][0]
+        if fctx.rev() != self._lastrev:
+            filename = hglib.fromunicode(self._fd.canonicalFilePath())
+            s = hglib.get_revision_desc(fctx, filename)
+            self.showMessage.emit(s)
+            self._lastrev = fctx.rev()
+
+    def _repoAgentForFile(self):
+        rpath = self._fd.repoRootPath()
+        if not rpath:
+            return self._repoagent
+        return self._repoagent.subRepoAgent(rpath)
 
     def display(self, fd):
         if fd.rev() is None:
@@ -1052,18 +1047,27 @@ class _AnnotateViewControl(_AbstractViewControl):
             return
         self._fd = fd
         del self._links[:]
-        ctx = fd.rawContext()
-        filename = hglib.fromunicode(fd.canonicalFilePath())
-        self._thread.abort()
-        self._thread.start(ctx[filename])
+        self._cmdsession.abort()
+        repoagent = self._repoAgentForFile()
+        cmdline = hglib.buildcmdargs('annotate', fd.canonicalFilePath(),
+                                     rev=fd.rev(), text=True, file=True,
+                                     number=True, line_number=True, T='pickle')
+        self._cmdsession = sess = repoagent.runCommand(cmdline, self)
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._onAnnotateFinished)
 
-    @pyqtSlot()
-    def fillModel(self):
-        self._thread.wait()
-        if self._thread.data is None:
+    @pyqtSlot(int)
+    def _onAnnotateFinished(self, ret):
+        sess = self._cmdsession
+        if not sess.isFinished():
+            # new request is already running
             return
-
-        self._links = list(self._thread.data)
+        if ret != 0:
+            return
+        repo = self._repoAgentForFile().rawRepo()
+        data = pickle.loads(str(sess.readAll()))
+        self._links = [(repo.filectx(l['file'], changeid=l['rev']),
+                        l['line_number']) for l in data]
         self._updateView()
 
     def _updateView(self):
@@ -1168,7 +1172,6 @@ class _AnnotateViewControl(_AbstractViewControl):
             self.visualDiffRevisionRequested.emit(data[0], data[1])
 
         menu.addSeparator()
-        origrev = fctx.rev()
         anngotomenu = menu.addMenu(_('Go to'))
         annviewmenu = menu.addMenu(_('View File at'))
         anndiffmenu = menu.addMenu(_('Diff File to'))
@@ -1228,47 +1231,6 @@ class _AnnotateViewControl(_AbstractViewControl):
                 sline = line
                 eline = line + 1
             self._sci.setSelection(sline, 0, eline, 0)
-
-
-class AnnotateThread(QThread):
-    'Background thread for annotating a file at a revision'
-    def __init__(self, parent=None, diffopts=None):
-        super(AnnotateThread, self).__init__(parent)
-        self._threadid = None
-        self._diffopts = diffopts
-
-    @pyqtSlot(object)
-    def start(self, fctx):
-        self._fctx = fctx
-        super(AnnotateThread, self).start()
-        self.data = None
-
-    @pyqtSlot()
-    def abort(self):
-        threadid = self._threadid
-        if threadid is None:
-            return
-        try:
-            thread2._async_raise(threadid, KeyboardInterrupt)
-            self.wait()
-        except ValueError:
-            pass
-
-    def run(self):
-        assert self.currentThread() != qApp.thread()
-        self._threadid = self.currentThreadId()
-        try:
-            try:
-                data = []
-                for (fctx, line), _text in \
-                        self._fctx.annotate(True, True, self._diffopts):
-                    data.append((fctx, line))
-                self.data = data
-            except KeyboardInterrupt:
-                pass
-        finally:
-            self._threadid = None
-            del self._fctx
 
 
 class _ChunkSelectionViewControl(_AbstractViewControl):

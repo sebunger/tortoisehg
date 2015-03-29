@@ -15,8 +15,8 @@ from PyQt4.QtGui import *
 from mercurial import hg, util, scmutil, httpconnection
 
 from tortoisehg.util import hglib, paths, wconfig
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdcore, cmdui, qtlib, thgrepo
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import cmdcore, qtlib, thgrepo
 from tortoisehg.hgqt import hgrcutil, hgemail, rebase, resolve
 
 def parseurl(url):
@@ -46,7 +46,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     switchToRequest = pyqtSignal(QString)
 
-    def __init__(self, repoagent, parent=None, embedded=False):
+    def __init__(self, repoagent, parent=None):
         QWidget.__init__(self, parent)
 
         layout = QVBoxLayout()
@@ -61,11 +61,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self._lastbfile = None  # output bundle of last incoming command
         self.opts = {}
         self.cmenu = None
-        self.embedded = embedded
 
         s = QSettings()
-        for opt in ('subrepos', 'force', 'new-branch', 'noproxy', 'debug',
-                    'mq'):
+        for opt in ('force', 'new-branch', 'noproxy', 'debug', 'mq'):
             val = s.value('sync/' + opt, None).toBool()
             if val:
                 if opt != 'mq' or 'mq' in self.repo.extensions():
@@ -76,6 +74,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 self.opts[opt] = val
 
         self._repoagent.configChanged.connect(self.reload)
+        self._repoagent.repositoryChanged.connect(self._onRepositoryChanged)
 
         tb = QToolBar(self)
         tb.setIconSize(qtlib.toolBarIconSize())
@@ -137,9 +136,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.targetcombo.setEnabled(False)
         self.targetcheckbox = QCheckBox(_('Target:'))
         self.targetcheckbox.toggled.connect(self.targetcombo.setEnabled)
-        tb.addSeparator().setVisible(embedded)
-        tb.addWidget(self.targetcheckbox).setVisible(embedded)
-        tb.addWidget(self.targetcombo).setVisible(embedded)
+        tb.addSeparator()
+        tb.addWidget(self.targetcheckbox)
+        tb.addWidget(self.targetcombo)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
@@ -231,32 +230,33 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         return self._repoagent.rawRepo()
 
     def canswitch(self):
-        return not self.targetcheckbox.isChecked()
+        return False
 
-    def loadTargets(self, ctx):
+    def _loadTargets(self):
         self.targetcombo.clear()
         # itemData(role=UserRole) is the argument list to pass to hg
-        selIndex = 0
-        self.targetcombo.addItem(_('rev: %d (%s)') % (ctx.rev(), str(ctx)),
-                                 ('--rev', str(ctx.rev())))
+        self.targetcombo.addItem('', ('--rev', 'null'))  # placeholder
 
         for name in hglib.namedbranches(self.repo):
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('branch: ') + uname, ('--branch', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name,
                                          Qt.ToolTipRole)
-            if ctx.thgbranchhead() and name == ctx.branch():
-                selIndex = self.targetcombo.count() - 1
         for name in self.repo._bookmarks.keys():
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('bookmark: ') + uname,
                                      ('--bookmark', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name,
                                          Qt.ToolTipRole)
-            if name in ctx.bookmarks():
-                selIndex = self.targetcombo.count() - 1
 
-        return selIndex
+    def _findTargetIndex(self, ctx):
+        for name in ctx.bookmarks():
+            uname = hglib.tounicode(name)
+            return self.targetcombo.findText(_('bookmark: ') + uname)
+        if ctx.node() in self.repo.branchheads(ctx.branch()):
+            uname = hglib.tounicode(ctx.branch())
+            return self.targetcombo.findText(_('branch: ') + uname)
+        return 0
 
     def refreshTargets(self, rev):
         if type(rev) is not int:
@@ -266,14 +266,19 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
 
         ctx = self.repo.changectx(rev)
-        index = self.loadTargets(ctx)
-
-        if index < 0:
-            index = 0
-        self.targetcombo.setCurrentIndex(index)
+        if self.targetcombo.count() <= 0:
+            self._loadTargets()
+        self.targetcombo.setItemText(0, _('rev: %d (%s)') % (ctx.rev(), ctx))
+        self.targetcombo.setItemData(0, ('--rev', str(ctx.rev())))
+        self.targetcombo.setCurrentIndex(self._findTargetIndex(ctx))
 
     def isTargetSelected(self):
         return self.targetcheckbox.isChecked()
+
+    @pyqtSlot(int)
+    def _onRepositoryChanged(self, flags):
+        if flags & thgrepo.LogChanged:
+            self._loadTargets()
 
     def editOptions(self):
         dlg = OptionsDialog(self._repoagent, self.opts, self)
@@ -602,7 +607,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if not self.opts.get('mq'):
             cmdline.append(lurl)
         ucmdline = map(hglib.tounicode, cmdline)
-        overlay = ucmdline[0] not in ('incoming', 'pull')  # no incoming bundle
+        # bypass overlay of incoming bundle to pull changes
+        overlay = ucmdline[0] not in ('fetch', 'incoming', 'pull')
         self._cmdsession = sess = self._repoagent.runCommand(ucmdline, self,
                                                              overlay=overlay)
         sess.commandFinished.connect(self._updateUi)
@@ -646,7 +652,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         save = self.currentUrl()
         orev = self.opts.get('rev')
-        self.setEditUrl(bundle)
+        # XXX hack to ignore incoming bundle because it can't apply phase
+        # movement, pull bookmarks and largefiles. further cleanups should
+        # go on default branch.
+        self.setEditUrl(bsource or bundle)
         if rev is not None:
             self.opts['rev'] = str(rev)
         self.pullclicked(bsource)
@@ -666,8 +675,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def inclicked(self):
         url = self.currentUrl()
         link = self.linkifyWithTarget(url)
-        if self.embedded and not url.startswith('p4://') and \
-           not self.opts.get('subrepos'):
+        if not url.startswith('p4://'):
             bfile = hglib.fromunicode(url)
             for badchar in (':', '*', '\\', '?', '#'):
                 bfile = bfile.replace(badchar, '')
@@ -680,7 +688,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         else:
             self._lastbfile = None
             cmdline = ['incoming']
-            sess = self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
+            sess = self.run(cmdline, ('force', 'branch', 'rev'))
             sess.commandFinished.connect(self._onIncomingFinished)
 
         self.showMessage.emit(_('Getting incoming changesets from %s...')
@@ -748,16 +756,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def outclicked(self):
         link = self.linkifyWithTarget(self.currentUrl())
-        if self.embedded and not self.opts.get('subrepos'):
-            cmdline = ['outgoing', '--template', '{node}\n']
-            sess = self.run(cmdline, ('force', 'branch', 'rev'))
-            sess.setCaptureOutput(True)
-            sess.commandFinished.connect(self._onOutgoingFinished)
-        else:
-            cmdline = ['outgoing']
-            sess = self.run(cmdline, ('force', 'branch', 'rev', 'subrepos'))
-            sess.commandFinished.connect(self._onOutgoingFinished)
-
+        cmdline = ['outgoing', '--template', '{node}\n']
+        sess = self.run(cmdline, ('force', 'branch', 'rev'))
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._onOutgoingFinished)
         self.showMessage.emit(_('Finding outgoing changesets to %s...') % link)
 
     @pyqtSlot(int)
@@ -766,13 +768,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if ret == 0:
             data = str(self._cmdsession.readAll())
             nodes = _extractnodeids(data)
-            if nodes:
-                self.showMessage.emit(_('%d outgoing changesets to %s') %
-                                      (len(nodes), link))
-                self.outgoingNodes.emit(nodes)
-            else:
-                self.showMessage.emit(_('outgoing changesets to %s found')
-                                      % link)
+            self.showMessage.emit(_('%d outgoing changesets to %s') %
+                                  (len(nodes), link))
+            self.outgoingNodes.emit(nodes)
         elif ret == 1:
             self.showMessage.emit(_('No outgoing changesets to %s') % link)
         else:
@@ -986,52 +984,6 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         self.reload()
-
-
-class SyncDialog(QDialog):
-
-    def __init__(self, repoagent, parent=None):
-        super(SyncDialog, self).__init__(parent)
-        self.setWindowFlags(Qt.Window)
-        self.setWindowTitle(_('TortoiseHg Sync'))
-        self.setWindowIcon(qtlib.geticon('thg-sync'))
-        self.resize(850, 550)
-
-        layout = QVBoxLayout()
-        layout.setContentsMargins(5, 5, 5, 0)
-        self.setLayout(layout)
-
-        self._syncwidget = sync = SyncWidget(repoagent, self)
-        layout.addWidget(sync)
-
-        self._cmdlog = cmdui.LogWidget(self)
-        self._stbar = cmdui.ThgStatusBar(self)
-        layout.addWidget(self._cmdlog)
-        layout.addWidget(self._stbar)
-        self._cmdlog.hide()
-        sync.newCommand.connect(self._handleNewCommand)
-        sync.showMessage.connect(self._stbar.showMessage)
-
-    def currentUrl(self):
-        return self._syncwidget.currentUrl()
-
-    def setUrl(self, newurl):
-        self._syncwidget.setUrl(newurl)
-
-    @pyqtSlot(cmdcore.CmdSession)
-    def _handleNewCommand(self, sess):
-        sess.commandFinished.connect(self._stbar.clearProgress)
-        sess.outputReceived.connect(self._cmdlog.appendLog)
-        sess.progressReceived.connect(self._stbar.setProgress)
-        self._cmdlog.show()
-
-    def reject(self):
-        if not self._syncwidget.canExit():
-            if not qtlib.QuestionMsgBox(_('TortoiseHg Sync'),
-                _('Are you sure that you want to cancel synchronization?'),
-                parent=self):
-                return
-        super(SyncDialog, self).reject()
 
 
 class PostPullDialog(QDialog):
@@ -1584,11 +1536,6 @@ class OptionsDialog(QDialog):
         self.forcecb.setChecked(opts.get('force', False))
         layout.addWidget(self.forcecb)
 
-        self.subrepocb = QCheckBox(
-            _('Recurse into subrepositories') + u' (--subrepos)')
-        self.subrepocb.setChecked(opts.get('subrepos', False))
-        layout.addWidget(self.subrepocb)
-
         repo = repoagent.rawRepo()
         self.noproxycb = QCheckBox(
             _('Temporarily disable configured HTTP proxy'))
@@ -1635,7 +1582,6 @@ class OptionsDialog(QDialog):
                          ('branch', self.branchle)):
             outopts[name] = hglib.fromunicode(le.text()).strip()
 
-        outopts['subrepos'] = self.subrepocb.isChecked()
         outopts['force'] = self.forcecb.isChecked()
         outopts['new-branch'] = self.newbranchcb.isChecked()
         outopts['noproxy'] = self.noproxycb.isChecked()

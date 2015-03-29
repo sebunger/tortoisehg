@@ -12,7 +12,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import error, util
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, lexers, qtlib
 from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
@@ -179,10 +179,10 @@ class EmailDialog(QDialog):
 
         if self._qui.bundle_radio.isChecked():
             assert self._outgoing  # only outgoing bundle is supported
-            opts['rev'] = self._outgoingrevs
+            opts['rev'] = hglib.compactrevs(self._outgoingrevs)
             opts['bundle'] = True
         else:
-            opts['rev'] = self._revs
+            opts['rev'] = hglib.compactrevs(self._revs)
 
         def diffformat():
             n = self.getdiffformat()

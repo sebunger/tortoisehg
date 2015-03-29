@@ -10,7 +10,7 @@ import os
 from mercurial import hg, util, error, context, merge, scmutil
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, filectxactions, filedata, fileview
 
 from PyQt4.QtCore import *
@@ -390,7 +390,9 @@ class StatusWidget(QWidget):
         self.refreshBtn.setEnabled(True)
         self.progress.emit(*cmdui.stopProgress(_('Refresh')))
         if self.refthread.wctx is not None:
-            self.updateModel(self.refthread.wctx, self.refthread.patchecked)
+            assert self.refthread.wstatus is not None
+            self.updateModel(self.refthread.wctx, self.refthread.wstatus,
+                             self.refthread.patchecked)
         self.refthread = None
         if len(self.repo.parents()) > 1:
             # nuke partial selections if wctx has a merge in-progress
@@ -410,7 +412,7 @@ class StatusWidget(QWidget):
     def canExit(self):
         return not self.isRefreshingWctx()
 
-    def updateModel(self, wctx, patchecked):
+    def updateModel(self, wctx, wstatus, patchecked):
         self.tv.setSortingEnabled(False)
         if self.tv.model():
             checked = self.tv.model().getChecked()
@@ -421,9 +423,9 @@ class StatusWidget(QWidget):
                                     _('No files found for this operation'),
                                     parent=self)
         ms = merge.mergestate(self.repo)
-        tm = WctxModel(self._repoagent, wctx, ms, self.pctx, self.savechecks,
-                       self.opts, checked, self, checkable=self.checkable,
-                       defcheck=self.defcheck)
+        tm = WctxModel(self._repoagent, wctx, wstatus, ms, self.pctx,
+                       self.savechecks, self.opts, checked, self,
+                       checkable=self.checkable, defcheck=self.defcheck)
         if self.checkable:
             tm.checkToggled.connect(self.checkToggled)
             tm.checkCountChanged.connect(self.updateCheckCount)
@@ -627,6 +629,7 @@ class StatusThread(QThread):
         self.pats = pats
         self.opts = opts
         self.wctx = None
+        self.wstatus = None
         self.patchecked = {}
 
     def run(self):
@@ -667,6 +670,7 @@ class StatusThread(QThread):
                 self.repo.lfstatus = False
                 wctx = context.workingctx(self.repo, changes=status)
             self.wctx = wctx
+            self.wstatus = status
 
             wctx.dirtySubrepos = []
             for s in wctx.substate:
@@ -698,8 +702,8 @@ class WctxModel(QAbstractTableModel):
     checkCountChanged = pyqtSignal()
     checkToggled = pyqtSignal(QString, bool)
 
-    def __init__(self, repoagent, wctx, ms, pctx, savechecks, opts, checked,
-                 parent, checkable=True, defcheck='MAR!S'):
+    def __init__(self, repoagent, wctx, wstatus, ms, pctx, savechecks, opts,
+                 checked, parent, checkable=True, defcheck='MAR!S'):
         QAbstractTableModel.__init__(self, parent)
         self._repoagent = repoagent
         self._pctx = pctx
@@ -728,35 +732,35 @@ class WctxModel(QAbstractTableModel):
         else:
             pctxmatch = lambda f: True
         if opts['modified']:
-            for m in wctx.modified():
+            for m in wstatus.modified:
                 nchecked[m] = checked.get(m, 'M' in defcheck and
                                           m not in excludes and pctxmatch(m))
                 rows.append(mkrow(m, 'M'))
         if opts['added']:
-            for a in wctx.added():
+            for a in wstatus.added:
                 nchecked[a] = checked.get(a, 'A' in defcheck and
                                           a not in excludes and pctxmatch(a))
                 rows.append(mkrow(a, 'A'))
         if opts['removed']:
-            for r in wctx.removed():
+            for r in wstatus.removed:
                 nchecked[r] = checked.get(r, 'R' in defcheck and
                                           r not in excludes and pctxmatch(r))
                 rows.append(mkrow(r, 'R'))
         if opts['deleted']:
-            for d in wctx.deleted():
+            for d in wstatus.deleted:
                 nchecked[d] = checked.get(d, 'D' in defcheck and
                                           d not in excludes and pctxmatch(d))
                 rows.append(mkrow(d, '!'))
         if opts['unknown']:
-            for u in wctx.unknown() or []:
+            for u in wstatus.unknown or []:
                 nchecked[u] = checked.get(u, '?' in defcheck)
                 rows.append(mkrow(u, '?'))
         if opts['ignored']:
-            for i in wctx.ignored() or []:
+            for i in wstatus.ignored or []:
                 nchecked[i] = checked.get(i, 'I' in defcheck)
                 rows.append(mkrow(i, 'I'))
         if opts['clean']:
-            for c in wctx.clean() or []:
+            for c in wstatus.clean or []:
                 nchecked[c] = checked.get(c, 'C' in defcheck)
                 rows.append(mkrow(c, 'C'))
         if opts['subrepo']:

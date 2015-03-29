@@ -19,21 +19,26 @@ import binascii, os, re
 from mercurial import util, error
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt import filedata, graph, qtlib
-
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import cmdcore, filedata, graph
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-nullvariant = QVariant()
-
 mqpatchmimetype = 'application/thg-mqunappliedpatch'
 
 # TODO: Remove these two when we adopt GTK author color scheme
-COLORS = [ "blue", "darkgreen", "red", "green", "darkblue", "purple",
-           "dodgerblue", Qt.darkYellow, "magenta", "darkred", "darkmagenta",
-           "darkcyan", ]
+COLORS = ["blue",
+          "darkgreen",
+          "green",
+          "darkblue",
+          "purple",
+          "dodgerblue",
+          Qt.darkYellow,
+          "magenta",
+          "darkmagenta",
+          "darkcyan",
+          ]
 COLORS = [str(QColor(x).name()) for x in COLORS]
 
 # pick names from "hg help templating" if any
@@ -72,21 +77,23 @@ COLUMNHEADERS = (
     )
 ALLCOLUMNS = tuple(name for name, _text in COLUMNHEADERS)
 
-UNAPPLIED_PATCH_COLOR = '#999999'
-HIDDENREV_COLOR = '#666666'
+UNAPPLIED_PATCH_COLOR = QColor('#999999')
+HIDDENREV_COLOR = QColor('#666666')
+TROUBLED_COLOR = QColor(172, 34, 34)
 
 GraphNodeRole = Qt.UserRole + 0
+LabelsRole = Qt.UserRole + 1  # [(text, style), ...]
 
-def get_color(n, ignore=()):
+def _hashcolor(data, modulo=None):
+    """function to reliably map a string to a color index
+
+    The algorithm used is very basic and can be improved if needed.
     """
-    Return a color at index 'n' rotating in the available
-    colors. 'ignore' is a list of colors not to be chosen.
-    """
-    ignore = [str(QColor(x).name()) for x in ignore]
-    colors = [x for x in COLORS if x not in ignore]
-    if not colors: # ghh, no more available colors...
-        colors = COLORS
-    return colors[n % len(colors)]
+    if modulo is None:
+        modulo = len(COLORS)
+    idx = sum([ord(c) for c in data])
+    idx %= modulo
+    return idx
 
 def _parsebranchcolors(value):
     r"""Parse tortoisehg.branchcolors setting
@@ -128,145 +135,222 @@ def _parsebranchcolors(value):
         colors.append((key, val))
     return colors
 
-def _renderlabels(labels, margin=2):
-    if not labels:
-        return
-    font = QApplication.font('QAbstractItemView')
-    fm = QFontMetrics(font, None)  # screen-compatible (i.e. QPixmap) metrics
-    twidths = [fm.width(t) for t, _s in labels]
-    th = fm.height()
-
-    padw = 2
-    padh = 1  # may overwrite horizontal frame to fit row
-
-    pix = QPixmap(sum(twidths) + len(labels) * (2 * padw + margin) - margin,
-                  th + 2 * padh)
-    pix.fill(Qt.transparent)
-    painter = QPainter(pix)
-    painter.setFont(font)
-    x = 0
-    for (text, style), tw in zip(labels, twidths):
-        lw = tw + 2 * padw
-        lh = th + 2 * padh
-        # draw bevel, background and text in order
-        bg = qtlib.getbgcoloreffect(style)
-        painter.fillRect(x, 0, lw, lh, bg.darker(110))
-        painter.fillRect(x + 1, 1, lw - 2, lh - 2, bg.lighter(110))
-        painter.fillRect(x + 2, 2, lw - 4, lh - 4, bg)
-        painter.setPen(qtlib.gettextcoloreffect(style))
-        painter.drawText(x + padw, padh, tw, th, 0, text)
-        x += lw + margin
-    painter.end()
-    return pix
-
 
 class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
     showMessage = pyqtSignal(unicode)
-    filled = pyqtSignal()
-    loaded = pyqtSignal()
+
+    # emitted when listed revisions are updated because of repository or
+    # filter option change; a view might have to change current index
+    revsUpdated = pyqtSignal()
 
     _defaultcolumns = ('Graph', 'Rev', 'Branch', 'Description', 'Author',
                        'Age', 'Tags', 'Phase')
 
     _mqtags = ('qbase', 'qtip', 'qparent')
 
-    def __init__(self, repo, branch, revset, rfilter, parent,
-                 allparents=False, showgraftsource=True):
-        """
-        repo is a hg repo instance
-        """
+    def __init__(self, repoagent, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self._cache = []
-        self.graph = None
-        self.timerHandle = None
-        self.rowcount = 0
-        self.repo = repo
-        self.revset = frozenset(revset)
-        self.filterbyrevset = rfilter
+        self._timerhandle = None
+        self._rowcount = 0
+        self._repoagent = repoagent
+        self._selectedrevs = frozenset([])
+        self._revspec = ''
+        self._filterbyrevset = True
         self.unicodestar = True
         self.unicodexinabox = True
-        self.latesttags = {-1: 'null'}
-        self.fullauthorname = False
-        self.filterbranch = branch  # unicode
-        self.allparents = allparents
-        self.showgraftsource = showgraftsource
+        self._latesttags = {-1: (0, 0, 'null')}  # date, dist, tag
+        self._fullauthorname = False
+        self._filterbranch = ''  # unicode
+        self._allparents = False
+        self._showgraftsource = True
 
         # To be deleted
         self._user_colors = {}
         self._branch_colors = {}
 
-        if repo:
-            self.initBranchColors()
-            self.reloadConfig()
-            self._initGraph()
+        self._querysess = cmdcore.nullCmdSession()
+        self._pendingrebuild = False
 
-    def initBranchColors(self):
-        # Set all the branch colors once on a fixed order,
-        # which should make the branch colors more stable
+        repoagent.configChanged.connect(self._invalidate)
+        repoagent.repositoryChanged.connect(self._reloadGraph)
 
+        self._initBranchColors()
+        self._reloadConfig()
+        self.graph = self._createGraph()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
+    def _initBranchColors(self):
         # Always assign the first color to the default branch
-        self.namedbranch_color('default')
+        self._branch_colors['default'] = COLORS[0]
 
         # Set the colors specified in the tortoisehg.brachcolors config key
         self._branch_colors.update(_parsebranchcolors(
             self.repo.ui.config('tortoisehg', 'branchcolors')))
 
-        # Then assign colors to all branches in alphabetical order
-        # Note that re-assigning the color to the default branch
-        # is not expensive
-        for branch in sorted(self.repo.branchmap()):
-            self.namedbranch_color(branch)
-
     def setBranch(self, branch, allparents=False):
-        self.filterbranch = branch
-        self.allparents = allparents
-        self._initGraph()
+        branchchanged = (branch != self._filterbranch)
+        parentchanged = (allparents != self._allparents)
+        self._filterbranch = branch
+        self._allparents = allparents
+        if branchchanged or (branch and parentchanged):
+            self._rebuildGraph()
 
     def setShowGraftSource(self, visible):
-        self.showgraftsource = visible
-        self._initGraph()
+        if self._showgraftsource == visible:
+            return
+        self._showgraftsource = visible
+        self._rebuildGraph()
 
-    def _initGraph(self):
-        self.invalidateCache()
+    def _createGraph(self):
         opts = {
-            'branch': hglib.fromunicode(self.filterbranch),
-            'showgraftsource': self.showgraftsource,
+            'branch': hglib.fromunicode(self._filterbranch),
+            'showgraftsource': self._showgraftsource,
             }
-        if self.revset and self.filterbyrevset:
-            opts['revset'] = self.revset
+        if self._revspec and not self._selectedrevs and self._filterbyrevset:
+            return graph.Graph(self.repo, [])  # no matches found
+        if self._selectedrevs and self._filterbyrevset:
+            opts['revset'] = self._selectedrevs
             opts['showfamilyline'] = \
                 self.repo.ui.configbool('tortoisehg', 'showfamilyline', True)
             grapher = graph.revision_grapher(self.repo, opts)
-            self.graph = graph.Graph(self.repo, grapher, include_mq=False)
+            return graph.Graph(self.repo, grapher, include_mq=False)
         else:
-            opts['allparents'] = self.allparents
+            opts['allparents'] = self._allparents
             grapher = graph.revision_grapher(self.repo, opts)
-            self.graph = graph.Graph(self.repo, grapher, include_mq=True)
-        self.rowcount = 0
-        self.layoutChanged.emit()
-        self.showMessage.emit('')
-        QTimer.singleShot(0, self, SIGNAL('filled()'))
+            return graph.Graph(self.repo, grapher, include_mq=True)
 
-    def setRevset(self, revset):
-        self.revset = frozenset(revset)
-        self.invalidateCache()
+    @pyqtSlot()
+    def _reloadGraph(self):
+        if self._revspec:
+            self._runQuery()
+        self._rebuildGraph()
 
-    def reloadConfig(self):
+    def _rebuildGraph(self):
+        if not self._querysess.isFinished():
+            self._pendingrebuild = True
+            return
+        # skip costly operation while initializing options
+        if self._rowcount <= 0 and not self.graph.isfilled():
+            assert not self._cache
+            self.graph = self._createGraph()
+            return
+
+        self.layoutAboutToBeChanged.emit()
+        try:
+            oldindexmap = {}  # rev: [index, ...]
+            for i in self.persistentIndexList():
+                rev = self.graph[i.row()].rev
+                if rev not in oldindexmap:
+                    oldindexmap[rev] = []
+                oldindexmap[rev].append(i)
+            try:
+                brev = min(rev for rev in oldindexmap if isinstance(rev, int))
+            except ValueError:
+                brev = None
+
+            self._cache = []
+            try:
+                self.graph = self._createGraph()
+                self._ensureBuilt(brev)
+            except (error.RevlogError, error.RepoError):
+                self._shrinkRowCount()  # avoid further exceptions at data()
+                raise
+            self._expandRowCount()  # old rows may be mapped to inserted rows
+            for rev, ois in oldindexmap.iteritems():
+                row = self.graph.index(rev)
+                nis = [self.index(row, i.column(), i.parent()) for i in ois]
+                self.changePersistentIndexList(ois, nis)
+            self._shrinkRowCount()  # old rows should be mapped before removal
+            self._pendingrebuild = False
+        finally:
+            self.layoutChanged.emit()
+        self._emitAllDataChanged()
+        self.revsUpdated.emit()
+
+    def revset(self):
+        return self._revspec
+
+    def setRevset(self, revspec):
+        revspec = unicode(revspec)
+        if revspec == self._revspec:
+            return
+        self._revspec = revspec
+        if not revspec:
+            self._querysess.abort()
+            self._applyRevsetResult([])
+            return
+        self._runQuery()
+
+    def _runQuery(self):
+        self.showMessage.emit(_('Searching...'))
+
+        self._querysess.abort()
+        cmdline = ['log', '-T', '{rev}\n', '-r', self._revspec]
+        self._querysess = sess = self._repoagent.runCommand(cmdline)
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._onQueryFinished)
+
+    @pyqtSlot(int)
+    def _onQueryFinished(self, ret):
+        sess = self._querysess
+        if not sess.isFinished():
+            # new query is already running
+            return
+        if ret == 0:
+            revs = map(int, str(sess.readAll()).splitlines())
+            if revs:
+                self.showMessage.emit(_('%d matches found') % len(revs))
+            else:
+                self.showMessage.emit(_('No matches found'))
+            self._applyRevsetResult(revs)
+        elif not sess.isAborted():
+            self.showMessage.emit(sess.errorString() or sess.warningString())
+        if self._pendingrebuild:
+            self._rebuildGraph()  # invalid revspec
+
+    def _applyRevsetResult(self, revset):
+        self._selectedrevs = frozenset(revset)
+        if self._filterbyrevset or self._pendingrebuild:
+            self._rebuildGraph()
+        else:
+            self._invalidate()
+            self.revsUpdated.emit()  # some revisions may be disabled
+
+    def setFilterByRevset(self, filtered):
+        if self._filterbyrevset == filtered:
+            return
+        self._filterbyrevset = filtered
+        if self._revspec:
+            self._rebuildGraph()
+
+    def _reloadConfig(self):
         _ui = self.repo.ui
-        self.fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
-        self.authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
-        self.fullauthorname = _ui.configbool('tortoisehg', 'fullauthorname')
+        self._fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
+        self._authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
+        self._fullauthorname = _ui.configbool('tortoisehg', 'fullauthorname')
 
-    def invalidate(self):
-        self.reloadConfig()
-        self.invalidateCache()
-        self.layoutChanged.emit()
+    @pyqtSlot()
+    def _invalidate(self):
+        self._reloadConfig()
+        self._cache = []
+        self._emitAllDataChanged()
+
+    def _emitAllDataChanged(self):
+        if self._rowcount <= 0:
+            return
+        # optimize range if necessary
+        bottomright = self.index(self._rowcount - 1, self.columnCount() - 1)
+        self.dataChanged.emit(self.index(0, 0), bottomright)
 
     def branch(self):
-        return self.filterbranch
+        return self._filterbranch
 
     def canFetchMore(self, parent):
         if parent.isValid():
@@ -276,56 +360,53 @@ class HgRepoListModel(QAbstractTableModel):
     def fetchMore(self, parent):
         if parent.isValid() or self.graph.isfilled():
             return
-        self.graph.build_nodes(self.fill_step)
-        self.updateRowCount()
+        self.graph.build_nodes(self._fill_step)
+        self._expandRowCount()
 
-    def ensureBuilt(self, rev):
+    def _ensureBuilt(self, rev):
         """
         Make sure rev data is available (graph element created).
 
         """
-        if (self.graph.isfilled()
-            # working rev must exist once build_nodes() is invoked
-            or (len(self.graph) > 0 and rev is None)
-            or (len(self.graph) > 0 and self.graph[-1].rev <= rev)):
-            return
-        self.graph.build_nodes(self.fill_step / 2, rev)
-        self.updateRowCount()
+        if not isinstance(rev, int):
+            rev = len(self.repo)  # working dir or unapplied patch
+        self.graph.build_nodes(rev=rev)
+        # caller should do _expandRowCount() or _shrinkRowCount() by itself
 
     def loadall(self):
-        self.timerHandle = self.startTimer(1)
+        self._timerhandle = self.startTimer(1)
 
     def timerEvent(self, event):
-        if event.timerId() == self.timerHandle:
+        if event.timerId() == self._timerhandle:
             self.showMessage.emit(_('filling (%d)')%(len(self.graph)))
-            if self.graph.isfilled():
-                self.killTimer(self.timerHandle)
-                self.timerHandle = None
-                self.showMessage.emit('')
-                self.loaded.emit()
+            self.graph.build_nodes()
             # we only fill the graph data structures without telling
             # views until the model is loaded, to keep maximal GUI
             # reactivity
-            elif not self.graph.build_nodes():
-                self.killTimer(self.timerHandle)
-                self.timerHandle = None
-                self.updateRowCount()
+            if self.graph.isfilled():
+                self.killTimer(self._timerhandle)
+                self._timerhandle = None
+                self._expandRowCount()
                 self.showMessage.emit('')
-                self.loaded.emit()
 
-    def updateRowCount(self):
-        currentlen = self.rowcount
+    def _expandRowCount(self):
         newlen = len(self.graph)
-
-        if newlen > self.rowcount:
-            self.beginInsertRows(QModelIndex(), currentlen, newlen-1)
-            self.rowcount = newlen
+        if newlen > self._rowcount:
+            self.beginInsertRows(QModelIndex(), self._rowcount, newlen - 1)
+            self._rowcount = newlen
             self.endInsertRows()
+
+    def _shrinkRowCount(self):
+        newlen = len(self.graph)
+        if newlen < self._rowcount:
+            self.beginRemoveRows(QModelIndex(), newlen, self._rowcount - 1)
+            self._rowcount = newlen
+            self.endRemoveRows()
 
     def rowCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0
-        return self.rowcount
+        return self._rowcount
 
     def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
@@ -333,8 +414,6 @@ class HgRepoListModel(QAbstractTableModel):
         return len(ALLCOLUMNS) - 1  # no FileColumn
 
     def maxWidthValueForColumn(self, column):
-        if self.graph is None:
-            return 'XXXX'
         if column == RevColumn:
             return '8' * len(str(len(self.repo))) + '+'
         if column == NodeColumn:
@@ -352,31 +431,39 @@ class HgRepoListModel(QAbstractTableModel):
             except IndexError:
                 pass
         if column == FileColumn:
-            return self.filename
+            return self._filename
         if column == ChangesColumn:
             return 'Changes'
         # Fall through for DescColumn
         return None
 
-    def user_color(self, user):
+    def rev(self, index):
+        """Revision number of the specified row; None for working-dir"""
+        if not index.isValid():
+            return -1
+        gnode = self.graph[index.row()]
+        if gnode.rev is not None and not isinstance(gnode.rev, int):
+            # avoid mixing integer and localstr
+            return -1
+        return gnode.rev
+
+    def _user_color(self, user):
         'deprecated, please replace with hgtk color scheme'
         if user not in self._user_colors:
-            self._user_colors[user] = get_color(len(self._user_colors),
-                                                self._user_colors.values())
+            idx = _hashcolor(user)
+            self._user_colors[user] = COLORS[idx]
         return self._user_colors[user]
 
-    def namedbranch_color(self, branch):
+    def _namedbranch_color(self, branch):
         'deprecated, please replace with hgtk color scheme'
         if branch not in self._branch_colors:
-            self._branch_colors[branch] = get_color(len(self._branch_colors))
+            idx = _hashcolor(branch)
+            self._branch_colors[branch] = COLORS[idx]
         return self._branch_colors[branch]
-
-    def invalidateCache(self):
-        self._cache = []
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
-            return nullvariant
+            return None
         gnode = self.graph[index.row()]
         if role == Qt.DisplayRole:
             if index.column() == FileColumn:
@@ -391,65 +478,80 @@ class HgRepoListModel(QAbstractTableModel):
         if role == Qt.ForegroundRole:
             if (gnode.shape == graph.NODE_SHAPE_UNAPPLIEDPATCH
                 and index.column() != DescColumn):
-                return QColor(UNAPPLIED_PATCH_COLOR)
-            if gnode.hidden and index.column() != GraphColumn:
-                return QColor(HIDDENREV_COLOR)
+                return UNAPPLIED_PATCH_COLOR
         if role == GraphNodeRole:
             return gnode
-        if (role, index.column()) not in self._cacheindexmap:
-            return nullvariant
+        if (PYQT_VERSION < 0x40701 and role == Qt.DecorationRole
+            and self._safedata(index, LabelsRole)):
+            # hack to flag HasDecoration where extended attributes of
+            # QStyleOptionViewItem are not accessible in initStyleOption()
+            return QColor(Qt.transparent)
         # repo may be changed while reading in case of postpull=rebase for
         # example, and result in RevlogError. (issue #429)
         try:
-            return self.safedata(index, role)
+            return self._safedata(index, role)
         except error.RevlogError, e:
             if 'THGDEBUG' in os.environ:
                 raise
             if role == Qt.DisplayRole:
-                return QVariant(hglib.tounicode(str(e)))
+                return hglib.tounicode(str(e))
             else:
-                return nullvariant
+                return None
 
-    def safedata(self, index, role):
+    def _safedata(self, index, role):
         row = index.row()
         graphlen = len(self.graph)
         cachelen = len(self._cache)
         if graphlen > cachelen:
-            self._cache.extend([None] * len(self._cacheindexmap)
-                               for _i in xrange(graphlen - cachelen))
+            self._cache.extend({} for _i in xrange(graphlen - cachelen))
         data = self._cache[row]
-        idx = self._cacheindexmap[role, index.column()]
-        if data[idx] is None:
+        idx = (role, index.column())
+        if idx not in data:
             try:
-                result = self.rawdata(index, role)
+                result = self._rawdata(index, role)
+            except error.RepoLookupError:
+                # happens if repository pruned/stripped or bundle unapplied
+                # but model is not reloaded yet because repository is busy
+                return None
             except util.Abort:
-                result = nullvariant
+                return None
             data[idx] = result
         return data[idx]
 
-    def rawdata(self, index, role):
+    def _rawdata(self, index, role):
         row = index.row()
         column = index.column()
         gnode = self.graph[row]
         ctx = self.repo.changectx(gnode.rev)
 
         if role == Qt.DisplayRole:
-            text = self._columnmap[column](self, ctx)
+            textfunc = self._columnmap.get(column)
+            if textfunc is None:
+                return None
+            text = textfunc(self, ctx)
             if not isinstance(text, (QString, unicode)):
                 text = hglib.tounicode(text)
-            return QVariant(text)
+            return text
         elif role == Qt.ForegroundRole:
-            if column == AuthorColumn:
-                if self.authorcolor:
-                    return QVariant(QColor(self.user_color(ctx.user())))
-                return nullvariant
-            if column in (GraphColumn, BranchColumn):
-                return QVariant(QColor(self.namedbranch_color(ctx.branch())))
-        elif role == Qt.DecorationRole and column == DescColumn:
-            return QVariant(self._renderrevlabels(ctx))
-        elif role == Qt.DecorationRole and column == ChangesColumn:
-            return QVariant(self._renderchanges(ctx))
-        return nullvariant
+            color = None
+            if gnode.troubles:
+                color = TROUBLED_COLOR
+            elif column == AuthorColumn and self._authorcolor:
+                color = QColor(self._user_color(ctx.user()))
+            elif column in (GraphColumn, BranchColumn):
+                color = QColor(self._namedbranch_color(ctx.branch()))
+            if index.column() != GraphColumn:
+                if gnode.faded:
+                    if color is None:
+                        color = HIDDENREV_COLOR
+                    else:
+                        color = color.lighter()
+            return color
+        elif role == LabelsRole and column == DescColumn:
+            return self._getrevlabels(ctx)
+        elif role == LabelsRole and column == ChangesColumn:
+            return self._getchanges(ctx)
+        return None
 
     def flags(self, index):
         flags = super(HgRepoListModel, self).flags(index)
@@ -470,7 +572,11 @@ class HgRepoListModel(QAbstractTableModel):
 
     def isActiveRev(self, rev):
         """True if the specified rev is not excluded by revset"""
-        return not self.revset or rev in self.revset
+        return (not self._revspec
+                or rev in self._selectedrevs
+                # consider everything is active while first query is running
+                or (self._revspec and not self._selectedrevs
+                    and not self._querysess.isFinished()))
 
     def mimeTypes(self):
         return QStringList([mqpatchmimetype])
@@ -507,25 +613,51 @@ class HgRepoListModel(QAbstractTableModel):
         else:
             destpatch = None  # next to working rev
 
-        hglib.movemqpatches(self.repo, destpatch, dragpatches)
-        repoagent = self.repo._pyqtobj  # TODO
-        repoagent.pollStatus()
+        cmdline = hglib.buildcmdargs('qreorder', after=destpatch, *dragpatches)
+        cmdline = map(hglib.tounicode, cmdline)
+        self._repoagent.runCommand(cmdline)
         return True
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
             return COLUMNHEADERS[section][1]
 
+    def defaultIndex(self):
+        """Index that should be selected when the model is initially loaded
+        or the row previously selected is gone"""
+        repo = self.repo
+        initialsel = repo.ui.config('tortoisehg', 'initialrevision', 'current')
+        changeid = {'current': '.',
+                    'tip': 'tip',
+                    'workingdir': None,
+                    }.get(initialsel, '.')
+        rev = repo[changeid].rev()
+        if self._selectedrevs and rev not in self._selectedrevs:
+            rev = max(self._selectedrevs)
+        index = self.indexFromRev(rev)
+        if index.flags() & Qt.ItemIsEnabled:
+            return index
+
+        if self._filterbranch:
+            # look for the first active revision as last ditch; should be
+            # removed if filterbranch is merged with revset
+            for row, gnode in enumerate(self.graph.nodes):
+                if not isinstance(gnode.rev, int):
+                    continue
+                index = self.index(row, 0)
+                if index.flags() & Qt.ItemIsEnabled:
+                    return index
+        return QModelIndex()
+
     def indexFromRev(self, rev):
-        if self.graph is None:
-            return QModelIndex()
-        self.ensureBuilt(rev)
+        self._ensureBuilt(rev)
+        self._expandRowCount()
         row = self.graph.index(rev)
         if row >= 0:
             return self.index(row, 0)
         return QModelIndex()
 
-    def getbranch(self, ctx):
+    def _getbranch(self, ctx):
         b = hglib.tounicode(ctx.branch())
         if ctx.extra().get('close'):
             if self.unicodexinabox:
@@ -534,41 +666,43 @@ class HgRepoListModel(QAbstractTableModel):
                 b += u'--'
         return b
 
-    def getlatesttags(self, ctx):
+    def _getlatesttags(self, ctx):
         rev = ctx.rev()
         todo = [rev]
         repo = self.repo
         while todo:
             rev = todo.pop()
-            if rev in self.latesttags:
+            if rev in self._latesttags:
                 continue
             ctx = repo[rev]
             tags = [t for t in ctx.tags()
                     if repo.tagtype(t) and repo.tagtype(t) != 'local']
             if tags:
-                self.latesttags[rev] = ':'.join(sorted(tags))
+                self._latesttags[rev] = ctx.date()[0], 0, ':'.join(sorted(tags))
                 continue
             try:
+                # The tuples are laid out so the right one can be found by
+                # comparison.
                 if (ctx.parents()):
-                    ptag = max(
-                        self.latesttags[p.rev()] for p in ctx.parents())
+                    pdate, pdist, ptag = max(
+                        self._latesttags[p.rev()] for p in ctx.parents())
                 else:
-                    ptag = ""
+                    pdate, pdist, ptag = 0, -1, ""
             except KeyError:
                 # Cache miss - recurse
                 todo.append(rev)
                 todo.extend(p.rev() for p in ctx.parents())
                 continue
-            self.latesttags[rev] = ptag
-        return self.latesttags[rev]
+            self._latesttags[rev] = pdate, pdist + 1, ptag
+        return self._latesttags[rev][2]
 
-    def gettags(self, ctx):
+    def _gettags(self, ctx):
         if ctx.rev() is None:
             return ''
         tags = [t for t in ctx.tags() if t not in self._mqtags]
         return hglib.tounicode(','.join(tags))
 
-    def getrev(self, ctx):
+    def _getrev(self, ctx):
         rev = ctx.rev()
         if type(rev) is int:
             return str(rev)
@@ -577,16 +711,16 @@ class HgRepoListModel(QAbstractTableModel):
         else:
             return ''
 
-    def getauthor(self, ctx):
+    def _getauthor(self, ctx):
         try:
             user = ctx.user()
-            if not self.fullauthorname:
+            if not self._fullauthorname:
                 user = hglib.username(user)
             return user
         except error.Abort:
             return _('Mercurial User')
 
-    def getlog(self, ctx):
+    def _getlog(self, ctx):
         if ctx.rev() is None:
             if self.unicodestar:
                 # The Unicode symbol is a black star:
@@ -599,16 +733,16 @@ class HgRepoListModel(QAbstractTableModel):
             limit = None  # first line
         return hglib.longsummary(ctx.description(), limit)
 
-    def _renderrevlabels(self, ctx):
+    def _getrevlabels(self, ctx):
         labels = []
+        branchheads = self.repo.branchheads(ctx.branch())
         if ctx.rev() is None:
             for pctx in ctx.parents():
-                branchheads = hglib.branchheads(self.repo)
                 if branchheads and pctx.node() not in branchheads:
                     labels.append((_('Not a head revision!'), 'log.warning'))
-            return _renderlabels(labels)
+            return labels
 
-        if ctx.thgbranchhead():
+        if ctx.node() in branchheads:
             labels.append((hglib.tounicode(ctx.branch()), 'log.branch'))
 
         if ctx.thgmqunappliedpatch():
@@ -630,9 +764,9 @@ class HgRepoListModel(QAbstractTableModel):
                 style = 'log.tag'
             labels.append((hglib.tounicode(tag), style))
 
-        return _renderlabels(labels)
+        return labels
 
-    def _renderchanges(self, ctx):
+    def _getchanges(self, ctx):
         """Return the MAR status for the given ctx."""
         labels = []
         M, A, R = ctx.changesToParent(0)
@@ -642,9 +776,9 @@ class HgRepoListModel(QAbstractTableModel):
             labels.append((str(len(M)), 'log.modified'))
         if R:
             labels.append((str(len(R)), 'log.removed'))
-        return _renderlabels(labels, margin=0)
+        return labels
 
-    def getconv(self, ctx):
+    def _getconv(self, ctx):
         if ctx.rev() is not None:
             extra = ctx.extra()
             cvt = extra.get('convert_revision', '')
@@ -662,7 +796,7 @@ class HgRepoListModel(QAbstractTableModel):
                 return cvt
         return ''
 
-    def getphase(self, ctx):
+    def _getphase(self, ctx):
         if ctx.rev() is None:
             return ''
         try:
@@ -671,28 +805,19 @@ class HgRepoListModel(QAbstractTableModel):
             return 'draft'
 
     _columnmap = {
-        RevColumn: getrev,
-        BranchColumn: getbranch,
-        DescColumn: getlog,
-        AuthorColumn: getauthor,
-        TagsColumn: gettags,
-        LatestTagColumn: getlatesttags,
+        RevColumn: _getrev,
+        BranchColumn: _getbranch,
+        DescColumn: _getlog,
+        AuthorColumn: _getauthor,
+        TagsColumn: _gettags,
+        LatestTagColumn: _getlatesttags,
         NodeColumn: lambda self, ctx: str(ctx),
         AgeColumn: lambda self, ctx: hglib.age(ctx.date()).decode('utf-8'),
         LocalDateColumn: lambda self, ctx: hglib.displaytime(ctx.date()),
         UtcDateColumn: lambda self, ctx: hglib.utctime(ctx.date()),
-        ConvertedColumn: getconv,
-        PhaseColumn: getphase,
+        ConvertedColumn: _getconv,
+        PhaseColumn: _getphase,
         }
-
-    # (role, column): index in _cache[row]
-    _cacheindexmap = dict((k, i) for i, k in enumerate(
-        [(Qt.DisplayRole, c) for c in _columnmap]
-        + [(Qt.ForegroundRole, GraphColumn),
-           (Qt.ForegroundRole, BranchColumn),
-           (Qt.ForegroundRole, AuthorColumn),
-           (Qt.DecorationRole, DescColumn),
-           (Qt.DecorationRole, ChangesColumn)]))
 
 
 class FileRevModel(HgRepoListModel):
@@ -704,17 +829,13 @@ class FileRevModel(HgRepoListModel):
     _defaultcolumns = ('Graph', 'Rev', 'Branch', 'Description', 'Author',
                        'Age', 'Filename')
 
-    def __init__(self, repo, filename, parent=None):
-        """
-        data is a HgHLRepo instance
-        """
-        self.filename = filename
-        HgRepoListModel.__init__(self, repo, '', [], False, parent)
+    def __init__(self, repoagent, filename, parent=None):
+        self._filename = filename
+        HgRepoListModel.__init__(self, repoagent, parent)
 
-    def _initGraph(self):
-        grapher = graph.filelog_grapher(self.repo, self.filename)
-        self.graph = graph.Graph(self.repo, grapher)
-        QTimer.singleShot(0, self, SIGNAL('filled()'))
+    def _createGraph(self):
+        grapher = graph.filelog_grapher(self.repo, self._filename)
+        return graph.Graph(self.repo, grapher)
 
     def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
@@ -731,7 +852,7 @@ class FileRevModel(HgRepoListModel):
         if rev is None:
             rev = '.'
         try:
-            fctx = self.repo[rev][self.filename]
+            fctx = self.repo[rev][self._filename]
         except error.LookupError:
             return QModelIndex()
         return self.indexFromRev(fctx.linkrev())

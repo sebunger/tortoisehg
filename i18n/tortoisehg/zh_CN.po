@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-08-18 14:01-0300\n"
-"PO-Revision-Date: 2014-05-31 22:35+0000\n"
+"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"PO-Revision-Date: 2014-11-26 07:30+0000\n"
 "Last-Translator: yfdyh000 <yfdyh000@gmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-08-19 06:24+0000\n"
-"X-Generator: Launchpad (build 17156)\n"
+"X-Launchpad-Export-Date: 2015-02-20 05:18+0000\n"
+"X-Generator: Launchpad (build 17341)\n"
 "Language: zh_CN\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -24,6 +24,9 @@ msgstr "TortoiseHg 层叠图标服务"
 
 msgid "Exit"
 msgstr "退出"
+
+msgid "hg lighthg"
+msgstr "hg lighthg"
 
 msgid "About"
 msgstr "关于"
@@ -577,6 +580,10 @@ msgid "process exited unexpectedly with code %d"
 msgstr "进程意外退出，代码 %d"
 
 #, python-format
+msgid "failed to encode command: %s"
+msgstr ""
+
+#, python-format
 msgid "timed out while reading: %r..."
 msgstr "读取超时: %r..."
 
@@ -598,6 +605,10 @@ msgstr "没有 \"runcommand\" 能力"
 msgid "corrupted command result: %r"
 msgstr "损坏的命令结果: %r"
 
+#, python-format
+msgid "failed to encode input: %s"
+msgstr ""
+
 msgid "Terminated by user"
 msgstr "被用户终止"
 
@@ -616,10 +627,6 @@ msgstr "[命令返回代码%d %%s]"
 #, python-format
 msgid "[command completed successfully %s]"
 msgstr "[命令成功完成 %s]"
-
-#, python-format
-msgid "ignoring invalid cmdworker '%s'\n"
-msgstr "忽略无效的 cmdworker '%s'\n"
 
 msgid "Running..."
 msgstr "正在运行..."
@@ -1231,11 +1238,11 @@ msgstr "命令解析错误: %s"
 msgid "no matches found: %s"
 msgstr "没有找到匹配项: %s"
 
-msgid "Output Log"
-msgstr "输出日志"
+msgid "Console"
+msgstr ""
 
-msgid "File &History"
-msgstr "文件历史(&H)"
+msgid "File &History / Annotate"
+msgstr ""
 
 msgid "Show the history of the selected file"
 msgstr "显示选中文件的历史"
@@ -1322,7 +1329,7 @@ msgid "Custom Tools"
 msgstr "自定义工具"
 
 msgid "Diff &Local"
-msgstr ""
+msgstr "与本地比较差异(&L)"
 
 msgid "&View Missing"
 msgstr "查看缺失(&V)"
@@ -1394,10 +1401,10 @@ msgid "&Ignore..."
 msgstr "忽略(&I)..."
 
 msgid "Edit Re&jects"
-msgstr ""
+msgstr "编辑拒绝(&j)"
 
 msgid "Manually resolve rejected patch chunks"
-msgstr ""
+msgstr "手动解决被拒绝的补丁块"
 
 msgid "De&tect Renames..."
 msgstr "检测重命名(&T)..."
@@ -1594,10 +1601,10 @@ msgid "Forward"
 msgstr "前进"
 
 msgid "Diff Selected &Changesets"
-msgstr ""
+msgstr "与选中的变更集比较差异(&C)"
 
 msgid "&Diff Selected File Revisions"
-msgstr ""
+msgstr "与选中的文件版本比较差异(&D)"
 
 msgid "Show Revision &Details"
 msgstr "显示修订详情(&D)"
@@ -2240,64 +2247,29 @@ msgstr "TortoiseHg 已创建一个新的 .hgignore 文件。您希望将其纳�
 msgid "Unable to write .hgignore file"
 msgstr "无法写入 .hgignore 文件"
 
+msgid "Copy working directory files from skeleton"
+msgstr ""
+
 msgid "Add special files (.hgignore, ...)"
 msgstr "添加特殊文件 (.hgignore,...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "创建和 Mercurial 1.7 以前的版本兼容的仓库"
 
-msgid "Show in Workbench after init"
-msgstr "初始化完成后在工作台中打开"
-
-msgid "Create"
-msgstr "创建"
-
 msgid "New Repository"
 msgstr "新建仓库"
 
-msgid "Error executing init"
-msgstr "初始化错误"
-
-msgid "Destination path is empty"
-msgstr "目标路径为空"
-
-msgid "Please enter the directory path"
-msgstr "请输入目录路径"
-
-msgid "Init"
-msgstr "初始化"
-
-#, python-format
-msgid "Are you sure about adding the new repository %d extra levels deep?"
+msgid "&Create"
 msgstr ""
-
-#, python-format
-msgid ""
-"Path exists up to:\n"
-"%s\n"
-"and you asked for:\n"
-"%s"
-msgstr ""
-
-#, python-format
-msgid "Cannot create folder %s"
-msgstr "无法创建文件夹 %s"
-
-msgid "Unable to create new repository"
-msgstr "无法创建新仓库"
-
-msgid "Error when creating repository"
-msgstr "创建仓库时出错"
-
-#, python-format
-msgid "<p>Repository successfully created at</p><p>%s</p>"
-msgstr "<p>已在下列位置成功创建仓库:</p><p>%s</p>"
 
 msgid "Unable to create a config file"
 msgstr "无法创建配置文件"
 
 msgid "Insufficient access rights."
 msgstr "访问权限不足。"
+
+msgid "Show Log"
+msgstr "显示日志"
 
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
@@ -2357,7 +2329,7 @@ msgid "Find matches - %s"
 msgstr "查找匹配项 - %s"
 
 msgid "Revisions to Match:"
-msgstr ""
+msgstr "要匹配的版本："
 
 #, python-format
 msgid "Match any of <b><i>%d</i></b> revisions"
@@ -2461,7 +2433,7 @@ msgstr ""
 
 msgid ""
 "No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
-msgstr ""
+msgstr "没有合并冲突，准备提交或者<a href=\"resolve\"><b>审核</b></a>"
 
 msgid "Commit merge results"
 msgstr "提交合并结果"
@@ -2480,11 +2452,9 @@ msgstr "TortoiseHg 合并提交"
 
 #, python-format
 msgid ""
-"Error creating interpreting commit date (%s).\n"
+"Error interpreting commit date (%s).\n"
 "Using current date instead."
 msgstr ""
-"解析提交日期 (%s) 出错。\n"
-"使用当前日期代替。"
 
 msgid "Merge changeset"
 msgstr "合并修改集"
@@ -2525,6 +2495,9 @@ msgstr "创建补丁队列"
 
 msgid "New patch queue name"
 msgstr "新的补丁队列名称"
+
+msgid "Create"
+msgstr "创建"
 
 msgid "Rename Patch Queue"
 msgstr "更名补丁队列"
@@ -2582,10 +2555,10 @@ msgid "Apply one patch"
 msgstr "应用一个补丁"
 
 msgid "Set &Guards..."
-msgstr ""
+msgstr "设置警卫(&G)..."
 
 msgid "Configure guards for selected patch"
-msgstr ""
+msgstr "为选定补丁配置警卫"
 
 msgid "&Delete Patches..."
 msgstr "删除补丁(&D)..."
@@ -2612,11 +2585,11 @@ msgid "Patch Queue Actions Toolbar"
 msgstr "补丁队列操作工具栏"
 
 msgid "Configure guards"
-msgstr ""
+msgstr "配置警卫"
 
 #, python-format
 msgid "Input new guards for %s:"
-msgstr ""
+msgstr "请为 %s 输入新的警卫:"
 
 msgid "Confirm patch queue switch"
 msgstr "确认切换补丁队列"
@@ -2671,11 +2644,11 @@ msgstr "将被关闭"
 
 #, python-format
 msgid "needs merge of %i heads\n"
-msgstr ""
+msgstr "需要合并 %i 个头\n"
 
 #, python-format
 msgid "needs merge with %s (through %s)\n"
-msgstr ""
+msgstr "需要与 %s 合并 (通过 %s)\n"
 
 #, python-format
 msgid "needs merge with %s\n"
@@ -2796,6 +2769,16 @@ msgid "Connecting to Review Board..."
 msgstr ""
 
 msgid "Post &Review"
+msgstr ""
+
+msgid "Target:"
+msgstr "目标:"
+
+#, python-format
+msgid "Prune - %s"
+msgstr ""
+
+msgid "&Prune"
 msgstr ""
 
 msgid "No unknown files found"
@@ -3056,12 +3039,6 @@ msgstr "仓库被锁定"
 msgid "hint:"
 msgstr "提示:"
 
-msgid "Keyboard Interrupt"
-msgstr "键盘中断"
-
-msgid "Close this application?"
-msgstr "关闭程序？"
-
 msgid "Repository Error"
 msgstr "仓库错误"
 
@@ -3093,9 +3070,6 @@ msgstr "无壳配置"
 
 msgid "A terminal shell must be configured"
 msgstr "必须配置终端外壳"
-
-msgid "Show Log"
-msgstr "显示日志"
 
 msgid "Please enter a username"
 msgstr "请输入一个用户名"
@@ -3269,8 +3243,8 @@ msgstr "选择源文件。"
 msgid "Select Source Folder"
 msgstr "选择源目录"
 
-msgid "Source does not exists."
-msgstr "源文件不存在。"
+msgid "Source does not exist."
+msgstr ""
 
 msgid "The source must be within the repository tree."
 msgstr "源必须在版本库树中。"
@@ -3399,6 +3373,9 @@ msgstr "开发阶段"
 msgctxt "column header"
 msgid "Filename"
 msgstr "文件名"
+
+msgid "Searching..."
+msgstr "正在搜索..."
 
 #, python-format
 msgid "filling (%d)"
@@ -3690,6 +3667,27 @@ msgstr "正在载入仓库 %s"
 msgid "Repository Registry updated"
 msgstr "仓库注册表已更新"
 
+msgid "Close tab"
+msgstr "关闭标签页"
+
+msgid "Close other tabs"
+msgstr "关闭其他标签页"
+
+msgid "Undo close tab"
+msgstr "撤消关闭标签页"
+
+msgid "Reopen last closed tab"
+msgstr "重新打开最后关闭的标签页"
+
+msgid "Undo close other tabs"
+msgstr "撤消关闭其他标签页"
+
+msgid "Reopen last closed tab group"
+msgstr "重新打开最后关闭的标签组"
+
+msgid "Failed to open repository"
+msgstr "无法打开仓库"
+
 msgid "&Sort"
 msgstr "排序(&S)"
 
@@ -3751,12 +3749,16 @@ msgid "Commit"
 msgstr "提交"
 
 msgctxt "tab tooltip"
-msgid "Synchronize"
-msgstr "同步"
-
-msgctxt "tab tooltip"
 msgid "Search"
 msgstr "搜索"
+
+msgctxt "tab tooltip"
+msgid "Console log"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Synchronize"
+msgstr "同步"
 
 msgctxt "tab tooltip"
 msgid "Patch Branch"
@@ -3869,20 +3871,8 @@ msgid ""
 " Continue?"
 msgstr ""
 
-msgid "Repository stripped, incoming preview cleared"
-msgstr "仓库已剥离，传入预览已清除"
-
-msgid "Repository stripped, revision set cleared"
-msgstr "仓库已剥离，修订集已创建"
-
-msgid "Commit tab cannot exit"
-msgstr "提交标签页无法退出"
-
-msgid "Sync tab cannot exit"
-msgstr "同步标签页无法退出"
-
-msgid "Search tab cannot exit"
-msgstr "搜索标签页无法退出"
+msgid "Tab cannot exit"
+msgstr ""
 
 msgid "Pus&h"
 msgstr "推送(&H)"
@@ -3962,6 +3952,9 @@ msgstr "MQ 选项(&O)"
 msgid "&Rebase..."
 msgstr "变基(&R)..."
 
+msgid "&Prune..."
+msgstr ""
+
 msgid "&Strip..."
 msgstr "剥离(&S)..."
 
@@ -4027,6 +4020,9 @@ msgstr "类似的修订..."
 
 msgid "Graft Selected to local..."
 msgstr "嫁接选定到本地..."
+
+msgid "&Prune Selected..."
+msgstr ""
 
 msgid "Post Selected to Review Board..."
 msgstr ""
@@ -4235,6 +4231,15 @@ msgid ""
 "Please check that the command path is valid and that it is a valid "
 "application"
 msgstr ""
+
+msgid "&Edit Toolbar"
+msgstr "编辑工具栏(&E)"
+
+msgid "&Refresh"
+msgstr "刷新(&R)"
+
+msgid "&Filter Toolbar"
+msgstr "过滤工具栏(&F)"
 
 #, python-format
 msgid "Resolve Conflicts - %s"
@@ -4581,15 +4586,6 @@ msgid ""
 "a>"
 msgstr ""
 
-msgid "Searching..."
-msgstr "正在搜索..."
-
-msgid "Running"
-msgstr "正在处理"
-
-msgid "query"
-msgstr "查询"
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
@@ -4668,6 +4664,9 @@ msgstr "显示帮助并退出"
 msgid "set/override config option (use 'section.name=value')"
 msgstr ""
 
+msgid "enable debugging output"
+msgstr ""
+
 msgid "start debugger"
 msgstr "启动调试器"
 
@@ -4685,9 +4684,6 @@ msgstr "从文件中读取文件列表"
 
 msgid "read file list from file encoding utf-8"
 msgstr "从 UTF-8 编码读取文件列表"
-
-msgid "open a new workbench window"
-msgstr "打开一个新的工作台窗口"
 
 msgid "thg about"
 msgstr "thg 关于"
@@ -4776,6 +4772,18 @@ msgstr ""
 
 msgid "thg debugbugreport [TEXT]"
 msgstr "thg debugbugreport [TEXT]"
+
+msgid "thg debugconsole"
+msgstr ""
+
+msgid "thg debuglighthg"
+msgstr ""
+
+msgid "thg debugruncommand -- COMMAND [ARGUMENT]..."
+msgstr ""
+
+msgid "no command specified"
+msgstr ""
 
 msgid "thg drag_copy SOURCE... DEST"
 msgstr "thg drag_copy SOURCE... DEST"
@@ -4896,11 +4904,20 @@ msgstr "thg import [OPTION] [SOURCE]..."
 msgid "thg init [DEST]"
 msgstr "thg init [DEST]"
 
+msgid "search for a given text or revset"
+msgstr ""
+
 msgid "(DEPRECATED)"
 msgstr ""
 
+msgid "open a new workbench window"
+msgstr "打开一个新的工作台窗口"
+
 msgid "thg log [OPTIONS] [FILE]"
 msgstr "thg log [OPTIONS] [FILE]"
+
+msgid "cannot specify both -k/--query and filenames"
+msgstr ""
 
 msgid "revision to display"
 msgstr "要显示的修订"
@@ -4925,6 +4942,12 @@ msgstr "thg postreview [-r] REV..."
 
 msgid "no revisions specified"
 msgstr "没有指定修订版本"
+
+msgid "revisions to prune"
+msgstr ""
+
+msgid "thg prune [-r] REV..."
+msgstr ""
 
 msgid "thg purge"
 msgstr "thg purge"
@@ -5040,10 +5063,13 @@ msgstr ""
 msgid "do not back up stripped revisions"
 msgstr ""
 
+msgid "do not modify working copy during strip"
+msgstr ""
+
 msgid "revision to strip"
 msgstr "要剥离的修订"
 
-msgid "thg strip [-f] [-n] [[-r] REV]"
+msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
 msgid "thg sync [PEER]"
@@ -5115,9 +5141,6 @@ msgstr "路径:"
 
 msgid "Update to:"
 msgstr "更新到:"
-
-msgid "Target:"
-msgstr "目标:"
 
 msgid "Options:"
 msgstr "选项:"
@@ -5262,13 +5285,11 @@ msgstr "外壳"
 msgid ""
 "Specify the command to launch your preferred terminal shell application. If "
 "the value includes the string %(reponame)s, the name of the repository will "
-"be substituted in place of %(reponame)s. (restart needed)<br>Default, "
-"Windows: cmd.exe /K title %(reponame)s<br>Default, OS X: not set<br>Default, "
-"other: xterm -T \"%(reponame)s\""
+"be substituted in place of %(reponame)s. Similarly, %(root)s will be the "
+"full path to the repository. (restart needed)<br>Default, Windows: cmd.exe /"
+"K title %(reponame)s<br>Default, OS X: not set<br>Default, other: xterm -T "
+"\"%(reponame)s\""
 msgstr ""
-"指定启动您喜欢的外壳程序的命令。设置值中的字符串 %(reponame)s 将被仓库名替"
-"代。(需要重新启动)<br>Windows默认: cmd.exe /K title %(reponame)s<br>OS X默"
-"认: 未设置<br>其它系统默认: xterm -T \"%(reponame)s\""
 
 msgid "Immediate Operations"
 msgstr "无提示操作"
@@ -5340,6 +5361,14 @@ msgid ""
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
 "to review and resolve changes manually. Default: True."
+msgstr ""
+
+msgid "New Repo Skeleton"
+msgstr ""
+
+msgid ""
+"If specified, files in the directory, e.g. .hgignore, are copied to the "
+"newly-created repository."
 msgstr ""
 
 msgid "Workbench"
@@ -5461,12 +5490,10 @@ msgid "Hide Tags"
 msgstr "隐藏标签"
 
 msgid ""
-"Space separated list of tags that will not be shown.Useful example: Specify "
+"Space separated list of tags that will not be shown. Useful example: Specify "
 "\"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial "
 "Queues Extension. Default: None (leave blank)"
 msgstr ""
-"不会显示的标签列表，用空格隔开。示例: 设为 \"qbase qparent qtip\" 以隐藏所有 "
-"Mercurial Queues 扩展插入的标签。默认: 无 (留空)"
 
 msgid "Activate Bookmarks"
 msgstr "激活书签"
@@ -6034,7 +6061,8 @@ msgid ""
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
 "(where n is a non-negative integer). {0} refers to the entire string matched "
 "by issue.regex, while {1} refers to the first group and so on. If no {n} "
-"tokensare found in issue.link, the entire matched string is appended instead."
+"tokens are found in issue.link, the entire matched string is appended "
+"instead."
 msgstr ""
 
 msgid "Inline Tags"
@@ -6084,9 +6112,9 @@ msgid ""
 "hashes that are shown on the revision panels into links.<br>The \"template "
 "string\" uses a \"mercurial template\"-like syntax that currently accepts "
 "two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported).<li>"
-"{rev} : replaced by the revision number.</ul>For example, in order to link "
-"to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
+"revision id (note that {node} on its own is currently unsupported)."
+"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
 "tortoisehg/thg/commits/{node|short}"
 msgstr ""
 
@@ -6186,7 +6214,7 @@ msgstr "服务器"
 msgid ""
 "List of Servers from which \"projrc\" configuration files must be pulled. "
 "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull from "
-"the default sync path.Default is pull from NO servers."
+"the default sync path. Default is pull from NO servers."
 msgstr ""
 
 msgid "Include"
@@ -6367,8 +6395,19 @@ msgstr "显示图标"
 msgid "Highlight Icon"
 msgstr "高亮显示图标"
 
-msgid "TortoiseHg Shell Configuration"
-msgstr "TortoiseHg Shell 配置"
+#. i18n: URL of TortoiseSVN documentation
+msgid ""
+"http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
+"html#tsvn-dug-settings-icon-set"
+msgstr ""
+
+#, python-format
+msgid ""
+"You can change the icon set from <a href=\"%s\">TortoiseSVN's Settings</a>"
+msgstr ""
+
+msgid "Explorer Extension Settings - TortoiseHg"
+msgstr ""
 
 msgid "Clear"
 msgstr "清除"
@@ -6677,15 +6716,15 @@ msgstr "仓库设置中的路径:"
 msgid "Related Paths:"
 msgstr "相关的路径:"
 
-#, python-format
-msgid "rev: %d (%s)"
-msgstr "修订版本: %d (%s)"
-
 msgid "branch: "
 msgstr "分支: "
 
 msgid "bookmark: "
 msgstr "书签: "
+
+#, python-format
+msgid "rev: %d (%s)"
+msgstr "修订版本: %d (%s)"
 
 msgid "Post Pull: "
 msgstr "拉取完成后: "
@@ -6778,10 +6817,6 @@ msgstr "正在查找可推送到 %s 的修订集..."
 #, python-format
 msgid "%d outgoing changesets to %s"
 msgstr "%d 个可推送到 %s 的修订集"
-
-#, python-format
-msgid "outgoing changesets to %s found"
-msgstr "发现可推送到 %s 的修订集"
 
 #, python-format
 msgid "No outgoing changesets to %s"
@@ -6877,12 +6912,6 @@ msgstr "打包文件 (*.hg)"
 
 msgid "Unable to remove URL"
 msgstr "无法删除URL"
-
-msgid "TortoiseHg Sync"
-msgstr "TortoiseHg 同步"
-
-msgid "Are you sure that you want to cancel synchronization?"
-msgstr "您确定要取消同步？"
 
 msgid "Post Pull Behavior"
 msgstr "拉取完成后的行为"
@@ -7079,16 +7108,6 @@ msgid "Move"
 msgstr "移动"
 
 #, python-format
-msgid "Tag '%s' already exists"
-msgstr "标签 '%s' 已存在"
-
-msgid "uncommitted merge"
-msgstr "未提交的合并"
-
-msgid "not at a branch head (use force)"
-msgstr "不是分支头 (强行合并)"
-
-#, python-format
 msgid "Moved tag %s to changeset %s (from changeset %s)"
 msgstr "移动标签 %s 到修订集 %s (从修订集 %s)"
 
@@ -7103,14 +7122,6 @@ msgstr "标签 '%s' 已被移除"
 #, python-format
 msgid "Tag '%s' has been added"
 msgstr "已添加标签 '%s'"
-
-#, python-format
-msgid "tag '%s' is not a local tag"
-msgstr "标签 '%s' 不是一个本地标签"
-
-#, python-format
-msgid "tag '%s' is not a global tag"
-msgstr "标签 '%s' 不是一个全局标签"
 
 #, python-format
 msgid "Removed tag %s"
@@ -7177,6 +7188,9 @@ msgstr "废弃本地改动, 无备份(-f/--force)"
 msgid "No backup (-n/--nobackup)"
 msgstr "无备份(-n/--nobackup)"
 
+msgid "Do not modify working copy during strip (-k/--keep)"
+msgstr ""
+
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
 msgid_plural "<b>%d changesets</b> will be stripped"
@@ -7206,12 +7220,6 @@ msgstr "截去 - %s"
 
 msgid "&Strip"
 msgstr "剥离(&S)"
-
-msgid "response expected"
-msgstr "期待回复"
-
-msgid "password: "
-msgstr "密码: "
 
 msgid "Parent 1:"
 msgstr "父版本 1:"
@@ -7421,9 +7429,6 @@ msgstr "仓库(&R)"
 msgid "&Help"
 msgstr "帮助(&H)"
 
-msgid "&Edit Toolbar"
-msgstr "编辑工具栏(&E)"
-
 msgid "&Dock Toolbar"
 msgstr ""
 
@@ -7445,14 +7450,20 @@ msgstr "显示仓库注册表(&O)"
 msgid "Show &Patch Queue"
 msgstr "显示补丁队列(&P)"
 
-msgid "Show Output &Log"
-msgstr "显示输出日志(&L)"
+msgid "Show Conso&le"
+msgstr ""
+
+msgid "Place Console in Doc&k Area"
+msgstr ""
 
 msgid "R&epository Registry Options"
 msgstr "仓库注册表选项(&E)"
 
 msgid "Save Open Repositories on E&xit"
 msgstr "退出时保存打开的仓库(&X)"
+
+msgid "Sa&ve Current Sync Paths on Exit"
+msgstr ""
 
 msgid "&Commit"
 msgstr "提交(&C)"
@@ -7468,9 +7479,6 @@ msgstr "搜索(&S)"
 
 msgid "S&ynchronize"
 msgstr "同步(&Y)"
-
-msgid "&Refresh"
-msgstr "刷新(&R)"
 
 msgid "Refresh current repository"
 msgstr "刷新当前仓库"
@@ -7495,9 +7503,6 @@ msgstr "转到修订版本(&G)..."
 
 msgid "Go to a specific revision"
 msgstr "转到指定的修订版本"
-
-msgid "&Filter Toolbar"
-msgstr "过滤工具栏(&F)"
 
 msgid "Filter graph with revision sets or branches"
 msgstr "在修订历史图上过滤修订集或分支"
@@ -7620,29 +7625,8 @@ msgstr ""
 msgid "Execute custom tool '%s'"
 msgstr "执行自定义工具 '%s'"
 
-msgid "Close tab"
-msgstr "关闭标签页"
-
-msgid "Close other tabs"
-msgstr "关闭其他标签页"
-
-msgid "Undo close tab"
-msgstr "撤消关闭标签页"
-
-msgid "Reopen last closed tab"
-msgstr "重新打开最后关闭的标签页"
-
-msgid "Undo close other tabs"
-msgstr "撤消关闭其他标签页"
-
-msgid "Reopen last closed tab group"
-msgstr "重新打开最后关闭的标签组"
-
 msgid "Custom Toolbar &Settings"
 msgstr "自定义工具栏设置(&S)"
-
-msgid "Failed to open repository"
-msgstr "无法打开仓库"
 
 msgid "TortoiseHg Workbench"
 msgstr "TortoiseHg 工作台"
@@ -7654,13 +7638,6 @@ msgstr "%s - TortoiseHg 工作台 - %s"
 #, python-format
 msgid "%s - TortoiseHg Workbench"
 msgstr "%s - TortoiseHg 工作台"
-
-msgid "Reopening tabs"
-msgstr "重新打开选项卡"
-
-#, python-format
-msgid "Reopening repository %s"
-msgstr "重新打开仓库 %s"
 
 msgid "Goto revision"
 msgstr "转到修订版本"
@@ -7699,66 +7676,27 @@ msgstr "执行 \"commit finished\" 触发器出错"
 msgid "Cannot open Plugin Options dialog"
 msgstr "无法打开插件选项对话框"
 
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
+msgid "move after the specified patch"
 msgstr ""
-"hg: 命令 '%s' 意义不明:\n"
-"    %s\n"
+
+msgid "[--after PATCH] PATCH..."
+msgstr ""
+
+msgid "unknown patch to move specified"
+msgstr ""
+
+msgid "invalid patch position specified"
+msgstr ""
+
+msgid "cannot move applied patches"
+msgstr ""
 
 #, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr "hg: 解析错误发生于 %s: %s\n"
+msgid "patch %s not in series"
+msgstr ""
 
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr "hg: 解析错误: %s\n"
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr "等待 %s 持有的锁定超时"
-
-#, python-format
-msgid "lock held by %s"
-msgstr "%s 持有的锁定"
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr "终止: %s: %s\n"
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr "终止: 无法锁定 %s: %s\n"
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr "hg %s: %s\n"
-
-#, python-format
-msgid "hg: %s\n"
-msgstr "hg: %s\n"
-
-msgid "abort: remote error:\n"
-msgstr "终止: 远程错误:\n"
-
-#, python-format
-msgid "abort: %s"
-msgstr "取消: %s"
-
-msgid " empty string\n"
-msgstr " 空字符串\n"
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr "hg: 未知命令 '%s'\n"
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr "终止: 错误: %s\n"
-
-msgid "broken pipe\n"
-msgstr "坏的 pipe\n"
+msgid "cannot move into applied patches"
+msgstr ""
 
 msgid "abort: "
 msgstr "中止: "
@@ -8004,6 +7942,9 @@ msgstr "和拖入的仓库进行同步"
 msgid "unrecognized response: %s"
 msgstr "无法识别的响应: %s"
 
+msgid "password: "
+msgstr "密码: "
+
 #, python-format
 msgid "repository %s not found"
 msgstr "仓库 %s 未找到"
@@ -8086,6 +8027,12 @@ msgstr ""
 
 #~ msgid "Unknown Files"
 #~ msgstr "未知文件"
+
+#~ msgid "Please enter the directory path"
+#~ msgstr "请输入目录路径"
+
+#~ msgid "response expected"
+#~ msgstr "期待回复"
 
 #~ msgid "this is a binary file\n"
 #~ msgstr "这是一个二进制文件\n"
@@ -8313,6 +8260,9 @@ msgstr ""
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "创建和Mercurial 1.0版本兼容的仓库"
+
+#~ msgid "Error when creating repository"
+#~ msgstr "创建仓库时出错"
 
 #~ msgid "Rollback (undo) last transaction to repository (pull, commit, etc)"
 #~ msgstr "回滚或取消仓库的最后一次事务(pull, commit等)"
@@ -8785,6 +8735,12 @@ msgstr ""
 
 #~ msgid "Filters"
 #~ msgstr "过滤名单"
+
+#~ msgid "Destination path is empty"
+#~ msgstr "目标路径为空"
+
+#~ msgid "Unable to create new repository"
+#~ msgstr "无法创建新仓库"
 
 #~ msgid ""
 #~ "total: %d hunks (%d changed lines); selected: %d hunks (%d changed lines)"
@@ -10226,6 +10182,9 @@ msgstr ""
 #~ msgid "Menu Items"
 #~ msgstr "菜单项"
 
+#~ msgid "TortoiseHg Shell Configuration"
+#~ msgstr "TortoiseHg Shell 配置"
+
 #~ msgid "<- Top"
 #~ msgstr "<- 主菜单"
 
@@ -10252,6 +10211,12 @@ msgstr ""
 
 #~ msgid "tag '%s' does not exist"
 #~ msgstr "标签 '%s' 不存在"
+
+#~ msgid "tag '%s' is not a local tag"
+#~ msgstr "标签 '%s' 不是一个本地标签"
+
+#~ msgid "tag '%s' is not a global tag"
+#~ msgstr "标签 '%s' 不是一个全局标签"
 
 #~ msgid "Default Tab"
 #~ msgstr "默认标签页"
@@ -10717,6 +10682,12 @@ msgstr ""
 #~ msgid "There is no Mercurial repository here (.hg not found)"
 #~ msgstr "这里没有 Mercurial 仓库(未找到.hg目录)"
 
+#~ msgid "TortoiseHg Sync"
+#~ msgstr "TortoiseHg 同步"
+
+#~ msgid "outgoing changesets to %s found"
+#~ msgstr "发现可推送到 %s 的修订集"
+
 #~ msgid "&Yes (--force)"
 #~ msgstr "是(&Y) (--force)"
 
@@ -10746,6 +10717,14 @@ msgstr ""
 #~ msgstr ""
 #~ "设置了的话, 会将摘要中的行进行合并, 使每行尽可能达到80个字. 默认: 否"
 
+#~ msgid ""
+#~ "Space separated list of tags that will not be shown.Useful example: "
+#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
+#~ "Mercurial Queues Extension. Default: None (leave blank)"
+#~ msgstr ""
+#~ "不会显示的标签列表，用空格隔开。示例: 设为 \"qbase qparent qtip\" 以隐藏所"
+#~ "有 Mercurial Queues 扩展插入的标签。默认: 无 (留空)"
+
 #~ msgid "Connect to mail server using TLS. Default: False"
 #~ msgstr "用TLS方式连接邮件服务器. 默认: 否"
 
@@ -10757,3 +10736,22 @@ msgstr ""
 
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr "忽略对空行的修改. 默认: 否"
+
+#~ msgid ""
+#~ "Error creating interpreting commit date (%s).\n"
+#~ "Using current date instead."
+#~ msgstr ""
+#~ "解析提交日期 (%s) 出错。\n"
+#~ "使用当前日期代替。"
+
+#~ msgid "Source does not exists."
+#~ msgstr "源文件不存在。"
+
+#~ msgid "Repository stripped, incoming preview cleared"
+#~ msgstr "仓库已剥离，传入预览已清除"
+
+#~ msgid "Repository stripped, revision set cleared"
+#~ msgstr "仓库已剥离，修订集已创建"
+
+#~ msgid "Are you sure that you want to cancel synchronization?"
+#~ msgstr "您确定要取消同步？"

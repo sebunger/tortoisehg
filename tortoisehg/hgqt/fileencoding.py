@@ -10,7 +10,7 @@ import codecs
 from PyQt4.QtGui import QActionGroup
 
 from mercurial import encoding
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 
 # List of encoding names which are likely used, based on the Chromium
 # source <chrome/browser/character_encoding.cc> and the Python documentation

@@ -21,7 +21,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import extensions, scmutil
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, qtlib
 from tortoisehg.hgqt.postreview_ui import Ui_PostReviewDialog
 from tortoisehg.hgqt.hgemail import _ChangesetsModel

@@ -7,22 +7,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-08-18 14:01-0300\n"
-"PO-Revision-Date: 2014-08-29 09:03+0000\n"
+"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"PO-Revision-Date: 2015-01-09 14:23+0000\n"
 "Last-Translator: Aldwoni <aldwoni@gmail.com>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2014-08-30 07:03+0000\n"
-"X-Generator: Launchpad (build 17176)\n"
+"X-Launchpad-Export-Date: 2015-02-20 05:13+0000\n"
+"X-Generator: Launchpad (build 17341)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
 
 msgid "Exit"
 msgstr "Afsluiten"
+
+msgid "hg lighthg"
+msgstr ""
 
 msgid "About"
 msgstr "Info"
@@ -32,6 +35,8 @@ msgstr "Copyright 2008-2014 Steve Borho en anderen"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr ""
+"Enkele iconen zijn welwillend ter beschikking gesteld door TortoiseSVN en "
+"Tango projects"
 
 msgid "You can visit our site here"
 msgstr "Bezoek onze website hier"
@@ -590,6 +595,10 @@ msgid "process exited unexpectedly with code %d"
 msgstr ""
 
 #, python-format
+msgid "failed to encode command: %s"
+msgstr ""
+
+#, python-format
 msgid "timed out while reading: %r..."
 msgstr ""
 
@@ -602,13 +611,17 @@ msgstr ""
 
 #, python-format
 msgid "invalid \"hello\" message: %r"
-msgstr ""
+msgstr "ongeldig  \"hallo\" bericht: %r"
 
 msgid "no \"runcommand\" capability"
 msgstr ""
 
 #, python-format
 msgid "corrupted command result: %r"
+msgstr ""
+
+#, python-format
+msgid "failed to encode input: %s"
 msgstr ""
 
 msgid "Terminated by user"
@@ -629,10 +642,6 @@ msgstr "[opdracht resultaat code %d %%s]"
 #, python-format
 msgid "[command completed successfully %s]"
 msgstr "[opdracht succesvol voltooid  %s]"
-
-#, python-format
-msgid "ignoring invalid cmdworker '%s'\n"
-msgstr ""
 
 msgid "Running..."
 msgstr "Bezig..."
@@ -1262,11 +1271,11 @@ msgstr "fout bij ontleden opdracht: %s"
 msgid "no matches found: %s"
 msgstr "geen overeenkomsten gevonden: %s"
 
-msgid "Output Log"
-msgstr "Resultaat Log"
+msgid "Console"
+msgstr ""
 
-msgid "File &History"
-msgstr "Bestands&historiek"
+msgid "File &History / Annotate"
+msgstr ""
 
 msgid "Show the history of the selected file"
 msgstr "Geef de geschiedenis van het geselecteerd bestand weer"
@@ -1755,7 +1764,7 @@ msgid "Show changes from second parent"
 msgstr "Toon wijzigingen uit de tweede ouder"
 
 msgid "E&ncoding"
-msgstr ""
+msgstr "Cod&ering"
 
 msgid "&Search in Current File"
 msgstr "Zoek in Huidig Bestand"
@@ -2293,70 +2302,29 @@ msgstr ""
 msgid "Unable to write .hgignore file"
 msgstr "Kan .hgignore bestand niet wegschrijven"
 
+msgid "Copy working directory files from skeleton"
+msgstr ""
+
 msgid "Add special files (.hgignore, ...)"
 msgstr "Voeg speciale bestanden toe (.hgignore, ...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Maak de repo compatibel met Mercurial <1.7"
 
-msgid "Show in Workbench after init"
-msgstr "Toon in Werkbank na initialisatie"
-
-msgid "Create"
-msgstr "Aanmaken"
-
 msgid "New Repository"
 msgstr "Nieuwe Repository"
 
-msgid "Error executing init"
-msgstr "Fout tijdens initialisatie"
-
-msgid "Destination path is empty"
-msgstr "Doelpad is niet ingevuld"
-
-msgid "Please enter the directory path"
-msgstr "Geef aub het pad op voor de map"
-
-msgid "Init"
-msgstr "Initialiseren"
-
-#, python-format
-msgid "Are you sure about adding the new repository %d extra levels deep?"
+msgid "&Create"
 msgstr ""
-"Bent u zeker dat u de nieuwe repository %d extra niveau's diep wilt "
-"toevoegen?"
-
-#, python-format
-msgid ""
-"Path exists up to:\n"
-"%s\n"
-"and you asked for:\n"
-"%s"
-msgstr ""
-"Pad bestaat tot en met:\n"
-"%s\n"
-"en u wilde:\n"
-"%s"
-
-#, python-format
-msgid "Cannot create folder %s"
-msgstr "Kan map %s niet aanmaken"
-
-msgid "Unable to create new repository"
-msgstr "Kan nieuwe repository niet aanmaken"
-
-msgid "Error when creating repository"
-msgstr "Fout tijdens aanmaken repository"
-
-#, python-format
-msgid "<p>Repository successfully created at</p><p>%s</p>"
-msgstr "<p>Repository met succes aangemaakt in</p><p>%s</p>"
 
 msgid "Unable to create a config file"
 msgstr "Kan instellingenbestand niet aanmaken"
 
 msgid "Insufficient access rights."
 msgstr "Onvoldoende toegangsrechten."
+
+msgid "Show Log"
+msgstr "Toon Resultaten"
 
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
@@ -2551,11 +2519,9 @@ msgstr "TortoiseHg Samenvoeg Commit"
 
 #, python-format
 msgid ""
-"Error creating interpreting commit date (%s).\n"
+"Error interpreting commit date (%s).\n"
 "Using current date instead."
 msgstr ""
-"Fout tijdens interpreteren van commit datum (%s).\n"
-"De huidige datum wordt gebruikt."
 
 msgid "Merge changeset"
 msgstr "Samenvoeg-changeset"
@@ -2598,6 +2564,9 @@ msgstr ""
 
 msgid "New patch queue name"
 msgstr "Nieuwe patch wachtrij naam"
+
+msgid "Create"
+msgstr "Aanmaken"
 
 msgid "Rename Patch Queue"
 msgstr ""
@@ -2872,6 +2841,16 @@ msgstr "Bezig met verbinden met Review Board..."
 msgid "Post &Review"
 msgstr "&Review Versturen"
 
+msgid "Target:"
+msgstr "Doel:"
+
+#, python-format
+msgid "Prune - %s"
+msgstr ""
+
+msgid "&Prune"
+msgstr ""
+
 msgid "No unknown files found"
 msgstr "Geen onbekende bestanden gevonden"
 
@@ -3135,12 +3114,6 @@ msgstr "De repository is gelockt"
 msgid "hint:"
 msgstr "hint:"
 
-msgid "Keyboard Interrupt"
-msgstr ""
-
-msgid "Close this application?"
-msgstr "Deze toepassing sluiten?"
-
 msgid "Repository Error"
 msgstr "Repository Fout"
 
@@ -3172,9 +3145,6 @@ msgstr "Geen shell ingesteld"
 
 msgid "A terminal shell must be configured"
 msgstr "Er moet een terminal shell ingesteld zijn"
-
-msgid "Show Log"
-msgstr "Toon Resultaten"
 
 msgid "Please enter a username"
 msgstr "Gelieve een gebruikersnaam in te voeren"
@@ -3367,8 +3337,8 @@ msgstr "Kies Bron bestand"
 msgid "Select Source Folder"
 msgstr "Bronmap selecteren"
 
-msgid "Source does not exists."
-msgstr "Bron bestaat niet."
+msgid "Source does not exist."
+msgstr ""
 
 msgid "The source must be within the repository tree."
 msgstr "De bron moet zich binnen de repository structuur bevinden."
@@ -3497,6 +3467,9 @@ msgstr "Fase"
 msgctxt "column header"
 msgid "Filename"
 msgstr "Bestandsnaam"
+
+msgid "Searching..."
+msgstr "Bezig met zoeken ..."
 
 #, python-format
 msgid "filling (%d)"
@@ -3799,6 +3772,27 @@ msgstr "Repository %s wordt geladen"
 msgid "Repository Registry updated"
 msgstr "Repository register bijgewerkt"
 
+msgid "Close tab"
+msgstr "Tabblad sluiten"
+
+msgid "Close other tabs"
+msgstr "Andere tabbladen sluiten"
+
+msgid "Undo close tab"
+msgstr "Tabblad sluiten ongedaan maken"
+
+msgid "Reopen last closed tab"
+msgstr "Laatste gesloten tabblad heropenen"
+
+msgid "Undo close other tabs"
+msgstr "Sluiten andere tabbladen ongedaan maken"
+
+msgid "Reopen last closed tab group"
+msgstr "Laatste gesloten tabbladgroep heropenen"
+
+msgid "Failed to open repository"
+msgstr "Openen van de repository mislukt"
+
 msgid "&Sort"
 msgstr "&Sorteren"
 
@@ -3864,12 +3858,16 @@ msgid "Commit"
 msgstr "Commit"
 
 msgctxt "tab tooltip"
-msgid "Synchronize"
-msgstr "Synchroniseren"
-
-msgctxt "tab tooltip"
 msgid "Search"
 msgstr "Zoeken"
+
+msgctxt "tab tooltip"
+msgid "Console log"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Synchronize"
+msgstr "Synchroniseren"
 
 msgctxt "tab tooltip"
 msgid "Patch Branch"
@@ -3988,20 +3986,8 @@ msgstr ""
 "waarbij niet-gecommitte wijzigingen achterblijven.\n"
 " Doorgaan?"
 
-msgid "Repository stripped, incoming preview cleared"
-msgstr "Repository stripped, inkomende preview gewist"
-
-msgid "Repository stripped, revision set cleared"
-msgstr "Repository stripped, revisie set uitgeblankt"
-
-msgid "Commit tab cannot exit"
-msgstr "Het Commit tabblad kan niet afsluiten"
-
-msgid "Sync tab cannot exit"
-msgstr "Het Sync tabblad kan niet afsluiten"
-
-msgid "Search tab cannot exit"
-msgstr "Het Zoek tabblad kan niet afsluiten"
+msgid "Tab cannot exit"
+msgstr ""
 
 msgid "Pus&h"
 msgstr "Pus&h"
@@ -4081,6 +4067,9 @@ msgstr ""
 msgid "&Rebase..."
 msgstr "&Rebase..."
 
+msgid "&Prune..."
+msgstr ""
+
 msgid "&Strip..."
 msgstr "&Strip..."
 
@@ -4146,6 +4135,9 @@ msgstr "Gelijkende revisies..."
 
 msgid "Graft Selected to local..."
 msgstr "Graft keuze naar loakel rev..."
+
+msgid "&Prune Selected..."
+msgstr ""
 
 msgid "Post Selected to Review Board..."
 msgstr "Verstuur keuzes naar Review Board"
@@ -4391,6 +4383,15 @@ msgstr ""
 "\n"
 "Kontroleer aub of het pad van de de opdracht geldig is en dat het een "
 "geldige toepassing is."
+
+msgid "&Edit Toolbar"
+msgstr "Werkbalk be&werken"
+
+msgid "&Refresh"
+msgstr "Ve&rversen"
+
+msgid "&Filter Toolbar"
+msgstr "&Filter Toolbar"
 
 #, python-format
 msgid "Resolve Conflicts - %s"
@@ -4761,15 +4762,6 @@ msgstr ""
 "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help revsets</"
 "a>"
 
-msgid "Searching..."
-msgstr "Bezig met zoeken ..."
-
-msgid "Running"
-msgstr "Bezig"
-
-msgid "query"
-msgstr "query"
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
@@ -4849,6 +4841,9 @@ msgstr "toon hulp en sluit af"
 msgid "set/override config option (use 'section.name=value')"
 msgstr ""
 
+msgid "enable debugging output"
+msgstr ""
+
 msgid "start debugger"
 msgstr "start de debugger"
 
@@ -4866,9 +4861,6 @@ msgstr "bestandslijst uitlezen bestand"
 
 msgid "read file list from file encoding utf-8"
 msgstr "bestandslijst uitlezen uit utf-8 gecodeerd bestand"
-
-msgid "open a new workbench window"
-msgstr "open een nieuw werkbank venster"
 
 msgid "thg about"
 msgstr "thg about"
@@ -4957,6 +4949,18 @@ msgstr ""
 
 msgid "thg debugbugreport [TEXT]"
 msgstr "thg debugbugreport [TEXT]"
+
+msgid "thg debugconsole"
+msgstr ""
+
+msgid "thg debuglighthg"
+msgstr ""
+
+msgid "thg debugruncommand -- COMMAND [ARGUMENT]..."
+msgstr ""
+
+msgid "no command specified"
+msgstr ""
 
 msgid "thg drag_copy SOURCE... DEST"
 msgstr "thg drag_copy BRON... DOEL"
@@ -5079,11 +5083,20 @@ msgstr "thg import [OPTIES] [DOEL]..."
 msgid "thg init [DEST]"
 msgstr "thg init [DOEL]"
 
+msgid "search for a given text or revset"
+msgstr ""
+
 msgid "(DEPRECATED)"
 msgstr "(AFGEKEURD)"
 
+msgid "open a new workbench window"
+msgstr "open een nieuw werkbank venster"
+
 msgid "thg log [OPTIONS] [FILE]"
 msgstr "thg log [OPTIES] [BESTAND]"
+
+msgid "cannot specify both -k/--query and filenames"
+msgstr ""
 
 msgid "revision to display"
 msgstr "revisie om te tonen"
@@ -5107,6 +5120,12 @@ msgid "thg postreview [-r] REV..."
 msgstr ""
 
 msgid "no revisions specified"
+msgstr ""
+
+msgid "revisions to prune"
+msgstr ""
+
+msgid "thg prune [-r] REV..."
 msgstr ""
 
 msgid "thg purge"
@@ -5223,11 +5242,14 @@ msgstr "verwerp niet-gecommitte wijzigingen (geen backup)"
 msgid "do not back up stripped revisions"
 msgstr "maak geen backup van de gestripte revisies"
 
+msgid "do not modify working copy during strip"
+msgstr ""
+
 msgid "revision to strip"
 msgstr "revisie om te strippen"
 
-msgid "thg strip [-f] [-n] [[-r] REV]"
-msgstr "thg strip [-f] [-n] [[-r] REV]"
+msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
+msgstr ""
 
 msgid "thg sync [PEER]"
 msgstr "thg sync [PEER]"
@@ -5298,9 +5320,6 @@ msgstr "Lokatie:"
 
 msgid "Update to:"
 msgstr "Bijwerken naar:"
-
-msgid "Target:"
-msgstr "Doel:"
 
 msgid "Options:"
 msgstr "Opties:"
@@ -5459,15 +5478,11 @@ msgstr "Shell"
 msgid ""
 "Specify the command to launch your preferred terminal shell application. If "
 "the value includes the string %(reponame)s, the name of the repository will "
-"be substituted in place of %(reponame)s. (restart needed)<br>Default, "
-"Windows: cmd.exe /K title %(reponame)s<br>Default, OS X: not set<br>Default, "
-"other: xterm -T \"%(reponame)s\""
+"be substituted in place of %(reponame)s. Similarly, %(root)s will be the "
+"full path to the repository. (restart needed)<br>Default, Windows: cmd.exe /"
+"K title %(reponame)s<br>Default, OS X: not set<br>Default, other: xterm -T "
+"\"%(reponame)s\""
 msgstr ""
-"Geef de opdracht op om uw verkozen terminal shell toepassing te lanceren. "
-"Als de waarde de tekenreeks %(reponame)s bevat, dan zal die vervangen worden "
-"met de naam van de repository. (herstart nodig)<br>Standaard, Windows: cmd."
-"exe /K titel %(reponame)s<br>Standaard, OS X:  niet ingesteld<br>Standaard, "
-"andere: xterm -T \"%(reponame)s\""
 
 msgid "Immediate Operations"
 msgstr "Directe Operaties"
@@ -5547,6 +5562,14 @@ msgid ""
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
 "to review and resolve changes manually. Default: True."
+msgstr ""
+
+msgid "New Repo Skeleton"
+msgstr ""
+
+msgid ""
+"If specified, files in the directory, e.g. .hgignore, are copied to the "
+"newly-created repository."
 msgstr ""
 
 msgid "Workbench"
@@ -5685,14 +5708,13 @@ msgid "Hide Tags"
 msgstr "Etiketten Verbergen"
 
 msgid ""
-"Space separated list of tags that will not be shown.Useful example: Specify "
+"Space separated list of tags that will not be shown. Useful example: Specify "
 "\"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial "
 "Queues Extension. Default: None (leave blank)"
 msgstr ""
-"Spatie-gescheiden lijst van etiketten die niet getoond zullen worden. "
-"Bruikbaar voorbeeld: geef \"qbase qparent qtip\" op om de standaard "
-"etiketten te verbergen die de Mercurial Queues extensie invoegt. Standaard: "
-"Geen (blank laten)"
+"Spatie-gescheiden lijst van etiketten die niet getoond mogen worden. "
+"Bruikbaar voorbeeld: \"qbase parent qtip\" om de standaard etiketten te "
+"verbergen voor de Mmercurial Queues extensie. Standaard: Geen (blanko laten)"
 
 msgid "Activate Bookmarks"
 msgstr "Aktieve Bladwijzers"
@@ -6336,15 +6358,9 @@ msgid ""
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
 "(where n is a non-negative integer). {0} refers to the entire string matched "
 "by issue.regex, while {1} refers to the first group and so on. If no {n} "
-"tokensare found in issue.link, the entire matched string is appended instead."
+"tokens are found in issue.link, the entire matched string is appended "
+"instead."
 msgstr ""
-"Definiëert de uit te voeren opdracht als een probleemnummer herkend wordt. U "
-"kunt groepen invoegen in issue.regex, en de overeenkomende {n} markeringen "
-"in issue.link (waar n een niet-negatief geheel getal is). {0} verwijst naar "
-"de gehele tekenreeks die overeenkomt met issue.regex, tgerwijl {1} verwijst "
-"naar de eerste groep en zo verder. Als geen {n} markeringen gevonden worden "
-"in issue.link dan wordt in plaats daarvan de hele overeenkomende tekenreeks "
-"toegevoegd."
 
 msgid "Inline Tags"
 msgstr "Etiketten Invoegen"
@@ -6400,9 +6416,9 @@ msgid ""
 "hashes that are shown on the revision panels into links.<br>The \"template "
 "string\" uses a \"mercurial template\"-like syntax that currently accepts "
 "two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported).<li>"
-"{rev} : replaced by the revision number.</ul>For example, in order to link "
-"to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
+"revision id (note that {node} on its own is currently unsupported)."
+"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
 "tortoisehg/thg/commits/{node|short}"
 msgstr ""
 
@@ -6521,12 +6537,8 @@ msgstr "Servers"
 msgid ""
 "List of Servers from which \"projrc\" configuration files must be pulled. "
 "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull from "
-"the default sync path.Default is pull from NO servers."
+"the default sync path. Default is pull from NO servers."
 msgstr ""
-"Lijst van servers waarvan \"projrc\" bestanden moeten gepulld worden. Stel "
-"het in op \"*\" om van alle servers te pullen. Stel het in op \"default\" om "
-"te pullen van het standaard sync pad. Standaard is pull van GEEN ENKELE "
-"server."
 
 msgid "Include"
 msgstr "Insluiten"
@@ -6729,8 +6741,19 @@ msgstr "Ikoon tonen"
 msgid "Highlight Icon"
 msgstr "Ikoon in de verf zetten"
 
-msgid "TortoiseHg Shell Configuration"
-msgstr "TortoiseHg Shell Instellingen"
+#. i18n: URL of TortoiseSVN documentation
+msgid ""
+"http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
+"html#tsvn-dug-settings-icon-set"
+msgstr ""
+
+#, python-format
+msgid ""
+"You can change the icon set from <a href=\"%s\">TortoiseSVN's Settings</a>"
+msgstr ""
+
+msgid "Explorer Extension Settings - TortoiseHg"
+msgstr ""
 
 msgid "Clear"
 msgstr "Wissen"
@@ -7039,15 +7062,15 @@ msgstr "Paden in Repository Instellingen"
 msgid "Related Paths:"
 msgstr "Gerelateerde Paden:"
 
-#, python-format
-msgid "rev: %d (%s)"
-msgstr "rev: %d (%s)"
-
 msgid "branch: "
 msgstr "tak: "
 
 msgid "bookmark: "
 msgstr "bladwijzer: "
+
+#, python-format
+msgid "rev: %d (%s)"
+msgstr "rev: %d (%s)"
 
 msgid "Post Pull: "
 msgstr "Na-Pull: "
@@ -7143,10 +7166,6 @@ msgstr "Bezig met zoeken van uitgaande changesets naar %s..."
 #, python-format
 msgid "%d outgoing changesets to %s"
 msgstr "%d uitgaande changesets naar %s"
-
-#, python-format
-msgid "outgoing changesets to %s found"
-msgstr "uitgaande changesets naar %s gevonden"
 
 #, python-format
 msgid "No outgoing changesets to %s"
@@ -7246,12 +7265,6 @@ msgstr "Bundelbestanden (*.hg)"
 
 msgid "Unable to remove URL"
 msgstr "Kan URL niet verwijderen"
-
-msgid "TortoiseHg Sync"
-msgstr "TortoiseHg Sync"
-
-msgid "Are you sure that you want to cancel synchronization?"
-msgstr "Bent u zeker dat u de synchronisatie wilt afblazen ?"
 
 msgid "Post Pull Behavior"
 msgstr "Na-Pull Gedrag"
@@ -7468,16 +7481,6 @@ msgid "Move"
 msgstr "Verplaatsen"
 
 #, python-format
-msgid "Tag '%s' already exists"
-msgstr "Etiket '%s' bestaat al"
-
-msgid "uncommitted merge"
-msgstr "niet-gecommitte samenvoeging"
-
-msgid "not at a branch head (use force)"
-msgstr "is geen takhoofd (gebruik force)"
-
-#, python-format
 msgid "Moved tag %s to changeset %s (from changeset %s)"
 msgstr "Etiket %s verplaatst naar changeset %s (vanaf changeset %s)"
 
@@ -7492,14 +7495,6 @@ msgstr "Etiket '%s' werd verplaatst"
 #, python-format
 msgid "Tag '%s' has been added"
 msgstr "Etiket '%s' werd toegevoegd"
-
-#, python-format
-msgid "tag '%s' is not a local tag"
-msgstr "etiket '%s' is geen lokaal etiket"
-
-#, python-format
-msgid "tag '%s' is not a global tag"
-msgstr "etiket '%s' is geen globaal etiket"
 
 #, python-format
 msgid "Removed tag %s"
@@ -7566,6 +7561,9 @@ msgstr "Lokale wijzigingen verwerpen, geen backup (-f/--force)"
 msgid "No backup (-n/--nobackup)"
 msgstr "Geen backup (-n/--nobackup)"
 
+msgid "Do not modify working copy during strip (-k/--keep)"
+msgstr ""
+
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
 msgid_plural "<b>%d changesets</b> will be stripped"
@@ -7596,12 +7594,6 @@ msgstr "Strip - %s"
 
 msgid "&Strip"
 msgstr "&Strip"
-
-msgid "response expected"
-msgstr "antwoord verwacht"
-
-msgid "password: "
-msgstr "wachtwoord: "
 
 msgid "Parent 1:"
 msgstr "Ouder 1:"
@@ -7819,9 +7811,6 @@ msgstr "&Repository"
 msgid "&Help"
 msgstr "&Help"
 
-msgid "&Edit Toolbar"
-msgstr "Werkbalk be&werken"
-
 msgid "&Dock Toolbar"
 msgstr "&Docking toolbar"
 
@@ -7843,14 +7832,20 @@ msgstr "Repository Register Tonen"
 msgid "Show &Patch Queue"
 msgstr "Toon &Patch Queue"
 
-msgid "Show Output &Log"
-msgstr "Uitvoer&log Tonen"
+msgid "Show Conso&le"
+msgstr ""
+
+msgid "Place Console in Doc&k Area"
+msgstr ""
 
 msgid "R&epository Registry Options"
 msgstr "R&epository Register Opties"
 
 msgid "Save Open Repositories on E&xit"
 msgstr "Open Repositories Opslaan bij Afsluiten"
+
+msgid "Sa&ve Current Sync Paths on Exit"
+msgstr ""
 
 msgid "&Commit"
 msgstr "&Commit"
@@ -7866,9 +7861,6 @@ msgstr "Zoeken"
 
 msgid "S&ynchronize"
 msgstr "S&ynchroniseren"
-
-msgid "&Refresh"
-msgstr "Ve&rversen"
 
 msgid "Refresh current repository"
 msgstr "Huidige repository verversen"
@@ -7893,9 +7885,6 @@ msgstr "&Ga naar Revisie..."
 
 msgid "Go to a specific revision"
 msgstr "Naar een specifieke revisie gaan"
-
-msgid "&Filter Toolbar"
-msgstr "&Filter Toolbar"
 
 msgid "Filter graph with revision sets or branches"
 msgstr "Filter graaf met revisie sets of met takken"
@@ -8008,29 +7997,8 @@ msgstr ""
 msgid "Execute custom tool '%s'"
 msgstr "Voer eigen tool '%s' uit"
 
-msgid "Close tab"
-msgstr "Tabblad sluiten"
-
-msgid "Close other tabs"
-msgstr "Andere tabbladen sluiten"
-
-msgid "Undo close tab"
-msgstr "Tabblad sluiten ongedaan maken"
-
-msgid "Reopen last closed tab"
-msgstr "Laatste gesloten tabblad heropenen"
-
-msgid "Undo close other tabs"
-msgstr "Sluiten andere tabbladen ongedaan maken"
-
-msgid "Reopen last closed tab group"
-msgstr "Laatste gesloten tabbladgroep heropenen"
-
 msgid "Custom Toolbar &Settings"
 msgstr ""
-
-msgid "Failed to open repository"
-msgstr "Openen van de repository mislukt"
 
 msgid "TortoiseHg Workbench"
 msgstr "TortoiseHg Werkbank"
@@ -8042,13 +8010,6 @@ msgstr "%s - TortoiseHg Werkbank - %s"
 #, python-format
 msgid "%s - TortoiseHg Workbench"
 msgstr "%s - TortoiseHg Werkbank"
-
-msgid "Reopening tabs"
-msgstr "Bezig met heropenen tabbladen"
-
-#, python-format
-msgid "Reopening repository %s"
-msgstr "Bezig met heropenen repository %s"
 
 msgid "Goto revision"
 msgstr "Ga naar revisie"
@@ -8094,66 +8055,27 @@ msgstr "Fout bij uitvoeren van de \"commit beëindigd\" trigger"
 msgid "Cannot open Plugin Options dialog"
 msgstr "Kan de Plugin Opties dialoog niet openen"
 
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
+msgid "move after the specified patch"
 msgstr ""
-"hg: opdracht '%s' is dubbelzinnig:\n"
-"    %s\n"
+
+msgid "[--after PATCH] PATCH..."
+msgstr ""
+
+msgid "unknown patch to move specified"
+msgstr ""
+
+msgid "invalid patch position specified"
+msgstr ""
+
+msgid "cannot move applied patches"
+msgstr ""
 
 #, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr "hg: parse fout op %s: %s\n"
+msgid "patch %s not in series"
+msgstr ""
 
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr "hg: parse fout: %s\n"
-
-#, python-format
-msgid "timed out waiting for lock held by %s"
-msgstr "wachten op lock door %s duurt te lang"
-
-#, python-format
-msgid "lock held by %s"
-msgstr "gelockt door %s"
-
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr "afgebroken: %s: %s\n"
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr "afgebroken: kon niet locken %s: %s\n"
-
-#, python-format
-msgid "hg %s: %s\n"
-msgstr "hg: %s: %s\n"
-
-#, python-format
-msgid "hg: %s\n"
-msgstr "hg: %s\n"
-
-msgid "abort: remote error:\n"
-msgstr "afgebroken: externe fout:\n"
-
-#, python-format
-msgid "abort: %s"
-msgstr "afgebroken: %s"
-
-msgid " empty string\n"
-msgstr " lege tekenreeks\n"
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr "hg: onbekende opdracht '%s'\n"
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr "afgebroken: fout: %s\n"
-
-msgid "broken pipe\n"
-msgstr "afgebroken pipe\n"
+msgid "cannot move into applied patches"
+msgstr ""
 
 msgid "abort: "
 msgstr "afgebroken: "
@@ -8406,6 +8328,9 @@ msgstr "Synchroniseer met gesleepte repository"
 msgid "unrecognized response: %s"
 msgstr ""
 
+msgid "password: "
+msgstr "wachtwoord: "
+
 #, python-format
 msgid "repository %s not found"
 msgstr "repository %s niet gevonden"
@@ -8540,6 +8465,15 @@ msgstr ""
 #~ msgid "Save as.."
 #~ msgstr "Opslaan als..."
 
+#~ msgid "Destination path is empty"
+#~ msgstr "Doelpad is niet ingevuld"
+
+#~ msgid "Please enter the directory path"
+#~ msgstr "Geef aub het pad op voor de map"
+
+#~ msgid "Error when creating repository"
+#~ msgstr "Fout tijdens aanmaken repository"
+
 #~ msgid "Undo"
 #~ msgstr "Ongedaan maken"
 
@@ -8563,6 +8497,9 @@ msgstr ""
 
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "blok %d al toegepast op regel %d (fuzz %d)\n"
+
+#~ msgid "Repository stripped, incoming preview cleared"
+#~ msgstr "Repository stripped, inkomende preview gewist"
 
 #~ msgid "Message Line Length"
 #~ msgstr "Lengte van de Berichtlijnen"
@@ -9712,16 +9649,6 @@ msgstr ""
 #~ msgstr "voer uit zelfs als patches niet correct uit het rek te halen zijn"
 
 #~ msgid ""
-#~ "Space separated list of tags that will not be shown. Useful example: "
-#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
-#~ "Mercurial Queues Extension. Default: None (leave blank)"
-#~ msgstr ""
-#~ "Spatie-gescheiden lijst van etiketten die niet getoond mogen worden. "
-#~ "Bruikbaar voorbeeld: \"qbase parent qtip\" om de standaard etiketten te "
-#~ "verbergen voor de Mmercurial Queues extensie. Standaard: Geen (blanko "
-#~ "laten)"
-
-#~ msgid ""
 #~ "Adjust the display of the main toolbar in the Repository Explorer.  "
 #~ "Values: small, large, or theme. Default: theme"
 #~ msgstr ""
@@ -9754,6 +9681,41 @@ msgstr ""
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "Negeer witruimte bij het vergelijken van regels. Standaard: Uit"
 
+#~ msgid "TortoiseHg Shell Configuration"
+#~ msgstr "TortoiseHg Shell Instellingen"
+
+#~ msgid ""
+#~ "Error creating interpreting commit date (%s).\n"
+#~ "Using current date instead."
+#~ msgstr ""
+#~ "Fout tijdens interpreteren van commit datum (%s).\n"
+#~ "De huidige datum wordt gebruikt."
+
+#~ msgid ""
+#~ "Defines the command to run when an issue number is recognized. You may "
+#~ "include groups in issue.regex, and corresponding {n} tokens in issue.link "
+#~ "(where n is a non-negative integer). {0} refers to the entire string "
+#~ "matched by issue.regex, while {1} refers to the first group and so on. If "
+#~ "no {n} tokensare found in issue.link, the entire matched string is "
+#~ "appended instead."
+#~ msgstr ""
+#~ "Definiëert de uit te voeren opdracht als een probleemnummer herkend "
+#~ "wordt. U kunt groepen invoegen in issue.regex, en de overeenkomende {n} "
+#~ "markeringen in issue.link (waar n een niet-negatief geheel getal is). {0} "
+#~ "verwijst naar de gehele tekenreeks die overeenkomt met issue.regex, "
+#~ "tgerwijl {1} verwijst naar de eerste groep en zo verder. Als geen {n} "
+#~ "markeringen gevonden worden in issue.link dan wordt in plaats daarvan de "
+#~ "hele overeenkomende tekenreeks toegevoegd."
+
+#~ msgid "TortoiseHg Sync"
+#~ msgstr "TortoiseHg Sync"
+
+#~ msgid "Are you sure that you want to cancel synchronization?"
+#~ msgstr "Bent u zeker dat u de synchronisatie wilt afblazen ?"
+
+#~ msgid "response expected"
+#~ msgstr "antwoord verwacht"
+
 #~ msgid "No repository found here"
 #~ msgstr "her is geen repository gevonden"
 
@@ -9769,11 +9731,49 @@ msgstr ""
 #~ msgid "TortoiseHg Clone"
 #~ msgstr "TortoiseHg Klonen"
 
+#~ msgid "Unable to create new repository"
+#~ msgstr "Kan nieuwe repository niet aanmaken"
+
+#~ msgid "Source does not exists."
+#~ msgstr "Bron bestaat niet."
+
+#~ msgid "Repository stripped, revision set cleared"
+#~ msgstr "Repository stripped, revisie set uitgeblankt"
+
 #~ msgid "Character encoding name"
 #~ msgstr "Naam karakter encodering"
 
+#~ msgid "outgoing changesets to %s found"
+#~ msgstr "uitgaande changesets naar %s gevonden"
+
 #~ msgid "Pull"
 #~ msgstr "Pull"
+
+#~ msgid "tag '%s' is not a local tag"
+#~ msgstr "etiket '%s' is geen lokaal etiket"
+
+#~ msgid "tag '%s' is not a global tag"
+#~ msgstr "etiket '%s' is geen globaal etiket"
+
+#~ msgid ""
+#~ "Space separated list of tags that will not be shown.Useful example: "
+#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
+#~ "Mercurial Queues Extension. Default: None (leave blank)"
+#~ msgstr ""
+#~ "Spatie-gescheiden lijst van etiketten die niet getoond zullen worden. "
+#~ "Bruikbaar voorbeeld: geef \"qbase qparent qtip\" op om de standaard "
+#~ "etiketten te verbergen die de Mercurial Queues extensie invoegt. "
+#~ "Standaard: Geen (blank laten)"
+
+#~ msgid ""
+#~ "List of Servers from which \"projrc\" configuration files must be pulled. "
+#~ "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull "
+#~ "from the default sync path.Default is pull from NO servers."
+#~ msgstr ""
+#~ "Lijst van servers waarvan \"projrc\" bestanden moeten gepulld worden. "
+#~ "Stel het in op \"*\" om van alle servers te pullen. Stel het in op "
+#~ "\"default\" om te pullen van het standaard sync pad. Standaard is pull "
+#~ "van GEEN ENKELE server."
 
 #~ msgid "Several icons are courtesy of the TortoiseSVN project"
 #~ msgstr ""

@@ -13,7 +13,7 @@ from mercurial import ui, hg, error, commands, match, util, subrepo
 from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmldelegate, thgrepo, cmdui, settings
 from tortoisehg.hgqt import filedialogs, fileview
 from tortoisehg.util import paths, hglib, thread2
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -334,10 +334,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.thread.matchedRow.connect(
                      lambda wrapper: model.appendRow(*wrapper.data))
         self.thread.start()
-
-    def reload(self):
-        # TODO
-        pass
 
     def searchfinished(self):
         self.cancelbutton.setEnabled(False)

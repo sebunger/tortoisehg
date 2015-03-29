@@ -13,9 +13,9 @@ from PyQt4.Qsci import QsciScintilla
 
 from mercurial import commands, util
 
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 
 class _LogWidgetForConsole(cmdui.LogWidget):
     """Wrapped LogWidget for ConsoleWidget"""
@@ -258,19 +258,19 @@ def _searchhistory(items, text, direction, idx):
         idx += direction
     return None, idx
 
-class ConsoleWidget(QWidget):
+class ConsoleWidget(QWidget, qtlib.TaskWidget):
     """Console to run hg/thg command and show output"""
     closeRequested = pyqtSignal()
 
     def __init__(self, agent, parent=None):
-        super(ConsoleWidget, self).__init__(parent)
+        QWidget.__init__(self, parent)
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._initlogwidget()
         self.setFocusProxy(self._logwidget)
         self._agent = agent
         agent.busyChanged.connect(self._suppressPromptOnBusy)
-        agent.outputReceived.connect(self._logwidget.appendLog)
+        agent.outputReceived.connect(self.appendLog)
         if util.safehasattr(agent, 'displayName'):
             self._logwidget.setPrompt('%s%% ' % agent.displayName())
         self.openPrompt()
@@ -417,9 +417,9 @@ class ConsoleWidget(QWidget):
         text = hglib.tounicode(self._extproc.readAllStandardError().data())
         self._logwidget.appendLog(text, 'ui.warning')
 
-    @pyqtSlot(unicode, str)
+    @pyqtSlot(unicode, unicode)
     def appendLog(self, msg, label):
-        """Append log text from another cmdui"""
+        """Append log text to the last line while keeping the prompt line"""
         self._logwidget.clearPrompt()
         try:
             self._logwidget.appendLog(msg, label)
@@ -522,6 +522,7 @@ class ConsoleWidget(QWidget):
         'exit':  _cmd_exit,
         }
 
+
 class LogDockWidget(QDockWidget):
 
     def __init__(self, repomanager, cmdagent, parent=None):
@@ -530,7 +531,7 @@ class LogDockWidget(QDockWidget):
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
                          QDockWidget.DockWidgetFloatable)
-        self.setWindowTitle(_('Output Log'))
+        self.setWindowTitle(_('Console'))
         # Not enabled until we have a way to make it configurable
         #self.setWindowFlags(Qt.Drawer)
         self.dockLocationChanged.connect(self._updateTitleBarStyle)
@@ -545,12 +546,10 @@ class LogDockWidget(QDockWidget):
         for root in self._repomanager.repoRootPaths():
             self._createConsoleFor(root)
 
-        # move focus only when console is activated by keyboard/mouse operation
-        self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
-
     def setCurrentRepoRoot(self, root):
         w = self._findConsoleFor(root)
         self._consoles.setCurrentWidget(w)
+        self.setFocusProxy(w)
 
     def _findConsoleFor(self, root):
         for i in xrange(self._consoles.count()):
@@ -578,21 +577,6 @@ class LogDockWidget(QDockWidget):
         w = self._findConsoleFor(root)
         self._consoles.removeWidget(w)
         w.setParent(None)
-
-    @pyqtSlot()
-    def clear(self):
-        w = self._consoles.currentWidget()
-        w.clear()
-
-    def appendLog(self, msg, label, reporoot=None):
-        w = self._findConsoleFor(reporoot)
-        w.appendLog(msg, label)
-
-    @pyqtSlot(bool)
-    def _setFocusOnToggleView(self, visible):
-        if visible:
-            w = self._consoles.currentWidget()
-            w.setFocus()
 
     def setVisible(self, visible):
         super(LogDockWidget, self).setVisible(visible)

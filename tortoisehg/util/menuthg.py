@@ -13,7 +13,7 @@ from tortoisehg.util.i18n import _ as gettext
 from tortoisehg.util import cachethg, paths, hglib
 
 def _(msgid):
-    return {'id': msgid, 'str': gettext(msgid)}
+    return {'id': msgid, 'str': gettext(msgid).encode('utf-8')}
 
 thgcmenu = {
     'commit':     { 'label': _('Commit...'),

@@ -20,12 +20,13 @@ import subprocess
 import mercurial.ui as uimod
 from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
 from mercurial import pathutil
+from mercurial import revset as revsetmod
 
-from tortoisehg.hgqt.i18n import agettext as _
+from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import qtapp, qtlib, thgrepo
-from tortoisehg.hgqt import quickop
+from tortoisehg.hgqt import cmdui, quickop
 
 try:
     from tortoisehg.util.config import nofork as config_nofork
@@ -45,8 +46,6 @@ def dispatch(args, u=None):
             u.setconfig('ui', 'traceback', 'on')
         if '--debugger' in args:
             pdb.set_trace()
-        if 'THGDEBUG' in os.environ:
-            u.setconfig('ui', 'debug', 'on')
         return _runcatch(u, args)
     except error.ParseError, e:
         qtapp.earlyExceptionMsgBox(e)
@@ -61,7 +60,6 @@ def dispatch(args, u=None):
         print _('\nCaught keyboard interrupt, aborting.\n')
         return -1
 
-origwdir = os.getcwd()
 def portable_fork(ui, opts):
     if 'THG_GUI_SPAWN' in os.environ or (
         not opts.get('fork') and opts.get('nofork')):
@@ -72,27 +70,29 @@ def portable_fork(ui, opts):
             return
     elif config_nofork:
         return
+    os.environ['THG_GUI_SPAWN'] = '1'
     try:
-        portable_start_fork()
+        _forkbg()
     except OSError, inst:
         ui.warn(_('failed to fork GUI process: %s\n') % inst.strerror)
-        return
-    sys.exit(0)
 
-def portable_start_fork(extraargs=None):
-    os.environ['THG_GUI_SPAWN'] = '1'
-    # Spawn background process and exit
-    if hasattr(sys, "frozen"):
-        args = sys.argv
-    else:
-        args = [sys.executable] + sys.argv
-    if extraargs:
-        args += extraargs
-    cmdline = subprocess.list2cmdline(args)
-    os.chdir(origwdir)
-    subprocess.Popen(cmdline,
-                     creationflags=qtlib.openflags,
-                     shell=True)
+# native window API can't be used after fork() on Mac OS X
+if os.name == 'posix' and sys.platform != 'darwin':
+    def _forkbg():
+        pid = os.fork()
+        if pid > 0:
+            sys.exit(0)
+
+else:
+    _origwdir = os.getcwd()
+
+    def _forkbg():
+        # Spawn background process and exit
+        cmdline = list(paths.get_thg_command())
+        cmdline.extend(sys.argv[1:])
+        os.chdir(_origwdir)
+        subprocess.Popen(cmdline, creationflags=qtlib.openflags)
+        sys.exit(0)
 
 # Windows and Nautilus shellext execute
 # "thg subcmd --listfile TMPFILE" or "thg subcmd --listfileutf8 TMPFILE"(planning) .
@@ -263,13 +263,12 @@ def runcommand(ui, args):
 
     cmdoptions['alias'] = alias
     ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
+    ui.setconfig('ui', 'debug',
+                 str(bool(options['debug'] or 'THGDEBUG' in os.environ)))
     i18n.setlanguage(ui.config('tortoisehg', 'ui.language'))
 
     if options['help']:
         return help_(ui, cmd)
-
-    if options['newworkbench']:
-        cmdoptions['newworkbench'] = True
 
     path = options['repository']
     if path:
@@ -386,13 +385,13 @@ globalopts = [
     ('h', 'help', None, _('display help and exit')),
     ('', 'config', [],
      _("set/override config option (use 'section.name=value')")),
+    ('', 'debug', None, _('enable debugging output')),
     ('', 'debugger', None, _('start debugger')),
     ('', 'profile', None, _('print command execution profile')),
     ('', 'nofork', None, _('do not fork GUI process')),
     ('', 'fork', None, _('always fork GUI process')),
     ('', 'listfile', '', _('read file list from file')),
     ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
-    ('', 'newworkbench', None, _('open a new workbench window')),
 ]
 
 # common command functions
@@ -414,11 +413,14 @@ def _workbench(ui, *pats, **opts):
             w.openRepo(root, False, bundle=hglib.tounicode(bundle))
         else:
             w.showRepo(root)
+        rev = opts.get('rev')
+        if rev:
+            w.goto(hglib.fromunicode(root), rev)
 
-        if pats:
-            q = _formatfilerevset(pats)
+        q = opts.get('query') or _formatfilerevset(pats)
+        if q:
             w.setRevsetFilter(root, hglib.tounicode(q))
-    if w.repoTabsWidget.count() <= 0:
+    if not w.currentRepoRootPath():
         w.reporegistry.setVisible(True)
     return w
 
@@ -519,7 +521,9 @@ def bookmark(ui, repoagent, *names, **opts):
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt import clone as clonemod
-    return clonemod.CloneDialog(ui, pats, opts)
+    dlg = clonemod.CloneDialog(ui, pats, opts)
+    dlg.clonedRepository.connect(qtrun.openRepoInWorkbench)
+    return dlg
 
 @command('^commit|ci',
     [('u', 'user', '', _('record user as committer')),
@@ -543,6 +547,32 @@ def debugblockmatcher(ui, *pats, **opts):
 def debugbugreport(ui, *pats, **opts):
     """open bugreport dialog by exception"""
     raise Exception(' '.join(pats))
+
+@command('debugconsole', [], _('thg debugconsole'))
+def debugconsole(ui, repoagent, *pats, **opts):
+    """open console window"""
+    from tortoisehg.hgqt import docklog
+    dlg = docklog.ConsoleWidget(repoagent)
+    dlg.closeRequested.connect(dlg.close)
+    dlg.resize(700, 400)
+    return dlg
+
+@command('debuglighthg', [], _('thg debuglighthg'))
+def debuglighthg(ui, repoagent, *pats, **opts):
+    from tortoisehg.hgqt import repowidget
+    return repowidget.LightRepoWindow(repoagent)
+
+@command('debugruncommand', [],
+    _('thg debugruncommand -- COMMAND [ARGUMENT]...'))
+def debugruncommand(ui, repoagent, *cmdline, **opts):
+    """run hg command in dialog"""
+    if not cmdline:
+        raise util.Abort(_('no command specified'))
+    dlg = cmdui.CmdSessionDialog()
+    dlg.setLogVisible(ui.verbose)
+    sess = repoagent.runCommand(map(hglib.tounicode, cmdline), dlg)
+    dlg.setSession(sess)
+    return dlg
 
 @command('drag_copy', [], _('thg drag_copy SOURCE... DEST'))
 def drag_copy(ui, repoagent, *pats, **opts):
@@ -821,16 +851,26 @@ def import_(ui, repoagent, *pats, **opts):
     return dlg
 
 @command('^init', [], _('thg init [DEST]'))
-def init(ui, *pats, **opts):
+def init(ui, dest='.', **opts):
     """init dialog"""
     from tortoisehg.hgqt import hginit
-    return hginit.InitDialog(pats, opts)
+    dlg = hginit.InitDialog(ui, hglib.tounicode(dest))
+    dlg.newRepository.connect(qtrun.openRepoInWorkbench)
+    return dlg
 
 @command('^log|history|explorer|workbench',
-    [('l', 'limit', '', _('(DEPRECATED)'))],
+    [('k', 'query', '', _('search for a given text or revset')),
+     ('r', 'rev', '', _('select the specified revision')),
+     ('l', 'limit', '', _('(DEPRECATED)')),
+     ('', 'newworkbench', None, _('open a new workbench window'))],
     _('thg log [OPTIONS] [FILE]'))
 def log(ui, *pats, **opts):
     """workbench application"""
+    if opts.get('query') and pats:
+        # 'filelog' does not support -k, and multiple filenames are packed
+        # into revset query that may conflict with user-supplied one.
+        raise util.Abort(_('cannot specify both -k/--query and filenames'))
+
     root = opts.get('root') or paths.find_root()
     if root and len(pats) == 1 and os.path.isfile(pats[0]):
         # TODO: do not instantiate repo here
@@ -848,7 +888,9 @@ def log(ui, *pats, **opts):
     if singleworkbenchmode:
         newworkbench = opts.get('newworkbench')
         if root and not newworkbench:
-            if qtapp.connectToExistingWorkbench(root, _formatfilerevset(pats)):
+            # TODO: send -rREV to server
+            q = opts.get('query') or _formatfilerevset(pats)
+            if qtapp.connectToExistingWorkbench(root, q):
                 # The were able to connect to an existing workbench server, and
                 # it confirmed that it has opened the selected repo for us
                 sys.exit(0)
@@ -917,6 +959,20 @@ def postreview(ui, repoagent, *pats, **opts):
     if not revs:
         raise util.Abort(_('no revisions specified'))
     return postreviewmod.PostReviewDialog(repo.ui, repoagent, revs)
+
+@command('^prune|obsolete|kill',
+    [('r', 'rev', [], _('revisions to prune'))],
+    _('thg prune [-r] REV...'))
+def prune(ui, repoagent, *revs, **opts):
+    """hide changesets by marking them obsolete"""
+    from tortoisehg.hgqt import prune as prunemod
+    revs = list(revs)
+    revs.extend(opts.get('rev'))
+    if len(revs) < 2:
+        revspec = ''.join(revs)
+    else:
+        revspec = revsetmod.formatspec('%lr', revs)
+    return prunemod.createPruneDialog(repoagent, hglib.tounicode(revspec))
 
 @command('^purge', [], _('thg purge'))
 def purge(ui, repoagent, *pats, **opts):
@@ -1074,8 +1130,9 @@ def status(ui, repoagent, *pats, **opts):
 @command('^strip',
     [('f', 'force', None, _('discard uncommitted changes (no backup)')),
      ('n', 'nobackup', None, _('do not back up stripped revisions')),
+     ('k', 'keep', None, _('do not modify working copy during strip')),
      ('r', 'rev', '', _('revision to strip'))],
-    _('thg strip [-f] [-n] [[-r] REV]'))
+    _('thg strip [-k] [-f] [-n] [[-r] REV]'))
 def strip(ui, repoagent, *pats, **opts):
     """strip dialog"""
     from tortoisehg.hgqt import thgstrip
@@ -1089,10 +1146,12 @@ def strip(ui, repoagent, *pats, **opts):
 @command('^sync|synchronize', [], _('thg sync [PEER]'))
 def sync(ui, repoagent, *pats, **opts):
     """synchronize with other repositories"""
-    from tortoisehg.hgqt import sync as syncmod
-    w = syncmod.SyncDialog(repoagent)
+    from tortoisehg.hgqt import repowidget
+    repo = repoagent.rawRepo()
+    repo.ui.setconfig('tortoisehg', 'defaultwidget', 'sync')
+    w = repowidget.LightRepoWindow(repoagent)
     if pats:
-        w.setUrl(hglib.tounicode(pats[0]))
+        w.setSyncUrl(hglib.tounicode(pats[0]))
     return w
 
 @command('^tag',

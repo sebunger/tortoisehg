@@ -11,8 +11,8 @@ from PyQt4.QtGui import *
 import os
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, csinfo, visdiff, thgrepo
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib, cmdcore, cmdui, csinfo, visdiff, thgrepo
 
 MARGINS = (8, 0, 0, 0)
 
@@ -20,6 +20,7 @@ class ResolveDialog(QDialog):
     def __init__(self, repoagent, parent=None):
         super(ResolveDialog, self).__init__(parent)
         self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
         self.setWindowFlags(self.windowFlags()
                             & ~Qt.WindowContextHelpButtonHint
                             | Qt.WindowMaximizeButtonHint)
@@ -233,8 +234,10 @@ class ResolveDialog(QDialog):
             selected = [(r, w) for r, w in selected if r != curroot]
         if cmdlines:
             sess = self._repoagent.runCommandSequence(cmdlines, self)
+            self._cmdsession = sess
             sess.commandFinished.connect(self.refresh)
             sess.outputReceived.connect(self._cmdlog.appendLog)
+            self._updateActions()
 
     def merge(self, tool=False):
         if not tool:
@@ -345,12 +348,10 @@ class ResolveDialog(QDialog):
 
         model = self.utree.model()
         smodel = self.utree.selectionModel()
-        sflags = QItemSelectionModel.Select | QItemSelectionModel.Columns
+        sflags = QItemSelectionModel.Select | QItemSelectionModel.Rows
         for i, path in enumerate(u):
             if path in paths:
                 smodel.select(model.index(i, 0), sflags)
-                smodel.select(model.index(i, 1), sflags)
-                smodel.select(model.index(i, 2), sflags)
 
         smodel.selectionChanged.connect(self._updateUnresolvedActions)
         self._updateUnresolvedActions()
@@ -368,8 +369,6 @@ class ResolveDialog(QDialog):
         for i, path in enumerate(r):
             if path in paths:
                 smodel.select(model.index(i, 0), sflags)
-                smodel.select(model.index(i, 1), sflags)
-                smodel.select(model.index(i, 2), sflags)
 
         smodel.selectionChanged.connect(self._updateResolvedActions)
         self._updateResolvedActions()
@@ -395,15 +394,21 @@ class ResolveDialog(QDialog):
                 return
         super(ResolveDialog, self).reject()
 
+    def _updateActions(self):
+        self._updateUnresolvedActions()
+        self._updateResolvedActions()
+
     @pyqtSlot()
     def _updateUnresolvedActions(self):
-        enable = self.utree.selectionModel().hasSelection()
+        enable = (self.utree.selectionModel().hasSelection()
+                  and self._cmdsession.isFinished())
         for c in self.umenuitems:
             c.setEnabled(enable)
 
     @pyqtSlot()
     def _updateResolvedActions(self):
-        enable = self.rtree.selectionModel().hasSelection()
+        enable = (self.rtree.selectionModel().hasSelection()
+                  and self._cmdsession.isFinished())
         for c in self.rmenuitems:
             c.setEnabled(enable)
         merge = len(self.repo.parents()) > 1

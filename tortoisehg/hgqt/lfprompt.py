@@ -9,7 +9,7 @@ import os
 
 from mercurial import match
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 
 def _createPrompt(parent, files):
     return qtlib.CustomPrompt(
@@ -27,7 +27,7 @@ def promptForLfiles(parent, ui, repo, files):
     lfiles = []
     section = 'largefiles'
     try:
-        minsize = int(ui.config(section, 'minsize', default='10'))
+        minsize = float(ui.config(section, 'minsize', default=10))
     except ValueError:
         minsize = 10
     patterns = ui.config(section, 'patterns', default=())

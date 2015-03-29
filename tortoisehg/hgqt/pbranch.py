@@ -10,10 +10,10 @@ import errno
 
 from mercurial import extensions, error, util
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, cmdcore, cmdui, update, revdetails
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -38,8 +38,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         self.show_internal_branches = False
 
         repoagent.configChanged.connect(self.configChanged)
-        repoagent.repositoryChanged.connect(self.repositoryChanged)
-        repoagent.workingBranchChanged.connect(self.workingBranchChanged)
+        repoagent.repositoryChanged.connect(self.refresh)
 
         # Build child widgets
 
@@ -137,6 +136,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         self.repo.thginvalidate()
         self.refresh()
 
+    @pyqtSlot()
     def refresh(self):
         """
         Refresh the list of patches.
@@ -506,14 +506,6 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot()
     def configChanged(self):
         pass
-
-    @pyqtSlot()
-    def repositoryChanged(self):
-        self.refresh()
-
-    @pyqtSlot()
-    def workingBranchChanged(self):
-        self.refresh()
 
     def pmerge_clicked(self):
         self.pmerge()

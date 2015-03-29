@@ -79,12 +79,7 @@ def wfctx_renamed(orig, self):
                 return None
     return orig(self)
 
-registered = False
 def uisetup(ui):
-    global registered
-    if registered:
-        return
-    registered = True
     extensions.wrapfunction(context.workingfilectx, 'data', wfctx_data)
     extensions.wrapfunction(context.workingfilectx, 'flags', wfctx_flags)
     extensions.wrapfunction(context.workingfilectx, 'renamed', wfctx_renamed)

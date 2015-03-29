@@ -322,7 +322,7 @@ class build_qt(Command):
             def createToplevelWidget(self, classname, widgetname):
                 o = indenter.getIndenter()
                 o.level = 0
-                o.write('from tortoisehg.hgqt.i18n import _')
+                o.write('from tortoisehg.util.i18n import _')
                 return super(_UICompiler, self).createToplevelWidget(classname, widgetname)
         compiler.UICompiler = _UICompiler
 

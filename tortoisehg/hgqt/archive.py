@@ -13,8 +13,8 @@ from PyQt4.QtGui import *
 
 from mercurial import error
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, qtlib
 
 WD_PARENT = _('= Working Directory Parent =')
@@ -218,7 +218,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
                                      r=hglib.tounicode(self.get_selected_rev()),
                                      S=self.subrepos_chk.isChecked(), I=incl,
                                      t=self.get_selected_archive_type()['type'])
-        self.hgcmd_txt.setText('hg ' + ' '.join(cmdline))
+        self.hgcmd_txt.setText('hg ' + hglib.prettifycmdline(cmdline))
         self.commandChanged.emit()
         return cmdline
 

@@ -143,10 +143,8 @@ class patchctx(object):
 
     # TortoiseHg methods
     def thgtags(self):              return []
-    def thgwdparent(self):          return False
     def thgmqappliedpatch(self):    return False
     def thgmqpatchname(self):       return self._patchname
-    def thgbranchhead(self):        return False
     def thgmqunappliedpatch(self):  return True
 
     # largefiles/kbfiles methods

@@ -17,7 +17,7 @@ import time
 
 from PyQt4.QtCore import *
 
-from mercurial import hg, util, error, bundlerepo, extensions, filemerge, node
+from mercurial import hg, error, bundlerepo, extensions, filemerge, node
 from mercurial import localrepo, merge, subrepo
 from mercurial import ui as uimod
 from hgext import mq
@@ -61,30 +61,30 @@ def _filteredrepo(repo, hiddenincluded):
         return repo.filtered('visible')
 
 
-class _LockStillHeld(Exception):
-    'Raised to abort status check due to lock existence'
+# flags describing changes that could occur in repository
+LogChanged = 0x1
+WorkingParentChanged = 0x2
+WorkingBranchChanged = 0x4
+WorkingStateChanged = 0x8  # internal flag to invalidate dirstate cache
+
 
 class RepoWatcher(QObject):
     """Notify changes of repository by optionally monitoring filesystem"""
 
     configChanged = pyqtSignal()
-    repositoryChanged = pyqtSignal()
+    repositoryChanged = pyqtSignal(int)
     repositoryDestroyed = pyqtSignal()
-    workingBranchChanged = pyqtSignal()
-    workingStateChanged = pyqtSignal()
-
-    # Maybe repositoryChanged, workingBranchChanged and workingStateChanged
-    # should be merged into repositoryChanged(flags), so that client widgets
-    # and models can tune their reloader.
-    # For example, flags=WorkingParent will redraw graph but not for other
-    # columns, flags=WorkingState will trigger refreshWctx, etc.
 
     def __init__(self, repo, parent=None):
         super(RepoWatcher, self).__init__(parent)
-        self.repo = repo
+        self._repo = repo
         self._ui = repo.ui
         self._fswatcher = None
-        self.recordState()
+        self._filesmap = {}  # path: (flag, watched)
+        self._datamap = {}  # readmeth: (flag, dep-path)
+        self._lastmtimes = {}  # path: mtime
+        self._lastdata = {}  # readmeth: content
+        self._fixState()
         self._uimtime = time.time()
 
     def startMonitoring(self):
@@ -93,9 +93,9 @@ class RepoWatcher(QObject):
             self._fswatcher = QFileSystemWatcher(self)
             self._fswatcher.directoryChanged.connect(self._pollChanges)
             self._fswatcher.fileChanged.connect(self._pollChanges)
-        self._fswatcher.addPath(hglib.tounicode(self.repo.path))
-        self._fswatcher.addPath(hglib.tounicode(self.repo.spath))
-        self.addMissingPaths()
+        self._fswatcher.addPath(hglib.tounicode(self._repo.path))
+        self._fswatcher.addPath(hglib.tounicode(self._repo.spath))
+        self._addMissingPaths()
         self._fswatcher.blockSignals(False)
 
     def stopMonitoring(self):
@@ -131,160 +131,145 @@ class RepoWatcher(QObject):
         self.pollStatus()
         # filesystem monitor may be stopped inside pollStatus()
         if self.isMonitoring():
-            self.addMissingPaths()
+            self._addMissingPaths()
 
-    def addMissingPaths(self):
+    def _addMissingPaths(self):
         'Add files to watcher that may have been added or replaced'
-        existing = [f for f in self._getwatchedfiles() if os.path.exists(f)]
+        existing = [f for f, (_flag, watched) in self._filesmap.iteritems()
+                    if watched and f in self._lastmtimes]
         files = [unicode(f) for f in self._fswatcher.files()]
         for f in existing:
             if hglib.tounicode(f) not in files:
                 self._ui.debug('add file to watcher: %s\n' % f)
                 self._fswatcher.addPath(hglib.tounicode(f))
-        for f in self.repo.uifiles():
+        for f in self._repo.uifiles():
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
                 self._ui.debug('add ui file to watcher: %s\n' % f)
                 self._fswatcher.addPath(hglib.tounicode(f))
 
+    def clearStatus(self):
+        self._lastmtimes.clear()
+        self._lastdata.clear()
+
     def pollStatus(self):
-        if not os.path.exists(self.repo.path):
-            self._ui.debug('repository destroyed: %s\n' % self.repo.root)
+        if not os.path.exists(self._repo.path):
+            self._ui.debug('repository destroyed: %s\n' % self._repo.root)
             self.repositoryDestroyed.emit()
             return
-        if self.locked():
+        if self._locked():
             self._ui.debug('locked, aborting\n')
             return
-        try:
-            if self._checkdirstate():
-                self._ui.debug('dirstate changed, exiting\n')
-                return
-            self._checkrepotime()
-            self._checkuimtime()
-        except _LockStillHeld:
+        curmtimes, curdata = self._readState()
+        changeflags = self._calculateChangeFlags(curmtimes, curdata)
+        if self._locked():
             self._ui.debug('lock still held - ignoring for now\n')
+            return
+        self._lastmtimes = curmtimes
+        self._lastdata = curdata
+        if changeflags:
+            self._ui.debug('change found (flags = 0x%x)\n' % changeflags)
+            self.repositoryChanged.emit(changeflags)  # may update repo paths
+            self._fixState()
+        self._checkuimtime()
 
-    def locked(self):
-        if os.path.lexists(self.repo.join('wlock')):
+    def _locked(self):
+        if os.path.lexists(self._repo.join('wlock')):
             return True
-        if os.path.lexists(self.repo.sjoin('lock')):
+        if os.path.lexists(self._repo.sjoin('lock')):
             return True
         return False
 
-    def recordState(self):
-        try:
-            self._parentnodes = self._getrawparents()
-            self._repomtime = self._getrepomtime()
-            self._dirstatemtime = os.path.getmtime(self.repo.join('dirstate'))
-            self._branchmtime = os.path.getmtime(self.repo.join('branch'))
-            self._rawbranch = self.repo.opener('branch').read()
-        except EnvironmentError:
-            self._dirstatemtime = None
-            self._branchmtime = None
-            self._rawbranch = None
+    def _fixState(self):
+        """Update paths to be checked and record state of new paths"""
+        repo = self._repo
+        q = getattr(repo, 'mq', None)
+        newfilesmap = {
+            # no need to watch 'bookmarks' because repo._bookmarks.write
+            # touches 00changelog.i (see bookmarks.bmstore.write)
+            repo.join('bookmarks.current'): (LogChanged, False),
+            repo.join('branch'): (0, False),
+            repo.join('dirstate'): (WorkingStateChanged, False),
+            repo.join('localtags'): (LogChanged, False),
+            repo.sjoin('00changelog.i'): (LogChanged, False),
+            repo.sjoin('obsstore'): (LogChanged, False),
+            repo.sjoin('phaseroots'): (LogChanged, False),
+            }
+        if q:
+            newfilesmap.update({
+                q.join('guards'): (LogChanged, True),
+                q.join('series'): (LogChanged, True),
+                q.join('status'): (LogChanged, True),
+                repo.join('patches.queue'): (LogChanged, True),
+                repo.join('patches.queues'): (LogChanged, True),
+                })
+        newpaths = set(newfilesmap) - set(self._filesmap)
+        if not newpaths:
+            return
+        self._filesmap = newfilesmap
+        self._datamap = {
+            RepoWatcher._readbranch: (WorkingBranchChanged,
+                                      repo.join('branch')),
+            RepoWatcher._readparents: (WorkingParentChanged,
+                                       repo.join('dirstate')),
+            }
+        newmtimes, newdata = self._readState(newpaths)
+        self._lastmtimes.update(newmtimes)
+        self._lastdata.update(newdata)
 
-    def _getrawparents(self):
-        try:
-            return self.repo.opener('dirstate').read(40)
-        except EnvironmentError:
-            return None
+    def _readState(self, targetpaths=None):
+        if targetpaths is None:
+            targetpaths = self._filesmap
 
-    def _getwatchedfiles(self):
-        'Repository files which may be modified without locking'
-        watchedfiles = []
-        if hasattr(self.repo, 'mq'):
-            watchedfiles.append(self.repo.mq.join('series'))
-            watchedfiles.append(self.repo.mq.join('status'))
-            watchedfiles.append(self.repo.mq.join('guards'))
-            watchedfiles.append(self.repo.join('patches.queue'))
-            watchedfiles.append(self.repo.join('patches.queues'))
-        return watchedfiles
-
-    def _getrepofiles(self):
-        watchedfiles = [self.repo.sjoin('00changelog.i')]
-        watchedfiles.append(self.repo.sjoin('phaseroots'))
-        watchedfiles.append(self.repo.join('localtags'))
-        # no need to watch 'bookmarks' because repo._bookmarks.write touches
-        # 00changelog.i (see bookmarks.bmstore.write)
-        watchedfiles.append(self.repo.join('bookmarks.current'))
-        return watchedfiles + self._getwatchedfiles()
-
-    def _getrepomtime(self):
-        'Return the last modification time for the repo'
-        mtime = []
-        for f in self._getrepofiles():
+        curmtimes = {}
+        for path in targetpaths:
             try:
-                mtime.append(os.path.getmtime(f))
+                curmtimes[path] = os.path.getmtime(path)
             except EnvironmentError:
                 pass
-        if mtime:
-            return max(mtime)
 
-    def _checkrepotime(self):
-        'Check for new changelog entries, or MQ status changes'
-        if self._repomtime < self._getrepomtime():
-            self._ui.debug('detected repository change\n')
-            if self.locked():
-                raise _LockStillHeld
-            self.recordState()
-            self.repositoryChanged.emit()
+        curdata = {}
+        for readmeth, (_flag, path) in self._datamap.iteritems():
+            if path not in targetpaths:
+                continue
+            last = self._lastmtimes.get(path, -1)
+            cur = curmtimes.get(path, -1)
+            if last < cur:
+                try:
+                    curdata[readmeth] = readmeth(self)
+                except EnvironmentError:
+                    pass
+            elif cur >= 0 and readmeth in self._lastdata:
+                curdata[readmeth] = self._lastdata[readmeth]
 
-    def _checkdirstate(self):
-        'Check for new dirstate mtime, then working parent changes'
-        try:
-            mtime = os.path.getmtime(self.repo.join('dirstate'))
-        except EnvironmentError:
-            return False
-        if mtime <= self._dirstatemtime:
-            return False
-        changed = self._checkparentchanges() or self._checkbranch()
-        if not changed:
-            # returns False because in this case it's still necessary to check
-            # repo mtime in order to emit repositoryChanged appropriately
-            self._ui.debug('working directory status may be changed\n')
-            self.workingStateChanged.emit()
-        self._dirstatemtime = mtime
-        return changed
+        return curmtimes, curdata
 
-    def _checkparentchanges(self):
-        nodes = self._getrawparents()
-        if nodes != self._parentnodes:
-            self._ui.debug('dirstate change found\n')
-            if self.locked():
-                raise _LockStillHeld
-            self.recordState()
-            self.repositoryChanged.emit()
-            return True
-        return False
+    def _calculateChangeFlags(self, curmtimes, curdata):
+        changeflags = 0
+        for path, (flag, _watched) in self._filesmap.iteritems():
+            last = self._lastmtimes.get(path, -1)
+            cur = curmtimes.get(path, -1)
+            if last < cur or (last >= 0 and cur < 0):
+                self._ui.debug(' mtime: %s (%r -> %r)\n' % (path, last, cur))
+                changeflags |= flag
+        for readmeth, (flag, _path) in self._datamap.iteritems():
+            last = self._lastdata.get(readmeth)
+            cur = curdata.get(readmeth)
+            if last != cur:
+                self._ui.debug(' data: %s (%r -> %r)\n'
+                               % (readmeth.__name__, last, cur))
+                changeflags |= flag
+        return changeflags
 
-    def _checkbranch(self):
-        try:
-            mtime = os.path.getmtime(self.repo.join('branch'))
-        except EnvironmentError:
-            return False
-        if mtime <= self._branchmtime:
-            return False
-        changed = self._checkbranchcontent()
-        self._branchmtime = mtime
-        return changed
+    def _readparents(self):
+        return self._repo.opener('dirstate').read(40)
 
-    def _checkbranchcontent(self):
-        try:
-            newbranch = self.repo.opener('branch').read()
-        except EnvironmentError:
-            return False
-        if newbranch != self._rawbranch:
-            self._ui.debug('branch time change\n')
-            if self.locked():
-                raise _LockStillHeld
-            self._rawbranch = newbranch
-            self.workingBranchChanged.emit()
-            return True
-        return False
+    def _readbranch(self):
+        return self._repo.opener('branch').read()
 
     def _checkuimtime(self):
         'Check for modified config files, or a new .hg/hgrc file'
         try:
-            files = self.repo.uifiles()
+            files = self._repo.uifiles()
             mtime = max(os.path.getmtime(f) for f in files if os.path.isfile(f))
             if mtime > self._uimtime:
                 self._ui.debug('config change detected\n')
@@ -300,9 +285,8 @@ class RepoAgent(QObject):
     # change notifications are not emitted while command is running because
     # repository files are likely to be modified
     configChanged = pyqtSignal()
-    repositoryChanged = pyqtSignal()
+    repositoryChanged = pyqtSignal(int)
     repositoryDestroyed = pyqtSignal()
-    workingBranchChanged = pyqtSignal()
 
     serviceStopped = pyqtSignal()
     busyChanged = pyqtSignal(bool)
@@ -322,14 +306,12 @@ class RepoAgent(QObject):
         # keep url separately from repo.url() because it is abbreviated to
         # relative path to cwd in bundle or union repo
         self._overlayurl = ''
-        self._repochanging = False
+        self._repochanging = 0
 
         self._watcher = watcher = RepoWatcher(repo, self)
         watcher.configChanged.connect(self._onConfigChanged)
         watcher.repositoryChanged.connect(self._onRepositoryChanged)
         watcher.repositoryDestroyed.connect(self._onRepositoryDestroyed)
-        watcher.workingBranchChanged.connect(self._onWorkingBranchChanged)
-        watcher.workingStateChanged.connect(self._onWorkingStateChanged)
 
         self._cmdagent = cmdagent = cmdcore.CmdAgent(repo.ui, self,
                                                      cwd=self.rootPath())
@@ -373,6 +355,19 @@ class RepoAgent(QObject):
     def _tryEmitServiceStopped(self):
         if not self.isServiceRunning():
             self.serviceStopped.emit()
+
+    def suspendMonitoring(self):
+        """Stop filesystem monitoring temporarily; may be resumed when command
+        finished or overlay repository changed"""
+        # no "suspended" status until we really need it
+        self._watcher.stopMonitoring()
+
+    def resumeMonitoring(self):
+        """Resume filesystem monitoring if possible"""
+        if self._watcher.isMonitoring():
+            return
+        self.pollStatus()
+        self.startMonitoringIfEnabled()
 
     def rawRepo(self):
         return self._repo
@@ -422,7 +417,7 @@ class RepoAgent(QObject):
         repo = repo.filtered('visible')
         self._changeRepo(_filteredrepo(repo, self.hiddenRevsIncluded()))
         self._overlayurl = url
-        self._watcher.stopMonitoring()
+        self.suspendMonitoring()
         self._flushRepositoryChanged()
 
     def clearOverlay(self):
@@ -432,22 +427,27 @@ class RepoAgent(QObject):
         repo.thginvalidate()  # take changes during overlaid
         self._changeRepo(_filteredrepo(repo, self.hiddenRevsIncluded()))
         self._overlayurl = ''
-        self.pollStatus()
-        self.startMonitoringIfEnabled()
+        self.resumeMonitoring()
 
     def _changeRepo(self, repo):
-        self._repochanging = True
+        # bundle/union repo will append temporary revisions to changelog
+        self._repochanging = LogChanged
         self._repo = repo
 
-    def _emitRepositoryChanged(self):
-        self._repochanging = False
-        self.repositoryChanged.emit()
+    def _emitRepositoryChanged(self, flags):
+        flags |= self._repochanging
+        self._repochanging = 0
+        self.repositoryChanged.emit(flags)
 
     def _flushRepositoryChanged(self):
         if self._cmdagent.isBusy():
             return  # delayed until _onBusyChanged(False)
         if self._repochanging:
-            self._emitRepositoryChanged()
+            self._emitRepositoryChanged(0)
+
+    def clearStatus(self):
+        """Forget last status so that next poll should emit change signals"""
+        self._watcher.clearStatus()
 
     def pollStatus(self):
         """Force checking changes to emit corresponding signals"""
@@ -463,10 +463,12 @@ class RepoAgent(QObject):
         self._cmdagent.stopService()  # to reload config
         self.configChanged.emit()
 
-    @pyqtSlot()
-    def _onRepositoryChanged(self):
+    @pyqtSlot(int)
+    def _onRepositoryChanged(self, flags):
         self._repo.thginvalidate()
-        self._emitRepositoryChanged()
+        # ignore signal that just contains internal flags
+        if flags & ~WorkingStateChanged:
+            self._emitRepositoryChanged(flags)
 
     @pyqtSlot()
     def _onRepositoryDestroyed(self):
@@ -475,15 +477,6 @@ class RepoAgent(QObject):
         # avoid further changed/destroyed signals
         self._watcher.stopMonitoring()
         self.repositoryDestroyed.emit()
-
-    @pyqtSlot()
-    def _onWorkingBranchChanged(self):
-        self._repo.thginvalidate()
-        self.workingBranchChanged.emit()
-
-    @pyqtSlot()
-    def _onWorkingStateChanged(self):
-        self._repo.thginvalidate()
 
     def isBusy(self):
         return self._cmdagent.isBusy()
@@ -498,10 +491,9 @@ class RepoAgent(QObject):
     @pyqtSlot(bool)
     def _onBusyChanged(self, busy):
         if busy:
-            self._watcher.stopMonitoring()
+            self.suspendMonitoring()
         else:
-            self.pollStatus()
-            self.startMonitoringIfEnabled()
+            self.resumeMonitoring()
         self.busyChanged.emit(busy)
 
     def runCommand(self, cmdline, uihandler=None, overlay=True):
@@ -533,7 +525,7 @@ class RepoAgent(QObject):
     def subRepoAgent(self, path):
         """Return RepoAgent of sub or patch repository"""
         root = self.rootPath()
-        path = _normreporoot(os.path.join(root, path))
+        path = hglib.normreporoot(os.path.join(root, path))
         if path == root or not path.startswith(root.rstrip(os.sep) + os.sep):
             # only sub path is allowed to avoid circular references
             raise ValueError('invalid sub path: %s' % path)
@@ -563,13 +555,6 @@ class RepoAgent(QObject):
         self._subrepoagents.clear()
 
 
-def _normreporoot(path):
-    """Normalize repo root path in the same manner as localrepository"""
-    # see localrepo.localrepository and scmutil.vfs
-    lpath = hglib.fromunicode(path)
-    lpath = os.path.realpath(util.expandpath(lpath))
-    return hglib.tounicode(lpath)
-
 class RepoManager(QObject):
     """Cache open RepoAgent instances and bundle their signals"""
 
@@ -577,7 +562,7 @@ class RepoManager(QObject):
     repositoryClosed = pyqtSignal(unicode)
 
     configChanged = pyqtSignal(unicode)
-    repositoryChanged = pyqtSignal(unicode)
+    repositoryChanged = pyqtSignal(unicode, int)
     repositoryDestroyed = pyqtSignal(unicode)
 
     busyChanged = pyqtSignal(unicode, bool)
@@ -587,8 +572,6 @@ class RepoManager(QObject):
         # source, dest
         (SIGNAL('configChanged()'),
          SIGNAL('configChanged(QString)')),
-        (SIGNAL('repositoryChanged()'),
-         SIGNAL('repositoryChanged(QString)')),
         (SIGNAL('repositoryDestroyed()'),
          SIGNAL('repositoryDestroyed(QString)')),
         (SIGNAL('serviceStopped()'),
@@ -611,7 +594,7 @@ class RepoManager(QObject):
 
     def openRepoAgent(self, path):
         """Return RepoAgent for the specified path and increment refcount"""
-        path = _normreporoot(path)
+        path = hglib.normreporoot(path)
         if path in self._openagents:
             agent, refcount = self._openagents[path]
             self._openagents[path] = (agent, refcount + 1)
@@ -625,6 +608,7 @@ class RepoManager(QObject):
         for (sig, _slot), mapper in zip(self._SIGNALMAP, self._sigmappers):
             QObject.connect(agent, sig, mapper, SLOT('map()'))
             mapper.setMapping(agent, agent.rootPath())
+        agent.repositoryChanged.connect(self._mapRepositoryChanged)
         agent.progressReceived.connect(self._mapProgressReceived)
         agent.startMonitoringIfEnabled()
 
@@ -636,7 +620,7 @@ class RepoManager(QObject):
     @pyqtSlot(unicode)
     def releaseRepoAgent(self, path):
         """Decrement refcount of RepoAgent and close it if possible"""
-        path = _normreporoot(path)
+        path = hglib.normreporoot(path)
         agent, refcount = self._openagents[path]
         self._openagents[path] = (agent, refcount - 1)
         if refcount > 1:
@@ -664,6 +648,7 @@ class RepoManager(QObject):
         for (sig, _slot), mapper in zip(self._SIGNALMAP, self._sigmappers):
             QObject.disconnect(agent, sig, mapper, SLOT('map()'))
             mapper.removeMappings(agent)
+        agent.repositoryChanged.disconnect(self._mapRepositoryChanged)
         agent.progressReceived.disconnect(self._mapProgressReceived)
         agent.setParent(None)
         self.repositoryClosed.emit(path)
@@ -671,12 +656,18 @@ class RepoManager(QObject):
     def repoAgent(self, path):
         """Peek open RepoAgent for the specified path without refcount change;
         None for unknown path"""
-        path = _normreporoot(path)
+        path = hglib.normreporoot(path)
         return self._openagents.get(path, (None, 0))[0]
 
     def repoRootPaths(self):
         """Return list of root paths of open repositories"""
         return self._openagents.keys()
+
+    @qtlib.senderSafeSlot(int)
+    def _mapRepositoryChanged(self, flags):
+        agent = self.sender()
+        assert isinstance(agent, RepoAgent)
+        self.repositoryChanged.emit(agent.rootPath(), flags)
 
     @pyqtSlot(unicode)
     def _mapBusyChanged(self, path):
@@ -953,10 +944,6 @@ def _createchangectxcls(parentcls):
             htlist = self._repo._thghiddentags
             return [tag for tag in self.tags() if tag not in htlist]
 
-        def thgwdparent(self):
-            '''True if self is a parent of the working directory'''
-            return self.rev() in [ctx.rev() for ctx in self._repo.parents()]
-
         def _thgmqpatchtags(self):
             '''Returns the set of self's tags which are MQ patch names'''
             mytags = set(self.tags())
@@ -977,10 +964,6 @@ def _createchangectxcls(parentcls):
             patchtags = self._thgmqpatchtags()
             assert len(patchtags) == 1, "thgmqpatchname: called on non-mq patch"
             return list(patchtags)[0]
-
-        def thgbranchhead(self):
-            '''True if self is a branch head'''
-            return self.node() in hglib.branchheads(self._repo)
 
         def thgmqoriginalparent(self):
             '''The revisionid of the original patch parent'''

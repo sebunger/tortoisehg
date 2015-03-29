@@ -10,8 +10,8 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import util, error
 from tortoisehg.util import paths, wconfig, hglib
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, qtlib
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.serve_ui import Ui_ServeDialog
 from tortoisehg.hgqt.webconf import WebconfForm
 

@@ -9,8 +9,8 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from tortoisehg.util import hglib, wconfig
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.webconf_ui import Ui_WebconfForm
 
 _FILE_FILTER = ';;'.join([_('Config files (*.conf *.config *.ini)'),

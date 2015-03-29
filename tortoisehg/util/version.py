@@ -7,7 +7,11 @@
 
 import os
 from mercurial import ui, hg, commands, error
-from tortoisehg.util.i18n import _
+from tortoisehg.util.i18n import _ as _gettext
+
+# TODO: use unicode version globally
+def _(message, context=''):
+    return _gettext(message, context).encode('utf-8')
 
 def liveversion():
     'Attempt to read the version from the live repository'

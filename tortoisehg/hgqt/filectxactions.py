@@ -16,7 +16,7 @@ from mercurial import util
 
 from tortoisehg.hgqt import cmdcore, cmdui, lfprompt, qtlib, revert, visdiff
 from tortoisehg.hgqt import customtools, rejects
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, shlib
 
 def _lcanonpaths(fds):
@@ -201,31 +201,31 @@ class FilectxActions(QObject):
             cmdui.errorMessageBox(self._cmdsession, self.parent())
         self._updateActions()
 
-    @actionSlot(_('File &History'), 'hg-log', 'Shift+Return',
+    @actionSlot(_('File &History / Annotate'), 'hg-log', 'Shift+Return',
                 _('Show the history of the selected file'),
                 (_isfile, _notpatch, _filestatus('MARC!')))
     def navigateFileLog(self, fds):
-        from tortoisehg.hgqt import filedialogs
-        self._navigateAll(filedialogs.FileLogDialog, fds)
+        from tortoisehg.hgqt import filedialogs, fileview
+        for fd in fds:
+            dlg = self._navigate(filedialogs.FileLogDialog, fd)
+            dlg.setFileViewMode(fileview.AnnMode)
 
     @actionSlot(_('Co&mpare File Revisions'), 'compare-files', None,
                 _('Compare revisions of the selected file'),
                 (_isfile, _notpatch))
     def navigateFileDiff(self, fds):
         from tortoisehg.hgqt import filedialogs
-        self._navigateAll(filedialogs.FileDiffDialog, fds)
-
-    def _navigateAll(self, dlgclass, fds):
         for fd in fds:
-            self._navigate(dlgclass, fd)
+            self._navigate(filedialogs.FileDiffDialog, fd)
 
     def _navigate(self, dlgclass, fd):
         repoagent = self._repoAgentFor(fd)
         repo = repoagent.rawRepo()
         filename = hglib.fromunicode(fd.canonicalFilePath())
-        if len(repo.file(filename)) > 0:
+        if repo.file(filename):
             dlg = self._nav_dialogs.open(dlgclass, repoagent, filename)
             dlg.goto(fd.rev())
+            return dlg
 
     def _createnavdialog(self, dlgclass, repoagent, filename):
         return dlgclass(repoagent, filename)

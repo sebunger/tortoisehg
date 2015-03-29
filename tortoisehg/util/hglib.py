@@ -6,6 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 import sys
 import shlex
 import time
@@ -25,7 +26,13 @@ _extensions_blacklist = ('color', 'pager', 'progress')
 
 from tortoisehg.util import paths
 from tortoisehg.util.hgversion import hgversion
-from tortoisehg.util.i18n import _, ngettext
+from tortoisehg.util.i18n import _ as _gettext, ngettext as _ngettext
+
+# TODO: use unicode version globally
+def _(message, context=''):
+    return _gettext(message, context).encode('utf-8')
+def ngettext(singular, plural, n):
+    return _ngettext(singular, plural, n).encode('utf-8')
 
 def tounicode(s):
     """
@@ -97,12 +104,6 @@ def fromutf(s):
         return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
 
-def branchheads(repo):
-    heads = []
-    for branchname, nodes in repo.branchmap().iteritems():
-        heads.extend(nodes)
-    return heads
-
 def namedbranches(repo):
     branchmap = repo.branchmap()
     dead = repo.deadbranches
@@ -161,14 +162,6 @@ def getrevisionlabel(repo, rev):
 
     return str(rev)
 
-def querywctxstatus(wctx, ignored=False, clean=False, unknown=False):
-    """Do expensive status query to update corresponding attributes"""
-    try:
-        wctx.status(listignored=ignored, listclean=clean, listunknown=unknown)
-    except TypeError:
-        # hg<3.1 (aca692aa0712)
-        wctx.status(ignored=ignored, clean=clean, unknown=unknown)
-
 def getmqpatchtags(repo):
     '''Returns all tag names used by MQ patches, or []'''
     if hasattr(repo, 'mq'):
@@ -186,27 +179,6 @@ def getcurrentqqueue(repo):
         cur = cur[8:]
     return cur
 
-def _applymovemqpatches(q, after, patches):
-    fullindexes = dict((q.guard_re.split(rpn, 1)[0], i)
-                       for i, rpn in enumerate(q.fullseries))
-    fullmap = {}  # patch: line in series file
-    for i, n in sorted([(fullindexes[n], n) for n in patches], reverse=True):
-        fullmap[n] = q.fullseries.pop(i)
-    del fullindexes  # invalid
-
-    if after is None:
-        fullat = 0
-    else:
-        for i, rpn in enumerate(q.fullseries):
-            if q.guard_re.split(rpn, 1)[0] == after:
-                fullat = i + 1
-                break
-        else:
-            fullat = len(q.fullseries)  # last ditch (should not happen)
-    q.fullseries[fullat:fullat] = (fullmap[n] for n in patches)
-    q.parseseries()
-    q.seriesdirty = True
-
 def getqqueues(repo):
     ui = repo.ui.copy()
     ui.quiet = True  # don't append "(active)"
@@ -218,39 +190,6 @@ def getqqueues(repo):
     except (util.Abort, EnvironmentError):
         qqueues = []
     return qqueues
-
-# maybe this can be implemented as hg extension
-def movemqpatches(repo, after, patches):
-    """Move the given patches after the specified patch, or to the beginning
-    of the series if after is None"""
-    q = repo.mq
-    if util.any(n not in q.series for n in patches):
-        raise ValueError('unknown patch to move specified')
-    if after in patches:
-        raise ValueError('invalid patch position specified')
-    if util.any(q.isapplied(n) for n in patches):
-        raise ValueError('cannot move applied patches')
-
-    if after is None:
-        at = 0
-    else:
-        at = q.series.index(after) + 1
-    if at < q.seriesend(True):
-        raise ValueError('cannot move into applied patches')
-
-    try:
-        wlock = repo.wlock(False)  # no wait to avoid blocking GUI thread
-    except error.LockHeld:
-        return False
-    try:
-        _applymovemqpatches(q, after, patches)
-        try:
-            q.savedirty()
-            return True
-        except EnvironmentError:
-            return False
-    finally:
-        wlock.release()
 
 def readundodesc(repo):
     """Read short description and changelog size of last transaction"""
@@ -344,6 +283,13 @@ def canonpaths(list):
                 # May already be canonical
                 canonpats.append(f)
     return canonpats
+
+def normreporoot(path):
+    """Normalize repo root path in the same manner as localrepository"""
+    # see localrepo.localrepository and scmutil.vfs
+    lpath = fromunicode(path)
+    lpath = os.path.realpath(util.expandpath(lpath))
+    return tounicode(lpath)
 
 
 def mergetools(ui, values=None):
@@ -790,6 +736,40 @@ def escaperev(rev):
     assert rev >= 0
     return '%d' % rev
 
+def _escaperevrange(a, b):
+    if a == b:
+        return escaperev(a)
+    else:
+        return '%s:%s' % (escaperev(a), escaperev(b))
+
+def compactrevs(revs):
+    """Build command-line-safe revspec from list of revision numbers; revs
+    should be sorted in ascending order to get compact form
+
+    >>> compactrevs([])
+    ''
+    >>> compactrevs([0])
+    '0'
+    >>> compactrevs([0, 1])
+    '0:1'
+    >>> compactrevs([-1, 0, 1, 3])
+    'null:1 + 3'
+    >>> compactrevs([0, 4, 5, 6, 8, 9])
+    '0 + 4:6 + 8:9'
+    """
+    if not revs:
+        return ''
+    specs = []
+    k = m = revs[0]
+    for n in revs[1:]:
+        if m + 1 == n:
+            m = n
+        else:
+            specs.append(_escaperevrange(k, m))
+            k = m = n
+    specs.append(_escaperevrange(k, m))
+    return ' + '.join(specs)
+
 def buildcmdargs(name, *args, **opts):
     r"""Build list of command-line arguments
 
@@ -855,3 +835,32 @@ def buildcmdargs(name, *args, **opts):
     fullargs.extend(args)
 
     return fullargs
+
+_urlpassre = re.compile(r'^([a-zA-Z0-9+.\-]+://[^:@/]*):[^@/]+@')
+
+def _reprcmdarg(arg):
+    arg = _urlpassre.sub(r'\1:***@', arg)
+    arg = arg.replace('\n', '^M')
+
+    # only for display; no use to construct command string for os.system()
+    if not arg or ' ' in arg or '\\' in arg or '"' in arg:
+        return '"%s"' % arg.replace('"', '\\"')
+    else:
+        return arg
+
+def prettifycmdline(cmdline):
+    r"""Build pretty command-line string for display
+
+    >>> prettifycmdline(['log', 'foo\\bar', '', 'foo bar', 'foo"bar'])
+    'log "foo\\bar" "" "foo bar" "foo\\"bar"'
+    >>> prettifycmdline(['log', '--template', '{node}\n'])
+    'log --template {node}^M'
+
+    mask password in url-like string:
+
+    >>> prettifycmdline(['push', 'http://foo123:bar456@example.org/'])
+    'push http://foo123:***@example.org/'
+    >>> prettifycmdline(['clone', 'svn+http://:bar@example.org:8080/trunk/'])
+    'clone svn+http://:***@example.org:8080/trunk/'
+    """
+    return ' '.join(_reprcmdarg(e) for e in cmdline)

@@ -11,7 +11,7 @@ from PyQt4.QtGui import QMessageBox, QWidget
 
 from mercurial import cmdutil, hg, util
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, qtlib, thgrepo
 
 def _checkchanged(repo):

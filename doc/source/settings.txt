@@ -77,6 +77,9 @@ are specific to TortoiseHg).
 TortoiseHg
 ----------
 
+:guilabel:`UI Language:`
+	Specify your preferred user interface language (restart needed)
+
 :guilabel:`3-way Merge Tool:`
 	Graphical merge program for resolving merge conflicts.  If left
 	unspecified, Mercurial will use the first applicable tool it finds
@@ -93,29 +96,44 @@ TortoiseHg
 	the first applicable tool it finds.
 
 :guilabel:`Visual Editor:`
-	Specify the visual editor used to view files, etc.
+	Specify visual editor, as described in the ``[editor-tools]`` section
+	of your Mercurial configuration files.  If left unspecified, TortoiseHg
+	will use the first applicable tool it finds.
 
-:guilabel:`CLI Editor:`
-	The editor to use during a commit and other
-	instances where Mercurial needs multiline input from
-	the user.  Only used by command line interface commands.
+:guilabel:`Shell:`
+	Specify the command to launch your preferred terminal shell
+	application. If the value includes the string ``%(reponame)s``, the
+	name of the repository will be substituted in place of
+	``%(reponame)s``. Similarly, ``%(root)s`` will be the full path to
+	the repository. (restart needed)
+
+	Default, Windows:
+	  ``cmd.exe /K title %(reponame)s``
+	Default, OS X:
+	  not set
+	Default, other:
+	  ``xterm -T "%(reponame)s"``
+
+:guilabel:`Immediate Operations:`
+	Space separated list of shell operations you would like to be
+	performed immediately, without user interaction. Commands are "add
+	remove revert forget". Default: None (leave blank)
 
 :guilabel:`Tab Width:`
 	Specify the number of spaces that tabs expand to in various
-	TortoiseHg windows. Default: Not expanded.
+	TortoiseHg windows. Default: 8
+
+:guilabel:`Force Repo Tab:`
+	Always show repo tabs, even for a single repo. Default: False
+
+:guilabel:`Monitor Repo Changes:`
+	Specify the target filesystem where TortoiseHg monitors changes.
+	Default: localonly
 
 :guilabel:`Max Diff Size:`
 	The maximum size file (in KB) that TortoiseHg will
 	show changes for in the changelog, status, and commit windows.
 	A value of zero implies no limit.  Default: 1024 (1MB).
-
-:guilabel:`Bottom Diffs:`
-	Show the diff panel below the file list in status, shelve, and
-	commit dialogs.  Default: False (show diffs to right of file list).
-
-:guilabel:`Capture stderr:`
-	Redirect stderr to a buffer which is parsed at the end of the process
-	for runtime errors. Default: True.
 
 :guilabel:`Fork GUI:`
 	When running thg from the command line, fork a background process
@@ -125,10 +143,117 @@ TortoiseHg
 	Show a full directory path of the repository in the dialog title
 	instead of just the root directory name.  Default: False
 
-:guilabel:`Spell Check Language:`
-	Default language for spell check.  System language is used if not
-	specified.  Examples: en, en_GB, en_US.  Spell checking requires
-	gtkspell, which is only available on Gnome PCs.
+:guilabel:`Auto-resolve merges:`
+	Indicates whether TortoiseHg should attempt to automatically resolve
+	changes from both sides to the same file, and only report merge
+	conflicts when this is not possible. When False, all files with
+	changes on both sides of the merge will report as conflicting, even
+	if the edits are to different parts of the file. In either case, when
+	conflicts occur, the user will be invited to review and resolve
+	changes manually. Default: True.
+
+:guilabel:`New Repo Skeleton:`
+	If specified, files in the directory, e.g. ``.hgignore``, are copied
+	to the newly-created repository.
+
+
+.. module:: workbench.settings
+	:synopsis: Dialog used to set workbench specific preferences
+
+Workbench
+---------
+
+:guilabel:`Single Workbench Window:`
+	Select whether you want to have a single workbench window. If you
+	disable this setting you will get a new workbench window everytime
+	that you use the "Hg Workbench" command on the explorer context menu.
+	Default: True
+
+:guilabel:`Default widget:`
+	Select the initial widget that will be shown when opening a
+	repository. Default: revdetails
+
+:guilabel:`Initial revision:`
+	Select the initial revision that will be selected when opening a
+	repository.  You can select the "current" (i.e. the working directory
+	parent), the current "tip" or the working directory ("workingdir").
+	Default: current
+
+:guilabel:`Open new tabs next to the current tab:`
+	Should new tabs be open next to the current tab? If False new tabs
+	will be open after the last tab. Default: True
+
+:guilabel:`Author Coloring:`
+	Color changesets by author name. Default: False
+
+:guilabel:`Full Authorname:`
+	Show full authorname in Logview. If not enabled, only a short part,
+	usually name without email is shown. Default: False
+
+:guilabel:`Task Tabs:`
+	Show tabs along the side of the bottom half of each repo widget
+	allowing one to switch task tabs without using the toolbar. Default:
+	off
+
+:guilabel:`Task Toolbar Order:`
+	Specify which task buttons you want to show on the task toolbar and
+	in which order.
+	Type a list of the task button names. Add separators by putting "|"
+	between task button names.
+	Valid names are: log commit sync grep and pbranch.
+	Default: log commit grep pbranch | sync
+
+:guilabel:`Long Summary:`
+	If true, concatenate multiple lines of changeset summary and truncate
+	them at 80 characters as necessary. Default: False
+
+:guilabel:`Log Batch Size:`
+	The number of revisions to read and display in the changelog viewer
+	in a single batch. Default: 500
+
+:guilabel:`Dead Branches:`
+	Comma separated list of branch names that should be ignored when
+	building a list of branch names for a repository. Default: None
+	(leave blank)
+
+:guilabel:`Branch Colors:`
+	Space separated list of branch names and colors of the form
+	``branch:#XXXXXX``. Spaces and colons in the branch name must be
+	escaped using a backslash (``\``). Likewise some other characters can
+	be escaped in this way, e.g. ``\u0040`` will be decoded to the ``@``
+	haracter, and ``\n`` to a linefeed. Default: None (leave blank)
+
+:guilabel:`Hide Tags:`
+	Space separated list of tags that will not be shown. Useful example:
+	Specify "qbase qparent qtip" to hide the standard tags inserted by
+	the Mercurial Queues Extension. Default: None (leave blank)
+
+:guilabel:`Activate Bookmarks:`
+	Select when TortoiseHg will show a prompt to activate a bookmark when
+	updating to a revision that has one or more
+	bookmarks.
+
+	``auto`` :
+	  Try to automatically activate bookmarks. When updating to a revision
+	  that has a single bookmark it will be activated automatically. Show
+	  a prompt if there is more than one bookmark on the revision that is
+	  being updated to.
+	``prompt`` :
+	  The default. Show a prompt when updating to a revision that has one
+	   or more bookmarks.
+	``never`` :
+	  Never show any prompt to activate any bookmarks.
+
+	Default: prompt
+
+:guilabel:`Show Family Line:`
+	Show indirect revision dependency on the revision graph when filtered
+	by revset. Default: True
+
+	.. note::
+	   Calculating family line may be slow in some cases. This option is
+	   expected to be removed if the performance issue is solved.
+
 
 .. module:: commit.settings
 	:synopsis: Dialog used to set commit specific preferences
@@ -137,82 +262,149 @@ Commit
 ------
 
 :guilabel:`Username:`
-	Name associated with commits.
+	Name associated with commits.  The common format is:
+	``Full Name <email@example.com>``
 
 :guilabel:`Summary Line Length:`
-	Maximum length of the commit message summary line.
-	If set, TortoiseHg will issue a warning if the
-	summary line is too long or not separated by a
-	blank line. Default: 0 (unenforced).
+	Suggested length of commit message lines. A red vertical line will
+	mark this length.  :guilabel:`CTRL-E` will reflow the current
+	paragraph to the specified line length. Default: 80
 
-:guilabel:`Message Line Length:`
-	Word wrap length of the commit message.  If
-	set, the popup menu can be used to format
-	the message and a warning will be issued
-	if any lines are too long at commit.
-	Default: 0 (unenforced).
+:guilabel:`Close After Commit:`
+	Close the commit tool after every successful commit.  Default: False
 
 :guilabel:`Push After Commit:`
 	Attempt to push to default push target after every successful
-	commit.  Default: False
+	commit.  Default: No push
 
 :guilabel:`Auto Commit List:`
 	Comma separated list of files that are automatically included in
 	every commit.  Intended for use only as a repository setting.
-	Default: None
+	Default: None (leave blank)
 
 :guilabel:`Auto Exclude List:`
 	Comma separated list of files that are automatically unchecked when
-	the status, commit, and shelve dialogs are opened.  Default: None
+	the status, and commit dialogs are opened. Default: None (leave
+	blank)
 
-.. module:: changelog.settings
-	:synopsis: Dialog used to set changelog specific preferences
+:guilabel:`English Messages:`
+	Generate English commit messages even if :envvar:`LANGUAGE` or
+	:envvar:`LANG` environment variables are set to a non-English
+	language. This setting is used by the Merge, Tag and Backout dialogs.
+	Default: False
 
-Changelog
----------
+:guilabel:`New Commit Phase:`
+	The phase of new commits. Default: draft
 
-:guilabel:`Author Coloring:`
-	Color changesets by author name.  If not enabled,
-	the changes are colored green for merge, red for
-	non-trivial parents, black for normal.
-	Default: False.
+:guilabel:`Secret MQ Patches:`
+	Make MQ patches secret (instead of draft). Default: False
 
-:guilabel:`Long Summary:`
-	If true, concatenate multiple lines of changeset summary
-	until they reach 80 characters.
-	Default: False.
+:guilabel:`Check Subrepo Phase:`
+	Check the phase of the current revision of each subrepository.  For
+	settings other than "ignore", the phase of the current revision of
+	each subrepository is checked before committing the parent
+	repository.  Default: follow
 
-:guilabel:`Log Batch Size:`
-	The number of revisions to read and display in the
-	changelog viewer in a single batch.
-	Default: 500.
+:guilabel:`Monitor working directory changes:`
+	Select when the working directory status list will be refreshed:
 
-:guilabel:`Dead Branches:`
-	Comma separated list of branch names that should be ignored when
-	building a list of branch names for a repository.  Default: None
+	``auto`` : default
+	  let TortoiseHg decide when to refresh the working directory status
+	  list. TortoiseHg will refresh the status list whenever it performs
+	  an action that may potentially modify the working directory.
+	  *This may miss any changes that happen outside of TortoiseHg's
+	  control*;
+	``always`` :
+	  in addition to the automatic updates above, also refresh the status
+	  list whenever the user clicks on the "working dir revision" or on
+	  the "Commit icon" on the workbench task bar;
+	``alwayslocal`` :
+	  same as ``always`` but restricts forced refreshes to *local repos*.
 
-:guilabel:`Branch Colors:`
-	Space separated list of branch names and colors of the form
-	branch:#XXXXXX. Spaces and colons in the branch name must be escaped
-	using a backslash (\\). Likewise some other characters can be
-	escaped in this way, e.g. \\u0040 will be decoded to the @
-	character, and \\n to a linefeed.  Default: None
+	Default: auto
 
-:guilabel:`Hide Tags:`
-	Space separated list of tags that will not be shown.
-	Useful example: Specify "qbase qparent qtip" to hide the
-	standard tags inserted by the Mercurial Queues Extension.
-	Default: None.
+:guilabel:`Confirm adding unknown files:`
+	Determines if TortoiseHg should show a confirmation dialog before
+	adding new files in a commit. If True, a confirmation dialog will be
+	showed. If False, selected new files will be included in the commit
+	with no confirmation dialog.  Default: True
 
-.. module:: web.settings
+:guilabel:`Confirm deleting files:`
+	Determines if TortoiseHg should show a confirmation dialog before
+	removing files in a commit. If True, a confirmation dialog will be
+	showed. If False, selected deleted files will be included in the
+	commit with no confirmation dialog.  Default: True
+
+
+.. module:: sync.settings
+	:synopsis: Dialog used to set sync specific preferences
+
+Sync
+----
+
+:guilabel:`After Pull Operation:`
+	Operation which is performed directly after a successful pull. update
+	equates to ``pull --update``, fetch equates to the fetch extension,
+	rebase equates to ``pull --rebase``, updateorrebase equates to ``pull
+	-u --rebase``.  Default: none
+
+:guilabel:`Default Push:`
+	Select the revisions that will be pushed by default, whenever you
+	click the Push button.
+
+	``all`` :
+	  The default. Push all changes in *all branches*.
+	``branch`` :
+	  Push all changes in the *current branch*.
+	``revision`` :
+	  Push the changes in the current branch *up to the current revision*.
+
+	Default: all
+
+:guilabel:`Confirm Push:`
+	Determines if TortoiseHg should show a confirmation dialog before
+	pushing changesets. If False, push will be performed without any
+	confirmation dialog. Default: True
+
+:guilabel:`Target Combo:`
+	Select if TortoiseHg will show a target combo in the sync toolbar.
+
+	``auto`` :
+	  The default. Show the combo if more than one target configured.
+	``always``:
+	  Always show the combo.
+
+	Default: auto
+
+:guilabel:`SSH Command:`
+	Command to use for SSH connections.
+
+	Default: ``ssh`` or ``TortoisePlink.exe -ssh -2`` (Windows)
+
+
+.. module:: server.settings
 	:synopsis: Dialog used to set web server specific preferences
 
-Web
----
+Server
+------
+
+**Repository Details:**
 
 :guilabel:`Name:`
-	Repository name to use in the web interface.
-	Default is the working directory.
+	Repository name to use in the web interface, and by TortoiseHg as a
+	shorthand name.  Default is the working directory.
+
+:guilabel:`Encoding:`
+	Character encoding of files in the repository, used by the web
+	interface and TortoiseHg.
+
+:guilabel:`'Publishing' repository:`
+	Controls draft phase behavior when working as a server. When true,
+	pushed changesets are set to public in both client and server and
+	pulled or cloned changesets are set to public in the client. Default:
+	True
+
+**Web Server:**
 
 :guilabel:`Description:`
 	Textual description of the repository's purpose or
@@ -262,9 +454,6 @@ Web
 	denied, and any authenticated user name present in this list
 	(separated by whitespace or ",") is also denied. The contents
 	of the deny_push list are examined before the allow_push list.
-
-:guilabel:`Encoding:`
-	Character encoding name.
 
 
 .. module:: proxy.settings
@@ -325,8 +514,7 @@ Email
 	Default: 25.
 
 :guilabel:`SMTP TLS:`
-	Connect to mail server using TLS.
-	Default: False.
+	Method to enable TLS when connecting to mail server. Default: none
 
 :guilabel:`SMTP Username:`
 	Username to authenticate to mail server with.
@@ -341,17 +529,26 @@ Email
 .. module:: diff.settings
 	:synopsis: Dialog used to set diff specific preferences
 
-Diff
-----
+Diff and Annotate
+-----------------
 
 :guilabel:`Patch EOL:`
 	Normalize file line endings during and after patch to lf or crlf.
-	Strict does no normalization.  Auto (introduced in hg 1.5) does
-	per-file detection and is the recommended setting.  Default: strict
+	Strict does no normalization.  Auto does per-file detection, and is
+	the recommended setting. Default: strict
 
 :guilabel:`Git Format:`
 	Use git extended diff header format.
 	Default: False.
+
+:guilabel:`MQ Git Format:`
+	When set to ``auto``, mq will automatically use git patches when
+	required  to avoid losing changes to file modes, copy records or
+	binary files. If set to ``keep``, mq will obey the ``[diff]`` section
+	configuration while preserving existing git patches upon qrefresh. If
+	set to ``yes`` or ``no``, mq will override the ``[diff]`` section and
+	always generate git or regular patches, possibly losing data in the
+	second case. Default: auto
 
 :guilabel:`No Dates:`
 	Do not include modification dates in diff headers.
@@ -373,9 +570,19 @@ Diff
 	Ignore changes whose lines are all blank.
 	Default: False.
 
-:guilabel:`Coloring Style:`
-	Adjust the coloring style of diff lines in the changeset viewer.
-	Default: foreground.
+**Annotate:**
+
+:guilabel:`Ignore White Space:`
+	Ignore white space when comparing lines in the annotate view.
+	Default: False
+
+:guilabel:`Ignore WS Amount:`
+	Ignore changes in the amount of white space in the annotate view.
+	Default: False
+
+:guilabel:`Ignore Blank Lines:`
+	Ignore changes whose lines are all blank in the annotate view.
+	Default: False
 
 
 .. module:: font.settings
@@ -384,34 +591,189 @@ Diff
 Font
 ----
 
-:guilabel:`Theme default fonts`
-	Use default fonts based on current GTK theme.
+:guilabel:`Message Font:`
+	Font used to display commit messages. Default: monospace 10
 
-:guilabel:`Preset fonts:`
-	Select preset fonts from drop-down combo.  These font sets are tuned
-	specifically for each language and/or environment.
+:guilabel:`Diff Font:`
+	Font used to display text differences. Default: monospace 10
 
-:guilabel:`Custom fonts:`
-	Set font names and sizes individually for each usage place.
+:guilabel:`List Font:`
+	Font used to display file lists. Default: sans 9
 
-The group which contains drop-down combo entries under
-:guilabel:`Custom fonts:` radio button is enabled when you activate it.
+:guilabel:`ChangeLog Font:`
+	Font used to display changelog data. Default: monospace 10
 
-:guilabel:`Commit Message:`
-	Font used in changeset viewer and commit log text.
-	Default: monospace 10.
+:guilabel:`Output Font:`
+	Font used to display output messages. Default: sans 8
 
-:guilabel:`Diff Text:`
-	Font used for diffs in status and commit tools.
-        Default: monospace 10.
 
-:guilabel:`File List:`
-	Font used in file lists in status and commit tools.
-        Default: sans 9.
+.. module:: issue.settings
+	:synopsis: Dialog used to set issue tracking specific preferences
 
-:guilabel:`Command Output:`
-	Font used in command output window.
-        Default: monospace 10.
+Issue Tracking
+--------------
+
+:guilabel:`Issue Regex:`
+	Defines the regex to match when picking up issue numbers.
+
+:guilabel:`Issue Link:`
+	Defines the command to run when an issue number is recognized. You
+	may include groups in issue.regex, and corresponding ``{n}`` tokens in
+	issue.link (where n is a non-negative integer). ``{0}`` refers to the
+	entire string matched by issue.regex, while ``{1}`` refers to the
+	first group and so on. If no ``{n}`` tokens are found in issue.link,
+	the entire matched string is appended instead.
+
+:guilabel:`Inline Tags:`
+	Show tags at start of commit message.
+
+:guilabel:`Mandatory Issue Reference:`
+	When committing, require that a reference to an issue be specified.
+	If enabled, the regex configured in 'Issue Regex' must find a match
+	in the commit message.
+
+:guilabel:`Issue Tracker Plugin:`
+	Configures a COM ``IBugTraqProvider`` or ``IBugTrackProvider2`` issue
+	tracking plugin.
+
+:guilabel:`Configure Issue Tracker:`
+	Configure the selected COM Bug Tracker plugin.
+
+:guilabel:`Issue Tracker Trigger:`
+	Determines when the issue tracker state will be updated by
+	TortoiseHg. Valid settings values are:
+
+	``never`` :
+	  Do not update the Issue Tracker state automatically.
+	``commit`` :
+	  Update the Issue Tracker state after a successful commit.
+
+	Default: never
+
+:guilabel:`Changeset Link:`
+	A "template string" that, when set, turns the revision number and
+	short hashes that are shown on the revision panels into links.
+	The "template string" uses a "mercurial template"-like syntax that
+	currently accepts two template expressions:
+
+	``{node|short}`` :
+	  replaced by the 12 digit revision id (note that ``{node}`` on its
+	  own is currently unsupported).
+	``{rev}`` :
+	  replaced by the revision number.
+
+	For example, in order to link to bitbucket commit pages you can set
+	this to: ``https://bitbucket.org/tortoisehg/thg/commits/{node|short}``
+
+
+.. module:: reviewboard.settings
+	:synopsis: Dialog used to set review board specific preferences
+
+Review Board
+------------
+
+:guilabel:`Server:`
+	Path to review board example ``http://demo.reviewboard.org``
+
+:guilabel:`User:`
+	User name to authenticate with review board
+
+:guilabel:`Password:`
+	Password to authenticate with review board
+
+:guilabel:`Server Repository ID:`
+	The default repository id for this repo on the review board server
+
+:guilabel:`Target Groups:`
+	A comma separated list of target groups
+
+:guilabel:`Target People:`
+	A comma separated list of target people
+
+
+.. module:: largefiles.settings
+	:synopsis: Dialog used to set largefiles specific preferences
+
+Largefiles
+----------
+
+:guilabel:`Patterns:`
+	Files with names meeting the specified patterns will be automatically
+	added as largefiles
+
+:guilabel:`Minimum Size:`
+	Files of at least the specified size (in megabytes) will be added as
+	largefiles
+
+:guilabel:`User Cache:`
+	Path to the directory where a user's cache of largefiles will be
+	stored
+
+
+.. module:: projrc.settings
+	:synopsis: Dialog used to set projrc specific preferences
+
+Projrc
+------
+
+:guilabel:`Require confirmation:`
+	When to ask the user to confirm the update of the local "projrc"
+	configuration file when the remote projrc file changes. Possible
+	values are:
+
+	``always`` : default
+	  Always show a confirmation prompt before updating the local
+	  ``.hg/projrc`` file.
+	``first`` :
+	  Show a confirmation dialog when the repository is cloned or when a
+	  remote projrc file is found for the first time.
+	``never`` :
+	  Update the local ``.hg/projrc`` file automatically, without
+	  requiring any user confirmation.
+
+:guilabel:`Servers:`
+	List of Servers from which "projrc" configuration files must be
+	pulled. Set it to "*" to pull from all servers. Set it to "default"
+	to pull from the default sync path. Default is pull from NO servers.
+
+:guilabel:`Include:`
+	List of settings that will be pulled from the project configuration
+	file. Default is include NO settings.
+
+:guilabel:`Exclude:`
+	List of settings that will NOT be pulled from the project
+	configuration file. Default is exclude none of the included settings.
+
+:guilabel:`Update on incoming:`
+	Let the user update the projrc on incoming:
+
+	``never`` : default
+	  Show whether the remote projrc file has changed, but do not update
+	  (nor ask to update) the local projrc file.
+	``prompt`` :
+	  Look for changes to the projrc file. If there are changes *always*
+	  show a confirmation prompt, asking the user if it wants to update
+	  its local projrc file.
+	``auto`` :
+	  Look for changes to the projrc file. Use the value of the
+	  "projrc.confirm" configuration key to determine whether to show a
+	  confirmation dialog or not before updating the local projrc file.
+
+	Default: never
+
+
+.. module:: gpg.settings
+	:synopsis: Dialog used to set gpg specific preferences
+
+GnuPG
+-----
+
+:guilabel:`Command:`
+	Specify the path to GPG. Default: gpg
+
+:guilabel:`Key ID:`
+	GPG key ID associated with user. Default: None (leave blank)
+
 
 Keyboard navigation
 ===================

@@ -13,7 +13,7 @@ from PyQt4.QtGui import *
 
 from mercurial import commands, match, ui, util, error
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgqt import qtlib, qscilib

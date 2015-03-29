@@ -114,38 +114,16 @@ class BlockList(QWidget):
         w = self.width() - 1
         h = self.height()
         p = QPainter(self)
-        contentheight = self._maximum - self._minimum + self._pagestep
-        yscale = float(h) / contentheight
-        p.scale(1.0, yscale)
-        p.setPen(Qt.NoPen)
-
-        if yscale < 1.0:
-            minheight = 1.0 / yscale
-        else:
-            minheight = 1.0
-
-        def getmarkerrect(x, y, width, height):
-            """
-            return marker rect with making it's height at least `minheight`.
-            (`minheight` is the height that will be rendered as 1px)
-            """
-            if height < minheight:
-                height = minheight
-                if contentheight < y + minheight:
-                    y = contentheight - minheight
-            return QRectF(x, y, width, height)
-
+        sy = float(h) / (self._maximum - self._minimum + self._pagestep)
         for typ, alo, ahi in self._blocks:
-            p.save()
-            p.setBrush(self.blockTypes[typ])
-            p.drawRect(getmarkerrect(1, alo, w - 1, ahi - alo))
-            p.restore()
+            color = self.blockTypes[typ]
+            p.setPen(color)  # make sure the height is at least 1px
+            p.setBrush(color)
+            p.drawRect(1, alo * sy, w - 1, (ahi - alo) * sy)
 
-        p.save()
         p.setPen(self._vrectbordercolor)
         p.setBrush(self._vrectcolor)
-        p.drawRect(getmarkerrect(0, self._value, w, self._pagestep))
-        p.restore()
+        p.drawRect(0, self._value * sy, w, self._pagestep * sy)
 
     def scrollToPos(self, y):
         # Scroll to the position which specified by Y coodinate.

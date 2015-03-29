@@ -10,7 +10,7 @@ import os, sys
 from mercurial import util
 
 from tortoisehg.util import hglib, shlib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, status, cmdcore, cmdui, lfprompt
 
 from PyQt4.QtCore import *

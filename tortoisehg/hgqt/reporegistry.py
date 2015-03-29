@@ -10,7 +10,7 @@ import os
 from mercurial import commands, hg, ui, util
 
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, repotreemodel, settings
 
 from PyQt4.QtCore import *
@@ -232,6 +232,7 @@ class RepoRegistryView(QDockWidget):
         QDockWidget.__init__(self, parent)
 
         self._repomanager = repomanager
+        repomanager.repositoryOpened.connect(self._addAndScanRepo)
         self.watcher = None
         self._setupSettingActions()
 
@@ -400,8 +401,11 @@ class RepoRegistryView(QDockWidget):
                  if i.column() == 0 and self.tview.isExpanded(i)]
         s.setValue('expanded', paths)
 
-    def addRepo(self, uroot):
+    # TODO: better to handle repositoryOpened signal by model
+    @pyqtSlot(unicode)
+    def _addAndScanRepo(self, uroot):
         """Add repo if not exists; called when the workbench has opened it"""
+        uroot = unicode(uroot)
         m = self.tview.model()
         knownindex = m.indexFromRepoRoot(uroot)
         if knownindex.isValid():

@@ -12,11 +12,10 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from mercurial import error
-from mercurial.node import hex
 
-from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo
+from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib
 
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'close',
                  'tags', 'graft', 'transplant', 'obsolete',

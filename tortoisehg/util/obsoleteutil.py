@@ -36,14 +36,14 @@ def first_known_precursors(ctx):
             if crev is not None:
                 try:
                     yield ctx._repo[crev]
+                    continue
                 except error.RepoLookupError:
                     # filtered-out changeset
                     pass
-            else:
-                for mark in precursorsmarkers(obsstore, current):
-                    if mark[0] not in seen:
-                        candidates.add(mark[0])
-                        seen.add(mark[0])
+            for mark in precursorsmarkers(obsstore, current):
+                if mark[0] not in seen:
+                    candidates.add(mark[0])
+                    seen.add(mark[0])
 
 def first_known_successors(ctx):
     obsstore = getattr(ctx._repo, 'obsstore', None)
@@ -67,12 +67,12 @@ def first_known_successors(ctx):
             if crev is not None:
                 try:
                     yield ctx._repo[crev]
+                    continue
                 except error.RepoLookupError:
                     # filtered-out changeset
                     pass
-            else:
-                for mark in successorsmarkers(obsstore, current):
-                    for succ in mark[1]:
-                        if succ not in seen:
-                            candidates.add(succ)
-                            seen.add(succ)
+            for mark in successorsmarkers(obsstore, current):
+                for succ in mark[1]:
+                    if succ not in seen:
+                        candidates.add(succ)
+                        seen.add(succ)
