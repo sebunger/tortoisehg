@@ -11,7 +11,7 @@ from mercurial import patch
 from hgext import record
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib, fileencoding, lexers
 
 from PyQt4.QtCore import *
@@ -176,8 +176,9 @@ class RejectsDialog(QDialog):
         buf = cStringIO.StringIO()
         chunk = self.chunks[row]
         chunk.write(buf)
+        chunkstr = buf.getvalue().decode(self._textEncoding(), 'replace')
         startline = max(chunk.fromline-1, 0)
-        self.rejectbrowser.showChunk(buf.getvalue().splitlines(True)[1:])
+        self.rejectbrowser.showChunk(chunkstr.splitlines(True)[1:])
         self.editor.setCursorPosition(startline, 0)
         self.editor.ensureLineVisible(startline)
         self.editor.markerDeleteAll(-1)
@@ -200,6 +201,7 @@ class RejectsDialog(QDialog):
                 return
         qscilib.readFile(self.editor, hglib.tounicode(self.path),
                          self._textEncoding())
+        self.showChunk(self.chunklist.currentRow())
 
     def saveSettings(self):
         s = QSettings()
@@ -213,16 +215,16 @@ class RejectsDialog(QDialog):
         if not acceptresolution:
             action = QMessageBox.warning(self,
                 _("Warning"),
-                _("You have marked all rejected patch chunks as resolved yet you " \
-                "have not modified the file on the edit panel.\n\n" \
-                "This probably means that no code from any of the rejected patch " \
-                "chunks made it into the file.\n\n"\
-                "Are you sure that you want to leave the file as is and " \
-                "consider all the rejected patch chunks as resolved?\n\n" \
-                "Doing so may delete them from a shelve, for example, which " \
-                "would mean that you would lose them forever!\n\n"
-                "Click Yes to accept the file as is or No to continue resolving " \
-                "the rejected patch chunks."),
+                _("You have marked all rejected patch chunks as resolved yet "
+                  "you have not modified the file on the edit panel.\n\n"
+                  "This probably means that no code from any of the rejected "
+                  "patch chunks made it into the file.\n\n"
+                  "Are you sure that you want to leave the file as is and "
+                  "consider all the rejected patch chunks as resolved?\n\n"
+                  "Doing so may delete them from a shelve, for example, which "
+                  "would mean that you would lose them forever!\n\n"
+                  "Click Yes to accept the file as is or No to continue "
+                  "resolving the rejected patch chunks."),
                 QMessageBox.Yes, QMessageBox.No)
             if action == QMessageBox.Yes:
                 acceptresolution = True
@@ -271,7 +273,7 @@ class RejectBrowser(qscilib.Scintilla):
         added = []
         removed = []
         for i, line in enumerate(lines):
-            utext.append(hglib.tounicode(line[1:]))
+            utext.append(line[1:])
             if line[0] == '+':
                 added.append(i)
             elif line[0] == '-':

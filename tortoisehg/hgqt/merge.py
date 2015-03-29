@@ -9,7 +9,7 @@
 from mercurial import error, util
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, cmdcore, cmdui, status, resolve
 from tortoisehg.hgqt import qscilib, thgrepo, messageentry, commit, wctxcleaner
 
@@ -584,7 +584,7 @@ class CommitPage(BasePage):
             else:
                 err = hglib.tounicode(str(e))
             qtlib.WarningMsgBox(_('TortoiseHg Merge Commit'),
-                _('Error creating interpreting commit date (%s).\n'
+                _('Error interpreting commit date (%s).\n'
                   'Using current date instead.'), err)
             dcmd = []
 

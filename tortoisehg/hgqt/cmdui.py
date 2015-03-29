@@ -11,7 +11,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, qtlib, qscilib
 
 def startProgress(topic, status):
@@ -74,7 +74,11 @@ class ThgStatusBar(QStatusBar):
         self.lbl = QLabel()
         self.lbl.linkActivated.connect(self.linkActivated)
         self.addWidget(self.lbl)
+        self._busyrepos = set()
+        self._busypbar = QProgressBar(self, minimum=0, maximum=0)
+        self.addWidget(self._busypbar)
         self.setStyleSheet('QStatusBar::item { border: none }')
+        self._updateBusyProgress()
 
     @pyqtSlot(unicode)
     def showMessage(self, ustr, error=False):
@@ -83,6 +87,22 @@ class ThgStatusBar(QStatusBar):
             self.lbl.setStyleSheet('QLabel { color: red }')
         else:
             self.lbl.setStyleSheet('')
+
+    def setRepoBusy(self, root, busy):
+        root = unicode(root)
+        if busy:
+            self._busyrepos.add(root)
+        else:
+            self._busyrepos.discard(root)
+        self._updateBusyProgress()
+
+    def _updateBusyProgress(self):
+        # busy indicator is the last option, which is visible only if no
+        # progress information is available
+        visible = bool(self._busyrepos and not self.topics)
+        self._busypbar.setVisible(visible)
+        if visible:
+            self._busypbar.setMaximumSize(150, self.lbl.sizeHint().height())
 
     @pyqtSlot()
     def clearProgress(self):
@@ -102,6 +122,7 @@ class ThgStatusBar(QStatusBar):
         self.removeWidget(pm)
         pm.setParent(None)
         del self.topics[key]
+        self._updateBusyProgress()
 
     # TODO: migrate to setProgress() API
     @pyqtSlot(QString, object, QString, QString, object)
@@ -124,6 +145,7 @@ class ThgStatusBar(QStatusBar):
             pm.setMaximumHeight(self.lbl.sizeHint().height())
             self.addWidget(pm)
             self.topics[key] = pm
+            self._updateBusyProgress()
         else:
             pm = self.topics[key]
         if total:
@@ -191,12 +213,12 @@ class LogWidget(qscilib.ScintillaCompat):
             # NOTE: self.setMarkerForegroundColor() doesn't take effect,
             # because it's a *Background* marker.
 
-    @pyqtSlot(unicode, str)
+    @pyqtSlot(unicode, unicode)
     def appendLog(self, msg, label):
         """Append log text to the last line; scrolls down to there"""
         self.append(msg)
         self._setmarker(xrange(self.lines() - unicode(msg).count('\n') - 1,
-                               self.lines() - 1), label)
+                               self.lines() - 1), unicode(label))
         self.setCursorPosition(self.lines() - 1, 0)
 
     def _setmarker(self, lines, label):
@@ -205,7 +227,7 @@ class LogWidget(qscilib.ScintillaCompat):
                 self.markerAdd(i, m)
 
     def _markersforlabel(self, label):
-        return iter(self._markers[l] for l in str(label).split()
+        return iter(self._markers[l] for l in label.split()
                     if l in self._markers)
 
     @pyqtSlot()

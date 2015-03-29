@@ -217,7 +217,16 @@ import os
 import itertools
 import collections
 
-from mercurial import error, revset as revsetmod
+from mercurial import revset as revsetmod
+from mercurial import graphmod, phases
+
+try:
+    groupbranchiter = graphmod.groupbranchiter
+except AttributeError:
+    # for hg<3.3
+    def groupbranchiter(revs, *args, **kwargs):
+        """dummy function doing nothing for old version"""
+        return revs
 
 from tortoisehg.util import obsoleteutil
 
@@ -230,6 +239,8 @@ NODE_SHAPE_REVISION = 0
 NODE_SHAPE_CLOSEDBRANCH = 1
 NODE_SHAPE_APPLIEDPATCH = 2
 NODE_SHAPE_UNAPPLIEDPATCH = 3
+NODE_SHAPE_REVISION_DRAFT = 4
+NODE_SHAPE_REVISION_SECRET = 5
 
 
 class StandardDag(object):
@@ -278,7 +289,18 @@ class StandardDag(object):
             if visiblerev(curr_rev):
                 yield repo[curr_rev]
             curr_rev = len(repo) - 1
-        for curr_rev in revsetmod.spanset(repo, curr_rev, stop_rev - 1):
+        revs = revsetmod.spanset(repo, curr_rev, stop_rev - 1)
+        # jump in the branch grouping graph experiment if the user subscribed
+        if repo.ui.configbool('experimental', 'graph-group-branches', False):
+            firstbranch = ()
+            firstbranchrevset = repo.ui.config(
+                'experimental', 'graph-group-branches.firstbranch', '')
+            if firstbranchrevset:
+                firstbranch = repo.revs(firstbranchrevset)
+            parentrevs = repo.changelog.parentrevs
+            revs = list(groupbranchiter(revs, parentrevs, firstbranch))
+
+        for curr_rev in revs:
             if visiblerev(curr_rev):
                 yield repo[curr_rev]
 
@@ -587,7 +609,7 @@ def _iter_graphnodes(dag, nodefactory):
             p = (revs.index(r), next_revs.index(e.endrev))
             lines.append((p, e))
 
-        yield nodefactory(ctx, rev_index, lines)
+        yield nodefactory(dag.repo, ctx, rev_index, lines)
         revs = next_revs
 
 
@@ -644,7 +666,7 @@ class FileDag(object):
 def mq_patch_grapher(repo):
     """Graphs unapplied MQ patches"""
     for patchname in reversed(repo.thgmqunappliedpatches):
-        yield GraphNode(patchname, NODE_SHAPE_UNAPPLIEDPATCH, 0, [])
+        yield GraphNode(NODE_SHAPE_UNAPPLIEDPATCH, name=patchname)
 
 class RevColorPalette(object):
     """Assign node and line colors for each revision"""
@@ -722,48 +744,65 @@ class GraphNode(object):
     Simple class to encapsulate a hg node in the revision graph. Does
     nothing but declaring attributes.
     """
-    __slots__ = ["rev", "shape", "x", "bottomlines", "toplines", "hidden",
-                 "wdparent", "extra"]
+    __slots__ = ["bottomlines",
+                 "extra",
+                 "hidden",
+                 "obsolete",
+                 "rev",
+                 "shape",
+                 "toplines",
+                 "troubles",
+                 "wdparent",
+                 "x"]
 
     @classmethod
-    def fromchangectx(cls, ctx, xposition, lines):
+    def fromchangectx(cls, repo, ctx, xposition, lines):
         if ctx.thgmqappliedpatch():
             shape = NODE_SHAPE_APPLIEDPATCH
         elif ctx.extra().get('close'):
             shape = NODE_SHAPE_CLOSEDBRANCH
+        elif phases.draft == ctx.phase():
+            shape = NODE_SHAPE_REVISION_DRAFT
+        elif phases.secret <= ctx.phase():
+            shape = NODE_SHAPE_REVISION_SECRET
         else:
             shape = NODE_SHAPE_REVISION
-        return cls(ctx.rev(), shape, xposition, lines, ctx.hidden(),
-                   ctx.thgwdparent())
+        wdparent = ctx.node() in repo.dirstate.parents()
+        return cls(shape, ctx=ctx, xposition=xposition, lines=lines,
+                   wdparent=wdparent)
 
     @classmethod
-    def fromfilectx(cls, fctx, xposition, lines):
-        try:
-            ctx = fctx._repo[fctx.rev()]  # get changectx wrapped by thgrepo
-            if ctx.thgmqappliedpatch():
-                shape = NODE_SHAPE_APPLIEDPATCH
-            else:
-                shape = NODE_SHAPE_REVISION
-            hidden = ctx.hidden()
-            wdparent = ctx.thgwdparent()
-        except error.RepoLookupError:
-            # linkrev may point to hidden revision
-            shape = NODE_SHAPE_REVISION
-            hidden = True
-            wdparent = False
-        return cls(fctx.rev(), shape, xposition, lines, hidden, wdparent,
-                   [fctx.path()])
+    def fromfilectx(cls, repo, fctx, xposition, lines):
+        ctx = repo.unfiltered()[fctx.rev()]  # get changectx wrapped by thgrepo
+        obj = cls.fromchangectx(repo, ctx, xposition, lines)
+        obj.extra = [fctx.path()]
+        return obj
 
-    def __init__(self, rev, shape, xposition, lines, hidden=False,
+    def __init__(self, shape, ctx=None, name=None, xposition=0, lines=(),
                  wdparent=False, extra=None):
-        self.rev = rev
+        if name is not None:
+            # unapplied patch use their name as rev
+            assert ctx is None
+            self.rev = name
+            self.hidden = False
+            self.obsolete = False
+            self.troubles = ()
+        else:
+            self.rev = ctx.rev()
+            self.hidden = ctx.hidden()
+            self.obsolete = ctx.obsolete()
+            self.troubles = ctx.troubles()
         self.shape = shape
         self.x = xposition
         self.bottomlines = lines
         self.toplines = []
-        self.hidden = hidden
         self.wdparent = wdparent
         self.extra = extra
+
+    @property
+    def faded(self):
+        return self.hidden or self.obsolete
+
     @property
     def cols(self):
         xs = [self.x]
@@ -822,31 +861,34 @@ class Graph(object):
             else:
                 timer = time.time
             startsec = timer()
+            nnodes = -1  # infinite
+        elif nnodes is None:
+            nnodes = 0
 
-        stopped = False
-
+        if rev is not None and self.nodes:
+            gnode = self.nodes[-1]
+            if isinstance(gnode.rev, int) and gnode.rev <= rev:
+                rev = None  # already reached rev
+        if rev is None and nnodes == 0:
+            return True
         for gnode in self.grapher:
             if self.nodes:
                 gnode.toplines = self.nodes[-1].bottomlines
             self.nodes.append(gnode)
             self.nodesdict[gnode.rev] = gnode
-            if (rev is not None and isinstance(gnode.rev, int)
-                and gnode.rev <= rev):
-                rev = None # we reached rev, switching to nnode counter
             if rev is None:
-                if nnodes is not None:
-                    nnodes -= 1
-                    if not nnodes:
-                        break
+                nnodes -= 1
+            elif isinstance(gnode.rev, int) and gnode.rev <= rev:
+                rev = None  # we reached rev, switching to nnode counter
+            if rev is None and nnodes == 0:
+                return True
             if usetimer:
                 cursec = timer()
                 if cursec < startsec or cursec > startsec + 0.1:
-                    break
-        else:
-            self.grapher = None
-            stopped = True
+                    return True
 
-        return not stopped
+        self.grapher = None
+        return False
 
     def isfilled(self):
         return self.grapher is None

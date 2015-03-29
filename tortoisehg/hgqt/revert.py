@@ -11,7 +11,7 @@ from PyQt4.QtGui import *
 from mercurial.node import nullid
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, qtlib
 
 class RevertDialog(QDialog):

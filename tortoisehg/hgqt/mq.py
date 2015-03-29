@@ -13,7 +13,7 @@ from PyQt4.QtGui import *
 from mercurial import error, util
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, qtlib, cmdui
 from tortoisehg.hgqt import commit, qdelete, qfold, qrename, rejects
 
@@ -505,8 +505,9 @@ class PatchQueueModel(QAbstractListModel):
         else:
             after = None  # next to working rev
         patches = str(data.data('application/vnd.thg.mq.series')).splitlines()
-        if hglib.movemqpatches(repo, after, patches):
-            self._repoagent.pollStatus()
+        cmdline = hglib.buildcmdargs('qreorder', after=after, *patches)
+        cmdline = map(hglib.tounicode, cmdline)
+        self._repoagent.runCommand(cmdline)
         return True
 
     def supportedDropActions(self):

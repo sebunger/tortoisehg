@@ -8,12 +8,12 @@
 
 import os # for os.name
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt.filelistview import HgFileListView
 from tortoisehg.hgqt.fileview import HgFileView
 from tortoisehg.hgqt.revpanel import RevPanelWidget
 from tortoisehg.hgqt import filectxactions, manifestmodel, qtlib, cmdui, status
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

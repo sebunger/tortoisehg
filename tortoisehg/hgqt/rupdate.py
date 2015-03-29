@@ -24,7 +24,7 @@ Also, enable the plugin with the following in mercurial.ini::
 from mercurial import error
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdui, csinfo, qtlib
 
 from PyQt4.QtCore import *

@@ -14,8 +14,8 @@ from mercurial.node import nullrev
 from hgext import record
 
 from tortoisehg.util import hglib, patchctx
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import fileencoding
-from tortoisehg.hgqt.i18n import _
 
 forcedisplaymsg = _('Display the file anyway')
 

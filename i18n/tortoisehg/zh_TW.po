@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2014-08-18 14:01-0300\n"
-"PO-Revision-Date: 2014-06-30 06:05+0000\n"
+"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"PO-Revision-Date: 2015-02-16 16:26+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2014-08-19 06:23+0000\n"
-"X-Generator: Launchpad (build 17156)\n"
+"X-Launchpad-Export-Date: 2015-02-20 05:18+0000\n"
+"X-Generator: Launchpad (build 17341)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -24,11 +24,14 @@ msgstr ""
 msgid "Exit"
 msgstr "離開"
 
+msgid "hg lighthg"
+msgstr ""
+
 msgid "About"
 msgstr "關於"
 
 msgid "Copyright 2008-2014 Steve Borho and others"
-msgstr ""
+msgstr "Copyright 2008-2014 Steve Borho 及其他"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "許多圖示是由TortoiseSVN及Tango projects 所提供"
@@ -576,6 +579,10 @@ msgid "process exited unexpectedly with code %d"
 msgstr "程序意外結束,代碼 %d"
 
 #, python-format
+msgid "failed to encode command: %s"
+msgstr ""
+
+#, python-format
 msgid "timed out while reading: %r..."
 msgstr "讀取逾時: %r ..."
 
@@ -597,6 +604,10 @@ msgstr ""
 msgid "corrupted command result: %r"
 msgstr ""
 
+#, python-format
+msgid "failed to encode input: %s"
+msgstr ""
+
 msgid "Terminated by user"
 msgstr "被使用者終止了"
 
@@ -615,10 +626,6 @@ msgstr "[命令返回碼 %d %%s]"
 #, python-format
 msgid "[command completed successfully %s]"
 msgstr "[命令完成 %s]"
-
-#, python-format
-msgid "ignoring invalid cmdworker '%s'\n"
-msgstr ""
 
 msgid "Running..."
 msgstr "執行中..."
@@ -1213,11 +1220,11 @@ msgstr "命令剖析錯誤: %s"
 msgid "no matches found: %s"
 msgstr "找不到符合的: %s"
 
-msgid "Output Log"
-msgstr "輸出紀錄"
+msgid "Console"
+msgstr ""
 
-msgid "File &History"
-msgstr "檔案歷史 (&H)"
+msgid "File &History / Annotate"
+msgstr ""
 
 msgid "Show the history of the selected file"
 msgstr "顯示選擇檔案的歷史"
@@ -2210,64 +2217,29 @@ msgstr "TortoiseHg 建立了一個新的.hgignore 檔案,你要把他加到儲�
 msgid "Unable to write .hgignore file"
 msgstr "不能寫入.hgignore檔案"
 
+msgid "Copy working directory files from skeleton"
+msgstr ""
+
 msgid "Add special files (.hgignore, ...)"
 msgstr "增加特別的檔案 (.hgignore, ...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "讓儲存庫相容於1.7版之前的Mercurial"
 
-msgid "Show in Workbench after init"
-msgstr "初始化後顯示在工作台"
-
-msgid "Create"
-msgstr "建立"
-
 msgid "New Repository"
 msgstr "新儲存庫"
 
-msgid "Error executing init"
-msgstr "執行初始化錯誤"
-
-msgid "Destination path is empty"
-msgstr "目的地路徑是空的"
-
-msgid "Please enter the directory path"
-msgstr "請輸入目錄"
-
-msgid "Init"
-msgstr "初始化"
-
-#, python-format
-msgid "Are you sure about adding the new repository %d extra levels deep?"
+msgid "&Create"
 msgstr ""
-
-#, python-format
-msgid ""
-"Path exists up to:\n"
-"%s\n"
-"and you asked for:\n"
-"%s"
-msgstr ""
-
-#, python-format
-msgid "Cannot create folder %s"
-msgstr "不能建立 %s 資料夾"
-
-msgid "Unable to create new repository"
-msgstr "不能建立新的儲存庫"
-
-msgid "Error when creating repository"
-msgstr "建立儲存庫時錯誤"
-
-#, python-format
-msgid "<p>Repository successfully created at</p><p>%s</p>"
-msgstr "<p>儲存庫成功建立在</p><p>%s</p>"
 
 msgid "Unable to create a config file"
 msgstr "不能建立一個設定檔"
 
 msgid "Insufficient access rights."
 msgstr "存取權限不對"
+
+msgid "Show Log"
+msgstr "顯示紀錄"
 
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
@@ -2324,7 +2296,7 @@ msgstr "符合(&M)"
 
 #, python-format
 msgid "Find matches - %s"
-msgstr "找到符合 - %s"
+msgstr "找出符合 - %s"
 
 msgid "Revisions to Match:"
 msgstr ""
@@ -2429,7 +2401,7 @@ msgstr "%d個檔案在兩個分支都被改過,得要<a href=\"resolve\"><b>解�
 
 msgid ""
 "No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
-msgstr ""
+msgstr "沒有合併衝突,準備提交或<a href=\"resolve\"><b>預覽</b></a>"
 
 msgid "Commit merge results"
 msgstr "提交合併結果"
@@ -2448,7 +2420,7 @@ msgstr ""
 
 #, python-format
 msgid ""
-"Error creating interpreting commit date (%s).\n"
+"Error interpreting commit date (%s).\n"
 "Using current date instead."
 msgstr ""
 
@@ -2491,6 +2463,9 @@ msgstr "建立補丁序列"
 
 msgid "New patch queue name"
 msgstr "新的補丁佇列名字"
+
+msgid "Create"
+msgstr "建立"
 
 msgid "Rename Patch Queue"
 msgstr "重新命名補丁佇列"
@@ -2760,6 +2735,16 @@ msgstr "連線到Review Board..."
 msgid "Post &Review"
 msgstr ""
 
+msgid "Target:"
+msgstr "目標:"
+
+#, python-format
+msgid "Prune - %s"
+msgstr ""
+
+msgid "&Prune"
+msgstr ""
+
 msgid "No unknown files found"
 msgstr "找不到未知的檔案"
 
@@ -3016,12 +3001,6 @@ msgstr "儲存庫被鎖住"
 msgid "hint:"
 msgstr ""
 
-msgid "Keyboard Interrupt"
-msgstr ""
-
-msgid "Close this application?"
-msgstr "關閉這個應用程式?"
-
 msgid "Repository Error"
 msgstr "儲存庫錯誤"
 
@@ -3053,9 +3032,6 @@ msgstr "沒有配置命令列程式"
 
 msgid "A terminal shell must be configured"
 msgstr "必須要配置一個命令列終端機程式"
-
-msgid "Show Log"
-msgstr "顯示紀錄"
 
 msgid "Please enter a username"
 msgstr "請輸入一個使用者名字"
@@ -3124,7 +3100,7 @@ msgid "To rebase destination"
 msgstr ""
 
 msgid "Swap source and destination"
-msgstr ""
+msgstr "來源跟目的交換"
 
 msgid "Keep original changesets"
 msgstr "保留原始變更集"
@@ -3229,8 +3205,8 @@ msgstr "選擇來源檔"
 msgid "Select Source Folder"
 msgstr "選擇來源目錄"
 
-msgid "Source does not exists."
-msgstr "來源不存在"
+msgid "Source does not exist."
+msgstr ""
 
 msgid "The source must be within the repository tree."
 msgstr "來源必須在儲存庫樹裡面"
@@ -3277,7 +3253,7 @@ msgid "Toggle filtering of non-matched changesets"
 msgstr ""
 
 msgid "Show/Hide hidden changesets"
-msgstr ""
+msgstr "顯示/隱藏被隱藏的變更集"
 
 msgid "Toggle graft relations visibility"
 msgstr ""
@@ -3302,7 +3278,7 @@ msgstr "包括所有的祖先"
 
 msgctxt "column header"
 msgid "Graph"
-msgstr ""
+msgstr "分支圖"
 
 msgctxt "column header"
 msgid "Rev"
@@ -3359,6 +3335,9 @@ msgstr "階段"
 msgctxt "column header"
 msgid "Filename"
 msgstr "檔名"
+
+msgid "Searching..."
+msgstr "搜尋中..."
 
 #, python-format
 msgid "filling (%d)"
@@ -3642,6 +3621,27 @@ msgstr "載入 %s 儲存庫"
 msgid "Repository Registry updated"
 msgstr "儲存庫登錄已被更新"
 
+msgid "Close tab"
+msgstr "關閉分頁"
+
+msgid "Close other tabs"
+msgstr "關閉其他分頁"
+
+msgid "Undo close tab"
+msgstr "復原關閉的分頁"
+
+msgid "Reopen last closed tab"
+msgstr "重新開啟最後關閉的分頁"
+
+msgid "Undo close other tabs"
+msgstr "復原關閉的其他分頁"
+
+msgid "Reopen last closed tab group"
+msgstr "重新開啟最後關閉的分頁群組"
+
+msgid "Failed to open repository"
+msgstr "開啟儲存庫失敗"
+
 msgid "&Sort"
 msgstr ""
 
@@ -3703,12 +3703,16 @@ msgid "Commit"
 msgstr "提交"
 
 msgctxt "tab tooltip"
-msgid "Synchronize"
-msgstr "同步化"
-
-msgctxt "tab tooltip"
 msgid "Search"
 msgstr "搜尋"
+
+msgctxt "tab tooltip"
+msgid "Console log"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Synchronize"
+msgstr "同步化"
 
 msgctxt "tab tooltip"
 msgid "Patch Branch"
@@ -3822,20 +3826,8 @@ msgid ""
 msgstr ""
 "你目前工作的修訂版(%d)將會經由這個回退操作而移除,回到未提交的變更.要繼續嗎?"
 
-msgid "Repository stripped, incoming preview cleared"
+msgid "Tab cannot exit"
 msgstr ""
-
-msgid "Repository stripped, revision set cleared"
-msgstr ""
-
-msgid "Commit tab cannot exit"
-msgstr "提交分頁不能結束"
-
-msgid "Sync tab cannot exit"
-msgstr "同步化分頁不能結束"
-
-msgid "Search tab cannot exit"
-msgstr "搜尋分頁不能結束"
 
 msgid "Pus&h"
 msgstr "推送(&h)"
@@ -3915,6 +3907,9 @@ msgstr "MQ選項(&O)"
 msgid "&Rebase..."
 msgstr ""
 
+msgid "&Prune..."
+msgstr ""
+
 msgid "&Strip..."
 msgstr "剝除(&S)..."
 
@@ -3979,6 +3974,9 @@ msgid "Similar revisions..."
 msgstr "相似的修訂版..."
 
 msgid "Graft Selected to local..."
+msgstr ""
+
+msgid "&Prune Selected..."
 msgstr ""
 
 msgid "Post Selected to Review Board..."
@@ -4189,6 +4187,15 @@ msgid ""
 "application"
 msgstr ""
 
+msgid "&Edit Toolbar"
+msgstr "編輯工具列(&E)"
+
+msgid "&Refresh"
+msgstr "重新整理(&R)"
+
+msgid "&Filter Toolbar"
+msgstr "過濾器工具列(&F)"
+
 #, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "解決衝突 - %s"
@@ -4316,7 +4323,7 @@ msgid "Ma&nifest Mode"
 msgstr ""
 
 msgid "Show all version-controlled files in tree view"
-msgstr ""
+msgstr "在樹狀顯示區內顯示所有被版本控制的檔案"
 
 msgid "&Flat List"
 msgstr ""
@@ -4340,7 +4347,7 @@ msgid "Toggle parent to be used as the base revision"
 msgstr "切換作為基礎的母系修訂版"
 
 msgid "List Optio&ns"
-msgstr ""
+msgstr "列表選項(n)"
 
 #, python-format
 msgid "%s - Revision Details (%s)"
@@ -4534,15 +4541,6 @@ msgid ""
 "a>"
 msgstr ""
 
-msgid "Searching..."
-msgstr "搜尋中..."
-
-msgid "Running"
-msgstr "執行中"
-
-msgid "query"
-msgstr ""
-
 msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
@@ -4618,6 +4616,9 @@ msgstr "顯示說明指引並離開"
 msgid "set/override config option (use 'section.name=value')"
 msgstr ""
 
+msgid "enable debugging output"
+msgstr ""
+
 msgid "start debugger"
 msgstr "開始除錯"
 
@@ -4635,9 +4636,6 @@ msgstr ""
 
 msgid "read file list from file encoding utf-8"
 msgstr ""
-
-msgid "open a new workbench window"
-msgstr "開啟一個新的工作台視窗"
 
 msgid "thg about"
 msgstr ""
@@ -4725,6 +4723,18 @@ msgid "thg debugblockmatcher"
 msgstr ""
 
 msgid "thg debugbugreport [TEXT]"
+msgstr ""
+
+msgid "thg debugconsole"
+msgstr ""
+
+msgid "thg debuglighthg"
+msgstr ""
+
+msgid "thg debugruncommand -- COMMAND [ARGUMENT]..."
+msgstr ""
+
+msgid "no command specified"
 msgstr ""
 
 msgid "thg drag_copy SOURCE... DEST"
@@ -4846,10 +4856,19 @@ msgstr ""
 msgid "thg init [DEST]"
 msgstr ""
 
+msgid "search for a given text or revset"
+msgstr ""
+
 msgid "(DEPRECATED)"
 msgstr ""
 
+msgid "open a new workbench window"
+msgstr "開啟一個新的工作台視窗"
+
 msgid "thg log [OPTIONS] [FILE]"
+msgstr ""
+
+msgid "cannot specify both -k/--query and filenames"
 msgstr ""
 
 msgid "revision to display"
@@ -4874,6 +4893,12 @@ msgid "thg postreview [-r] REV..."
 msgstr ""
 
 msgid "no revisions specified"
+msgstr ""
+
+msgid "revisions to prune"
+msgstr ""
+
+msgid "thg prune [-r] REV..."
 msgstr ""
 
 msgid "thg purge"
@@ -4990,10 +5015,13 @@ msgstr "放棄沒提交的變更(不備份)"
 msgid "do not back up stripped revisions"
 msgstr "不要備份已剝除的修訂版"
 
+msgid "do not modify working copy during strip"
+msgstr ""
+
 msgid "revision to strip"
 msgstr "剝除修訂版"
 
-msgid "thg strip [-f] [-n] [[-r] REV]"
+msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
 msgid "thg sync [PEER]"
@@ -5065,9 +5093,6 @@ msgstr "位置:"
 
 msgid "Update to:"
 msgstr "更新到:"
-
-msgid "Target:"
-msgstr "目標:"
 
 msgid "Options:"
 msgstr "選項:"
@@ -5212,9 +5237,10 @@ msgstr "命令列(shell)"
 msgid ""
 "Specify the command to launch your preferred terminal shell application. If "
 "the value includes the string %(reponame)s, the name of the repository will "
-"be substituted in place of %(reponame)s. (restart needed)<br>Default, "
-"Windows: cmd.exe /K title %(reponame)s<br>Default, OS X: not set<br>Default, "
-"other: xterm -T \"%(reponame)s\""
+"be substituted in place of %(reponame)s. Similarly, %(root)s will be the "
+"full path to the repository. (restart needed)<br>Default, Windows: cmd.exe /"
+"K title %(reponame)s<br>Default, OS X: not set<br>Default, other: xterm -T "
+"\"%(reponame)s\""
 msgstr ""
 
 msgid "Immediate Operations"
@@ -5256,6 +5282,8 @@ msgid ""
 "changelog, status, and commit windows. A value of zero implies no limit.  "
 "Default: 1024 (1MB)"
 msgstr ""
+"TortoiseHg 在變更紀錄、狀態、提交窗格顯示內容的最大大小，以為 KB 單位。0 表示"
+"不限制。預設：1024 (1MB)"
 
 msgid "Fork GUI"
 msgstr ""
@@ -5266,12 +5294,13 @@ msgid ""
 msgstr "當使用命令列執行的時候,衍生一個背景行程來執行視窗對話框. 預設:True"
 
 msgid "Full Path Title"
-msgstr "完整路徑抬頭"
+msgstr "完整路徑標題"
 
 msgid ""
 "Show a full directory path of the repository in the dialog title instead of "
 "just the root directory name.  Default: False"
-msgstr "在對話框標題列上顯示儲存庫的完整路徑,而非只是顯示最上層路徑.預設:False"
+msgstr ""
+"在對話框標題列上顯示儲存庫的完整路徑，而非只顯示最上層路徑。預設：False"
 
 msgid "Auto-resolve merges"
 msgstr "合併時自動解決衝突"
@@ -5283,6 +5312,14 @@ msgid ""
 "merge will report as conflicting, even if the edits are to different parts "
 "of the file. In either case, when conflicts occur, the user will be invited "
 "to review and resolve changes manually. Default: True."
+msgstr ""
+
+msgid "New Repo Skeleton"
+msgstr ""
+
+msgid ""
+"If specified, files in the directory, e.g. .hgignore, are copied to the "
+"newly-created repository."
 msgstr ""
 
 msgid "Workbench"
@@ -5298,12 +5335,12 @@ msgid ""
 msgstr ""
 
 msgid "Default widget"
-msgstr "預設視窗組件"
+msgstr "預設視窗元件"
 
 msgid ""
 "Select the initial widget that will be shown when opening a repository. "
 "Default: revdetails"
-msgstr "當開啟儲存庫時首先出現的視窗組件.預設:revdetails"
+msgstr "開啟儲存庫時首先出現的視窗元件。預設：revdetails"
 
 msgid ""
 "Select the initial revision that will be selected when opening a "
@@ -5326,7 +5363,7 @@ msgid "Author Coloring"
 msgstr "作者色彩"
 
 msgid "Color changesets by author name. Default: False"
-msgstr ""
+msgstr "依作者以顏色區分變更。預設：否"
 
 msgid "Full Authorname"
 msgstr "完整作者名"
@@ -5343,7 +5380,8 @@ msgid ""
 "Show tabs along the side of the bottom half of each repo widget allowing one "
 "to switch task tabs without using the toolbar. Default: off"
 msgstr ""
-"將任務工具列的按鈕化成儲存庫畫面上的分頁標籤,你就不再需要任務工具列.預設: off"
+"將任務工具列的按鈕化成儲存庫畫面上的分頁標籤，你就不再需要任務工具列。預設："
+"off"
 
 msgid "Task Toolbar Order"
 msgstr "任務工具列指定"
@@ -5364,12 +5402,12 @@ msgid ""
 msgstr ""
 
 msgid "Log Batch Size"
-msgstr ""
+msgstr "日誌批次大小"
 
 msgid ""
 "The number of revisions to read and display in the changelog viewer in a "
 "single batch. Default: 500"
-msgstr ""
+msgstr "顯示變更紀錄時，一次讀取的修訂版本數。預設：500"
 
 msgid "Dead Branches"
 msgstr "死亡的分支"
@@ -5394,7 +5432,7 @@ msgid "Hide Tags"
 msgstr "隱藏標籤"
 
 msgid ""
-"Space separated list of tags that will not be shown.Useful example: Specify "
+"Space separated list of tags that will not be shown. Useful example: Specify "
 "\"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial "
 "Queues Extension. Default: None (leave blank)"
 msgstr ""
@@ -5911,7 +5949,7 @@ msgid "ChangeLog Font"
 msgstr "變更紀錄字型"
 
 msgid "Font used to display changelog data. Default: monospace 10"
-msgstr "顯示變更紀錄資料用的字型. 預設:monospace 10"
+msgstr "變更紀錄窗格內資料的字型。預設：monospace 10"
 
 msgid "Output Font"
 msgstr "輸出字型"
@@ -5945,7 +5983,8 @@ msgid ""
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
 "(where n is a non-negative integer). {0} refers to the entire string matched "
 "by issue.regex, while {1} refers to the first group and so on. If no {n} "
-"tokensare found in issue.link, the entire matched string is appended instead."
+"tokens are found in issue.link, the entire matched string is appended "
+"instead."
 msgstr ""
 
 msgid "Inline Tags"
@@ -5995,9 +6034,9 @@ msgid ""
 "hashes that are shown on the revision panels into links.<br>The \"template "
 "string\" uses a \"mercurial template\"-like syntax that currently accepts "
 "two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported).<li>"
-"{rev} : replaced by the revision number.</ul>For example, in order to link "
-"to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
+"revision id (note that {node} on its own is currently unsupported)."
+"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
 "tortoisehg/thg/commits/{node|short}"
 msgstr ""
 
@@ -6097,7 +6136,7 @@ msgstr ""
 msgid ""
 "List of Servers from which \"projrc\" configuration files must be pulled. "
 "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull from "
-"the default sync path.Default is pull from NO servers."
+"the default sync path. Default is pull from NO servers."
 msgstr ""
 
 msgid "Include"
@@ -6278,8 +6317,19 @@ msgstr "顯示圖示"
 msgid "Highlight Icon"
 msgstr "高亮度圖示"
 
-msgid "TortoiseHg Shell Configuration"
-msgstr "TortoiseHg命令列設置"
+#. i18n: URL of TortoiseSVN documentation
+msgid ""
+"http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
+"html#tsvn-dug-settings-icon-set"
+msgstr ""
+
+#, python-format
+msgid ""
+"You can change the icon set from <a href=\"%s\">TortoiseSVN's Settings</a>"
+msgstr ""
+
+msgid "Explorer Extension Settings - TortoiseHg"
+msgstr ""
 
 msgid "Clear"
 msgstr "清除"
@@ -6588,15 +6638,15 @@ msgstr "在儲存庫設定檔裡的路徑:"
 msgid "Related Paths:"
 msgstr "相關的路徑:"
 
-#, python-format
-msgid "rev: %d (%s)"
-msgstr ""
-
 msgid "branch: "
 msgstr "分支: "
 
 msgid "bookmark: "
 msgstr "書籤: "
+
+#, python-format
+msgid "rev: %d (%s)"
+msgstr ""
 
 msgid "Post Pull: "
 msgstr "拉收之後: "
@@ -6687,10 +6737,6 @@ msgstr "從 %s 那邊尋找可被推送的變更集"
 #, python-format
 msgid "%d outgoing changesets to %s"
 msgstr "%d個可被推送的變更集到%s"
-
-#, python-format
-msgid "outgoing changesets to %s found"
-msgstr ""
 
 #, python-format
 msgid "No outgoing changesets to %s"
@@ -6786,12 +6832,6 @@ msgstr "包裹檔(*.hg)"
 
 msgid "Unable to remove URL"
 msgstr "不能移除URL"
-
-msgid "TortoiseHg Sync"
-msgstr ""
-
-msgid "Are you sure that you want to cancel synchronization?"
-msgstr "你確定你要取消同步?"
 
 msgid "Post Pull Behavior"
 msgstr "推送後的行為"
@@ -6988,16 +7028,6 @@ msgid "Move"
 msgstr "搬移"
 
 #, python-format
-msgid "Tag '%s' already exists"
-msgstr "標籤 '%s'已經存在"
-
-msgid "uncommitted merge"
-msgstr "未提交的合併"
-
-msgid "not at a branch head (use force)"
-msgstr "不是一個分支標頭(使用強制)"
-
-#, python-format
 msgid "Moved tag %s to changeset %s (from changeset %s)"
 msgstr "移動標籤%s到%s變更集(從%s變更集)"
 
@@ -7012,14 +7042,6 @@ msgstr "標籤'%s'已經移動了"
 #, python-format
 msgid "Tag '%s' has been added"
 msgstr "標籤'%s'已經增加了"
-
-#, python-format
-msgid "tag '%s' is not a local tag"
-msgstr "'%s'不是一個本地標籤"
-
-#, python-format
-msgid "tag '%s' is not a global tag"
-msgstr "'%s'標籤不是一個全域標籤"
 
 #, python-format
 msgid "Removed tag %s"
@@ -7086,6 +7108,9 @@ msgstr "放棄本地工作複本的變更,不備份(-f/--force)"
 msgid "No backup (-n/--nobackup)"
 msgstr "不備份 (-n/--nobackup)"
 
+msgid "Do not modify working copy during strip (-k/--keep)"
+msgstr ""
+
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
 msgid_plural "<b>%d changesets</b> will be stripped"
@@ -7115,12 +7140,6 @@ msgstr "剝除 - %s"
 
 msgid "&Strip"
 msgstr "剝除(&S)"
-
-msgid "response expected"
-msgstr ""
-
-msgid "password: "
-msgstr "密碼: "
 
 msgid "Parent 1:"
 msgstr "母系 1:"
@@ -7330,9 +7349,6 @@ msgstr "儲存庫(&R)"
 msgid "&Help"
 msgstr "說明(&H)"
 
-msgid "&Edit Toolbar"
-msgstr "編輯工具列(&E)"
-
 msgid "&Dock Toolbar"
 msgstr "停駐工具列(&D)"
 
@@ -7354,14 +7370,20 @@ msgstr "顯示儲存庫紀錄(&o)"
 msgid "Show &Patch Queue"
 msgstr "顯示補丁佇列(&P)"
 
-msgid "Show Output &Log"
-msgstr "顯示輸出記錄(&L)"
+msgid "Show Conso&le"
+msgstr "顯示Console(&l)"
+
+msgid "Place Console in Doc&k Area"
+msgstr "(&k)把Console放在Dock區"
 
 msgid "R&epository Registry Options"
 msgstr "儲存庫登錄選項(&e)"
 
 msgid "Save Open Repositories on E&xit"
 msgstr "結束時儲存已開啟的儲存庫(&x)"
+
+msgid "Sa&ve Current Sync Paths on Exit"
+msgstr ""
 
 msgid "&Commit"
 msgstr "提交(&C)"
@@ -7377,9 +7399,6 @@ msgstr "搜尋(&S)"
 
 msgid "S&ynchronize"
 msgstr "同步化(&y)"
-
-msgid "&Refresh"
-msgstr "重新整理(&R)"
 
 msgid "Refresh current repository"
 msgstr "重新整理目前儲存庫"
@@ -7404,9 +7423,6 @@ msgstr "前往修訂版(&G)..."
 
 msgid "Go to a specific revision"
 msgstr "前往一個指定的修訂版"
-
-msgid "&Filter Toolbar"
-msgstr "過濾器工具列(&F)"
 
 msgid "Filter graph with revision sets or branches"
 msgstr ""
@@ -7521,29 +7537,8 @@ msgstr "從 %s 那邊推送可被推送的變更集"
 msgid "Execute custom tool '%s'"
 msgstr "執行自訂工具 '%s'"
 
-msgid "Close tab"
-msgstr "關閉分頁"
-
-msgid "Close other tabs"
-msgstr "關閉其他分頁"
-
-msgid "Undo close tab"
-msgstr "復原關閉的分頁"
-
-msgid "Reopen last closed tab"
-msgstr "重新開啟最後關閉的分頁"
-
-msgid "Undo close other tabs"
-msgstr "復原關閉的其他分頁"
-
-msgid "Reopen last closed tab group"
-msgstr "重新開啟最後關閉的分頁群組"
-
 msgid "Custom Toolbar &Settings"
 msgstr "自訂工具列設定(&S)"
-
-msgid "Failed to open repository"
-msgstr "開啟儲存庫失敗"
 
 msgid "TortoiseHg Workbench"
 msgstr "TortoiseHg工作台"
@@ -7555,13 +7550,6 @@ msgstr "%s - TortoiseHg工作台 - %s"
 #, python-format
 msgid "%s - TortoiseHg Workbench"
 msgstr "%s - TortoiseHg工作台"
-
-msgid "Reopening tabs"
-msgstr "重開分頁中"
-
-#, python-format
-msgid "Reopening repository %s"
-msgstr "重新開啟 %s 儲存庫"
 
 msgid "Goto revision"
 msgstr "前往修訂版"
@@ -7592,74 +7580,35 @@ msgid "This error will not be shown again until you restart the workbench"
 msgstr "這錯誤不會再顯示,除非你重新啟動工作台"
 
 msgid "Error getting commit message information from Issue Tracker plugin"
-msgstr ""
+msgstr "從Issue Tracker plugin取得提交訊息時發生錯誤"
 
 msgid "Error executing \"commit finished\" trigger"
-msgstr ""
+msgstr "正在執行\"commit finished\"觸發器時發生錯誤"
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "不能開啟Plugin選項對話框"
 
-#, python-format
-msgid ""
-"hg: command '%s' is ambiguous:\n"
-"    %s\n"
+msgid "move after the specified patch"
 msgstr ""
-"hg 命令 '%s' 曖昧不明:\n"
-"%s\n"
 
-#, python-format
-msgid "hg: parse error at %s: %s\n"
-msgstr "hg: 剖析錯誤在%s: %s\n"
+msgid "[--after PATCH] PATCH..."
+msgstr ""
 
-#, python-format
-msgid "hg: parse error: %s\n"
-msgstr "hg: 剖析錯誤: %s\n"
+msgid "unknown patch to move specified"
+msgstr ""
 
-#, python-format
-msgid "timed out waiting for lock held by %s"
+msgid "invalid patch position specified"
+msgstr ""
+
+msgid "cannot move applied patches"
 msgstr ""
 
 #, python-format
-msgid "lock held by %s"
+msgid "patch %s not in series"
 msgstr ""
 
-#, python-format
-msgid "abort: %s: %s\n"
-msgstr "中止: %s: %s\n"
-
-#, python-format
-msgid "abort: could not lock %s: %s\n"
-msgstr "中止: 不能鎖住%s: %s\n"
-
-#, python-format
-msgid "hg %s: %s\n"
+msgid "cannot move into applied patches"
 msgstr ""
-
-#, python-format
-msgid "hg: %s\n"
-msgstr ""
-
-msgid "abort: remote error:\n"
-msgstr "中止:遠端錯誤:\n"
-
-#, python-format
-msgid "abort: %s"
-msgstr "中止:%s"
-
-msgid " empty string\n"
-msgstr " 空字串\n"
-
-#, python-format
-msgid "hg: unknown command '%s'\n"
-msgstr ""
-
-#, python-format
-msgid "abort: error: %s\n"
-msgstr "中止: 錯誤: %s\n"
-
-msgid "broken pipe\n"
-msgstr "管線中斷\n"
 
 msgid "abort: "
 msgstr "中止: "
@@ -7904,6 +7853,9 @@ msgstr ""
 #, python-format
 msgid "unrecognized response: %s"
 msgstr ""
+
+msgid "password: "
+msgstr "密碼: "
 
 #, python-format
 msgid "repository %s not found"
@@ -8731,6 +8683,12 @@ msgstr ""
 #~ msgid "TortoiseHg Clone"
 #~ msgstr "TortoiseHg 拓製"
 
+#~ msgid "Destination path is empty"
+#~ msgstr "目的地路徑是空的"
+
+#~ msgid "Error when creating repository"
+#~ msgstr "建立儲存庫時錯誤"
+
 #~ msgid "Failed to clone"
 #~ msgstr "拓製失敗"
 
@@ -8767,6 +8725,9 @@ msgstr ""
 #~ msgid "Error while reading status"
 #~ msgstr "讀取訊息時錯誤"
 
+#~ msgid "Please enter the directory path"
+#~ msgstr "請輸入目錄"
+
 #~ msgid ""
 #~ "** Please report this bug to http://bitbucket.org/tortoisehg/stable/"
 #~ "issues\n"
@@ -8792,6 +8753,9 @@ msgstr ""
 
 #~ msgid "working parents"
 #~ msgstr "工作母系"
+
+#~ msgid "Unable to create new repository"
+#~ msgstr "不能建立新的儲存庫"
 
 #~ msgid "There is no Mercurial repository here (.hg not found)"
 #~ msgstr "這裡沒有Mercurial儲存庫(我找不到.hg目錄)"
@@ -9002,6 +8966,9 @@ msgstr ""
 
 #~ msgid "New Patch Name"
 #~ msgstr "新增補丁名字"
+
+#~ msgid "Source does not exists."
+#~ msgstr "來源不存在"
 
 #~ msgid "Capture stderr"
 #~ msgstr "抓取標準錯誤(stderr)"
@@ -9214,6 +9181,9 @@ msgstr ""
 #~ msgid "Confirm Forced Push"
 #~ msgstr "確認強制推送"
 
+#~ msgid "tag '%s' is not a global tag"
+#~ msgstr "'%s'標籤不是一個全域標籤"
+
 #~ msgid "View missing"
 #~ msgstr "檢視遺失"
 
@@ -9243,6 +9213,9 @@ msgstr ""
 
 #~ msgid "Confirm Fold"
 #~ msgstr "確認折疊"
+
+#~ msgid "tag '%s' is not a local tag"
+#~ msgstr "'%s'不是一個本地標籤"
 
 #~ msgid "tag '%s' does not exist"
 #~ msgstr "Tag '%s' 不存在"
@@ -9320,6 +9293,9 @@ msgstr ""
 #~ "If true, concatenate multiple lines of changeset summary until they reach "
 #~ "80 characters. Default: False"
 #~ msgstr "假如是 true的話,串聯多行的變更摘要,直到他們達到80個字符 預設:False"
+
+#~ msgid "TortoiseHg Shell Configuration"
+#~ msgstr "TortoiseHg命令列設置"
 
 #~ msgid "Verify"
 #~ msgstr "驗證"
@@ -9774,3 +9750,14 @@ msgstr ""
 
 #~ msgid "Backout..."
 #~ msgstr "回退 ..."
+
+#~ msgid "Are you sure that you want to cancel synchronization?"
+#~ msgstr "你確定你要取消同步?"
+
+#~ msgid ""
+#~ "Space separated list of tags that will not be shown.Useful example: "
+#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
+#~ "Mercurial Queues Extension. Default: None (leave blank)"
+#~ msgstr ""
+#~ "不會顯示的標籤列表，以空格隔開。例如：設為「qbase qparent qtip」以隱藏 "
+#~ "Mercurial Queues 擴充套件插入的標籤。預設：無 (留空)"

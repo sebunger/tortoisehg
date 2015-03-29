@@ -14,7 +14,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdui, cslist, qtlib, commit
 
 _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),

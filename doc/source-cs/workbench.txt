@@ -95,7 +95,7 @@ Editovací lišta
   Dialog pro aktualizaci zadané revize.	 
 
 Pracovní lišta filtru
---------------------
+---------------------
 
 Tato lišta slouží pro zadávání vyhledávacích vzorů při vyhledávání specifikovaných revizí.
   

@@ -12,7 +12,7 @@ import shutil
 from mercurial import hg, scmutil, ui
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _, ngettext
+from tortoisehg.util.i18n import _, ngettext
 from tortoisehg.hgqt import qtlib, cmdui
 
 from PyQt4.QtCore import *

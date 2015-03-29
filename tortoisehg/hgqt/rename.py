@@ -13,9 +13,9 @@ from PyQt4.QtGui import *
 
 from mercurial import util
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, qtlib, manifestmodel
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 
 class RenameWidget(cmdui.AbstractCmdWidget):
 
@@ -36,7 +36,9 @@ class RenameWidget(cmdui.AbstractCmdWidget):
         self.src_btn = QPushButton(_('Browse...'))
         self.dest_txt = QLineEdit(destination or source or '')
         self.dest_btn = QPushButton(_('Browse...'))
-        comp = manifestmodel.ManifestCompleter(self)
+        # use QCompleter(model, parent) to avoid ownership bug of
+        # QCompleter(parent /TransferBack/) in PyQt<4.11.4
+        comp = manifestmodel.ManifestCompleter(None, self)
         comp.setModel(manifestmodel.ManifestModel(repoagent, comp))
         for lbl, txt, btn in [
                 (_('Source:'), self.src_txt, self.src_btn),
@@ -154,7 +156,7 @@ class RenameWidget(cmdui.AbstractCmdWidget):
                                   v=True, f=True)
 
     def show_command(self, cmdline):
-        self.hgcmd_txt.setText('hg %s' % ' '.join(cmdline))
+        self.hgcmd_txt.setText('hg %s' % hglib.prettifycmdline(cmdline))
 
     def canRunCommand(self):
         src, dest = self.source(), self.destination()
@@ -166,7 +168,7 @@ class RenameWidget(cmdui.AbstractCmdWidget):
         # check inputs
         fullsrc, fulldest = self._sourceFile(), self._destinationFile()
         if not os.path.exists(fullsrc):
-            qtlib.WarningMsgBox(self.msgTitle, _('Source does not exists.'))
+            qtlib.WarningMsgBox(self.msgTitle, _('Source does not exist.'))
             return cmdcore.nullCmdSession()
         if not fullsrc.startswith(self._repoagent.rootPath()):
             qtlib.ErrorMsgBox(self.errTitle,

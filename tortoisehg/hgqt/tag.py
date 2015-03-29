@@ -5,9 +5,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdcore, qtlib, i18n
+from tortoisehg.util import hglib, i18n
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import cmdcore, qtlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -18,7 +18,7 @@ class TagDialog(QDialog):
 
     def __init__(self, repoagent, tag='', rev='tip', parent=None, opts={}):
         super(TagDialog, self).__init__(parent)
-        self.setWindowFlags(self.windowFlags() & \
+        self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 
         self._repoagent = repoagent
@@ -29,14 +29,14 @@ class TagDialog(QDialog):
         # base layout box
         base = QVBoxLayout()
         base.setSpacing(0)
-        base.setContentsMargins(*(0,)*4)
+        base.setContentsMargins(0, 0, 0, 0)
         base.setSizeConstraint(QLayout.SetFixedSize)
         self.setLayout(base)
 
         # main layout box
         box = QVBoxLayout()
         box.setSpacing(8)
-        box.setContentsMargins(*(8,)*4)
+        box.setContentsMargins(8, 8, 8, 8)
         self.layout().addLayout(box)
 
         form = QFormLayout(fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow)
@@ -246,30 +246,19 @@ class TagDialog(QDialog):
             message = None
 
         exists = tag in self.repo.tags()
-        if exists and not force:
-            self.set_status(_("Tag '%s' already exists") % tagu, False)
-            return
         if not local:
-            parents = self.repo.parents()
-            if len(parents) > 1:
-                self.set_status(_('uncommitted merge'), False)
-                return
-            p1 = parents[0]
-            if not force and p1.node() not in hglib.branchheads(self.repo):
-                self.set_status(_('not at a branch head (use force)'), False)
-                return
             if not message:
                 ctx = self.repo[self.rev]
                 if exists:
                     origctx = self.repo[self.repo.tags()[tag]]
-                    msgset = keep._('Moved tag %s to changeset %s' \
-                        ' (from changeset %s)')
-                    message = (english and msgset['id'] or msgset['str']) \
-                       % (tagu, str(ctx), str(origctx))
+                    msgset = keep._('Moved tag %s to changeset %s'
+                                    ' (from changeset %s)')
+                    message = ((english and msgset['id'] or msgset['str'])
+                               % (tagu, str(ctx), str(origctx)))
                 else:
                     msgset = keep._('Added tag %s for changeset %s')
-                    message = (english and msgset['id'] or msgset['str']) \
-                               % (tagu, str(ctx))
+                    message = ((english and msgset['id'] or msgset['str'])
+                               % (tagu, str(ctx)))
 
         if exists:
             finishmsg = _("Tag '%s' has been moved") % tagu
@@ -285,7 +274,6 @@ class TagDialog(QDialog):
 
     def onRemoveTag(self):
         tagu = self.tagCombo.currentText()
-        tag = hglib.fromunicode(tagu)
         local = self.localCheckBox.isChecked()
         force = self.replaceCheckBox.isChecked()
         english = self.englishCheckBox.isChecked()
@@ -294,29 +282,14 @@ class TagDialog(QDialog):
         else:
             message = None
 
-        tagtype = self.repo.tagtype(tag)
-        if local:
-            if tagtype != 'local':
-                self.set_status(_("tag '%s' is not a local tag") % tagu, False)
-                return
-        else:
-            if tagtype != 'global':
-                self.set_status(_("tag '%s' is not a global tag") % tagu, False)
-                return
-            parents = self.repo.parents()
-            if len(parents) > 1:
-                self.set_status(_('uncommitted merge'), False)
-                return
-            p1 = parents[0]
-            if not force and p1.node() not in hglib.branchheads(self.repo):
-                self.set_status(_('not at a branch head (use force)'), False)
-                return
+        if not local:
             if not message:
                 msgset = keep._('Removed tag %s')
                 message = (english and msgset['id'] or msgset['str']) % tagu
 
         finishmsg = _("Tag '%s' has been removed") % tagu
-        self._runTag(tagu, remove=True, local=local, message=message,
+        self._runTag(tagu, remove=True,
+                     local=local, force=force, message=message,
                      finishmsg=finishmsg)
 
     def reject(self):

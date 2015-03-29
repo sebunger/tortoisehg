@@ -11,8 +11,8 @@ import re, os, weakref
 from mercurial import util
 
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -120,8 +120,10 @@ class _SciImSupport(object):
 class ScintillaCompat(QsciScintilla):
     """Scintilla widget with compatibility patches"""
 
-    # QScintilla 2.8 can handle input method events properly
-    if QSCINTILLA_VERSION < 0x20800:
+    # QScintilla 2.8.4 still can't handle input method events properly.
+    # For example, it fails to delete the last preedit text by ^H, and
+    # editing position goes wrong. So we sticks to our version.
+    if True:
         def __init__(self, parent=None):
             super(ScintillaCompat, self).__init__(parent)
             self._imsupport = _SciImSupport(self)

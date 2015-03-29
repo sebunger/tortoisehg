@@ -6,7 +6,7 @@
 # GNU General Public License version 2 or any later version.
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import repotreeitem
 
 from PyQt4.QtCore import *
@@ -373,6 +373,7 @@ class RepoTreeModel(QAbstractItemModel):
     def activeRepoIndex(self, column=0):
         return self._indexFromItem(self._activeRepoItem, column)
 
+    # TODO: rename loadSubrepos() and appendSubrepos() to scanRepo() ?
     def loadSubrepos(self, index):
         """Scan subrepos of the repo; returns list of invalid paths"""
         item = index.internalPointer()
@@ -390,7 +391,9 @@ class RepoTreeModel(QAbstractItemModel):
             for e in tmpitem.childs:
                 item.appendChild(e)
             self.endInsertRows()
-        if item._valid != tmpitem._valid:
+        if (item._sharedpath != tmpitem._sharedpath
+            or item._valid != tmpitem._valid):
+            item._sharedpath = tmpitem._sharedpath
             item._valid = tmpitem._valid
             self._emitItemDataChanged(item)
         return map(hglib.tounicode, invalidpaths)

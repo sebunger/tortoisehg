@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import gc, os, platform, sys, traceback
+import gc, os, platform, signal, sys, traceback
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import QApplication, QFont
@@ -20,7 +20,7 @@ if PYQT_VERSION < 0x40600 or QT_VERSION < 0x40600:
 
 from mercurial import error, util
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import bugreport, qtlib, thgrepo, workbench
@@ -85,6 +85,8 @@ class ExceptionCatcher(QObject):
         self._ui.debug('setting up excepthook\n')
         self._origexcepthook = sys.excepthook
         sys.excepthook = self.ehook
+        self._originthandler = signal.signal(signal.SIGINT, self._inthandler)
+        self._initWakeup()
 
     def release(self):
         if not self._origexcepthook:
@@ -92,6 +94,9 @@ class ExceptionCatcher(QObject):
         self._ui.debug('restoring excepthook\n')
         sys.excepthook = self._origexcepthook
         self._origexcepthook = None
+        signal.signal(signal.SIGINT, self._originthandler)
+        self._originthandler = None
+        self._releaseWakeup()
 
     def ehook(self, etype, evalue, tracebackobj):
         'Will be called by any thread, on any unhandled exception'
@@ -140,12 +145,6 @@ class ExceptionCatcher(QObject):
             dlg = bugreport.ExceptionMsgBox(hglib.tounicode(str(evalue)),
                                             errstr, opts, parent=parent)
             dlg.exec_()
-        elif etype is KeyboardInterrupt:
-            self.errors = []
-            if qtlib.QuestionMsgBox(_('Keyboard Interrupt'),
-                                    _('Close this application?'),
-                                    parent=parent):
-                self._mainapp.exit(-1)
         else:
             dlg = bugreport.BugReport(opts, parent=parent)
             dlg.exec_()
@@ -153,6 +152,64 @@ class ExceptionCatcher(QObject):
     def _printexception(self):
         for args in self.errors:
             traceback.print_exception(*args)
+
+    def _inthandler(self, signum, frame):
+        # QTimer makes sure to not enter new event loop in signal handler,
+        # which will be invoked at random location.  Note that some windows
+        # may show modal confirmation dialog in closeEvent().
+        QTimer.singleShot(0, self._mainapp.closeAllWindows)
+
+    if os.name == 'posix' and util.safehasattr(signal, 'set_wakeup_fd'):
+        # Wake up Python interpreter via pipe so that SIGINT can be handled
+        # immediately.  (http://qt-project.org/doc/qt-4.8/unix-signals.html)
+
+        def _initWakeup(self):
+            import fcntl
+            rfd, wfd = os.pipe()
+            for fd in (rfd, wfd):
+                flags = fcntl.fcntl(fd, fcntl.F_GETFL)
+                fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+            self._wakeupsn = QSocketNotifier(rfd, QSocketNotifier.Read, self)
+            self._wakeupsn.activated.connect(self._handleWakeup)
+            self._origwakeupfd = signal.set_wakeup_fd(wfd)
+
+        def _releaseWakeup(self):
+            self._wakeupsn.setEnabled(False)
+            rfd = self._wakeupsn.socket()
+            wfd = signal.set_wakeup_fd(self._origwakeupfd)
+            self._origwakeupfd = -1
+            os.close(rfd)
+            os.close(wfd)
+
+        @pyqtSlot()
+        def _handleWakeup(self):
+            # here Python signal handler will be invoked
+            self._wakeupsn.setEnabled(False)
+            rfd = self._wakeupsn.socket()
+            try:
+                os.read(rfd, 1)
+            except OSError, inst:
+                self._ui.debug('failed to read wakeup fd: %s\n' % inst)
+            self._wakeupsn.setEnabled(True)
+
+    else:
+        # On Windows, non-blocking anonymous pipe or socket is not available.
+        # So run Python instruction at a regular interval.  Because it wastes
+        # CPU time, it is disabled if thg is known to be detached from tty.
+
+        def _initWakeup(self):
+            self._wakeuptimer = 0
+            if self._ui.interactive():
+                self._wakeuptimer = self.startTimer(200)
+
+        def _releaseWakeup(self):
+            if self._wakeuptimer > 0:
+                self.killTimer(self._wakeuptimer)
+                self._wakeuptimer = 0
+
+        def timerEvent(self, event):
+            # nop for instant SIGINT handling
+            pass
 
 
 class GarbageCollector(QObject):
@@ -313,6 +370,7 @@ class QtRunner(QObject):
         self._mainapp = QApplication(sys.argv)
         self._exccatcher = ExceptionCatcher(ui, self._mainapp, self)
         self._gc = GarbageCollector(ui, self)
+
         # default org is used by QSettings
         self._mainapp.setApplicationName('TortoiseHgQt')
         self._mainapp.setOrganizationName('TortoiseHg')
@@ -433,6 +491,18 @@ class QtRunner(QObject):
         assert not self._workbench
         self._workbench = workbench.Workbench(self._ui, self._repomanager)
         return self._workbench
+
+    @pyqtSlot(unicode)
+    def openRepoInWorkbench(self, uroot):
+        """Show the specified repository in Workbench; reuses the existing
+        Workbench process"""
+        assert self._ui
+        singlewb = self._ui.configbool('tortoisehg', 'workbench.single', True)
+        # only if the server is another process; otherwise it would deadlock
+        if (singlewb and not self._server
+            and connectToExistingWorkbench(hglib.fromunicode(uroot))):
+            return
+        self.showRepoInWorkbench(uroot)
 
     def showRepoInWorkbench(self, uroot, rev=-1):
         """Show the specified repository in Workbench"""

@@ -59,7 +59,6 @@ def get_hg_command():
     return _hg_command
 
 if os.name == 'nt':
-    import _winreg
     import win32file
 
     def find_in_path(pgmname):
@@ -103,12 +102,13 @@ if os.name == 'nt':
 
     def get_prog_root():
         if getattr(sys, 'frozen', False):
-            try:
-                return _winreg.QueryValue(_winreg.HKEY_LOCAL_MACHINE,
-                                          r"Software\TortoiseHg")
-            except:
-                pass
+            return os.path.dirname(sys.executable)
         return os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
+    def get_thg_command():
+        if getattr(sys, 'frozen', False):
+            return [sys.executable]
+        return [sys.executable] + sys.argv[:1]
 
     def is_unc_path(path):
         unc, rest = os.path.splitunc(path)
@@ -151,6 +151,9 @@ else: # Not Windows
     def get_prog_root():
         path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         return path
+
+    def get_thg_command():
+        return sys.argv[:1]
 
     def is_unc_path(path):
         return False

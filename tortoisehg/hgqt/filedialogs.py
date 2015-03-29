@@ -20,7 +20,7 @@ Qt4 dialogs to display hg revisions of a file
 import difflib
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, repomodel, blockmatcher, lexers
 from tortoisehg.hgqt import filectxactions, fileview, repoview, revpanel
 from tortoisehg.hgqt.qscilib import Scintilla
@@ -105,6 +105,14 @@ class _UnfilteredRepoAgentProxy(object):
     def rawRepo(self):
         repo = self._repoagent.rawRepo()
         return repo.unfiltered()
+
+    def runCommand(self, cmdline, uihandler=None, overlay=True):
+        cmdline = ['--hidden'] + cmdline
+        return self._repoagent.runCommand(cmdline, uihandler, overlay)
+
+    def runCommandSequence(self, cmdlines, uihandler=None, overlay=True):
+        cmdlines = [['--hidden'] + l for l in cmdlines]
+        return self._repoagent.runCommandSequence(cmdlines, uihandler, overlay)
 
     def __getattr__(self, name):
         return getattr(self._repoagent, name)
@@ -228,8 +236,8 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionForward)
 
     def setupModels(self):
-        self.filerevmodel = repomodel.FileRevModel(self.repo, self.filename,
-                                                   parent=self)
+        self.filerevmodel = repomodel.FileRevModel(
+            self._repoagent, self.filename, parent=self)
         self.repoview.setModel(self.filerevmodel)
         self.repoview.revisionSelected.connect(self.onRevisionSelected)
         self.repoview.revisionActivated.connect(self.onRevisionActivated)
@@ -237,7 +245,7 @@ class FileLogDialog(_AbstractFileDialog):
         selmodel = self.repoview.selectionModel()
         selmodel.selectionChanged.connect(self._onRevisionSelectionChanged)
         self.filerevmodel.showMessage.connect(self.statusBar().showMessage)
-        self.filerevmodel.filled.connect(self.modelFilled)
+        QTimer.singleShot(0, self._updateRepoViewForModel)
 
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
@@ -275,7 +283,8 @@ class FileLogDialog(_AbstractFileDialog):
         self.actionBack.setEnabled(self.repoview.canGoBack())
         self.actionForward.setEnabled(self.repoview.canGoForward())
 
-    def modelFilled(self):
+    @pyqtSlot()
+    def _updateRepoViewForModel(self):
         self.repoview.resizeColumns()
         if self._show_rev is not None:
             index = self.filerevmodel.indexLinkedFromRev(self._show_rev)
@@ -529,14 +538,14 @@ class FileDiffDialog(_AbstractFileDialog):
     def setupModels(self):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
-        self.filerevmodel = repomodel.FileRevModel(self.repo, self.filename,
-                                                   parent=self)
-        self.filerevmodel.filled.connect(self.modelFilled)
+        self.filerevmodel = repomodel.FileRevModel(
+            self._repoagent, self.filename, parent=self)
         for w in self._repoViews:
             w.setModel(self.filerevmodel)
             w.menuRequested.connect(self.viewMenuRequest)
             selmodel = w.selectionModel()
             selmodel.selectionChanged.connect(self._onRevisionSelectionChanged)
+        QTimer.singleShot(0, self._updateRepoViewForModel)
 
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
@@ -568,7 +577,8 @@ class FileDiffDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionNextDiff)
         self.editToolbar.addAction(self.actionPrevDiff)
 
-    def modelFilled(self):
+    @pyqtSlot()
+    def _updateRepoViewForModel(self):
         for w in self._repoViews:
             w.resizeColumns()
         if self._show_rev is not None:

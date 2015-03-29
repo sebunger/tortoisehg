@@ -12,7 +12,7 @@ from PyQt4.QtGui import *
 from mercurial import error
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _, ngettext
+from tortoisehg.util.i18n import _, ngettext
 from tortoisehg.hgqt import cmdcore, cmdui, cslist, qtlib
 
 class StripWidget(cmdui.AbstractCmdWidget):
@@ -63,21 +63,22 @@ class StripWidget(cmdui.AbstractCmdWidget):
         grid.addWidget(QLabel(_('Options:')), 3, 0, Qt.AlignLeft | Qt.AlignTop)
         grid.addLayout(optbox, 3, 1)
 
-        self.discard_chk = QCheckBox(_('Discard local changes, no backup '
-                                       '(-f/--force)'))
-        self.nobackup_chk = QCheckBox(_('No backup (-n/--nobackup)'))
-        optbox.addWidget(self.discard_chk)
-        optbox.addWidget(self.nobackup_chk)
-
-        self.discard_chk.setChecked(bool(opts.get('force')))
-        self.nobackup_chk.setChecked(bool(opts.get('nobackup')))
+        self._optchks = {}
+        for name, text in [
+                ('force', _('Discard local changes, no backup (-f/--force)')),
+                ('nobackup', _('No backup (-n/--nobackup)')),
+                ('keep', _('Do not modify working copy during strip '
+                           '(-k/--keep)')),
+                ]:
+            self._optchks[name] = w = QCheckBox(text)
+            w.setChecked(bool(opts.get(name)))
+            optbox.addWidget(w)
 
         grid.setRowStretch(cslistrow, 1)
         grid.setColumnStretch(cslistcol, 1)
 
         # signal handlers
         self.rev_combo.editTextChanged.connect(self.preview)
-        self.discard_chk.toggled.connect(self.preview)
 
         # prepare to show
         self.rev_combo.lineEdit().selectAll()
@@ -134,10 +135,8 @@ class StripWidget(cmdui.AbstractCmdWidget):
         return self.get_rev() is not None
 
     def runCommand(self):
-        opts = {'verbose': True,
-                'force': self.discard_chk.isChecked(),
-                'nobackup': self.nobackup_chk.isChecked(),
-                }
+        opts = {'verbose': True}
+        opts.update((n, w.isChecked()) for n, w in self._optchks.iteritems())
 
         wc = self.repo[None]
         wcparents = wc.parents()
@@ -145,7 +144,7 @@ class StripWidget(cmdui.AbstractCmdWidget):
         wcp2rev = None
         if len(wcparents) > 1:
             wcp2rev = wcparents[1].rev()
-        if not opts['force'] and \
+        if not opts['force'] and not opts['keep'] and \
                 (wcp1rev in self.cslist.curitems or
                          wcp2rev in self.cslist.curitems) and \
                 (wc.modified() or wc.added() or wc.removed()):

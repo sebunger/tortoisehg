@@ -52,13 +52,11 @@ Při sestavování argumentů pro příkazovový řádek můžeme použít násl
 	$parent1:  soubor nebo složka z revize prvního rodiče
 	$parent2:  soubor nebo složka z revize druhého rodiče
 	$child:    soubor nebo složka z porovnávané revize
-	$ancestor: soubor nebo složka z předka sloučení
 	$parent:   synonym pro $parent1
 
 	$plabel1:  symbolický název revize prvního rodiče
 	$plabel2:  symbolický název revize druhého rodiče
 	$clabel:   symbolický název pro porovnávané revize
-	$alabel:   symbolický název revize předka
 	
 $parent2 a $ancestor mají ovšem smysl pouze tehdy, jsou-li použity jako argumenty trojného diffu pro zobrazení sloučených changesetů. Nemůže-li váš diffový nástroj použít rozumným způsobem revizi předka, je bezpečnější vypustit jej z příkazového řádku pro diff3args.
 

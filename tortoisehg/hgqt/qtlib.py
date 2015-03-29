@@ -17,11 +17,10 @@ import re
 import sip
 import weakref
 
-from mercurial.i18n import _ as hggettext
 from mercurial import extensions, error, util
 
 from tortoisehg.util import hglib, paths, editor, terminal
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from hgext.color import _styles
 
 from PyQt4.QtCore import *
@@ -239,8 +238,12 @@ def openshell(root, reponame, ui=None):
             # cmd.exe in new window, probably because the initial cmd.exe is
             # invoked with SW_HIDE.
             os.chdir(root)
-            fullargs = map(hglib.tounicode, shlex.split(shellcmd))
-            started = QProcess.startDetached(fullargs[0], fullargs[1:])
+            if os.name == 'nt':
+                # can't parse shellcmd in POSIX way
+                started = QProcess.startDetached(hglib.tounicode(shellcmd))
+            else:
+                fullargs = map(hglib.tounicode, shlex.split(shellcmd))
+                started = QProcess.startDetached(fullargs[0], fullargs[1:])
         finally:
             os.chdir(cwd)
         if not started:
@@ -961,199 +964,6 @@ class LabeledSeparator(QWidget):
 
         self.setLayout(box)
 
-# Strings and regexes used to convert hashes and subrepo paths into links
-_hashregex = re.compile(r'\b[0-9a-fA-F]{12,}')
-# Currently converting subrepo paths into links only works in English
-_subrepoindicatorpattern = hglib.tounicode(hggettext('(in subrepo %s)') + '\n')
-
-def _linkifyHash(message, subrepo=''):
-    if subrepo:
-        p = 'repo:%s?' % subrepo
-    else:
-        p = 'cset:'
-    replaceexpr = lambda m: '<a href="%s">%s</a>' % (p + m.group(0), m.group(0))
-    return _hashregex.sub(replaceexpr, message)
-
-def _linkifySubrepoRef(message, subrepo, hash=''):
-    if hash:
-        hash = '?' + hash
-    subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
-    subrepoindicator = _subrepoindicatorpattern % subrepo
-    linkifiedsubrepoindicator = _subrepoindicatorpattern % subrepolink
-    message = message.replace(subrepoindicator, linkifiedsubrepoindicator)
-    return message
-
-def linkifyMessage(message, subrepo=None):
-    r"""Convert revision id hashes and subrepo paths in messages into links
-
-    >>> linkifyMessage('abort: 0123456789ab!\nhint: foo\n')
-    u'abort: <a href="cset:0123456789ab">0123456789ab</a>!<br>hint: foo<br>'
-    >>> linkifyMessage('abort: foo (in subrepo bar)\n', subrepo='bar')
-    u'abort: foo (in subrepo <a href="repo:bar">bar</a>)<br>'
-    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\nhint: foo\n',
-    ...                subrepo='bar') #doctest: +NORMALIZE_WHITESPACE
-    u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
-    (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
-
-    subrepo name containing regexp backreference, \g:
-
-    >>> linkifyMessage('abort: 0123456789ab! (in subrepo foo\\goo)\n',
-    ...                subrepo='foo\\goo') #doctest: +NORMALIZE_WHITESPACE
-    u'abort: <a href="repo:foo\\goo?0123456789ab">0123456789ab</a>!
-    (in subrepo <a href="repo:foo\\goo?0123456789ab">foo\\goo</a>)<br>'
-    """
-    message = unicode(message)
-    message = _linkifyHash(message, subrepo)
-    if subrepo:
-        hash = ''
-        m = _hashregex.search(message)
-        if m:
-            hash = m.group(0)
-        message = _linkifySubrepoRef(message, subrepo, hash)
-    return message.replace('\n', '<br>')
-
-class InfoBar(QFrame):
-    """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
-
-    Layout::
-
-        |widgets ...                |right widgets ...|x|
-    """
-    finished = pyqtSignal(int)  # mimic QDialog
-    linkActivated = pyqtSignal(unicode)
-
-    # type of InfoBar (the number denotes its priority)
-    INFO = 1
-    ERROR = 2
-    CONFIRM = 3
-
-    infobartype = INFO
-
-    _colormap = {
-        INFO: '#e7f9e0',
-        ERROR: '#f9d8d8',
-        CONFIRM: '#fae9b3',
-        }
-
-    def __init__(self, parent=None):
-        super(InfoBar, self).__init__(parent, frameShape=QFrame.StyledPanel,
-                                      frameShadow=QFrame.Plain)
-        self.setAutoFillBackground(True)
-        p = self.palette()
-        p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
-        p.setColor(QPalette.WindowText, QColor("black"))
-        self.setPalette(p)
-
-        self.setLayout(QHBoxLayout())
-        self.layout().setContentsMargins(2, 2, 2, 2)
-
-        self.layout().addStretch()
-        self._closebutton = QPushButton(self, flat=True, autoDefault=False,
-            icon=self.style().standardIcon(QStyle.SP_TitleBarCloseButton))
-        self._closebutton.clicked.connect(self.close)
-        self.layout().addWidget(self._closebutton)
-
-    def addWidget(self, w, stretch=0):
-        self.layout().insertWidget(self.layout().count() - 2, w, stretch)
-
-    def addRightWidget(self, w):
-        self.layout().insertWidget(self.layout().count() - 1, w)
-
-    def closeEvent(self, event):
-        if self.isVisible():
-            self.finished.emit(0)
-        super(InfoBar, self).closeEvent(event)
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.close()
-        super(InfoBar, self).keyPressEvent(event)
-
-    def heightForWidth(self, width):
-        # loosely based on the internal strategy of QBoxLayout
-        if self.layout().hasHeightForWidth():
-            return super(InfoBar, self).heightForWidth(width)
-        else:
-            return self.sizeHint().height()
-
-class StatusInfoBar(InfoBar):
-    """Show status message"""
-    def __init__(self, message, parent=None):
-        super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(message, self,
-                                wordWrap=True,
-                                textInteractionFlags=Qt.TextSelectableByMouse \
-                                | Qt.LinksAccessibleByMouse)
-        self._msglabel.linkActivated.connect(self.linkActivated)
-        self.addWidget(self._msglabel, stretch=1)
-
-class CommandErrorInfoBar(InfoBar):
-    """Show command execution failure (with link to open log window)"""
-    infobartype = InfoBar.ERROR
-
-    def __init__(self, message, parent=None):
-        super(CommandErrorInfoBar, self).__init__(parent)
-
-        self._msglabel = QLabel(message, self,
-                                wordWrap=True,
-                                textInteractionFlags=Qt.TextSelectableByMouse \
-                                | Qt.LinksAccessibleByMouse)
-        self._msglabel.linkActivated.connect(self.linkActivated)
-        self.addWidget(self._msglabel, stretch=1)
-
-        self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
-        self._loglabel.linkActivated.connect(self.linkActivated)
-        self.addRightWidget(self._loglabel)
-
-class ConfirmInfoBar(InfoBar):
-    """Show confirmation message with accept/reject buttons"""
-    accepted = pyqtSignal()
-    rejected = pyqtSignal()
-    infobartype = InfoBar.CONFIRM
-
-    def __init__(self, message, parent=None):
-        super(ConfirmInfoBar, self).__init__(parent)
-
-        # no wordWrap=True and stretch=1, which inserts unwanted space
-        # between _msglabel and _buttons.
-        self._msglabel = QLabel(message, self,
-                                textInteractionFlags=Qt.TextSelectableByMouse \
-                                | Qt.LinksAccessibleByMouse)
-        self._msglabel.linkActivated.connect(self.linkActivated)
-        self.addWidget(self._msglabel)
-
-        self._buttons = QDialogButtonBox(self)
-        self._buttons.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.acceptButton = self._buttons.addButton(QDialogButtonBox.Ok)
-        self.rejectButton = self._buttons.addButton(QDialogButtonBox.Cancel)
-        self._buttons.accepted.connect(self._accept)
-        self._buttons.rejected.connect(self._reject)
-        self.addWidget(self._buttons)
-
-        # so that acceptButton gets focus by default
-        self.setFocusProxy(self._buttons)
-
-    def closeEvent(self, event):
-        if self.isVisible():
-            self.finished.emit(1)
-            self.rejected.emit()
-            self.hide()  # avoid double emission of finished signal
-        super(ConfirmInfoBar, self).closeEvent(event)
-
-    @pyqtSlot()
-    def _accept(self):
-        self.finished.emit(0)
-        self.accepted.emit()
-        self.hide()
-        self.close()
-
-    @pyqtSlot()
-    def _reject(self):
-        self.finished.emit(1)
-        self.rejected.emit()
-        self.hide()
-        self.close()
-
 class WidgetGroups(object):
     """ Support for bulk-updating properties of Qt widgets """
 
@@ -1324,6 +1134,9 @@ class TaskWidget(object):
     def canExit(self):
         return True
 
+    def reload(self):
+        pass
+
 class DemandWidget(QWidget):
     'Create a widget the first time it is shown'
 
@@ -1385,7 +1198,8 @@ class Spacer(QWidget):
 def _configuredusername(ui):
     # need to check the existence before calling ui.username(); otherwise it
     # may fall back to the system default.
-    if (not os.environ.get('HGUSER') and not ui.config('ui', 'username')
+    if (not os.environ.get('HGUSER')
+        and not ui.config('ui', ['username', 'user'])
         and not os.environ.get('EMAIL')):
         return None
     try:

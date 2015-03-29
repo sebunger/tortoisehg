@@ -11,7 +11,7 @@ from PyQt4.QtGui import *
 import os
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, cmdcore, cmdui, resolve, thgrepo, wctxcleaner
 from tortoisehg.hgqt import csinfo, cslist
 

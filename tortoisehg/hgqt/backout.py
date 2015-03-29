@@ -5,9 +5,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, csinfo, i18n, cmdcore, cmdui, status, resolve
+from tortoisehg.util import hglib, i18n
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib, csinfo, cmdcore, cmdui, status, resolve
 from tortoisehg.hgqt import qscilib, thgrepo, messageentry, wctxcleaner
 
 from PyQt4.QtCore import *

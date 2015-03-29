@@ -15,7 +15,7 @@ from PyQt4.QtGui import *
 from mercurial import cmdutil, commands, hg
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, cmdui, qtlib
 
 def _startrev_available():
@@ -44,10 +44,10 @@ def _suggesteddest(src, basedest):
 
 class CloneWidget(cmdui.AbstractCmdWidget):
 
-    def __init__(self, ui, args=None, opts={}, parent=None):
+    def __init__(self, ui, cmdagent, args=None, opts={}, parent=None):
         super(CloneWidget, self).__init__(parent)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        self._cmdagent = cmdcore.CmdAgent(ui, self)
+        self._cmdagent = cmdagent
         self.ui = ui
 
         dest = src = os.getcwd()
@@ -271,7 +271,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             name = 'clone'
 
         cmdline = hglib.buildcmdargs(name, src, dest or None, **opts)
-        self.hgcmd_txt.setText('hg ' + ' '.join(cmdline))
+        self.hgcmd_txt.setText('hg ' + hglib.prettifycmdline(cmdline))
         self.commandChanged.emit()
         return cmdline
 
@@ -336,7 +336,9 @@ class CloneDialog(cmdui.CmdControlDialog):
         self.setWindowIcon(qtlib.geticon('hg-clone'))
         self.setObjectName('clone')
         self.setRunButtonText(_('&Clone'))
-        self.setCommandWidget(CloneWidget(ui, args, opts, self))
+        self._cmdagent = cmdagent = cmdcore.CmdAgent(ui, self)
+        cmdagent.serviceStopped.connect(self.reject)
+        self.setCommandWidget(CloneWidget(ui, cmdagent, args, opts, self))
         self.commandFinished.connect(self._emitCloned)
 
     def source(self):
@@ -357,3 +359,9 @@ class CloneDialog(cmdui.CmdControlDialog):
     def _emitCloned(self, ret):
         if ret == 0:
             self.clonedRepository.emit(self.destination(), self.source())
+
+    def done(self, r):
+        if self._cmdagent.isServiceRunning():
+            self._cmdagent.stopService()
+            return  # postponed until serviceStopped
+        super(CloneDialog, self).done(r)

@@ -12,7 +12,7 @@ from mercurial import commands, error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, chunks
 
 from PyQt4.QtCore import *

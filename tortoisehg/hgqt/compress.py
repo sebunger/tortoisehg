@@ -8,7 +8,7 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import csinfo, cmdui, commit, wctxcleaner
 
 class CompressDialog(QDialog):

@@ -13,9 +13,9 @@ TortoiseHg About dialog - PyQt4 version
 
 import sys
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import version, hglib, paths
+from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *

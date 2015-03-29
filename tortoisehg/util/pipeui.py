@@ -225,10 +225,9 @@ def _extenduiclass(parcls):
             except ValueError:
                 raise util.Abort(_('unrecognized response: %s') % r)
 
-        # getpass() cannot communicate with command server as of hg 2.9
         def getpass(self, prompt=None, default=None):
             prompt = self.label(prompt or _('password: '), 'ui.getpass')
-            return self.prompt(prompt, default)
+            return super(pipeui, self).getpass(prompt, default)
 
         def progress(self, topic, pos, item='', unit='', total=None):
             now = time.time()

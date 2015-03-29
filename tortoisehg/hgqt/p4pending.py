@@ -11,7 +11,7 @@ from PyQt4.QtGui import *
 from mercurial import error
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cslist, cmdcore, cmdui
 
 
