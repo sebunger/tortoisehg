@@ -14,7 +14,7 @@ X-Python-Version: >= 2.4
 
 Package: tortoisehg
 Architecture: all
-Depends: mercurial (>= 3.0~), mercurial (<< 3.2~), python-gobject (>= 2.12.1),
+Depends: mercurial (>= 3.3.2~), mercurial (<< 3.4~), python-gobject (>= 2.12.1),
  python-qt4 (>= 4.7), python-qscintilla2, ${shlibs:Depends}, ${misc:Depends},
  ${python:Depends}
 Recommends: libjs-jquery, libjs-underscore, python-iniparse, python-pygments
