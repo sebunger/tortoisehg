@@ -1,8 +1,8 @@
-tortoisehg (3.3.2-1) UNRELEASED; urgency=medium
+tortoisehg (3.4-1) UNRELEASED; urgency=medium
 
-  * Imported Upstream version 3.3.2
+  * Imported Upstream version 3.4
 
- -- Andrew Shadura <andrewsh@debian.org>  Sun, 29 Mar 2015 17:11:24 +0200
+ -- Andrew Shadura <andrewsh@debian.org>  Sun, 31 May 2015 11:29:25 +0200
 
 tortoisehg (3.1.1-1) unstable; urgency=low
 
