@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
 "PO-Revision-Date: 2015-02-23 06:57+0000\n"
 "Last-Translator: Tovim <Unknown>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-02-24 05:21+0000\n"
-"X-Generator: Launchpad (build 17355)\n"
+"X-Launchpad-Export-Date: 2015-04-28 05:11+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 "Language: cs\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
@@ -33,7 +33,7 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "O programu"
 
-msgid "Copyright 2008-2014 Steve Borho and others"
+msgid "Copyright 2008-2015 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -381,6 +381,43 @@ msgstr "Záložka '%s' byla odstraněna"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "Záložka '%s' byla přejmenována na '%s'"
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr ""
+
+msgid "Outgoing Bookmarks"
+msgstr ""
+
+msgid "&Push Bookmark"
+msgstr ""
+
+msgid "&Remove Bookmark"
+msgstr ""
+
+msgid "Incoming Bookmarks"
+msgstr ""
+
+msgid "P&ull Bookmark"
+msgstr ""
+
+msgid "R&emove Bookmark"
+msgstr ""
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr ""
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - operace s větví"
@@ -535,6 +572,9 @@ msgstr "Možnosti"
 
 msgid "Clone to revision:"
 msgstr "Klonovat k revizi:"
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr ""
 
 msgid "Do not update the new working directory"
 msgstr "Neaktualizovat nový pracovní adresář"
@@ -1127,6 +1167,7 @@ msgstr "Název nástroje"
 msgid "The tool name. It cannot contain spaces."
 msgstr "Název nástroje. Nesmí obsahovat mezery."
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1150,6 +1191,7 @@ msgstr ""
 "- {FILES}: Seznam souborů, dotčených vybranou revizí.\n"
 "- {ALLFILES}: Všechny soubory, sledované Mercuriálem ve vybrané revizi."
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -2505,15 +2547,6 @@ msgstr ""
 msgid "Commit Later"
 msgstr ""
 
-msgid "TortoiseHg Merge Commit"
-msgstr ""
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
-
 msgid "Merge changeset"
 msgstr "Changeset sloučení"
 
@@ -3213,16 +3246,16 @@ msgstr "K destinaci přeskupení"
 msgid "Swap source and destination"
 msgstr ""
 
-msgid "Keep original changesets"
-msgstr "Zachovat původní changesety"
-
-msgid "Keep original branch names"
-msgstr "Zachovat původní názvy větví"
-
-msgid "Collapse the rebased changesets"
+msgid "Keep original changesets (--keep)"
 msgstr ""
 
-msgid "Rebase entire source branch"
+msgid "Keep original branch names (--keepbranches)"
+msgstr ""
+
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr ""
+
+msgid "Rebase entire source branch (-b/--base)"
 msgstr ""
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
@@ -3873,6 +3906,9 @@ msgstr "%s <příchozí>"
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr "Nalezeno %d příchozích changesetů"
+
+msgid "Pull"
+msgstr "Pull"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Převzít (pull) příchozí changesty do svého repozitáře"
@@ -5239,7 +5275,10 @@ msgstr "odtrhované revize"
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
-msgid "thg sync [PEER]"
+msgid "open the bookmark sync window"
+msgstr ""
+
+msgid "thg sync [OPTION]... [PEER]"
 msgstr ""
 
 msgid "replace existing tag"
@@ -5763,6 +5802,14 @@ msgid ""
 msgstr ""
 "Jména spojená s komity.  Obvyklý formát je:<br>Full Name &lt;email@example."
 "com&gt;"
+
+msgid "Ask Username"
+msgstr ""
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
 
 msgid "Summary Line Length"
 msgstr "Délka souhrnného řádku"
@@ -6359,6 +6406,7 @@ msgstr "Definuje regex shody pro vyhledávání čísel problémů"
 msgid "Issue Link"
 msgstr "Připojení k problému"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -7030,6 +7078,9 @@ msgstr "Odchozí změny do vybraného URL"
 msgid "Push outgoing changes to selected URL"
 msgstr "Předat (push) odchozí změny do vybraného URL"
 
+msgid "Sync Bookmarks"
+msgstr ""
+
 msgid "Email outgoing changesets for remote repository"
 msgstr "Odeslat odchozí changesety emailem"
 
@@ -7354,13 +7405,6 @@ msgstr ""
 "Subrepozitář '%s' má netriviální implicitní sync URL:<p>%s<p>Nahradit jej "
 "tímto URL?:<p>%s"
 
-msgid "Certificate Query Error"
-msgstr "Certificate Query Error"
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr "Neplatné číslo portu: %s"
-
 msgid "Security: "
 msgstr "Bezpečnost: "
 
@@ -7437,6 +7481,9 @@ msgstr ""
 
 msgid "User Certificate Chain File"
 msgstr "User Certificate Chain File"
+
+msgid "Certificate Query Error"
+msgstr "Certificate Query Error"
 
 msgid "Unable to save authentication"
 msgstr "Nejde uložit autentizaci"
@@ -7903,7 +7950,16 @@ msgstr "Aktualizovat pracovní adresář k označené revizi"
 msgid "&Shelve..."
 msgstr ""
 
-msgid "&Import..."
+msgid "&Import Patches..."
+msgstr ""
+
+msgid "U&nbundle..."
+msgstr ""
+
+msgid "&Merge..."
+msgstr ""
+
+msgid "Merge with the other head of the current branch"
 msgstr ""
 
 msgid "&Resolve..."
@@ -7949,6 +8005,9 @@ msgid "&Outgoing"
 msgstr ""
 
 msgid "P&ush"
+msgstr ""
+
+msgid "&Sync Bookmarks..."
 msgstr ""
 
 #, python-format
@@ -8066,6 +8125,21 @@ msgstr "Chyba při aktivaci události  \"commit finished\""
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "Nejde otevřít dialog Plugin Options"
+
+msgid "[SOURCE]"
+msgstr ""
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr ""
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr ""
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr ""
 
 msgid "move after the specified patch"
 msgstr ""
@@ -8961,9 +9035,6 @@ msgstr ""
 
 #~ msgid "Incoming"
 #~ msgstr "Příchozí"
-
-#~ msgid "Pull"
-#~ msgstr "Pull"
 
 #~ msgid "Outgoing"
 #~ msgstr "Odchozí"
@@ -11554,21 +11625,6 @@ msgstr ""
 #~ msgid "%s will be imported to the repository"
 #~ msgstr "%s bude importován do repozitáře"
 
-#~ msgid "Repository stripped, revision set cleared"
-#~ msgstr "Repozitář odtržen, sada revizí smazána"
-
-#~ msgid ""
-#~ "Space separated list of tags that will not be shown.Useful example: "
-#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
-#~ "Mercurial Queues Extension. Default: None (leave blank)"
-#~ msgstr ""
-#~ "Seznam mezerami oddělených tagů, které nebudou zobrazovány. Užitečný "
-#~ "příklad: Zadání \"qbase qparent qtip\" způsobí skrytí standardních tagů, "
-#~ "vkládaných extenzí Mercurialu Queues. Implicitně: None (nevyplněno)"
-
-#~ msgid "TortoiseHg Sync"
-#~ msgstr "TortoiseHg Sync"
-
 #~ msgid ""
 #~ "Commit message text for new changeset that reverses the effect of the "
 #~ "change being backed out."
@@ -11691,27 +11747,6 @@ msgstr ""
 #~ msgid "Abandon Error"
 #~ msgstr "Abandon Error"
 
-#~ msgid "Source does not exists."
-#~ msgstr "Zdroj neexistuje"
-
-#~ msgid "Repository stripped, incoming preview cleared"
-#~ msgstr "Repozitář odtržen, náhled příchozích změn smazán"
-
-#~ msgid ""
-#~ "List of Servers from which \"projrc\" configuration files must be pulled. "
-#~ "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull "
-#~ "from the default sync path.Default is pull from NO servers."
-#~ msgstr ""
-#~ "Seznam serverů z nichž musí být konfigurační soubory \"projrc\" staženy "
-#~ "(pulled). Při nastavení \"default\" se 'pull' provádí z implicitní "
-#~ "synchronizační cesty. Implicitně je nastaveno 'pull from NO servers'."
-
-#~ msgid "Are you sure that you want to cancel synchronization?"
-#~ msgstr "Jste si jist, že chcete zrušit synchronizaci?"
-
-#~ msgid "outgoing changesets to %s found"
-#~ msgstr "nalezeny odchozí changesety do %s"
-
 #~ msgid "View missing"
 #~ msgstr "Zobrazit chybějící soubor"
 
@@ -11742,13 +11777,6 @@ msgstr ""
 
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "Konfigurace kontextové nabídky Windows"
-
-#~ msgid ""
-#~ "Error creating interpreting commit date (%s).\n"
-#~ "Using current date instead."
-#~ msgstr ""
-#~ "Chyba při vytváření interpretovaného datumu komitu (%s).\n"
-#~ "Místo toho je použit datum aktuální."
 
 #~ msgid "Error when creating repository"
 #~ msgstr "Chyba při vytváření repozitáře"

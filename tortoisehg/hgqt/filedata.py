@@ -9,15 +9,18 @@ import os, posixpath
 import cStringIO
 
 from mercurial import commands, error, match, patch, subrepo, util, mdiff
+from mercurial import copies
 from mercurial import ui as uimod
 from mercurial.node import nullrev
-from hgext import record
 
 from tortoisehg.util import hglib, patchctx
 from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import fileencoding
 
 forcedisplaymsg = _('Display the file anyway')
+
+class _BadContent(Exception):
+    """Failed to display file because it is binary or size limit exceeded"""
 
 def _exceedsMaxLineLength(data, maxlength=100000):
     if len(data) < maxlength:
@@ -73,7 +76,7 @@ class _AbstractFileData(object):
 
     def createRebased(self, pctx):
         # new status is not known
-        return self.__class__(self._ctx, pctx, self._wfile)
+        return self.__class__(self._ctx, pctx, self._wfile, rpath=self._rpath)
 
     def load(self, changeselect=False, force=False):
         # Note: changeselect may be set to True even if the underlying data
@@ -210,67 +213,55 @@ class FileData(_AbstractFileData):
         ctx2 = self._pctx
         wfile = self._wfile
         status = self._status
+        errorprefix = _('File or diffs not displayed: ')
         try:
             self._readStatus(ctx, ctx2, wfile, status, changeselect, force)
-        except (EnvironmentError, error.LookupError), e:
-            self.error = hglib.tounicode(str(e))
+        except _BadContent, e:
+            self.error = errorprefix + e.args[0] + '\n\n' + forcedisplaymsg
+        except (EnvironmentError, error.LookupError, util.Abort), e:
+            self.error = errorprefix + hglib.tounicode(str(e))
 
-    def _checkMaxDiff(self, ctx, wfile, maxdiff, status, force):
+    def _checkMaxDiff(self, ctx, wfile, maxdiff, force):
         self.error = None
-        p = _('File or diffs not displayed: ')
-        try:
-            fctx = ctx.filectx(wfile)
-            if ctx.rev() is None:
-                size = fctx.size()
-            else:
-                # fctx.size() can read all data into memory in rename cases so
-                # we read the size directly from the filelog, this is deeper
-                # under the API than I prefer to go, but seems necessary
-                size = fctx._filelog.rawsize(fctx.filerev())
-        except (EnvironmentError, error.LookupError), e:
-            self.error = p + hglib.tounicode(str(e))
-            return None
+        fctx = ctx.filectx(wfile)
+        if ctx.rev() is None:
+            size = fctx.size()
+        else:
+            # fctx.size() can read all data into memory in rename cases so
+            # we read the size directly from the filelog, this is deeper
+            # under the API than I prefer to go, but seems necessary
+            size = fctx._filelog.rawsize(fctx.filerev())
         if not force and size > maxdiff:
-            self.error = p + _('File is larger than the specified max size.\n'
-                               'maxdiff = %s KB') % (maxdiff // 1024)
-            self.error += u'\n\n' + forcedisplaymsg
-            if status == 'A':
-                self._checkRenamed(ctx, fctx)
-            return None
+            raise _BadContent(_('File is larger than the specified max size.\n'
+                                'maxdiff = %s KB') % (maxdiff // 1024))
 
-        try:
-            data = fctx.data()
-            if not force:
-                if '\0' in data or ctx.isStandin(wfile):
-                    self.error = p + _('File is binary')
-                elif _exceedsMaxLineLength(data):
-                    # it's incredibly slow to render long line by QScintilla
-                    self.error = p + \
-                        _('File may be binary (maximum line length exceeded)')
-            if self.error:
-                self.error += u'\n\n' + forcedisplaymsg
-                if status == 'A':
-                    self._checkRenamed(ctx, fctx)
-                return None
-        except (EnvironmentError, util.Abort), e:
-            self.error = p + hglib.tounicode(str(e))
-            return None
+        data = fctx.data()
+        if not force:
+            if '\0' in data or ctx.isStandin(wfile):
+                raise _BadContent(_('File is binary'))
+            elif _exceedsMaxLineLength(data):
+                # it's incredibly slow to render long line by QScintilla
+                raise _BadContent(_('File may be binary (maximum line length '
+                                    'exceeded)'))
         return fctx, data
 
-    def _checkRenamed(self, ctx, fctx):
-        # TODO: maybe we can use fctx.parents() in place of (oldname, node)
-        renamed = fctx.renamed()
-        if not renamed:
+    def _checkRenamed(self, repo, ctx, pctx, wfile):
+        try:
+            m = match.exact(repo, '', [wfile])
+            copy = copies.pathcopies(pctx, ctx, match=m)
+        except TypeError:
+            # build full map on hg<3.4 (4906dc0e038c)
+            copy = copies.pathcopies(pctx, ctx)
+        oldname = copy.get(wfile)
+        if not oldname:
             self.flabel += _(' <i>(was added)</i>')
             return
-
-        oldname, node = renamed
         fr = hglib.tounicode(oldname)
         if oldname in ctx:
             self.flabel += _(' <i>(copied from %s)</i>') % fr
         else:
             self.flabel += _(' <i>(renamed from %s)</i>') % fr
-        return oldname, node
+        return oldname
 
     def _readStatus(self, ctx, ctx2, wfile, status, changeselect, force):
         def getstatus(repo, n1, n2, wfile):
@@ -311,10 +302,10 @@ class FileData(_AbstractFileData):
             self.flabel += _(' <i>(is a symlink)</i>')
             return
 
-        if status is None:
-            status = getstatus(repo, ctx.p1().node(), ctx.node(), wfile)
         if ctx2 is None:
             ctx2 = ctx.p1()
+        if status is None:
+            status = getstatus(repo, ctx2.node(), ctx.node(), wfile)
 
         mde = _('File or diffs not displayed: '
                 'File is larger than the specified max size.\n'
@@ -356,10 +347,12 @@ class FileData(_AbstractFileData):
             if ctx.hasStandin(wfile):
                 wfile = ctx.findStandin(wfile)
                 isbfile = True
-            res = self._checkMaxDiff(ctx, wfile, maxdiff, status, force)
-            if res is None:
-                return
-            fctx, newdata = res
+            try:
+                fctx, newdata = self._checkMaxDiff(ctx, wfile, maxdiff, force)
+            except _BadContent:
+                if status == 'A':
+                    self._checkRenamed(repo, ctx, ctx2, wfile)
+                raise
             self.contents = newdata
             if status == 'C':
                 # no further comparison is necessary
@@ -373,11 +366,10 @@ class FileData(_AbstractFileData):
                                     "<font color='red'>unset</font>")
 
         if status == 'A':
-            renamed = self._checkRenamed(ctx, fctx)
-            if not renamed:
+            oldname = self._checkRenamed(repo, ctx, ctx2, wfile)
+            if not oldname:
                 return
-            oldname, node = renamed
-            olddata = repo.filectx(oldname, fileid=node).data()
+            olddata = ctx2[oldname].data()
         elif status == 'M':
             if wfile not in ctx2:
                 # merge situation where file was added in other branch
@@ -398,9 +390,9 @@ class FileData(_AbstractFileData):
                 fp.write(c)
             fp.seek(0)
 
-            # feed diffs through record.parsepatch() for more fine grained
+            # feed diffs through parsepatch() for more fine grained
             # chunk selection
-            filediffs = record.parsepatch(fp)
+            filediffs = hglib.parsepatch(fp)
             if filediffs and filediffs[0].hunks:
                 self.changes = filediffs[0]
             else:
@@ -561,6 +553,12 @@ class SubrepoData(_AbstractFileData):
     def __init__(self, ctx, pctx, path, status, rpath, subkind):
         super(SubrepoData, self).__init__(ctx, pctx, path, status, rpath)
         self._subkind = subkind
+
+    def createRebased(self, pctx):
+        # new status should be unknown, but currently it is 'S'
+        assert self._status == 'S'  # TODO: replace 'S' by subrepo's status
+        return self.__class__(self._ctx, pctx, self._wfile, status=self._status,
+                              rpath=self._rpath, subkind=self._subkind)
 
     def load(self, changeselect=False, force=False):
         ctx = self._ctx

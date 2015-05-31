@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
-"PO-Revision-Date: 2015-02-21 08:36+0000\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
+"PO-Revision-Date: 2015-04-28 08:18+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2015-02-22 05:14+0000\n"
-"X-Generator: Launchpad (build 17355)\n"
+"X-Launchpad-Export-Date: 2015-04-29 05:12+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -32,8 +32,8 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "À propos"
 
-msgid "Copyright 2008-2014 Steve Borho and others"
-msgstr "Copyright 2008-2014 Steve Borho et d'autres"
+msgid "Copyright 2008-2015 Steve Borho and others"
+msgstr "Copyright 2008-2015 Steve Borho et d'autres"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Plusieurs icônes sont offertes par les projets TortoiseSVN et Tango"
@@ -54,7 +54,7 @@ msgstr "avec Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr "Une nouvelle version de TortoiseHg (%s) est disponible."
+msgstr "Une nouvelle version de TortoiseHg (%s) est disponible !"
 
 msgid "License"
 msgstr "Licence"
@@ -386,6 +386,43 @@ msgstr "Le signet '%s' a été enlevé"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "Le signet '%s' a été renommé en '%s'"
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr "Synchronisation des signets TortoiseHg"
+
+msgid "Outgoing Bookmarks"
+msgstr "Signets sortants"
+
+msgid "&Push Bookmark"
+msgstr "&Pousser un signet"
+
+msgid "&Remove Bookmark"
+msgstr "Enleve&r un signet"
+
+msgid "Incoming Bookmarks"
+msgstr "Signets entrants"
+
+msgid "P&ull Bookmark"
+msgstr "Tirer un signet"
+
+msgid "R&emove Bookmark"
+msgstr "&Enlever un signet"
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr "Signet local tiré : %s"
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr "Signet distant tiré : %s"
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr "Signet distant enlevé : %s"
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr "Signet local enlevé : %s"
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - opération de branche"
@@ -544,6 +581,9 @@ msgstr "Options"
 
 msgid "Clone to revision:"
 msgstr "Cloner jusqu'à la révision :"
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr "Un identifiant de révision, signet, étiquette ou nom de branche"
 
 msgid "Do not update the new working directory"
 msgstr "Ne pas mettre à jour le nouveau répertoire de travail"
@@ -1136,6 +1176,7 @@ msgstr "Nom de l'outil"
 msgid "The tool name. It cannot contain spaces."
 msgstr "Le nom de l'outil ne peut pas contenir d'espace."
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1162,6 +1203,7 @@ msgstr ""
 "- {ALLFILES} : tous les fichiers suivis par Mercurial dans la révision "
 "sélectionnée."
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -2534,17 +2576,6 @@ msgstr "Committer maintenant"
 msgid "Commit Later"
 msgstr "Committer plus tard"
 
-msgid "TortoiseHg Merge Commit"
-msgstr "TortoiseHg Commit de fusion"
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
-"Erreur en interprétant la date de commit (%s).\n"
-"Utilisation de la date actuelle."
-
 msgid "Merge changeset"
 msgstr "Révision de fusion"
 
@@ -3237,17 +3268,17 @@ msgstr "Vers la destination du \"rebase\""
 msgid "Swap source and destination"
 msgstr "Permuter source et destination"
 
-msgid "Keep original changesets"
-msgstr "Garder les révisions d'origine"
+msgid "Keep original changesets (--keep)"
+msgstr "Garder les révisions d'origine (--keep)"
 
-msgid "Keep original branch names"
-msgstr "Garder les noms de branches originaux"
+msgid "Keep original branch names (--keepbranches)"
+msgstr "Garder les noms de branche d'origine (--keepbranches)"
 
-msgid "Collapse the rebased changesets"
-msgstr "Fusionner les versions \"rebasées\""
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr "Fusionner les révisions \"rebasées\" (--collapse)"
 
-msgid "Rebase entire source branch"
-msgstr "Rebaser entièrement la branche source"
+msgid "Rebase entire source branch (-b/--base)"
+msgstr "\"Rebaser\" entièrement la branche source (-b/--base)"
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3909,6 +3940,9 @@ msgstr "%s <entrant>"
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr "%d révisions entrantes trouvées"
+
+msgid "Pull"
+msgstr "Récupérer"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Tirer les révisions entrantes dans votre dépôt"
@@ -5295,8 +5329,11 @@ msgstr "révision à supprimer"
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr "thg strip [-k] [-f] [-n] [[-r] REV]"
 
-msgid "thg sync [PEER]"
-msgstr "thg sync [PEER]"
+msgid "open the bookmark sync window"
+msgstr "ouvrir la fenêtre de synchronisation de signet"
+
+msgid "thg sync [OPTION]... [PEER]"
+msgstr "thg sync [OPTION]... [PEER]"
 
 msgid "replace existing tag"
 msgstr "remplacer l'étiquette existante"
@@ -5840,6 +5877,16 @@ msgid ""
 msgstr ""
 "Nom associé aux commits. Le format habituel est :<br>Nom complet &lt;"
 "email@example.com&gt;"
+
+msgid "Ask Username"
+msgstr "Demander le nom d'utilisateur"
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
+"Si aucun nom d'utilisateur n'est spécifié, il lui sera demandé. Par défaut : "
+"Faux"
 
 msgid "Summary Line Length"
 msgstr "Longueur de la ligne de résumé"
@@ -6473,6 +6520,7 @@ msgstr "Définit l'expression régulière pour trouver des numéros de problème
 msgid "Issue Link"
 msgstr "Lien vers un problème"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -7169,6 +7217,9 @@ msgstr "Détecter les révisions sortantes vers l'URL sélectionnée"
 msgid "Push outgoing changes to selected URL"
 msgstr "Pousser les révisions sortantes vers l'URL sélectionnée"
 
+msgid "Sync Bookmarks"
+msgstr "Synchroniser des signets"
+
 msgid "Email outgoing changesets for remote repository"
 msgstr "Envoyer par courriel des révisions sortantes pour un dépôt distant"
 
@@ -7497,13 +7548,6 @@ msgstr ""
 "Le sous-dépôt '%s' a une URL par défaut non trivial :<p>%s</p>La remplacer "
 "avec l'URL suivante ?<p>%s"
 
-msgid "Certificate Query Error"
-msgstr "Erreur de requête de certificat"
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr "Numéro de port invalide : %s"
-
 msgid "Security: "
 msgstr "Sécurité : "
 
@@ -7580,6 +7624,9 @@ msgstr ""
 
 msgid "User Certificate Chain File"
 msgstr "Fichier de chaîne de certificat de l'utilisateur"
+
+msgid "Certificate Query Error"
+msgstr "Erreur de requête de certificat"
 
 msgid "Unable to save authentication"
 msgstr "Impossible d'enregistrer l'authentification"
@@ -8052,8 +8099,17 @@ msgstr "Mettre à jour le répertoire de travail ou changer de révision"
 msgid "&Shelve..."
 msgstr "&Shelve..."
 
-msgid "&Import..."
-msgstr "&Importer…"
+msgid "&Import Patches..."
+msgstr "&Importer des patchs..."
+
+msgid "U&nbundle..."
+msgstr "Dépaqueter (u&nbundle)..."
+
+msgid "&Merge..."
+msgstr "Fusionner..."
+
+msgid "Merge with the other head of the current branch"
+msgstr "Fusionner avec l'autre tête de la branche courante"
 
 msgid "&Resolve..."
 msgstr "&Résoudre..."
@@ -8099,6 +8155,9 @@ msgstr "Sortant"
 
 msgid "P&ush"
 msgstr "Pousser"
+
+msgid "&Sync Bookmarks..."
+msgstr "&Synchroniser des signets..."
 
 #, python-format
 msgid ""
@@ -8220,6 +8279,22 @@ msgstr "Erreur durant le déclencheur \"commit terminé\""
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "Ne peut pas ouvrir le dialogue des options plugin"
+
+msgid "[SOURCE]"
+msgstr "[SOURCE]"
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr "URL non supportée : %s"
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr ""
+"empreinte du serveur pour %s ne peut pas être obtenue (Python trop vieux)"
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr "erreur de certificat %s : aucun certificat reçu"
 
 msgid "move after the specified patch"
 msgstr "déplacer après le patch spécifié"
@@ -9357,9 +9432,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Email..."
 #~ msgstr "Courrier électronique..."
 
-#~ msgid "Pull"
-#~ msgstr "Récupérer"
-
 #~ msgid "Outgoing"
 #~ msgstr "Sortant"
 
@@ -10364,9 +10436,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Unapply last patch"
 #~ msgstr "Dé-appliquer le dernier patch"
 
-#~ msgid "Source does not exists."
-#~ msgstr "La source n'existe pas."
-
 #~ msgid "tag '%s' is not a local tag"
 #~ msgstr "l'étiquette '%s' n'est pas une étiquette locale"
 
@@ -10408,9 +10477,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 
 #~ msgid "Several icons are courtesy of the TortoiseSVN project"
 #~ msgstr "Plusieurs icônes sont offertes par le projet TortoiseSVN"
-
-#~ msgid "outgoing changesets to %s found"
-#~ msgstr "révisions sortantes vers %s trouvées"
 
 #~ msgid "Push"
 #~ msgstr "Pousser"
@@ -10457,23 +10523,8 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Ignore changes in the amount of white space. Default: False"
 #~ msgstr "Ignorer les changements dans le nombre d'espaces. Par défaut : Faux"
 
-#~ msgid ""
-#~ "Space separated list of tags that will not be shown.Useful example: "
-#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
-#~ "Mercurial Queues Extension. Default: None (leave blank)"
-#~ msgstr ""
-#~ "Liste séparée par des espaces d'étiquettes qui ne seront pas affichées. "
-#~ "Exemple: spécifier \"qbase qparent qtip\" pour cacher les étiquettes "
-#~ "standards insérées par l'extension MQ. Par défaut : Aucune (laisser vide)"
-
 #~ msgid "Character encoding name"
 #~ msgstr "Nom de l'encodage des caractères"
-
-#~ msgid "TortoiseHg Sync"
-#~ msgstr "TortoiseHg Sync"
-
-#~ msgid "Are you sure that you want to cancel synchronization?"
-#~ msgstr "Êtes-vous sûr de vouloir annuler la synchronisation ?"
 
 #~ msgid "Recover"
 #~ msgstr "Récupérer"
@@ -10516,24 +10567,8 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "morceau %d déjà appliqué à la ligne %d (flou %d)\n"
 
-#~ msgid ""
-#~ "List of Servers from which \"projrc\" configuration files must be pulled. "
-#~ "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull "
-#~ "from the default sync path.Default is pull from NO servers."
-#~ msgstr ""
-#~ "Liste des serveurs desquels les fichiers de configuration \"projrc\" "
-#~ "doivent être tirés. Définir à \"*\" pour tirer de tous les serveurs. "
-#~ "Définir à \"default\" pour tirer uniquement du dépôt par défaut. Par "
-#~ "défaut, les fichiers \"projrc\" ne sont tirés d'aucun serveur."
-
 #~ msgid "View missing"
 #~ msgstr "Afficher les fichiers manquants"
-
-#~ msgid "Repository stripped, incoming preview cleared"
-#~ msgstr "Dépôt nettoyé, prévisualisation des révisions entrantes effacée"
-
-#~ msgid "Repository stripped, revision set cleared"
-#~ msgstr "Dépôt nettoyé, ensemble de révisions effacé"
 
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "Configuration du Shell de TortoiseHg"
@@ -10564,10 +10599,3 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ "correspond à la chaîne entière trouvée par issue.regex, {1} désigne le "
 #~ "premier groupe et ainsi de suite. Si aucun jeton {n} n'est trouvé dans "
 #~ "issue.link, la chaîne complète trouvée est ajoutée."
-
-#~ msgid ""
-#~ "Error creating interpreting commit date (%s).\n"
-#~ "Using current date instead."
-#~ msgstr ""
-#~ "Erreur en interprétant la date de commit (%s).\n"
-#~ "Utilisation de la date actuelle."

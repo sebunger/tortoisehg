@@ -7,7 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 shortlicense = '''
-Copyright (C) 2008-2014 Steve Borho <steve@borho.org> and others.
+Copyright (C) 2008-2015 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
@@ -1143,15 +1143,21 @@ def strip(ui, repoagent, *pats, **opts):
         rev = pats[0]
     return thgstrip.createStripDialog(repoagent, rev=rev, opts=opts)
 
-@command('^sync|synchronize', [], _('thg sync [PEER]'))
-def sync(ui, repoagent, *pats, **opts):
+@command('^sync|synchronize',
+    [('B', 'bookmarks', False, _('open the bookmark sync window'))],
+    _('thg sync [OPTION]... [PEER]'))
+def sync(ui, repoagent, url=None, **opts):
     """synchronize with other repositories"""
-    from tortoisehg.hgqt import repowidget
+    from tortoisehg.hgqt import bookmark as bookmarkmod, repowidget
+    url = hglib.tounicode(url)
+    if opts.get('bookmarks'):
+        return bookmarkmod.SyncBookmarkDialog(repoagent, url)
+
     repo = repoagent.rawRepo()
     repo.ui.setconfig('tortoisehg', 'defaultwidget', 'sync')
     w = repowidget.LightRepoWindow(repoagent)
-    if pats:
-        w.setSyncUrl(hglib.tounicode(pats[0]))
+    if url:
+        w.setSyncUrl(url)
     return w
 
 @command('^tag',

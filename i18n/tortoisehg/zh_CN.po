@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
-"PO-Revision-Date: 2014-11-26 07:30+0000\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
+"PO-Revision-Date: 2015-04-05 02:03+0000\n"
 "Last-Translator: yfdyh000 <yfdyh000@gmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-02-20 05:18+0000\n"
-"X-Generator: Launchpad (build 17341)\n"
+"X-Launchpad-Export-Date: 2015-04-28 05:16+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 "Language: zh_CN\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -31,8 +31,8 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "关于"
 
-msgid "Copyright 2008-2014 Steve Borho and others"
-msgstr "版权所有 2008-2014 Steve Borho 等"
+msgid "Copyright 2008-2015 Steve Borho and others"
+msgstr "版权所有 2008-2015 Steve Borho 等人"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "某些图标来自TortoiseSVN和Tango项目"
@@ -376,6 +376,43 @@ msgstr "书签 \"%s\" 已移除"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "书签已 '%s' 重命名为 '%s'"
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr ""
+
+msgid "Outgoing Bookmarks"
+msgstr ""
+
+msgid "&Push Bookmark"
+msgstr ""
+
+msgid "&Remove Bookmark"
+msgstr ""
+
+msgid "Incoming Bookmarks"
+msgstr ""
+
+msgid "P&ull Bookmark"
+msgstr ""
+
+msgid "R&emove Bookmark"
+msgstr ""
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr ""
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - 分支操作"
@@ -529,6 +566,9 @@ msgstr "选项"
 msgid "Clone to revision:"
 msgstr "克隆指定版本:"
 
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr ""
+
 msgid "Do not update the new working directory"
 msgstr "不更新当前新的工作目录"
 
@@ -581,7 +621,7 @@ msgstr "进程意外退出，代码 %d"
 
 #, python-format
 msgid "failed to encode command: %s"
-msgstr ""
+msgstr "将命令编码失败: %s"
 
 #, python-format
 msgid "timed out while reading: %r..."
@@ -607,7 +647,7 @@ msgstr "损坏的命令结果: %r"
 
 #, python-format
 msgid "failed to encode input: %s"
-msgstr ""
+msgstr "将输入编码失败: %s"
 
 msgid "Terminated by user"
 msgstr "被用户终止"
@@ -1118,6 +1158,7 @@ msgstr "工具名称"
 msgid "The tool name. It cannot contain spaces."
 msgstr "工具名称。不能包含空格。"
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1140,6 +1181,7 @@ msgstr ""
 "- {FILES}: 涉及选中修订的文件列表。\n"
 "- {ALLFILES}: Mercurial 对选中的修订中跟踪的所有文件。"
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -1239,10 +1281,10 @@ msgid "no matches found: %s"
 msgstr "没有找到匹配项: %s"
 
 msgid "Console"
-msgstr ""
+msgstr "控制台"
 
 msgid "File &History / Annotate"
-msgstr ""
+msgstr "文件历史(&H) / 溯源"
 
 msgid "Show the history of the selected file"
 msgstr "显示选中文件的历史"
@@ -2260,7 +2302,7 @@ msgid "New Repository"
 msgstr "新建仓库"
 
 msgid "&Create"
-msgstr ""
+msgstr "创建(&C)"
 
 msgid "Unable to create a config file"
 msgstr "无法创建配置文件"
@@ -2446,15 +2488,6 @@ msgstr "现在提交"
 
 msgid "Commit Later"
 msgstr "以后提交"
-
-msgid "TortoiseHg Merge Commit"
-msgstr "TortoiseHg 合并提交"
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
 
 msgid "Merge changeset"
 msgstr "合并修改集"
@@ -2652,7 +2685,7 @@ msgstr "需要与 %s 合并 (通过 %s)\n"
 
 #, python-format
 msgid "needs merge with %s\n"
-msgstr ""
+msgstr "需要与 %s 合并\n"
 
 #, python-format
 msgid "needs update of diff base to tip of %s\n"
@@ -3140,17 +3173,17 @@ msgstr "变基目标"
 msgid "Swap source and destination"
 msgstr "交换源与目标"
 
-msgid "Keep original changesets"
-msgstr "保持原有变更集"
-
-msgid "Keep original branch names"
-msgstr "保持原有分支名称"
-
-msgid "Collapse the rebased changesets"
+msgid "Keep original changesets (--keep)"
 msgstr ""
 
-msgid "Rebase entire source branch"
-msgstr "变基整个源分支"
+msgid "Keep original branch names (--keepbranches)"
+msgstr ""
+
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr ""
+
+msgid "Rebase entire source branch (-b/--base)"
+msgstr ""
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr "变基在 Subversion 上未公开的头（覆盖源、目标）"
@@ -3771,6 +3804,9 @@ msgstr "%s <可拉取>"
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr "发现 %d 个进入变更集"
+
+msgid "Pull"
+msgstr "拉取"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "拉取修订集到您的仓库"
@@ -5072,8 +5108,11 @@ msgstr "要剥离的修订"
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
-msgid "thg sync [PEER]"
-msgstr "thg sync [PEER]"
+msgid "open the bookmark sync window"
+msgstr ""
+
+msgid "thg sync [OPTION]... [PEER]"
+msgstr ""
 
 msgid "replace existing tag"
 msgstr "替换已存在的标签"
@@ -5530,6 +5569,14 @@ msgid ""
 "Name associated with commits.  The common format is:<br>Full Name &lt;"
 "email@example.com&gt;"
 msgstr "提交使用的用户名。常见格式: <br>全名 &lt;email@example.com&gt;"
+
+msgid "Ask Username"
+msgstr ""
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
 
 msgid "Summary Line Length"
 msgstr "摘要行的长度"
@@ -6056,6 +6103,7 @@ msgstr "定义匹配问题编号的正则表达式。"
 msgid "Issue Link"
 msgstr "问题链接"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -6680,6 +6728,9 @@ msgstr "检查可推送到指定URL的更改"
 msgid "Push outgoing changes to selected URL"
 msgstr "推送更改到指定URL"
 
+msgid "Sync Bookmarks"
+msgstr ""
+
 msgid "Email outgoing changesets for remote repository"
 msgstr "将修订集作为电子邮件发送到远程仓库"
 
@@ -6991,13 +7042,6 @@ msgid ""
 "following URL?:<p>%s"
 msgstr ""
 
-msgid "Certificate Query Error"
-msgstr "证书查询出错"
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr "无效的端口号: %s"
-
 msgid "Security: "
 msgstr "安全: "
 
@@ -7059,6 +7103,9 @@ msgstr ""
 
 msgid "User Certificate Chain File"
 msgstr "用户证书链文件"
+
+msgid "Certificate Query Error"
+msgstr "证书查询出错"
 
 msgid "Unable to save authentication"
 msgstr "无法保存身份验证"
@@ -7516,8 +7563,17 @@ msgstr "更新工作目录或切换修订版本"
 msgid "&Shelve..."
 msgstr "剥离(&S)..."
 
-msgid "&Import..."
-msgstr "导入(&I)..."
+msgid "&Import Patches..."
+msgstr ""
+
+msgid "U&nbundle..."
+msgstr ""
+
+msgid "&Merge..."
+msgstr ""
+
+msgid "Merge with the other head of the current branch"
+msgstr ""
 
 msgid "&Resolve..."
 msgstr "解决(&R)..."
@@ -7563,6 +7619,9 @@ msgstr "传出(O)"
 
 msgid "P&ush"
 msgstr "推送(&U)"
+
+msgid "&Sync Bookmarks..."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -7675,6 +7734,21 @@ msgstr "执行 \"commit finished\" 触发器出错"
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "无法打开插件选项对话框"
+
+msgid "[SOURCE]"
+msgstr ""
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr ""
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr ""
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr ""
 
 msgid "move after the specified patch"
 msgstr ""
@@ -9462,9 +9536,6 @@ msgstr ""
 #~ msgid "_Synchronize"
 #~ msgstr "同步(_S)"
 
-#~ msgid "Pull"
-#~ msgstr "拉取"
-
 #~ msgid "Email..."
 #~ msgstr "邮寄..."
 
@@ -10682,12 +10753,6 @@ msgstr ""
 #~ msgid "There is no Mercurial repository here (.hg not found)"
 #~ msgstr "这里没有 Mercurial 仓库(未找到.hg目录)"
 
-#~ msgid "TortoiseHg Sync"
-#~ msgstr "TortoiseHg 同步"
-
-#~ msgid "outgoing changesets to %s found"
-#~ msgstr "发现可推送到 %s 的修订集"
-
 #~ msgid "&Yes (--force)"
 #~ msgstr "是(&Y) (--force)"
 
@@ -10717,14 +10782,6 @@ msgstr ""
 #~ msgstr ""
 #~ "设置了的话, 会将摘要中的行进行合并, 使每行尽可能达到80个字. 默认: 否"
 
-#~ msgid ""
-#~ "Space separated list of tags that will not be shown.Useful example: "
-#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
-#~ "Mercurial Queues Extension. Default: None (leave blank)"
-#~ msgstr ""
-#~ "不会显示的标签列表，用空格隔开。示例: 设为 \"qbase qparent qtip\" 以隐藏所"
-#~ "有 Mercurial Queues 扩展插入的标签。默认: 无 (留空)"
-
 #~ msgid "Connect to mail server using TLS. Default: False"
 #~ msgstr "用TLS方式连接邮件服务器. 默认: 否"
 
@@ -10736,22 +10793,3 @@ msgstr ""
 
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr "忽略对空行的修改. 默认: 否"
-
-#~ msgid ""
-#~ "Error creating interpreting commit date (%s).\n"
-#~ "Using current date instead."
-#~ msgstr ""
-#~ "解析提交日期 (%s) 出错。\n"
-#~ "使用当前日期代替。"
-
-#~ msgid "Source does not exists."
-#~ msgstr "源文件不存在。"
-
-#~ msgid "Repository stripped, incoming preview cleared"
-#~ msgstr "仓库已剥离，传入预览已清除"
-
-#~ msgid "Repository stripped, revision set cleared"
-#~ msgstr "仓库已剥离，修订集已创建"
-
-#~ msgid "Are you sure that you want to cancel synchronization?"
-#~ msgstr "您确定要取消同步？"

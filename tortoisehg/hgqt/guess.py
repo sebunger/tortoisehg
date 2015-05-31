@@ -442,11 +442,11 @@ class RenameSearchThread(QThread):
         else:
             ws = wctx.status()
             srcs = ws.removed + ws.deleted
-        added = [wctx[a] for a in self.ufiles]
-        removed = [pctx[a] for a in srcs if a in pctx]
+        added = [wctx[a] for a in sorted(self.ufiles)]
+        removed = [pctx[a] for a in sorted(srcs) if a in pctx]
         # do not consider files of zero length
-        added = sorted([fctx for fctx in added if fctx.size() > 0])
-        removed = sorted([fctx for fctx in removed if fctx.size() > 0])
+        added = [fctx for fctx in added if fctx.size() > 0]
+        removed = [fctx for fctx in removed if fctx.size() > 0]
         exacts = []
         gen = similar._findexactmatches(repo, added, removed)
         for o, n in gen:

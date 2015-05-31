@@ -193,7 +193,6 @@ class StatusWidget(QWidget):
         self.docf = docf
 
         self.fileview = fileview.HgFileView(self._repoagent, self)
-        self.fileview.setModeVisible(fileview.AnnMode, False)
         self.fileview.setShelveButtonVisible(True)
         self.fileview.showMessage.connect(self.showMessage)
         self.fileview.linkActivated.connect(self.linkActivated)

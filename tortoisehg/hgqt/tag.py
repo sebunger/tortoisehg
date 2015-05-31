@@ -30,17 +30,14 @@ class TagDialog(QDialog):
         base = QVBoxLayout()
         base.setSpacing(0)
         base.setContentsMargins(0, 0, 0, 0)
-        base.setSizeConstraint(QLayout.SetFixedSize)
+        base.setSizeConstraint(QLayout.SetMinAndMaxSize)
         self.setLayout(base)
 
-        # main layout box
-        box = QVBoxLayout()
-        box.setSpacing(8)
-        box.setContentsMargins(8, 8, 8, 8)
-        self.layout().addLayout(box)
-
+        formwidget = QWidget(self)
+        formwidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         form = QFormLayout(fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow)
-        box.addLayout(form)
+        formwidget.setLayout(form)
+        base.addWidget(formwidget)
 
         repo = repoagent.rawRepo()
         ctx = repo[rev]
@@ -51,6 +48,7 @@ class TagDialog(QDialog):
         self.tagCombo = QComboBox()
         self.tagCombo.setEditable(True)
         self.tagCombo.setEditText(hglib.tounicode(tag))
+        self.tagCombo.setMinimumContentsLength(30)  # cut long name
         self.tagCombo.currentIndexChanged.connect(self.updateStates)
         self.tagCombo.editTextChanged.connect(self.updateStates)
         qtlib.allowCaseChangingInput(self.tagCombo)
@@ -62,11 +60,9 @@ class TagDialog(QDialog):
         ### options
         expander = qtlib.ExpanderLabel(_('Options'), False)
         expander.expanded.connect(self.show_options)
-        box.addWidget(expander)
-
         optbox = QVBoxLayout()
         optbox.setSpacing(6)
-        box.addLayout(optbox)
+        form.addRow(expander, optbox)
 
         hbox = QHBoxLayout()
         hbox.setSpacing(0)
@@ -96,7 +92,7 @@ class TagDialog(QDialog):
         bbox.rejected.connect(self.reject)
         self.addBtn = bbox.addButton(_('&Add'), BB.ActionRole)
         self.removeBtn = bbox.addButton(_('&Remove'), BB.ActionRole)
-        box.addWidget(bbox)
+        form.addRow(bbox)
 
         self.addBtn.clicked.connect(self.onAddTag)
         self.removeBtn.clicked.connect(self.onRemoveTag)
@@ -209,8 +205,8 @@ class TagDialog(QDialog):
         self.customTextLineEdit.setVisible(visible)
 
     def set_status(self, text, icon):
-        self.status.setShown(True)
-        self.sep.setShown(True)
+        self.status.setVisible(True)
+        self.sep.setVisible(True)
         self.status.set_status(text, icon)
 
     def clear_status(self):

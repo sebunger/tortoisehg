@@ -10,7 +10,6 @@ import os, re
 
 from mercurial import util, patch, commands
 from mercurial import match as matchmod
-from hgext import record
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
@@ -420,7 +419,7 @@ class ChunksWidget(QWidget):
                                 opts=diffopts):
                 buf.write(p)
             buf.seek(0)
-            chunks = record.parsepatch(buf)
+            chunks = hglib.parsepatch(buf)
             if chunks:
                 header = chunks[0]
                 return [header] + header.hunks
@@ -746,7 +745,7 @@ class DiffBrowser(QFrame):
         elif type(self._ctx.rev()) is str:
             chunks = self._ctx._files[filename]
         else:
-            header = record.parsepatch(cStringIO.StringIO(fd.diff))[0]
+            header = hglib.parsepatch(cStringIO.StringIO(fd.diff))[0]
             chunks = [header] + header.hunks
 
         utext = []

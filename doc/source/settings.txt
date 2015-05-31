@@ -265,6 +265,10 @@ Commit
 	Name associated with commits.  The common format is:
 	``Full Name <email@example.com>``
 
+:guilabel:`Ask Username:`
+	If no username has been specified, the user will be prompted to enter
+	a username.  Default: False
+
 :guilabel:`Summary Line Length:`
 	Suggested length of commit message lines. A red vertical line will
 	mark this length.  :guilabel:`CTRL-E` will reflow the current

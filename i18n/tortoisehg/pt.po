@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
 "PO-Revision-Date: 2013-05-10 20:06+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-02-20 05:16+0000\n"
-"X-Generator: Launchpad (build 17341)\n"
+"X-Launchpad-Export-Date: 2015-04-28 05:14+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servisor de ícones de sobreposição do TortoiseHg"
@@ -30,7 +30,7 @@ msgstr ""
 msgid "About"
 msgstr "Sobre"
 
-msgid "Copyright 2008-2014 Steve Borho and others"
+msgid "Copyright 2008-2015 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -373,6 +373,43 @@ msgstr "O marcador \"%s\" foi removido"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "O nome do marcador \"%s\" foi mudado para \"%s\""
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr ""
+
+msgid "Outgoing Bookmarks"
+msgstr ""
+
+msgid "&Push Bookmark"
+msgstr ""
+
+msgid "&Remove Bookmark"
+msgstr ""
+
+msgid "Incoming Bookmarks"
+msgstr ""
+
+msgid "P&ull Bookmark"
+msgstr ""
+
+msgid "R&emove Bookmark"
+msgstr ""
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr ""
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - operação do ramo"
@@ -527,6 +564,9 @@ msgstr "Opções"
 
 msgid "Clone to revision:"
 msgstr "clonar para a revisão"
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr ""
 
 msgid "Do not update the new working directory"
 msgstr "Não actualizar a nova directoria de trabalho"
@@ -1109,6 +1149,7 @@ msgstr "Nome da ferramenta"
 msgid "The tool name. It cannot contain spaces."
 msgstr "O nome da ferramenta não pode ter espaços."
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1123,6 +1164,7 @@ msgid ""
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -2421,15 +2463,6 @@ msgstr "Submeter agora"
 msgid "Commit Later"
 msgstr "Submeter mais tarde"
 
-msgid "TortoiseHg Merge Commit"
-msgstr "Unir e submeter do TortoiseHg"
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
-
 msgid "Merge changeset"
 msgstr "Unir changeset"
 
@@ -3115,16 +3148,16 @@ msgstr ""
 msgid "Swap source and destination"
 msgstr ""
 
-msgid "Keep original changesets"
-msgstr "Manter changesets originais"
-
-msgid "Keep original branch names"
-msgstr "Manter nomes dos ramos originais"
-
-msgid "Collapse the rebased changesets"
+msgid "Keep original changesets (--keep)"
 msgstr ""
 
-msgid "Rebase entire source branch"
+msgid "Keep original branch names (--keepbranches)"
+msgstr ""
+
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr ""
+
+msgid "Rebase entire source branch (-b/--base)"
 msgstr ""
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
@@ -3736,6 +3769,9 @@ msgstr ""
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr ""
+
+msgid "Pull"
+msgstr "Receber"
 
 msgid "Pull incoming changesets into your repository"
 msgstr ""
@@ -5035,7 +5071,10 @@ msgstr ""
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
-msgid "thg sync [PEER]"
+msgid "open the bookmark sync window"
+msgstr ""
+
+msgid "thg sync [OPTION]... [PEER]"
 msgstr ""
 
 msgid "replace existing tag"
@@ -5487,6 +5526,14 @@ msgstr "Nome de utilizador"
 msgid ""
 "Name associated with commits.  The common format is:<br>Full Name &lt;"
 "email@example.com&gt;"
+msgstr ""
+
+msgid "Ask Username"
+msgstr ""
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
 msgstr ""
 
 msgid "Summary Line Length"
@@ -5997,6 +6044,7 @@ msgstr ""
 msgid "Issue Link"
 msgstr "Issue Link"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -6622,6 +6670,9 @@ msgstr ""
 msgid "Push outgoing changes to selected URL"
 msgstr ""
 
+msgid "Sync Bookmarks"
+msgstr ""
+
 msgid "Email outgoing changesets for remote repository"
 msgstr ""
 
@@ -6931,13 +6982,6 @@ msgid ""
 "following URL?:<p>%s"
 msgstr ""
 
-msgid "Certificate Query Error"
-msgstr ""
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr ""
-
 msgid "Security: "
 msgstr ""
 
@@ -6998,6 +7042,9 @@ msgid ""
 msgstr ""
 
 msgid "User Certificate Chain File"
+msgstr ""
+
+msgid "Certificate Query Error"
 msgstr ""
 
 msgid "Unable to save authentication"
@@ -7455,8 +7502,17 @@ msgstr ""
 msgid "&Shelve..."
 msgstr ""
 
-msgid "&Import..."
-msgstr "Importar..."
+msgid "&Import Patches..."
+msgstr ""
+
+msgid "U&nbundle..."
+msgstr ""
+
+msgid "&Merge..."
+msgstr ""
+
+msgid "Merge with the other head of the current branch"
+msgstr ""
 
 msgid "&Resolve..."
 msgstr "&Resolver..."
@@ -7501,6 +7557,9 @@ msgid "&Outgoing"
 msgstr ""
 
 msgid "P&ush"
+msgstr ""
+
+msgid "&Sync Bookmarks..."
 msgstr ""
 
 #, python-format
@@ -7603,6 +7662,21 @@ msgid "Error executing \"commit finished\" trigger"
 msgstr ""
 
 msgid "Cannot open Plugin Options dialog"
+msgstr ""
+
+msgid "[SOURCE]"
+msgstr ""
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr ""
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr ""
+
+#, python-format
+msgid "%s certificate error: no certificate received"
 msgstr ""
 
 msgid "move after the specified patch"
@@ -10454,9 +10528,6 @@ msgstr ""
 
 #~ msgid "Heads"
 #~ msgstr "Cabeçalhos"
-
-#~ msgid "Pull"
-#~ msgstr "Receber"
 
 #~ msgid "Push"
 #~ msgstr "Enviar"

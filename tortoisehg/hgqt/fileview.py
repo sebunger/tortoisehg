@@ -359,19 +359,11 @@ class HgFileView(QFrame):
         """Switch view to DiffMode/FileMode/AnnMode if available for the current
         content; otherwise it will be switched later"""
         action = self._modeAction(mode)
-        if not action.isVisible():
-            raise ValueError('unsupported mode: %r' % mode)
-
         if action.isEnabled():
             if not action.isChecked():
                 action.trigger()  # implies _setModeByAction()
         else:
             self._lostMode = mode
-
-    def setModeVisible(self, mode, visible):
-        action = self._modeAction(mode)
-        action.setVisible(visible)
-        self._fallBackToAvailableMode()
 
     @pyqtSlot(QAction)
     def _setParentRevision(self, action):
@@ -503,7 +495,7 @@ class HgFileView(QFrame):
                 availablemodes.add(DiffMode)
             if fd.contents:
                 availablemodes.add(FileMode)
-            if (fd.contents and fd.rev() is not None and fd.rev() >= 0
+            if (fd.contents and (fd.rev() is None or fd.rev() >= 0)
                 and fd.fileStatus() != 'R'):
                 availablemodes.add(AnnMode)
         self._restrictModes(availablemodes)
@@ -932,7 +924,7 @@ class _AnnotateViewControl(_AbstractViewControl):
         self._fd = fd
         self._links = []  # by line
         self._revmarkers = {}  # by rev
-        self._lastrev = None
+        self._lastrev = -1
 
         self._lastmarginclick = QTime.currentTime()
         self._lastmarginclick.addMSecs(-QApplication.doubleClickInterval())
@@ -1000,27 +992,30 @@ class _AnnotateViewControl(_AbstractViewControl):
             return hglib.tounicode(hglib.username(fctx.user()))
         def getdate(fctx):
             return util.shortdate(fctx.date())
-        def getrev(fctx):
-            return fctx.rev()
+        if self._fd.rev() is None:
+            p1rev = self._fd.parentRevs()[0]
+            revfmt = '%%%dd%%c' % len(str(p1rev))
+            def getrev(fctx):
+                if fctx.rev() is None:
+                    return revfmt % (p1rev, '+')
+                else:
+                    return revfmt % (fctx.rev(), ' ')
+        else:
+            revfmt = '%%%dd' % len(str(self._fd.rev()))
+            def getrev(fctx):
+                return revfmt % fctx.rev()
 
         aformat = [str(a.data().toString()) for a in self._annoptactions
                    if a.isChecked()]
-        revwidth = len(str(self._fd.rev()))
         annfields = {
-            'rev': ('%%%dd' % revwidth, getrev),
-            'author': ('%s', getauthor),
-            'date': ('%s', getdate),
+            'rev': getrev,
+            'author': getauthor,
+            'date': getdate,
         }
-        annformat = []
-        annfunc = []
-        for fieldname in aformat:
-            s, f = annfields[fieldname]
-            annformat.append(s)
-            annfunc.append(f)
-        annformat = ' : '.join(annformat)
+        annfunc = [annfields[n] for n in aformat]
 
         uniqfctxs = set(fctx for fctx, _origline in self._links)
-        return dict((fctx.rev(), annformat % tuple(f(fctx) for f in annfunc))
+        return dict((fctx.rev(), ' : '.join(f(fctx) for f in annfunc))
                     for fctx in uniqfctxs)
 
     def _emitRevisionHintAtLine(self, line):
@@ -1040,8 +1035,6 @@ class _AnnotateViewControl(_AbstractViewControl):
         return self._repoagent.subRepoAgent(rpath)
 
     def display(self, fd):
-        if fd.rev() is None:
-            return
         if self._fd == fd and self._links:
             self._updateView()
             return
@@ -1050,7 +1043,8 @@ class _AnnotateViewControl(_AbstractViewControl):
         self._cmdsession.abort()
         repoagent = self._repoAgentForFile()
         cmdline = hglib.buildcmdargs('annotate', fd.canonicalFilePath(),
-                                     rev=fd.rev(), text=True, file=True,
+                                     rev=hglib.escaperev(fd.rev(), 'wdir()'),
+                                     text=True, file=True,
                                      number=True, line_number=True, T='pickle')
         self._cmdsession = sess = repoagent.runCommand(cmdline, self)
         sess.setCaptureOutput(True)
@@ -1066,8 +1060,16 @@ class _AnnotateViewControl(_AbstractViewControl):
             return
         repo = self._repoAgentForFile().rawRepo()
         data = pickle.loads(str(sess.readAll()))
-        self._links = [(repo.filectx(l['file'], changeid=l['rev']),
-                        l['line_number']) for l in data]
+        links = []
+        fctxcache = {}  # (path, rev): fctx
+        for l in data:
+            path, rev = l['file'], l['rev']
+            try:
+                fctx = fctxcache[path, rev]
+            except KeyError:
+                fctx = fctxcache[path, rev] = repo[rev][path]
+            links.append((fctx, l['line_number']))
+        self._links = links
         self._updateView()
 
     def _updateView(self):

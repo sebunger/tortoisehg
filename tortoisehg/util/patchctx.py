@@ -6,15 +6,13 @@
 # GNU General Public License version 2 or any later version.
 
 import os
-import sys
-import shlex
 import binascii
 import cStringIO
 
 from mercurial import patch, util, error
 from mercurial import node
 from mercurial.util import propertycache
-from hgext import mq, record
+from hgext import mq
 
 from tortoisehg.util import hglib
 
@@ -209,8 +207,8 @@ class patchctx(object):
                 # consume comments and headers
                 for i in range(self._ph.diffstartline):
                     pf.readline()
-                for chunk in record.parsepatch(pf):
-                    if not isinstance(chunk, record.header):
+                for chunk in hglib.parsepatch(pf):
+                    if not isinstance(chunk, hglib.patchheader):
                         continue
                     top = patch.parsefilename(chunk.header[-2])
                     bot = patch.parsefilename(chunk.header[-1])

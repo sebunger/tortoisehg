@@ -220,14 +220,6 @@ import collections
 from mercurial import revset as revsetmod
 from mercurial import graphmod, phases
 
-try:
-    groupbranchiter = graphmod.groupbranchiter
-except AttributeError:
-    # for hg<3.3
-    def groupbranchiter(revs, *args, **kwargs):
-        """dummy function doing nothing for old version"""
-        return revs
-
 from tortoisehg.util import obsoleteutil
 
 LINE_TYPE_PARENT = 0
@@ -298,7 +290,7 @@ class StandardDag(object):
             if firstbranchrevset:
                 firstbranch = repo.revs(firstbranchrevset)
             parentrevs = repo.changelog.parentrevs
-            revs = list(groupbranchiter(revs, parentrevs, firstbranch))
+            revs = list(graphmod.groupbranchiter(revs, parentrevs, firstbranch))
 
         for curr_rev in revs:
             if visiblerev(curr_rev):

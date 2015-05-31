@@ -136,6 +136,8 @@ class RevisionSetQuery(QDialog):
 
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
+        # same policy as status bar of QMainWindow
+        self.stbar.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
         self.stbar.lbl.setOpenExternalLinks(True)
 
         hbox = QHBoxLayout()

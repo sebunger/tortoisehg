@@ -5,17 +5,52 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import os
+import os, socket
 
-from mercurial import cmdutil, extensions, util
+from mercurial import cmdutil, extensions, sslutil, util
 
 from tortoisehg.util import hgversion
 from tortoisehg.util.i18n import agettext as _
 
 cmdtable = {}
 _mqcmdtable = {}
+command = cmdutil.command(cmdtable)
 mqcommand = cmdutil.command(_mqcmdtable)
 testedwith = hgversion.testedwith
+
+@command('debuggethostfingerprint',
+    [],
+    _('[SOURCE]'),
+    optionalrepo=True)
+def debuggethostfingerprint(ui, repo, source='default'):
+    """retrieve a fingerprint of the server certificate
+
+    The server certificate is not verified.
+    """
+    source = ui.expandpath(source)
+    u = util.url(source)
+    scheme = (u.scheme or '').split('+')[-1]
+    host = u.host
+    port = util.getport(u.port or scheme or '-1')
+    if scheme != 'https' or not host or not (0 <= port <= 65535):
+        raise util.Abort(_('unsupported URL: %s') % source)
+
+    sock = socket.socket()
+    try:
+        sock.connect((host, port))
+        sock = sslutil.ssl_wrap_socket(sock, None, None, serverhostname=host)
+        if not util.safehasattr(sock, 'getpeercert'):  # python 2.5 ?
+            raise util.Abort(_('host fingerprint for %s cannot be obtained '
+                               '(Python too old)') % host)
+        peercert = sock.getpeercert(True)
+        if not peercert:
+            raise util.Abort(_('%s certificate error: no certificate received')
+                             % host)
+    finally:
+        sock.close()
+
+    s = util.sha1(peercert).hexdigest()
+    ui.write(':'.join([s[x:x + 2] for x in xrange(0, len(s), 2)]), '\n')
 
 def postinitskel(ui, repo, hooktype, result, pats, **kwargs):
     """create common files in new repository"""

@@ -33,6 +33,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         ### target revision combo
         self.rev_combo = combo = QComboBox()
         combo.setEditable(True)
+        combo.setMinimumContentsLength(30)  # cut long name
         combo.installEventFilter(qtlib.BadCompletionBlocker(combo))
         form.addRow(_('Update to:'), combo)
 
@@ -362,8 +363,8 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
 
     @pyqtSlot(bool)
     def show_options(self, visible):
-        self.merge_chk.setShown(visible)
-        self.autoresolve_chk.setShown(visible)
+        self.merge_chk.setVisible(visible)
+        self.autoresolve_chk.setVisible(visible)
 
     @pyqtSlot(int)
     def _updatePathComboTooltip(self, idx):

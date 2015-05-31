@@ -16,8 +16,8 @@ from mercurial import hg, util, scmutil, httpconnection
 
 from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.util.i18n import _
-from tortoisehg.hgqt import cmdcore, qtlib, thgrepo
-from tortoisehg.hgqt import hgrcutil, hgemail, rebase, resolve
+from tortoisehg.hgqt import cmdcore, cmdui, qtlib, thgrepo
+from tortoisehg.hgqt import bookmark, hgrcutil, hgemail, rebase, resolve
 
 def parseurl(url):
     assert type(url) == unicode
@@ -103,6 +103,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.pushAction = \
         newaction(_('Push outgoing changes to selected URL'),
              'hg-push', lambda: self.pushclicked(None))
+        newaction(_('Sync Bookmarks'), 'thg-sync-bookmarks', self.syncBookmark)
         newaction(_('Email outgoing changesets for remote repository'),
              'mail-forward', self.emailclicked)
 
@@ -929,6 +930,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         sess.commandFinished.connect(self._onOutgoingEmailFinished)
         self.showMessage.emit(_('Determining outgoing changesets to email...'))
 
+    def syncBookmark(self):
+        dlg = bookmark.SyncBookmarkDialog(self._repoagent, self.currentUrl(),
+                                          self)
+        dlg.exec_()
+
     @pyqtSlot(int)
     def _onOutgoingEmailFinished(self, ret):
         if ret == 0:
@@ -960,7 +966,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if bundlefile:
             # Set the pull source to the selected bundle file
             self.urlentry.setText(bundlefile)
-            # Execute the incomming command, which will show the revisions in
+            # Execute the incoming command, which will show the revisions in
             # the bundle, and let the user accept or reject them
             self.inclicked()
 
@@ -1235,30 +1241,9 @@ class SecureDialog(QDialog):
     def __init__(self, repoagent, urlu, parent):
         super(SecureDialog, self).__init__(parent)
         self._repoagent = repoagent
+        self._querysess = cmdcore.nullCmdSession()
         repo = repoagent.rawRepo()
-
-        def genfingerprint():
-            if u.port is None:
-                portnum = 443
-            else:
-                try:
-                    portnum = int(u.port)
-                except ValueError:
-                    qtlib.WarningMsgBox(_('Certificate Query Error'),
-                                        _('Invalid port number: %s')
-                                        % hglib.tounicode(u.port), parent=self)
-                    return
-            try:
-                pem = ssl.get_server_certificate( (u.host, portnum) )
-                der = ssl.PEM_cert_to_DER_cert(pem)
-            except Exception, e:
-                qtlib.WarningMsgBox(_('Certificate Query Error'),
-                                    hglib.tounicode(str(e)), parent=self)
-                return
-            hash = util.sha1(der).hexdigest()
-            pretty = ":".join([hash[x:x + 2] for x in xrange(0, len(hash), 2)])
-            le.setText(pretty)
-
+        self._url = urlu
         u = parseurl(urlu)
         assert u.host
         uhost = hglib.tounicode(u.host)
@@ -1302,21 +1287,15 @@ class SecureDialog(QDialog):
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
             le.setPlaceholderText(_('### host certificate fingerprint ###'))
         hbox.addWidget(le)
-        try:
-            import ssl # Python 2.6 or backport for 2.5
-            qb = QPushButton(_('Query'))
-            qb.clicked.connect(genfingerprint)
-            qb.setEnabled(False)
-            self.fprintradio.toggled.connect(qb.setEnabled)
-            hbox.addWidget(qb)
-        except ImportError:
-            pass
+        self._querybutton = qb = QPushButton(_('Query'))
+        qb.clicked.connect(self._queryFingerprint)
+        self.fprintradio.toggled.connect(self._updateUi)
+        hbox.addWidget(qb)
         vbox.addWidget(self.cacertradio)
         vbox.addWidget(self.fprintradio)
         vbox.addLayout(hbox)
         vbox.addWidget(self.insecureradio)
 
-        self.cacertradio.setEnabled(bool(repo.ui.config('web', 'cacerts')))
         self.cacertradio.setChecked(True) # default
         if fprint:
             self.fprintradio.setChecked(True)
@@ -1370,8 +1349,27 @@ are expanded in the filename.'''))
         self.bb = bb
         self.layout().addWidget(bb)
 
+        self._updateUi()
         self.userentry.selectAll()
         QTimer.singleShot(0, lambda:self.userentry.setFocus())
+
+    @pyqtSlot()
+    def _queryFingerprint(self):
+        cmdline = hglib.buildcmdargs('debuggethostfingerprint', self._url)
+        self._querysess = sess = self._repoagent.runCommand(cmdline, self)
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._onQueryFingerprintFinished)
+        self._updateUi()
+
+    @pyqtSlot(int)
+    def _onQueryFingerprintFinished(self, ret):
+        sess = self._querysess
+        if ret == 0:
+            data = str(sess.readAll())
+            self.fprintentry.setText(hglib.tounicode(data).strip())
+        else:
+            cmdui.errorMessageBox(sess, self, _('Certificate Query Error'))
+        self._updateUi()
 
     def keyringHelp(self):
         qtlib.openhelpcontents('sync.html#security')
@@ -1423,6 +1421,11 @@ are expanded in the filename.'''))
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         super(SecureDialog, self).accept()
+
+    @pyqtSlot()
+    def _updateUi(self):
+        self._querybutton.setEnabled(self.fprintradio.isChecked()
+                                     and self._querysess.isFinished())
 
 
 class PathsTree(QTreeView):

@@ -163,9 +163,9 @@ class RemoteUpdateWidget(cmdui.AbstractCmdWidget):
     ### Signal Handlers ###
 
     def show_options(self, visible):
-        self.push_chk.setShown(visible)
-        self.newbranch_chk.setShown(visible)
-        self.force_chk.setShown(visible)
+        self.push_chk.setVisible(visible)
+        self.newbranch_chk.setVisible(visible)
+        self.force_chk.setVisible(visible)
 
 
 def createRemoteUpdateDialog(repoagent, rev=None, parent=None):

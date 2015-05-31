@@ -29,17 +29,15 @@ class SignDialog(QDialog):
         base = QVBoxLayout()
         base.setSpacing(0)
         base.setContentsMargins(*(0,)*4)
-        base.setSizeConstraint(QLayout.SetFixedSize)
+        base.setSizeConstraint(QLayout.SetMinAndMaxSize)
         self.setLayout(base)
 
-        box = QVBoxLayout()
-        box.setSpacing(8)
-        box.setContentsMargins(*(8,)*4)
-        self.layout().addLayout(box)
-
         ## main layout grid
+        formwidget = QWidget(self)
+        formwidget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         form = QFormLayout(fieldGrowthPolicy=QFormLayout.AllNonFixedFieldsGrow)
-        box.addLayout(form)
+        formwidget.setLayout(form)
+        base.addWidget(formwidget)
 
         repo = repoagent.rawRepo()
         form.addRow(_('Revision:'), QLabel('%s (%s)' % (rev, repo[rev])))
@@ -51,11 +49,9 @@ class SignDialog(QDialog):
         ### options
         expander = qtlib.ExpanderLabel(_('Options'), False)
         expander.expanded.connect(self.show_options)
-        box.addWidget(expander)
-
         optbox = QVBoxLayout()
         optbox.setSpacing(6)
-        box.addLayout(optbox)
+        form.addRow(expander, optbox)
 
         hbox = QHBoxLayout()
         hbox.setSpacing(0)
@@ -87,7 +83,7 @@ class SignDialog(QDialog):
         self.signBtn = bbox.addButton(_('&Sign'), BB.ActionRole)
         bbox.addButton(BB.Close)
         bbox.rejected.connect(self.reject)
-        box.addWidget(bbox)
+        form.addRow(bbox)
 
         self.signBtn.clicked.connect(self.onSign)
 
@@ -188,8 +184,8 @@ class SignDialog(QDialog):
             self.customTextLineEdit.setFocus()
 
     def set_status(self, text, icon=None):
-        self.status.setShown(True)
-        self.sep.setShown(True)
+        self.status.setVisible(True)
+        self.sep.setVisible(True)
         self.status.set_status(text, icon)
 
     def clear_status(self):

@@ -132,6 +132,8 @@ class CloneWidget(cmdui.AbstractCmdWidget):
 
         self.rev_chk, self.rev_text = chktext(_('Clone to revision:'),
                                               stretch=40)
+        self.rev_text.setToolTip(_('A revision identifier, bookmark, tag or '
+                                   'branch name'))
 
         self.noupdate_chk = QCheckBox(_('Do not update the new working directory'))
         self.pproto_chk = QCheckBox(_('Use pull protocol to copy metadata'))

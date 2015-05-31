@@ -228,6 +228,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     @pyqtSlot()
     def _reloadGraph(self):
+        self._latesttags = {-1: self._latesttags[-1]}  # clear
         if self._revspec:
             self._runQuery()
         self._rebuildGraph()
