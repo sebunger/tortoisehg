@@ -11,24 +11,19 @@ TortoiseHg 2.0
 Filosofie
 ---------
 
-Mezi TortoiseHg 1.0 a TortoiseHg 2.0 došlo k následujícím výrazným změnám.
+Mezi TortoiseHg 1.0 a TortoiseHg 2.0 došlo k následujícím změnám.
 
-Workbench - Verpánek
-^^^^^^^^^^^^^^^^^^^^^
+Verpánek
+^^^^^^^^
 
-Chtěli jsme mít jednu aplikaci, která by měla přístup k většině funkcí TortoiseHg (a Mercurialu) a která by šla spustit zástupcem z plochy, nebo výběrem z menu Start. Za tím účelem jsme vyvinuli aplikaci Workbench neboli Verpánek.
+Chtěli jsme mít jedinou aplikaci, která by měla přístup k téměř všem funkcím TortoiseHg (a Mercurialu) a která by šla spustit zástupcem z plochy, nebo výběrem z menu Start. Za tím účelem jsme vyvinuli aplikaci Workbench neboli Verpánek.
 
-Workbench umí zobrazit více současně otevřených repozitářů na kartách, aktivovaných poklepem na položce seznamu v panelu :guilabel:`Repository Registry`.
+Verpánek podporuje otevření a zobrazení více než jednoho repozitáře na kartách, aktivovaných poklepem na položce seznamu v panelu :guilabel:`Seznam repozitářů`.
 
-Každá repozitářová karta je propojena s úkonovými kartami (podrobnosti revizí, komit, synchronizace, manifest, hledání), které se zobrazují pod přehledem changesetů. Tyto karty se přepínají ikonami po straně nebo nabídkami aplikací.
+Každá repozitářová karta je propojena s úkonovými kartami (Podrobnosti revizí, Commit, Synchronizace, Hledat), které se zobrazují v úkonové ploše pod Přehledem revizí. Tyto karty se přepínají poklepem na ouška, ikonami v úkonové liště nebo výběrem nabídky v roletce :guilabel:`View`.
 
-K disposici jsou také dva parkovatelné widgety - *Repozitory Registry* a *Output Log*. První zobrazuje stromovou strukturu všech lokálních repozitářů v počítači, druhý widget zobrazuje aktuálně prováděné příkazy a lze jej použít jako konzolu pro zadávání příkazů. 
+K disposici jsou také tři parkovatelné panely - *Seznam repozitářů*, *Patch Queue* a *Output Log*. První zobrazuje stromovou strukturu lokálních repozitářů v počítači, druhý panel se použije při manipulaci s oprávkami (patches) a třetí panel zobrazuje aktuálně prováděné příkazy a lze jej použít jako konzolu pro zadávání příkazů. 
 
-
-Zobrazení příkazových řádků Mercurialu
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Ve snaze poučit uživatele o příkazovém rozhraní Mercurialu, jsou téměř všechny příkazy prováděny v záznamovém okně *Output Log*, kde je zobrazen celý příkazový řádek a výstup Mercurialu. 
 
 Nástroj Resolve, uvážlivá sloučení
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -37,25 +32,21 @@ TortoiseHg 2.0 zavádí dialog 'resolve' pro řešení konfliktů při slučová
 
 Za podpory procedury 'resolve' mohou být jednotlivá sloučení restartována tak často, jak je pro správné sloučení souborů zapotřebí. 
 
-Proceduru 'resolve' použije TortoiseHg implicitně k řešení všech konfliktů. Pokud je úspěšná, dojde k automatickéhu sloučení, pokud ne, musí konflikt vyřešit uživatel. 
+Proceduru 'resolve' použije TortoiseHg implicitně k řešení všech konfliktů. Pokud je úspěšné, dojde k automatickéhu sloučení, pokud ne, musí konflikt vyřešit uživatel. 
 
 
 Zlepšené odkládání souborů
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-Tortoise 2.0 obsahuje nový odkládací nástroj 'shelve' který umí přesouvat změny z pracovního adresáře do souboru almárky (shell file) nebo do nepoužité oprávky MQ (MQ patch).
-
-Termín 'almárka' používám místo 'police' proto, že mi přijde hezčí. Slovesa 'shell' a 'unshell' zkusím v případě nutnosti přeložit jako 'odsunout' a 'přisunout'.
-
-
+Tortoise 2.0 obsahuje nový odkládací nástroj 'shelve' který umí přesouvat změny z pracovního adresáře do šelfového souboru (shelf file) nebo do neaplikované oprávky MQ (MQ patch).
 
 
 Sady revizí
 ^^^^^^^^^^^
-Lištu pro nastavení filtru v Repozitory Explorer jsme ve Verpánku nahradili lištou pro sadu revizí (implicitně není zobrazena). Sady revizí byly zavedeny v Mercurialu 1.6 a byly v každém dalším vydání integrovány se stoupajícím počtem příkazů. Je to mocný dotazovací nástroj pro hledání a určování revizí v repozitáři. 
+Lištu pro nastavení filtru v Repozitory Explorer jsme ve Verpánku nahradili Pracovní lištou filtru pro výběr sad revizí (implicitně není zobrazena). Sady revizí byly zavedeny v Mercurialu 1.6 a byly v každém dalším vydání integrovány se stoupajícím počtem příkazů. Je to mocný dotazovací nástroj pro vyhledávání revizí v repozitáři. 
 
-Workbench obsahuje také editor sady revizí, který je zdrojem poučení o dostupných klíčových slovech a jejich argumentech, a má schopnost doplňovat otevřené závorky, počatá slova a další.
+.. Verpánek obsahuje také editor sady revizí, který je zdrojem poučení o dostupných klíčových slovech a jejich argumentech, a má schopnost doplňovat otevřené závorky, počatá slova a další.
 
-Příchozí a odchozí changesety jsou nyní v TortoiseHg 2.0 zobrazeny jako sady revizí. V předchozích verzích byly reprezentovány komentářem ke grafu.
+.. Příchozí a odchozí changesety jsou nyní v TortoiseHg 2.0 zobrazeny jako sady revizí. V předchozích verzích byly reprezentovány komentářem ke grafu.
 
 Technologie
 -----------
@@ -63,32 +54,32 @@ Technologie
 Qt a PyQt
 ^^^^^^^^^
 
-V TortoiseHg 2.0 jsou téměř zcela přepsány všechny nástroje a dialogy s využitím vynikající bázové aplikace `Qt <http://qt.nokia.com/products>`_ od Nokie a pěkných poutek (bindings) `PyQt <http://www.riverbankcomputing.co.uk/software/pyqt/intro>`_ od Riverbank Computing.
+Téměř všechny nástroje a dialogy v TortoiseHg 2.0 byly přepsány pro využití vynikajících aplikací `Qt <http://qt.nokia.com/products>`_  a  `PyQt <http://www.riverbankcomputing.co.uk/software/pyqt/intro>`_. 
 
 QScintilla2
 ^^^^^^^^^^^
 
 TortoiseHg používá značnou měrou editovací komponenty aplikace `QScintilla2 <http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/index.html>`_ pro:
-  * zobrazení souborů a diffů se zvýrazněním syntaxe
-  * zobrazení anotací se zvýrazněním syntaxe
-  * editaci komitových zpráv s automatickým dokončováním jmen souborů a zdrojových symbolů 
-  * editaci řetězců sad revizí (revision set strings) s doplňováním závorek a s automatickým dokončováním.
+* zobrazení souborů a diffů se zvýrazněním syntaxe
+* zobrazení anotací se zvýrazněním syntaxe
+* editaci komitových zpráv s automatickým dokončováním jmen souborů a zdrojových symbolů 
+* editaci řetězců sad revizí (revision set strings) s doplňováním závorek a s automatickým dokončováním.
 
-Délku tabulátoru lze nastavit v konfiguračním nástroji, zatímco délky řádků a viditelnost "white space" jsou ovládány z kontextového menu.
+Délku tabulátoru lze nastavit v konfiguračním nástroji, zatímco délky řádků a viditelnost "white space" jsou ovládány z kontextových menu.
 
 Zjišťování stavu repozitáře a konfigurace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Workbench a další aplikace, jako např. nástroj :guilabel:`commit` prohledají repozitáře ve vašem počítači aby v nich nebo v konfiguračních souborech zjistily změny a automaticky v případě potřeby aktualizovaly běžící aplikace. Téměř všechny konfigurační změny jsou okamžitě účinné kromě povolení či zakázání extenzí Mercurialu. Změny nastavení extenzí obvykle vyžadují restart aplikace.
+Verpánek a další aplikace, jako např. nástroj :guilabel:`commit` prohledají repozitáře ve vašem počítači aby v nich nebo v konfiguračních souborech zjistily změny a automaticky v případě potřeby aktualizovaly běžící aplikace. Téměř všechny konfigurační změny jsou okamžitě účinné kromě povolení či zakázání extenzí Mercurialu. Změny nastavení extenzí obvykle vyžadují restart aplikace.
 
 Okamžité hlášení chyb
 ^^^^^^^^^^^^^^^^^^^^^
 Před TortoiseHg 2.0 bylo hlášení chyb zapisováno do stderr v okamžiku jejich vzniku a stderr byl odchycen a skenován pro předání uživateli při ukončení aplikace. I když se tímto mechanizmem získalo mnoho cenných chybových zpráv, bylo možné jen výjimečně zjistit, které operace chybu způsobily.
 
-Pro TortoiseHg 2.0 byl vytvořen generický manipulátor výjimek, který odchytí všechny výjimky Pythonu, které by jinak zůstaly kódem aplikace neošetřeny. To umožňuje zobrazit záznamy výjimek teměř okamžitě po jejich vzniku (po krátké pauze potřebné pro shromáždění za sebou jdoucích výjimek). Očekává se, že chybové zprávy budou napříště obsahovat lepší instrukce pro reprodukci nebo alespoň souvislosti pro zpětné záznamy.
+Pro TortoiseHg 2.0 byl vytvořen generický manipulátor výjimek, který odchytí všechny výjimky Pythonu, které by jinak zůstaly kódem aplikace neošetřeny. To umožňuje zobrazit záznamy výjimek téměř okamžitě po jejich vzniku (po krátké pauze potřebné pro shromáždění za sebou jdoucích výjimek). Očekává se, že chybové zprávy budou napříště obsahovat lepší instrukce pro reprodukci nebo alespoň souvislosti pro zpětné záznamy.
 
 Načtení grafu dle požadavku
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Za účelem pružného oživení zobrazení načítá grafový algoritmus při oživení (refresh) implicitně jenom několik stovek revizí a poté načítá pouze požadované revize. Při procházení grafem může dojít k jeho trhavému zobrazení. Tento projev lze odstanit příkazem :guilabel:`Load all revisions` (načíst všechny revize) v menu :guilabel:`View`.
+Za účelem pružného zobrazení načítá grafový algoritmus při akci refresh implicitně jenom několik stovek revizí a poté načítá pouze požadované revize. Při procházení Přehledem revizí může dojít k jeho trhavému zobrazení. Tento projev lze odstanit příkazem :guilabel:`Načíst všechny revize` v menu :guilabel:`View`.
 
 
 .. vim: noet ts=4

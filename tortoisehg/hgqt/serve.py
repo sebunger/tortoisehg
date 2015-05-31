@@ -5,20 +5,19 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import sys, os, httplib, socket, tempfile
+import os, tempfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import extensions, hgweb, util, error
-from mercurial.hgweb import server  # workaround for demandimport
+from mercurial import util, error
 from tortoisehg.util import paths, wconfig, hglib
-from tortoisehg.hgqt import cmdui, qtlib, thgrepo
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import cmdcore, cmdui, qtlib
 from tortoisehg.hgqt.serve_ui import Ui_ServeDialog
 from tortoisehg.hgqt.webconf import WebconfForm
 
 class ServeDialog(QDialog):
     """Dialog for serving repositories via web"""
-    def __init__(self, webconf, parent=None):
+    def __init__(self, ui, webconf, parent=None):
         super(ServeDialog, self).__init__(parent)
         self.setWindowFlags((self.windowFlags() | Qt.WindowMinimizeButtonHint)
                             & ~Qt.WindowContextHelpButtonHint)
@@ -29,18 +28,18 @@ class ServeDialog(QDialog):
         self._qui.setupUi(self)
 
         self._initwebconf(webconf)
-        self._initcmd()
+        self._initcmd(ui)
         self._initactions()
         self._updateform()
 
-    def _initcmd(self):
-        self._cmd = cmdui.Widget(True, False, self)
+    def _initcmd(self, ui):
         # TODO: forget old logs?
-        self._log_edit = self._cmd.core.outputLog
+        self._log_edit = cmdui.LogWidget(self)
         self._qui.details_tabs.addTab(self._log_edit, _('Log'))
-        self._cmd.hide()
-        self._cmd.commandStarted.connect(self._updateform)
-        self._cmd.commandFinished.connect(self._updateform)
+        # as of hg 3.0, hgweb does not cooperate with command-server channel
+        self._agent = cmdcore.CmdAgent(ui, self, worker='proc')
+        self._agent.outputReceived.connect(self._log_edit.appendLog)
+        self._agent.busyChanged.connect(self._updateform)
 
     def _initwebconf(self, webconf):
         self._webconf_form = WebconfForm(webconf=webconf, parent=self)
@@ -76,12 +75,11 @@ class ServeDialog(QDialog):
         if self.isstarted():
             return
 
-        _setupwrapper()
-        self._cmd.run(self._cmdargs())
+        self._agent.runCommand(map(hglib.tounicode, self._cmdargs()))
 
     def _cmdargs(self):
         """Build command args to run server"""
-        a = ['serve', '--port', str(self.port), '--debug']
+        a = ['serve', '--port', str(self.port), '-v']
         if self._singlerepo:
             a += ['-R', self._singlerepo]
         else:
@@ -119,28 +117,7 @@ class ServeDialog(QDialog):
     @pyqtSlot()
     def stop(self):
         """Stop web server"""
-        if not self.isstarted():
-            return
-
-        self._cmd.cancel()
-        self._fake_request()
-
-    def _fake_request(self):
-        """Send fake request for server to run python code"""
-        TIMEOUT = 0.5  # [sec]
-        conn = httplib.HTTPConnection('localhost:%d' % self.port)
-        origtimeout = socket.getdefaulttimeout()
-        socket.setdefaulttimeout(TIMEOUT)
-        try:
-            try:
-                conn.request('GET', '/')
-                res = conn.getresponse()
-                res.read()
-            except (socket.error, httplib.HTTPException):
-                pass
-        finally:
-            socket.setdefaulttimeout(origtimeout)
-            conn.close()
+        self._agent.abortCommands()
 
     def reject(self):
         self.stop()
@@ -148,7 +125,7 @@ class ServeDialog(QDialog):
 
     def isstarted(self):
         """Is the web server running?"""
-        return self._cmd.core.running()
+        return self._agent.isBusy()
 
     @property
     def rooturl(self):
@@ -206,65 +183,6 @@ class ServeDialog(QDialog):
         from tortoisehg.hgqt import settings
         settings.SettingsDialog(parent=self, focus='web.name').exec_()
 
-def _create_server(orig, ui, app):
-    """wrapper for hgweb.server.create_server to be interruptable"""
-    server = orig(ui, app)
-    server.accesslog = ui
-    server.errorlog = ui  # TODO: ui.warn
-    server._serving = False
-
-    def serve_forever(orig):
-        server._serving = True
-        try:
-            try:
-                while server._serving:
-                    server.handle_request()
-            except KeyboardInterrupt:
-                # raised outside try-block around process_request().
-                # see SocketServer.BaseServer
-                pass
-        finally:
-            server._serving = False
-            server.server_close()
-
-    def handle_error(orig, request, client_address):
-        type, value, _traceback = sys.exc_info()
-        if issubclass(type, KeyboardInterrupt):
-            server._serving = False
-        else:
-            ui.write_err('%s\n' % value)
-
-    extensions.wrapfunction(server, 'serve_forever', serve_forever)
-    extensions.wrapfunction(server, 'handle_error', handle_error)
-    return server
-
-_setupwrapper_done = False
-def _setupwrapper():
-    """Wrap hgweb.server.create_server to get along with thg"""
-    global _setupwrapper_done
-    if not _setupwrapper_done:
-        extensions.wrapfunction(hgweb.server, 'create_server',
-                                _create_server)
-        _setupwrapper_done = True
-
-def run(ui, *pats, **opts):
-    repopath = opts.get('root') or paths.find_root()
-    webconfpath = opts.get('web_conf') or opts.get('webdir_conf')
-    dlg = ServeDialog(webconf=_newwebconf(repopath, webconfpath))
-
-    lui = ui.copy()
-    if webconfpath:
-        lui.readconfig(webconfpath)
-    elif repopath:
-        lui.readconfig(os.path.join(repopath, '.hg', 'hgrc'), repopath)
-    try:
-        dlg.setport(int(lui.config('web', 'port', '8000')))
-    except ValueError:
-        pass
-
-    if repopath or webconfpath:
-        dlg.start()
-    return dlg
 
 def _asconfigliststr(value):
     r"""
@@ -283,27 +201,45 @@ def _asconfigliststr(value):
     else:
         return value
 
-def _newwebconf(repopath, webconfpath):
-    """create config obj for hgweb"""
+def _readconfig(ui, repopath, webconfpath):
+    """Create new ui and webconf object and read appropriate files"""
+    lui = ui.copy()
     if webconfpath:
+        lui.readconfig(webconfpath)
         # TODO: handle file not found
         c = wconfig.readfile(webconfpath)
         c.path = os.path.abspath(webconfpath)
-        return c
+        return lui, c
     elif repopath:  # imitate webconf for single repo
+        lui.readconfig(os.path.join(repopath, '.hg', 'hgrc'), repopath)
         c = wconfig.config()
         try:
-            # TODO: not nice to instantiate repo just for repo.shortname
-            repo = thgrepo.repository(None, repopath)
             if not os.path.exists(os.path.join(repopath, '.hgsub')):
                 # no _asconfigliststr(repopath) for now, because ServeDialog
                 # cannot parse it as a list in single-repo mode.
                 c.set('paths', '/', repopath)
             else:
                 # since hg 8cbb59124e67, path entry is parsed as a list
-                base = hglib.fromunicode(repo.shortname)
+                base = hglib.shortreponame(lui) or os.path.basename(repopath)
                 c.set('paths', base,
                       _asconfigliststr(os.path.join(repopath, '**')))
         except (EnvironmentError, error.Abort, error.RepoError):
             c.set('paths', '/', repopath)
-        return c
+        return lui, c
+    else:
+        return lui, None
+
+def run(ui, *pats, **opts):
+    repopath = opts.get('root') or paths.find_root()
+    webconfpath = opts.get('web_conf') or opts.get('webdir_conf')
+
+    lui, webconf = _readconfig(ui, repopath, webconfpath)
+    dlg = ServeDialog(lui, webconf=webconf)
+    try:
+        dlg.setport(int(lui.config('web', 'port', '8000')))
+    except ValueError:
+        pass
+
+    if repopath or webconfpath:
+        dlg.start()
+    return dlg

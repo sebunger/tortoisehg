@@ -13,9 +13,9 @@ from PyQt4.Qsci import QsciScintilla
 
 from mercurial import commands, util
 
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui
+from tortoisehg.hgqt import cmdui, qtlib
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 
 class _LogWidgetForConsole(cmdui.LogWidget):
     """Wrapped LogWidget for ConsoleWidget"""
@@ -65,6 +65,9 @@ class _LogWidgetForConsole(cmdui.LogWidget):
     def setPrompt(self, text):
         if text == self._prompt:
             return
+        if self._findPromptLine() < 0:
+            self._prompt = text
+            return
         self.clearPrompt()
         self._prompt = text
         self.openPrompt()
@@ -103,6 +106,13 @@ class _LogWidgetForConsole(cmdui.LogWidget):
     def _findPromptLine(self):
         return self.markerFindPrevious(self.lines() - 1,
                                        1 << self._prompt_marker)
+
+    @pyqtSlot()
+    def clearLog(self):
+        wasopen = self._findPromptLine() >= 0
+        self.clear()
+        if wasopen:
+            self.openPrompt()
 
     @pyqtSlot()
     def closePrompt(self):
@@ -248,36 +258,21 @@ def _searchhistory(items, text, direction, idx):
         idx += direction
     return None, idx
 
-class _ConsoleCmdTable(dict):
-    """Command table for ConsoleWidget"""
-    _cmdfuncprefix = '_cmd_'
-
-    def __call__(self, func):
-        if not func.__name__.startswith(self._cmdfuncprefix):
-            raise ValueError('bad command function name %s' % func.__name__)
-        self[func.__name__[len(self._cmdfuncprefix):]] = func
-        return func
-
-class ConsoleWidget(QWidget):
+class ConsoleWidget(QWidget, qtlib.TaskWidget):
     """Console to run hg/thg command and show output"""
     closeRequested = pyqtSignal()
 
-    progressReceived = pyqtSignal(QString, object, QString, QString,
-                                  object, object)
-    """Emitted when progress received
-
-    Args: topic, pos, item, unit, total, reporoot
-    """
-
-    _cmdtable = _ConsoleCmdTable()
-
-    def __init__(self, parent=None):
-        super(ConsoleWidget, self).__init__(parent)
+    def __init__(self, agent, parent=None):
+        QWidget.__init__(self, parent)
         self.setLayout(QVBoxLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
         self._initlogwidget()
         self.setFocusProxy(self._logwidget)
-        self._repoagent = None
+        self._agent = agent
+        agent.busyChanged.connect(self._suppressPromptOnBusy)
+        agent.outputReceived.connect(self.appendLog)
+        if util.safehasattr(agent, 'displayName'):
+            self._logwidget.setPrompt('%s%% ' % agent.displayName())
         self.openPrompt()
         self._commandHistory = []
         self._commandIdx = 0
@@ -394,74 +389,55 @@ class ConsoleWidget(QWidget):
             self._logwidget.ensureCursorVisible()
 
     @util.propertycache
-    def _cmdcore(self):
-        cmdcore = cmdui.Core(False, self)
-        cmdcore.output.connect(self._logwidget.appendLog)
-        cmdcore.commandStarted.connect(self.closePrompt)
-        cmdcore.commandFinished.connect(self.openPrompt)
-        cmdcore.progress.connect(self._emitProgress)
-        return cmdcore
-
-    @util.propertycache
     def _extproc(self):
         extproc = QProcess(self)
         extproc.started.connect(self.closePrompt)
         extproc.finished.connect(self.openPrompt)
-
-        def handleerror(error):
-            msgmap = {
-                QProcess.FailedToStart: _('failed to run command\n'),
-                QProcess.Crashed: _('crashed\n')}
-            if extproc.state() == QProcess.NotRunning:
-                self._logwidget.closePrompt()
-            self._logwidget.appendLog(
-                msgmap.get(error, _('error while running command\n')),
-                'ui.error')
-            if extproc.state() == QProcess.NotRunning:
-                self._logwidget.openPrompt()
-        extproc.error.connect(handleerror)
-
-        def put(bytes, label=None):
-            self._logwidget.appendLog(hglib.tounicode(bytes.data()), label)
-        extproc.readyReadStandardOutput.connect(
-            lambda: put(extproc.readAllStandardOutput()))
-        extproc.readyReadStandardError.connect(
-            lambda: put(extproc.readAllStandardError(), 'ui.error'))
-
+        extproc.error.connect(self._handleExtprocError)
+        extproc.readyReadStandardOutput.connect(self._appendExtprocStdout)
+        extproc.readyReadStandardError.connect(self._appendExtprocStderr)
         return extproc
 
-    @pyqtSlot(unicode, str)
+    @pyqtSlot()
+    def _handleExtprocError(self):
+        if self._extproc.state() == QProcess.NotRunning:
+            self._logwidget.closePrompt()
+        msg = self._extproc.errorString()
+        self._logwidget.appendLog(msg + '\n', 'ui.error')
+        if self._extproc.state() == QProcess.NotRunning:
+            self._logwidget.openPrompt()
+
+    @pyqtSlot()
+    def _appendExtprocStdout(self):
+        text = hglib.tounicode(self._extproc.readAllStandardOutput().data())
+        self._logwidget.appendLog(text, '')
+
+    @pyqtSlot()
+    def _appendExtprocStderr(self):
+        text = hglib.tounicode(self._extproc.readAllStandardError().data())
+        self._logwidget.appendLog(text, 'ui.warning')
+
+    @pyqtSlot(unicode, unicode)
     def appendLog(self, msg, label):
-        """Append log text from another cmdui"""
+        """Append log text to the last line while keeping the prompt line"""
         self._logwidget.clearPrompt()
         try:
             self._logwidget.appendLog(msg, label)
         finally:
-            if not self._repoagent or not self._repoagent.isBusy():
+            if not self._agent.isBusy():
                 self.openPrompt()
 
-    def setRepoAgent(self, repoagent):
-        """Change the current working repository"""
-        if self._repoagent:
-            self._repoagent.busyChanged.disconnect(self._suppressPromptOnBusy)
-        self._repoagent = repoagent
-        repoagent.busyChanged.connect(self._suppressPromptOnBusy)
-        repo = repoagent.rawRepo()
-        self._logwidget.setPrompt('%s%% ' % (repo and repo.displayname or ''))
-
     def repoRootPath(self):
-        if self._repoagent:
-            return self._repoagent.rootPath()
+        if util.safehasattr(self._agent, 'rootPath'):
+            return self._agent.rootPath()
 
     @property
     def _repo(self):
-        if self._repoagent:
-            return self._repoagent.rawRepo()
+        if util.safehasattr(self._agent, 'rawRepo'):
+            return self._agent.rawRepo()
 
-    @property
-    def cwd(self):
-        """Return the current working directory"""
-        return self._repo and self._repo.root or os.getcwd()
+    def _workingDirectory(self):
+        return self.repoRootPath() or os.getcwdu()
 
     @pyqtSlot(bool)
     def _suppressPromptOnBusy(self, busy):
@@ -470,13 +446,9 @@ class ConsoleWidget(QWidget):
         else:
             self.openPrompt()
 
-    @pyqtSlot(unicode, object, unicode, unicode, object)
-    def _emitProgress(self, *args):
-        self.progressReceived.emit(
-            *(args + (self._repo and self._repo.root or None,)))
-
     @pyqtSlot(unicode)
     def _runcommand(self, cmdline):
+        cmdline = unicode(cmdline)
         self._commandIdx = 0
         try:
             args = list(self._parsecmdline(cmdline))
@@ -489,9 +461,8 @@ class ConsoleWidget(QWidget):
             self.openPrompt()
             return
         # add command to command history
-        ucmdline = unicode(cmdline)
-        if not self._commandHistory or self._commandHistory[-1] != ucmdline:
-            self._commandHistory.append(ucmdline)
+        if not self._commandHistory or self._commandHistory[-1] != cmdline:
+            self._commandHistory.append(cmdline)
         # execute the command
         cmd = args.pop(0)
         try:
@@ -502,72 +473,65 @@ class ConsoleWidget(QWidget):
     def _parsecmdline(self, cmdline):
         """Split command line string to imitate a unix shell"""
         try:
-            args = shlex.split(hglib.fromunicode(cmdline))
+            # shlex can't process unicode on Python < 2.7.3
+            args = shlex.split(cmdline.encode('utf-8'))
         except ValueError, e:
             raise ValueError(_('command parse error: %s') % e)
         for e in args:
-            e = util.expandpath(e)
+            e = util.expandpath(e).decode('utf-8')
             if util.any(c in e for c in '*?[]'):
-                expanded = glob.glob(os.path.join(self.cwd, e))
+                expanded = glob.glob(os.path.join(self._workingDirectory(), e))
                 if not expanded:
-                    raise ValueError(_('no matches found: %s')
-                                     % hglib.tounicode(e))
+                    raise ValueError(_('no matches found: %s') % e)
                 for p in expanded:
                     yield p
             else:
                 yield e
 
     def _runextcommand(self, cmdline):
-        self._extproc.setWorkingDirectory(hglib.tounicode(self.cwd))
+        self._extproc.setWorkingDirectory(self._workingDirectory())
         self._extproc.start(cmdline, QIODevice.ReadOnly)
 
-    @_cmdtable
     def _cmd_hg(self, args):
         self.closePrompt()
-        if self._repo:
-            args = ['--cwd', self._repo.root] + args
-        self._cmdcore.run(args)
+        self._agent.runCommand(args, self)
 
-    @_cmdtable
     def _cmd_thg(self, args):
         from tortoisehg.hgqt import run
         self.closePrompt()
         try:
-            if self._repo:
-                args = ['-R', self._repo.root] + args
+            if self.repoRootPath():
+                args = ['-R', self.repoRootPath()] + args
             # TODO: show errors
-            run.dispatch(args)
+            run.dispatch(map(hglib.fromunicode, args))
         finally:
             self.openPrompt()
 
-    @_cmdtable
     def _cmd_clear(self, args):
-        self.clear()
-        self.openPrompt()
+        self._logwidget.clearLog()
 
-    @_cmdtable
-    def _cmd_cls(self, args):
-        self.clear()
-        self.openPrompt()
-
-    @_cmdtable
     def _cmd_exit(self, args):
-        self.clear()
-        self.openPrompt()
+        self._logwidget.clearLog()
         self.closeRequested.emit()
+
+    _cmdtable = {
+        'hg':    _cmd_hg,
+        'thg':   _cmd_thg,
+        'clear': _cmd_clear,
+        'cls':   _cmd_clear,
+        'exit':  _cmd_exit,
+        }
+
 
 class LogDockWidget(QDockWidget):
 
-    progressReceived = pyqtSignal(QString, object, QString, QString,
-                                  object, object)
-
-    def __init__(self, repomanager, parent=None):
+    def __init__(self, repomanager, cmdagent, parent=None):
         super(LogDockWidget, self).__init__(parent)
 
         self.setFeatures(QDockWidget.DockWidgetClosable |
                          QDockWidget.DockWidgetMovable  |
                          QDockWidget.DockWidgetFloatable)
-        self.setWindowTitle(_('Output Log'))
+        self.setWindowTitle(_('Console'))
         # Not enabled until we have a way to make it configurable
         #self.setWindowFlags(Qt.Drawer)
         self.dockLocationChanged.connect(self._updateTitleBarStyle)
@@ -578,16 +542,14 @@ class LogDockWidget(QDockWidget):
 
         self._consoles = QStackedWidget(self)
         self.setWidget(self._consoles)
-        self._createConsole()
+        self._createConsole(cmdagent)
         for root in self._repomanager.repoRootPaths():
             self._createConsoleFor(root)
-
-        # move focus only when console is activated by keyboard/mouse operation
-        self.toggleViewAction().triggered.connect(self._setFocusOnToggleView)
 
     def setCurrentRepoRoot(self, root):
         w = self._findConsoleFor(root)
         self._consoles.setCurrentWidget(w)
+        self.setFocusProxy(w)
 
     def _findConsoleFor(self, root):
         for i in xrange(self._consoles.count()):
@@ -596,20 +558,18 @@ class LogDockWidget(QDockWidget):
                 return w
         raise ValueError('no console found for %r' % root)
 
-    def _createConsole(self):
-        w = ConsoleWidget(self)
+    def _createConsole(self, agent):
+        w = ConsoleWidget(agent, self)
         w.closeRequested.connect(self.close)
-        w.progressReceived.connect(self.progressReceived)
         self._consoles.addWidget(w)
         return w
 
     @pyqtSlot(unicode)
     def _createConsoleFor(self, root):
         root = unicode(root)
-        w = self._createConsole()
         repoagent = self._repomanager.repoAgent(root)
         assert repoagent
-        w.setRepoAgent(repoagent)
+        self._createConsole(repoagent)
 
     @pyqtSlot(unicode)
     def _destroyConsoleFor(self, root):
@@ -617,21 +577,6 @@ class LogDockWidget(QDockWidget):
         w = self._findConsoleFor(root)
         self._consoles.removeWidget(w)
         w.setParent(None)
-
-    @pyqtSlot()
-    def clear(self):
-        w = self._consoles.currentWidget()
-        w.clear()
-
-    def appendLog(self, msg, label, reporoot=None):
-        w = self._findConsoleFor(reporoot)
-        w.appendLog(msg, label)
-
-    @pyqtSlot(bool)
-    def _setFocusOnToggleView(self, visible):
-        if visible:
-            w = self._consoles.currentWidget()
-            w.setFocus()
 
     def setVisible(self, visible):
         super(LogDockWidget, self).setVisible(visible)

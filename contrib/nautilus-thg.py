@@ -1,11 +1,18 @@
-# TortoiseHg plugin for Nautilus
+# TortoiseHg plugin for Nautilus and Caja
 #
 # Copyright 2007 Steve Borho
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from gi.repository import Nautilus
+this_file = __file__.rsplit('.', 1)[0]
+if this_file.endswith('caja-thg'):
+    from gi.repository import Caja as Nautilus
+    idstr_prefix = 'HgCaja'
+else:
+    from gi.repository import Nautilus
+    idstr_prefix = 'HgNautilus3'
+
 from gi.repository import GObject
 from gi.repository import GLib
 from gi.repository import Gio
@@ -14,7 +21,6 @@ import os
 import sys
 
 thg_main     = 'thg'
-idstr_prefix = 'HgNautilus3'
 
 try:
     from mercurial import demandimport

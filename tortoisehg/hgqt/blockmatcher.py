@@ -17,8 +17,6 @@
 """
 Qt4 widgets to display diffs as blocks
 """
-import sys, os
-
 from PyQt4.QtGui import *
 from PyQt4.QtCore import *
 
@@ -116,19 +114,16 @@ class BlockList(QWidget):
         w = self.width() - 1
         h = self.height()
         p = QPainter(self)
-        p.scale(1.0, float(h)/(self._maximum - self._minimum + self._pagestep))
-        p.setPen(Qt.NoPen)
+        sy = float(h) / (self._maximum - self._minimum + self._pagestep)
         for typ, alo, ahi in self._blocks:
-            p.save()
-            p.setBrush(self.blockTypes[typ])
-            p.drawRect(1, alo, w-1, ahi-alo)
-            p.restore()
+            color = self.blockTypes[typ]
+            p.setPen(color)  # make sure the height is at least 1px
+            p.setBrush(color)
+            p.drawRect(1, alo * sy, w - 1, (ahi - alo) * sy)
 
-        p.save()
         p.setPen(self._vrectbordercolor)
         p.setBrush(self._vrectcolor)
-        p.drawRect(0, self._value, w, self._pagestep)
-        p.restore()
+        p.drawRect(0, self._value * sy, w, self._pagestep * sy)
 
     def scrollToPos(self, y):
         # Scroll to the position which specified by Y coodinate.
@@ -226,6 +221,9 @@ class BlockMatch(BlockList):
         self._blocks.add((typ, alo, ahi, blo, bhi))
 
     def paintEvent(self, event):
+        if self._pagestep['left'] == 0 or self._pagestep['right'] == 0:
+            return
+
         w = self.width()
         h = self.height()
         p = QPainter(self)
@@ -305,12 +303,10 @@ class BlockMatch(BlockList):
             self.update()
             self.pageStepChanged.emit(pagestep, side)
 
+    @pyqtSlot()
     def syncPageStep(self):
         for side in ['left', 'right']:
             self.setPageStep(self._sbar[side].pageStep(), side)
-
-    def resizeEvent(self, event):
-        self.syncPageStep()
 
     def linkScrollBar(self, sb, side):
         """
@@ -334,9 +330,9 @@ class BlockMatch(BlockList):
         self.pageStepChanged.connect(
                      lambda v, s: side==s and sb.setPageStep(v))
 
-if __name__ == '__main__':
-    a = QApplication([])
-    f = QFrame()
+
+def createTestWidget(ui, parent=None):
+    f = QFrame(parent)
     l = QHBoxLayout(f)
 
     sb1 = QScrollBar()
@@ -378,9 +374,7 @@ if __name__ == '__main__':
     w2.setRange(0, 1200)
     w2.setPageStep(100)
 
-    print "sb1=", sb1.minimum(), sb1.maximum(), sb1.pageStep()
-    print "sb2=", sb2.minimum(), sb2.maximum(), sb2.pageStep()
+    ui.status('sb1=%d %d %d\n' % (sb1.minimum(), sb1.maximum(), sb1.pageStep()))
+    ui.status('sb2=%d %d %d\n' % (sb2.minimum(), sb2.maximum(), sb2.pageStep()))
 
-    f.show()
-    a.exec_()
-
+    return f

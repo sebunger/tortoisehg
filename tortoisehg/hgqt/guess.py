@@ -9,9 +9,9 @@ import os
 
 from mercurial import hg, ui, mdiff, similar, patch
 
-from tortoisehg.util import hglib, shlib, thread2
+from tortoisehg.util import hglib, thread2
+from tortoisehg.util.i18n import _
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib, htmlui, cmdui
 
 from PyQt4.QtCore import *
@@ -25,14 +25,15 @@ class DetectRenameDialog(QDialog):
     'Detect renames after they occur'
     matchAccepted = pyqtSignal()
 
-    def __init__(self, repo, parent, *pats):
+    def __init__(self, repoagent, parent, *pats):
         QDialog.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.pats = pats
         self.thread = None
 
-        self.setWindowTitle(_('Detect Copies/Renames in %s') % repo.displayname)
+        self.setWindowTitle(_('Detect Copies/Renames in %s')
+                            % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('detect_rename'))
         self.setWindowFlags(Qt.Window)
 
@@ -157,17 +158,21 @@ class DetectRenameDialog(QDialog):
         self.vsplit, self.hsplit = vsplit, hsplit
         QTimer.singleShot(0, self.refresh)
 
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     def refresh(self):
         self.repo.thginvalidate()
         self.repo.lfstatus = True
         wctx = self.repo[None]
-        wctx.status(unknown=True)
+        ws = wctx.status(listunknown=True)
         self.repo.lfstatus = False
         self.unrevlist.clear()
         dests = []
-        for u in wctx.unknown():
+        for u in ws.unknown:
             dests.append(u)
-        for a in wctx.added():
+        for a in ws.added:
             if not wctx[a].renamed():
                 dests.append(a)
         for x in dests:
@@ -214,7 +219,7 @@ class DetectRenameDialog(QDialog):
         self.thread.start()
 
     def searchfinished(self):
-        self.stbar.clear()
+        self.stbar.clearProgress()
         for col in xrange(3):
             self.matchtv.resizeColumnToContents(col)
         self.findbtn.setEnabled(self.unrevlist.count())
@@ -431,16 +436,17 @@ class RenameSearchThread(QThread):
         wctx = repo[None]
         pctx = repo['.']
         if self.copies:
-            wctx.status(clean=True)
-            srcs = wctx.removed() + wctx.deleted()
-            srcs += wctx.modified() + wctx.clean()
+            ws = wctx.status(listclean=True)
+            srcs = ws.removed + ws.deleted
+            srcs += ws.modified + ws.clean
         else:
-            srcs = wctx.removed() + wctx.deleted()
-        added = [wctx[a] for a in self.ufiles]
-        removed = [pctx[a] for a in srcs if a in pctx]
+            ws = wctx.status()
+            srcs = ws.removed + ws.deleted
+        added = [wctx[a] for a in sorted(self.ufiles)]
+        removed = [pctx[a] for a in sorted(srcs) if a in pctx]
         # do not consider files of zero length
-        added = sorted([fctx for fctx in added if fctx.size() > 0])
-        removed = sorted([fctx for fctx in removed if fctx.size() > 0])
+        added = [fctx for fctx in added if fctx.size() > 0]
+        removed = [fctx for fctx in removed if fctx.size() > 0]
         exacts = []
         gen = similar._findexactmatches(repo, added, removed)
         for o, n in gen:

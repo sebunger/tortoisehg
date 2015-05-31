@@ -13,7 +13,7 @@ from mercurial import ui, hg, error, commands, match, util, subrepo
 from tortoisehg.hgqt import htmlui, visdiff, qtlib, htmldelegate, thgrepo, cmdui, settings
 from tortoisehg.hgqt import filedialogs, fileview
 from tortoisehg.util import paths, hglib, thread2
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -27,9 +27,10 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
     progress = pyqtSignal(QString, object, QString, QString, object)
     revisionSelected = pyqtSignal(int)
 
-    def __init__(self, upats, repo, parent=None, **opts):
+    def __init__(self, repoagent, upats, parent=None, **opts):
         QWidget.__init__(self, parent)
 
+        self._repoagent = repoagent
         self.thread = None
 
         mainvbox = QVBoxLayout()
@@ -99,12 +100,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         grid.setColumnStretch(1, 0)
         frame = QFrame()
         frame.setFrameStyle(QFrame.StyledPanel)
-        def revisiontoggled(checked):
-            revle.setEnabled(checked)
-            if checked:
-                revle.selectAll()
-                QTimer.singleShot(0, lambda:revle.setFocus())
-        revision.toggled.connect(revisiontoggled)
+        revision.toggled.connect(self._onRevisionToggled)
         history.toggled.connect(singlematch.setDisabled)
         revle.setEnabled(False)
         revle.returnPressed.connect(self.runSearch)
@@ -112,43 +108,26 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         incle.returnPressed.connect(self.runSearch)
         bt.clicked.connect(self.runSearch)
 
-        def updateRecurse(checked):
-            try:
-                wctx = repo[None]
-                if '.hgsubstate' in wctx:
-                    recurse.setEnabled(checked)
-                else:
-                    recurse.setEnabled(False)
-                    recurse.setChecked(False)
-            except Exception:
-                recurse.setEnabled(False)
-                recurse.setChecked(False)
-        working.toggled.connect(updateRecurse)
         recurse.setChecked(True)
         working.setChecked(True)
+        working.toggled.connect(self._updateRecurse)
 
-        def updatefollow():
-            slowpath = bool(incle.text() or excle.text())
-            follow.setEnabled(history.isChecked() and not slowpath)
-            if slowpath:
-                follow.setChecked(False)
-        history.toggled.connect(updatefollow)
-        incle.textChanged.connect(updatefollow)
-        excle.textChanged.connect(updatefollow)
-        updatefollow()
+        history.toggled.connect(self._updateFollow)
+        incle.textChanged.connect(self._updateFollow)
+        excle.textChanged.connect(self._updateFollow)
 
         mainvbox.addLayout(hbox)
         frame.setLayout(grid)
         mainvbox.addWidget(frame)
 
-        tv = MatchTree(repo, self)
+        tv = MatchTree(repoagent, self)
         tv.revisionSelected.connect(self.revisionSelected)
         tv.setColumnHidden(COL_REVISION, True)
         tv.setColumnHidden(COL_USER, True)
         mainvbox.addWidget(tv)
         le.returnPressed.connect(self.runSearch)
 
-        self.repo = repo
+        repo = repoagent.rawRepo()
         self.tv, self.regexple, self.chk, self.recurse = tv, le, chk, recurse
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
@@ -164,7 +143,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             incle.setText(','.join(upats[1:]))
         chk.setChecked(opts.get('ignorecase', False))
 
-        repoid = str(repo[0])
+        repoid = hglib.shortrepoid(repo)
         s = QSettings()
         sh = list(s.value('grep/search-'+repoid).toStringList())
         ph = list(s.value('grep/paths-'+repoid).toStringList())
@@ -172,23 +151,15 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.searchhistory = [s for s in sh if s]
         self.setCompleters()
 
-        if parent:
-            self.closeonesc = False
-            mainvbox.setContentsMargins(0, 0, 0, 0)
-            self.setLayout(mainvbox)
-        else:
-            self.setWindowTitle(_('TortoiseHg Search'))
-            self.resize(800, 550)
-            self.closeonesc = True
-            self.stbar = cmdui.ThgStatusBar()
-            mainvbox.setContentsMargins(5, 5, 5, 5)
-            outervbox = QVBoxLayout()
-            outervbox.addLayout(mainvbox)
-            outervbox.addWidget(self.stbar)
-            outervbox.setContentsMargins(0, 0, 0, 0)
-            self.setLayout(outervbox)
-            self.showMessage.connect(self.stbar.showMessage)
-            self.progress.connect(self.stbar.progress)
+        mainvbox.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(mainvbox)
+
+        self._updateRecurse()
+        self._updateFollow()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def setCompleters(self):
         comp = QCompleter(self.searchhistory, self)
@@ -236,6 +207,34 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         if isinstance(rev, int):
             self.revle.setText(str(rev))
 
+    @pyqtSlot(bool)
+    def _onRevisionToggled(self, checked):
+        self.revle.setEnabled(checked)
+        if checked:
+            self.revle.selectAll()
+            self.revle.setFocus()
+
+    @pyqtSlot()
+    def _updateRecurse(self):
+        checked = self.wctxradio.isChecked()
+        try:
+            wctx = self.repo[None]
+            if '.hgsubstate' in wctx:
+                self.recurse.setEnabled(checked)
+            else:
+                self.recurse.setEnabled(False)
+                self.recurse.setChecked(False)
+        except util.Abort:
+            self.recurse.setEnabled(False)
+            self.recurse.setChecked(False)
+
+    @pyqtSlot()
+    def _updateFollow(self):
+        slowpath = bool(self.incle.text() or self.excle.text())
+        self.follow.setEnabled(self.aradio.isChecked() and not slowpath)
+        if slowpath:
+            self.follow.setChecked(False)
+
     def setSearch(self, upattern, **opts):
         self.regexple.setText(upattern)
         if opts.get('all'):
@@ -250,11 +249,9 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             self.thread.wait(2000)
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            if self.thread and self.thread.isRunning():
-                self.stopClicked()
-            elif self.closeonesc:
-                self.close()
+        if (event.key() == Qt.Key_Escape
+            and self.thread and self.thread.isRunning()):
+            self.stopClicked()
         else:
             return super(SearchWidget, self).keyPressEvent(event)
 
@@ -265,7 +262,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         return True
 
     def saveSettings(self, s):
-        repoid = str(self.repo[0])
+        repoid = hglib.shortrepoid(self.repo)
         s.setValue('grep/search-'+repoid, self.searchhistory)
         s.setValue('grep/paths-'+repoid, self.pathshistory)
 
@@ -337,10 +334,6 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.thread.matchedRow.connect(
                      lambda wrapper: model.appendRow(*wrapper.data))
         self.thread.start()
-
-    def reload(self):
-        # TODO
-        pass
 
     def searchfinished(self):
         self.cancelbutton.setEnabled(False)
@@ -538,16 +531,17 @@ class MatchTree(QTableView):
     revisionSelected = pyqtSignal(int)
     contextmenu = None
 
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent):
         QTableView.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.pattern = None
         self.icase = False
         self.embedded = parent.parent() is not None
         self.selectedRows = ()
 
         self.delegate = htmldelegate.HTMLDelegate(self)
+        self.setDragDropMode(QTableView.DragOnly)
         self.setItemDelegateForColumn(COL_TEXT, self.delegate)
         self.setSelectionMode(QTableView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -578,46 +572,12 @@ class MatchTree(QTableView):
         self.activated.connect(self.onRowActivated)
         self.customContextMenuRequested.connect(self.menuRequest)
 
-        self.setModel(MatchModel(self))
+        self.setModel(MatchModel(repoagent, self))
         self.selectionModel().selectionChanged.connect(self.onSelectionChanged)
 
-    def dragObject(self):
-        snapshots = {}
-        for index in self.selectionModel().selectedRows():
-            path, line, rev, user, text = self.model().getRow(index)
-            if rev not in snapshots:
-                snapshots[rev] = [path]
-            else:
-                snapshots[rev].append(path)
-        urls = []
-        for rev, paths in snapshots.iteritems():
-            if rev is not None:
-                base, _ = visdiff.snapshot(self.repo, paths, self.repo[rev])
-            else:
-                base = self.repo.root
-            for p in paths:
-                urls.append(QUrl.fromLocalFile(os.path.join(base, path)))
-        if urls:
-            d = QDrag(self)
-            m = QMimeData()
-            m.setUrls(urls)
-            d.setMimeData(m)
-            d.start(Qt.CopyAction)
-
-    def mousePressEvent(self, event):
-        self.pressPos = event.pos()
-        self.pressTime = QTime.currentTime()
-        return QTableView.mousePressEvent(self, event)
-
-    def mouseMoveEvent(self, event):
-        d = event.pos() - self.pressPos
-        if d.manhattanLength() < QApplication.startDragDistance():
-            return QTableView.mouseMoveEvent(self, event)
-        elapsed = self.pressTime.msecsTo(QTime.currentTime())
-        if elapsed < QApplication.startDragTime():
-            return QTableView.mouseMoveEvent(self, event)
-        self.dragObject()
-        return QTableView.mouseMoveEvent(self, event)
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def menuRequest(self, point):
         if not self.selectionModel().selectedRows():
@@ -661,29 +621,32 @@ class MatchTree(QTableView):
                 abs = repo.wjoin(path)
                 root = paths.find_root(abs)
                 if root and abs.startswith(root):
+                    uroot = hglib.tounicode(root)
+                    srepoagent = self._repoagent.subRepoAgent(uroot)
                     path = abs[len(root)+1:]
-                    srepo = thgrepo.repository(None, root)
-                    self._openAnnotateDialog(srepo, rev, path, line)
+                    self._openAnnotateDialog(srepoagent, rev, path, line)
                 else:
                     continue
             else:
-                self._openAnnotateDialog(repo, rev, path, line)
+                self._openAnnotateDialog(self._repoagent, rev, path, line)
 
-    def _openAnnotateDialog(self, repo, rev, path, line):
+    def _openAnnotateDialog(self, repoagent, rev, path, line):
         if rev is None:
+            repo = repoagent.rawRepo()
             rev = repo['.'].rev()
 
-        dlg = self._filedialogs.open(repo, path)
+        dlg = self._filedialogs.open(repoagent, path)
         dlg.setFileViewMode(fileview.AnnMode)
         dlg.goto(rev)
         dlg.showLine(line)
         dlg.setSearchPattern(hglib.tounicode(self.pattern))
         dlg.setSearchCaseInsensitive(self.icase)
 
-    def _createFileDialog(self, repo, path):
-        return filedialogs.FileLogDialog(repo, path)
+    def _createFileDialog(self, repoagent, path):
+        return filedialogs.FileLogDialog(repoagent, path)
 
-    def _genFileDialogKey(self, repo, path):
+    def _genFileDialogKey(self, repoagent, path):
+        repo = repoagent.rawRepo()
         return repo.wjoin(path)
 
     def onViewChangeset(self):
@@ -730,26 +693,27 @@ class MatchTree(QTableView):
 
 
 class MatchModel(QAbstractTableModel):
-    def __init__(self, parent):
+    def __init__(self, repoagent, parent):
         QAbstractTableModel.__init__(self, parent)
+        self._repoagent = repoagent
         self.rows = []
         self.headers = (_('File'), _('Line'), _('Rev'), _('User'),
                         _('Match Text'))
 
-    def rowCount(self, parent):
+    def rowCount(self, parent=QModelIndex()):
         return len(self.rows)
 
-    def columnCount(self, parent):
+    def columnCount(self, parent=QModelIndex()):
         return len(self.headers)
 
-    def data(self, index, role):
+    def data(self, index, role=Qt.DisplayRole):
         if not index.isValid():
             return QVariant()
         if role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
         return QVariant()
 
-    def headerData(self, col, orientation, role):
+    def headerData(self, col, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole or orientation != Qt.Horizontal:
             return QVariant()
         else:
@@ -758,6 +722,34 @@ class MatchModel(QAbstractTableModel):
     def flags(self, index):
         flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsDragEnabled
         return flags
+
+    def mimeTypes(self):
+        return ['text/uri-list']
+
+    def mimeData(self, indexes):
+        snapshots = {}
+        for index in indexes:
+            if index.column() != 0:
+                continue
+            path, line, rev, user, text = self.rows[index.row()]
+            if rev not in snapshots:
+                snapshots[rev] = [path]
+            else:
+                snapshots[rev].append(path)
+        urls = []
+        for rev, paths in snapshots.iteritems():
+            if rev is not None:
+                repo = self._repoagent.rawRepo()
+                lpaths = map(hglib.fromunicode, paths)
+                lbase, _ = visdiff.snapshot(repo, lpaths, repo[rev])
+                base = hglib.tounicode(lbase)
+            else:
+                base = self._repoagent.rootPath()
+            for p in paths:
+                urls.append(QUrl.fromLocalFile(os.path.join(base, p)))
+        m = QMimeData()
+        m.setUrls(urls)
+        return m
 
     def sort(self, col, order):
         self.layoutAboutToBeChanged.emit()
@@ -785,13 +777,24 @@ class MatchModel(QAbstractTableModel):
         return self.rows[index.row()]
 
 class SearchDialog(QDialog):
-    def __init__(self, upats, repo, parent=None, **opts):
+    def __init__(self, repoagent, upats, parent=None, **opts):
         super(SearchDialog, self).__init__(parent)
         self.setWindowFlags(Qt.Window)
         self.setWindowIcon(qtlib.geticon('view-filter'))
-        self.setLayout(QVBoxLayout(self))
-        self._searchwidget = SearchWidget(upats, repo, parent=self, **opts)
-        self.layout().addWidget(self._searchwidget)
+        self.setWindowTitle(_('TortoiseHg Search'))
+
+        outervbox = QVBoxLayout()
+        outervbox.setContentsMargins(5, 5, 5, 0)
+        self.setLayout(outervbox)
+        self._searchwidget = SearchWidget(repoagent, upats, parent=self, **opts)
+        outervbox.addWidget(self._searchwidget)
+
+        self._stbar = cmdui.ThgStatusBar()
+        outervbox.addWidget(self._stbar)
+        self._searchwidget.showMessage.connect(self._stbar.showMessage)
+        self._searchwidget.progress.connect(self._stbar.progress)
+
+        self.resize(800, 550)
 
     def closeEvent(self, event):
         if not self._searchwidget.canExit():

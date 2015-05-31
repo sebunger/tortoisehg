@@ -67,7 +67,7 @@ When the visual diff window is used to compare working copy files, it
 always directly diffs against the working copy files since it always
 operates on a single file at a time.
 
-.. note::
+.. deprecated:: 1.0
 	The :menuselection:`TortoiseHg --> Skip Diff Window` configurable
 	has been removed because it is now redundant.
 
@@ -93,13 +93,11 @@ variables::
 	$parent1:  the file or directory from the first parent revision
 	$parent2:  the file or directory from the second parent revision
 	$child:    the file or directory from the revision being compared
-	$ancestor: the file or directory from the ancestor of a merge
 	$parent:   a synonym for $parent1
 
 	$plabel1:  a symbolic name for the first parent revision
 	$plabel2:  a symbolic name for the second parent revision
 	$clabel:   a symbolic name for the revision being compared
-	$alabel:   a symbolic name for the ancestor revision
 
 Obviously, $parent2 and $ancestor are only meaningful when used in three
 way diff arguments, for viewing merge changesets.  If your diff tool

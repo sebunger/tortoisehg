@@ -9,8 +9,7 @@ Předmluva
 Cílový čtenář
 ==============
 
-Tato kniha je napsána pro "gramotného" uživatele počítače, který chce používat
-Mercurial pro správu svých dat a vyhovuje mu, není-li pro komunikaci s 
+Tato kniha je napsána pro "informovaného" uživatele, který chce používat Mercurial pro správu svých dat a vyhovuje mu, není-li pro komunikaci s 
 programem omezen pouze na příkazový řádek. TortoiseHg je extenze
 uživatelského rozhraní Windows.
 
@@ -20,7 +19,6 @@ Nejaktuálnější verzi této dokumentace lze nalézt na
 Seznámení s obsahem
 ====================
 
-Tato `Předmluva` stručně seznamuje s programem, s kolektivem lidí, kteří se na jeho tvorbě podílejí a s licenčními podmínkami pro jeho používání a šíření.
 
 V kapitole :doc:`intro` se seznámíme s instalací programu a s nastavením jeho jazykové verze. 
 
@@ -28,11 +26,11 @@ Kapitola :doc:`whatsnew` uvádí rozdíly mezi TorotiseHg řady 2 a 1.
 
 Kapitola :doc:`quick` je stručným návodem na užívání programu.
 
-Hlavní kapitola :doc:`daily` popisuje často používané nástroje programu. 
+Hlavní kapitola :doc:`daily` zevrubně popisuje často používané nástroje programu. 
 
 Kapitola :doc:`settings` popisuje konfiguraci TortoiseHg.
 
-Kapitola :doc:`patches` popisuje práci s oprávkami.
+Kapitola :doc:`patches` popisuje práci s oprávkami (patches).
 
 Kapitola :doc:`extensions` popisuje extenze Mercurialu, které jsou součástí binárního paketu TortoiseHg.
 
@@ -56,7 +54,7 @@ Komunita
 Adresy:
 
 * `Uživatelé <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - Oznámení, otázky-odpovědi a diskuze o vlastnostech
-* `Vývojáři <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - Oprávky (patches), zprávy o chybách a diskuze o vývoji programu.
+* `Vývojáři <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - Oprávky, zprávy o chybách a diskuze o vývoji programu.
 * `Problémy <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Přehled zaznamenávaných problémů.
 
 Naše Wiki na stránkách Bitbucket je `zde <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ .
@@ -112,12 +110,19 @@ Poznámky překladatele
 
 Program TortoiseHg lze aktivovat buď jako kontextové menu v Průzkumníku Windows nebo jej lze volat příkazem :command:`thg <command>` z konzoly cmd.exe. U příkazů pro thg se nelze vyhnout anglickým termínům. Rovněž příkazy Mercurialu :command:`hg <command>` lze zadat pouze v anglickém jazyce.
 
-Z toho vyplývá, že bez znalosti omezeného množství anglických slov se při používání TortoiseHg neobejdeme. Proto jsem si dovolil mnohá slova v manuálu i v lokalizaci nepřekládat.
+Z toho vyplývá, že bez znalosti jistého množství anglických slov se při používání TortoiseHg nelze obejít. Proto jsem si dovolil mnohá slova v manuálu i v lokalizaci nepřekládat.
 
-Slova PATCH a HUNK překládám jako oprávka a porce. SHELF (police) překládám pro zbystření pozornosti jako almárka, WORKBENCH jako Verpánek.
+Slova patch a hunk překládám jako oprávka a porce, Workbench jako Verpánek.
 
-Kde si nevím rady, ponechávám text nepřeložený, za což se laskavému čtenáři omlouvám.
+Považuji za vhodné vymezit význam slova pracovní adresář. **Pracovní adresář** je pomyslná složka, která svůj obsah odvozuje z aktuálně nastavené aktuální revize.  
 
-Případné připomínky či pomoc vítám: tovim@seznam.cz
+Kořenový adresář projeku, který obsahuje složku s názvem *.hg* neboli **repozitář** je rovněž dynamický útvar a v tomto textu bude označován jako **repozitórium**. Pro každou revizi může mít repozitórium jiné složení souborů!
+
+Nutno dodat, že pojem *repozitář* se často (nepřesně) používá i pro *repozitórium*.
+
+Termíny changeset a revize jsou prakticky zaměnitelné. 
+ 
+
+Případné připomínky vítám: tovim@seznam.cz
     
 .. vim: noet ts=4

@@ -6,15 +6,13 @@
 # GNU General Public License version 2 or any later version.
 
 import os
-import sys
-import shlex
 import binascii
 import cStringIO
 
 from mercurial import patch, util, error
 from mercurial import node
 from mercurial.util import propertycache
-from hgext import mq, record
+from hgext import mq
 
 from tortoisehg.util import hglib
 
@@ -29,7 +27,11 @@ class patchctx(object):
             The handle is NOT closed.
         """
         self._path = patchpath
-        self._patchname = os.path.basename(patchpath)
+        if rev:
+            assert isinstance(rev, str)
+            self._patchname = rev
+        else:
+            self._patchname = os.path.basename(patchpath)
         self._repo = repo
         self._rev = rev or 'patch'
         self._status = [[], [], []]
@@ -38,7 +40,6 @@ class patchctx(object):
         self._desc = ''
         self._branch = ''
         self._node = node.nullid
-        self._identity = node.nullid
         self._mtime = None
         self._fsize = 0
         self._parseerror = None
@@ -49,9 +50,6 @@ class patchctx(object):
             self._fsize = os.path.getsize(patchpath)
             ph = mq.patchheader(self._path)
             self._ph = ph
-            hash = util.sha1(self._path)
-            hash.update(str(self._mtime))
-            self._identity = hash.digest()
         except EnvironmentError:
             self._date = util.makedate()
             return
@@ -143,17 +141,13 @@ class patchctx(object):
 
     # TortoiseHg methods
     def thgtags(self):              return []
-    def thgwdparent(self):          return False
     def thgmqappliedpatch(self):    return False
     def thgmqpatchname(self):       return self._patchname
-    def thgbranchhead(self):        return False
     def thgmqunappliedpatch(self):  return True
-    def thgid(self):                return self._identity
 
     # largefiles/kbfiles methods
     def hasStandin(self, file):     return False
     def isStandin(self, path):      return False
-    def removeStandin(self, path):  return path
 
     def longsummary(self):
         if self._repo.ui.configbool('tortoisehg', 'longsummary'):
@@ -168,6 +162,12 @@ class patchctx(object):
             return self._status
         else:
             return [], [], []
+
+    def thgmqoriginalparent(self):
+        '''The revision id of the original patch parent'''
+        if not util.safehasattr(self, '_ph'):
+            return ''
+        return self._ph.parent
 
     def thgmqpatchdata(self, wfile):
         'called by fileview to get diff data'
@@ -207,8 +207,8 @@ class patchctx(object):
                 # consume comments and headers
                 for i in range(self._ph.diffstartline):
                     pf.readline()
-                for chunk in record.parsepatch(pf):
-                    if not isinstance(chunk, record.header):
+                for chunk in hglib.parsepatch(pf):
+                    if not isinstance(chunk, hglib.patchheader):
                         continue
                     top = patch.parsefilename(chunk.header[-2])
                     bot = patch.parsefilename(chunk.header[-1])

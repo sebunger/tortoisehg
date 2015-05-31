@@ -12,7 +12,7 @@ import shutil
 from mercurial import hg, scmutil, ui
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _, ngettext
+from tortoisehg.util.i18n import _, ngettext
 from tortoisehg.hgqt import qtlib, cmdui
 
 from PyQt4.QtCore import *
@@ -23,10 +23,13 @@ class PurgeDialog(QDialog):
     progress = pyqtSignal(QString, object, QString, QString, object)
     showMessage = pyqtSignal(QString)
 
-    def __init__(self, repo, parent):
+    def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
+
+        self._repoagent = repoagent
+
         layout = QVBoxLayout()
         layout.setMargin(0)
         layout.setSpacing(0)
@@ -75,9 +78,8 @@ class PurgeDialog(QDialog):
         self.showMessage.connect(self.stbar.showMessage)
         layout.addWidget(self.stbar)
 
-        self.setWindowTitle(_('%s - purge') % repo.displayname)
+        self.setWindowTitle(_('%s - purge') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-purge'))
-        self.repo = repo
 
         self.bb.setEnabled(False)
         self.progress.emit(*cmdui.startProgress(_('Checking'), '...'))
@@ -89,6 +91,10 @@ class PurgeDialog(QDialog):
         self.th = None
         QTimer.singleShot(0, self.checkStatus)
 
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     def checkStatus(self):
         repo = self.repo
         class CheckThread(QThread):
@@ -99,10 +105,8 @@ class PurgeDialog(QDialog):
 
             def run(self):
                 try:
-                    repo.bfstatus = True
                     repo.lfstatus = True
                     stat = repo.status(ignored=True, unknown=True)
-                    repo.bfstatus = False
                     repo.lfstatus = False
                     trashcan = repo.join('Trashcan')
                     if os.path.isdir(trashcan):
@@ -223,14 +227,15 @@ class PurgeThread(QThread):
 
         self.showMessage.emit('')
         match = scmutil.matchall(repo)
-        match.dir = directories.append
-        repo.bfstatus = True
+        match.explicitdir = match.traversedir = directories.append
         repo.lfstatus = True
         status = repo.status(match=match, ignored=opts['ignored'],
                              unknown=opts['unknown'], clean=False)
-        repo.bfstatus = False
         repo.lfstatus = False
-        files = status[4] + status[5]
+        files = []
+        for k, i in [('unknown', 4), ('ignored', 5)]:
+            if opts[k]:
+                files.extend(status[i])
 
         def remove(remove_func, name):
             try:
@@ -261,7 +266,7 @@ class PurgeThread(QThread):
 
         if opts['delfolders'] and directories:
             for i, f in enumerate(sorted(directories, reverse=True)):
-                if not os.listdir(repo.wjoin(f)):
+                if match(f) and not os.listdir(repo.wjoin(f)):
                     data = ('rmdir', i, f, '', len(directories))
                     self.progress.emit(*data)
                     remove(os.rmdir, f)

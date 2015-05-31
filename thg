@@ -13,8 +13,9 @@ import sys
 
 argv = sys.argv[1:]
 if 'THG_OSX_APP' in os.environ:
-    # Remove the -psn argument supplied by launchd
-    if argv[0].startswith('-psn'):
+    # Remove the -psn argument supplied by launchd (if present - it's not
+    # on 10.9)
+    if len(argv) > 0 and argv[0].startswith('-psn'):
         argv = argv[1:]
     # sys.path as created by py2app doesn't work quite right with demandimport
     # Add the explicit path where PyQt4 and other libs are
@@ -28,6 +29,9 @@ if hasattr(sys, "frozen"):
         if 'THGDEBUG' in os.environ:
             import win32traceutil
             print 'starting'
+    # insert installed bin/ folder at start of PATH
+    binpath = os.path.join(os.path.dirname(sys.executable), 'bin')
+    os.environ['PATH'] = os.pathsep.join([binpath, os.environ['PATH']])
     # os.Popen() needs this, and Mercurial still uses os.Popen
     if 'COMSPEC' not in os.environ:
         comspec = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
@@ -58,6 +62,7 @@ import threading
 
 from mercurial import demandimport
 demandimport.ignore.append('win32com.shell')
+demandimport.ignore.append('numpy')  # comtypes.npsupport does try-import
 demandimport.ignore.append('tortoisehg.util.config')
 demandimport.ignore.append('icons_rc')
 demandimport.ignore.append('translations_rc')
@@ -87,7 +92,8 @@ if errmsg:
     qtrun(run, ui.ui(), **opts)
     sys.exit(1)
 
-if 'THGDEBUG' in os.environ or '--profile' in sys.argv:
+if ('THGDEBUG' in os.environ or '--profile' in sys.argv
+    or getattr(sys, 'frozen', None) != 'windows_exe'):
     sys.exit(tortoisehg.hgqt.run.dispatch(argv))
 else:
     import cStringIO
@@ -115,10 +121,10 @@ else:
                 qtrun(run, ui.ui(), **opts)
                 break
         sys.exit(ret)
+    except KeyboardInterrupt:
+        sys.exit(-1)
+    except SystemExit:
+        raise
     except:
-        if sys.exc_info()[0] not in [SystemExit, KeyboardInterrupt]:
-            import traceback
-            sys.stderr = origstderr
-            traceback.print_exc()
-        else:
-            raise SystemExit(ret)
+        sys.__stderr__ = sys.stderr = origstderr
+        raise

@@ -177,6 +177,13 @@ Work with the various task tabs.
 
 ..
 
+	:guilabel:`Search`
+		For performing text searches through file content.
+		
+..		See _`Search` for more detail.
+
+..
+
 	:guilabel:`Synchronize`
 		Gives you full control about how you let your repositories
 		communicate with any other repository.
@@ -189,43 +196,10 @@ Work with the various task tabs.
 
 ..
 
-	:guilabel:`Manifest`
-		Shows information about the complete content of the repository as it
-		was for the current revision. Here you can view the raw content of
-		files or an Annotate view.  There is a context menu on the filelist
-		to do further digging into the history data.  You can even compare a
-		file between different revision from there.
-		See _`Manifest` for more detail.
-
-..		.. figure:: figures/manifest-tasktab.png
-			:alt: Manifest Task Tab
-			
-			Manifest Task Tab
-
-..
-
-	:guilabel:`Search`
-		For performing text searches through file content.
-		
-..		See _`Search` for more detail.
-
-..
-
 ..		.. figure:: figures/search-tasktab.png
 			:alt: Search Task Tab
 			
 			Search Task Tab
-
-..
-
-	:guilabel:`Patch Queue`
-		This widget implements the MQ extension functionality.
-		See _`Patch Queue` for more detail.
-
-..		.. figure:: figures/mq-tasktab.png
-			:alt: Patch Queue Task Tab
-			
-			Patch Queue Task Tab
 
 ..
 
@@ -351,14 +325,16 @@ With only one revision selected:
 	:guilabel:`Update...`
 		Update your working directory to this revision. Opens the
 		TortoiseHg update dialog with this revision selected.
-	:guilabel:`Visual diff...`
+	:guilabel:`Diff to Parent`
 		Open this change in your visual diff tool.
-	:guilabel:`Diff to local...`
+	:guilabel:`Diff to Local`
 		Display changes (visual diff) between this revision and your
 		current working directory.
-	:guilabel:`Browse at rev...`
+	:guilabel:`Browse at Revision`
 		Brings up the Manifest window with the content of all files in the repo
 		at the selected revision.
+	:guilabel:`Similar Revisions...`
+		Open the TortoiseHg dialog to search for similar revisions.
 	:guilabel:`Merge with local...`
 		Merge the selected changeset with the Working Dir.  Opens the TortoiseHg
 		merge dialog with this revision selected.
@@ -366,27 +342,47 @@ With only one revision selected:
 		Allows to manage tags to the selected revision.
 	:guilabel:`Bookmark...`
 		Allows to manage bookmarks for the selected revision.
-		*This option requires the boomarks extension to be enabled.*
 	:guilabel:`Backout...`
 		Create a backout changeset for selected revision.
+	:guilabel:`Copy Hash`
+		Copies the revision hash to the clipboard.
+		Copy current revision's full hash to the clipboard.
+
+		Under X11, the short changeset hash is automatically
+		copied to the primary selection when the revision is
+		clicked, you paste it by pressing the middle mouse
+		button.
+
 	:guilabel:`Export`
-		:guilabel:`Export patch`
+		:guilabel:`Export Patch...`
 			Generate a patch file containing this revision's changes.
-		:guilabel:`Email patch...`
+		:guilabel:`Email Patch...`
 			Send this revision's changes to email recipient.  Opens the
 			TortoiseHg email dialog with this revision selected.
 		:guilabel:`Archive...`
 			Open the archive dialog for this revision, allowing user to
 			generate a backup copy of the repository at that revision.
-		:guilabel:`Copy patch`
-			todo
+		:guilabel:`Bundle Rev and Descendants...`
+			Open a dialog for exporting this revision and its descendants
+			to a bundle file.
+		:guilabel:`Copy Patch`
+			Copies this revision's changes to the clipboard.
 			*Only visible when MQ is enabled.*
-	
-	:guilabel:`Copy hash`
-			Copy current revision's full hash to the clipboard.
+
+	:guilabel:`Change Phase to`
+		:guilabel:`public`
+			Change the phase of this revision to public.
+		:guilabel:`draft`
+			Change the phase of this revision to draft.
+		:guilabel:`secret`
+			Change the phase of this revision to secret.
+
+	:guilabel:`Graft to Local...`
+		Open the graft dialog to copy the selected revision.
+
 	:guilabel:`Modify history`
-		:guilabel:`QGoto`
-			Push/pop patches upto this one
+		:guilabel:`Unapply Patch`
+			Pop patches upto this one
 			*Only visible when MQ is enabled*
 		:guilabel:`Import to MQ`
 			Import selected revision into the current patch queue.  Only
@@ -395,10 +391,19 @@ With only one revision selected:
 		:guilabel:`Finish patch`
 			Transforms the MQ patch into a regular changeset.
 			*Only visible when MQ is enabled*
+		:guilabel:`Rename Patch...`
+			Renames the MQ patch file.
+			*Only visible when MQ is enabled*
+		:guilabel:`MQ Options`
+			Open the MQ options dialog.
+			*Only visible when MQ is enabled*
 		:guilabel:`Rebase...`
 			Move the selected revision and all of its descendants onto the
 			current working parent revision.
 			*Only visible when rebase is enabled*
+		:guilabel:`Prune...`
+			Mark the selected revision as obsolete.
+			*Only visible when evolve is enabled*
 		:guilabel:`Strip...`
 			Remove the selected revision and all of its descendants from the
 			repository [#rcm1]_ *Only visible when MQ is enabled*
@@ -438,7 +443,7 @@ File Context Menus
 ------------------
 
 Right-clicking on filenames in the file list pane (bottom left of the RevDetails
-and Manifest task tabs) will bring up a context menu for the selected file:
+task tab) will bring up a context menu for the selected file:
 
 	:guilabel:`Visual Diff`
 		Open this revision of the file in your visual diff tool.

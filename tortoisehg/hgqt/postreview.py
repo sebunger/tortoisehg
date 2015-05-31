@@ -2,24 +2,27 @@
 #
 # Copyright 2011 Michael De Wildt <michael.dewildt@gmail.com>
 #
-# A dialog to allow users to post a review to reviewboard
-# http:///www.reviewboard.org
-#
-# This dialog requires a fork of the review board mercurial plugin, maintained
-# by mdelagra, that can be downloaded from:
-#
-# https://bitbucket.org/mdelagra/mercurial-reviewboard/
-#
-# More information can be found at http://www.mikeyd.com.au/tortoisehg-reviewboard
-#
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
+
+"""A dialog to allow users to post a review to reviewboard
+
+http:///www.reviewboard.org
+
+This dialog requires a fork of the review board mercurial plugin, maintained
+by mdelagra, that can be downloaded from:
+
+https://bitbucket.org/mdelagra/mercurial-reviewboard/
+
+More information can be found at http://www.mikeyd.com.au/tortoisehg-reviewboard
+"""
+
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from mercurial import extensions, scmutil
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, qtlib
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import cmdcore, qtlib
 from tortoisehg.hgqt.postreview_ui import Ui_PostReviewDialog
 from tortoisehg.hgqt.hgemail import _ChangesetsModel
 
@@ -84,13 +87,14 @@ class LoadReviewDataThread(QThread):
 
 class PostReviewDialog(QDialog):
     """Dialog for sending patches to reviewboard"""
-    def __init__(self, ui, repo, revs, parent=None):
+    def __init__(self, ui, repoagent, revs, parent=None):
         super(PostReviewDialog, self).__init__(parent)
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.ui = ui
-        self.repo = repo
+        self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
+        self._cmdoutputs = []
         self.error_message = None
-        self.cmd = None
 
         self.qui = Ui_PostReviewDialog()
         self.qui.setupUi(self)
@@ -103,6 +107,10 @@ class PostReviewDialog(QDialog):
         self.review_thread.start()
         QShortcut(QKeySequence('Ctrl+Return'), self, self.accept)
         QShortcut(QKeySequence('Ctrl+Enter'), self, self.accept)
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def passwordPrompt(self):
@@ -130,9 +138,10 @@ class PostReviewDialog(QDialog):
             self.qui.post_review_button.setEnabled(True)
 
     def closeEvent(self, event):
-        if self.cmd and self.cmd.core.running():
-            self.cmd.commandFinished.disconnect(self.onCompletion)
-            self.cmd.cancel()
+        if not self._cmdsession.isFinished():
+            self._cmdsession.abort()
+            event.ignore()
+            return
 
         # Dispose of the review data thread
         self.review_thread.terminate()
@@ -248,7 +257,8 @@ class PostReviewDialog(QDialog):
         if (len(self.selectedRevs) > 1):
             #Set the parent to the revision below the last one on the list
             #so all checked revisions are included in the request
-            opts['parent'] = str(self.selectedRevs[0] - 1)
+            ctx = self.repo[self.selectedRevs[0]]
+            opts['parent'] = str(ctx.p1().rev())
 
         # Always use the upstream repo to determine the parent diff base
         # without the diff uploaded to review board dies
@@ -256,9 +266,6 @@ class PostReviewDialog(QDialog):
 
         #Set the password just in  case the user has opted to not save it
         opts['password'] = str(self.password)
-
-        #Finally we want to pass the repo path to the hg extension
-        opts['repository'] = self.repo.root
 
         return opts
 
@@ -329,8 +336,6 @@ class PostReviewDialog(QDialog):
 
             return args
 
-        hglib.loadextension(self.ui, 'reviewboard')
-
         opts = self.postReviewOpts()
 
         revstr = str(self.selectedRevs.pop())
@@ -338,17 +343,19 @@ class PostReviewDialog(QDialog):
         self.qui.post_review_button.setEnabled(False)
         self.qui.close_button.setEnabled(False)
 
-        self.cmd = cmdui.Runner(False, self)
-        self.cmd.setTitle(_('Review Board'))
-        self.cmd.commandFinished.connect(self.onCompletion)
-        self.cmd.run(['postreview'] + cmdargs(opts) + [revstr])
+        cmdline = map(hglib.tounicode,
+                      ['postreview'] + cmdargs(opts) + [revstr])
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        del self._cmdoutputs[:]
+        sess.commandFinished.connect(self.onCompletion)
+        sess.outputReceived.connect(self._captureOutput)
 
     @pyqtSlot()
     def onCompletion(self):
         self.qui.progress_bar.hide()
         self.qui.progress_label.hide()
 
-        output = self.cmd.core.rawoutput()
+        output = hglib.fromunicode(''.join(self._cmdoutputs), 'replace')
 
         saved = 'saved:' in output
         published = 'published:' in output
@@ -379,6 +386,11 @@ class PostReviewDialog(QDialog):
 
         self.writeSettings()
         super(PostReviewDialog, self).accept()
+
+    @pyqtSlot(unicode, unicode)
+    def _captureOutput(self, msg, label):
+        if label != 'control':
+            self._cmdoutputs.append(unicode(msg))
 
     @pyqtSlot()
     def onSettingsButtonClicked(self):

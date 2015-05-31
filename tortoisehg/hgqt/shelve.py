@@ -12,7 +12,7 @@ from mercurial import commands, error, util
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, cmdui, chunks
 
 from PyQt4.QtCore import *
@@ -22,13 +22,13 @@ class ShelveDialog(QDialog):
 
     wdir = _('Working Directory')
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
 
         self.setWindowIcon(qtlib.geticon('shelve'))
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.shelves = []
         self.patches = []
 
@@ -72,7 +72,7 @@ class ShelveDialog(QDialog):
         ahbox.addWidget(self.clearShelfButtonA)
         ahbox.addWidget(self.delShelfButtonA)
 
-        self.browsea = chunks.ChunksWidget(repo, self, True)
+        self.browsea = chunks.ChunksWidget(self._repoagent, self)
         self.browsea.splitter.splitterMoved.connect(self.linkSplitters)
         self.browsea.linkActivated.connect(self.linkActivated)
         self.browsea.showMessage.connect(self.showMessage)
@@ -102,17 +102,18 @@ class ShelveDialog(QDialog):
         bhbox.addWidget(self.clearShelfButtonB)
         bhbox.addWidget(self.delShelfButtonB)
 
-        self.browseb = chunks.ChunksWidget(repo, self, True)
+        self.browseb = chunks.ChunksWidget(self._repoagent, self)
         self.browseb.splitter.splitterMoved.connect(self.linkSplitters)
         self.browseb.linkActivated.connect(self.linkActivated)
         self.browseb.showMessage.connect(self.showMessage)
         bvbox.addWidget(self.browseb)
 
         self.lefttbar = QToolBar(_('Left Toolbar'), objectName='lefttbar')
+        self.lefttbar.setIconSize(qtlib.toolBarIconSize())
         self.lefttbar.setStyleSheet(qtlib.tbstylesheet)
         self.tbarhbox.addWidget(self.lefttbar)
         self.deletea = a = QAction(_('Delete selected chunks'), self)
-        self.deletea.triggered.connect(self.browsea.deleteSelectedChunks)
+        self.deletea.triggered.connect(self.deleteChunksA)
         a.setIcon(qtlib.geticon('thg-shelve-delete-left'))
         self.lefttbar.addAction(self.deletea)
         self.allright = a = QAction(_('Move all files right'), self)
@@ -132,6 +133,7 @@ class ShelveDialog(QDialog):
         self.lefttbar.addAction(self.chunksright)
 
         self.rbar = QToolBar(_('Refresh Toolbar'), objectName='rbar')
+        self.rbar.setIconSize(qtlib.toolBarIconSize())
         self.rbar.setStyleSheet(qtlib.tbstylesheet)
         self.tbarhbox.addStretch(1)
         self.tbarhbox.addWidget(self.rbar)
@@ -146,6 +148,7 @@ class ShelveDialog(QDialog):
         self.rbar.addAction(self.actionNew)
 
         self.righttbar = QToolBar(_('Right Toolbar'), objectName='righttbar')
+        self.righttbar.setIconSize(qtlib.toolBarIconSize())
         self.righttbar.setStyleSheet(qtlib.tbstylesheet)
         self.tbarhbox.addStretch(1)
         self.tbarhbox.addWidget(self.righttbar)
@@ -165,7 +168,7 @@ class ShelveDialog(QDialog):
         a.setIcon(qtlib.geticon('thg-shelve-move-left-all'))
         self.righttbar.addAction(self.allleft)
         self.deleteb = a = QAction(_('Delete selected chunks'), self)
-        self.deleteb.triggered.connect(self.browseb.deleteSelectedChunks)
+        self.deleteb.triggered.connect(self.deleteChunksB)
         a.setIcon(qtlib.geticon('thg-shelve-delete-right'))
         self.righttbar.addAction(self.deleteb)
 
@@ -191,10 +194,15 @@ class ShelveDialog(QDialog):
                            'in .hg/Trashcan/'))
 
         self.refreshCombos()
-        repo.repositoryChanged.connect(self.refreshCombos)
+        repoagent.repositoryChanged.connect(self.refreshCombos)
 
-        self.setWindowTitle(_('TortoiseHg Shelve - %s') % repo.displayname)
+        self.setWindowTitle(_('TortoiseHg Shelve - %s')
+                            % repoagent.displayName())
         self.restoreSettings()
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     @pyqtSlot()
     def moveFileRight(self):
@@ -240,6 +248,23 @@ class ShelveDialog(QDialog):
     def moveChunksLeft(self):
         file, chunks = self.browseb.getSelectedFileAndChunks()
         if self.browsea.mergeChunks(file, chunks):
+            self.browseb.deleteSelectedChunks()
+
+    @pyqtSlot()
+    def deleteChunksA(self):
+        if self.comboa.currentIndex() == 0:
+            msg = _('Delete selected chunks from working copy?')
+        else:
+            f = hglib.tounicode(os.path.basename(self.currentPatchA()))
+            msg = _('Delete selected chunks from shelf file %s?') % f
+        if qtlib.QuestionMsgBox(_('Are you sure?'), msg, parent=self):
+            self.browsea.deleteSelectedChunks()
+
+    @pyqtSlot()
+    def deleteChunksB(self):
+        f = hglib.tounicode(os.path.basename(self.currentPatchB()))
+        msg = _('Delete selected chunks from shelf file %s?') % f
+        if qtlib.QuestionMsgBox(_('Are you sure?'), msg, parent=self):
             self.browseb.deleteSelectedChunks()
 
     @pyqtSlot()
@@ -382,7 +407,7 @@ class ShelveDialog(QDialog):
     def refreshCombos(self):
         shelvea, shelveb = self.currentPatchA(), self.currentPatchB()
 
-        # Note that thgshelves returns the shelve list ordered from newest to 
+        # Note that thgshelves returns the shelve list ordered from newest to
         # oldest
         shelves = self.repo.thgshelves()
         disp = [_('Shelf: %s') % hglib.tounicode(s) for s in shelves]
@@ -431,6 +456,7 @@ class ShelveDialog(QDialog):
     def comboAChanged(self, index):
         if self.comboRefreshInProgress:
             return
+        assert index >= 0  # side A should always have "Working Directory"
         if index == 0:
             rev = None
             self.delShelfButtonA.setEnabled(False)
@@ -440,15 +466,27 @@ class ShelveDialog(QDialog):
             self.delShelfButtonA.setEnabled(index <= len(self.shelves))
             self.clearShelfButtonA.setEnabled(index <= len(self.shelves))
         self.browsea.setContext(self.repo.changectx(rev))
+        self._deselectSamePatch(self.combob)
 
     @pyqtSlot(int)
     def comboBChanged(self, index):
         if self.comboRefreshInProgress:
             return
         rev = self.currentPatchB()
-        self.delShelfButtonB.setEnabled(index < len(self.shelves))
-        self.clearShelfButtonB.setEnabled(index < len(self.shelves))
+        self.delShelfButtonB.setEnabled(0 <= index < len(self.shelves))
+        self.clearShelfButtonB.setEnabled(0 <= index < len(self.shelves))
         self.browseb.setContext(self.repo.changectx(rev))
+        self._deselectSamePatch(self.comboa)
+
+    def _deselectSamePatch(self, combo):
+        # if the same patch or shelve is selected by both sides, "move" action
+        # will corrupt patch content.
+        if self.currentPatchA() != self.currentPatchB():
+            return
+        if combo.count() > 1:
+            combo.setCurrentIndex((combo.currentIndex() + 1) % combo.count())
+        else:
+            combo.setCurrentIndex(-1)
 
     @pyqtSlot(int, int)
     def linkSplitters(self, pos, index):

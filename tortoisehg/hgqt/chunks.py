@@ -8,15 +8,14 @@
 import cStringIO
 import os, re
 
-from mercurial import hg, util, patch, commands, cmdutil
-from mercurial import match as matchmod, ui as uimod
-from hgext import record
+from mercurial import util, patch, commands
+from mercurial import match as matchmod
 
 from tortoisehg.util import hglib
 from tortoisehg.util.patchctx import patchctx
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, thgrepo, qscilib, lexers, visdiff, revert
-from tortoisehg.hgqt import filelistmodel, filelistview, filedata, blockmatcher
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib, qscilib, lexers, visdiff, revert, rejects
+from tortoisehg.hgqt import filelistview, filedata, blockmatcher, manifestmodel
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -38,11 +37,10 @@ class ChunksWidget(QWidget):
 
     contextmenu = None
 
-    def __init__(self, repo, parent, multiselectable):
+    def __init__(self, repoagent, parent):
         QWidget.__init__(self, parent)
 
-        self.repo = repo
-        self.multiselectable = multiselectable
+        self._repoagent = repoagent
         self.currentFile = None
 
         layout = QVBoxLayout(self)
@@ -56,9 +54,11 @@ class ChunksWidget(QWidget):
         self.splitter.setChildrenCollapsible(False)
         self.layout().addWidget(self.splitter)
 
-        self.filelist = filelistview.HgFileListView(repo, self, multiselectable)
-        self.filelistmodel = filelistmodel.HgFileListModel(self)
-        self.filelist.setModel(self.filelistmodel)
+        repo = self._repoagent.rawRepo()
+        self.filelist = filelistview.HgFileListView(self)
+        model = manifestmodel.ManifestModel(
+            repoagent, self, statusfilter='MAR', flat=True)
+        self.filelist.setModel(model)
         self.filelist.setContextMenuPolicy(Qt.CustomContextMenu)
         self.filelist.customContextMenuRequested.connect(self.menuRequest)
         self.filelist.doubleClicked.connect(self.vdiff)
@@ -106,6 +106,10 @@ class ChunksWidget(QWidget):
             self._actions[name] = act
             self.addAction(act)
 
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
     @pyqtSlot(QPoint)
     def menuRequest(self, point):
         actionlist = ['diff', 'edit', 'revert']
@@ -132,7 +136,7 @@ class ChunksWidget(QWidget):
         rev = self.ctx.rev()
         if rev is None:
             rev = self.ctx.p1().rev()
-        dlg = revert.RevertDialog(self.repo, filenames, rev, self)
+        dlg = revert.RevertDialog(self._repoagent, filenames, rev, self)
         dlg.exec_()
         dlg.deleteLater()
 
@@ -161,11 +165,12 @@ class ChunksWidget(QWidget):
             pass
 
     def runPatcher(self, fp, wfile, updatestate):
-        ui = self.repo.ui.copy()
+        # don't repo.ui.copy(), which is protected to clone baseui since hg 2.9
+        ui = self.repo.ui
         class warncapt(ui.__class__):
             def warn(self, msg, *args, **opts):
                 self.write(msg)
-        ui.__class__ = warncapt
+        ui = warncapt(ui)
 
         ok = True
         repo = self.repo
@@ -195,8 +200,8 @@ class ChunksWidget(QWidget):
                                         hglib.tounicode(line) + u'<br><br>' +
                                         _('Edit patched file and rejects?'),
                                        parent=self):
-                    from tortoisehg.hgqt import rejects
-                    dlg = rejects.RejectsDialog(repo.wjoin(wfile), self)
+                    dlg = rejects.RejectsDialog(repo.ui, repo.wjoin(wfile),
+                                                self)
                     if dlg.exec_() == QDialog.Accepted:
                         ok = True
                     break
@@ -414,7 +419,7 @@ class ChunksWidget(QWidget):
                                 opts=diffopts):
                 buf.write(p)
             buf.seek(0)
-            chunks = record.parsepatch(buf)
+            chunks = hglib.parsepatch(buf)
             if chunks:
                 header = chunks[0]
                 return [header] + header.hunks
@@ -443,7 +448,7 @@ class ChunksWidget(QWidget):
 
     def setContext(self, ctx):
         self.diffbrowse.setContext(ctx)
-        self.filelist.setContext(ctx)
+        self.filelist.model().setRawContext(ctx)
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)
@@ -525,10 +530,11 @@ class DiffBrowser(QFrame):
         w.setTextInteractionFlags(f | Qt.TextSelectableByMouse)
         w.linkActivated.connect(self.linkActivated)
 
-        self.searchbar = qscilib.SearchToolBar(hidable=True)
+        self.searchbar = qscilib.SearchToolBar()
         self.searchbar.hide()
         self.searchbar.searchRequested.connect(self.find)
         self.searchbar.conditionChanged.connect(self.highlightText)
+        self.addActions(self.searchbar.editorActions())
 
         guifont = qtlib.getfont('fontlist').font()
         self.sumlabel = QLabel()
@@ -548,7 +554,7 @@ class DiffBrowser(QFrame):
         self.actionFind.setToolTip(_('Toggle display of text search bar'))
         qtlib.newshortcutsforstdkey(QKeySequence.Find, self, self.searchbar.show)
         self.diffToolbar = QToolBar(_('Diff Toolbar'))
-        self.diffToolbar.setIconSize(QSize(16, 16))
+        self.diffToolbar.setIconSize(qtlib.smallIconSize())
         self.diffToolbar.setStyleSheet(qtlib.tbstylesheet)
         self.diffToolbar.addAction(self.actionFind)
         hbox.addWidget(self.diffToolbar)
@@ -569,8 +575,6 @@ class DiffBrowser(QFrame):
         self.sci.setReadOnly(True)
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
-        self.sci.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.sci.customContextMenuRequested.connect(self.menuRequested)
         self.sci.setCaretLineVisible(False)
 
         self.sci.setMarginType(1, qsci.SymbolMargin)
@@ -611,10 +615,6 @@ class DiffBrowser(QFrame):
         self.layout().addWidget(self.searchbar)
 
         self.clearDisplay()
-
-    def menuRequested(self, point):
-        point = self.sci.viewport().mapToGlobal(point)
-        return self.sci.createStandardContextMenu().exec_(point)
 
     def loadSettings(self, qs, prefix):
         self.sci.loadSettings(qs, prefix)
@@ -717,7 +717,9 @@ class DiffBrowser(QFrame):
         self._lastfile = filename
         self.clearChunks()
 
-        fd = filedata.FileData(self._ctx, None, filename, status, force=force)
+        fd = filedata.createFileData(self._ctx, None, filename, status)
+        fd.load(force=force)
+        fd.detectTextEncoding()
 
         if fd.elabel:
             self.extralabel.setText(fd.elabel)
@@ -743,7 +745,7 @@ class DiffBrowser(QFrame):
         elif type(self._ctx.rev()) is str:
             chunks = self._ctx._files[filename]
         else:
-            header = record.parsepatch(cStringIO.StringIO(fd.diff))[0]
+            header = hglib.parsepatch(cStringIO.StringIO(fd.diff))[0]
             chunks = [header] + header.hunks
 
         utext = []
@@ -752,8 +754,7 @@ class DiffBrowser(QFrame):
             chunk.selected = False
             chunk.write(buf)
             chunk.lines = buf.getvalue().splitlines()
-            utext += [hglib.tounicode(l) for l in chunk.lines]
-            utext.append('')
+            utext.append(buf.getvalue().decode(fd.textEncoding(), 'replace'))
         self.sci.setText(u'\n'.join(utext))
 
         start = 0

@@ -1,10 +1,10 @@
 
  .. TortoiseHg documentation master file, created by
-    sphinx-quickstart on Tue Jul 21 13:14:26 2009.
-    Poslední editace překladu 30. dubna 2012   
+    sphinx-quickstart on Tue May 15 13:14:26 2014.
+    Poslední editace překladu 30. dubna 2014   
 
 Vítejte v dokumentaci pro TortoiseHg!
-======================================
+=====================================
 
 
 .. toctree::

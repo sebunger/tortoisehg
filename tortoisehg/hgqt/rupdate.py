@@ -1,64 +1,91 @@
-# Copyright 2011 Ryan Seto <mr.werewolf@gmail.com>
-#
 # rupdate.py - Remote Update dialog for TortoiseHg
 #
-# This dialog lets users update a remote ssh repository.
-#
-# Requires a copy of the rupdate plugin found at:
-#     http://bitbucket.org/MrWerewolf/rupdate
-#
-# Also, enable the plugin with the following in mercurial.ini:
-#
-# [extensions]
-# rupdate = /path/to/rupdate
-#
+# Copyright 2007 TK Soh <teekaysoh@gmail.com>
+# Copyright 2007 Steve Borho <steve@borho.org>
+# Copyright 2010 Yuki KODAMA <endflow.net@gmail.com>
+# Copyright 2011 Ryan Seto <mr.werewolf@gmail.com>
 #
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from mercurial import error, node
+"""Remote Update dialog for TortoiseHg
+
+This dialog lets users update a remote ssh repository.
+
+Requires a copy of the rupdate plugin found at:
+http://bitbucket.org/MrWerewolf/rupdate
+
+Also, enable the plugin with the following in mercurial.ini::
+
+    [extensions]
+    rupdate = /path/to/rupdate
+"""
+
+from mercurial import error
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import hgrcutil
-from tortoisehg.hgqt.update import UpdateDialog
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import cmdui, csinfo, qtlib
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-class rUpdateDialog(UpdateDialog):
+class RemoteUpdateWidget(cmdui.AbstractCmdWidget):
 
-    def __init__(self, repo, rev=None, parent=None, opts={}):
-        super(rUpdateDialog, self).__init__(repo, rev, parent, opts)
+    def __init__(self, repoagent, rev=None, parent=None):
+        super(RemoteUpdateWidget, self).__init__(parent)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self._repoagent = repoagent
+        repo = repoagent.rawRepo()
 
-        # Get configured paths
-        self.paths = {}
-        fn = self.repo.join('hgrc')
-        fn, cfg = hgrcutil.loadIniFile([fn], self)
-        if 'paths' in cfg:
-            for alias in cfg['paths']:
-                self.paths[ alias ] = cfg['paths'][alias]
+        ## main layout
+        form = QFormLayout()
+        form.setContentsMargins(0, 0, 0, 0)
+        form.setSpacing(6)
+        self.setLayout(form)
 
         ### target path combo
         self.path_combo = pcombo = QComboBox()
         pcombo.setEditable(True)
+        pcombo.addItems([hglib.tounicode(path)
+                         for _name, path in repo.ui.configitems('paths')])
+        form.addRow(_('Location:'), pcombo)
 
-        for alias in self.paths:
-            pcombo.addItem(hglib.tounicode(self.paths[alias]))
+        ### target revision combo
+        self.rev_combo = combo = QComboBox()
+        combo.setEditable(True)
+        form.addRow(_('Update to:'), combo)
 
-        ### shift existing items down a row.
-        for i in range(self.grid.count()-1, -1, -1):
-            row, col, rowSp, colSp = self.grid.getItemPosition(i)
-            item = self.grid.takeAt(i)
-            self.grid.removeItem(item)
-            self.grid.addItem(item, row + 1, col, rowSp, colSp, item.alignment())
+        combo.addItems(map(hglib.tounicode, hglib.namedbranches(repo)))
+        tags = list(self.repo.tags()) + repo._bookmarks.keys()
+        tags.sort(reverse=True)
+        combo.addItems(map(hglib.tounicode, tags))
 
-        ### add target path combo to grid
-        self.grid.addWidget(QLabel(_('Location:')), 0, 0)
-        self.grid.addWidget(pcombo, 0, 1)
+        if rev is None:
+            selecturev = hglib.tounicode(self.repo.dirstate.branch())
+        else:
+            selecturev = hglib.tounicode(str(rev))
+        selectindex = combo.findText(selecturev)
+        if selectindex >= 0:
+            combo.setCurrentIndex(selectindex)
+        else:
+            combo.setEditText(selecturev)
+
+        ### target revision info
+        items = ('%(rev)s', ' %(branch)s', ' %(tags)s', '<br />%(summary)s')
+        style = csinfo.labelstyle(contents=items, width=350, selectable=True)
+        factory = csinfo.factory(self.repo, style=style)
+        self.target_info = factory()
+        form.addRow(_('Target:'), self.target_info)
 
         ### Options
-        self.discard_chk.setText(_('Discard remote changes, no backup '
+        self.optbox = QVBoxLayout()
+        self.optbox.setSpacing(6)
+        self.optexpander = expander = qtlib.ExpanderLabel(_('Options:'), False)
+        expander.expanded.connect(self.show_options)
+        form.addRow(expander, self.optbox)
+
+        self.discard_chk = QCheckBox(_('Discard remote changes, no backup '
                                        '(-C/--clean)'))
         self.push_chk = QCheckBox(_('Perform a push before updating'
                                         ' (-p/--push)'))
@@ -66,91 +93,86 @@ class rUpdateDialog(UpdateDialog):
                                         ' (--new-branch)'))
         self.force_chk = QCheckBox(_('Force push to remote location'
                                         ' (-f/--force)'))
-        self.optbox.removeWidget(self.showlog_chk)
+        self.optbox.addWidget(self.discard_chk)
         self.optbox.addWidget(self.push_chk)
         self.optbox.addWidget(self.newbranch_chk)
         self.optbox.addWidget(self.force_chk)
-        self.optbox.addWidget(self.showlog_chk)
 
-        #### Persisted Options
-        self.push_chk.setChecked(
-            QSettings().value('rupdate/push', False).toBool())
-
-        self.newbranch_chk.setChecked(
-            QSettings().value('rupdate/newbranch', False).toBool())
-
-        self.showlog_chk.setChecked(
-            QSettings().value('rupdate/showlog', False).toBool())
+        # signal handlers
+        self.rev_combo.editTextChanged.connect(self.update_info)
 
         # prepare to show
         self.push_chk.setHidden(True)
         self.newbranch_chk.setHidden(True)
         self.force_chk.setHidden(True)
-        self.showlog_chk.setHidden(True)
         self.update_info()
 
-        # expand options if a hidden one is checked
-        self.show_options(self.hiddenSettingIsChecked())
+    def readSettings(self, qs):
+        self.push_chk.setChecked(qs.value('push').toBool())
+        self.newbranch_chk.setChecked(qs.value('newbranch').toBool())
 
-    ### Private Methods ###
+        self.optexpander.set_expanded(self.push_chk.isChecked()
+                                      or self.newbranch_chk.isChecked()
+                                      or self.force_chk.isChecked())
 
-    def hiddenSettingIsChecked(self):
-        # This might be called from the super class before all options are built.
-        # So, we need to check to make sure these options exist first.
-        if (getattr(self, "push_chk", None) and self.push_chk.isChecked()
-            ) or (getattr(self, "newbranch_chk", None) and self.newbranch_chk.isChecked()
-            ) or (getattr(self, "force_chk", None) and self.force_chk.isChecked()
-            ) or (getattr(self, "showlog_chk", None) and self.showlog_chk.isChecked()):
-            return True
-        else:
+    def writeSettings(self, qs):
+        qs.setValue('push', self.push_chk.isChecked())
+        qs.setValue('newbranch', self.newbranch_chk.isChecked())
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
+
+    @pyqtSlot()
+    def update_info(self):
+        new_rev = hglib.fromunicode(self.rev_combo.currentText())
+        if new_rev == 'null':
+            self.target_info.setText(_('remove working directory'))
+            self.commandChanged.emit()
+            return
+        try:
+            self.target_info.update(self.repo[new_rev])
+        except (error.LookupError, error.RepoLookupError, error.RepoError):
+            self.target_info.setText(_('unknown revision!'))
+        self.commandChanged.emit()
+
+    def canRunCommand(self):
+        rev = hglib.fromunicode(self.rev_combo.currentText())
+        try:
+            return rev in self.repo
+        except error.LookupError:
+            # ambiguous changeid
             return False
 
-    def saveSettings(self):
-        QSettings().setValue('rupdate/push', self.push_chk.isChecked())
-        QSettings().setValue('rupdate/newbranch', self.newbranch_chk.isChecked())
-        QSettings().setValue('rupdate/showlog', self.showlog_chk.isChecked())
-
-    def update_info(self):
-        super(rUpdateDialog, self).update_info()
-
-        # Keep update button enabled.
-        self.update_btn.setDisabled(False)
-
-    def update(self):
-        self.saveSettings()
-        cmdline = ['rupdate', '--repository', self.repo.root]
-
-        if self.discard_chk.isChecked():
-            cmdline.append('--clean')
-        if self.push_chk.isChecked():
-            cmdline.append('--push')
-        if self.newbranch_chk.isChecked():
-            cmdline.append('--new-branch')
-        if self.force_chk.isChecked():
-            cmdline.append('--force')
-
-        dest = hglib.fromunicode(self.path_combo.currentText())
-        cmdline.append('-d')
-        cmdline.append(dest)
+    def runCommand(self):
+        opts = {
+            'clean': self.discard_chk.isChecked(),
+            'push': self.push_chk.isChecked(),
+            'new_branch': self.newbranch_chk.isChecked(),
+            'force': self.force_chk.isChecked(),
+            'd': self.path_combo.currentText(),
+            }
 
         # Refer to the revision by the short hash.
         rev = hglib.fromunicode(self.rev_combo.currentText())
-        revHash = self.repo[rev].hex()
-        cmdline.append(revHash)
+        ctx = self.repo[rev]
 
-        # start updating
-        self.repo.incrementBusyCount()
-        self.cmd.run(cmdline)
+        cmdline = hglib.buildcmdargs('rupdate', ctx.hex(), **opts)
+        return self._repoagent.runCommand(cmdline, self)
 
     ### Signal Handlers ###
 
     def show_options(self, visible):
-        # Like hiddenSettingIsChecked(), need to make sure these options exist first.
-        if getattr(self, "push_chk", None): self.push_chk.setShown(visible)
-        if getattr(self, "newbranch_chk", None): self.newbranch_chk.setShown(visible)
-        if getattr(self, "force_chk", None): self.force_chk.setShown(visible)
-        if getattr(self, "showlog_chk", None): self.showlog_chk.setShown(visible)
+        self.push_chk.setVisible(visible)
+        self.newbranch_chk.setVisible(visible)
+        self.force_chk.setVisible(visible)
 
-    def command_started(self):
-        super(rUpdateDialog, self).command_started()
-        self.update_btn.setHidden(False)
+
+def createRemoteUpdateDialog(repoagent, rev=None, parent=None):
+    dlg = cmdui.CmdControlDialog(parent)
+    dlg.setWindowTitle(_('Remote Update - %s') % repoagent.displayName())
+    dlg.setWindowIcon(qtlib.geticon('hg-update'))
+    dlg.setObjectName('rupdate')
+    dlg.setRunButtonText(_('&Update'))
+    dlg.setCommandWidget(RemoteUpdateWidget(repoagent, rev, dlg))
+    return dlg

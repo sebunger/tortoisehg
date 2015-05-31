@@ -5,13 +5,13 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import os
+import os, re
 
 from mercurial import node
 from mercurial import ui, hg, util, error
 
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, hgrcutil
 
 from PyQt4.QtCore import *
@@ -54,6 +54,103 @@ def find(root, targetfunc, stopfunc=None):
         if targetfunc(e):
             return e
     raise ValueError('not found')
+
+# '/' for path separator, '#n' for index of duplicated names
+_quotenamere = re.compile(r'[%/#]')
+
+def _quotename(s):
+    r"""Replace special characters to %xx (minimal set of urllib.quote)
+
+    >>> _quotename('foo/bar%baz#qux')
+    'foo%2Fbar%25baz%23qux'
+    >>> _quotename(u'\xa1')
+    u'\xa1'
+    """
+    return _quotenamere.sub(lambda m: '%%%02X' % ord(m.group(0)), s)
+
+def _buildquotenamemap(items):
+    namemap = {}
+    for e in items:
+        q = _quotename(e.shortname())
+        if q not in namemap:
+            namemap[q] = [e]
+        else:
+            namemap[q].append(e)
+    return namemap
+
+def itempath(item):
+    """Virtual path to the given item"""
+    rnames = []
+    while item.parent():
+        namemap = _buildquotenamemap(item.parent().childs)
+        q = _quotename(item.shortname())
+        i = namemap[q].index(item)
+        if i == 0:
+            rnames.append(q)
+        else:
+            rnames.append('%s#%d' % (q, i))
+        item = item.parent()
+    return '/'.join(reversed(rnames))
+
+def findbyitempath(root, path):
+    """Return the item for the given virtual path
+
+    >>> root = RepoTreeItem()
+    >>> foo = RepoGroupItem('foo')
+    >>> root.appendChild(foo)
+    >>> bar = RepoGroupItem('bar')
+    >>> root.appendChild(bar)
+    >>> bar.appendChild(RepoItem('/tmp/baz', 'baz'))
+    >>> root.appendChild(RepoGroupItem('foo'))
+    >>> root.appendChild(RepoGroupItem('qux/quux'))
+
+    >>> def f(path):
+    ...     return itempath(findbyitempath(root, path))
+
+    >>> f('')
+    ''
+    >>> f('foo')
+    'foo'
+    >>> f('bar/baz')
+    'bar/baz'
+    >>> f('qux%2Fquux')
+    'qux%2Fquux'
+    >>> f('bar/baz/unknown')
+    Traceback (most recent call last):
+      ...
+    ValueError: not found
+
+    >>> f('foo#1')
+    'foo#1'
+    >>> f('foo#2')
+    Traceback (most recent call last):
+      ...
+    ValueError: not found
+    >>> f('foo#bar')
+    Traceback (most recent call last):
+      ...
+    ValueError: invalid path
+    """
+    if not path:
+        return root
+    item = root
+    for q in path.split('/'):
+        h = q.rfind('#')
+        if h >= 0:
+            try:
+                i = int(q[h + 1:])
+            except ValueError:
+                raise ValueError('invalid path')
+            q = q[:h]
+        else:
+            i = 0
+        namemap = _buildquotenamemap(item.childs)
+        try:
+            item = namemap[q][i]
+        except LookupError:
+            raise ValueError('not found')
+    return item
+
 
 class RepoTreeItem(object):
     xmltagname = 'treeitem'
@@ -142,16 +239,20 @@ class RepoTreeItem(object):
 class RepoItem(RepoTreeItem):
     xmltagname = 'repo'
 
-    def __init__(self, root, shortname=None, basenode=None, parent=None):
+    def __init__(self, root, shortname=None, basenode=None, sharedpath=None,
+                 parent=None):
         RepoTreeItem.__init__(self, parent)
         self._root = root
         self._shortname = shortname or u''
         self._basenode = basenode or node.nullid
-        self._valid = True  # expensive check is done at appendSubrepos()
+        # expensive check is done at appendSubrepos()
+        self._sharedpath = sharedpath or ''
+        self._valid = True
 
     def isRepo(self):
         return True
 
+    # TODO: return unicode instead of localstr because shortname() is unicode
     def rootpath(self):
         return self._root
 
@@ -184,6 +285,8 @@ class RepoItem(RepoTreeItem):
             ico = qtlib.geticon(baseiconname)
             if not self._valid:
                 ico = qtlib.getoverlaidicon(ico, qtlib.geticon('dialog-warning'))
+            elif self._sharedpath:
+                ico = qtlib.getoverlaidicon(ico, qtlib.geticon('hg-sharedrepo'))
             return ico
         elif role in (Qt.DisplayRole, Qt.EditRole):
             return [self.shortname, self.shortpath][column]()
@@ -226,6 +329,8 @@ class RepoItem(RepoTreeItem):
         xw.writeAttribute('root', hglib.tounicode(self._root))
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
+        if self._sharedpath:
+            xw.writeAttribute('sharedpath', self._sharedpath)
         _dumpChild(xw, parent=self)
 
     @classmethod
@@ -233,7 +338,8 @@ class RepoItem(RepoTreeItem):
         a = xr.attributes()
         obj = cls(hglib.fromunicode(a.value('', 'root').toString()),
                   unicode(a.value('', 'shortname').toString()),
-                  node.bin(str(a.value('', 'basenode').toString())))
+                  node.bin(str(a.value('', 'basenode').toString())),
+                  unicode(a.value('', 'sharedpath').toString()))
         _undumpChild(xr, parent=obj, undump=_undumpSubrepoItem)
         return obj
 
@@ -241,6 +347,7 @@ class RepoItem(RepoTreeItem):
         return _('Local Repository %s') % hglib.tounicode(self._root)
 
     def appendSubrepos(self, repo=None):
+        self._sharedpath = ''
         invalidRepoList = []
         try:
             sri = None
@@ -248,9 +355,13 @@ class RepoItem(RepoTreeItem):
                 if not os.path.exists(self._root):
                     self._valid = False
                     return [self._root]
-                elif not os.path.exists(os.path.join(self._root, '.hgsub')):
+                elif (not os.path.exists(os.path.join(self._root, '.hgsub'))
+                      and not os.path.exists(
+                          os.path.join(self._root, '.hg', 'sharedpath'))):
                     return []  # skip repo creation, which is expensive
                 repo = hg.repository(ui.ui(), self._root)
+            if repo.sharedpath != repo.path:
+                self._sharedpath = hglib.tounicode(repo.sharedpath)
             wctx = repo['.']
             sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
             for subpath in sorted(wctx.substate, key=sortkey):
@@ -367,8 +478,8 @@ class SubrepoItem(RepoItem):
             return super(SubrepoItem, self).data(column, role)
 
     def menulist(self):
-        acts = ['open', 'clone', 'addsubrepo', None, 'explore',
-                'terminal', 'copypath']
+        acts = ['open', 'clone', None, 'addsubrepo', 'removesubrepo',
+                None, 'explore', 'terminal', 'copypath']
         if self.childCount() > 0:
             acts.extend([None, (_('&Sort'), ['sortbyname', 'sortbyhgsub'])])
         acts.extend([None, 'settings'])
@@ -456,7 +567,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def setData(self, column, value):
         if column == 0:
-            self.name = value.toString()
+            self.name = unicode(value.toString())
             return True
         return False
 
@@ -464,7 +575,7 @@ class RepoGroupItem(RepoTreeItem):
         return ''  # may be okay to return _commonpath instead?
 
     def shortname(self):  # for sortbyname()
-        return unicode(self.name)
+        return self.name
 
     def menulist(self):
         return ['openAll', 'add', None, 'newGroup', None, 'rename', 'remove',
@@ -485,7 +596,7 @@ class RepoGroupItem(RepoTreeItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(a.value('', 'name').toString())
+        obj = cls(unicode(a.value('', 'name').toString()))
         _undumpChild(xr, parent=obj)
         return obj
 

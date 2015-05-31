@@ -73,6 +73,8 @@ class _wsortdict(object):
         return len(self._dict)
 
     def update(self, src):
+        if isinstance(src, _wsortdict):
+            src = src._dict
         self._dict.update(src)
         self._logupdate(src)
 
@@ -180,15 +182,22 @@ class _wconfig(object):
     def _readini(self):
         """Create iniparse object by reading every file"""
         if len(self._readfiles) > 1:
-            raise NotImplementedError("wconfig does not support read() more than once")
+            raise NotImplementedError("wconfig does not support read() more "
+                                      "than once")
 
         def newini(fp=None):
             try:
                 # TODO: optionxformvalue isn't used by INIConfig ?
                 return INIConfig(fp=fp, optionxformvalue=None)
-            except ConfigParser.ParsingError, err:
+            except ConfigParser.MissingSectionHeaderError, err:
                 raise error.ParseError(err.message.splitlines()[0],
                                        '%s:%d' % (err.filename, err.lineno))
+            except ConfigParser.ParsingError, err:
+                if err.errors:
+                    loc = '%s:%d' % (err.filename, err.errors[0][0])
+                else:
+                    loc = err.filename
+                raise error.ParseError(err.message.splitlines()[0], loc)
 
         if not self._readfiles:
             return newini()
@@ -243,13 +252,22 @@ def readfile(path):
 
 def writefile(config, path):
     """Write the given config obj to the specified file"""
-    f = util.atomictempfile(os.path.realpath(path), 'w')
+    # normalize line endings
+    buf = cStringIO.StringIO()
+    config.write(buf)
+    data = '\n'.join(buf.getvalue().splitlines()) + '\n'
+
+    if os.name == 'nt':
+        # no atomic rename to the existing file that may fail occasionally
+        # for unknown reasons, possibly because of our QFileSystemWatcher or
+        # a virus scanner.  also it breaks NTFS symlink (issue #2181).
+        openfile = util.posixfile
+    else:
+        # atomic rename is reliable on Unix
+        openfile = util.atomictempfile
+    f = openfile(os.path.realpath(path), 'w')
     try:
-        buf = cStringIO.StringIO()
-        config.write(buf)
-        # normalize line endings
-        for line in buf.getvalue().splitlines():
-            f.write(line + '\n')
+        f.write(data)
         f.close()
     finally:
         del f  # unlink temp file

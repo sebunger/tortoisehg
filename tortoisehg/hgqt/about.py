@@ -13,9 +13,9 @@ TortoiseHg About dialog - PyQt4 version
 
 import sys
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import version, hglib, paths
+from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -53,12 +53,12 @@ class AboutDialog(QDialog):
         self.copyright_lbl = QLabel()
         self.copyright_lbl.setAlignment(Qt.AlignCenter)
         self.copyright_lbl.setText('\n'
-                + _('Copyright 2008-2013 Steve Borho and others'))
+                + _('Copyright 2008-2015 Steve Borho and others'))
         self.vbox.addWidget(self.copyright_lbl)
         self.courtesy_lbl = QLabel()
         self.courtesy_lbl.setAlignment(Qt.AlignCenter)
         self.courtesy_lbl.setText(
-              _('Several icons are courtesy of the TortoiseSVN project') + '\n')
+              _('Several icons are courtesy of the TortoiseSVN and Tango projects') + '\n')
         self.vbox.addWidget(self.courtesy_lbl)
 
         self.download_url_lbl = QLabel()
@@ -74,21 +74,15 @@ class AboutDialog(QDialog):
         self.blancline_lbl = QLabel()
         self.vbox.addWidget(self.blancline_lbl)
 
-        self.hbox = QHBoxLayout()
-        self.license_btn = QPushButton()
-        self.license_btn.setText(_('&License'))
+        bbox = QDialogButtonBox(self)
+        self.license_btn = bbox.addButton(_('&License'),
+                                          QDialogButtonBox.ResetRole)
         self.license_btn.setAutoDefault(False)
         self.license_btn.clicked.connect(self.showLicense)
-        self.hspacer = QSpacerItem(40, 20,
-                QSizePolicy.Expanding, QSizePolicy.Minimum)
-        self.close_btn = QPushButton()
-        self.close_btn.setText(_('&Close'))
+        self.close_btn = bbox.addButton(QDialogButtonBox.Close)
         self.close_btn.setDefault(True)
         self.close_btn.clicked.connect(self.close)
-        self.hbox.addWidget(self.license_btn)
-        self.hbox.addItem(self.hspacer)
-        self.hbox.addWidget(self.close_btn)
-        self.vbox.addLayout(self.hbox)
+        self.vbox.addWidget(bbox)
 
         self.setLayout(self.vbox)
         self.layout().setSizeConstraint(QLayout.SetFixedSize)
@@ -126,11 +120,14 @@ class AboutDialog(QDialog):
     @pyqtSlot()
     def uFinished(self):
         newver = (0,0,0)
+        newverstr = '0.0.0'
+        upgradeurl = ''
         try:
             f = self._newverreply.readAll().data().splitlines()
             self._newverreply.close()
             self._newverreply = None
-            newver = tuple([int(p) for p in f[0].split('.')])
+            newverstr = f[0]
+            newver = tuple([int(p) for p in newverstr.split('.')])
             upgradeurl = f[1] # generic download URL
             platform = sys.platform
             if platform == 'win32':
@@ -152,14 +149,14 @@ class AboutDialog(QDialog):
         except ValueError:
             curver = (0,0,0)
         if newver > curver:
-            url_lbl = _('A new version of TortoiseHg is ready for download!')
+            url_lbl = _('A new version of TortoiseHg (%s) '
+                        'is ready for download!') % newverstr
             urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
             self.download_url_lbl.setText(urldata)
 
     def showLicense(self):
-        from tortoisehg.hgqt import license
-        ld = license.LicenseDialog(self)
-        ld.show()
+        ld = LicenseDialog(self)
+        ld.exec_()
 
     def closeEvent(self, event):
         if self._newverreply:
@@ -174,3 +171,48 @@ class AboutDialog(QDialog):
     def _writesettings(self):
         s = QSettings()
         s.setValue('about/geom', self.saveGeometry())
+
+
+class LicenseDialog(QDialog):
+    """Dialog for showing the TortoiseHg license"""
+    def __init__(self, parent=None):
+        super(LicenseDialog, self).__init__(parent)
+
+        self.setWindowIcon(qtlib.geticon('thg_logo'))
+        self.setWindowTitle(_('License'))
+        self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
+        self.resize(700, 400)
+
+        self.lic_txt = QPlainTextEdit()
+        self.lic_txt.setFont(QFont('Monospace'))
+        self.lic_txt.setTextInteractionFlags(
+                Qt.TextSelectableByKeyboard|Qt.TextSelectableByMouse)
+        try:
+            lic = open(paths.get_license_path(), 'rb').read()
+            self.lic_txt.setPlainText(lic)
+        except (IOError):
+            pass
+
+        bbox = QDialogButtonBox(self)
+        self.close_btn = bbox.addButton(QDialogButtonBox.Close)
+        self.close_btn.clicked.connect(self.close)
+
+        self.vbox = QVBoxLayout()
+        self.vbox.setSpacing(6)
+        self.vbox.addWidget(self.lic_txt)
+        self.vbox.addWidget(bbox)
+
+        self.setLayout(self.vbox)
+        self._readsettings()
+
+    def closeEvent(self, event):
+        self._writesettings()
+        super(LicenseDialog, self).closeEvent(event)
+
+    def _readsettings(self):
+        s = QSettings()
+        self.restoreGeometry(s.value('license/geom').toByteArray())
+
+    def _writesettings(self):
+        s = QSettings()
+        s.setValue('license/geom', self.saveGeometry())

@@ -15,6 +15,7 @@ import subprocess
 import cgi
 import tempfile
 import re
+import tarfile
 from fnmatch import fnmatch
 from distutils import log
 from distutils.core import setup, Command
@@ -25,8 +26,8 @@ from distutils.spawn import spawn, find_executable
 from os.path import isdir, exists, join, walk, splitext
 from i18n.msgfmt import Msgfmt
 
-thgcopyright = 'Copyright (C) 2010-2013 Steve Borho and others'
-hgcopyright = 'Copyright (C) 2005-2013 Matt Mackall and others'
+thgcopyright = 'Copyright (C) 2010-2015 Steve Borho and others'
+hgcopyright = 'Copyright (C) 2005-2015 Matt Mackall and others'
 
 class build_mo(Command):
 
@@ -55,6 +56,87 @@ class build_mo(Command):
             modata = Msgfmt(pofile).get()
             self.mkpath(modir)
             open(mofile, "wb").write(modata)
+
+class import_po(Command):
+
+    description = "import translations (.po file)"
+
+    user_options = [("package=", "p", "launchpad export package or bzr repo "
+                     "[defualt: launchpad-export.tar.gz]"),
+                    ("lang=", "l",
+                     "languages to be imported, separated by ','")
+                    ]
+
+    def initialize_options(self):
+        self.package = None
+        self.lang = None
+
+    def finalize_options(self):
+        if not self.package:
+            self.package = 'launchpad-export.tar.gz'
+
+        if self.lang:
+            self.lang = self.lang.upper().split(',')
+
+    def _untar(self, name, path='.'):
+        tar = tarfile.open(name, 'r')
+        path = os.path.abspath(path)
+        for tarinfo in tar.getmembers():
+            # Extract the safe file only
+            p = os.path.abspath(os.path.join(path, tarinfo.name))
+            if p.startswith(path):
+                tar.extract(tarinfo, path)
+        tar.close()
+
+    def run(self):
+        if not find_executable('msgcat'):
+            self.warn("could not find msgcat executable")
+            return
+
+        dest_prefix = 'i18n/tortoisehg'
+        src_prefix = 'po/tortoisehg'
+
+        log.info('import from %s' % self.package)
+
+        if os.path.isdir(self.package):
+            self.bzrrepo = True
+            self.package_path = self.package
+        elif tarfile.is_tarfile(self.package):
+            self.bzrrepo = False
+            self.package_path = tempfile.mkdtemp()
+            self._untar(self.package, self.package_path)
+        else:
+            self.warn('%s is not a valid tranlation package' % self.package)
+            return
+
+        if self.bzrrepo:
+            filter = r'^([\S]+)\.po$'
+        else:
+            filter = r'^tortoisehg-([\S]+)\.po$'
+        r = re.compile(filter)
+
+        src_dir = os.path.join(self.package_path, src_prefix)
+        for src_file in os.listdir(src_dir):
+            m = r.match(src_file)
+            if not m:
+                continue
+
+            # filter the language
+            lang = m.group(1)
+            if self.lang and lang.upper() not in self.lang:
+                continue
+
+            dest_file = join(dest_prefix, lang) + '.po'
+            msg = 'updating %s...' % dest_file
+            cmd = ['msgcat',
+                   '--no-location',
+                   '-o', dest_file,
+                   os.path.join(src_dir, src_file)
+                   ]
+            self.execute(spawn, (cmd,), msg)
+
+        if not self.bzrrepo:
+            shutil.rmtree(self.package_path)
 
 class update_pot(Command):
 
@@ -126,7 +208,8 @@ class build_qt(Command):
         # Search for pyuic4 in python bin dir, then in the $Path.
         if py_file is None:
             py_file = splitext(ui_file)[0] + "_ui.py"
-        if not(self.force or newer(ui_file, py_file)):
+        # setup.py is the source of "from i18n import _" line
+        if not (self.force or newer_group([ui_file, __file__], py_file)):
             return
         try:
             from PyQt4 import uic
@@ -239,7 +322,7 @@ class build_qt(Command):
             def createToplevelWidget(self, classname, widgetname):
                 o = indenter.getIndenter()
                 o.level = 0
-                o.write('from tortoisehg.hgqt.i18n import _')
+                o.write('from tortoisehg.util.i18n import _')
                 return super(_UICompiler, self).createToplevelWidget(classname, widgetname)
         compiler.UICompiler = _UICompiler
 
@@ -300,6 +383,7 @@ cmdclass = {
         'clean': clean,
         'clean_local': clean_local,
         'update_pot': update_pot ,
+        'import_po': import_po
     }
 
 def setup_windows(version):

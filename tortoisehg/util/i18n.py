@@ -56,13 +56,13 @@ def availablelanguages():
 def _(message, context=''):
     if context:
         sep = '\004'
-        tmsg = t.gettext(context + sep + message)
+        tmsg = t.ugettext(context + sep + message)
         if sep not in tmsg:
             return tmsg
-    return t.gettext(message)
+    return t.ugettext(message)
 
 def ngettext(singular, plural, n):
-    return t.ngettext(singular, plural, n)
+    return t.ungettext(singular, plural, n)
 
 def agettext(message, context=''):
     """Translate message and convert to local encoding
@@ -74,7 +74,7 @@ def agettext(message, context=''):
     try:
         from tortoisehg.util import hglib
         u = _(message, context)
-        return hglib.fromutf(u)
+        return hglib.fromunicode(u)
     except (LookupError, UnicodeEncodeError):
         return message
 

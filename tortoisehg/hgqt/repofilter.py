@@ -10,11 +10,11 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error, revset as hgrevset
+from mercurial import error, util, revset as hgrevset
 from mercurial import repoview
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import revset, qtlib
 
 _permanent_queries = ('head()', 'merge()',
@@ -30,7 +30,7 @@ def _firstword(query):
         pass
 
 def _querytype(repo, query):
-    """
+    r"""
     >>> repo = set('0 1 2 3 . stable'.split())
     >>> _querytype(repo, u'') is None
     True
@@ -48,12 +48,17 @@ def _querytype(repo, query):
     'keyword'
     >>> _querytype(repo, u'tagged()')
     'revset'
+    >>> _querytype(repo, u'\u3000')  # UnicodeEncodeError
+    'revset'
     """
     if not query:
         return
     if '(' in query:
         return 'revset'
-    changeid = _firstword(query)
+    try:
+        changeid = _firstword(query)
+    except UnicodeEncodeError:
+        return 'revset'  # avoid further error on formatspec()
     if not changeid:
         return 'keyword'
     try:
@@ -66,29 +71,25 @@ def _querytype(repo, query):
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
 
-    setRevisionSet = pyqtSignal(object)
-    clearRevisionSet = pyqtSignal()
+    setRevisionSet = pyqtSignal(unicode)
     filterToggled = pyqtSignal(bool)
-
-    showMessage = pyqtSignal(QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
 
     branchChanged = pyqtSignal(unicode, bool)
     """Emitted (branch, allparents) when branch selection changed"""
 
     showHiddenChanged = pyqtSignal(bool)
+    showGraftSourceChanged = pyqtSignal(bool)
 
     _allBranchesLabel = u'\u2605 ' + _('Show all') + u' \u2605'
 
-    def __init__(self, repo, parent=None):
+    def __init__(self, repoagent, parent=None):
         super(RepoFilterBar, self).__init__(parent)
         self.layout().setContentsMargins(0, 0, 0, 0)
-        self.setIconSize(QSize(16,16))
-        self.setFloatable(False)
-        self.setMovable(False)
-        self._repo = repo
+        self.setIconSize(qtlib.smallIconSize())
+        self._repoagent = repoagent
         self._permanent_queries = list(_permanent_queries)
-        username = repo.ui.config('ui', 'username')
+        repo = repoagent.rawRepo()
+        username = repo.ui.config('ui', ['username', 'user'])
         if username:
             self._permanent_queries.insert(0,
                 hgrevset.formatspec('author(%s)', os.path.expandvars(username)))
@@ -98,9 +99,7 @@ class RepoFilterBar(QToolBar):
         if not QFontMetrics(self.font()).inFont(QString(u'\u2605').at(0)):
             self._allBranchesLabel = u'*** %s ***' % _('Show all')
 
-        self.entrydlg = revset.RevisionSetQuery(repo, self)
-        self.entrydlg.progress.connect(self.progress)
-        self.entrydlg.showMessage.connect(self.showMessage)
+        self.entrydlg = revset.RevisionSetQuery(repoagent, self)
         self.entrydlg.queryIssued.connect(self.queryIssued)
         self.entrydlg.hide()
 
@@ -155,7 +154,7 @@ class RepoFilterBar(QToolBar):
         self.addSeparator()
 
         self.filtercb = f = QCheckBox(_('filter'))
-        f.toggled.connect(self.filterToggled)
+        f.clicked.connect(self.filterToggled)
         f.setToolTip(_('Toggle filtering of non-matched changesets'))
         self.addWidget(f)
         self.addSeparator()
@@ -166,29 +165,33 @@ class RepoFilterBar(QToolBar):
         self.showHiddenBtn.setToolTip(_('Show/Hide hidden changesets'))
         self.showHiddenBtn.clicked.connect(self.showHiddenChanged)
         self.addWidget(self.showHiddenBtn)
+
+        self.showGraftSourceBtn = QToolButton()
+        self.showGraftSourceBtn.setIcon(qtlib.geticon('hg-transplant'))
+        self.showGraftSourceBtn.setCheckable(True)
+        self.showGraftSourceBtn.setChecked(True)
+        self.showGraftSourceBtn.setToolTip(_('Toggle graft relations visibility'))
+        self.showGraftSourceBtn.clicked.connect(self.showGraftSourceChanged)
+        self.addWidget(self.showGraftSourceBtn)
         self.addSeparator()
 
         self._initBranchFilter()
+        self.setFocusProxy(self.revsetcombo)
         self.refresh()
+
+    @property
+    def _repo(self):
+        return self._repoagent.rawRepo()
 
     def onClearButtonClicked(self):
         if self.revsetcombo.currentText():
             self.revsetcombo.clearEditText()
-        else:
+        elif not isinstance(self.parentWidget(), QMainWindow):
+            # act as "close" button because this isn't managed as toolbar
             self.hide()
-        self.clearRevisionSet.emit()
-
-    def setEnableFilter(self, enabled):
-        'Enable/disable the changing of the current filter'
-        self.revsetcombo.setEnabled(enabled)
-        self.clearBtn.setEnabled(enabled)
-        self.searchBtn.setEnabled(enabled)
-        self.editorBtn.setEnabled(enabled)
-        self.deleteBtn.setEnabled(enabled)
-        self._branchCombo.setEnabled(enabled)
-        self._branchLabel.setEnabled(enabled)
-        self.filterEnabled = enabled
-        self.showHiddenBtn.setEnabled(enabled)
+        # always request to clear filter; model may still be filtered even
+        # if edit box is empty
+        self.runQuery()
 
     def selectionChanged(self):
         selection = self.revsetcombo.lineEdit().selectedText()
@@ -204,9 +207,15 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.addItems(full)
         self.revsetcombo.setCurrentIndex(-1)
 
-    def showEvent(self, event):
-        super(RepoFilterBar, self).showEvent(event)
-        self.revsetcombo.setFocus()
+    if not util.safehasattr(QToolBar, 'visibilityChanged'):
+        # Qt < 4.7
+        visibilityChanged = pyqtSignal(bool)
+
+        def event(self, event):
+            etype = event.type()
+            if etype == QEvent.Show or etype == QEvent.Hide and self.isHidden():
+                self.visibilityChanged.emit(etype == QEvent.Show)
+            return super(RepoFilterBar, self).event(event)
 
     def eventFilter(self, watched, event):
         if watched is self.revsetcombo.lineEdit():
@@ -220,17 +229,11 @@ class RepoFilterBar(QToolBar):
         self.entrydlg.entry.setText(query)
         self.entrydlg.entry.setCursorPosition(0, len(query))
         self.entrydlg.entry.setFocus()
-        self.entrydlg.setShown(True)
+        self.entrydlg.setVisible(True)
 
-    def queryIssued(self, query, revset):
-        if self._prepareQuery() != unicode(query):  # keep keyword query as-is
-            self.revsetcombo.setEditText(query)
-        if revset:
-            self.setRevisionSet.emit(revset)
-        else:
-            self.clearRevisionSet.emit()
-        self.saveQuery()
-        self.revsetcombo.lineEdit().selectAll()
+    def queryIssued(self, query):
+        self.revsetcombo.setEditText(query)
+        self.runQuery()
 
     def _prepareQuery(self):
         query = unicode(self.revsetcombo.currentText()).strip()
@@ -275,17 +278,17 @@ class RepoFilterBar(QToolBar):
         le.setContentsMargins(*margins)
 
     def setQuery(self, query):
+        self.revsetcombo.setCurrentIndex(self.revsetcombo.findText(query))
         self.revsetcombo.setEditText(query)
 
     @pyqtSlot()
     def runQuery(self):
         'Run the current revset query or request to clear the previous result'
         query = self._prepareQuery()
+        self.setRevisionSet.emit(query)
         if query:
-            self.entrydlg.entry.setText(query)
-            self.entrydlg.runQuery()
-        else:
-            self.clearRevisionSet.emit()
+            self.saveQuery()
+            self.revsetcombo.lineEdit().selectAll()
 
     def saveQuery(self):
         query = self.revsetcombo.currentText()
@@ -300,7 +303,7 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.setCurrentIndex(self.revsetcombo.findText(query))
 
     def loadSettings(self, s):
-        repoid = str(self._repo[0])
+        repoid = hglib.shortrepoid(self._repo)
         s.beginGroup('revset/' + repoid)
         self.entrydlg.restoreGeometry(s.value('geom').toByteArray())
         self.revsethist = list(s.value('queries').toStringList())
@@ -311,12 +314,13 @@ class RepoFilterBar(QToolBar):
         self.revsetcombo.setCurrentIndex(-1)
         self.setVisible(s.value('showrepofilterbar').toBool())
         self.showHiddenBtn.setChecked(s.value('showhidden').toBool())
+        self.showGraftSourceBtn.setChecked(s.value('showgraftsource', True).toBool())
         self._loadBranchFilterSettings(s)
         s.endGroup()
 
     def saveSettings(self, s):
         try:
-            repoid = str(self._repo[0])
+            repoid = hglib.shortrepoid(self._repo)
         except EnvironmentError:
             return
         s.beginGroup('revset/' + repoid)
@@ -326,13 +330,13 @@ class RepoFilterBar(QToolBar):
         s.setValue('showrepofilterbar', not self.isHidden())
         self._saveBranchFilterSettings(s)
         s.setValue('showhidden', self.showHiddenBtn.isChecked())
+        s.setValue('showgraftsource', self.showGraftSourceBtn.isChecked())
         s.endGroup()
 
     def _initBranchFilter(self):
         self._branchLabel = QToolButton(
-            text=_('Branch'), popupMode=QToolButton.MenuButtonPopup,
+            text=_('Branch'), popupMode=QToolButton.InstantPopup,
             statusTip=_('Display graph the named branch only'))
-        self._branchLabel.clicked.connect(self._branchLabel.showMenu)
         self._branchMenu = QMenu(self._branchLabel)
         self._abranchAction = self._branchMenu.addAction(
             _('Display only active branches'), self.refresh)
@@ -383,9 +387,9 @@ class RepoFilterBar(QToolBar):
                 for n in self._repo.heads()
                 if not self._repo[n].extra().get('close')]))
         elif self._cbranchAction.isChecked():
-            branches = sorted(self._repo.branchtags().keys())
+            branches = sorted(self._repo.branchmap())
         else:
-            branches = self._repo.namedbranches
+            branches = hglib.namedbranches(self._repo)
 
         # easy access to common branches (Python sorted() is stable)
         priomap = {self._repo.dirstate.branch(): -2, 'default': -1}
@@ -429,6 +433,9 @@ class RepoFilterBar(QToolBar):
 
     def getShowHidden(self):
         return self.showHiddenBtn.isChecked()
+
+    def getShowGraftSource(self):
+        return self.showGraftSourceBtn.isChecked()
 
     @pyqtSlot()
     def _emitBranchChanged(self):

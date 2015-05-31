@@ -6,7 +6,7 @@
 # GNU General Public License version 2 or any later version.
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import repotreeitem
 
 from PyQt4.QtCore import *
@@ -14,6 +14,25 @@ from PyQt4.QtGui import QFont
 
 import os
 
+if PYQT_VERSION < 0x40700:
+    class LocalQXmlStreamReader(QXmlStreamReader):
+        def readNextStartElement(self):
+            while self.readNext() != QXmlStreamReader.Invalid:
+                if self.isEndElement():
+                    return False
+                elif self.isStartElement():
+                    return True
+            return False
+
+        def skipCurrentElement(self):
+            depth = 1
+            while depth > 0 and self.readNext() != QXmlStreamReader.Invalid:
+                if self.isEndElement():
+                    depth -= 1
+                elif self.isStartElement():
+                    depth += 1
+
+    QXmlStreamReader = LocalQXmlStreamReader
 
 extractXmlElementName = 'reporegextract'
 reporegistryXmlElementName = 'reporegistry'
@@ -33,8 +52,6 @@ def writeXml(target, item, rootElementName):
     xw.writeEndDocument()
 
 def readXml(source, rootElementName):
-    if PYQT_VERSION < 0x40700:
-        return
     itemread = None
     xr = QXmlStreamReader(source)
     if xr.readNextStartElement():
@@ -44,12 +61,12 @@ def readXml(source, rootElementName):
                   "(was looking for %s)" % (ele, rootElementName)
             return
     if xr.hasError():
-        print str(xr.errorString())
+        print hglib.fromunicode(xr.errorString(), 'replace')
     if xr.readNextStartElement():
         itemread = repotreeitem.undumpObject(xr)
         xr.skipCurrentElement()
     if xr.hasError():
-        print str(xr.errorString())
+        print hglib.fromunicode(xr.errorString(), 'replace')
     return itemread
 
 def iterRepoItemFromXml(source):
@@ -57,7 +74,8 @@ def iterRepoItemFromXml(source):
     xr = QXmlStreamReader(source)
     while not xr.atEnd():
         t = xr.readNext()
-        if t == QXmlStreamReader.StartElement and xr.name() in ('repo', 'subrepo'):
+        if (t == QXmlStreamReader.StartElement
+            and xr.name() in ('repo', 'subrepo')):
             yield repotreeitem.undumpObject(xr)
 
 def getRepoItemList(root, standalone=False):
@@ -70,8 +88,15 @@ def getRepoItemList(root, standalone=False):
 
 
 class RepoTreeModel(QAbstractItemModel):
-    def __init__(self, filename, parent=None, showShortPaths=False):
+    def __init__(self, filename, repomanager, parent=None,
+                 showShortPaths=False):
         QAbstractItemModel.__init__(self, parent)
+
+        self._repomanager = repomanager
+        self._repomanager.configChanged.connect(self._updateShortName)
+        self._repomanager.repositoryChanged.connect(self._updateBaseNode)
+        self._repomanager.repositoryOpened.connect(self._updateItem)
+
         self.showShortPaths = showShortPaths
         self._activeRepoItem = None
 
@@ -126,7 +151,7 @@ class RepoTreeModel(QAbstractItemModel):
         if parent.column() > 0:
             return 0
         if not parent.isValid():
-            parentItem = self.rootItem;
+            parentItem = self.rootItem
         else:
             parentItem = parent.internalPointer()
         return parentItem.childCount()
@@ -290,7 +315,7 @@ class RepoTreeModel(QAbstractItemModel):
                 for e in getRepoItemList(self.rootItem, standalone)]
 
     def _indexFromItem(self, item, column=0):
-        if item:
+        if item and item is not self.rootItem:
             return self.createIndex(item.row(), column, item)
         else:
             return QModelIndex()
@@ -308,19 +333,27 @@ class RepoTreeModel(QAbstractItemModel):
         ri.appendChild(repotreeitem.RepoGroupItem(name, ri))
         self.endInsertRows()
 
+    def itemPath(self, index):
+        """Virtual path of the item at the given index"""
+        if index.isValid():
+            item = index.internalPointer()
+        else:
+            item = self.rootItem
+        return repotreeitem.itempath(item)
+
+    def indexFromItemPath(self, path, column=0):
+        """Model index for the item specified by the given virtual path"""
+        try:
+            item = repotreeitem.findbyitempath(self.rootItem, unicode(path))
+        except ValueError:
+            return QModelIndex()
+        return self._indexFromItem(item, column)
+
     def write(self, fn):
         f = QFile(fn)
         f.open(QIODevice.WriteOnly)
         writeXml(f, self.rootItem, reporegistryXmlElementName)
         f.close()
-
-    def depth(self, index):
-        count = 1
-        while True:
-            index = index.parent()
-            if index.row() < 0:
-                return count
-            count += 1
 
     def _emitItemDataChanged(self, item):
         self.dataChanged.emit(self._indexFromItem(item, 0),
@@ -340,6 +373,7 @@ class RepoTreeModel(QAbstractItemModel):
     def activeRepoIndex(self, column=0):
         return self._indexFromItem(self._activeRepoItem, column)
 
+    # TODO: rename loadSubrepos() and appendSubrepos() to scanRepo() ?
     def loadSubrepos(self, index):
         """Scan subrepos of the repo; returns list of invalid paths"""
         item = index.internalPointer()
@@ -357,7 +391,9 @@ class RepoTreeModel(QAbstractItemModel):
             for e in tmpitem.childs:
                 item.appendChild(e)
             self.endInsertRows()
-        if item._valid != tmpitem._valid:
+        if (item._sharedpath != tmpitem._sharedpath
+            or item._valid != tmpitem._valid):
+            item._sharedpath = tmpitem._sharedpath
             item._valid = tmpitem._valid
             self._emitItemDataChanged(item)
         return map(hglib.tounicode, invalidpaths)
@@ -371,6 +407,26 @@ class RepoTreeModel(QAbstractItemModel):
                     grp.updateCommonPath()
                 else:
                     grp.updateCommonPath('')
+
+    @pyqtSlot(unicode)
+    def _updateShortName(self, uroot):
+        repoagent = self._repomanager.repoAgent(uroot)
+        it = self.getRepoItem(hglib.fromunicode(uroot))
+        if it:
+            it.setShortName(repoagent.shortName())
+            self._emitItemDataChanged(it)
+
+    @pyqtSlot(unicode)
+    def _updateBaseNode(self, uroot):
+        repo = self._repomanager.repoAgent(uroot).rawRepo()
+        it = self.getRepoItem(hglib.fromunicode(uroot))
+        if it:
+            it.setBaseNode(hglib.repoidnode(repo))
+
+    @pyqtSlot(unicode)
+    def _updateItem(self, uroot):
+        self._updateShortName(uroot)
+        self._updateBaseNode(uroot)
 
     def sortchilds(self, childs, keyfunc):
         self.layoutAboutToBeChanged.emit()

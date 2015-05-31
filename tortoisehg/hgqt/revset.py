@@ -5,20 +5,14 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
-from mercurial import revset, hg, error
-
 from tortoisehg.hgqt import qtlib, cmdui
-from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 
 from PyQt4.Qsci import QsciScintilla, QsciAPIs, QsciLexerPython
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 # TODO:
-#  Connect to repoview revisionClicked events
 #  Shift-Click rev range -> revision range X:Y
 #  Ctrl-Click two revs -> DAG range X::Y
 #  QFontMetrics.elidedText for help label
@@ -112,18 +106,17 @@ _logical = (
 )
 
 class RevisionSetQuery(QDialog):
-    # Emit query string and resulting revision set
-    queryIssued = pyqtSignal(QString, object)
-    showMessage = pyqtSignal(QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, repo, parent=None):
+    queryIssued = pyqtSignal(QString)
+
+    def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
 
-        self.repo = repo
+        self._repoagent = repoagent
         # Since the revset dialot belongs to a repository, we display
         # the repository name in the dialog title
-        self.setWindowTitle(_('Revision Set Query') + ' - ' + repo.displayname)
+        self.setWindowTitle(_('Revision Set Query')
+                            + ' - ' + repoagent.displayName())
         self.setWindowFlags(Qt.Window)
 
         layout = QVBoxLayout()
@@ -134,6 +127,7 @@ class RevisionSetQuery(QDialog):
         logical = _logical
         ancestry = _ancestry
 
+        repo = repoagent.rawRepo()
         if 'hgsubversion' in repo.extensions():
             logical = list(logical) + [('fromsvn()',
                     _('all revisions converted from subversion')),]
@@ -142,9 +136,9 @@ class RevisionSetQuery(QDialog):
 
         self.stbar = cmdui.ThgStatusBar(self)
         self.stbar.setSizeGripEnabled(False)
+        # same policy as status bar of QMainWindow
+        self.stbar.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
         self.stbar.lbl.setOpenExternalLinks(True)
-        self.showMessage.connect(self.stbar.showMessage)
-        self.progress.connect(self.stbar.progress)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(*(0,)*4)
@@ -222,28 +216,8 @@ class RevisionSetQuery(QDialog):
         QShortcut(QKeySequence('Return'), self, self.returnPressed)
         QShortcut(QKeySequence('Escape'), self, self.reject)
 
-        self.refreshing = None
-
     def runQuery(self):
-        if self.refreshing:
-            return
-        self.entry.setEnabled(False)
-        self.showMessage.emit(_('Searching...'))
-        self.progress.emit(*cmdui.startProgress(_('Running'), _('query')))
-
-        self.refreshing = RevsetThread(self.repo, self.entry.text(), self)
-        self.refreshing.showMessage.connect(self.showMessage)
-        self.refreshing.queryIssued.connect(self.queryIssued)
-        self.refreshing.finished.connect(self.queryFinished)
-        self.refreshing.setCursorPosition.connect(self.entry.setCursorPosition)
-        self.refreshing.start()
-
-    def queryFinished(self):
-        self.refreshing.wait()
-        self.refreshing.setParent(None)  # assist garbage-collection
-        self.refreshing = None
-        self.entry.setEnabled(True)
-        self.progress.emit(*cmdui.stopProgress(_('Running')))
+        self.queryIssued.emit(self.entry.text())
 
     def returnPressed(self):
         if self.entry.hasSelectedText():
@@ -367,41 +341,3 @@ class RevsetEntry(QsciScintilla):
 
     def sizeHint(self):
         return QSize(10, self.fontMetrics().height())
-
-
-
-class RevsetThread(QThread):
-    queryIssued = pyqtSignal(QString, object)
-    showMessage = pyqtSignal(QString)
-    setCursorPosition = pyqtSignal(int, int)
-
-    def __init__(self, repo, query, parent):
-        super(RevsetThread, self).__init__(parent)
-        self.repo = hg.repository(repo.ui, repo.root)
-        self.text = hglib.fromunicode(query)
-        self.query = query
-
-    def run(self):
-        cwd = os.getcwd()
-        try:
-            os.chdir(self.repo.root)
-            func = revset.match(self.repo.ui, self.text)
-            l = list(func(self.repo, list(self.repo)))
-            if len(l):
-                self.showMessage.emit(_('%d matches found') % len(l))
-            else:
-                self.showMessage.emit(_('No matches found'))
-            self.queryIssued.emit(self.query, l)
-        except error.ParseError, e:
-            if len(e.args) == 2:
-                msg, pos = e.args
-                self.setCursorPosition.emit(0, pos)
-            else:
-                msg = e.args[0]
-            self.showMessage.emit(_('Parse Error: ') + hglib.tounicode(msg))
-        except TypeError:
-            raise
-        except Exception, e:
-            self.showMessage.emit(_('Invalid query: ')+hglib.tounicode(str(e)))
-
-        os.chdir(cwd)

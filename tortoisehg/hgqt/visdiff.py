@@ -15,7 +15,7 @@ import re
 
 from mercurial import hg, util, error, match, scmutil, copies
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
 from tortoisehg.hgqt import qtlib
 
@@ -170,7 +170,11 @@ def besttool(ui, tools, force=None):
         return preferred
     pris = []
     for t in tools.keys():
-        p = int(ui.config('merge-tools', t + '.priority', 0))
+        try:
+            p = ui.configint('merge-tools', t + '.priority', 0)
+        except error.ConfigError, inst:
+            ui.warn('visdiff: %s\n' % inst)
+            p = 0
         pris.append((-p, t))
     tools = sorted(pris)
     return tools[0][1]
@@ -331,10 +335,11 @@ def visualdiff(ui, repo, pats, opts):
             label1b += '[other]'
             label2 += '[merged]'
 
+        repoagent = repo._pyqtobj  # TODO
         replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b,
                        plabel1=label1a, plabel2=label1b,
                        phash1=str(ctx1a), phash2=str(ctx1b),
-                       repo=hglib.fromunicode(repo.displayname),
+                       repo=hglib.fromunicode(repoagent.displayName()),
                        clabel=label2, child=dir2, chash=str(ctx2))
         launchtool(diffcmd, args, replace, True)
 
@@ -385,7 +390,8 @@ class FileSelectionDialog(QDialog):
         self.setWindowTitle(title)
 
         self.resize(650, 250)
-        self.reponame = hglib.fromunicode(repo.displayname)
+        repoagent = repo._pyqtobj  # TODO
+        self.reponame = hglib.fromunicode(repoagent.displayName())
 
         self.ctxs = (ctx1a, ctx1b, ctx2)
         self.filesets = (sa, sb)

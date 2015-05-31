@@ -6,15 +6,14 @@
 # GNU General Public License version 2 or any later version.
 
 import os
-import time
 import errno
 
-from mercurial import extensions, ui, error, util
+from mercurial import extensions, error, util
 
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, cmdui, update, revdetails
+from tortoisehg.hgqt import qtlib, cmdcore, cmdui, update, revdetails
 from tortoisehg.hgqt.qtlib import geticon
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -27,22 +26,19 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
     A widget that show the patch graph and provide actions
     for the pbranch extension
     '''
-    output = pyqtSignal(QString, QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    makeLogVisible = pyqtSignal(bool)
 
-    def __init__(self, repo, parent=None, logwidget=None):
+    def __init__(self, repoagent, parent=None, logwidget=None):
         QWidget.__init__(self, parent)
 
         # Set up variables and connect signals
 
-        self.repo = repo
+        self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
         self.pbranch = extensions.find('pbranch') # Unfortunately global instead of repo-specific
         self.show_internal_branches = False
 
-        repo.configChanged.connect(self.configChanged)
-        repo.repositoryChanged.connect(self.repositoryChanged)
-        repo.workingBranchChanged.connect(self.workingBranchChanged)
+        repoagent.configChanged.connect(self.configChanged)
+        repoagent.repositoryChanged.connect(self.refresh)
 
         # Build child widgets
 
@@ -55,6 +51,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
 
         def Toolbar():
             tb = QToolBar(_("Patch Branch Toolbar"), self)
+            tb.setIconSize(qtlib.toolBarIconSize())
             tb.setEnabled(True)
             tb.setObjectName("toolBar_patchbranch")
             tb.setFloatable(False)
@@ -125,23 +122,21 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
 
         def PatchDiffDetails():
             # pdiff view of selected patc
-            self.patchdiff = revdetails.RevDetailsWidget(self.repo, self)
+            self.patchdiff = revdetails.RevDetailsWidget(self._repoagent, self)
             return self.patchdiff
 
         BuildChildWidgets()
 
-        # Command output
-        self.runner = cmdui.Runner(False, self)
-        self.runner.output.connect(self.output)
-        self.runner.progress.connect(self.progress)
-        self.runner.makeLogVisible.connect(self.makeLogVisible)
-        self.runner.commandFinished.connect(self.commandFinished)
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def reload(self):
         'User has requested a reload'
         self.repo.thginvalidate()
         self.refresh()
 
+    @pyqtSlot()
     def refresh(self):
         """
         Refresh the list of patches.
@@ -346,8 +341,9 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         dialog = PNewDialog()
         if dialog.exec_() != QDialog.Accepted:
             return False
-        self.repo.incrementBusyCount()
-        self.runner.run(dialog.getCmd(cwd=self.repo.root))
+        cmdline = dialog.getCmd()
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self.commandFinished)
         return True
 
     def pnew(self, patch_name):
@@ -358,9 +354,8 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         """
         if self.pbranch is None:
             return False
-        self.repo.incrementBusyCount()
         self.pbranch.cmdnew(self.repo.ui, self.repo, patch_name)
-        self.repo.decrementBusyCount()
+        self._repoagent.pollStatus()
         return True
 
     def pmerge(self, patch_name=None):
@@ -371,13 +366,13 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         """
         if not self.has_patch():
             return
-        cmd = ['pmerge', '--cwd', self.repo.root]
+        cmdline = ['pmerge']
         if patch_name:
-            cmd += [patch_name]
+            cmdline += [hglib.tounicode(patch_name)]
         else:
-            cmd += ['--all']
-        self.repo.incrementBusyCount()
-        self.runner.run(cmd)
+            cmdline += ['--all']
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
+        sess.commandFinished.connect(self.commandFinished)
 
     def has_pbranch(self):
         """ return True if pbranch extension can be used """
@@ -502,21 +497,15 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         if self.patchlist.geometry().contains(event.pos()):
             self.show_patch_cmenu(event.globalPos())
 
+    @pyqtSlot(int)
     def commandFinished(self, ret):
-        self.repo.decrementBusyCount()
+        if ret != 0:
+            cmdui.errorMessageBox(self._cmdsession, self)
         self.refresh()
 
     @pyqtSlot()
     def configChanged(self):
         pass
-
-    @pyqtSlot()
-    def repositoryChanged(self):
-        self.refresh()
-
-    @pyqtSlot()
-    def workingBranchChanged(self):
-        self.refresh()
 
     def pmerge_clicked(self):
         self.pmerge()
@@ -565,10 +554,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         branch = self.selected_patch()
         # TODO: Fetch list of heads of branch
         # - use a list of revs if more than one found
-        dlg = update.UpdateDialog(self.repo, branch, self)
-        dlg.output.connect(self.output)
-        dlg.makeLogVisible.connect(self.makeLogVisible)
-        dlg.progress.connect(self.progress)
+        dlg = update.UpdateDialog(self._repoagent, branch, self)
         dlg.exec_()
 
     def merge_activated(self):
@@ -880,12 +866,12 @@ class PNewDialog(QDialog):
     def patchname(self):
         return self.patchnamele.text()
 
-    def getCmd(self, cwd):
-        cmd = ['pnew', '--cwd', cwd, hglib.fromunicode(self.patchname())]
+    def getCmd(self):
+        cmd = ['pnew', unicode(self.patchname())]
         optList = [('patchtext','--text'),
                    ('patchdate','--date'),
                    ('patchuser','--user')]
         for v,o in optList:
             if getattr(self,v+'cb').isChecked():
-                cmd.extend([o,hglib.fromunicode(getattr(self,v+'le').text())])
+                cmd.extend([o,unicode(getattr(self,v+'le').text())])
         return cmd

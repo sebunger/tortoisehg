@@ -161,7 +161,7 @@ def get_states(upath, repo=None):
             cache_tick_count = GetTickCount()
             debugf("overlayicons disabled")
             return NOT_IN_REPO
-        if localonly and paths.netdrive_status(path):
+        if localonly and not paths.is_on_fixed_drive(path):
             debugf("%s: is a network drive", path)
             overlay_cache = {None: None}
             cache_tick_count = GetTickCount()

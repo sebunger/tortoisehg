@@ -1,5 +1,5 @@
-GNOME desktop integration
-=========================
+Integrace s desktopem GNOME
+===========================
 
 .. module:: nautilus
 	:synopsis: GNOME desktop integration

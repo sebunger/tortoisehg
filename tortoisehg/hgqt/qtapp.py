@@ -6,15 +6,21 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import gc, os, sys, traceback
+import gc, os, platform, signal, sys, traceback
 
 from PyQt4.QtCore import *
-from PyQt4.QtGui import QApplication
+from PyQt4.QtGui import QApplication, QFont
 from PyQt4.QtNetwork import QLocalServer, QLocalSocket
+
+if PYQT_VERSION < 0x40600 or QT_VERSION < 0x40600:
+    sys.stderr.write('TortoiseHg requires at least Qt 4.6 and PyQt 4.6\n')
+    sys.stderr.write('You have Qt %s and PyQt %s\n' %
+                     (QT_VERSION_STR, PYQT_VERSION_STR))
+    sys.exit(-1)
 
 from mercurial import error, util
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import bugreport, qtlib, thgrepo, workbench
@@ -79,6 +85,8 @@ class ExceptionCatcher(QObject):
         self._ui.debug('setting up excepthook\n')
         self._origexcepthook = sys.excepthook
         sys.excepthook = self.ehook
+        self._originthandler = signal.signal(signal.SIGINT, self._inthandler)
+        self._initWakeup()
 
     def release(self):
         if not self._origexcepthook:
@@ -86,6 +94,9 @@ class ExceptionCatcher(QObject):
         self._ui.debug('restoring excepthook\n')
         sys.excepthook = self._origexcepthook
         self._origexcepthook = None
+        signal.signal(signal.SIGINT, self._originthandler)
+        self._originthandler = None
+        self._releaseWakeup()
 
     def ehook(self, etype, evalue, tracebackobj):
         'Will be called by any thread, on any unhandled exception'
@@ -122,6 +133,7 @@ class ExceptionCatcher(QObject):
         opts['error'] = ''.join(''.join(traceback.format_exception(*args))
                                 for args in self.errors)
         etype, evalue = self.errors[0][:2]
+        parent = self._mainapp.activeWindow()
         if (len(set(e[0] for e in self.errors)) == 1
             and etype in _recoverableexc):
             opts['values'] = evalue
@@ -131,22 +143,73 @@ class ExceptionCatcher(QObject):
                                    u'</b> %(arg1)s'])
                 opts['values'] = [str(evalue), evalue.hint]
             dlg = bugreport.ExceptionMsgBox(hglib.tounicode(str(evalue)),
-                                            errstr, opts,
-                                            parent=self._mainapp.activeWindow())
-        elif etype is KeyboardInterrupt:
-            if qtlib.QuestionMsgBox(_('Keyboard interrupt'),
-                                    _('Close this application?')):
-                QApplication.quit()
-            else:
-                self.errors = []
-                return
+                                            errstr, opts, parent=parent)
+            dlg.exec_()
         else:
-            dlg = bugreport.BugReport(opts, parent=self._mainapp.activeWindow())
-        dlg.exec_()
+            dlg = bugreport.BugReport(opts, parent=parent)
+            dlg.exec_()
 
     def _printexception(self):
         for args in self.errors:
             traceback.print_exception(*args)
+
+    def _inthandler(self, signum, frame):
+        # QTimer makes sure to not enter new event loop in signal handler,
+        # which will be invoked at random location.  Note that some windows
+        # may show modal confirmation dialog in closeEvent().
+        QTimer.singleShot(0, self._mainapp.closeAllWindows)
+
+    if os.name == 'posix' and util.safehasattr(signal, 'set_wakeup_fd'):
+        # Wake up Python interpreter via pipe so that SIGINT can be handled
+        # immediately.  (http://qt-project.org/doc/qt-4.8/unix-signals.html)
+
+        def _initWakeup(self):
+            import fcntl
+            rfd, wfd = os.pipe()
+            for fd in (rfd, wfd):
+                flags = fcntl.fcntl(fd, fcntl.F_GETFL)
+                fcntl.fcntl(fd, fcntl.F_SETFL, flags | os.O_NONBLOCK)
+            self._wakeupsn = QSocketNotifier(rfd, QSocketNotifier.Read, self)
+            self._wakeupsn.activated.connect(self._handleWakeup)
+            self._origwakeupfd = signal.set_wakeup_fd(wfd)
+
+        def _releaseWakeup(self):
+            self._wakeupsn.setEnabled(False)
+            rfd = self._wakeupsn.socket()
+            wfd = signal.set_wakeup_fd(self._origwakeupfd)
+            self._origwakeupfd = -1
+            os.close(rfd)
+            os.close(wfd)
+
+        @pyqtSlot()
+        def _handleWakeup(self):
+            # here Python signal handler will be invoked
+            self._wakeupsn.setEnabled(False)
+            rfd = self._wakeupsn.socket()
+            try:
+                os.read(rfd, 1)
+            except OSError, inst:
+                self._ui.debug('failed to read wakeup fd: %s\n' % inst)
+            self._wakeupsn.setEnabled(True)
+
+    else:
+        # On Windows, non-blocking anonymous pipe or socket is not available.
+        # So run Python instruction at a regular interval.  Because it wastes
+        # CPU time, it is disabled if thg is known to be detached from tty.
+
+        def _initWakeup(self):
+            self._wakeuptimer = 0
+            if self._ui.interactive():
+                self._wakeuptimer = self.startTimer(200)
+
+        def _releaseWakeup(self):
+            if self._wakeuptimer > 0:
+                self.killTimer(self._wakeuptimer)
+                self._wakeuptimer = 0
+
+        def timerEvent(self, event):
+            # nop for instant SIGINT handling
+            pass
 
 
 class GarbageCollector(QObject):
@@ -204,7 +267,7 @@ def allowSetForegroundWindow(processid=-1):
         except ImportError:
             pass
 
-def connectToExistingWorkbench(root=None):
+def connectToExistingWorkbench(root, revset=None):
     """
     Connect and send data to an existing workbench server
 
@@ -215,13 +278,13 @@ def connectToExistingWorkbench(root=None):
     also send "echo" to check that the connection works (i.e. that there is a
     server)
     """
-    if root:
-        data = root
+    if revset:
+        data = '\0'.join([root, revset])
     else:
-        data = '[echo]'
+        data = root
+    servername = QApplication.applicationName() + '-' + util.getuser()
     socket = QLocalSocket()
-    socket.connectToServer(QApplication.applicationName() + '-' + util.getuser(),
-        QIODevice.ReadWrite)
+    socket.connectToServer(servername, QIODevice.ReadWrite)
     if socket.waitForConnected(10000):
         # Momentarily let any process set the foreground window
         # The server process with revoke this permission as soon as it gets
@@ -233,8 +296,39 @@ def connectToExistingWorkbench(root=None):
         reply = socket.readAll()
         if data == reply:
             return True
+    elif socket.error() == QLocalSocket.ConnectionRefusedError:
+        # last server process was crashed?
+        QLocalServer.removeServer(servername)
     return False
 
+
+def _fixapplicationfont():
+    if os.name != 'nt':
+        return
+    try:
+        import win32gui, win32con
+    except ImportError:
+        return
+
+    # use configurable font like GTK, Mozilla XUL or Eclipse SWT
+    ncm = win32gui.SystemParametersInfo(win32con.SPI_GETNONCLIENTMETRICS)
+    lf = ncm['lfMessageFont']
+    f = QFont(hglib.tounicode(lf.lfFaceName))
+    f.setItalic(lf.lfItalic)
+    if lf.lfWeight != win32con.FW_DONTCARE:
+        weights = [(0, QFont.Light), (400, QFont.Normal), (600, QFont.DemiBold),
+                   (700, QFont.Bold), (800, QFont.Black)]
+        n, w = filter(lambda e: e[0] <= lf.lfWeight, weights)[-1]
+        f.setWeight(w)
+    f.setPixelSize(abs(lf.lfHeight))
+    QApplication.setFont(f, 'QWidget')
+
+def _gettranslationpath():
+    """Return path to Qt's translation file (.qm)"""
+    if getattr(sys, 'frozen', False):
+        return ':/translations'
+    else:
+        return QLibraryInfo.location(QLibraryInfo.TranslationsPath)
 
 class QtRunner(QObject):
     """Run Qt app and hold its windows
@@ -251,8 +345,9 @@ class QtRunner(QObject):
         self._exccatcher = None
         self._server = None
         self._repomanager = None
+        self._reporeleaser = None
+        self._mainreporoot = None
         self._workbench = None
-        self._dialogs = {}  # dlg: reporoot
 
     def __call__(self, dlgfunc, ui, *args, **opts):
         if self._mainapp:
@@ -261,10 +356,21 @@ class QtRunner(QObject):
 
         QSettings.setDefaultFormat(QSettings.IniFormat)
 
+        # fixes font placement on OSX 10.9 with QT <= 4.8.5
+        # see QTBUG-32789 (https://bugreports.qt-project.org/browse/QTBUG-32789)
+        if sys.platform == 'darwin' and QT_VERSION <= 0x040805:
+            version = platform.mac_ver()[0]
+            version = '.'.join(version.split('.')[:2])
+            if version == '10.9':
+                # needs to replace the font created in the constructor of
+                # QApplication, which is invalid use of QFont but works on Mac
+                QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
+
         self._ui = ui
         self._mainapp = QApplication(sys.argv)
         self._exccatcher = ExceptionCatcher(ui, self._mainapp, self)
         self._gc = GarbageCollector(ui, self)
+
         # default org is used by QSettings
         self._mainapp.setApplicationName('TortoiseHgQt')
         self._mainapp.setOrganizationName('TortoiseHg')
@@ -272,20 +378,31 @@ class QtRunner(QObject):
         self._mainapp.setApplicationVersion(thgversion.version())
         self._fixlibrarypaths()
         self._installtranslator()
-        qtlib.setup_font_substitutions()
-        qtlib.fix_application_font()
+        QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
+        _fixapplicationfont()
         qtlib.configstyles(ui)
         qtlib.initfontcache(ui)
         self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
 
         self._repomanager = thgrepo.RepoManager(ui, self)
+        self._reporeleaser = releaser = QSignalMapper(self)
+        releaser.mapped[unicode].connect(self._repomanager.releaseRepoAgent)
+
+        # stop services after control returns to the main event loop
+        self._mainapp.setQuitOnLastWindowClosed(False)
+        self._mainapp.lastWindowClosed.connect(self._quitGracefully,
+                                               Qt.QueuedConnection)
 
         dlg, reporoot = self._createdialog(dlgfunc, args, opts)
+        self._mainreporoot = reporoot
         try:
             if dlg:
                 dlg.show()
                 dlg.raise_()
             else:
+                if reporoot:
+                    self._repomanager.releaseRepoAgent(reporoot)
+                    self._mainreporoot = None
                 return -1
 
             if thginithook is not None:
@@ -293,12 +410,29 @@ class QtRunner(QObject):
 
             return self._mainapp.exec_()
         finally:
-            if reporoot:
-                self._repomanager.releaseRepoAgent(reporoot)
-            if self._server:
-                self._server.close()
             self._exccatcher.release()
             self._mainapp = self._ui = None
+
+    @pyqtSlot()
+    def _quitGracefully(self):
+        # won't be called if the application is quit by BugReport dialog
+        if self._mainreporoot:
+            self._repomanager.releaseRepoAgent(self._mainreporoot)
+            self._mainreporoot = None
+        if self._server:
+            self._server.close()
+        if self._tryQuit():
+            return
+        self._ui.debug('repositories are closing asynchronously\n')
+        self._repomanager.repositoryClosed.connect(self._tryQuit)
+        QTimer.singleShot(5000, self._mainapp.quit)  # in case of bug
+
+    @pyqtSlot()
+    def _tryQuit(self):
+        if self._repomanager.repoRootPaths():
+            return False
+        self._mainapp.quit()
+        return True
 
     def _fixlibrarypaths(self):
         # make sure to use the bundled Qt plugins to avoid ABI incompatibility
@@ -310,7 +444,7 @@ class QtRunner(QObject):
         if not i18n.language:
             return
         t = QTranslator(self._mainapp)
-        t.load('qt_' + i18n.language, qtlib.gettranslationpath())
+        t.load('qt_' + i18n.language, _gettranslationpath())
         self._mainapp.installTranslator(t)
 
     def _createdialog(self, dlgfunc, args, opts):
@@ -340,20 +474,16 @@ class QtRunner(QObject):
         if not dlg:
             return
 
-        self._dialogs[dlg] = reporoot  # avoid garbage collection
-        if hasattr(dlg, 'finished') and hasattr(dlg.finished, 'connect'):
-            dlg.finished.connect(dlg.deleteLater)
-        # NOTE: Somehow `destroyed` signal doesn't emit the original obj.
-        # So we cannot write `dlg.destroyed.connect(self._forgetdialog)`.
-        dlg.destroyed.connect(lambda: self._forgetdialog(dlg))
-        dlg.show()
-
-    def _forgetdialog(self, dlg):
-        """forget the dialog to be garbage collectable"""
-        assert dlg in self._dialogs
-        reporoot = self._dialogs.pop(dlg)
+        dlg.setAttribute(Qt.WA_DeleteOnClose)
         if reporoot:
-            self._repomanager.releaseRepoAgent(reporoot)
+            dlg.destroyed[()].connect(self._reporeleaser.map)
+            self._reporeleaser.setMapping(dlg, reporoot)
+        if dlg is not self._workbench and not dlg.parent():
+            # keep reference to avoid garbage collection.  workbench should
+            # exist when run.dispatch() is called for the second time.
+            assert self._workbench
+            dlg.setParent(self._workbench, dlg.windowFlags())
+        dlg.show()
 
     def createWorkbench(self):
         """Create Workbench window and keep single reference"""
@@ -361,6 +491,18 @@ class QtRunner(QObject):
         assert not self._workbench
         self._workbench = workbench.Workbench(self._ui, self._repomanager)
         return self._workbench
+
+    @pyqtSlot(unicode)
+    def openRepoInWorkbench(self, uroot):
+        """Show the specified repository in Workbench; reuses the existing
+        Workbench process"""
+        assert self._ui
+        singlewb = self._ui.configbool('tortoisehg', 'workbench.single', True)
+        # only if the server is another process; otherwise it would deadlock
+        if (singlewb and not self._server
+            and connectToExistingWorkbench(hglib.fromunicode(uroot))):
+            return
+        self.showRepoInWorkbench(uroot)
 
     def showRepoInWorkbench(self, uroot, rev=-1):
         """Show the specified repository in Workbench"""
@@ -389,15 +531,24 @@ class QtRunner(QObject):
         socket = self._server.nextPendingConnection()
         if socket:
             socket.waitForReadyRead(10000)
-            root = str(socket.readAll())
-            if root and root != '[echo]':
-                self.showRepoInWorkbench(hglib.tounicode(root))
+            data = str(socket.readAll())
+            if data and data != '[echo]':
+                args = data.split('\0', 1)
+                if len(args) > 1:
+                    uroot, urevset = map(hglib.tounicode, args)
+                else:
+                    uroot = hglib.tounicode(args[0])
+                    urevset = None
+                self.showRepoInWorkbench(uroot)
+
+                wb = self._workbench
+                if urevset:
+                    wb.setRevsetFilter(uroot, urevset)
 
                 # Bring the workbench window to the front
                 # This assumes that the client process has
                 # called allowSetForegroundWindow(-1) right before
                 # sending the request
-                wb = self._workbench
                 wb.setWindowState(wb.windowState() & ~Qt.WindowMinimized
                                   | Qt.WindowActive)
                 wb.show()
@@ -406,5 +557,5 @@ class QtRunner(QObject):
                 # Revoke the blanket permission to set the foreground window
                 allowSetForegroundWindow(os.getpid())
 
-            socket.write(QByteArray(root))
+            socket.write(QByteArray(data))
             socket.flush()

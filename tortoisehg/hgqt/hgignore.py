@@ -13,7 +13,7 @@ from PyQt4.QtGui import *
 
 from mercurial import commands, match, ui, util, error
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.util import shlib, hglib
 
 from tortoisehg.hgqt import qtlib, qscilib
@@ -25,16 +25,16 @@ class HgignoreDialog(QDialog):
 
     contextmenu = None
 
-    def __init__(self, repo, parent=None, *pats):
+    def __init__(self, repoagent, parent=None, *pats):
         'Initialize the Dialog'
         QDialog.__init__(self, parent)
         self.setWindowFlags(self.windowFlags()
             & ~Qt.WindowContextHelpButtonHint
             | Qt.WindowMaximizeButtonHint)
 
-        self.repo = repo
+        self._repoagent = repoagent
         self.pats = pats
-        self.setWindowTitle(_('Ignore filter - %s') % repo.displayname)
+        self.setWindowTitle(_('Ignore filter - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('ignore'))
 
         vbox = QVBoxLayout()
@@ -52,10 +52,12 @@ class HgignoreDialog(QDialog):
         le.returnPressed.connect(self.addEntry)
 
         add = QPushButton(_('Add'))
+        add.setAutoDefault(False)
         add.clicked.connect(self.addEntry)
         hbox.addWidget(add, 0)
 
         # layer 2
+        repo = repoagent.rawRepo()
         hbox = QHBoxLayout()
         vbox.addLayout(hbox)
         ignorefiles = [repo.wjoin('.hgignore')]
@@ -71,6 +73,7 @@ class HgignoreDialog(QDialog):
         self.ignorefile = ignorefiles[0]
 
         edit = QPushButton(_('Edit File'))
+        edit.setAutoDefault(False)
         edit.clicked.connect(self.editClicked)
         hbox.addWidget(edit)
         hbox.addStretch(1)
@@ -109,6 +112,7 @@ class HgignoreDialog(QDialog):
         # layer 4 - dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Close)
+        bb.button(BB.Close).setAutoDefault(False)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
         vbox.addWidget(bb)
@@ -122,6 +126,10 @@ class HgignoreDialog(QDialog):
 
         s = QSettings()
         self.restoreGeometry(s.value('hgignore/geom').toByteArray())
+
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def eventFilter(self, obj, event):
         if obj != self.ignorelist:
@@ -249,8 +257,7 @@ class HgignoreDialog(QDialog):
         try:
             self.repo.thginvalidate()
             self.repo.lfstatus = True
-            wctx = self.repo[None]
-            wctx.status(unknown=True)
+            self.lclunknowns = self.repo.status(unknown=True)[4]
             self.repo.lfstatus = False
         except (EnvironmentError, error.RepoError), e:
             qtlib.WarningMsgBox(_('Unable to read repository status'),
@@ -271,7 +278,6 @@ class HgignoreDialog(QDialog):
                          for i in self.unknownlist.selectedIndexes()]
             except IndexError:
                 self.pats = []
-        self.lclunknowns = wctx.unknown()
         self.unknownlist.clear()
         self.unknownlist.addItems([uni(u) for u in self.lclunknowns])
         for i, u in enumerate(self.lclunknowns):

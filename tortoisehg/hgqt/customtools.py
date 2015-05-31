@@ -18,12 +18,14 @@
 
 import re
 
-from tortoisehg.hgqt.i18n import _
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import hglib
+from tortoisehg.util.i18n import _
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+DEFAULTICONNAME = 'tools-spanner-hammer'
 
 
 class ToolsFrame(QFrame):
@@ -165,7 +167,7 @@ class ToolsFrame(QFrame):
                 toolname, toolconfig = td.value()
                 icon = toolconfig.get('icon', '')
                 if not icon:
-                    icon = td._defaulticonname
+                    icon = DEFAULTICONNAME
                 item = QListWidgetItem(qtlib.geticon(icon), toolname)
                 gtl.takeItem(row)
                 gtl.insertItem(row, item)
@@ -245,8 +247,9 @@ class ToolsFrame(QFrame):
             for field in sorted(tools[name]):
                 keyname = '%s.%s' % (name, field)
                 value = tools[name][field]
-                if not value is '':
-                    ini.set(section, keyname, value)
+                # value may be bool if originating from hglib.tortoisehgtools()
+                if value != '':
+                    ini.set(section, keyname, str(value))
 
         # 2. Save the new guidefs
         for n, toollistwidget in enumerate(self.widgets):
@@ -552,7 +555,7 @@ class ToolListBox(QListWidget):
             item = text
         else:
             if not icon:
-                icon = CustomToolConfigDialog._defaulticonname
+                icon = DEFAULTICONNAME
             if isinstance(icon, str):
                 icon = qtlib.geticon(icon)
             item = QListWidgetItem(icon, text)
@@ -645,7 +648,7 @@ class CustomConfigDialog(QDialog):
         index = 0
         if selecteditem:
             try:
-                index = items.index(selecteditem)
+                index = list(items).index(selecteditem)
             except ValueError:
                 pass
         combo = QComboBox()
@@ -697,14 +700,13 @@ class CustomToolConfigDialog(CustomConfigDialog):
                        (_('Applied patches'), 'applied'),
                        (_('Applied patches or qparent'), 'qgoto'),
                        ]
-    _defaulticonname = 'tools-spanner-hammer'
     _defaulticonstring = _('<default icon>')
 
     def __init__(self, parent=None, toolname=None, toolconfig={}):
         super(CustomToolConfigDialog, self).__init__(parent,
             dialogname='customtools',
             windowTitle=_('Configure Custom Tool'),
-            windowIcon=qtlib.geticon(self._defaulticonname))
+            windowIcon=qtlib.geticon(DEFAULTICONNAME))
 
         vbox = self.formvbox
 
@@ -727,6 +729,8 @@ class CustomToolConfigDialog(CustomConfigDialog):
             '- {ROOT}: The path to the current repository root.\n'
             '- {REV} / {REVID}: the selected revision number / '
             'hexadecimal revision id hash respectively.\n'
+            '- {SELECTEDFILES}: The list of files selected by the user on the '
+            'revision details file list.\n'
             '- {FILES}: The list of files touched by the selected revision.\n'
             '- {ALLFILES}: All the files tracked by Mercurial on the selected'
             ' revision.'))
@@ -754,7 +758,7 @@ class CustomToolConfigDialog(CustomConfigDialog):
             ico = self._defaulticonstring
         elif ico not in iconnames:
             combo.addItem(qtlib.geticon(ico), ico)
-        combo.addItem(qtlib.geticon(self._defaulticonname),
+        combo.addItem(qtlib.geticon(DEFAULTICONNAME),
                       self._defaulticonstring)
         for name in iconnames:
             combo.addItem(qtlib.geticon(name), name)
@@ -871,40 +875,3 @@ class HookConfigDialog(CustomConfigDialog):
         if not command:
             return _('You must set a command to run.')
         return '' # No error
-
-
-def addCustomToolsSubmenu(menu,
-        ui, location, make, slot, label=_('Custom Tools')):
-    '''
-    Add a custom tools submenu to an existing menus
-
-    This can be used, for example, to add the custom tools submenu to the
-    different file context menus
-    '''
-    tools, toollist = hglib.tortoisehgtools(ui,
-        selectedlocation=location)
-    if not tools:
-        return
-    submenu = menu.addMenu(label)
-    submenu.triggered.connect(slot)
-    emptysubmenu = True
-    for name in toollist:
-        if name == '|':
-            submenu.addSeparator()
-            continue
-        info = tools.get(name, None)
-        if info is None:
-            continue
-        command = info.get('command', None)
-        if not command:
-            continue
-        label = info.get('label', name)
-        icon = info.get('icon', CustomToolConfigDialog._defaulticonname)
-        status = info.get('status', 'MAR!C?S')
-        a = make(label, None, frozenset(status),
-            icon=icon, inmenu=submenu)
-        if a is not None:
-            a.setData(name)
-            emptysubmenu = False
-    if emptysubmenu:
-        menu.removeAction(submenu.menuAction())

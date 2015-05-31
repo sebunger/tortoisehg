@@ -6,17 +6,29 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
+import re
 import sys
 import shlex
 import time
-import urllib
 
-from mercurial import ui, util, extensions, match, bundlerepo, cmdutil
-from mercurial import encoding, templatefilters, filemerge, error, scmutil
-from mercurial import dispatch as hgdispatch
+from mercurial import ui, util, extensions
+from mercurial import encoding, templatefilters, filemerge, error, pathutil
+from mercurial import dispatch as dispatchmod
+from mercurial import revset as revsetmod
+from mercurial.node import nullrev
+from hgext import mq as mqmod
+
+try:
+    from mercurial import patch
+    parsepatch = patch.parsepatch
+    patchheader = patch.header
+except AttributeError:
+    # hg<3.4 (20aac24e2114, dc655360bccb)
+    from hgext import record
+    parsepatch = record.parsepatch
+    patchheader = record.header
 
 _encoding = encoding.encoding
-_encodingmode = encoding.encodingmode
 _fallbackencoding = encoding.fallbackencoding
 
 # extensions which can cause problem with TortoiseHg
@@ -24,7 +36,13 @@ _extensions_blacklist = ('color', 'pager', 'progress')
 
 from tortoisehg.util import paths
 from tortoisehg.util.hgversion import hgversion
-from tortoisehg.util.i18n import _, ngettext
+from tortoisehg.util.i18n import _ as _gettext, ngettext as _ngettext
+
+# TODO: use unicode version globally
+def _(message, context=''):
+    return _gettext(message, context).encode('utf-8')
+def ngettext(singular, plural, n):
+    return _ngettext(singular, plural, n).encode('utf-8')
 
 def tounicode(s):
     """
@@ -39,11 +57,10 @@ def tounicode(s):
         return s
     if isinstance(s, encoding.localstr):
         return s._utf8.decode('utf-8')
-    for e in ('utf-8', _encoding):
-        try:
-            return s.decode(e, 'strict')
-        except UnicodeDecodeError:
-            pass
+    try:
+        return s.decode(_encoding, 'strict')
+    except UnicodeDecodeError:
+        pass
     return s.decode(_fallbackencoding, 'replace')
 
 def fromunicode(s, errors='strict'):
@@ -96,43 +113,34 @@ def fromutf(s):
         # can't round-trip
         return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
-_tabwidth = None
-def gettabwidth(ui):
-    global _tabwidth
-    if _tabwidth is not None:
-        return _tabwidth
-    tabwidth = ui.config('tortoisehg', 'tabwidth')
+
+def namedbranches(repo):
+    branchmap = repo.branchmap()
+    dead = repo.deadbranches
+    return sorted(br for br, _heads, _tip, isclosed
+                  in branchmap.iterbranches()
+                  if not isclosed and br not in dead)
+
+def _firstchangectx(repo):
     try:
-        tabwidth = int(tabwidth)
-        if tabwidth < 1 or tabwidth > 16:
-            tabwidth = 0
-    except (ValueError, TypeError):
-        tabwidth = 0
-    _tabwidth = tabwidth
-    return tabwidth
+        # try fast path, which may be hidden
+        return repo[0]
+    except error.RepoLookupError:
+        pass
+    for rev in revsetmod.spanset(repo):
+        return repo[rev]
+    return repo[nullrev]
 
-_maxdiff = None
-def getmaxdiffsize(ui):
-    global _maxdiff
-    if _maxdiff is not None:
-        return _maxdiff
-    maxdiff = ui.config('tortoisehg', 'maxdiff')
-    try:
-        maxdiff = int(maxdiff)
-        if maxdiff < 1:
-            maxdiff = sys.maxint
-    except (ValueError, TypeError):
-        maxdiff = 1024 # 1MB by default
-    _maxdiff = maxdiff * 1024
-    return _maxdiff
+def shortrepoid(repo):
+    """Short hash of the first root changeset; can be used for settings key"""
+    return str(_firstchangectx(repo))
 
-def getrevisionlabel(repo, rev):
-    """Return symbolic name for the specified revision or stringfy it"""
-    if rev is None:
-        return None  # no symbol for working revision
+def repoidnode(repo):
+    """Hash of the first root changeset in binary form"""
+    return _firstchangectx(repo).node()
 
+def _getfirstrevisionlabel(repo, ctx):
     # see context.changectx for look-up order of labels
-    ctx = repo[rev]
 
     bookmarks = ctx.bookmarks()
     if ctx in repo.parents():
@@ -152,85 +160,22 @@ def getrevisionlabel(repo, rev):
     if repo.branchtip(branch) == ctx.node():
         return branch
 
+def getrevisionlabel(repo, rev):
+    """Return symbolic name for the specified revision or stringfy it"""
+    if rev is None:
+        return None  # no symbol for working revision
+
+    ctx = repo[rev]
+    label = _getfirstrevisionlabel(repo, ctx)
+    if label and ctx == repo[label]:
+        return label
+
     return str(rev)
-
-_deadbranch = None
-def getdeadbranch(ui):
-    '''return a list of dead branch names in UTF-8'''
-    global _deadbranch
-    if _deadbranch is None:
-        db = toutf(ui.config('tortoisehg', 'deadbranch', ''))
-        dblist = [b.strip() for b in db.split(',')]
-        _deadbranch = dblist
-    return _deadbranch
-
-def getlivebranch(repo):
-    '''return a list of live branch names in UTF-8'''
-    lives = []
-    deads = getdeadbranch(repo.ui)
-    cl = repo.changelog
-    for branch, heads in repo.branchmap().iteritems():
-        # branch encoded in UTF-8
-        if branch in deads:
-            # ignore branch names in tortoisehg.deadbranch
-            continue
-        bheads = [h for h in heads if ('close' not in cl.read(h)[5])]
-        if not bheads:
-            # ignore branches with all heads closed
-            continue
-        lives.append(branch.replace('\0', ''))
-    return lives
-
-def getlivebheads(repo):
-    '''return a list of revs of live branch heads'''
-    bheads = []
-    for b, ls in repo.branchmap().iteritems():
-        bheads += [repo[x] for x in ls]
-    heads = [x.rev() for x in bheads if not x.extra().get('close')]
-    heads.sort()
-    heads.reverse()
-    return heads
-
-_hidetags = None
-def gethidetags(ui):
-    global _hidetags
-    if _hidetags is None:
-        tags = toutf(ui.config('tortoisehg', 'hidetags', ''))
-        taglist = [t.strip() for t in tags.split()]
-        _hidetags = taglist
-    return _hidetags
-
-def getfilteredtags(repo):
-    filtered = []
-    hides = gethidetags(repo.ui)
-    for tag in list(repo.tags()):
-        if tag not in hides:
-            filtered.append(tag)
-    return filtered
-
-def getrawctxtags(changectx):
-    '''Returns the tags for changectx, converted to UTF-8 but
-    unfiltered for hidden tags'''
-    value = [toutf(tag) for tag in changectx.tags()]
-    if len(value) == 0:
-        return None
-    return value
-
-def getctxtags(changectx):
-    '''Returns all unhidden tags for changectx, converted to UTF-8'''
-    value = getrawctxtags(changectx)
-    if value:
-        htlist = gethidetags(changectx._repo.ui)
-        tags = [tag for tag in value if tag not in htlist]
-        if len(tags) == 0:
-            return None
-        return tags
-    return None
 
 def getmqpatchtags(repo):
     '''Returns all tag names used by MQ patches, or []'''
     if hasattr(repo, 'mq'):
-        repo.mq.parse_series()
+        repo.mq.parseseries()
         return repo.mq.series[:]
     else:
         return []
@@ -244,65 +189,37 @@ def getcurrentqqueue(repo):
         cur = cur[8:]
     return cur
 
-def diffexpand(line):
-    'Expand tabs in a line of diff/patch text'
-    if _tabwidth is None:
-        gettabwidth(ui.ui())
-    if not _tabwidth or len(line) < 2:
-        return line
-    return line[0] + line[1:].expandtabs(_tabwidth)
+def getqqueues(repo):
+    ui = repo.ui.copy()
+    ui.quiet = True  # don't append "(active)"
+    ui.pushbuffer()
+    try:
+        opts = {'list': True}
+        mqmod.qqueue(ui, repo, None, **opts)
+        qqueues = tounicode(ui.popbuffer()).splitlines()
+    except (util.Abort, EnvironmentError):
+        qqueues = []
+    return qqueues
 
-_fontconfig = None
-def getfontconfig(_ui=None):
-    global _fontconfig
-    if _fontconfig is None:
-        if _ui is None:
-            _ui = ui.ui()
-        # defaults
-        _fontconfig = {'fontcomment': 'monospace 10',
-                       'fontdiff': 'monospace 10',
-                       'fontlist': 'sans 9',
-                       'fontlog': 'monospace 10'}
-        # overwrite defaults with configured values
-        for name, val in _ui.configitems('gtools'):
-            if val and name.startswith('font'):
-                _fontconfig[name] = val
-    return _fontconfig
-
-def invalidaterepo(repo):
-    repo.dirstate.invalidate()
-    for attr in ('_bookmarks', '_bookmarkcurrent'):
-        if attr in repo.__dict__:
-            delattr(repo, attr)
-    if isinstance(repo, bundlerepo.bundlerepository):
-        # Work around a bug in hg-1.3.  repo.invalidate() breaks
-        # overlay bundlerepos
-        return
-    repo.invalidate()
-    if 'mq' in repo.__dict__: #do not create if it does not exist
-        repo.mq.invalidate()
+def readundodesc(repo):
+    """Read short description and changelog size of last transaction"""
+    if os.path.exists(repo.sjoin('undo')):
+        try:
+            args = repo.opener('undo.desc', 'r').read().splitlines()
+            return args[1], int(args[0])
+        except (IOError, IndexError, ValueError):
+            pass
+    return '', len(repo)
 
 def enabledextensions():
     """Return the {name: shortdesc} dict of enabled extensions
 
     shortdesc is in local encoding.
     """
-    ret = extensions.enabled()
-    if type(ret) is tuple:
-        # hg <= 1.8
-        return ret[0]
-    else:
-        # hg <= 1.9
-        return ret
+    return extensions.enabled()
 
 def disabledextensions():
-    ret = extensions.disabled()
-    if type(ret) is tuple:
-        # hg <= 1.8
-        return ret[0] or {}
-    else:
-        # hg <= 1.9
-        return ret or {}
+    return extensions.disabled()
 
 def allextensions():
     """Return the {name: shortdesc} dict of known extensions
@@ -313,6 +230,11 @@ def allextensions():
     disabledexts = disabledextensions()
     exts = (disabledexts or {}).copy()
     exts.update(enabledexts)
+    if hasattr(sys, "frozen"):
+        if 'hgsubversion' not in exts:
+            exts['hgsubversion'] = _('hgsubversion packaged with thg')
+        if 'hggit' not in exts:
+            exts['hggit'] = _('hggit packaged with thg')
     return exts
 
 def validateextensions(enabledexts):
@@ -334,16 +256,6 @@ def validateextensions(enabledexts):
         exts['perfarce'] = _('perfarce is incompatible with hgsubversion')
     return exts
 
-def loadextension(ui, name):
-    # Between Mercurial revisions 1.2 and 1.3, extensions.load() stopped
-    # calling uisetup() after loading an extension.  This could do
-    # unexpected things if you use an hg version < 1.3
-    extensions.load(ui, name, None)
-    mod = extensions.find(name)
-    uisetup = getattr(mod, 'uisetup', None)
-    if uisetup:
-        uisetup(ui)
-
 def _loadextensionwithblacklist(orig, ui, name, path):
     if name.startswith('hgext.') or name.startswith('hgext/'):
         shortname = name[6:]
@@ -359,6 +271,7 @@ def wrapextensionsloader():
     extensions.wrapfunction(extensions, 'load',
                             _loadextensionwithblacklist)
 
+# TODO: provide singular canonpath() wrapper instead?
 def canonpaths(list):
     'Get canonical paths (relative to root) for list of files'
     # This is a horrible hack.  Please remove this when HG acquires a
@@ -368,40 +281,25 @@ def canonpaths(list):
     root = paths.find_root(cwd)
     for f in list:
         try:
-            canonpats.append(scmutil.canonpath(root, cwd, f))
+            canonpats.append(pathutil.canonpath(root, cwd, f))
         except util.Abort:
             # Attempt to resolve case folding conflicts.
             fu = f.upper()
             cwdu = cwd.upper()
             if fu.startswith(cwdu):
-                canonpats.append(scmutil.canonpath(root, cwd,
-                                                   f[len(cwd+os.sep):]))
+                canonpats.append(
+                    pathutil.canonpath(root, cwd, f[len(cwd + os.sep):]))
             else:
                 # May already be canonical
                 canonpats.append(f)
     return canonpats
 
-def escapepath(path):
-    'Before passing a file path to hg API, it may need escaping'
-    p = path
-    if '[' in p or '{' in p or '*' in p or '?' in p:
-        return 'path:' + p
-    else:
-        return p
-
-def normpats(pats):
-    'Normalize file patterns'
-    normpats = []
-    for pat in pats:
-        kind, p = match._patsplit(pat, None)
-        if kind:
-            normpats.append(pat)
-        else:
-            if '[' in p or '{' in p or '*' in p or '?' in p:
-                normpats.append('glob:' + p)
-            else:
-                normpats.append('path:' + p)
-    return normpats
+def normreporoot(path):
+    """Normalize repo root path in the same manner as localrepository"""
+    # see localrepo.localrepository and scmutil.vfs
+    lpath = fromunicode(path)
+    lpath = os.path.realpath(util.expandpath(lpath))
+    return tounicode(lpath)
 
 
 def mergetools(ui, values=None):
@@ -627,45 +525,40 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         toollist.append(name)
     return selectedtools, toollist
 
-def hgcmd_toq(q, label, args):
-    '''
-    Run an hg command in a background thread, pipe all output to a Queue
-    object.  Assumes command is completely noninteractive.
-    '''
-    class Qui(ui.ui):
-        def __init__(self, src=None):
-            super(Qui, self).__init__(src)
-            self.setconfig('ui', 'interactive', 'off')
+def copydynamicconfig(srcui, destui):
+    """Copy config values that come from command line or code
 
-        def write(self, *args, **opts):
-            if self._buffers:
-                self._buffers[-1].extend([str(a) for a in args])
-            else:
-                for a in args:
-                    if label:
-                        q.put((str(a), opts.get('label', '')))
-                    else:
-                        q.put(str(a))
+    >>> srcui = ui.ui()
+    >>> srcui.setconfig('paths', 'default', 'http://example.org/',
+    ...                 '/repo/.hg/hgrc:2')
+    >>> srcui.setconfig('patch', 'eol', 'auto', 'eol')
+    >>> destui = ui.ui()
+    >>> copydynamicconfig(srcui, destui)
+    >>> destui.config('paths', 'default') is None
+    True
+    >>> destui.config('patch', 'eol'), destui.configsource('patch', 'eol')
+    ('auto', 'eol')
+    """
+    for section, name, value in srcui.walkconfig():
+        source = srcui.configsource(section, name)
+        if ':' in source:
+            # path:line
+            continue
+        if source == 'none':
+            # ui.configsource returns 'none' by default
+            source = ''
+        destui.setconfig(section, name, value, source)
 
-        def plain(self):
-            return True
-
-    u = Qui()
-    oldterm = os.environ.get('TERM')
-    os.environ['TERM'] = 'dumb'
-    ret = dispatch(u, list(args))
-    if oldterm:
-        os.environ['TERM'] = oldterm
-    return ret
-
-def get_reponame(repo):
-    if repo.ui.config('tortoisehg', 'fullpath', False):
-        name = repo.root
-    elif repo.ui.config('web', 'name', False):
-        name = repo.ui.config('web', 'name')
-    else:
-        name = os.path.basename(repo.root)
-    return toutf(name)
+def shortreponame(ui):
+    name = ui.config('web', 'name')
+    if not name:
+        return
+    src = ui.configsource('web', 'name')  # path:line
+    if '/.hg/hgrc:' not in util.pconvert(src):
+        # global web.name will set the same name to all repositories
+        ui.debug('ignoring global web.name defined at %s\n' % src)
+        return
+    return name
 
 def displaytime(date):
     return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
@@ -734,7 +627,7 @@ def get_revision_desc(fctx, curpath=None):
         source = u''
     else:
         source = u'(%s)' % tounicode(fctx.path())
-    date = tounicode(age(fctx.date()))
+    date = age(fctx.date()).decode('utf-8')
     l = tounicode(fctx.description()).splitlines()
     summary = l and l[0] or ''
     return u'%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
@@ -761,51 +654,6 @@ def longsummary(description, limit=None):
     if add_ellipsis:
         summary += u' \u2026' # ellipsis ...
     return summary
-
-def validate_synch_path(path, repo):
-    '''
-    Validate the path that must be used to sync operations (pull,
-    push, outgoing and incoming)
-    '''
-    return_path = path
-    for alias, path_aux in repo.ui.configitems('paths'):
-        if path == alias:
-            return_path = path_aux
-        elif path == util.hidepassword(path_aux):
-            return_path = path_aux
-    return return_path
-
-def is_rev_current(repo, rev):
-    '''
-    Returns True if the revision indicated by 'rev' is the current
-    working directory parent.
-
-    If rev is '' or None, it is assumed to mean 'tip'.
-    '''
-    if rev in ('', None):
-        rev = 'tip'
-    rev = repo.lookup(rev)
-    parents = repo.parents()
-
-    if len(parents) > 1:
-        return False
-
-    return rev == parents[0].node()
-
-def export(repo, revs, template='hg-%h.patch', fp=None, switch_parent=False,
-           opts=None):
-    '''
-    export changesets as hg patches.
-
-    Mercurial moved patch.export to cmdutil.export after version 1.5
-    (change e764f24a45ee in mercurial).
-    '''
-
-    try:
-        return cmdutil.export(repo, revs, template, fp, switch_parent, opts)
-    except AttributeError:
-        from mercurial import patch
-        return patch.export(repo, revs, template, fp, switch_parent, opts)
 
 def getDeepestSubrepoContainingFile(wfile, ctx):
     """
@@ -842,27 +690,6 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
                     return os.path.join(wsub, wsubsub), wfileinsub, sctx
     return None, wfile, ctx
 
-def netlocsplit(netloc):
-    '''split [user[:passwd]@]host[:port] into 4-tuple.'''
-
-    a = netloc.find('@')
-    if a == -1:
-        user, passwd = None, None
-    else:
-        userpass, netloc = netloc[:a], netloc[a + 1:]
-        c = userpass.find(':')
-        if c == -1:
-            user, passwd = urllib.unquote(userpass), None
-        else:
-            user = urllib.unquote(userpass[:c])
-            passwd = urllib.unquote(userpass[c + 1:])
-    c = netloc.find(':')
-    if c == -1:
-        host, port = netloc, None
-    else:
-        host, port = netloc[:c], netloc[c + 1:]
-    return host, port, user, passwd
-
 def getLineSeparator(line):
     """Get the line separator used on a given line"""
     # By default assume the default OS line separator
@@ -874,9 +701,84 @@ def getLineSeparator(line):
             break
     return linesep
 
-def dispatch(ui, args):
-    req = hgdispatch.request(args, ui)
-    return hgdispatch._dispatch(req)
+def parseconfigopts(ui, args):
+    """Pop the --config options from the command line and apply them
+
+    >>> u = ui.ui()
+    >>> args = ['log', '--config', 'extensions.mq=!']
+    >>> parseconfigopts(u, args)
+    [('extensions', 'mq', '!')]
+    >>> args
+    ['log']
+    >>> u.config('extensions', 'mq')
+    '!'
+    """
+    config = dispatchmod._earlygetopt(['--config'], args)
+    return dispatchmod._parseconfig(ui, config)
+
+
+# (unicode, QString) -> unicode, otherwise -> str
+_stringify = '%s'.__mod__
+
+def escapepath(path):
+    r"""Convert path to command-line-safe string; path must be relative to
+    the repository root
+
+    >>> from PyQt4.QtCore import QString
+    >>> escapepath('foo/[bar].txt')
+    'path:foo/[bar].txt'
+    >>> escapepath(QString(u'\xc0'))
+    u'\xc0'
+    """
+    p = _stringify(path)
+    if '[' in p or '{' in p or '*' in p or '?' in p:
+        # bare path is expanded by scmutil.expandpats() on Windows
+        return 'path:' + p
+    else:
+        return p
+
+def escaperev(rev, default=None):
+    """Convert revision number to command-line-safe string"""
+    if rev is None:
+        return default
+    if rev == nullrev:
+        return 'null'
+    assert rev >= 0
+    return '%d' % rev
+
+def _escaperevrange(a, b):
+    if a == b:
+        return escaperev(a)
+    else:
+        return '%s:%s' % (escaperev(a), escaperev(b))
+
+def compactrevs(revs):
+    """Build command-line-safe revspec from list of revision numbers; revs
+    should be sorted in ascending order to get compact form
+
+    >>> compactrevs([])
+    ''
+    >>> compactrevs([0])
+    '0'
+    >>> compactrevs([0, 1])
+    '0:1'
+    >>> compactrevs([-1, 0, 1, 3])
+    'null:1 + 3'
+    >>> compactrevs([0, 4, 5, 6, 8, 9])
+    '0 + 4:6 + 8:9'
+    """
+    if not revs:
+        return ''
+    specs = []
+    k = m = revs[0]
+    for n in revs[1:]:
+        if m + 1 == n:
+            m = n
+        else:
+            specs.append(_escaperevrange(k, m))
+            k = m = n
+    specs.append(_escaperevrange(k, m))
+    return ' + '.join(specs)
 
 def buildcmdargs(name, *args, **opts):
     r"""Build list of command-line arguments
@@ -885,6 +787,8 @@ def buildcmdargs(name, *args, **opts):
     ['push', '--branch', 'foo']
     >>> buildcmdargs('graft', r=['0', '1'])
     ['graft', '-r', '0', '-r', '1']
+    >>> buildcmdargs('diff', r=[0, None])
+    ['diff', '-r', '0']
     >>> buildcmdargs('log', no_merges=True, quiet=False, limit=None)
     ['log', '--no-merges']
     >>> buildcmdargs('commit', user='')
@@ -896,6 +800,10 @@ def buildcmdargs(name, *args, **opts):
     ['add', 'foo', 'bar']
     >>> buildcmdargs('cat', '-foo', rev='0')
     ['cat', '--rev', '0', '--', '-foo']
+    >>> buildcmdargs('qpush', None)
+    ['qpush']
+    >>> buildcmdargs('update', '')
+    ['update', '']
 
     type conversion to string:
 
@@ -909,9 +817,7 @@ def buildcmdargs(name, *args, **opts):
     >>> buildcmdargs(QString('tag'), QString(u'\xc0'), message=QString(u'\xc1'))
     [u'tag', '--message', u'\xc1', u'\xc0']
     """
-    stringfy = '%s'.__mod__  # (unicode, QString) -> unicode, otherwise -> str
-
-    fullargs = [stringfy(name)]
+    fullargs = [_stringify(name)]
     for k, v in opts.iteritems():
         if v is None:
             continue
@@ -925,15 +831,46 @@ def buildcmdargs(name, *args, **opts):
                 fullargs.append(aname)
         elif isinstance(v, list):
             for e in v:
+                if e is None:
+                    continue
                 fullargs.append(aname)
-                fullargs.append(stringfy(e))
+                fullargs.append(_stringify(e))
         else:
             fullargs.append(aname)
-            fullargs.append(stringfy(v))
+            fullargs.append(_stringify(v))
 
-    args = map(stringfy, args)
+    args = [_stringify(v) for v in args if v is not None]
     if util.any(e.startswith('-') for e in args):
         fullargs.append('--')
     fullargs.extend(args)
 
     return fullargs
+
+_urlpassre = re.compile(r'^([a-zA-Z0-9+.\-]+://[^:@/]*):[^@/]+@')
+
+def _reprcmdarg(arg):
+    arg = _urlpassre.sub(r'\1:***@', arg)
+    arg = arg.replace('\n', '^M')
+
+    # only for display; no use to construct command string for os.system()
+    if not arg or ' ' in arg or '\\' in arg or '"' in arg:
+        return '"%s"' % arg.replace('"', '\\"')
+    else:
+        return arg
+
+def prettifycmdline(cmdline):
+    r"""Build pretty command-line string for display
+
+    >>> prettifycmdline(['log', 'foo\\bar', '', 'foo bar', 'foo"bar'])
+    'log "foo\\bar" "" "foo bar" "foo\\"bar"'
+    >>> prettifycmdline(['log', '--template', '{node}\n'])
+    'log --template {node}^M'
+
+    mask password in url-like string:
+
+    >>> prettifycmdline(['push', 'http://foo123:bar456@example.org/'])
+    'push http://foo123:***@example.org/'
+    >>> prettifycmdline(['clone', 'svn+http://:bar@example.org:8080/trunk/'])
+    'clone svn+http://:***@example.org:8080/trunk/'
+    """
+    return ' '.join(_reprcmdarg(e) for e in cmdline)

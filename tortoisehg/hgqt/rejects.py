@@ -6,15 +6,12 @@
 # of the GNU General Public License, incorporated herein by reference.
 
 import cStringIO
-import os
 
-from mercurial import hg, util, patch, commands, ui
-from hgext import record
+from mercurial import patch
 
 from tortoisehg.util import hglib
-from tortoisehg.util.patchctx import patchctx
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, lexers
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib, qscilib, fileencoding, lexers
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -23,7 +20,7 @@ from PyQt4 import Qsci
 qsci = Qsci.QsciScintilla
 
 class RejectsDialog(QDialog):
-    def __init__(self, path, parent):
+    def __init__(self, ui, path, parent=None):
         super(RejectsDialog, self).__init__(parent)
         self.setWindowTitle(_('Merge rejected patch chunks into %s') %
                             hglib.tounicode(path))
@@ -36,12 +33,12 @@ class RejectsDialog(QDialog):
         editor.setFolding(qsci.BoxedTreeFoldStyle)
         editor.installEventFilter(qscilib.KeyPressInterceptor(self))
         editor.setContextMenuPolicy(Qt.CustomContextMenu)
-        editor.customContextMenuRequested.connect(self.menuRequested)
+        editor.customContextMenuRequested.connect(self._onMenuRequested)
         self.baseLineColor = editor.markerDefine(qsci.Background, -1)
         editor.setMarkerBackgroundColor(QColor('lightblue'), self.baseLineColor)
         self.layout().addWidget(editor, 3)
 
-        searchbar = qscilib.SearchToolBar(self, hidable=True)
+        searchbar = qscilib.SearchToolBar(self)
         searchbar.searchRequested.connect(editor.find)
         searchbar.conditionChanged.connect(editor.highlightText)
         searchbar.hide()
@@ -49,6 +46,7 @@ class RejectsDialog(QDialog):
             searchbar.show()
             searchbar.setFocus(Qt.OtherFocusReason)
         qtlib.newshortcutsforstdkey(QKeySequence.Find, self, showsearchbar)
+        self.addActions(searchbar.editorActions())
         self.layout().addWidget(searchbar)
 
         hbox = QHBoxLayout()
@@ -79,6 +77,11 @@ class RejectsDialog(QDialog):
         self.rejectbrowser = RejectBrowser(self)
         hbox.addWidget(self.rejectbrowser, 5)
 
+        self.textencgroup = fileencoding.createActionGroup(self)
+        self.textencgroup.triggered.connect(self._reloadFile)
+        fileencoding.checkActionByName(self.textencgroup,
+                                       fileencoding.contentencoding(ui))
+
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
@@ -91,26 +94,16 @@ class RejectsDialog(QDialog):
         self.editor.loadSettings(s, 'rejects/editor')
         self.rejectbrowser.loadSettings(s, 'rejects/rejbrowse')
 
-        f = QFile(hglib.tounicode(path))
-        if not f.open(QIODevice.ReadOnly):
-            qtlib.ErrorMsgBox(_('Unable to merge rejects'),
-                              _("Can't read this file (maybe deleted)"))
+        if not qscilib.readFile(editor, hglib.tounicode(path),
+                                self._textEncoding()):
             self.hide()
             QTimer.singleShot(0, self.reject)
             return
-        earlybytes = f.read(4096)
-        if '\0' in earlybytes:
-            qtlib.ErrorMsgBox(_('Unable to merge rejects'),
-                              _('This appears to be a binary file'))
-            self.hide()
-            QTimer.singleShot(0, self.reject)
-            return
-
-        f.seek(0)
-        editor.read(f)
-        editor.setModified(False)
-        lexer = lexers.getlexer(ui.ui(), path, earlybytes, self)
+        earlybytes = hglib.fromunicode(editor.text(), 'replace')[:4096]
+        lexer = lexers.getlexer(ui, path, earlybytes, self)
         editor.setLexer(lexer)
+        if lexer is None:
+            editor.setFont(qtlib.getfont('fontlog').font())
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
 
@@ -122,7 +115,7 @@ class RejectsDialog(QDialog):
         except IOError, e:
             pass
         try:
-            header = record.parsepatch(buf)[0]
+            header = hglib.parsepatch(buf)[0]
             self.chunks = header.hunks
         except (patch.PatchError, IndexError), e:
             self.chunks = []
@@ -135,9 +128,14 @@ class RejectsDialog(QDialog):
         self.unresolved.setDisabled(True)
         QTimer.singleShot(0, lambda: self.chunklist.setCurrentRow(0))
 
-    def menuRequested(self, point):
-        point = self.editor.viewport().mapToGlobal(point)
-        return self.editor.createStandardContextMenu().exec_(point)
+    @pyqtSlot(QPoint)
+    def _onMenuRequested(self, point):
+        menu = self.editor.createStandardContextMenu()
+        menu.addSeparator()
+        m = menu.addMenu(_('E&ncoding'))
+        fileencoding.addActionsToMenu(m, self.textencgroup)
+        menu.exec_(self.editor.viewport().mapToGlobal(point))
+        menu.setParent(None)
 
     def updateChunkList(self):
         self.updating = True
@@ -177,14 +175,32 @@ class RejectsDialog(QDialog):
         buf = cStringIO.StringIO()
         chunk = self.chunks[row]
         chunk.write(buf)
+        chunkstr = buf.getvalue().decode(self._textEncoding(), 'replace')
         startline = max(chunk.fromline-1, 0)
-        self.rejectbrowser.showChunk(buf.getvalue().splitlines(True)[1:])
+        self.rejectbrowser.showChunk(chunkstr.splitlines(True)[1:])
         self.editor.setCursorPosition(startline, 0)
         self.editor.ensureLineVisible(startline)
         self.editor.markerDeleteAll(-1)
         self.editor.markerAdd(startline, self.baseLineColor)
         self.resolved.setEnabled(not chunk.resolved)
         self.unresolved.setEnabled(chunk.resolved)
+
+    def _textEncoding(self):
+        return fileencoding.checkedActionName(self.textencgroup)
+
+    @pyqtSlot()
+    def _reloadFile(self):
+        if self.editor.isModified():
+            r = qtlib.QuestionMsgBox(_('Reload File'),
+                                     _('Are you sure you want to reload this '
+                                       'file?'),
+                                     _('All unsaved changes will be lost.'),
+                                     parent=self)
+            if not r:
+                return
+        qscilib.readFile(self.editor, hglib.tounicode(self.path),
+                         self._textEncoding())
+        self.showChunk(self.chunklist.currentRow())
 
     def saveSettings(self):
         s = QSettings()
@@ -198,26 +214,23 @@ class RejectsDialog(QDialog):
         if not acceptresolution:
             action = QMessageBox.warning(self,
                 _("Warning"),
-                _("You have marked all rejected patch chunks as resolved yet you " \
-                "have not modified the file on the edit panel.\n\n" \
-                "This probably means that no code from any of the rejected patch " \
-                "chunks made it into the file.\n\n"\
-                "Are you sure that you want to leave the file as is and " \
-                "consider all the rejected patch chunks as resolved?\n\n" \
-                "Doing so may delete them from a shelve, for example, which " \
-                "would mean that you would lose them forever!\n\n"
-                "Click Yes to accept the file as is or No to continue resolving " \
-                "the rejected patch chunks."),
+                _("You have marked all rejected patch chunks as resolved yet "
+                  "you have not modified the file on the edit panel.\n\n"
+                  "This probably means that no code from any of the rejected "
+                  "patch chunks made it into the file.\n\n"
+                  "Are you sure that you want to leave the file as is and "
+                  "consider all the rejected patch chunks as resolved?\n\n"
+                  "Doing so may delete them from a shelve, for example, which "
+                  "would mean that you would lose them forever!\n\n"
+                  "Click Yes to accept the file as is or No to continue "
+                  "resolving the rejected patch chunks."),
                 QMessageBox.Yes, QMessageBox.No)
             if action == QMessageBox.Yes:
                 acceptresolution = True
 
         if acceptresolution:
-            f = QFile(hglib.tounicode(self.path))
-            saved = f.open(QIODevice.WriteOnly) and self.editor.write(f)
-            if not saved:
-                qtlib.ErrorMsgBox(_('Unable to save file'),
-                                  f.errorString(), parent=self)
+            if not qscilib.writeFile(self.editor, hglib.tounicode(self.path),
+                                     self._textEncoding()):
                 return
             self.saveSettings()
             super(RejectsDialog, self).accept()
@@ -236,8 +249,6 @@ class RejectBrowser(qscilib.Scintilla):
         self.setUtf8(True)
 
         self.installEventFilter(qscilib.KeyPressInterceptor(self))
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.menuRequested)
         self.setCaretLineVisible(False)
 
         self.setMarginType(1, qsci.SymbolMargin)
@@ -256,16 +267,12 @@ class RejectBrowser(qscilib.Scintilla):
         lexer = lexers.difflexer(self)
         self.setLexer(lexer)
 
-    def menuRequested(self, point):
-        point = self.viewport().mapToGlobal(point)
-        return self.createStandardContextMenu().exec_(point)
-
     def showChunk(self, lines):
         utext = []
         added = []
         removed = []
         for i, line in enumerate(lines):
-            utext.append(hglib.tounicode(line[1:]))
+            utext.append(line[1:])
             if line[0] == '+':
                 added.append(i)
             elif line[0] == '-':

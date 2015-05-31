@@ -14,29 +14,36 @@ import stat
 import subprocess
 import tempfile
 import re
+import sip
 import weakref
 
-from mercurial.i18n import _ as hggettext
-from mercurial import commands, extensions, error, util
+from mercurial import extensions, error, util
 
 from tortoisehg.util import hglib, paths, editor, terminal
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from hgext.color import _styles
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
-if PYQT_VERSION < 0x40600 or QT_VERSION < 0x40600:
-    sys.stderr.write('TortoiseHg requires at least Qt 4.6 and PyQt 4.6\n')
-    sys.stderr.write('You have Qt %s and PyQt %s\n' %
-                     (QT_VERSION_STR, PYQT_VERSION_STR))
-    sys.exit()
 
 try:
     import win32con
     openflags = win32con.CREATE_NO_WINDOW
 except ImportError:
     openflags = 0
+
+# largest allowed size for widget, defined in <src/gui/kernel/qwidget.h>
+QWIDGETSIZE_MAX = (1 << 24) - 1
+
+if PYQT_VERSION < 0x40704:
+    # QObject.sender() goes wrong if connection made in Qt layer.  consider
+    # using QSignalMapper for zero-argument slots instead.
+    def senderSafeSlot(*types, **opts):
+        def deco(func):
+            return func
+        return deco
+else:
+    senderSafeSlot = pyqtSlot
 
 tmproot = None
 def gettempdir():
@@ -59,7 +66,7 @@ def gettempdir():
 def openhelpcontents(url):
     'Open online help, use local CHM file if available'
     if not url.startswith('http'):
-        fullurl = 'http://tortoisehg.org/manual/2.7/' + url
+        fullurl = 'http://tortoisehg.readthedocs.org/en/latest/' + url
         # Use local CHM file if it can be found
         if os.name == 'nt' and paths.bin_path:
             chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
@@ -201,31 +208,6 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
                 u'%s : %s' % (hglib.tounicode(cmdline),
                               hglib.tounicode(str(e))))
 
-def savefiles(repo, files, rev, parent=None):
-    for curfile in files:
-        wfile = util.localpath(curfile)
-        wfile, ext = os.path.splitext(os.path.basename(wfile))
-        if wfile:
-            filename = "%s@%d%s" % (wfile, rev, ext)
-        else:
-            filename = "%s@%d" % (ext, rev)
-        result = QFileDialog.getSaveFileName(
-            parent=parent, caption=_("Save file to"),
-            directory=hglib.tounicode(filename))
-        if not result:
-            continue
-        cwd = os.getcwd()
-        try:
-            os.chdir(repo.root)
-            try:
-                commands.cat(repo.ui, repo, curfile, rev=rev,
-                             output=hglib.fromunicode(result))
-            except (util.Abort, IOError), e:
-                QMessageBox.critical(parent, _('Unable to save file'),
-                                     hglib.tounicode(str(e)))
-        finally:
-            os.chdir(cwd)
-
 def openshell(root, reponame, ui=None):
     if not os.path.exists(root):
         WarningMsgBox(
@@ -234,20 +216,34 @@ def openshell(root, reponame, ui=None):
         return
     shell, args = terminal.detectterminal(ui)
     if shell:
+        if args:
+            shell = shell + ' ' + util.expandpath(args)
+        # check invalid expression in tortoisehg.shell.  we shouldn't apply
+        # string formatting to untrusted value, but too late to change syntax.
+        try:
+            shell % {'root': '', 'reponame': ''}
+        except (KeyError, TypeError, ValueError):
+            # KeyError: "%(invalid)s", TypeError: "%(root)d", ValueError: "%"
+            ErrorMsgBox(_('Failed to open path in terminal'),
+                        _('Invalid configuration: %s')
+                        % hglib.tounicode(shell))
+            return
+        shellcmd = shell % {'root': root, 'reponame': reponame}
+
         cwd = os.getcwd()
         try:
-            if args:
-                shell = shell + ' ' + util.expandpath(args)
-            shellcmd = shell % {'root': root, 'reponame': reponame}
-
             # Unix: QProcess.startDetached(program) cannot parse single-quoted
             # parameters built using util.shellquote().
             # Windows: subprocess.Popen(program, shell=True) cannot spawn
             # cmd.exe in new window, probably because the initial cmd.exe is
             # invoked with SW_HIDE.
             os.chdir(root)
-            fullargs = shlex.split(shellcmd)
-            started = QProcess.startDetached(fullargs[0], fullargs[1:])
+            if os.name == 'nt':
+                # can't parse shellcmd in POSIX way
+                started = QProcess.startDetached(hglib.tounicode(shellcmd))
+            else:
+                fullargs = map(hglib.tounicode, shlex.split(shellcmd))
+                started = QProcess.startDetached(fullargs[0], fullargs[1:])
         finally:
             os.chdir(cwd)
         if not started:
@@ -256,6 +252,13 @@ def openshell(root, reponame, ui=None):
     else:
         InfoMsgBox(_('No shell configured'),
                    _('A terminal shell must be configured'))
+
+
+def isdarktheme(palette=None):
+    """True if white-on-black color scheme is preferable"""
+    if not palette:
+        palette = QApplication.palette()
+    return palette.color(QPalette.Base).black() >= 0x80
 
 # _styles maps from ui labels to effects
 # _effects maps an effect to font style properties.  We define a limited
@@ -279,8 +282,10 @@ _thgstyles = {
    'log.modified': 'black #ffddaa_background',
    'log.added': 'black #aaffaa_background',
    'log.removed': 'black #ffcccc_background',
+   'log.warning': 'black #ffcccc_background',
    'status.deleted': 'red bold',
    'ui.error': 'red bold #ffcccc_background',
+   'ui.warning': 'black bold #ffffaa_background',
    'control': 'black bold #dddddd_background',
 }
 
@@ -334,8 +339,15 @@ def geteffect(labels):
                 effects.append('color: ' + e)
     return ';'.join(effects)
 
-def applyeffects(chars, effects):
-    return '<span style="white-space: pre;%s">%s</span>' % (effects, chars)
+def gettextcoloreffect(labels):
+    """Map labels like "log.date" to foreground color if available"""
+    for l in str(labels).split():
+        if not l:
+            continue
+        for e in _styles.get(l, '').split():
+            if e.startswith('#') or e in QColor.colorNames():
+                return QColor(e)
+    return QColor()
 
 def getbgcoloreffect(labels):
     """Map labels like "log.date" to background color if available
@@ -502,6 +514,7 @@ _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
                         (QSize(), 'scalable/apps', '.svg'),
                         (QSize(), 'scalable/status', '.svg'),
                         (QSize(16, 16), '16x16/apps', '.png'),
+                        (QSize(16, 16), '16x16/mimetypes', '.png'),
                         (QSize(22, 22), '22x22/actions', '.png'),
                         (QSize(32, 32), '32x32/actions', '.png'),
                         (QSize(24, 24), '24x24/actions', '.png')]
@@ -580,6 +593,21 @@ def getcheckboxpixmap(state, bgcolor, widget):
     style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
     return pix
 
+def smallIconSize():
+    style = QApplication.style()
+    s = style.pixelMetric(QStyle.PM_SmallIconSize)
+    return QSize(s, s)
+
+def toolBarIconSize():
+    if sys.platform == 'darwin':
+        # most Mac users will have laptop-sized screens and prefer a smaller
+        # toolbar to preserve vertical space.
+        style = QCommonStyle()
+    else:
+        style = QApplication.style()
+    s = style.pixelMetric(QStyle.PM_ToolBarIconSize)
+    return QSize(s, s)
+
 class ThgFont(QObject):
     changed = pyqtSignal(QFont)
     def __init__(self, name):
@@ -606,18 +634,11 @@ _fontcache = {}
 def initfontcache(ui):
     for name in _fontdefaults:
         fname = ui.config('tortoisehg', name, _fontdefaults[name])
-        _fontcache[name] = ThgFont(fname)
+        _fontcache[name] = ThgFont(hglib.tounicode(fname))
 
 def getfont(name):
     assert name in _fontdefaults
     return _fontcache[name]
-
-def gettranslationpath():
-    """Return path to Qt's translation file (.qm)"""
-    if getattr(sys, 'frozen', False):
-        return ':/translations'
-    else:
-        return QLibraryInfo.location(QLibraryInfo.TranslationsPath)
 
 def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Ok,
                  labels=[], parent=None, defaultbutton=None):
@@ -725,30 +746,6 @@ class ChoicePrompt(QDialog):
             return self.choices[self.choice_combo.currentIndex()]
         return None
 
-def setup_font_substitutions():
-    QFont.insertSubstitutions('monospace', ['monaco', 'courier new'])
-
-def fix_application_font():
-    if os.name != 'nt':
-        return
-    try:
-        import win32gui, win32con
-    except ImportError:
-        return
-
-    # use configurable font like GTK, Mozilla XUL or Eclipse SWT
-    ncm = win32gui.SystemParametersInfo(win32con.SPI_GETNONCLIENTMETRICS)
-    lf = ncm['lfMessageFont']
-    f = QFont(hglib.tounicode(lf.lfFaceName))
-    f.setItalic(lf.lfItalic)
-    if lf.lfWeight != win32con.FW_DONTCARE:
-        weights = [(0, QFont.Light), (400, QFont.Normal), (600, QFont.DemiBold),
-                   (700, QFont.Bold), (800, QFont.Black)]
-        n, w = filter(lambda e: e[0] <= lf.lfWeight, weights)[-1]
-        f.setWeight(w)
-    f.setPixelSize(abs(lf.lfHeight))
-    QApplication.setFont(f, 'QWidget')
-
 def allowCaseChangingInput(combo):
     """Allow case-changing input of known combobox item
 
@@ -761,6 +758,82 @@ def allowCaseChangingInput(combo):
     """
     assert isinstance(combo, QComboBox) and combo.isEditable()
     combo.completer().setCaseSensitivity(Qt.CaseSensitive)
+
+class BadCompletionBlocker(QObject):
+    """Disable unexpected inline completion by enter key if selectAll()-ed
+
+    If the selection state looks in the middle of the completion, QComboBox
+    replaces the edit text by the current completion on enter key pressed.
+    This is wrong in the following scenario:
+
+    >>> combo = QComboBox(editable=True)
+    >>> combo.addItem('history value')
+    >>> combo.setEditText('initial value')
+    >>> combo.lineEdit().selectAll()
+    >>> QApplication.sendEvent(
+    ...     combo, QKeyEvent(QEvent.KeyPress, Qt.Key_Enter, Qt.NoModifier))
+    True
+    >>> str(combo.currentText())
+    'history value'
+
+    In this example, QLineControl picks the first item in the combo box
+    because the completion prefix has not been set.
+
+    BadCompletionBlocker is intended to work around this problem.
+
+    >>> combo.installEventFilter(BadCompletionBlocker(combo))
+    >>> combo.setEditText('initial value')
+    >>> combo.lineEdit().selectAll()
+    >>> QApplication.sendEvent(
+    ...     combo, QKeyEvent(QEvent.KeyPress, Qt.Key_Enter, Qt.NoModifier))
+    True
+    >>> str(combo.currentText())
+    'initial value'
+
+    For details, read QLineControl::processKeyEvent() and complete() of
+    src/gui/widgets/qlinecontrol.cpp.
+    """
+
+    def __init__(self, parent):
+        super(BadCompletionBlocker, self).__init__(parent)
+        if not isinstance(parent, QComboBox):
+            raise ValueError('invalid object to watch: %r' % parent)
+
+    def eventFilter(self, watched, event):
+        if watched is not self.parent():
+            return super(BadCompletionBlocker, self).eventFilter(watched, event)
+        if (event.type() != QEvent.KeyPress
+            or event.key() not in (Qt.Key_Enter, Qt.Key_Return)
+            or not watched.isEditable()):
+            return False
+        # deselect without completion if all text selected
+        le = watched.lineEdit()
+        if le.selectedText() == le.text():
+            le.deselect()
+        return False
+
+class ActionPushButton(QPushButton):
+    """Button which properties are defined by QAction like QToolButton"""
+
+    def __init__(self, action, parent=None):
+        super(ActionPushButton, self).__init__(parent)
+        self.setAutoDefault(False)  # action won't be used as dialog default
+        self._defaultAction = action
+        self.addAction(action)
+        self.clicked.connect(action.trigger)
+        self._copyActionProps()
+
+    def actionEvent(self, event):
+        if (event.type() == QEvent.ActionChanged
+            and event.action() is self._defaultAction):
+            self._copyActionProps()
+        super(ActionPushButton, self).actionEvent(event)
+
+    def _copyActionProps(self):
+        action = self._defaultAction
+        self.setEnabled(action.isEnabled())
+        self.setText(action.text())
+        self.setToolTip(action.toolTip())
 
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
@@ -826,7 +899,7 @@ class ExpanderLabel(QWidget):
         self.button.clicked.connect(self.pm_clicked)
         box.addWidget(self.button)
         self.label = ClickableLabel(label, self)
-        self.label.clicked.connect(lambda: self.button.click())
+        self.label.clicked.connect(self.button.click)
         box.addWidget(self.label)
         if not stretch:
             box.addStretch(0)
@@ -848,6 +921,8 @@ class StatusLabel(QWidget):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
+        # same policy as status bar of QMainWindow
+        self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 
         box = QHBoxLayout()
         box.setContentsMargins(*(0,)*4)
@@ -888,7 +963,7 @@ class StatusLabel(QWidget):
                 icon = geticon(icon)
             elif not isinstance(icon, QIcon):
                 raise TypeError, '%s: bool, str or QIcon' % type(icon)
-            self.status_icon.setShown(True)
+            self.status_icon.setVisible(True)
             self.status_icon.setPixmap(icon.pixmap(16, 16))
 
     def clear_icon(self):
@@ -913,199 +988,6 @@ class LabeledSeparator(QWidget):
         box.addWidget(sep, 1, Qt.AlignVCenter)
 
         self.setLayout(box)
-
-# Strings and regexes used to convert hashes and subrepo paths into links
-_hashregex = re.compile(r'\b[0-9a-fA-F]{12,}')
-# Currently converting subrepo paths into links only works in English
-_subrepoindicatorpattern = hglib.tounicode(hggettext('(in subrepo %s)') + '\n')
-
-def _linkifyHash(message, subrepo=''):
-    if subrepo:
-        p = 'repo:%s?' % subrepo
-    else:
-        p = 'cset:'
-    replaceexpr = lambda m: '<a href="%s">%s</a>' % (p + m.group(0), m.group(0))
-    return _hashregex.sub(replaceexpr, message)
-
-def _linkifySubrepoRef(message, subrepo, hash=''):
-    if hash:
-        hash = '?' + hash
-    subrepolink = '<a href="repo:%s%s">%s</a>' % (subrepo, hash, subrepo)
-    subrepoindicator = _subrepoindicatorpattern % subrepo
-    linkifiedsubrepoindicator = _subrepoindicatorpattern % subrepolink
-    message = message.replace(subrepoindicator, linkifiedsubrepoindicator)
-    return message
-
-def linkifyMessage(message, subrepo=None):
-    r"""Convert revision id hashes and subrepo paths in messages into links
-
-    >>> linkifyMessage('abort: 0123456789ab!\nhint: foo\n')
-    u'abort: <a href="cset:0123456789ab">0123456789ab</a>!<br>hint: foo<br>'
-    >>> linkifyMessage('abort: foo (in subrepo bar)\n', subrepo='bar')
-    u'abort: foo (in subrepo <a href="repo:bar">bar</a>)<br>'
-    >>> linkifyMessage('abort: 0123456789ab! (in subrepo bar)\nhint: foo\n',
-    ...                subrepo='bar') #doctest: +NORMALIZE_WHITESPACE
-    u'abort: <a href="repo:bar?0123456789ab">0123456789ab</a>!
-    (in subrepo <a href="repo:bar?0123456789ab">bar</a>)<br>hint: foo<br>'
-
-    subrepo name containing regexp backreference, \g:
-
-    >>> linkifyMessage('abort: 0123456789ab! (in subrepo foo\\goo)\n',
-    ...                subrepo='foo\\goo') #doctest: +NORMALIZE_WHITESPACE
-    u'abort: <a href="repo:foo\\goo?0123456789ab">0123456789ab</a>!
-    (in subrepo <a href="repo:foo\\goo?0123456789ab">foo\\goo</a>)<br>'
-    """
-    message = unicode(message)
-    message = _linkifyHash(message, subrepo)
-    if subrepo:
-        hash = ''
-        m = _hashregex.search(message)
-        if m:
-            hash = m.group(0)
-        message = _linkifySubrepoRef(message, subrepo, hash)
-    return message.replace('\n', '<br>')
-
-class InfoBar(QFrame):
-    """Non-modal confirmation/alert (like web flash or Chrome's InfoBar)
-
-    Layout::
-
-        |widgets ...                |right widgets ...|x|
-    """
-    finished = pyqtSignal(int)  # mimic QDialog
-    linkActivated = pyqtSignal(unicode)
-
-    # type of InfoBar (the number denotes its priority)
-    INFO = 1
-    ERROR = 2
-    CONFIRM = 3
-
-    infobartype = INFO
-
-    _colormap = {
-        INFO: '#e7f9e0',
-        ERROR: '#f9d8d8',
-        CONFIRM: '#fae9b3',
-        }
-
-    def __init__(self, parent=None):
-        super(InfoBar, self).__init__(parent, frameShape=QFrame.StyledPanel,
-                                      frameShadow=QFrame.Plain)
-        self.setAutoFillBackground(True)
-        p = self.palette()
-        p.setColor(QPalette.Window, QColor(self._colormap[self.infobartype]))
-        p.setColor(QPalette.WindowText, QColor("black"))
-        self.setPalette(p)
-
-        self.setLayout(QHBoxLayout())
-        self.layout().setContentsMargins(2, 2, 2, 2)
-
-        self.layout().addStretch()
-        self._closebutton = QPushButton(self, flat=True, autoDefault=False,
-            icon=self.style().standardIcon(QStyle.SP_DockWidgetCloseButton))
-        self._closebutton.clicked.connect(self.close)
-        self.layout().addWidget(self._closebutton)
-
-    def addWidget(self, w, stretch=0):
-        self.layout().insertWidget(self.layout().count() - 2, w, stretch)
-
-    def addRightWidget(self, w):
-        self.layout().insertWidget(self.layout().count() - 1, w)
-
-    def closeEvent(self, event):
-        if self.isVisible():
-            self.finished.emit(0)
-        super(InfoBar, self).closeEvent(event)
-
-    def keyPressEvent(self, event):
-        if event.key() == Qt.Key_Escape:
-            self.close()
-        super(InfoBar, self).keyPressEvent(event)
-
-    def heightForWidth(self, width):
-        # loosely based on the internal strategy of QBoxLayout
-        if self.layout().hasHeightForWidth():
-            return super(InfoBar, self).heightForWidth(width)
-        else:
-            return self.sizeHint().height()
-
-class StatusInfoBar(InfoBar):
-    """Show status message"""
-    def __init__(self, message, parent=None):
-        super(StatusInfoBar, self).__init__(parent)
-        self._msglabel = QLabel(message, self,
-                                wordWrap=True,
-                                textInteractionFlags=Qt.TextSelectableByMouse \
-                                | Qt.LinksAccessibleByMouse)
-        self._msglabel.linkActivated.connect(self.linkActivated)
-        self.addWidget(self._msglabel, stretch=1)
-
-class CommandErrorInfoBar(InfoBar):
-    """Show command execution failure (with link to open log window)"""
-    infobartype = InfoBar.ERROR
-
-    def __init__(self, message, parent=None):
-        super(CommandErrorInfoBar, self).__init__(parent)
-
-        self._msglabel = QLabel(message, self,
-                                wordWrap=True,
-                                textInteractionFlags=Qt.TextSelectableByMouse \
-                                | Qt.LinksAccessibleByMouse)
-        self._msglabel.linkActivated.connect(self.linkActivated)
-        self.addWidget(self._msglabel, stretch=1)
-
-        self._loglabel = QLabel('<a href="log:">%s</a>' % _('Show Log'))
-        self._loglabel.linkActivated.connect(self.linkActivated)
-        self.addRightWidget(self._loglabel)
-
-class ConfirmInfoBar(InfoBar):
-    """Show confirmation message with accept/reject buttons"""
-    accepted = pyqtSignal()
-    rejected = pyqtSignal()
-    infobartype = InfoBar.CONFIRM
-
-    def __init__(self, message, parent=None):
-        super(ConfirmInfoBar, self).__init__(parent)
-
-        # no wordWrap=True and stretch=1, which inserts unwanted space
-        # between _msglabel and _buttons.
-        self._msglabel = QLabel(message, self,
-                                textInteractionFlags=Qt.TextSelectableByMouse \
-                                | Qt.LinksAccessibleByMouse)
-        self._msglabel.linkActivated.connect(self.linkActivated)
-        self.addWidget(self._msglabel)
-
-        self._buttons = QDialogButtonBox(self)
-        self._buttons.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        self.acceptButton = self._buttons.addButton(QDialogButtonBox.Ok)
-        self.rejectButton = self._buttons.addButton(QDialogButtonBox.Cancel)
-        self._buttons.accepted.connect(self._accept)
-        self._buttons.rejected.connect(self._reject)
-        self.addWidget(self._buttons)
-
-        # so that acceptButton gets focus by default
-        self.setFocusProxy(self._buttons)
-
-    def closeEvent(self, event):
-        if self.isVisible():
-            self.finished.emit(1)
-            self.rejected.emit()
-            self.hide()  # avoid double emission of finished signal
-        super(ConfirmInfoBar, self).closeEvent(event)
-
-    @pyqtSlot()
-    def _accept(self):
-        self.finished.emit(0)
-        self.accepted.emit()
-        self.hide()
-        self.close()
-
-    @pyqtSlot()
-    def _reject(self):
-        self.finished.emit(1)
-        self.rejected.emit()
-        self.hide()
-        self.close()
 
 class WidgetGroups(object):
     """ Support for bulk-updating properties of Qt widgets """
@@ -1168,11 +1050,15 @@ class DialogKeeper(QObject):
     >>> dialogs.count()
     1
 
-    closed dialog will be disowned:
+    closed dialog will be deleted:
+
+    >>> def processDeferredDeletion():
+    ...     loop = QEventLoop()
+    ...     QTimer.singleShot(0, loop.quit)
+    ...     loop.exec_()
 
     >>> dlg1.reject()
-    >>> dlg1.parent() is None
-    True
+    >>> processDeferredDeletion()
     >>> dialogs.count()
     0
 
@@ -1195,6 +1081,7 @@ class DialogKeeper(QObject):
     >>> dialogs.open(QDialog) is dlg4
     True
     >>> dlg4.reject()
+    >>> processDeferredDeletion()
     >>> dialogs.count()
     1
     >>> dialogs.open(QDialog) is dlg3
@@ -1205,33 +1092,6 @@ class DialogKeeper(QObject):
 
         self._dialogs = DialogKeeper(self._createDialog)
         self._dialogs = DialogKeeper(lambda *args: Foo(self))
-
-    When to delete reference:
-
-    If a dialog is not referenced, and if accept(), reject() and done() are
-    not overridden, it could be garbage-collected during finished signal and
-    lead to hard crash::
-
-        #0  isSignalConnected (signal_index=..., this=0x0)
-        #1  QMetaObject::activate (...)
-        #2  ... in sipQDialog::done (this=0x1d655b0, ...)
-        #3  ... in sipQDialog::reject (this=0x1d655b0)
-        #4  ... in QDialog::closeEvent (this=this@entry=0x1d655b0, ...)
-
-    To avoid crash, a finished dialog is referenced explicitly by DialogKeeper
-    until next event processing.
-
-    >>> dialogs = DialogKeeper(QDialog)
-    >>> dlgref = weakref.ref(dialogs.open())
-    >>> dialogs.count()
-    1
-    >>> esckeyev = QKeyEvent(QEvent.KeyPress, Qt.Key_Escape, Qt.NoModifier)
-    >>> QApplication.postEvent(dlgref(), esckeyev)  # close without incref
-    >>> QApplication.processEvents()  # should not crash
-    >>> dialogs.count()
-    0
-    >>> dlgref() is None  # nobody should have reference
-    True
     """
 
     def __init__(self, createdlg, genkey=None, parent=None):
@@ -1239,11 +1099,6 @@ class DialogKeeper(QObject):
         self._createdlg = createdlg
         self._genkey = genkey or DialogKeeper._defaultgenkey
         self._keytodlgs = {}  # key: [dlg, ...]
-        self._dlgtokey = {}   # dlg: key
-
-        self._garbagedlgs = []
-        self._emptygarbagelater = QTimer(self, interval=0, singleShot=True)
-        self._emptygarbagelater.timeout.connect(self._emptygarbage)
 
     def open(self, *args, **kwargs):
         """Create new dialog or reactivate existing dialog"""
@@ -1275,33 +1130,22 @@ class DialogKeeper(QObject):
         if key not in self._keytodlgs:
             self._keytodlgs[key] = []
         self._keytodlgs[key].append(dlg)
-        self._dlgtokey[dlg] = key
-        dlg.finished.connect(self._forgetdlg)
+        dlg.setAttribute(Qt.WA_DeleteOnClose)
+        dlg.destroyed.connect(self._cleanupdlgs)
         return dlg
 
-    #@pyqtSlot()
-    def _forgetdlg(self):
-        dlg = self.sender()
-        dlg.finished.disconnect(self._forgetdlg)
-        if dlg.parent() is self.parent():
-            dlg.setParent(None)  # assist gc
-        key = self._dlgtokey.pop(dlg)
-        self._keytodlgs[key].remove(dlg)
-        if not self._keytodlgs[key]:
-            del self._keytodlgs[key]
-
-        # avoid deletion inside finished signal
-        self._garbagedlgs.append(dlg)
-        self._emptygarbagelater.start()
-
+    # "destroyed" is emitted soon after Python wrapper is deleted
     @pyqtSlot()
-    def _emptygarbage(self):
-        del self._garbagedlgs[:]
+    def _cleanupdlgs(self):
+        for key, dialogs in self._keytodlgs.items():
+            livedialogs = [dlg for dlg in dialogs if not sip.isdeleted(dlg)]
+            if livedialogs:
+                self._keytodlgs[key] = livedialogs
+            else:
+                del self._keytodlgs[key]
 
     def count(self):
-        assert len(self._dlgtokey) == sum(len(dlgs) for dlgs
-                                          in self._keytodlgs.itervalues())
-        return len(self._dlgtokey)
+        return sum(len(dlgs) for dlgs in self._keytodlgs.itervalues())
 
     @staticmethod
     def _defaultgenkey(_parent, *args, **_kwargs):
@@ -1314,6 +1158,9 @@ class TaskWidget(object):
 
     def canExit(self):
         return True
+
+    def reload(self):
+        pass
 
 class DemandWidget(QWidget):
     'Create a widget the first time it is shown'
@@ -1376,7 +1223,8 @@ class Spacer(QWidget):
 def _configuredusername(ui):
     # need to check the existence before calling ui.username(); otherwise it
     # may fall back to the system default.
-    if (not os.environ.get('HGUSER') and not ui.config('ui', 'username')
+    if (not os.environ.get('HGUSER')
+        and not ui.config('ui', ['username', 'user'])
         and not os.environ.get('EMAIL')):
         return None
     try:
@@ -1474,12 +1322,9 @@ class PaletteSwitcher(object):
     def __init__(self, targetwidget):
         self._targetwref = weakref.ref(targetwidget)  # avoid circular ref
         self._defaultpalette = targetwidget.palette()
-        bgcolor = self._defaultpalette.color(QPalette.Base)
-        if bgcolor.black() <= 128:
-            # Light theme
+        if not isdarktheme(self._defaultpalette):
             filterbgcolor = QColor('#FFFFB7')
         else:
-            # Dark theme
             filterbgcolor = QColor('darkgrey')
         self._filterpalette = QPalette()
         self._filterpalette.setColor(QPalette.Base, filterbgcolor)

@@ -27,8 +27,7 @@ Tabs" across the top of the main window.
 Each repository tab supports multiple "Task Tabs" beneath its graph
 splitter.  These task tabs are switchable via icons on the side of
 the Workbench or via application menus.  Available task tabs include a
-changeset browser, a commit tool, a manifest browser, a history search
-widget, and a sync widget.
+changeset browser, a commit tool, a history search widget, and a sync widget.
 
 Also available are two dockable widgets - a *Repository Registry* which
 lists all known repositories on your local machine and an *Output Log
@@ -92,7 +91,7 @@ Qt and PyQt
 ~~~~~~~~~~~
 
 TortoiseHg 2.0 has been a near rewrite of all of the tools and dialogs
-taking advantage of Nokia's excellent `Qt <http://qt.nokia.com/products/>`_
+taking advantage of Digia's excellent `Qt <https://qt-project.org/>`_
 UI framework and Riverbank Computing's fine
 `PyQt <http://www.riverbankcomputing.co.uk/software/pyqt/intro>`_ Python
 bindings.

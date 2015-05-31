@@ -11,7 +11,7 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciLexerMakefile
 
-from tortoisehg.hgqt.i18n import _
+from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, qscilib
 
 import re
@@ -63,9 +63,14 @@ class MessageEntry(qscilib.Scintilla):
             self.setLexer(None)
             self.setFont(font)
 
+    @pyqtSlot(QPoint)
     def menuRequested(self, point):
+        menu = self._createContextMenu(point)
+        menu.exec_(self.viewport().mapToGlobal(point))
+        menu.setParent(None)
+
+    def _createContextMenu(self, point):
         line = self.lineAt(point)
-        point = self.viewport().mapToGlobal(point)
         lexerenabled = self.lexer() is not None
 
         def apply():
@@ -83,7 +88,7 @@ class MessageEntry(qscilib.Scintilla):
 
         def paste():
             files = self.getChecked()
-            self.insert('\n'.join(files))
+            self.insert('\n'.join(sorted(files)))
         def settings():
             from tortoisehg.hgqt.settings import SettingsDialog
             dlg = SettingsDialog(True, focus='tortoisehg.summarylen')
@@ -92,7 +97,7 @@ class MessageEntry(qscilib.Scintilla):
             QSettings().setValue('msgentry/lexer', not lexerenabled)
             self.applylexer()
 
-        menu = self.createStandardContextMenu()
+        menu = self.createEditorContextMenu()
         menu.addSeparator()
         a = menu.addAction(_('Syntax Highlighting'))
         a.setCheckable(True)
@@ -108,7 +113,7 @@ class MessageEntry(qscilib.Scintilla):
                 action = menu.addAction(name)
                 action.triggered.connect(func)
             add(name, func)
-        return menu.exec_(point)
+        return menu
 
     def refresh(self, repo):
         self.setEdgeColumn(repo.summarylen)
@@ -176,7 +181,13 @@ class MessageEntry(qscilib.Scintilla):
         if b == e == 0:
             return line + 1
 
-        group = QStringList([lines[l].simplified() for l in xrange(b, e+1)])
+        group = [lines[l] for l in xrange(b, e+1)]
+        MARKER = u'\033\033\033\033\033'
+        curlinenum, curcol = self.getCursorPosition()
+        if b <= curlinenum <= e:
+            # insert a "marker" at the cursor position
+            group[curlinenum - b] = \
+                group[curlinenum - b].insert(curcol, MARKER)
         firstlinetext = unicode(lines[b])
         if firstlinetext:
             indentcount = len(firstlinetext) - len(firstlinetext.lstrip())
@@ -184,13 +195,24 @@ class MessageEntry(qscilib.Scintilla):
         else:
             indentcount = 0
             firstindent = ''
+        group = QStringList([line.simplified() for line in group])
         sentence = group.join(' ')
         parts = sentence.split(' ', QString.SkipEmptyParts)
 
         outlines = QStringList()
         line = QStringList()
         partslen = indentcount - 1
+        newcurlinenum, newcurcol = b, 0
         for part in parts:
+            if MARKER and MARKER in part:
+                # wherever the marker is found, that is where the cursor
+                # must be moved to after the reflow is done
+                newcurlinenum = b + len(outlines)
+                newcurcol = len(line.join(' ')) + 1 + part.indexOf(MARKER)
+                part = part.replace(MARKER, '')
+                MARKER = None  # there is no need to search any more
+                if not part:
+                    continue
             if partslen + len(line) + len(part) + 1 > self.summarylen:
                 if line:
                     linetext = line.join(' ')
@@ -208,7 +230,8 @@ class MessageEntry(qscilib.Scintilla):
         self.removeSelectedText()
         self.insertAt(outlines.join('\n')+'\n', b, 0)
         self.endUndoAction()
-        self.setCursorPosition(b, 0)
+        # restore the cursor position
+        self.setCursorPosition(newcurlinenum, newcurcol)
         return b + len(outlines) + 1
 
     def moveCursorToEnd(self):
@@ -224,10 +247,6 @@ class MessageEntry(qscilib.Scintilla):
         if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_E:
             line, col = self.getCursorPosition()
             self.reflowBlock(line)
-        elif event.key() == Qt.Key_Backtab:
-            event.accept()
-            newev = QKeyEvent(event.type(), Qt.Key_Tab, Qt.ShiftModifier)
-            super(MessageEntry, self).keyPressEvent(newev)
         else:
             super(MessageEntry, self).keyPressEvent(event)
 

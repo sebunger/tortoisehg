@@ -10,8 +10,8 @@ import os
 from mercurial import commands, hg, ui, util
 
 from tortoisehg.util import hglib, paths
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, repotreemodel, clone, settings
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib, repotreemodel, settings
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -225,11 +225,14 @@ class RepoRegistryView(QDockWidget):
     showMessage = pyqtSignal(QString)
     openRepo = pyqtSignal(QString, bool)
     removeRepo = pyqtSignal(QString)
+    cloneRepoRequested = pyqtSignal(QString)
     progressReceived = pyqtSignal(QString, object, QString, QString, object)
 
-    def __init__(self, parent):
+    def __init__(self, repomanager, parent):
         QDockWidget.__init__(self, parent)
 
+        self._repomanager = repomanager
+        repomanager.repositoryOpened.connect(self._addAndScanRepo)
         self.watcher = None
         self._setupSettingActions()
 
@@ -262,7 +265,7 @@ class RepoRegistryView(QDockWidget):
         self._updateSettingActions()
 
         sfile = settingsfilename()
-        model = repotreemodel.RepoTreeModel(sfile, self,
+        model = repotreemodel.RepoTreeModel(sfile, repomanager, self,
             showShortPaths=self._isSettingEnabled('showShortPaths'))
         tv.setModel(model)
 
@@ -284,7 +287,7 @@ class RepoRegistryView(QDockWidget):
 
     @pyqtSlot()
     def _initView(self):
-        self.expand()
+        self._loadExpandedState()
         self._updateColumnVisibility()
         if self._isSettingEnabled('showSubrepos'):
             self._scanAllRepos()
@@ -303,6 +306,15 @@ class RepoRegistryView(QDockWidget):
         s.beginGroup('Workbench')  # for compatibility with old release
         for key, action in self._settingactions.iteritems():
             s.setValue(key, action.isChecked())
+        s.endGroup()
+        s.beginGroup('reporegistry')
+        self._writeExpandedState(s)
+        s.endGroup()
+
+    def _loadExpandedState(self):
+        s = QSettings()
+        s.beginGroup('reporegistry')
+        self._readExpandedState(s)
         s.endGroup()
 
     def _setupSettingActions(self):
@@ -366,22 +378,34 @@ class RepoRegistryView(QDockWidget):
     def reloadModel(self):
         oldmodel = self.tview.model()
         activeroot = oldmodel.repoRoot(oldmodel.activeRepoIndex())
-        newmodel = repotreemodel.RepoTreeModel(settingsfilename(), self,
+        newmodel = repotreemodel.RepoTreeModel(settingsfilename(),
+            self._repomanager, self,
             self._isSettingEnabled('showShortPaths'))
         self.tview.setModel(newmodel)
         oldmodel.deleteLater()
         if self._isSettingEnabled('showSubrepos'):
             self._scanAllRepos()
-        self.expand()
+        self._loadExpandedState()
         if activeroot:
             self.setActiveTabRepo(activeroot)
         self._reloadModelTimer.stop()
 
-    def expand(self):
-        self.tview.expandToDepth(0)
+    def _readExpandedState(self, s):
+        model = self.tview.model()
+        for path in s.value('expanded').toStringList():
+            self.tview.expand(model.indexFromItemPath(path))
 
-    def addRepo(self, uroot):
+    def _writeExpandedState(self, s):
+        model = self.tview.model()
+        paths = [model.itemPath(i) for i in model.persistentIndexList()
+                 if i.column() == 0 and self.tview.isExpanded(i)]
+        s.setValue('expanded', paths)
+
+    # TODO: better to handle repositoryOpened signal by model
+    @pyqtSlot(unicode)
+    def _addAndScanRepo(self, uroot):
         """Add repo if not exists; called when the workbench has opened it"""
+        uroot = unicode(uroot)
         m = self.tview.model()
         knownindex = m.indexFromRepoRoot(uroot)
         if knownindex.isValid():
@@ -390,6 +414,14 @@ class RepoRegistryView(QDockWidget):
             index = m.addRepo(uroot)
             self._scanAddedRepo(index)
             self.updateSettingsFile()
+
+    def addClonedRepo(self, root, sourceroot):
+        """Add repo to the same group as the source"""
+        m = self.tview.model()
+        src = m.indexFromRepoRoot(sourceroot, standalone=True)
+        if src.isValid() and not m.isKnownRepoRoot(root):
+            index = m.addRepo(root, parent=src.parent())
+            self._scanAddedRepo(index)
 
     def setActiveTabRepo(self, root):
         """"The selected tab has changed on the workbench"""
@@ -442,6 +474,10 @@ class RepoRegistryView(QDockWidget):
              ("addsubrepo", _("A&dd Subrepository..."), 'thg-add-subrepo',
                 _("Convert an existing repository into a subrepository"),
                 self.addSubrepo),
+             ("removesubrepo", _("Remo&ve Subrepository..."),
+                'thg-remove-subrepo',
+                _("Remove this subrepository from the current revision"),
+                self.removeSubrepo),
              ("copypath", _("Copy &Path"), '',
                 _("Copy the root path of the repository to the clipboard"),
                 self.copyPath),
@@ -496,10 +532,7 @@ class RepoRegistryView(QDockWidget):
 
     def cloneRepo(self):
         root = self.selitem.internalPointer().rootpath()
-        d = clone.CloneDialog(args=[root, root + '-clone'], parent=self)
-        d.finished.connect(d.deleteLater)
-        d.clonedRepository.connect(self._openClone)
-        d.show()
+        self.cloneRepoRequested.emit(hglib.tounicode(root))
 
     def explore(self):
         root = self.selitem.internalPointer().rootpath()
@@ -507,7 +540,8 @@ class RepoRegistryView(QDockWidget):
 
     def terminal(self):
         repoitem = self.selitem.internalPointer()
-        qtlib.openshell(repoitem.rootpath(), repoitem.shortname())
+        qtlib.openshell(repoitem.rootpath(),
+                        hglib.fromunicode(repoitem.shortname()))
 
     def addNewRepo(self):
         'menu action handler for adding a new repository'
@@ -582,8 +616,6 @@ class RepoRegistryView(QDockWidget):
                         'as: "%s"') % (sroot, root, srelroot), parent=self)
                     return
                 else:
-                    # Already a subrepo!
-
                     # Read the current .hgsub file contents
                     lines = []
                     hasHgsub = os.path.exists(repo.wjoin('.hgsub'))
@@ -602,6 +634,8 @@ class RepoRegistryView(QDockWidget):
                     # Make sure that the selected subrepo (or one of its
                     # subrepos!) is not already on the .hgsub file
                     linesep = ''
+                    # On Windows case is unimportant, while on posix it is
+                    srelrootnormcase = os.path.normcase(srelroot)
                     for line in lines:
                         line = hglib.tounicode(line)
                         spath = line.split("=")[0].strip()
@@ -610,7 +644,7 @@ class RepoRegistryView(QDockWidget):
                         if not linesep:
                             linesep = hglib.getLineSeparator(line)
                         spath = util.pconvert(spath)
-                        if line.startswith(srelroot):
+                        if os.path.normcase(spath) == srelrootnormcase:
                             qtlib.WarningMsgBox(
                                 _('Failed to add repository'),
                                 _('The .hgsub file already contains the '
@@ -647,6 +681,64 @@ class RepoRegistryView(QDockWidget):
                             % root, parent=self)
                 return
 
+    def removeSubrepo(self):
+        'menu action handler for removing an existing subrepository'
+        path = hglib.tounicode(self.selitem.internalPointer().rootpath())
+        containerpath = os.path.normpath(os.path.join(path, '..'))
+        root = paths.find_root(containerpath)
+        relsubpath = os.path.normcase(os.path.normpath(path[1+len(root):]))
+        hgsubfilename = os.path.join(root, '.hgsub')
+
+        try:
+            f = open(hgsubfilename, 'r')
+            hgsub = []
+            found = False
+            for line in f.readlines():
+                spath = os.path.normcase(
+                    os.path.normpath(
+                        line.split('=')[0].strip()))
+                if spath != relsubpath:
+                    hgsub.append(line)
+                else:
+                    found = True
+            f.close()
+        except IOError:
+            qtlib.ErrorMsgBox(_('Could not open .hgsub file'),
+                _('Cannot read the .hgsub file.<p>'
+                  'Subrepository removal failed.'),
+                parent=self)
+            return
+
+        if not found:
+            qtlib.WarningMsgBox(_('Subrepository not found'),
+                _('The selected subrepository was not found '
+                  'on the .hgsub file.<p>'
+                  'Perhaps it has already been removed?'),
+                parent=self)
+            return
+        choices = (_('&Yes'), _('&No'))
+        answer = qtlib.CustomPrompt(_('Remove the selected repository?'),
+            _('Do you really want to remove the repository "<i>%s</i>" '
+              'from its parent repository "<i>%s</i>"') % (relsubpath, root),
+            self, choices=choices, default=choices[0]).run()
+        if answer != 0:
+            return
+        try:
+            f = open(hgsubfilename, 'w')
+            f.writelines(hgsub)
+            f.close()
+            qtlib.InfoMsgBox(_('Subrepository removed from .hgsub'),
+                _('The selected subrepository has been removed '
+                  'from the .hgsub file.<p>'
+                  'Remember that you must commit this .hgsub change in order '
+                  'to complete the removal of the subrepository!'),
+                parent=self)
+        except IOError:
+            qtlib.ErrorMsgBox(_('Could not update .hgsub file'),
+                _('Cannot update the .hgsub file.<p>'
+                  'Subrepository removal failed.'),
+                parent=self)
+
     def startSettings(self):
         root = self.selitem.internalPointer().rootpath()
         sd = settings.SettingsDialog(configrepo=True, focus='web.name',
@@ -657,15 +749,6 @@ class RepoRegistryView(QDockWidget):
     def openAll(self):
         for root in self.selitem.internalPointer().childRoots():
             self.openRepo.emit(hglib.tounicode(root), False)
-
-    @pyqtSlot(unicode, unicode)
-    def _openClone(self, root, sourceroot):
-        m = self.tview.model()
-        src = m.indexFromRepoRoot(sourceroot, standalone=True)
-        if src.isValid() and not m.isKnownRepoRoot(root):
-            index = m.addRepo(root, parent=src.parent())
-            self._scanAddedRepo(index)
-        self.open(root)
 
     def open(self, root=None):
         'open context menu action, open repowidget unconditionally'
@@ -737,17 +820,6 @@ class RepoRegistryView(QDockWidget):
                 return 0
         self.tview.model().sortchilds(ip.childs, keyfunc)
 
-    def setShortName(self, uroot, uname):
-        it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
-        if it:
-            it.setShortName(uname)
-            self.tview.model().layoutChanged.emit()
-
-    def setBaseNode(self, uroot, basenode):
-        it = self.tview.model().getRepoItem(hglib.fromunicode(uroot))
-        if it:
-            it.setBaseNode(basenode)
-
     def _scanAddedRepo(self, index):
         m = self.tview.model()
         invalidpaths = m.loadSubrepos(index)
@@ -780,7 +852,7 @@ class RepoRegistryView(QDockWidget):
         indexes = m.indexesOfRepoItems(standalone=True)
         if not self._isSettingEnabled('showNetworkSubrepos'):
             indexes = [idx for idx in indexes
-                       if not paths.netdrive_status(m.repoRoot(idx))]
+                       if paths.is_on_fixed_drive(m.repoRoot(idx))]
 
         topic = _('Updating repository registry')
         for n, idx in enumerate(indexes):

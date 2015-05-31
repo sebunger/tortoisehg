@@ -11,8 +11,8 @@ from mercurial import ui, util, error, extensions, scmutil, phases
 
 from tortoisehg.util import hglib, paths, wconfig, i18n, editor
 from tortoisehg.util import terminal, gpg
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib, qscilib, thgrepo, customtools, fileencoding
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -53,7 +53,7 @@ class SettingsCombo(QComboBox):
         else:
             settings = opts['settings']
             slist = settings.value('settings/'+opts['cpath']).toStringList()
-            self.previous = [s for s in slist if s]
+            self.previous = [unicode(s) for s in slist if s]
         self.setMinimumWidth(ENTRY_WIDTH)
 
     def resetList(self):
@@ -101,7 +101,7 @@ class SettingsCombo(QComboBox):
         self.resetList()
 
     def value(self):
-        utext = self.currentText()
+        utext = unicode(self.currentText())
         if utext == _unspecstr:
             return None
         if ('nohist' in self.opts or utext in self.defaults + self.previous
@@ -219,11 +219,28 @@ class TextEntry(QTextEdit):
         return os.linesep.join(lines)
 
 
+def _describeFont(font):
+    if not font:
+        return _unspecstr
+
+    s = unicode(font.family())
+    s += ", "  + _("%dpt") % font.pointSize()
+    if font.bold():
+        s += ", " + _("Bold")
+    if font.italic():
+        s += ", " + _("Italic")
+    if font.strikeOut():
+        s += ", " + _("Strike")
+    if font.underline():
+        s += ", " + _("Underline")
+    return s
+
 class FontEntry(QWidget):
     def __init__(self, parent=None, **opts):
         QWidget.__init__(self, parent, toolTip=opts['tooltip'])
         self.opts = opts
         self.curvalue = None
+        self.font = None
 
         self.label = QLabel()
         self.setButton = QPushButton(_('&Set...'))
@@ -245,50 +262,41 @@ class FontEntry(QWidget):
         self.fname = cpath[11:]
         self.setMinimumWidth(ENTRY_WIDTH)
 
-    def onSetClicked(self, checked):
-        def newFont(font):
-            self.setText(font.toString())
-            thgf.setFont(font)
+    def onSetClicked(self):
         thgf = qtlib.getfont(self.fname)
-        origfont = self.currentFont() or thgf.font()
-        dlg = QFontDialog(self)
-        dlg.currentFontChanged.connect(newFont)
-        font, isok = dlg.getFont(origfont, self)
+        origfont = self.font or thgf.font()
+        font, isok = QFontDialog.getFont(origfont, self)
         if not isok:
             return
-        self.label.setText(font.toString())
+        self.setCurrentFont(font)
         thgf.setFont(font)
 
-    def onClearClicked(self, checked):
-        self.label.setText(_unspecstr)
+    def onClearClicked(self):
+        self.setCurrentFont(None)
 
-    def currentFont(self):
-        """currently selected QFont if specified"""
-        if not self.value():
-            return None
-
-        f = QFont()
-        f.fromString(self.value())
-        return f
+    def setCurrentFont(self, font):
+        self.font = font
+        self.label.setText(_describeFont(self.font))
 
     ## common APIs for all edit widgets
 
     def setValue(self, curvalue):
-        self.curvalue = curvalue
         if curvalue:
-            self.label.setText(hglib.tounicode(curvalue))
+            self.curvalue = QFont()
+            self.curvalue.fromString(hglib.tounicode(curvalue))
         else:
-            self.label.setText(_unspecstr)
+            self.curvalue = None
+        self.setCurrentFont(self.curvalue)
 
     def value(self):
-        utext = self.label.text()
-        if utext == _unspecstr:
+        if not self.font:
             return None
-        else:
-            return hglib.fromunicode(utext)
+
+        utext = self.font.toString()
+        return hglib.fromunicode(utext)
 
     def isDirty(self):
-        return self.value() != self.curvalue
+        return self.font != self.curvalue
 
 class SettingsCheckBox(QCheckBox):
     def __init__(self, parent=None, **opts):
@@ -296,8 +304,6 @@ class SettingsCheckBox(QCheckBox):
         self.opts = opts
         self.curvalue = None
         self.setText(opts['label'])
-        self.valfunc = self.opts['valfunc']
-        self.toggled.connect(self.valfunc)
 
     def setValue(self, curvalue):
         if self.curvalue == None:
@@ -396,7 +402,9 @@ class PathBrowser(QWidget):
         self.opts = opts
 
         self.lineEdit = QLineEdit()
-        completer = QCompleter(self)
+        # use QCompleter(model, parent) to avoid ownership bug of
+        # QCompleter(parent /TransferBack/) in PyQt<4.11.4
+        completer = QCompleter(None, self)
         completer.setModel(QDirModel(completer))
         self.lineEdit.setCompleter(completer)
 
@@ -434,10 +442,12 @@ def genEditCombo(opts, defaults=[]):
     opts['defaults'] = defaults
     return SettingsCombo(**opts)
 
-def genIntEditCombo(opts):
+def genIntEditCombo(opts, defaults=None):
     'EditCombo, only allows integer values'
     opts['canedit'] = True
     opts['validator'] = QIntValidator(None)  # missing parent=None on PyQt4.6
+    if defaults:
+        opts['defaults'] = ['%d' % n for n in defaults]
     return SettingsCombo(**opts)
 
 def genLineEditBox(opts):
@@ -521,11 +531,11 @@ def genCheckBox(opts):
 class _fi(object):
     """Information of each field"""
     __slots__ = ('label', 'cpath', 'values', 'tooltip',
-                 'restartneeded', 'globalonly',
+                 'restartneeded', 'globalonly', 'noglobal',
                  'master', 'visible')
 
     def __init__(self, label, cpath, values, tooltip,
-                 restartneeded=False, globalonly=False,
+                 restartneeded=False, globalonly=False, noglobal=False,
                  master=None, visible=None):
         self.label = label
         self.cpath = cpath
@@ -533,6 +543,7 @@ class _fi(object):
         self.tooltip = tooltip
         self.restartneeded = restartneeded
         self.globalonly = globalonly
+        self.noglobal = noglobal
         self.master = master
         self.visible = visible
 
@@ -573,7 +584,8 @@ INFO = (
         _('Specify the command to launch your preferred terminal shell '
           'application. If the value includes the string %(reponame)s, the '
           'name of the repository will be substituted in place of '
-          '%(reponame)s. (restart needed)<br>'
+          '%(reponame)s. Similarly, %(root)s will be the full path to the '
+          'repository. (restart needed)<br>'
           'Default, Windows: cmd.exe /K title %(reponame)s<br>'
           'Default, OS X: not set<br>'
           'Default, other: xterm -T "%(reponame)s"'),
@@ -588,18 +600,20 @@ INFO = (
           'TortoiseHg windows. '
           'Default: 8')),
     _fi(_('Force Repo Tab'), 'tortoisehg.forcerepotab', genBoolRBGroup,
-        _('Always show repo tabs, even for a single repo. Default: False')),
+        _('Always show repo tabs, even for a single repo. Default: False'),
+        globalonly=True),
     _fi(_('Monitor Repo Changes'), 'tortoisehg.monitorrepo',
         (genDefaultCombo, ['always', 'localonly', 'never']),
         _('Specify the target filesystem where TortoiseHg monitors changes. '
-          'Default: always')),
+          'Default: localonly')),
     _fi(_('Max Diff Size'), 'tortoisehg.maxdiff', genIntEditCombo,
         _('The maximum size file (in KB) that TortoiseHg will '
           'show changes for in the changelog, status, and commit windows. '
           'A value of zero implies no limit.  Default: 1024 (1MB)')),
     _fi(_('Fork GUI'), 'tortoisehg.guifork', genBoolRBGroup,
         _('When running from the command line, fork a background '
-          'process to run graphical dialogs.  Default: True')),
+          'process to run graphical dialogs.  Default: True'),
+        globalonly=True),
     _fi(_('Full Path Title'), 'tortoisehg.fullpath', genBoolRBGroup,
         _('Show a full directory path of the repository in the dialog title '
           'instead of just the root directory name.  Default: False')),
@@ -610,7 +624,11 @@ INFO = (
           'with changes on both sides of the merge will report as conflicting, '
           'even if the edits are to different parts of the file. In either '
           'case, when conflicts occur, the user will be invited to review and '
-          'resolve changes manually. Default: False.')),
+          'resolve changes manually. Default: True.')),
+    _fi(_('New Repo Skeleton'), 'tortoisehg.initskel', genPathBrowser,
+        _('If specified, files in the directory, e.g. .hgignore, are copied '
+          'to the newly-created repository.'),
+        globalonly=True),
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
@@ -622,7 +640,7 @@ INFO = (
           'context menu. Default: True'),
         restartneeded=True, globalonly=True),
     _fi(_('Default widget'), 'tortoisehg.defaultwidget', (genDefaultCombo,
-        ['revdetails', 'commit', 'mq', 'sync', 'manifest', 'search']),
+        ['revdetails', 'commit', 'sync', 'search']),
         _('Select the initial widget that will be shown when opening a '
           'repository. '
           'Default: revdetails')),
@@ -637,11 +655,10 @@ INFO = (
         'tortoisehg.opentabsaftercurrent', genBoolRBGroup,
         _('Should new tabs be open next to the current tab? '
           'If False new tabs will be open after the last tab. '
-          'Default: True')),
+          'Default: True'),
+        globalonly=True),
     _fi(_('Author Coloring'), 'tortoisehg.authorcolor', genBoolRBGroup,
-        _('Color changesets by author name.  If not enabled, '
-          'the changes are colored green for merge, red for '
-          'non-trivial parents, black for normal. '
+        _('Color changesets by author name. '
           'Default: False')),
     _fi(_('Full Authorname'), 'tortoisehg.fullauthorname', genBoolRBGroup,
         _('Show full authorname in Logview. If not enabled, '
@@ -657,12 +674,12 @@ INFO = (
         _('Specify which task buttons you want to show on the task toolbar '
           'and in which order.<br>Type a list of the task button names. '
           'Add separators by putting "|" between task button names.<br>'
-          'Valid names are: log commit mq sync manifest grep and pbranch.<br>'
-          'Default: log commit mq sync manifest grep pbranch'),
+          'Valid names are: log commit sync grep and pbranch.<br>'
+          'Default: log commit grep pbranch | sync'),
         restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
-          'until they reach 80 characters. '
+          'and truncate them at 80 characters as necessary. '
           'Default: False')),
     _fi(_('Log Batch Size'), 'tortoisehg.graphlimit', genIntEditCombo,
         _('The number of revisions to read and display in the '
@@ -680,31 +697,10 @@ INFO = (
           '@ character, and \\n to a linefeed. '
           'Default: None (leave blank)')),
     _fi(_('Hide Tags'), 'tortoisehg.hidetags', genEditCombo,
-        _('Space separated list of tags that will not be shown.'
+        _('Space separated list of tags that will not be shown. '
           'Useful example: Specify "qbase qparent qtip" to hide the '
           'standard tags inserted by the Mercurial Queues Extension. '
           'Default: None (leave blank)')),
-    _fi(_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
-        ['none', 'update', 'fetch', 'rebase', 'updateorrebase']),
-        _('Operation which is performed directly after a successful pull. '
-          'update equates to pull --update, fetch equates to the fetch '
-          'extension, rebase equates to pull --rebase, '
-          'updateorrebase equates to pull -u --rebase.  Default: none')),
-    _fi(_('Default Push'), 'tortoisehg.defaultpush',
-        (genDefaultCombo, ['all', 'branch', 'revision']),
-        _('Select the revisions that will be pushed by default, '
-          'whenever you click the Push button.'
-          '<ul><li><b>all</b>: The default. Push all changes in '
-          '<i>all branches</i>.'
-          '<li><b>branch</b>: Push all changes in the <i>current branch</i>.'
-          '<li><b>revision</b>: Push the changes in the current branch '
-          '<i><u>up to</u> the current revision</i>.</ul><p>'
-          'Default: all')),
-    _fi(_('Confirm Push'), 'tortoisehg.confirmpush', genBoolRBGroup,
-        _('Determines if TortoiseHg should show a confirmation dialog '
-          'before pushing changesets. '
-          'If False, push will be performed without any confirmation dialog. '
-          'Default: True')),
     _fi(_('Activate Bookmarks'), 'tortoisehg.activatebookmarks',
         (genDefaultCombo, ['auto', 'prompt', 'never']),
         _('Select when TortoiseHg will show a prompt to activate a bookmark '
@@ -718,20 +714,21 @@ INFO = (
           '<li><b>never</b>: Never show any prompt to activate any bookmarks.'
           '</ul><p>'
           'Default: prompt')),
-    _fi(_('Target combo'), 'tortoisehg.workbench.target-combo',
-        (genDefaultCombo, ['auto', 'always']),
-        _('Select if TortoiseHg will show a target combo in the sync toolbar.'
-          '<ul><li><b>auto</b>: The default. Show the combo if more than one '
-          'target configured.'
-          '<li><b>always</b>: Always show the combo.'
-          '</ul><p>'
-          'Default: auto')),
+    _fi(_('Show Family Line'), 'tortoisehg.showfamilyline', genBoolRBGroup,
+        _('Show indirect revision dependency on the revision graph '
+          'when filtered by revset. Default: True<p>'
+          '<b>Note</b>: Calculating family line may be slow in some cases. '
+          'This option is expected to be removed if the performance issue is '
+          'solved.')),
     )),
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'},
  (
     _fi(_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is:<br>'
           'Full Name &lt;email@example.com&gt;')),
+    _fi(_('Ask Username'), 'ui.askusername', genBoolRBGroup,
+        _('If no username has been specified, the user will be prompted to '
+          'enter a username.  Default: False')),
     _fi(_('Summary Line Length'), 'tortoisehg.summarylen', genIntEditCombo,
         _('Suggested length of commit message lines. A red vertical '
           'line will mark this length.  CTRL-E will reflow the current '
@@ -762,6 +759,13 @@ INFO = (
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
         _('Make MQ patches secret (instead of draft). '
           'Default: False')),
+    _fi(_('Check Subrepo Phase'), 'phases.checksubrepos',
+        (genDefaultCombo, ['ignore', 'follow', 'abort']),
+        _('Check the phase of the current revision of each subrepository.  '
+          'For settings other than "ignore", the phase of the current '
+          'revision of each subrepository is checked before committing the '
+          'parent repository.  '
+          'Default: follow')),
     _fi(_('Monitor working<br>directory changes'),
         'tortoisehg.refreshwdstatus',
         (genDefaultCombo, ['auto', 'always', 'alwayslocal']),
@@ -794,17 +798,57 @@ INFO = (
           'commit with no confirmation dialog.  Default: True')),
     )),
 
+({'name': 'sync', 'label': _('Sync'), 'icon': 'thg-sync'}, (
+    _fi(_('After Pull Operation'), 'tortoisehg.postpull', (genDefaultCombo,
+        ['none', 'update', 'fetch', 'rebase', 'updateorrebase']),
+        _('Operation which is performed directly after a successful pull. '
+          'update equates to pull --update, fetch equates to the fetch '
+          'extension, rebase equates to pull --rebase, '
+          'updateorrebase equates to pull -u --rebase.  Default: none')),
+    _fi(_('Default Push'), 'tortoisehg.defaultpush',
+        (genDefaultCombo, ['all', 'branch', 'revision']),
+        _('Select the revisions that will be pushed by default, '
+          'whenever you click the Push button.'
+          '<ul><li><b>all</b>: The default. Push all changes in '
+          '<i>all branches</i>.'
+          '<li><b>branch</b>: Push all changes in the <i>current branch</i>.'
+          '<li><b>revision</b>: Push the changes in the current branch '
+          '<i><u>up to</u> the current revision</i>.</ul><p>'
+          'Default: all')),
+    _fi(_('Confirm Push'), 'tortoisehg.confirmpush', genBoolRBGroup,
+        _('Determines if TortoiseHg should show a confirmation dialog '
+          'before pushing changesets. '
+          'If False, push will be performed without any confirmation dialog. '
+          'Default: True')),
+    _fi(_('Target Combo'), 'tortoisehg.workbench.target-combo',
+        (genDefaultCombo, ['auto', 'always']),
+        _('Select if TortoiseHg will show a target combo in the sync toolbar.'
+          '<ul><li><b>auto</b>: The default. Show the combo if more than one '
+          'target configured.'
+          '<li><b>always</b>: Always show the combo.'
+          '</ul><p>'
+          'Default: auto')),
+    _fi(_('SSH Command'), 'ui.ssh', genEditCombo,
+        _('Command to use for SSH connections.<p>'
+          'Default: "ssh" or "TortoisePlink.exe -ssh -2" (Windows)')),
+    )),
+
 ({'name': 'web', 'label': _('Server'), 'icon': 'proxy'}, (
-    _fi(_('<b>Behavior:</b>'), None, genSpacer, ''),
+    _fi(_('<b>Repository Details:</b>'), None, genSpacer, ''),
+    _fi(_('Name'), 'web.name', genEditCombo,
+        _('Repository name to use in the web interface, and by TortoiseHg '
+          'as a shorthand name.  Default is the working directory.'),
+        noglobal=True),
+    _fi(_('Encoding'), 'web.encoding',
+        (genEditCombo, fileencoding.knownencodings()),
+        _('Character encoding of files in the repository, used by the web '
+          'interface and TortoiseHg.')),
     _fi(_("'Publishing' repository"), 'phases.publish', genBoolRBGroup,
         _('Controls draft phase behavior when working as a server. When true, '
           'pushed changesets are set to public in both client and server and '
           'pulled or cloned changesets are set to public in the client. '
           'Default: True')),
     _fi(_('<b>Web Server:</b>'), None, genSpacer, ''),
-    _fi(_('Name'), 'web.name', genEditCombo,
-        _('Repository name to use in the web interface, and by TortoiseHg '
-          'as a shorthand name.  Default is the working directory.')),
     _fi(_('Description'), 'web.description', genEditCombo,
         _("Textual description of the repository's purpose or "
           'contents.')),
@@ -845,8 +889,6 @@ INFO = (
           'denied, and any authenticated user name present in this list '
           '(separated by whitespace or ",") is also denied. The contents '
           'of the deny_push list are examined before the allow_push list.')),
-    _fi(_('Encoding'), 'web.encoding', (genEditCombo, ['UTF-8']),
-        _('Character encoding name')),
     )),
 
 ({'name': 'proxy', 'label': _('Proxy'), 'icon': QStyle.SP_DriveNetIcon}, (
@@ -882,12 +924,13 @@ INFO = (
           'is enough to use sendmail to send messages.')),
     _fi(_('SMTP Host'), 'smtp.host', genEditCombo,
         _('Host name of mail server')),
-    _fi(_('SMTP Port'), 'smtp.port', genIntEditCombo,
+    _fi(_('SMTP Port'), 'smtp.port', (genIntEditCombo, [25, 465, 587]),
         _('Port to connect to on mail server. '
           'Default: 25')),
-    _fi(_('SMTP TLS'), 'smtp.tls', genBoolRBGroup,
-        _('Connect to mail server using TLS. '
-          'Default: False')),
+    _fi(_('SMTP TLS'), 'smtp.tls',
+        (genDefaultCombo, ['starttls', 'smtps', 'none']),
+        _('Method to enable TLS when connecting to mail server. '
+          'Default: none')),
     _fi(_('SMTP Username'), 'smtp.username', genEditCombo,
         _('Username to authenticate to mail server with')),
     _fi(_('SMTP Password'), 'smtp.password', genPasswordEntry,
@@ -980,7 +1023,7 @@ INFO = (
           'You may include groups in issue.regex, and corresponding {n} '
           'tokens in issue.link (where n is a non-negative integer). '
           '{0} refers to the entire string matched by issue.regex, '
-          'while {1} refers to the first group and so on. If no {n} tokens'
+          'while {1} refers to the first group and so on. If no {n} tokens '
           'are found in issue.link, the entire matched string is appended '
           'instead.')),
     _fi(_('Inline Tags'), 'tortoisehg.issue.inlinetags', genBoolRBGroup,
@@ -1008,6 +1051,20 @@ INFO = (
           'successful commit.</ul><p>'
           'Default: never'),
         master='tortoisehg.issue.bugtraqplugin', visible=issuePluginVisible),
+    _fi(_('Changeset Link'), 'tortoisehg.changeset.link', genEditCombo,
+        _('A "template string" that, when set, turns the revision number and '
+          'short hashes that are shown on the revision panels into links.<br>'
+          'The "template string" uses a "mercurial template"-like syntax that '
+          'currently accepts two template expressions:'
+          '<ul>'
+          '<li>{node|short} : replaced by the 12 digit revision id (note that '
+          '{node} on its own is currently unsupported).'
+          '<li>{rev} : replaced by the revision number.'
+          '</ul>'
+          'For example, in order to link to bitbucket commit pages you can '
+          'set this to:<br>'
+          'https://bitbucket.org/tortoisehg/thg/commits/{node|short}'
+        )),
     )),
 
 ({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
@@ -1070,7 +1127,7 @@ INFO = (
     _fi(_('Servers'), 'projrc.servers', genEditCombo,
         _('List of Servers from which "projrc" configuration files must be '
           'pulled. Set it to "*" to pull from all servers. Set it to "default" '
-          'to pull from the default sync path.'
+          'to pull from the default sync path. '
           'Default is pull from NO servers.')),
     _fi(_('Include'), 'projrc.include', genEditCombo,
         _('List of settings that will be pulled from the project configuration '
@@ -1165,6 +1222,7 @@ class SettingsDialog(QDialog):
                                   _('no repo at ') + uroot, parent=self)
 
         if repo:
+            repoagent = repo._pyqtobj  # TODO
             if 'projrc' in repo.extensions():
                 projrcpath = os.sep.join([repo.root, '.hg', 'projrc'])
                 if os.path.exists(projrcpath):
@@ -1172,13 +1230,14 @@ class SettingsDialog(QDialog):
                                         readonly=True)
                     self.conftabs.addTab(rtab, qtlib.geticon('settings_projrc'),
                                          _('%s project settings (.hg/projrc)')
-                                         % os.path.basename(repo.displayname))
+                                         % repoagent.shortName())
                     rtab.restartRequested.connect(self._pushRestartRequest)
 
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             rtab = SettingsForm(rcpath=reporcpath, focus=focus)
             self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
-                                 _('%s repository settings') % repo.displayname)
+                                 _('%s repository settings')
+                                 % repoagent.shortName())
             rtab.restartRequested.connect(self._pushRestartRequest)
 
         BB = QDialogButtonBox
@@ -1201,14 +1260,15 @@ class SettingsDialog(QDialog):
         self._restartreqs.add(unicode(key))
 
     def applyChanges(self):
-        for i in xrange(self.conftabs.count()):
-            self.conftabs.widget(i).applyChanges()
+        results = [self.conftabs.widget(i).applyChanges()
+                   for i in xrange(self.conftabs.count())]
         if self._restartreqs:
             qtlib.InfoMsgBox(_('Settings'),
                              _('Restart all TortoiseHg applications '
                                'for the following changes to take effect:'),
                              ', '.join(sorted(self._restartreqs)))
             self._restartreqs.clear()
+        return util.all(results)
 
     def canExit(self):
         if self.isDirty():
@@ -1219,12 +1279,12 @@ class SettingsDialog(QDialog):
             if ret == 2:
                 return False
             elif ret == 0:
-                self.applyChanges()
-                return True
+                return self.applyChanges()
         return True
 
     def accept(self):
-        self.applyChanges()
+        if not self.applyChanges():
+            return
         s = self.settings
         s.setValue('settings/geom', self.saveGeometry())
         s.setValue('settings/lastpage', self._getactivepagename())
@@ -1370,9 +1430,8 @@ class SettingsForm(QWidget):
                 self.applyChanges()
             elif ret == 2:
                 return
-        if (qscilib.fileEditor(hglib.tounicode(self.fn), foldable=True)
-            == QDialog.Accepted):
-            self.refresh()
+        qscilib.fileEditor(hglib.tounicode(self.fn), foldable=True)
+        self.refresh()
 
     def refresh(self, *args):
         # refresh config values
@@ -1387,7 +1446,6 @@ class SettingsForm(QWidget):
     def refreshPage(self, page):
         name, info, widgets = page
         if name == 'extensions':
-            extsmentioned = False
             for row, w in enumerate(widgets):
                 key = w.opts['label']
                 for fullkey in (key, 'hgext.%s' % key, 'hgext/%s' % key):
@@ -1398,19 +1456,14 @@ class SettingsForm(QWidget):
                     curvalue = False
                 elif len(val) and val[0] == '!':
                     curvalue = False
-                    extsmentioned = True
                 else:
                     curvalue = True
-                    extsmentioned = True
                 w.setValue(curvalue)
                 if val == None:
                     w.opts['cpath'] = 'extensions.' + key
                 else:
                     w.opts['cpath'] = 'extensions.' + fullkey
-            if not extsmentioned:
-                # make sure widgets are shown properly,
-                # even when no extensions mentioned in the config file
-                self.validateextensions()
+            self.validateextensions()
         elif name == 'tools':
             self.toolsFrame.refresh()
         elif name == 'hooks':
@@ -1482,14 +1535,16 @@ class SettingsForm(QWidget):
             else:
                 func = e.values
                 w = func(opts)
-            w.installEventFilter(self)
             if e.globalonly:
                 w.setEnabled(self.rcpath == scmutil.userrcpath())
+            elif e.noglobal:
+                w.setEnabled(self.rcpath != scmutil.userrcpath())
             lbl = QLabel(e.label)
-            lbl.installEventFilter(self)
             lbl.setToolTip(e.tooltip)
             widgets.append(w)
             if e.isVisible():
+                lbl.installEventFilter(self)
+                w.installEventFilter(self)
                 form.addRow(lbl, w)
 
         # assign the master to widgets that have a master
@@ -1515,10 +1570,11 @@ class SettingsForm(QWidget):
         extsinfo = ()
         for i, name in enumerate(sorted(allexts)):
             tt = hglib.tounicode(allexts[name])
-            opts = {'label':name, 'cpath':'extensions.' + name, 'tooltip':tt,
-                    'valfunc':self.validateextensions}
+            opts = {'label':name, 'cpath':'extensions.' + name, 'tooltip':tt}
             w = genCheckBox(opts)
             w.installEventFilter(self)
+            w.clicked.connect(self.validateextensions)
+
             row, col = i / maxrows, i % maxrows
             grid.addWidget(w, col, row)
             widgets.append(w)
@@ -1603,7 +1659,7 @@ class SettingsForm(QWidget):
 
     def applyChanges(self):
         if self.readonly:
-            return
+            return True  # safely skipped because all fields are disabled
 
         for name, info, widgets in self.pages.values():
             if name == 'extensions':
@@ -1623,9 +1679,11 @@ class SettingsForm(QWidget):
 
         try:
             wconfig.writefile(self.ini, self.fn)
-        except IOError, e:
+            return True
+        except EnvironmentError, e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
-                                str(e), parent=self)
+                                hglib.tounicode(str(e)), parent=self)
+            return False
 
     def applyChangesForExtensions(self):
         emitChanged = False

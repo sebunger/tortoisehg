@@ -6,11 +6,9 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import sys
-
 from tortoisehg.hgqt import qtlib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.util import menuthg, hglib
+from tortoisehg.util.i18n import _
+from tortoisehg.util import menuthg
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -146,7 +144,8 @@ class ShellConfigWindow(QDialog):
         grid = QGridLayout()
         gbox.setLayout(grid)
         grid.setColumnStretch(3, 10)
-        w = QLabel(_("Warning: affects all Tortoises, logoff required after change"))
+        w = QLabel(_("Warning: affects all Tortoises, logoff required after "
+                     "change"))
         grid.addWidget(w, 0, 0, 1, 3)
         self.enableAddedHandler = w = checkbox(_("Added"))
         grid.addWidget(w, 1, 0)
@@ -176,6 +175,14 @@ class ShellConfigWindow(QDialog):
 
         iconslayout.addStretch()
 
+        # i18n: URL of TortoiseSVN documentation
+        url = _('http://tortoisesvn.net/docs/release/TortoiseSVN_en/'
+                'tsvn-dug-settings.html#tsvn-dug-settings-icon-set')
+        w = QLabel(_('You can change the icon set from <a href="%s">'
+                     "TortoiseSVN's Settings</a>") % url)
+        w.setOpenExternalLinks(True)
+        iconslayout.addWidget(w)
+
         # dialog buttons
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Ok|BB.Cancel|BB.Apply)
@@ -187,7 +194,7 @@ class ShellConfigWindow(QDialog):
         layout.addWidget(bb)
 
         self.setLayout(layout)
-        self.setWindowTitle(_("TortoiseHg Shell Configuration"))
+        self.setWindowTitle(_("Explorer Extension Settings - TortoiseHg"))
         self.setWindowIcon(qtlib.geticon('settings_repo'))
 
         self.load_shell_configs()
@@ -218,7 +225,7 @@ class ShellConfigWindow(QDialog):
         promoted = [pi.strip() for pi in promoteditems.split(',')]
         for cmd, info in menuthg.thgcmenu.items():
             label = info['label']
-            item = QListWidgetItem(hglib.tounicode(label['str']))
+            item = QListWidgetItem(label['str'].decode('utf-8'))
             item._id = label['id']
             if cmd in promoted:
                 self.topmenulist.addItem(item)

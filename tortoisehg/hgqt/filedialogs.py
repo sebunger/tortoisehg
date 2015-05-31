@@ -17,13 +17,12 @@
 Qt4 dialogs to display hg revisions of a file
 """
 
-import os
 import difflib
 
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import qtlib, visdiff, filerevmodel, blockmatcher, lexers
-from tortoisehg.hgqt import fileview, repoview, revpanel, revert
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import qtlib, repomodel, blockmatcher, lexers
+from tortoisehg.hgqt import filectxactions, fileview, repoview, revpanel
 from tortoisehg.hgqt.qscilib import Scintilla
 
 from PyQt4.QtCore import *
@@ -33,22 +32,108 @@ from PyQt4.Qsci import QsciScintilla
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
+_MARKERPLUSLINE = 31
+_MARKERMINUSLINE = 30
+_MARKERPLUSUNDERLINE = 29
+_MARKERMINUSUNDERLINE = 28
+
+_colormap = {
+             '+': QColor(0xA0, 0xFF, 0xB0),
+             '-': QColor(0xFF, 0xA0, 0xA0),
+             'x': QColor(0xA0, 0xA0, 0xFF)
+             }
+
+def _setupFileMenu(menu, fileactions):
+    for name in ['visualDiff', 'visualDiffToLocal', None,
+                 'visualDiffFile', 'visualDiffFileToLocal', None,
+                 'editFile', 'saveFile', 'editLocalFile', 'revertFile']:
+        if name:
+            menu.addAction(fileactions.action(name))
+        else:
+            menu.addSeparator()
+
+def _fileDataListForSelection(model, selmodel):
+    # since FileRevModel is a model for single file, this creates single
+    # FileData between two revisions instead of a list for each selection
+    indexes = sorted(selmodel.selectedRows())
+    if not indexes:
+        return []
+    if len(indexes) == 1:
+        fd = model.fileData(indexes[0])
+    else:
+        fd = model.fileData(indexes[0], indexes[-1])
+    return [fd]
+
+
+class _FileDiffScintilla(Scintilla):
+    def paintEvent(self, event):
+        super(_FileDiffScintilla, self).paintEvent(event)
+        viewport = self.viewport()
+
+        start = self.firstVisibleLine()
+        scale = self.textHeight(0)  # Currently all lines are the same height
+        n = min(viewport.height() / scale + 1, self.lines() - start)
+        lines = []
+        for i in xrange(0, n):
+            m = self.markersAtLine(start + i)
+            if m & (1 << _MARKERPLUSLINE):
+                lines.append((i, _colormap['+'], ))
+            if m & (1 << _MARKERPLUSUNDERLINE):
+                lines.append((i + 1, _colormap['+'], ))
+            if m & (1 << _MARKERMINUSLINE):
+                lines.append((i, _colormap['-'], ))
+            if m & (1 << _MARKERMINUSUNDERLINE):
+                lines.append((i + 1, _colormap['-'], ))
+
+        p = QPainter(viewport)
+        p.setRenderHint(QPainter.Antialiasing)
+        for (line, color) in lines:
+            p.setPen(QPen(color, 3.0))
+            y = line * scale
+            p.drawLine(0, y, viewport.width(), y)
+
+# Minimal wrapper to make RepoAgent always returns unfiltered repo.  Because
+# filelog_grapher can't take account of hidden changesets, all child widgets
+# of file dialog need to take unfiltered repo instance.
+#
+# TODO: this should be removed if filelog_grapher (and FileRevModel) are
+# superseded by revset-based implementation.
+class _UnfilteredRepoAgentProxy(object):
+    def __init__(self, repoagent):
+        self._repoagent = repoagent
+
+    def rawRepo(self):
+        repo = self._repoagent.rawRepo()
+        return repo.unfiltered()
+
+    def runCommand(self, cmdline, uihandler=None, overlay=True):
+        cmdline = ['--hidden'] + cmdline
+        return self._repoagent.runCommand(cmdline, uihandler, overlay)
+
+    def runCommandSequence(self, cmdlines, uihandler=None, overlay=True):
+        cmdlines = [['--hidden'] + l for l in cmdlines]
+        return self._repoagent.runCommandSequence(cmdlines, uihandler, overlay)
+
+    def __getattr__(self, name):
+        return getattr(self._repoagent, name)
+
 class _AbstractFileDialog(QMainWindow):
-    finished = pyqtSignal(int)
 
-    def __init__(self, repo, filename):
+    def __init__(self, repoagent, filename):
         QMainWindow.__init__(self)
-        self.repo = repo
+        self._repoagent = _UnfilteredRepoAgentProxy(repoagent)
 
-        self.setupUi(self)
+        self.setupUi()
         self._show_rev = None
 
         assert not isinstance(filename, (unicode, QString))
         self.filename = filename
 
         self.setWindowTitle(_('Hg file log viewer [%s] - %s')
-                            % (repo.displayname, hglib.tounicode(filename)))
+                            % (repoagent.displayName(),
+                               hglib.tounicode(filename)))
         self.setWindowIcon(qtlib.geticon('hg-log'))
+        self.setIconSize(qtlib.toolBarIconSize())
 
         self.createActions()
         self.setupToolbars()
@@ -56,9 +141,9 @@ class _AbstractFileDialog(QMainWindow):
         self.setupViews()
         self.setupModels()
 
-    def closeEvent(self, event):
-        super(_AbstractFileDialog, self).closeEvent(event)
-        self.finished.emit(0)  # mimic QDialog exit
+    @property
+    def repo(self):
+        return self._repoagent.rawRepo()
 
     def reload(self):
         'Reload toolbar action handler'
@@ -77,11 +162,9 @@ class FileLogDialog(_AbstractFileDialog):
     """
     A dialog showing a revision graph for a file.
     """
-    def __init__(self, repo, filename):
-        super(FileLogDialog, self).__init__(repo, filename)
+    def __init__(self, repoagent, filename):
+        super(FileLogDialog, self).__init__(repoagent, filename)
         self._readSettings()
-        self.menu = None
-        self.dualmenu = None
         self.revdetails = None
 
     def closeEvent(self, event):
@@ -110,7 +193,9 @@ class FileLogDialog(_AbstractFileDialog):
         finally:
             s.endGroup()
 
-    def setupUi(self, o):
+        self.repoview.saveSettings()
+
+    def setupUi(self):
         self.editToolbar = QToolBar(self)
         self.editToolbar.setContextMenuPolicy(Qt.PreventContextMenu)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
@@ -124,9 +209,8 @@ class FileLogDialog(_AbstractFileDialog):
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
         cs = ('fileLogDialog', _('File History Log Columns'))
-        self.repoview = repoview.HgRepoView(self.repo, cs[0], cs, self.splitter)
-        self.repoview.revisionSelectionChanged.connect(
-            self._checkValidSelection)
+        self.repoview = repoview.HgRepoView(self._repoagent, cs[0], cs,
+                                            self.splitter)
 
         self.contentframe = QFrame(self.splitter)
 
@@ -139,7 +223,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.revpanel.linkActivated.connect(self.onLinkActivated)
         vbox.addWidget(self.revpanel, 0)
 
-        self.textView = fileview.HgFileView(self.repo, self)
+        self.textView = fileview.HgFileView(self._repoagent, self)
         self.textView.revisionSelected.connect(self.goto)
         vbox.addWidget(self.textView, 1)
 
@@ -152,16 +236,16 @@ class FileLogDialog(_AbstractFileDialog):
         self.editToolbar.addAction(self.actionForward)
 
     def setupModels(self):
-        self.filerevmodel = filerevmodel.FileRevModel(self.repo,
-                                         self.repoview.colselect[0],
-                                         parent=self)
+        self.filerevmodel = repomodel.FileRevModel(
+            self._repoagent, self.filename, parent=self)
         self.repoview.setModel(self.filerevmodel)
         self.repoview.revisionSelected.connect(self.onRevisionSelected)
         self.repoview.revisionActivated.connect(self.onRevisionActivated)
         self.repoview.menuRequested.connect(self.viewMenuRequest)
+        selmodel = self.repoview.selectionModel()
+        selmodel.selectionChanged.connect(self._onRevisionSelectionChanged)
         self.filerevmodel.showMessage.connect(self.statusBar().showMessage)
-        self.filerevmodel.filled.connect(self.modelFilled)
-        self.filerevmodel.setFilename(self.filename)
+        QTimer.singleShot(0, self._updateRepoViewForModel)
 
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
@@ -169,19 +253,38 @@ class FileLogDialog(_AbstractFileDialog):
         self.actionReload.setIcon(qtlib.geticon('view-refresh'))
 
         self.actionBack = QAction(_('Back'), self, enabled=False,
+                                  shortcut=QKeySequence.Back,
                                   icon=qtlib.geticon('go-previous'))
         self.actionForward = QAction(_('Forward'), self, enabled=False,
+                                     shortcut=QKeySequence.Forward,
                                      icon=qtlib.geticon('go-next'))
         self.repoview.revisionSelected.connect(self._updateHistoryActions)
         self.actionBack.triggered.connect(self.repoview.back)
         self.actionForward.triggered.connect(self.repoview.forward)
+
+        self._fileactions = filectxactions.FilectxActions(self._repoagent, self)
+        self.addActions(self._fileactions.actions())
+
+    def _updateFileActions(self):
+        selmodel = self.repoview.selectionModel()
+        selfds = _fileDataListForSelection(self.filerevmodel, selmodel)
+        self._fileactions.setFileDataList(selfds)
+        if len(selmodel.selectedRows()) > 1:
+            texts = {'visualDiff': _('Diff Selected &Changesets'),
+                     'visualDiffFile': _('&Diff Selected File Revisions')}
+        else:
+            texts = {'visualDiff': _('Diff &Changeset to Parent'),
+                     'visualDiffFile': _('&Diff to Parent')}
+        for n, t in texts.iteritems():
+            self._fileactions.action(n).setText(t)
 
     @pyqtSlot()
     def _updateHistoryActions(self):
         self.actionBack.setEnabled(self.repoview.canGoBack())
         self.actionForward.setEnabled(self.repoview.canGoForward())
 
-    def modelFilled(self):
+    @pyqtSlot()
+    def _updateRepoViewForModel(self):
         self.repoview.resizeColumns()
         if self._show_rev is not None:
             index = self.filerevmodel.indexLinkedFromRev(self._show_rev)
@@ -190,153 +293,31 @@ class FileLogDialog(_AbstractFileDialog):
             return  # already set by goto()
         else:
             index = self.filerevmodel.index(0,0)
-        if index is not None:
-            self.repoview.setCurrentIndex(index)
+        self.repoview.setCurrentIndex(index)
 
     @pyqtSlot(QPoint, object)
     def viewMenuRequest(self, point, selection):
         'User requested a context menu in repo view widget'
         if not selection or len(selection) > 2:
             return
+        menu = QMenu(self)
         if len(selection) == 2:
-            if self.dualmenu is None:
-                self.dualmenu = menu = QMenu(self)
-                a = menu.addAction(_('&Diff Selected Changesets'))
-                a.triggered.connect(self.onVisualDiffRevs)
-                a = menu.addAction(_('Diff Selected &File Revisions'))
-                a.setIcon(qtlib.geticon('visualdiff'))
-                a.triggered.connect(self.onVisualDiffFileRevs)
-            else:
-                menu = self.dualmenu
-        elif self.menu is None:
-            self.menu = menu = QMenu(self)
-            a = menu.addAction(_('&Diff Changeset to Parent'))
-            a.setIcon(qtlib.geticon('visualdiff'))
-            a.triggered.connect(self.onVisualDiff)
-            a = menu.addAction(_('Diff Changeset to &Local'))
-            a.setIcon(qtlib.geticon('ldiff'))
-            a.triggered.connect(self.onVisualDiffToLocal)
-            menu.addSeparator()
-            a = menu.addAction(_('Diff &File to Parent'))
-            a.setIcon(qtlib.geticon('visualdiff'))
-            a.triggered.connect(self.onVisualDiffFile)
-            a = menu.addAction(_('Diff File to Lo&cal'))
-            a.setIcon(qtlib.geticon('ldiff'))
-            a.triggered.connect(self.onVisualDiffFileToLocal)
-            menu.addSeparator()
-            a = menu.addAction(_('&View at Revision'))
-            a.setIcon(qtlib.geticon('view-at-revision'))
-            a.triggered.connect(self.onViewFileAtRevision)
-            a = menu.addAction(_('&Save at Revision...'))
-            a.triggered.connect(self.onSaveFileAtRevision)
-            a = menu.addAction(_('&Edit Local'))
-            a.setIcon(qtlib.geticon('edit-file'))
-            a.triggered.connect(self.onEditLocal)
-            a = menu.addAction(_('&Revert to Revision...'))
-            a.setIcon(qtlib.geticon('hg-revert'))
-            a.triggered.connect(self.onRevertFileToRevision)
+            for name in ['visualDiff', 'visualDiffFile']:
+                menu.addAction(self._fileactions.action(name))
+        else:
+            _setupFileMenu(menu, self._fileactions)
             menu.addSeparator()
             a = menu.addAction(_('Show Revision &Details'))
             a.setIcon(qtlib.geticon('hg-log'))
             a.triggered.connect(self.onShowRevisionDetails)
-        else:
-            menu = self.menu
-        self.selection = selection
-        menu.exec_(point)
-
-    def onVisualDiff(self):
-        opts = dict(change=self.selection[0])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
-        if dlg:
-            dlg.exec_()
-
-    def onVisualDiffToLocal(self):
-        opts = dict(rev=['rev(%d)' % self.selection[0]])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
-        if dlg:
-            dlg.exec_()
-
-    def onVisualDiffRevs(self):
-        revs = self.selection
-        if len(revs) != 2:
-            self.textView.showMessage.emit(_('You must select two revisions to diff'))
-            return
-        opts = dict(rev=revs)
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
-        if dlg:
-            dlg.exec_()
-
-    def onVisualDiffFile(self):
-        rev = self.selection[0]
-        paths = [self.filerevmodel.graph.filename(rev)]
-        opts = dict(change=self.selection[0])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
-        if dlg:
-            dlg.exec_()
-
-    def onVisualDiffFileToLocal(self):
-        rev = self.selection[0]
-        paths = [self.filerevmodel.graph.filename(rev)]
-        opts = dict(rev=['rev(%d)' % rev])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
-        if dlg:
-            dlg.exec_()
-
-    def onVisualDiffFileRevs(self):
-        revs = self.selection
-        if len(revs) != 2:
-            self.textView.showMessage.emit(_('You must select two revisions to diff'))
-            return
-        paths = [self.filerevmodel.graph.filename(revs[0])]
-        opts = dict(rev=['rev(%d)' % rev for rev in revs])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
-        if dlg:
-            dlg.exec_()
-
-    def onEditLocal(self):
-        filenames = [self.filename]
-        if not filenames:
-            return
-        qtlib.editfiles(self.repo, filenames, parent=self)
-
-    def onRevertFileToRevision(self):
-        rev = self.selection[0]
-        if rev is None:
-            rev = self.repo['.'].rev()
-        fileSelection = [self.filerevmodel.graph.filename(rev)]
-        if len(fileSelection) == 0:
-            return
-        dlg = revert.RevertDialog(self.repo, fileSelection, rev, self)
-        if dlg:
-            dlg.exec_()
-            dlg.deleteLater()
-
-    def onViewFileAtRevision(self):
-        rev = self.selection[0]
-        filenames = [self.filerevmodel.graph.filename(rev)]
-        if not filenames:
-            return
-        if rev is None:
-            qtlib.editfiles(self.repo, filenames, parent=self)
-        else:
-            base, _ = visdiff.snapshot(self.repo, filenames, self.repo[rev])
-            files = [os.path.join(base, filename)
-                     for filename in filenames]
-            qtlib.editfiles(self.repo, files, parent=self)
-
-    def onSaveFileAtRevision(self, rev):
-        rev = self.selection[0]
-        files = [self.filerevmodel.graph.filename(rev)]
-        if not files or rev is None:
-            return
-        else:
-            qtlib.savefiles(self.repo, files, rev, parent=self)
+        menu.setAttribute(Qt.WA_DeleteOnClose)
+        menu.popup(point)
 
     def onShowRevisionDetails(self):
-        rev = self.selection[0]
+        rev = self.repoview.selectedRevisions()[0]
         if not self.revdetails:
             from tortoisehg.hgqt.revdetails import RevDetailsDialog
-            self.revdetails = RevDetailsDialog(self.repo, rev=rev)
+            self.revdetails = RevDetailsDialog(self._repoagent, rev=rev)
         else:
             self.revdetails.setRev(rev)
         self.revdetails.show()
@@ -354,17 +335,20 @@ class FileLogDialog(_AbstractFileDialog):
 
     def onRevisionSelected(self, rev):
         pos = self.textView.verticalScrollBar().value()
-        ctx = self.filerevmodel.repo.changectx(rev)
-        self.textView.setContext(ctx)
-        self.textView.displayFile(self.filerevmodel.graph.filename(rev), None)
+        fd = self.filerevmodel.fileData(self.repoview.currentIndex())
+        self.textView.display(fd)
         self.textView.verticalScrollBar().setValue(pos)
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
 
+    @pyqtSlot()
+    def _onRevisionSelectionChanged(self):
+        self._checkValidSelection()
+        self._updateFileActions()
+
     # It does not make sense to select more than two revisions at a time.
     # Rather than enforcing a max selection size we simply let the user
     # know when it has selected too many revisions by using the status bar
-    @pyqtSlot()
     def _checkValidSelection(self):
         selection = self.repoview.selectedRevisions()
         if len(selection) > 2:
@@ -375,7 +359,7 @@ class FileLogDialog(_AbstractFileDialog):
 
     def goto(self, rev):
         index = self.filerevmodel.indexLinkedFromRev(rev)
-        if index is not None:
+        if index.isValid():
             self.repoview.setCurrentIndex(index)
         else:
             self._show_rev = rev
@@ -392,18 +376,14 @@ class FileLogDialog(_AbstractFileDialog):
     def setSearchCaseInsensitive(self, ignorecase):
         self.textView.searchbar.setCaseInsensitive(ignorecase)
 
-    def reload(self):
-        self.repoview.saveSettings()
-        super(FileLogDialog, self).reload()
 
 class FileDiffDialog(_AbstractFileDialog):
     """
     Qt4 dialog to display diffs between different mercurial revisions of a file.
     """
-    def __init__(self, repo, filename):
-        super(FileDiffDialog, self).__init__(repo, filename)
+    def __init__(self, repoagent, filename):
+        super(FileDiffDialog, self).__init__(repoagent, filename)
         self._readSettings()
-        self.menu = None
 
     def closeEvent(self, event):
         self._writeSettings()
@@ -427,7 +407,10 @@ class FileDiffDialog(_AbstractFileDialog):
         finally:
             s.endGroup()
 
-    def setupUi(self, o):
+        for w in self._repoViews:
+            w.saveSettings()
+
+    def setupUi(self):
         self.editToolbar = QToolBar(self)
         self.editToolbar.setContextMenuPolicy(Qt.PreventContextMenu)
         self.addToolBar(Qt.ToolBarArea(Qt.TopToolBarArea), self.editToolbar)
@@ -446,30 +429,18 @@ class FileDiffDialog(_AbstractFileDialog):
         self.splitter = QSplitter(Qt.Vertical)
         self.setCentralWidget(self.splitter)
         self.horizontalLayout = QHBoxLayout()
+        self._repoViews = []
         cs = ('fileDiffDialogLeft', _('File Differences Log Columns'))
-        self.tableView_revisions_left = repoview.HgRepoView(self.repo, cs[0],
-                                                            cs, self)
-        self.tableView_revisions_right = repoview.HgRepoView(self.repo,
-                                                             'fileDiffDialogRight',
-                                                             cs, self)
-        self.horizontalLayout.addWidget(self.tableView_revisions_left)
-        self.horizontalLayout.addWidget(self.tableView_revisions_right)
-        self.tableView_revisions_right.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tableView_revisions_left.setSelectionMode(QAbstractItemView.SingleSelection)
+        for cfgname in [cs[0], 'fileDiffDialogRight']:
+            w = repoview.HgRepoView(self._repoagent, cfgname, cs, self)
+            w.setSelectionMode(QAbstractItemView.SingleSelection)
+            self.horizontalLayout.addWidget(w)
+            self._repoViews.append(w)
         self.frame = QFrame()
         self.splitter.addWidget(layouttowidget(self.horizontalLayout))
         self.splitter.addWidget(self.frame)
 
-    #@pyqtSlot(QPoint)
-    def fileViewMenuRequest(self, point):
-        sci = self.sender()
-        menu = sci.createStandardContextMenu()
-        point = sci.viewport().mapToGlobal(point)
-        menu.exec_(point)
-
     def setupViews(self):
-        self.tableViews = {'left': self.tableView_revisions_left,
-                           'right': self.tableView_revisions_right}
         # viewers are Scintilla editors
         self.viewers = {}
         # block are diff-block displayers
@@ -486,13 +457,11 @@ class FileDiffDialog(_AbstractFileDialog):
             lexer = None
 
         for side, idx  in (('left', 0), ('right', 3)):
-            sci = Scintilla(self.frame)
+            sci = _FileDiffScintilla(self.frame)
+            sci.installEventFilter(self)
             sci.verticalScrollBar().setFocusPolicy(Qt.StrongFocus)
             sci.setFocusProxy(sci.verticalScrollBar())
             sci.verticalScrollBar().installEventFilter(self)
-
-            sci.setContextMenuPolicy(Qt.CustomContextMenu)
-            sci.customContextMenuRequested.connect(self.fileViewMenuRequest)
 
             sci.setFrameShape(QFrame.NoFrame)
             sci.setMarginLineNumbers(1, True)
@@ -516,11 +485,20 @@ class FileDiffDialog(_AbstractFileDialog):
 
             # define markers for colorize zones of diff
             self.markerplus = sci.markerDefine(QsciScintilla.Background)
-            sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markerplus, 0xB0FFA0)
+            sci.setMarkerBackgroundColor(_colormap['+'], self.markerplus)
             self.markerminus = sci.markerDefine(QsciScintilla.Background)
-            sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markerminus, 0xA0A0FF)
+            sci.setMarkerBackgroundColor(_colormap['-'], self.markerminus)
             self.markertriangle = sci.markerDefine(QsciScintilla.Background)
-            sci.SendScintilla(sci.SCI_MARKERSETBACK, self.markertriangle, 0xFFA0A0)
+            sci.setMarkerBackgroundColor(_colormap['x'], self.markertriangle)
+
+            self.markerplusline = sci.markerDefine(QsciScintilla.Invisible,
+                                                   _MARKERPLUSLINE)
+            self.markerminusline = sci.markerDefine(QsciScintilla.Invisible,
+                                                    _MARKERMINUSLINE)
+            self.markerplusunderline = sci.markerDefine(QsciScintilla.Invisible,
+                                                        _MARKERPLUSUNDERLINE)
+            self.markerminusunderline = sci.markerDefine(QsciScintilla.Invisible,
+                                                         _MARKERMINUSUNDERLINE)
 
             self.viewers[side] = sci
             blk = blockmatcher.BlockList(self.frame)
@@ -530,10 +508,10 @@ class FileDiffDialog(_AbstractFileDialog):
             self.block[side] = blk
         lay.insertWidget(2, self.diffblock)
 
-        for side in sides:
-            table = getattr(self, 'tableView_revisions_%s' % side)
+        for table in self._repoViews:
             table.setTabKeyNavigation(False)
-            #table.installEventFilter(self)
+            table.installEventFilter(self)
+            table.columnsVisibilityChanged.connect(self._syncColumnsVisibility)
             table.revisionSelected.connect(self.onRevisionSelected)
             table.revisionActivated.connect(self.onRevisionActivated)
 
@@ -548,6 +526,10 @@ class FileDiffDialog(_AbstractFileDialog):
         self.setTabOrder(table, self.viewers['left'])
         self.setTabOrder(self.viewers['left'], self.viewers['right'])
 
+        # timer used to merge requests of syncPageStep on ResizeEvent
+        self._delayedSyncPageStep = QTimer(self, interval=0, singleShot=True)
+        self._delayedSyncPageStep.timeout.connect(self.diffblock.syncPageStep)
+
         # timer used to fill viewers with diff block markers during GUI idle time
         self.timer = QTimer()
         self.timer.setSingleShot(False)
@@ -556,14 +538,14 @@ class FileDiffDialog(_AbstractFileDialog):
     def setupModels(self):
         self.filedata = {'left': None, 'right': None}
         self._invbarchanged = False
-        self.filerevmodel = filerevmodel.FileRevModel(self.repo,
-                                         self.tableView_revisions_left.colselect[0],
-                                         self.filename, parent=self)
-        self.filerevmodel.filled.connect(self.modelFilled)
-        self.tableView_revisions_left.setModel(self.filerevmodel)
-        self.tableView_revisions_right.setModel(self.filerevmodel)
-        self.tableView_revisions_left.menuRequested.connect(self.viewMenuRequest)
-        self.tableView_revisions_right.menuRequested.connect(self.viewMenuRequest)
+        self.filerevmodel = repomodel.FileRevModel(
+            self._repoagent, self.filename, parent=self)
+        for w in self._repoViews:
+            w.setModel(self.filerevmodel)
+            w.menuRequested.connect(self.viewMenuRequest)
+            selmodel = w.selectionModel()
+            selmodel.selectionChanged.connect(self._onRevisionSelectionChanged)
+        QTimer.singleShot(0, self._updateRepoViewForModel)
 
     def createActions(self):
         self.actionClose.triggered.connect(self.close)
@@ -583,26 +565,48 @@ class FileDiffDialog(_AbstractFileDialog):
         self.actionNextDiff.setEnabled(False)
         self.actionPrevDiff.setEnabled(False)
 
+        self._fileactions = filectxactions.FilectxActions(self._repoagent, self)
+        self.addActions(self._fileactions.actions())
+
+    def _updateFileActionsForSelection(self, selmodel):
+        selfds = _fileDataListForSelection(self.filerevmodel, selmodel)
+        self._fileactions.setFileDataList(selfds)
+
     def setupToolbars(self):
         self.editToolbar.addSeparator()
         self.editToolbar.addAction(self.actionNextDiff)
         self.editToolbar.addAction(self.actionPrevDiff)
 
-    def modelFilled(self):
-        self.tableView_revisions_left.resizeColumns()
-        self.tableView_revisions_right.resizeColumns()
+    @pyqtSlot()
+    def _updateRepoViewForModel(self):
+        for w in self._repoViews:
+            w.resizeColumns()
         if self._show_rev is not None:
             self.goto(self._show_rev)
             self._show_rev = None
-        elif self.tableView_revisions_left.currentIndex().isValid():
+        elif self._repoViews[0].currentIndex().isValid():
             return  # already set by goto()
         elif len(self.filerevmodel.graph):
             self.goto(self.filerevmodel.graph[0].rev)
 
+    def eventFilter(self, watched, event):
+        if watched in self.viewers.values():
+            # copy page steps to diffblock _after_ viewers are resized; resize
+            # events will be posted in arbitrary order.
+            if event.type() == QEvent.Resize:
+                self._delayedSyncPageStep.start()
+            return False
+        elif watched in self._repoViews:
+            if event.type() == QEvent.FocusIn:
+                self._updateFileActionsForSelection(watched.selectionModel())
+            return False
+        else:
+            return super(FileDiffDialog, self).eventFilter(watched, event)
+
     def onRevisionSelected(self, rev):
         if rev is None or rev not in self.filerevmodel.graph.nodesdict:
             return
-        if self.sender() is self.tableView_revisions_right:
+        if self.sender() is self._repoViews[1]:
             side = 'right'
         else:
             side = 'left'
@@ -612,14 +616,19 @@ class FileDiffDialog(_AbstractFileDialog):
         self.filedata[side] = data.splitlines()
         self.update_diff(keeppos=otherside[side])
 
+    @qtlib.senderSafeSlot()
+    def _onRevisionSelectionChanged(self):
+        assert isinstance(self.sender(), QItemSelectionModel)
+        self._updateFileActionsForSelection(self.sender())
+
     def goto(self, rev):
         index = self.filerevmodel.indexLinkedFromRev(rev)
-        if index is not None:
+        if index.isValid():
             if index.row() == 0:
                 index = self.filerevmodel.index(1, 0)
-            self.tableView_revisions_left.setCurrentIndex(index)
+            self._repoViews[0].setCurrentIndex(index)
             index = self.filerevmodel.index(0, 0)
-            self.tableView_revisions_right.setCurrentIndex(index)
+            self._repoViews[1].setCurrentIndex(index)
         else:
             self._show_rev = rev
 
@@ -685,9 +694,21 @@ class FileDiffDialog(_AbstractFileDialog):
                 for i in range(alo, ahi):
                     w.markerAdd(i, self.markerminus)
 
+                w = self.viewers['right']
+                if blo < w.lines():
+                    w.markerAdd(blo, self.markerminusline)
+                else:
+                    w.markerAdd(blo - 1, self.markerminusunderline)
+
             elif tag == 'insert':
                 self.block['right'].addBlock('+', blo, bhi)
                 self.diffblock.addBlock('+', alo, ahi, blo, bhi)
+
+                w = self.viewers['left']
+                if alo < w.lines():
+                    w.markerAdd(alo, self.markerplusline)
+                else:
+                    w.markerAdd(alo - 1, self.markerplusunderline)
 
                 w = self.viewers['right']
                 for i in range(blo, bhi):
@@ -736,6 +757,12 @@ class FileDiffDialog(_AbstractFileDialog):
             self.update_page_steps(keeppos)
             self.timer.start()
 
+    @qtlib.senderSafeSlot()
+    def _syncColumnsVisibility(self):
+        src = self.sender()
+        dest = dict(zip(self._repoViews, reversed(self._repoViews)))[src]
+        dest.setVisibleColumns(src.visibleColumns())
+
     @pyqtSlot(int)
     def sbar_changed_left(self, value):
         self.sbar_changed(value, 'left')
@@ -770,109 +797,12 @@ class FileDiffDialog(_AbstractFileDialog):
         vbar.setValue(bvalue)
         self._invbarchanged = False
 
-    def reload(self):
-        self.tableView_revisions_left.saveSettings()
-        self.tableView_revisions_right.saveSettings()
-        super(FileDiffDialog, self).reload()
-
     @pyqtSlot(QPoint, object)
     def viewMenuRequest(self, point, selection):
         'User requested a context menu in repo view widget'
         if not selection:
             return
-        if self.menu is None:
-            self.menu = menu = QMenu(self)
-            a = menu.addAction(_('&Diff to Parent'))
-            a.setIcon(qtlib.geticon('visualdiff'))
-            a.triggered.connect(self.onVisualDiff)
-            a = menu.addAction(_('Diff to &Local'))
-            a.setIcon(qtlib.geticon('ldiff'))
-            a.triggered.connect(self.onVisualDiffToLocal)
-            menu.addSeparator()
-            a = menu.addAction(_('Diff &File to Parent'))
-            a.setIcon(qtlib.geticon('visualdiff'))
-            a.triggered.connect(self.onVisualDiffFile)
-            a = menu.addAction(_('Diff File to Lo&cal'))
-            a.setIcon(qtlib.geticon('ldiff'))
-            a.triggered.connect(self.onVisualDiffFileToLocal)
-            menu.addSeparator()
-            a = menu.addAction(_('&View at Revision'))
-            a.setIcon(qtlib.geticon('view-at-revision'))
-            a.triggered.connect(self.onViewFileAtRevision)
-            a = menu.addAction(_('&Save at Revision...'))
-            a.triggered.connect(self.onSaveFileAtRevision)
-            a = menu.addAction(_('&Edit Local'))
-            a.setIcon(qtlib.geticon('edit-file'))
-            a.triggered.connect(self.onEditLocal)
-            a = menu.addAction(_('&Revert to Revision...'))
-            a.setIcon(qtlib.geticon('hg-revert'))
-            a.triggered.connect(self.onRevertFileToRevision)
-        self.selection = selection
-        self.menu.exec_(point)
-
-    def onVisualDiff(self):
-        opts = dict(change=self.selection[0])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
-        if dlg:
-            dlg.exec_()
-
-    def onVisualDiffToLocal(self):
-        opts = dict(rev=['rev(%d)' % self.selection[0]])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, [], opts)
-        if dlg:
-            dlg.exec_()
-
-    def onVisualDiffFile(self):
-        rev = self.selection[0]
-        paths = [self.filerevmodel.graph.filename(rev)]
-        opts = dict(change=self.selection[0])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
-        if dlg:
-            dlg.exec_()
-
-    def onVisualDiffFileToLocal(self):
-        rev = self.selection[0]
-        paths = [self.filerevmodel.graph.filename(rev)]
-        opts = dict(rev=['rev(%d)' % rev])
-        dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
-        if dlg:
-            dlg.exec_()
-
-    def onEditLocal(self):
-        filenames = [self.filename]
-        if not filenames:
-            return
-        qtlib.editfiles(self.repo, filenames, parent=self)
-
-    def onRevertFileToRevision(self):
-        rev = self.selection[0]
-        if rev is None:
-            rev = self.repo['.'].rev()
-        fileSelection = [self.filerevmodel.graph.filename(rev)]
-        if len(fileSelection) == 0:
-            return
-        dlg = revert.RevertDialog(self.repo, fileSelection, rev, self)
-        if dlg:
-            dlg.exec_()
-            dlg.deleteLater()
-
-    def onViewFileAtRevision(self):
-        rev = self.selection[0]
-        filenames = [self.filerevmodel.graph.filename(rev)]
-        if not filenames:
-            return
-        if rev is None:
-            qtlib.editfiles(self.repo, filenames, parent=self)
-        else:
-            base, _ = visdiff.snapshot(self.repo, filenames, self.repo[rev])
-            files = [os.path.join(base, filename)
-                     for filename in filenames]
-            qtlib.editfiles(self.repo, files, parent=self)
-
-    def onSaveFileAtRevision(self, rev):
-        rev = self.selection[0]
-        files = [self.filerevmodel.graph.filename(rev)]
-        if not files or rev is None:
-            return
-        else:
-            qtlib.savefiles(self.repo, files, rev, parent=self)
+        menu = QMenu(self)
+        _setupFileMenu(menu, self._fileactions)
+        menu.setAttribute(Qt.WA_DeleteOnClose)
+        menu.popup(point)

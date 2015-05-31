@@ -8,19 +8,18 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os, tempfile, re
-from StringIO import StringIO
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-from mercurial import error, extensions, util, scmutil
+from mercurial import error, util
 from tortoisehg.util import hglib
-from tortoisehg.hgqt.i18n import _
-from tortoisehg.hgqt import cmdui, lexers, qtlib
+from tortoisehg.util.i18n import _
+from tortoisehg.hgqt import cmdcore, cmdui, lexers, qtlib
 from tortoisehg.hgqt.hgemail_ui import Ui_EmailDialog
 
 class EmailDialog(QDialog):
     """Dialog for sending patches via email"""
 
-    def __init__(self, repo, revs, parent=None, outgoing=False,
+    def __init__(self, repoagent, revs, parent=None, outgoing=False,
                  outgoingrevs=None):
         """Create EmailDialog for the given repo and revs
 
@@ -32,7 +31,8 @@ class EmailDialog(QDialog):
         """
         super(EmailDialog, self).__init__(parent)
         self.setWindowFlags(Qt.Window)
-        self._repo = repo
+        self._repoagent = repoagent
+        self._cmdsession = cmdcore.nullCmdSession()
         self._outgoing = outgoing
         self._outgoingrevs = outgoingrevs or []
 
@@ -97,16 +97,16 @@ class EmailDialog(QDialog):
             s.setValue('email/%s' % k, w.isChecked())
 
     def _initchangesets(self, revs):
-        def purerevs(revs):
-            return scmutil.revrange(self._repo, iter(str(e) for e in revs))
-
         self._changesets = _ChangesetsModel(self._repo,
-                                            # TODO: [':'] is inefficient
-                                            revs=purerevs(revs or [':']),
-                                            selectedrevs=purerevs(revs),
+                                            revs=revs or list(self._repo),
+                                            selectedrevs=revs,
                                             parent=self)
         self._changesets.dataChanged.connect(self._updateforms)
         self._qui.changesets_view.setModel(self._changesets)
+
+    @property
+    def _repo(self):
+        return self._repoagent.rawRepo()
 
     @property
     def _ui(self):
@@ -169,7 +169,7 @@ class EmailDialog(QDialog):
         """Generate opts for patchbomb by form values"""
         def headertext(s):
             # QLineEdit may contain newline character
-            return re.sub(r'\s', ' ', hglib.fromunicode(s))
+            return re.sub(r'\s', ' ', unicode(s))
 
         opts['to'] = [headertext(self._qui.to_edit.currentText())]
         opts['cc'] = [headertext(self._qui.cc_edit.currentText())]
@@ -179,10 +179,10 @@ class EmailDialog(QDialog):
 
         if self._qui.bundle_radio.isChecked():
             assert self._outgoing  # only outgoing bundle is supported
-            opts['rev'] = map(str, self._outgoingrevs)
+            opts['rev'] = hglib.compactrevs(self._outgoingrevs)
             opts['bundle'] = True
         else:
-            opts['rev'] = map(str, self._revs)
+            opts['rev'] = hglib.compactrevs(self._revs)
 
         def diffformat():
             n = self.getdiffformat()
@@ -195,10 +195,11 @@ class EmailDialog(QDialog):
         opts.update(self.getextraopts())
 
         def writetempfile(s):
-            fd, fname = tempfile.mkstemp(prefix='thg_emaildesc_')
+            fd, fname = tempfile.mkstemp(prefix='thg_emaildesc_',
+                                         dir=qtlib.gettempdir())
             try:
                 os.write(fd, s)
-                return fname
+                return hglib.tounicode(fname)
             finally:
                 os.close(fd)
 
@@ -207,11 +208,13 @@ class EmailDialog(QDialog):
             opts['subject'] = headertext(self._qui.subject_edit.currentText())
             opts['desc'] = writetempfile(
                 hglib.fromunicode(self._qui.body_edit.toPlainText()))
-            # TODO: change patchbomb not to use temporary file
 
-        # Include the repo in the command so it can be found when thg is not
-        # run from within a hg path
-        opts['repository'] = self._repo.root
+        # The email dialog is available no matter if patchbomb extension isn't
+        # enabled.  The extension name makes it unlikely first-time users
+        # would discover that Mercurial ships with a functioning patch MTA.
+        # Since patchbomb doesn't monkey patch any Mercurial code, it's safe
+        # to enable it on demand.
+        opts['config'] = 'extensions.patchbomb='
 
         return opts
 
@@ -249,7 +252,7 @@ class EmailDialog(QDialog):
         if self._introrequired():
             self._qui.writeintro_check.setChecked(True)
 
-    #@pyqtSlot()
+    @qtlib.senderSafeSlot()
     def _updateattachmodes(self):
         """Update checkboxes to select the embedding style of the patch"""
         attachmodes = [self._qui.attach_check, self._qui.inline_check]
@@ -271,19 +274,15 @@ class EmailDialog(QDialog):
             getattr(self._qui, e).editTextChanged.connect(self._updateforms)
 
     def accept(self):
-        hglib.loadextension(self._ui, 'patchbomb')
-
         opts = self._patchbombopts()
-        try:
-            cmd = cmdui.Dialog(hglib.buildcmdargs('email', **opts), parent=self)
-            cmd.setWindowTitle(_('Sending Email'))
-            cmd.setShowOutput(False)
-            cmd.finished.connect(cmd.deleteLater)
-            if cmd.exec_():
-                self._writehistory()
-        finally:
-            if 'desc' in opts:
-                os.unlink(opts['desc'])  # TODO: don't use tempfile
+        cmdline = hglib.buildcmdargs('email', **opts)
+        cmd = cmdui.CmdSessionDialog(self)
+        cmd.setWindowTitle(_('Sending Email'))
+        cmd.setLogVisible(False)
+        uih = cmdui.PasswordUiHandler(cmd)  # skip "intro" prompt
+        cmd.setSession(self._repoagent.runCommand(cmdline, uih))
+        if cmd.exec_() == 0:
+            self._writehistory()
 
     def _initintrobox(self):
         self._qui.intro_box.hide()  # hidden by default
@@ -292,7 +291,7 @@ class EmailDialog(QDialog):
 
     def _introrequired(self):
         """Is intro message required?"""
-        return len(self._revs) > 1 or self._qui.bundle_radio.isChecked()
+        return self._qui.bundle_radio.isChecked()
 
     def _initpreviewtab(self):
         def initqsci(w):
@@ -321,40 +320,17 @@ class EmailDialog(QDialog):
         if self._previewtabindex() != index:
             return
 
-        self._qui.preview_edit.setText(self._preview())
-
-    def _preview(self):
-        """Generate preview text by running patchbomb"""
-        def loadpatchbomb():
-            hglib.loadextension(self._ui, 'patchbomb')
-            return extensions.find('patchbomb')
-
-        def wrapui(ui):
-            buf = StringIO()
-            # TODO: common way to prepare pure ui
-            newui = ui.copy()
-            newui.setconfig('ui', 'interactive', False)
-            newui.setconfig('diff', 'git', False)
-            newui.write = lambda *args, **opts: buf.write(''.join(args))
-            newui.status = lambda *args, **opts: None
-            return newui, buf
-
-        def stripheadmsg(s):
-            # TODO: skip until first Content-type: line ??
-            return '\n'.join(s.splitlines()[3:])
-
-        ui, buf = wrapui(self._ui)
+        self._qui.preview_edit.clear()
         opts = self._patchbombopts(test=True)
-        try:
-            # TODO: fix hgext.patchbomb's implementation instead
-            if 'PAGER' in os.environ:
-                del os.environ['PAGER']
+        cmdline = hglib.buildcmdargs('email', **opts)
+        self._cmdsession = sess = self._repoagent.runCommand(cmdline)
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._updatepreview)
 
-            loadpatchbomb().patchbomb(ui, self._repo, **opts)
-            return stripheadmsg(hglib.tounicode(buf.getvalue()))
-        finally:
-            if 'desc' in opts:
-                os.unlink(opts['desc'])  # TODO: don't use tempfile
+    @pyqtSlot()
+    def _updatepreview(self):
+        msg = hglib.tounicode(str(self._cmdsession.readAll()))
+        self._qui.preview_edit.append(msg)
 
     def _previewtabindex(self):
         """Index of preview tab"""
@@ -377,7 +353,9 @@ class EmailDialog(QDialog):
     def on_selectnone_button_clicked(self):
         self._changesets.selectNone()
 
-class _ChangesetsModel(QAbstractTableModel):  # TODO: use component of log viewer?
+
+# TODO: use component of log viewer?
+class _ChangesetsModel(QAbstractTableModel):
     _COLUMNS = [('rev', lambda ctx: '%d:%s' % (ctx.rev(), ctx)),
                 ('author', lambda ctx: hglib.username(ctx.user())),
                 ('date', lambda ctx: util.shortdate(ctx.date())),
