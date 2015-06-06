@@ -1,6 +1,6 @@
 tortoisehg (3.4-1) UNRELEASED; urgency=medium
 
-  * Imported Upstream version 3.4
+  * Imported Upstream version 3.4 (Closes: #787515)
 
  -- Andrew Shadura <andrewsh@debian.org>  Sun, 31 May 2015 11:29:25 +0200
 
