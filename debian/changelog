@@ -1,3 +1,11 @@
+tortoisehg (3.4.1-1) unstable; urgency=low
+
+  * Imported Upstream version 3.4.1
+  * Update Standards-Version to 3.9.6.
+  * Update dependecy on mercurial to match hgversion.py.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 12 Jul 2015 12:45:11 -0700
+
 tortoisehg (3.4-0.1) unstable; urgency=medium
 
   * Non-maintainer upload.
