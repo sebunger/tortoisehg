@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
 "PO-Revision-Date: 2014-10-22 10:03+0000\n"
 "Last-Translator: onekosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-02-20 05:17+0000\n"
-"X-Generator: Launchpad (build 17341)\n"
+"X-Launchpad-Export-Date: 2015-04-28 05:15+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
@@ -31,8 +31,8 @@ msgstr ""
 msgid "About"
 msgstr "Про програму..."
 
-msgid "Copyright 2008-2014 Steve Borho and others"
-msgstr "Авторські права 2008-2014 Steve Borho та інших"
+msgid "Copyright 2008-2015 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Декілька значків люб'язно надані проектами TortoiseSVN, Tango"
@@ -382,6 +382,43 @@ msgstr "Закладка '%s' вилучена"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "Закладка '%s' змінила назву на '%s'"
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr ""
+
+msgid "Outgoing Bookmarks"
+msgstr ""
+
+msgid "&Push Bookmark"
+msgstr ""
+
+msgid "&Remove Bookmark"
+msgstr ""
+
+msgid "Incoming Bookmarks"
+msgstr ""
+
+msgid "P&ull Bookmark"
+msgstr ""
+
+msgid "R&emove Bookmark"
+msgstr ""
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr ""
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "Дія з гілкою - %s"
@@ -536,6 +573,9 @@ msgstr "Параметри"
 
 msgid "Clone to revision:"
 msgstr "Клонувати до ревізії:"
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr ""
 
 msgid "Do not update the new working directory"
 msgstr "Не поновлювати новий робочий каталог"
@@ -1128,6 +1168,7 @@ msgstr "Назва знаряддя"
 msgid "The tool name. It cannot contain spaces."
 msgstr "Назва знаряддя. Не може містити прогалини."
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1153,6 +1194,7 @@ msgstr ""
 "- {FILES}: Список файлів обраної ревізії.\n"
 "- {ALLFILES}: Всі файли, контрольовані Mercurial для обраної ревізії."
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -2511,15 +2553,6 @@ msgstr "Фіксувати зараз"
 msgid "Commit Later"
 msgstr "Фіксувати згодом"
 
-msgid "TortoiseHg Merge Commit"
-msgstr "TortoiseHg фіксація злиття"
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
-
 msgid "Merge changeset"
 msgstr "Злити набір змін"
 
@@ -3216,17 +3249,17 @@ msgstr "Переміщення похідних"
 msgid "Swap source and destination"
 msgstr "Обміняти місцями джерело та призначення"
 
-msgid "Keep original changesets"
-msgstr "Зберегти оригінальний набор змін"
+msgid "Keep original changesets (--keep)"
+msgstr ""
 
-msgid "Keep original branch names"
-msgstr "Зберегти оригінальні назви гілок"
+msgid "Keep original branch names (--keepbranches)"
+msgstr ""
 
-msgid "Collapse the rebased changesets"
-msgstr "Переміщення набору змін зазнало краху"
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr ""
 
-msgid "Rebase entire source branch"
-msgstr "Перемістити гілку джерела в цілому"
+msgid "Rebase entire source branch (-b/--base)"
+msgstr ""
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3876,6 +3909,9 @@ msgstr "%s <вхідний>"
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr "Знайдено %d вхідні зміни"
+
+msgid "Pull"
+msgstr "Затягнути"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Затягнути набори змін у сховище"
@@ -5244,8 +5280,11 @@ msgstr "перегляд порізки"
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
-msgid "thg sync [PEER]"
-msgstr "thg sync [PEER]"
+msgid "open the bookmark sync window"
+msgstr ""
+
+msgid "thg sync [OPTION]... [PEER]"
+msgstr ""
 
 msgid "replace existing tag"
 msgstr "замінити існуючий ярлик"
@@ -5771,6 +5810,14 @@ msgid ""
 msgstr ""
 "Ім'я асоційоване з зафіксованим кодом. Формат наступний:<br>повне ім'я &lt;"
 "email@example.com&gt;."
+
+msgid "Ask Username"
+msgstr ""
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
 
 msgid "Summary Line Length"
 msgstr "Зведена довжина рядка"
@@ -6367,6 +6414,7 @@ msgstr "Визначає регулярний вираз відповідно д
 msgid "Issue Link"
 msgstr "Посилання на проблему"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -7045,6 +7093,9 @@ msgstr "Виявити сформовані зміни у URL"
 msgid "Push outgoing changes to selected URL"
 msgstr "Виштовхнути сформовані зміни до URL"
 
+msgid "Sync Bookmarks"
+msgstr ""
+
 msgid "Email outgoing changesets for remote repository"
 msgstr "Відправити сформовані набори змін для зовнішнього сховища поштою"
 
@@ -7375,13 +7426,6 @@ msgstr ""
 "Підсховище '%s' має нетиповий URL обміну:<p>%s<p>Замінити його наступним "
 "URL?:<p>%s"
 
-msgid "Certificate Query Error"
-msgstr "Помилка запиту сертифікату"
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr "Некоректний номер порту: %s"
-
 msgid "Security: "
 msgstr "Безпека: "
 
@@ -7459,6 +7503,9 @@ msgstr ""
 
 msgid "User Certificate Chain File"
 msgstr "Файл ланцюжок сертифікатів користувача"
+
+msgid "Certificate Query Error"
+msgstr "Помилка запиту сертифікату"
 
 msgid "Unable to save authentication"
 msgstr "Зберігання аутентифікації не можливе"
@@ -7927,8 +7974,17 @@ msgstr "Оновлення робочого каталогу або переми
 msgid "&Shelve..."
 msgstr "Відкласти..."
 
-msgid "&Import..."
-msgstr "Імпортувати..."
+msgid "&Import Patches..."
+msgstr ""
+
+msgid "U&nbundle..."
+msgstr ""
+
+msgid "&Merge..."
+msgstr ""
+
+msgid "Merge with the other head of the current branch"
+msgstr ""
 
 msgid "&Resolve..."
 msgstr "Розв'язати..."
@@ -7974,6 +8030,9 @@ msgstr "Вихідний"
 
 msgid "P&ush"
 msgstr "Виштовхнути"
+
+msgid "&Sync Bookmarks..."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -8095,6 +8154,21 @@ msgstr "Помилка виконання \"commit finished\" перехоплю
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "Неможливо відкрити діалог Налаштуваня Модулів"
+
+msgid "[SOURCE]"
+msgstr ""
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr ""
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr ""
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr ""
 
 msgid "move after the specified patch"
 msgstr ""
@@ -9999,9 +10073,6 @@ msgstr ""
 #~ msgid "Finished committing"
 #~ msgstr "Фіксація завершена"
 
-#~ msgid "TortoiseHg Sync"
-#~ msgstr "Обмін TortoiseHg"
-
 #~ msgid "Save commit message at exit?"
 #~ msgstr "Зберегти зроблені повідомлення перед виходом?"
 
@@ -10145,9 +10216,6 @@ msgstr ""
 
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "частина %d вже прийнята для рядка %d (fuzz %d)\n"
-
-#~ msgid "outgoing changesets to %s found"
-#~ msgstr "знайдено вихідний набір змін %s"
 
 #~ msgid "Invalid date specification"
 #~ msgstr "Помилковий формат дати"
@@ -10339,9 +10407,6 @@ msgstr ""
 #~ msgid "Load more"
 #~ msgstr "Отримати більше"
 
-#~ msgid "Are you sure that you want to cancel synchronization?"
-#~ msgstr "Ви впевнені, що бажаєте скасувати синхронізацію?"
-
 #~ msgid "Show emails which would be sent"
 #~ msgstr "Відобразити надіслані листи"
 
@@ -10499,9 +10564,6 @@ msgstr ""
 
 #~ msgid "Push"
 #~ msgstr "Виштовхнути"
-
-#~ msgid "Pull"
-#~ msgstr "Затягнути"
 
 #~ msgid "template style to use"
 #~ msgstr "взірці стилів, які використовуються"
@@ -10817,19 +10879,6 @@ msgstr ""
 
 #~ msgid "Error when creating repository"
 #~ msgstr "Помилка при створенні сховища"
-
-#~ msgid ""
-#~ "Error creating interpreting commit date (%s).\n"
-#~ "Using current date instead."
-#~ msgstr ""
-#~ "Помилка при інтерпретації дати фіксації (%s).\n"
-#~ "Використовувати поточну дату."
-
-#~ msgid "Repository stripped, incoming preview cleared"
-#~ msgstr "Вичістили попередньо переглянуті вхідні, сховище відтяли"
-
-#~ msgid "Repository stripped, revision set cleared"
-#~ msgstr "Набір ревізій вичистили, сховище відтяли"
 
 #~ msgid "Merge target (other)"
 #~ msgstr "Мета злиття (інша)"
@@ -11169,9 +11218,6 @@ msgstr ""
 #~ msgid "Tag name is empty"
 #~ msgstr "Ярлик без назви"
 
-#~ msgid "Source does not exists."
-#~ msgstr "Джерело не існує."
-
 #~ msgid "Current patch: %s,  "
 #~ msgstr "Поточна латка: %s,  "
 
@@ -11293,16 +11339,6 @@ msgstr ""
 #~ msgstr "Очистити налагоджене, відмовившись від всіх змін"
 
 #~ msgid ""
-#~ "Space separated list of tags that will not be shown.Useful example: "
-#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
-#~ "Mercurial Queues Extension. Default: None (leave blank)"
-#~ msgstr ""
-#~ "Перелік ярликів, через кому, які відображатимуться. До прикладу: вкажіть "
-#~ "\"qbase qparent qtip\" аби приховати стандартні мітки, які вставляє "
-#~ "додаток Mercurial Queues Extension. Типово: невизначено (залишити "
-#~ "порожнім)."
-
-#~ msgid ""
 #~ "Comma separated list of exclusion patterns.  Exclusion patterns are "
 #~ "applied after inclusion patterns."
 #~ msgstr ""
@@ -11370,16 +11406,6 @@ msgstr ""
 
 #~ msgid "Refresh required"
 #~ msgstr "Потребує освіження"
-
-#~ msgid ""
-#~ "List of Servers from which \"projrc\" configuration files must be pulled. "
-#~ "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull "
-#~ "from the default sync path.Default is pull from NO servers."
-#~ msgstr ""
-#~ "Перелік серверів, з яких \"projrc\" затягуватимуться файли налаштувань. "
-#~ "Встановивши \"*\" отримуватимуть з усіх серверів. Встановивши \"типово\", "
-#~ "отримуватимуть типовими шляхами синхронізації. Типово отримувати з NO "
-#~ "серверів."
 
 #~ msgid ""
 #~ "No movable files selected\n"

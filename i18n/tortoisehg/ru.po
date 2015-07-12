@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
-"PO-Revision-Date: 2015-02-22 10:22+0000\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
+"PO-Revision-Date: 2015-04-27 18:05+0000\n"
 "Last-Translator: Дьяченко Александр <DyachenkoA@hotmail.ru>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-02-23 05:14+0000\n"
-"X-Generator: Launchpad (build 17355)\n"
+"X-Launchpad-Export-Date: 2015-04-28 05:14+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 "Language: ru\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -32,8 +32,8 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "О программе"
 
-msgid "Copyright 2008-2014 Steve Borho and others"
-msgstr "Copyright 2008-2014 Steve Borho и другие"
+msgid "Copyright 2008-2015 Steve Borho and others"
+msgstr "Авторское право 2008-2015 Steve Borho и другие"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Некоторые значки предоставлены проектами TortoiseSVN и Tango"
@@ -383,6 +383,43 @@ msgstr "Закладка '%s' была изъята"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "Закладка '%s' была переименована в '%s'"
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr "Синхронизация закладок TortoiseHg"
+
+msgid "Outgoing Bookmarks"
+msgstr "Исходящие закладки"
+
+msgid "&Push Bookmark"
+msgstr "&Протолкнуть закладки"
+
+msgid "&Remove Bookmark"
+msgstr "&Удалить закладку"
+
+msgid "Incoming Bookmarks"
+msgstr "Входящие закладки"
+
+msgid "P&ull Bookmark"
+msgstr "&Затянуть закладки"
+
+msgid "R&emove Bookmark"
+msgstr "&Удалить закладку"
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr "Протолкнуты локальные закладки: %s"
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr "Затянуты удаленные закладки: %s"
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr "Удалены удаленные закладки: %s"
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr "Удалены локальные закладки: %s"
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - операция с веткой"
@@ -539,6 +576,9 @@ msgstr "Настройки"
 
 msgid "Clone to revision:"
 msgstr "Клонировать до ревизии:"
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr "Идентификатор ревизии, закладка, метка или имя ветки"
 
 msgid "Do not update the new working directory"
 msgstr "Не обновлять создаваемый рабочий каталог"
@@ -1130,6 +1170,7 @@ msgstr "Имя инструмента"
 msgid "The tool name. It cannot contain spaces."
 msgstr "Имя инструмента. Не может содержать пробелы."
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1156,6 +1197,7 @@ msgstr ""
 "- {FILES}: Список файлов, затронутых выбранной ревизией.\n"
 "- {ALLFILES}: Все файлы, отслеживаемые Mercurial'ом в выбранной ревизии."
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -1233,7 +1275,7 @@ msgid ""
 msgstr ""
 "Когда задействовано, то автоматически показывать журнал вывода, при запуске "
 "команды.\n"
-"По умолчанию: Ложь."
+"По умолчанию: Нет."
 
 msgid "You must set a tool name."
 msgstr "Вы должны установить имя инструмента."
@@ -2531,17 +2573,6 @@ msgstr "Зафиксировать сейчас"
 msgid "Commit Later"
 msgstr "Зафиксировать позже"
 
-msgid "TortoiseHg Merge Commit"
-msgstr "Фиксация слияния TortoiseHg"
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
-"Ошибка интерпретации даты фиксации (%s).\n"
-"Взамен использована текущая дата."
-
 msgid "Merge changeset"
 msgstr "Слить набор изменений"
 
@@ -3243,17 +3274,17 @@ msgstr "Перебазировать поверх места назначени�
 msgid "Swap source and destination"
 msgstr "Поменять местами источник и назначение"
 
-msgid "Keep original changesets"
-msgstr "Сохранять исходные наборы изменений"
+msgid "Keep original changesets (--keep)"
+msgstr "Сохранять исходные наборы изменений (--keep)"
 
-msgid "Keep original branch names"
-msgstr "Сохранять исходные имена веток"
+msgid "Keep original branch names (--keepbranches)"
+msgstr "Сохранять исходные имена веток (--keepbranches)"
 
-msgid "Collapse the rebased changesets"
+msgid "Collapse the rebased changesets (--collapse)"
 msgstr "Свернуть перебазируемые наборы изменений (--collapse)"
 
-msgid "Rebase entire source branch"
-msgstr "Перебазировать всю ветвь источника"
+msgid "Rebase entire source branch (-b/--base)"
+msgstr "Перебазировать всю ветвь источника (-b/--base)"
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3365,7 +3396,7 @@ msgid "Select Source Folder"
 msgstr "Выберите исходную папку"
 
 msgid "Source does not exist."
-msgstr "Источник не существует."
+msgstr "Исходный файл не существует."
 
 msgid "The source must be within the repository tree."
 msgstr "Источник должен находиться внутри дерева каталогов хранилища"
@@ -3915,6 +3946,9 @@ msgstr "%s <входящий>"
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr "Найдено %d входящих наборов изменений"
+
+msgid "Pull"
+msgstr "Затянуть"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Затянуть входящие наборы изменений в ваше хранилище"
@@ -5290,8 +5324,11 @@ msgstr "ревизия для срезания"
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr "thg strip [-k] [-f] [-n] [[-r] РЕВИЗИЯ]"
 
-msgid "thg sync [PEER]"
-msgstr "thg sync [ПУТЬ]"
+msgid "open the bookmark sync window"
+msgstr "открыть окно синхронизации закладок"
+
+msgid "thg sync [OPTION]... [PEER]"
+msgstr "thg sync [ПАРАМЕТР]... [ПУТЬ]"
 
 msgid "replace existing tag"
 msgstr "заменить существующую метку"
@@ -5550,7 +5587,7 @@ msgid ""
 "Specify the number of spaces that tabs expand to in various TortoiseHg "
 "windows. Default: 8"
 msgstr ""
-"Укажите число пробелов для замены табуляции в различных окнах TortoiseHg. По-"
+"Укажите число пробелов для замены табуляции в различных окнах TortoiseHg. По "
 "умолчанию: 8"
 
 msgid "Force Repo Tab"
@@ -5832,6 +5869,16 @@ msgid ""
 msgstr ""
 "Имя, записываемое при фиксациях. Общеупотребительный формат таков:<br>Имя "
 "Фамилия &lt;email@example.com&gt;"
+
+msgid "Ask Username"
+msgstr "Спрашивать имя пользователя"
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
+"Если имя пользователя не было указано, пользователю будет предложено ввести "
+"имя пользователя. По умолчанию: Нет"
 
 msgid "Summary Line Length"
 msgstr "Длина строки сводки"
@@ -6460,6 +6507,7 @@ msgstr ""
 msgid "Issue Link"
 msgstr "Ссылка на проблему"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -7160,6 +7208,9 @@ msgstr "Определить исходящие изменения, предна
 msgid "Push outgoing changes to selected URL"
 msgstr "Протолкнуть исходящие изменения на выбранный URL"
 
+msgid "Sync Bookmarks"
+msgstr "Синхронизация закладок"
+
 msgid "Email outgoing changesets for remote repository"
 msgstr "Отправить исходящие наборы изменений в отдалённое хранилище по почте"
 
@@ -7495,13 +7546,6 @@ msgstr ""
 "Подхранилище '%s' имеет не тривиальный URL для синхронизации по умолчанию:<p>"
 "%s<p>Заменить его следующим URL?<p>%s"
 
-msgid "Certificate Query Error"
-msgstr "Ошибка запроса сертификата"
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr "Неверный номер порта: %s"
-
 msgid "Security: "
 msgstr "Безопасность: "
 
@@ -7576,6 +7620,9 @@ msgstr ""
 
 msgid "User Certificate Chain File"
 msgstr "Файл цепочки сертификатов пользователя"
+
+msgid "Certificate Query Error"
+msgstr "Ошибка запроса сертификата"
 
 msgid "Unable to save authentication"
 msgstr "Не удаётся сохранить аутентификацию"
@@ -8050,8 +8097,17 @@ msgstr "Обновить рабочий каталог или переключи
 msgid "&Shelve..."
 msgstr "&Отложить..."
 
-msgid "&Import..."
-msgstr "&Импорт..."
+msgid "&Import Patches..."
+msgstr "&Импортировать заплатки..."
+
+msgid "U&nbundle..."
+msgstr "&Разукомплектовать..."
+
+msgid "&Merge..."
+msgstr "&Слить..."
+
+msgid "Merge with the other head of the current branch"
+msgstr "Слить с другой головой текущей ветки"
 
 msgid "&Resolve..."
 msgstr "&Разрешение конфликтов..."
@@ -8097,6 +8153,9 @@ msgstr "&Исходящие"
 
 msgid "P&ush"
 msgstr "Про&толкнуть"
+
+msgid "&Sync Bookmarks..."
+msgstr "&Синхронизировать закладки..."
 
 #, python-format
 msgid ""
@@ -8220,6 +8279,21 @@ msgstr "Ошибка выполнения триггера \"commit finished\""
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "Невозможно открыть диалог настройки плагина"
+
+msgid "[SOURCE]"
+msgstr "[ИСТОЧНИК]"
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr "неподдерживаемый URL: %s"
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr "отпечаток хоста для %s не может быть получен (Python слишком стар)"
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr "%s ошибка сертификата: сертификат не получен"
 
 msgid "move after the specified patch"
 msgstr "переместить после указанной заплатки"
@@ -9612,9 +9686,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "Revision..."
 #~ msgstr "Ревизия..."
-
-#~ msgid "Pull"
-#~ msgstr "Затянуть"
 
 #~ msgid "Push"
 #~ msgstr "Протолкнуть"
@@ -11129,9 +11200,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ msgid "Refresh required"
 #~ msgstr "Требуется обновить изображение"
 
-#~ msgid "Source does not exists."
-#~ msgstr "Исходный файл не существует."
-
 #~ msgid "unknown hunk type: %s"
 #~ msgstr "неизвестный тип лоскута: %s"
 
@@ -11280,15 +11348,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ msgstr "лоскут %d уже наложен в строке %d (степень схожести %d)\n"
 
 #~ msgid ""
-#~ "Space separated list of tags that will not be shown.Useful example: "
-#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
-#~ "Mercurial Queues Extension. Default: None (leave blank)"
-#~ msgstr ""
-#~ "Разделяемый пробелами список меток, которые не будут отображаться. "
-#~ "Полезный пример: укажите «qbase qparent qtip» чтобы скрыть стандартные "
-#~ "метки, вставляемые расширением MQ. По умолчанию: Пусто"
-
-#~ msgid ""
 #~ "Comma separated list of inclusion patterns.  By default, the entire "
 #~ "repository is searched."
 #~ msgstr ""
@@ -11325,9 +11384,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "Конфигурация оболочки TortoiseHg"
-
-#~ msgid "TortoiseHg Sync"
-#~ msgstr "Синхронизация TortoiseHg"
 
 #~ msgid "_Revert File Contents"
 #~ msgstr "_Вернуть содержимое файла"
@@ -11761,26 +11817,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ msgid "abandon failed\n"
 #~ msgstr "выбрасывание не удалось\n"
 
-#~ msgid "Repository stripped, incoming preview cleared"
-#~ msgstr ""
-#~ "Хранилище урезано, предварительный просмотр входящих изменений очищен"
-
-#~ msgid "Repository stripped, revision set cleared"
-#~ msgstr "Хранилище урезано, выборка ревизий очищена"
-
-#~ msgid ""
-#~ "List of Servers from which \"projrc\" configuration files must be pulled. "
-#~ "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull "
-#~ "from the default sync path.Default is pull from NO servers."
-#~ msgstr ""
-#~ "Список серверов, с которых нужно затягивать файлы конфигурации «projrc». "
-#~ "Установите значение \"*\", чтобы затягивать со всех серверов. Установите "
-#~ "значение «default», чтобы затягивать из пути синхронизации по умолчанию. "
-#~ "По умолчанию — не затягивать ни с каких серверов."
-
-#~ msgid "outgoing changesets to %s found"
-#~ msgstr "найдены исходящие наборы изменений для %s"
-
 #~ msgid ""
 #~ "** Please report this bug to http://bitbucket.org/tortoisehg/stable/"
 #~ "issues\n"
@@ -11862,13 +11898,3 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "abandon shelved changes"
 #~ msgstr "Отказаться от отложенных изменений"
-
-#~ msgid "Are you sure that you want to cancel synchronization?"
-#~ msgstr "Вы правда хотите отменить синхронизацию?"
-
-#~ msgid ""
-#~ "Error creating interpreting commit date (%s).\n"
-#~ "Using current date instead."
-#~ msgstr ""
-#~ "Ошибка при создании интерпретации даты фиксации (%s).\n"
-#~ "Взамен используется текущая дата."

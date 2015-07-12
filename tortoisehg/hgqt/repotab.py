@@ -314,7 +314,7 @@ class RepoTabWidget(QWidget):
     def _createRepoWidget(self, root, bundle=None):
         try:
             repoagent = self._repomanager.openRepoAgent(root)
-        except error.RepoError, e:
+        except (error.Abort, error.RepoError), e:
             qtlib.WarningMsgBox(_('Failed to open repository'),
                                 hglib.tounicode(str(e)), parent=self)
             return

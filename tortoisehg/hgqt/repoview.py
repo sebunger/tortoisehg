@@ -195,7 +195,10 @@ class HgRepoView(QTreeView):
 
         key = '%s/column_widths/%s' % (self.cfgname,
                                        hglib.shortrepoid(self.repo))
-        col_widths = [int(w) for w in QSettings().value(key).toStringList()]
+        try:
+            col_widths = [int(w) for w in QSettings().value(key).toStringList()]
+        except ValueError:
+            col_widths = []
 
         for c in range(model.columnCount()):
             if hh.isSectionHidden(c):

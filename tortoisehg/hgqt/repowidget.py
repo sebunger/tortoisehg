@@ -173,8 +173,12 @@ class RepoWidget(QWidget):
     @pyqtSlot()
     def _initView(self):
         self._updateRepoViewForModel()
-        # restore column widths when model is initially loaded
-        self.repoview.resizeColumns()
+        # restore column widths when model is initially loaded.  For some
+        # reason, this needs to be deferred after updating the view.  Otherwise
+        # repoview.HgRepoView.resizeEvent() fires as the vertical scrollbar is
+        # added, which causes the last column to grow by the scrollbar width on
+        # each restart (and steal from the description width).
+        QTimer.singleShot(0, self.repoview.resizeColumns)
 
         # select the widget chosen by the user
         name = self.repo.ui.config('tortoisehg', 'defaultwidget')
@@ -610,6 +614,10 @@ class RepoWidget(QWidget):
         if dlg.exec_() == 0:
             self.gotoTip()
 
+    def unbundle(self):
+         w = self.syncDemand.get()
+         w.unbundle()
+
     def shelve(self, arg=None):
         self._dialogs.open(RepoWidget._createShelveDialog)
 
@@ -912,6 +920,9 @@ class RepoWidget(QWidget):
         """
         self.syncDemand.get().push(confirm, **kwargs)
         self.outgoingMode = False
+
+    def syncBookmark(self):
+        self.syncDemand.get().syncBookmark()
 
     ##
     ## Repoview context menu
@@ -1415,7 +1426,8 @@ class RepoWidget(QWidget):
             epath = os.path.join(udir, ename)
             custompath = False
 
-        cmdline = ['export', '--verbose', '--output', epath]
+        cmdline = hglib.buildcmdargs('export', verbose=True, output=epath,
+                                     rev=hglib.compactrevs(sorted(revisions)))
 
         existingRevisions = []
         for rev in revisions:
@@ -1434,7 +1446,6 @@ class RepoWidget(QWidget):
                         _('There is already an existing folder '
                         'with that same name.'))
                     return
-            cmdline.extend(['--rev', str(rev)])
 
         if existingRevisions:
             buttonNames = [_("Replace"), _("Append"), _("Abort")]
@@ -1546,6 +1557,36 @@ class RepoWidget(QWidget):
     def _createManifestDialog(self):
         return revdetails.createManifestDialog(self._repoagent, self.rev)
 
+    def mergeWithOtherHead(self):
+        """Open dialog to merge with the other head of the current branch"""
+        cmdline = hglib.buildcmdargs('merge', preview=True,
+                                     config='ui.logtemplate={rev}\n')
+        sess = self._runCommand(cmdline)
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._onMergePreviewFinished)
+
+    @qtlib.senderSafeSlot(int)
+    def _onMergePreviewFinished(self, ret):
+        sess = self.sender()
+        if ret == 255 and 'hg heads' in sess.errorString():
+            # multiple heads
+            self.filterbar.setQuery('head() - .')
+            self.filterbar.runQuery()
+            msg = '\n'.join(sess.errorString().splitlines()[:-1])  # drop hint
+            w = self.setInfoBar(infobar.ConfirmInfoBar, msg)
+            assert w
+            w.acceptButton.setText(_('Merge'))
+            w.accepted.connect(self.mergeWithRevision)
+            w.finished.connect(self.clearRevisionSet)
+            return
+        if ret != 0:
+            return
+        revs = map(int, str(sess.readAll()).splitlines())
+        if not revs:
+            return
+        self._dialogs.open(RepoWidget._createMergeDialog, revs[-1])
+
+    @pyqtSlot()
     def mergeWithRevision(self):
         pctx = self.repo['.']
         octx = self.repo[self.rev]
@@ -1667,7 +1708,7 @@ class RepoWidget(QWidget):
         if command == 'export':
             # patches should be in chronological order
             revs = sorted(self.menuselection)
-            cmdline = hglib.buildcmdargs('export', rev=revs)
+            cmdline = hglib.buildcmdargs('export', rev=hglib.compactrevs(revs))
         else:
             revs = self.rev and self.menuselection or None
             cmdline = hglib.buildcmdargs('diff', rev=revs)
@@ -1979,6 +2020,7 @@ class RepoWidget(QWidget):
     @pyqtSlot()
     def _notifyWorkingDirChanges(self):
         shlib.shell_notify([self.repo.root])
+        self._refreshCommitTabIfNeeded()
 
     @pyqtSlot()
     def _refreshCommitTabIfNeeded(self):

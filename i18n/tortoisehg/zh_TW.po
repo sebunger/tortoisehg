@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
 "PO-Revision-Date: 2015-02-16 16:26+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-02-20 05:18+0000\n"
-"X-Generator: Launchpad (build 17341)\n"
+"X-Launchpad-Export-Date: 2015-04-28 05:16+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -30,8 +30,8 @@ msgstr ""
 msgid "About"
 msgstr "關於"
 
-msgid "Copyright 2008-2014 Steve Borho and others"
-msgstr "Copyright 2008-2014 Steve Borho 及其他"
+msgid "Copyright 2008-2015 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "許多圖示是由TortoiseSVN及Tango projects 所提供"
@@ -375,6 +375,43 @@ msgstr "\"%s\"書籤已經被移除"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "\"%s\"書籤已經被重新命名成\"%s\""
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr ""
+
+msgid "Outgoing Bookmarks"
+msgstr ""
+
+msgid "&Push Bookmark"
+msgstr ""
+
+msgid "&Remove Bookmark"
+msgstr ""
+
+msgid "Incoming Bookmarks"
+msgstr ""
+
+msgid "P&ull Bookmark"
+msgstr ""
+
+msgid "R&emove Bookmark"
+msgstr ""
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr ""
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - 分支操作"
@@ -527,6 +564,9 @@ msgstr "選項"
 
 msgid "Clone to revision:"
 msgstr "拓製修訂版:"
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr ""
 
 msgid "Do not update the new working directory"
 msgstr "不要對新的工作目錄進行更新"
@@ -1112,6 +1152,7 @@ msgstr "工具名字"
 msgid "The tool name. It cannot contain spaces."
 msgstr "工具名字不能有空白"
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1126,6 +1167,7 @@ msgid ""
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -2415,15 +2457,6 @@ msgstr "馬上提交"
 msgid "Commit Later"
 msgstr "稍候提交"
 
-msgid "TortoiseHg Merge Commit"
-msgstr ""
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
-
 msgid "Merge changeset"
 msgstr "合併變更集"
 
@@ -3102,16 +3135,16 @@ msgstr ""
 msgid "Swap source and destination"
 msgstr "來源跟目的交換"
 
-msgid "Keep original changesets"
-msgstr "保留原始變更集"
-
-msgid "Keep original branch names"
-msgstr "保持原始分支名稱"
-
-msgid "Collapse the rebased changesets"
+msgid "Keep original changesets (--keep)"
 msgstr ""
 
-msgid "Rebase entire source branch"
+msgid "Keep original branch names (--keepbranches)"
+msgstr ""
+
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr ""
+
+msgid "Rebase entire source branch (-b/--base)"
 msgstr ""
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
@@ -3725,6 +3758,9 @@ msgstr "%s <可拉收>"
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr ""
+
+msgid "Pull"
+msgstr "拉收"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "拉收可拉收的變更集到你的儲存庫"
@@ -5024,7 +5060,10 @@ msgstr "剝除修訂版"
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
-msgid "thg sync [PEER]"
+msgid "open the bookmark sync window"
+msgstr ""
+
+msgid "thg sync [OPTION]... [PEER]"
 msgstr ""
 
 msgid "replace existing tag"
@@ -5472,6 +5511,14 @@ msgid ""
 "Name associated with commits.  The common format is:<br>Full Name &lt;"
 "email@example.com&gt;"
 msgstr "提交時用的名字.格式通常是 <br>Full Name &lt;email@example.com&gt;"
+
+msgid "Ask Username"
+msgstr ""
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
 
 msgid "Summary Line Length"
 msgstr "摘要行數"
@@ -5978,6 +6025,7 @@ msgstr ""
 msgid "Issue Link"
 msgstr "問題連結"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -6602,6 +6650,9 @@ msgstr "從選擇的URL那邊檢查可推送的變更集"
 msgid "Push outgoing changes to selected URL"
 msgstr "從選擇的URL那邊推送可推送的變更集"
 
+msgid "Sync Bookmarks"
+msgstr ""
+
 msgid "Email outgoing changesets for remote repository"
 msgstr "Email可被推送的變更集到遠端儲存庫"
 
@@ -6911,13 +6962,6 @@ msgid ""
 "following URL?:<p>%s"
 msgstr ""
 
-msgid "Certificate Query Error"
-msgstr ""
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr ""
-
 msgid "Security: "
 msgstr "安全性： "
 
@@ -6978,6 +7022,9 @@ msgid ""
 msgstr ""
 
 msgid "User Certificate Chain File"
+msgstr ""
+
+msgid "Certificate Query Error"
 msgstr ""
 
 msgid "Unable to save authentication"
@@ -7436,8 +7483,17 @@ msgstr "更新工作目錄或轉移至修訂版"
 msgid "&Shelve..."
 msgstr "擱置(&S)..."
 
-msgid "&Import..."
-msgstr "匯入(&I)..."
+msgid "&Import Patches..."
+msgstr ""
+
+msgid "U&nbundle..."
+msgstr ""
+
+msgid "&Merge..."
+msgstr ""
+
+msgid "Merge with the other head of the current branch"
+msgstr ""
 
 msgid "&Resolve..."
 msgstr "解決衝突(&R)..."
@@ -7483,6 +7539,9 @@ msgstr "檢查可推送的(&O)"
 
 msgid "P&ush"
 msgstr "推送(&u)"
+
+msgid "&Sync Bookmarks..."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -7587,6 +7646,21 @@ msgstr "正在執行\"commit finished\"觸發器時發生錯誤"
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "不能開啟Plugin選項對話框"
+
+msgid "[SOURCE]"
+msgstr ""
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr ""
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr ""
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr ""
 
 msgid "move after the specified patch"
 msgstr ""
@@ -8967,9 +9041,6 @@ msgstr ""
 #~ msgid "New Patch Name"
 #~ msgstr "新增補丁名字"
 
-#~ msgid "Source does not exists."
-#~ msgstr "來源不存在"
-
 #~ msgid "Capture stderr"
 #~ msgstr "抓取標準錯誤(stderr)"
 
@@ -9111,9 +9182,6 @@ msgstr ""
 
 #~ msgid "Force pull or push"
 #~ msgstr "強制拉收或推送"
-
-#~ msgid "Pull"
-#~ msgstr "拉收"
 
 #~ msgid "No changesets to pull"
 #~ msgstr "沒有變更集可拉收"
@@ -9750,14 +9818,3 @@ msgstr ""
 
 #~ msgid "Backout..."
 #~ msgstr "回退 ..."
-
-#~ msgid "Are you sure that you want to cancel synchronization?"
-#~ msgstr "你確定你要取消同步?"
-
-#~ msgid ""
-#~ "Space separated list of tags that will not be shown.Useful example: "
-#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
-#~ "Mercurial Queues Extension. Default: None (leave blank)"
-#~ msgstr ""
-#~ "不會顯示的標籤列表，以空格隔開。例如：設為「qbase qparent qtip」以隱藏 "
-#~ "Mercurial Queues 擴充套件插入的標籤。預設：無 (留空)"

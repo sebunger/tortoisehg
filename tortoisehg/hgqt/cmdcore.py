@@ -82,6 +82,10 @@ def _createDefaultUiHandler(uiparent):
     return cmdui.InteractiveUiHandler(uiparent)
 
 
+class _ProtocolError(Exception):
+    """Error while processing server message; must be caught by CmdWorker"""
+
+
 class CmdWorker(QObject):
     """Back-end service to run Mercurial commands"""
 
@@ -140,7 +144,7 @@ def _fixprocenv(proc):
     env = os.environ.copy()
     # disable flags and extensions that might break our output parsing
     # (e.g. "defaults" arguments, "PAGER" of "email --test")
-    env['HGPLAINEXCEPT'] = 'alias,i18n'
+    env['HGPLAINEXCEPT'] = 'alias,i18n,revsetalias'
     if not getattr(sys, 'frozen', False):
         # make sure hg process can look up our modules
         env['PYTHONPATH'] = (paths.get_prog_root() + os.pathsep
@@ -406,11 +410,12 @@ class CmdServer(CmdWorker):
                 except KeyError:
                     if not ch.isupper():
                         continue
-                    self._emitError(_('unexpected response on required '
-                                      'channel %r') % ch)
-                    self.stopService()
-                    return
+                    raise _ProtocolError(_('unexpected response on required '
+                                           'channel %r') % ch)
                 chfunc(self, ch, dataorsize)
+        except _ProtocolError, inst:
+            self._emitError(inst.args[0])
+            self.stopService()
         except Exception:
             self.stopService()
             raise
@@ -429,13 +434,9 @@ class CmdServer(CmdWorker):
             fields = dict(l.split(':', 1) for l in data.splitlines())
             capabilities = fields['capabilities'].split()
         except (KeyError, ValueError):
-            self._emitError(_('invalid "hello" message: %r') % data)
-            self.stopService()
-            return
+            raise _ProtocolError(_('invalid "hello" message: %r') % data)
         if 'runcommand' not in capabilities:
-            self._emitError(_('no "runcommand" capability'))
-            self.stopService()
-            return
+            raise _ProtocolError(_('no "runcommand" capability'))
         self._readchtable = self._idlechtable
         self._changeServiceState(CmdWorker.Ready)
 
@@ -465,9 +466,7 @@ class CmdServer(CmdWorker):
         try:
             ret, = struct.unpack('>i', data)
         except struct.error:
-            self._emitError(_('corrupted command result: %r') % data)
-            self.stopService()
-            return
+            raise _ProtocolError(_('corrupted command result: %r') % data)
         self._finishCommand(ret)
 
     def _processLineRequest(self, _ch, size):

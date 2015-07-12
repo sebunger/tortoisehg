@@ -186,10 +186,12 @@ class RepoFilterBar(QToolBar):
     def onClearButtonClicked(self):
         if self.revsetcombo.currentText():
             self.revsetcombo.clearEditText()
-            self.runQuery()
         elif not isinstance(self.parentWidget(), QMainWindow):
             # act as "close" button because this isn't managed as toolbar
             self.hide()
+        # always request to clear filter; model may still be filtered even
+        # if edit box is empty
+        self.runQuery()
 
     def selectionChanged(self):
         selection = self.revsetcombo.lineEdit().selectedText()
@@ -227,7 +229,7 @@ class RepoFilterBar(QToolBar):
         self.entrydlg.entry.setText(query)
         self.entrydlg.entry.setCursorPosition(0, len(query))
         self.entrydlg.entry.setFocus()
-        self.entrydlg.setShown(True)
+        self.entrydlg.setVisible(True)
 
     def queryIssued(self, query):
         self.revsetcombo.setEditText(query)

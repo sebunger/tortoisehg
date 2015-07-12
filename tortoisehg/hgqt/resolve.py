@@ -129,7 +129,7 @@ class ResolveDialog(QDialog):
         vbox.setContentsMargins(*MARGINS)
         hbox.addLayout(vbox)
         for action in [cmauto, cmmanual, cmlocal, cmother, cmres]:
-            vbox.addWidget(ActionPushButton(action, self))
+            vbox.addWidget(qtlib.ActionPushButton(action, self))
         vbox.addStretch(1)
 
         res = qtlib.LabeledSeparator(_('Resolved conflicts'))
@@ -175,7 +175,7 @@ class ResolveDialog(QDialog):
         vbox.setContentsMargins(*MARGINS)
         hbox.addLayout(vbox)
         for action in [cmedit, cmv3way, cmvp0, cmvp1, cmures]:
-            vbox.addWidget(ActionPushButton(action, self))
+            vbox.addWidget(qtlib.ActionPushButton(action, self))
         vbox.addStretch(1)
 
         hbox = QHBoxLayout()
@@ -484,27 +484,6 @@ class PathsModel(QAbstractTableModel):
         data = QMimeData()
         data.setUrls([QUrl.fromLocalFile(p) for p in paths])
         return data
-
-
-class ActionPushButton(QPushButton):
-    def __init__(self, action, parent=None):
-        super(ActionPushButton, self).__init__(parent)
-        self._defaultAction = action
-        self.addAction(action)
-        self.clicked.connect(action.trigger)
-        self._copyActionProps()
-
-    def actionEvent(self, event):
-        if (event.type() == QEvent.ActionChanged
-            and event.action() is self._defaultAction):
-            self._copyActionProps()
-        super(ActionPushButton, self).actionEvent(event)
-
-    def _copyActionProps(self):
-        action = self._defaultAction
-        self.setEnabled(action.isEnabled())
-        self.setText(action.text())
-        self.setToolTip(action.toolTip())
 
 
 class ToolsCombo(QComboBox):

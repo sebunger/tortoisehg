@@ -62,19 +62,21 @@ class RebaseDialog(QDialog):
         sep = qtlib.LabeledSeparator(_('Options'))
         self.layout().addWidget(sep)
 
-        self.keepchk = QCheckBox(_('Keep original changesets'))
+        self.keepchk = QCheckBox(_('Keep original changesets (--keep)'))
         self.keepchk.setChecked(opts.get('keep', False))
         self.layout().addWidget(self.keepchk)
 
-        self.keepbrancheschk = QCheckBox(_('Keep original branch names'))
+        self.keepbrancheschk = QCheckBox(_('Keep original branch names '
+                                           '(--keepbranches)'))
         self.keepbrancheschk.setChecked(opts.get('keepbranches', False))
         self.layout().addWidget(self.keepbrancheschk)
 
-        self.collapsechk = QCheckBox(_('Collapse the rebased changesets'))
+        self.collapsechk = QCheckBox(_('Collapse the rebased changesets '
+                                       '(--collapse)'))
         self.collapsechk.setChecked(opts.get('collapse', False))
         self.layout().addWidget(self.collapsechk)
 
-        self.basechk = QCheckBox(_('Rebase entire source branch'))
+        self.basechk = QCheckBox(_('Rebase entire source branch (-b/--base)'))
         self.layout().addWidget(self.basechk)
 
         self.autoresolvechk = QCheckBox(_('Automatically resolve merge '
@@ -157,7 +159,7 @@ class RebaseDialog(QDialog):
 
     def rebase(self):
         self.rebasebtn.setEnabled(False)
-        self.cancelbtn.setShown(False)
+        self.cancelbtn.setVisible(False)
         self.keepchk.setEnabled(False)
         self.keepbrancheschk.setEnabled(False)
         self.basechk.setEnabled(False)

@@ -26,8 +26,8 @@ from distutils.spawn import spawn, find_executable
 from os.path import isdir, exists, join, walk, splitext
 from i18n.msgfmt import Msgfmt
 
-thgcopyright = 'Copyright (C) 2010-2014 Steve Borho and others'
-hgcopyright = 'Copyright (C) 2005-2014 Matt Mackall and others'
+thgcopyright = 'Copyright (C) 2010-2015 Steve Borho and others'
+hgcopyright = 'Copyright (C) 2005-2015 Matt Mackall and others'
 
 class build_mo(Command):
 

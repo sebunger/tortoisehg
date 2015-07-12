@@ -125,6 +125,7 @@ class FilectxActions(QObject):
                 act.setIcon(qtlib.geticon(icon))
             if key:
                 act.setShortcut(key)
+                act.setShortcutContext(Qt.WidgetWithChildrenShortcut)
             if tip:
                 act.setStatusTip(tip)
             QObject.connect(act, SIGNAL('triggered()'),
@@ -208,6 +209,8 @@ class FilectxActions(QObject):
         from tortoisehg.hgqt import filedialogs, fileview
         for fd in fds:
             dlg = self._navigate(filedialogs.FileLogDialog, fd)
+            if not dlg:
+                continue
             dlg.setFileViewMode(fileview.AnnMode)
 
     @actionSlot(_('Co&mpare File Revisions'), 'compare-files', None,
@@ -457,7 +460,9 @@ class WctxActions(FilectxActions):
     def _initAdditionalActions(self):
         repo = self._repoagent.rawRepo()
         # the same shortcut as editFile that is disabled for working rev
-        self.action('editLocalFile').setShortcut('Ctrl+Shift+E')
+        a = self.action('editLocalFile')
+        a.setShortcut('Ctrl+Shift+E')
+        a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         a = self.action('addLargefile')
         a.setVisible('largefiles' in repo.extensions())
         self._addAction('renameFileMenu', *self._createRenameFileMenu())
@@ -541,7 +546,7 @@ class WctxActions(FilectxActions):
     def forgetFile(self, fds):
         self._runWorkingFileCommand('forget', fds)
 
-    @actionSlot(_('&Delete Unversioned...'), 'hg-purge', None, '',
+    @actionSlot(_('&Delete Unversioned...'), 'hg-purge', 'Delete', '',
                 (_notsubroot, _filestatus('?I')))
     def purgeFile(self, fds):
         parent = self.parent()

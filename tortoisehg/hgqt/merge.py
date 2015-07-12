@@ -6,8 +6,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from mercurial import error, util
-
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib, csinfo, cmdcore, cmdui, status, resolve
@@ -329,26 +327,28 @@ class MergePage(BasePage):
 
     def currentPage(self):
         super(MergePage, self).currentPage()
-        if self.field('discard').toBool():
-            # '.' is safer than self.localrev, in case the user has
-            # pulled a fast one on us and updated from the CLI
-            cmdline = ['debugsetparents', '.', hglib.tounicode(self._otherrev)]
-        else:
-            cmdline = ['merge', '--verbose']
-            if self.field('force').toBool():
-                cmdline.append('--force')
-            tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
-            cmdline += ['--tool=internal:' + tool]
-            cmdline.append(hglib.tounicode(self._otherrev))
-
-        if len(self.repo.parents()) == 1:
-            self._cmdlog.clearLog()
-            self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
-            sess.commandFinished.connect(self.onCommandFinished)
-            sess.outputReceived.connect(self._cmdlog.appendLog)
-        else:
+        if len(self.repo.parents()) > 1:
             self.mergecomplete = True
             self.completeChanged.emit()
+            return
+
+        discard = self.field('discard').toBool()
+        rev = hglib.tounicode(self._otherrev)
+        if discard:
+            tool = ':local'
+        else:
+            tool = self.field('autoresolve').toBool() and ':merge' or ':fail'
+        cmdlines = [hglib.buildcmdargs('merge', rev, verbose=True, tool=tool,
+                                       force=self.field('force').toBool())]
+        if discard:
+            # revert files added/removed at other side
+            cmdlines.append(hglib.buildcmdargs('revert', rev='.', all=True))
+
+        self._cmdlog.clearLog()
+        self._cmdsession = sess = self._repoagent.runCommandSequence(cmdlines,
+                                                                     self)
+        sess.commandFinished.connect(self.onCommandFinished)
+        sess.outputReceived.connect(self._cmdlog.appendLog)
 
     def isComplete(self):
         'should Next button be sensitive?'
@@ -566,31 +566,13 @@ class CommitPage(BasePage):
         self.setTitle(_('Committing...'))
         self.setSubTitle(_('Please wait while committing merged files.'))
 
-        message = unicode(self.msgEntry.text())
-        cmdline = ['commit', '--verbose', '--message', message, '--user', user]
-        if self.opts.get('recurseinsubrepos'):
-            cmdline.append('--subrepos')
-        try:
-            date = self.opts.get('date')
-            if date:
-                util.parsedate(date)
-                dcmd = ['--date', hglib.tounicode(date)]
-            else:
-                dcmd = []
-        except error.Abort, e:
-            if e.hint:
-                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
-                                            hglib.tounicode(e.hint))
-            else:
-                err = hglib.tounicode(str(e))
-            qtlib.WarningMsgBox(_('TortoiseHg Merge Commit'),
-                _('Error interpreting commit date (%s).\n'
-                  'Using current date instead.'), err)
-            dcmd = []
-
-        cmdline += dcmd
-
-        commandlines = [cmdline]
+        opts = {'verbose': True,
+                'message': self.msgEntry.text(),
+                'user': user,
+                'subrepos': bool(self.opts.get('recurseinsubrepos')),
+                'date': hglib.tounicode(self.opts.get('date')),
+                }
+        commandlines = [hglib.buildcmdargs('commit', **opts)]
         pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
         if pushafter:
             cmd = ['push', hglib.tounicode(pushafter)]

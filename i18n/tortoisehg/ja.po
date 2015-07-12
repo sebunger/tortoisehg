@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
 "PO-Revision-Date: 2015-01-31 04:22+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-02-20 05:15+0000\n"
-"X-Generator: Launchpad (build 17341)\n"
+"X-Launchpad-Export-Date: 2015-04-28 05:13+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
@@ -32,7 +32,7 @@ msgstr ""
 msgid "About"
 msgstr "バージョン情報"
 
-msgid "Copyright 2008-2014 Steve Borho and others"
+msgid "Copyright 2008-2015 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -379,6 +379,43 @@ msgstr "ブックマーク「%s」を削除しました"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "ブックマーク「%s」を「%s」へ変更しました"
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr ""
+
+msgid "Outgoing Bookmarks"
+msgstr ""
+
+msgid "&Push Bookmark"
+msgstr ""
+
+msgid "&Remove Bookmark"
+msgstr ""
+
+msgid "Incoming Bookmarks"
+msgstr ""
+
+msgid "P&ull Bookmark"
+msgstr ""
+
+msgid "R&emove Bookmark"
+msgstr ""
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr ""
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - ブランチ作業"
@@ -533,6 +570,9 @@ msgstr "オプション"
 
 msgid "Clone to revision:"
 msgstr "このリビジョンまでクローン:"
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr ""
 
 msgid "Do not update the new working directory"
 msgstr "作業領域を更新しない"
@@ -1123,6 +1163,7 @@ msgstr "ツール名"
 msgid "The tool name. It cannot contain spaces."
 msgstr "ツール名。空白が含まれていてはいけません"
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1137,6 +1178,7 @@ msgid ""
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -2472,15 +2514,6 @@ msgstr "すぐにコミット"
 msgid "Commit Later"
 msgstr "後でコミット"
 
-msgid "TortoiseHg Merge Commit"
-msgstr "TortoiseHg マージコミット"
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
-
 msgid "Merge changeset"
 msgstr "マージしたチェンジセット"
 
@@ -3167,17 +3200,17 @@ msgstr "リベース先"
 msgid "Swap source and destination"
 msgstr "リベース元と先を入れ替え"
 
-msgid "Keep original changesets"
-msgstr "元のチェンジセットを保持"
-
-msgid "Keep original branch names"
-msgstr "元のブランチ名を保持"
-
-msgid "Collapse the rebased changesets"
+msgid "Keep original changesets (--keep)"
 msgstr ""
 
-msgid "Rebase entire source branch"
-msgstr "元リビジョンのブランチ全体を移動"
+msgid "Keep original branch names (--keepbranches)"
+msgstr ""
+
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr ""
+
+msgid "Rebase entire source branch (-b/--base)"
+msgstr ""
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3801,6 +3834,9 @@ msgstr "%s <取り込み対象>"
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr "取り込まれる %d 個の履歴が見つかりました"
+
+msgid "Pull"
+msgstr "プル"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "プル (取り込み対象のチェンジセットをあなたのリポジトリに取り込みます)"
@@ -5139,8 +5175,11 @@ msgstr "stripするリビジョン"
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
-msgid "thg sync [PEER]"
-msgstr "thg sync [PEER]"
+msgid "open the bookmark sync window"
+msgstr ""
+
+msgid "thg sync [OPTION]... [PEER]"
+msgstr ""
 
 msgid "replace existing tag"
 msgstr "既存のタグを置換"
@@ -5622,6 +5661,14 @@ msgid ""
 msgstr ""
 "コミットに結びつける名前です。共通フォーマットは <br>名前&lt;email@example."
 "com&gt;<br> です。"
+
+msgid "Ask Username"
+msgstr ""
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
 
 msgid "Summary Line Length"
 msgstr "要約行文字数"
@@ -6174,6 +6221,7 @@ msgstr "課題番号にマッチする正規表現を定義"
 msgid "Issue Link"
 msgstr "課題へのリンク"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -6808,6 +6856,9 @@ msgstr "指定のURLにプッシュ(送信)する内容があるか確認"
 msgid "Push outgoing changes to selected URL"
 msgstr "指定のURLにプッシュ(送信)"
 
+msgid "Sync Bookmarks"
+msgstr ""
+
 msgid "Email outgoing changesets for remote repository"
 msgstr "連携先リポジトリとの差分をメールする"
 
@@ -7125,13 +7176,6 @@ msgid ""
 "following URL?:<p>%s"
 msgstr ""
 
-msgid "Certificate Query Error"
-msgstr "証明書クエリーエラー"
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr "無効なポート番号: %s"
-
 msgid "Security: "
 msgstr "セキュリティ: "
 
@@ -7195,6 +7239,9 @@ msgstr ""
 
 msgid "User Certificate Chain File"
 msgstr "ユーザー証明書のチェインファイル"
+
+msgid "Certificate Query Error"
+msgstr "証明書クエリーエラー"
 
 msgid "Unable to save authentication"
 msgstr "証明情報を保存できません"
@@ -7655,8 +7702,17 @@ msgstr "作業領域の内容更新またはリビジョンの切り替え"
 msgid "&Shelve..."
 msgstr "変更点の退避 (&shelve)..."
 
-msgid "&Import..."
-msgstr "パッチの取り込み (&import)..."
+msgid "&Import Patches..."
+msgstr ""
+
+msgid "U&nbundle..."
+msgstr ""
+
+msgid "&Merge..."
+msgstr ""
+
+msgid "Merge with the other head of the current branch"
+msgstr ""
 
 msgid "&Resolve..."
 msgstr "マージ衝突を解消 (&resolve)..."
@@ -7702,6 +7758,9 @@ msgstr "反映候補を検索 (&outgoing)"
 
 msgid "P&ush"
 msgstr "反映 (p&ush)"
+
+msgid "&Sync Bookmarks..."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -7818,6 +7877,21 @@ msgstr ""
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "プラグインオプションダイアログを開けません"
+
+msgid "[SOURCE]"
+msgstr ""
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr ""
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr ""
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr ""
 
 msgid "move after the specified patch"
 msgstr ""
@@ -9701,9 +9775,6 @@ msgstr ""
 #~ msgid "Email..."
 #~ msgstr "メール送信..."
 
-#~ msgid "Pull"
-#~ msgstr "プル"
-
 #~ msgid "Determine and mark outgoing changesets"
 #~ msgstr "送信するチェンジセットをマークする"
 
@@ -11108,9 +11179,6 @@ msgstr ""
 #~ msgid "bad shelve backup directory name"
 #~ msgstr "バックアップファイルの保存先として利用できないディレクトリ名です"
 
-#~ msgid "Source does not exists."
-#~ msgstr "元ファイルが存在しません"
-
 #~ msgid "delete of shelve backup failed"
 #~ msgstr "バックアップファイルを削除できません"
 
@@ -11119,12 +11187,6 @@ msgstr ""
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "中断: バックアップの復元に失敗しました %s\n"
-
-#~ msgid "TortoiseHg Sync"
-#~ msgstr "TortoiseHg 同期"
-
-#~ msgid "outgoing changesets to %s found"
-#~ msgstr "%s に送信できるチェンジセットがあります"
 
 #~ msgid "file %s already exists\n"
 #~ msgstr "ファイル %s はすでに存在しています\n"
@@ -11143,9 +11205,6 @@ msgstr ""
 
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "バックアップを除去中: %r\n"
-
-#~ msgid "Are you sure that you want to cancel synchronization?"
-#~ msgstr "本当に同期をキャンセルしますか?"
 
 #~ msgid "Restart merge with"
 #~ msgstr "指定ツールで再マージ"

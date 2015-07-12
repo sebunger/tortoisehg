@@ -185,10 +185,17 @@ class QuickOpDialog(QDialog):
                                 _('No operation to perform'),
                                 parent=self)
             return
-        self.repo.lfstatus = True
-        repostate = self.repo.status()
-        self.repo.lfstatus = False
         if self.command == 'remove':
+            self.repo.lfstatus = True
+            try:
+                try:
+                    repostate = self.repo.status()
+                except (EnvironmentError, util.Abort), e:
+                    qtlib.WarningMsgBox(_('Unable to read repository status'),
+                                        hglib.tounicode(str(e)), parent=self)
+                    return
+            finally:
+                self.repo.lfstatus = False
             if not self.chk.isChecked():
                 modified = repostate[0]
                 selmodified = []

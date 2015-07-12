@@ -8,7 +8,6 @@
 import cStringIO
 
 from mercurial import patch
-from hgext import record
 
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
@@ -116,7 +115,7 @@ class RejectsDialog(QDialog):
         except IOError, e:
             pass
         try:
-            header = record.parsepatch(buf)[0]
+            header = hglib.parsepatch(buf)[0]
             self.chunks = header.hunks
         except (patch.PatchError, IndexError), e:
             self.chunks = []

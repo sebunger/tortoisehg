@@ -73,6 +73,8 @@ class _wsortdict(object):
         return len(self._dict)
 
     def update(self, src):
+        if isinstance(src, _wsortdict):
+            src = src._dict
         self._dict.update(src)
         self._logupdate(src)
 

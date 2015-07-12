@@ -428,7 +428,7 @@ class SummaryPanel(SummaryBase, QWidget):
                 margin.setMargin(3)
                 margin.addWidget(self.expand_btn, 0, Qt.AlignTop)
                 self.layout().insertLayout(0, margin)
-            self.expand_btn.setShown(True)
+            self.expand_btn.setVisible(True)
         elif self.expand_btn.parentWidget() is not None:
             self.expand_btn.setHidden(True)
 

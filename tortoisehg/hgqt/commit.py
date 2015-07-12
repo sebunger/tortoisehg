@@ -937,8 +937,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.stwidget.tv.setFocus()
             return
 
+        # username will be prompted as necessary by hg if ui.askusername
         user = self.opts.get('user')
-        if not amend:
+        if not amend and not repo.ui.configbool('ui', 'askusername'):
             # TODO: no need to specify --user if it was read from ui
             user = qtlib.getCurrentUsername(self, self.repo, self.opts)
             if not user:
@@ -946,6 +947,16 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.addUsernameToHistory(user)
 
         checkedUnknowns = self.stwidget.getChecked('?I')
+        if checkedUnknowns and 'largefiles' in repo.extensions():
+            result = lfprompt.promptForLfiles(self, repo.ui, repo,
+                                              checkedUnknowns)
+            if not result:
+                return
+            checkedUnknowns, lfiles = result
+            if lfiles:
+                cmd = ['add', '--large', '--']
+                cmd.extend(map(hglib.escapepath, lfiles))
+                commandlines.append(cmd)
         if checkedUnknowns:
             confirm = self.repo.ui.configbool('tortoisehg',
                                               'confirmaddfiles', True)
@@ -958,21 +969,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             else:
                 res = 0
             if res == 0:
-                haslf = 'largefiles' in repo.extensions()
-                if haslf:
-                    result = lfprompt.promptForLfiles(self, repo.ui, repo,
-                                                      checkedUnknowns)
-                    if not result:
-                        return
-                    checkedUnknowns, lfiles = result
-                    if lfiles:
-                        cmd = ['add', '--large', '--']
-                        cmd.extend(map(hglib.escapepath, lfiles))
-                        commandlines.append(cmd)
-                if checkedUnknowns:
-                    cmd = ['add', '--']
-                    cmd.extend(map(hglib.escapepath, checkedUnknowns))
-                    commandlines.append(cmd)
+                cmd = ['add', '--']
+                cmd.extend(map(hglib.escapepath, checkedUnknowns))
+                commandlines.append(cmd)
             else:
                 return
         checkedMissing = self.stwidget.getChecked('!')
@@ -993,25 +992,13 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 commandlines.append(cmd)
             else:
                 return
-        try:
-            date = self.opts.get('date')
-            if date:
-                util.parsedate(date)
-                dcmd = ['--date', date]
-            else:
-                dcmd = []
-        except error.Abort, e:
-            if e.hint:
-                err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
-                                            hglib.tounicode(e.hint))
-            else:
-                err = hglib.tounicode(str(e))
-            self.showMessage.emit(err)
-            dcmd = []
         cmdline = ['commit', '--verbose', '--message='+msg]
         if user:
             cmdline.extend(['--user', user])
-        cmdline += dcmd + brcmd
+        date = self.opts.get('date')
+        if date:
+            cmdline += ['--date', date]
+        cmdline += brcmd
 
         if partials:
             # write patch for partial change selections to temp file

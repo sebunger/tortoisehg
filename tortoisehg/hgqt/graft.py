@@ -174,7 +174,7 @@ class GraftDialog(QDialog):
 
     def graft(self):
         self.graftbtn.setEnabled(False)
-        self.cancelbtn.setShown(False)
+        self.cancelbtn.setVisible(False)
         opts = dict((n, w.isChecked()) for n, w in self._optchks.iteritems())
         itool = opts.pop('autoresolve') and 'merge' or 'fail'
         opts['config'] = 'ui.merge=internal:%s' % itool

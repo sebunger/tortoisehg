@@ -131,11 +131,7 @@ Host Authentication
 
 Prior to version 1.7, Mercurial ignored this half of HTTPS connection
 security.  In version 1.7 it began warning that the server's certificate
-was not being verified.  Starting with Mercurial version 1.7.3
-(TortoiseHG 1.1.7), the binary installers begain to include a CA
-certificate file so that HTTPS server certificates could be verified by
-the standard certificate authorities.  We download our certificate
-authority file from http://curl.haxx.se/ca/cacert.pem.
+was not being verified.
 
 Mercurial version 1.7.5 introduced the ability to validate an HTTPS
 server's certificate against a stored fingerprint.  TortoiseHg 2.0's
@@ -144,7 +140,7 @@ between using a host fingerprint or using the CA certificates.
 
 In theory, a host fingerprint is more secure than the CA certificates
 if you do not necessarily trust all of the signing authorities listed in
-the cacert.pem file.  However you must be sure that the fingerprint you
+the default store.  However you must be sure that the fingerprint you
 store is the correct fingerprint for the server to which you believe you
 are communicating.
 

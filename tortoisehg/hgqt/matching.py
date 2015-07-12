@@ -31,19 +31,16 @@ class MatchDialog(QDialog):
         ## main layout grid
         self.grid = QGridLayout()
         self.grid.setSpacing(6)
+        self.grid.setColumnStretch(1, 1)
         box.addLayout(self.grid)
 
         ### matched revision combo
         self.rev_combo = combo = QComboBox()
         combo.setEditable(True)
+        combo.setMinimumContentsLength(30)  # cut long name
         self.grid.addWidget(QLabel(_('Find revisions matching fields of:')),
                             0, 0)
         self.grid.addWidget(combo, 0, 1)
-
-        # Give the combo box a minimum width that will ensure that the dialog is
-        # large enough to fit the additional progress bar that will appear when
-        # updating subrepositories.
-        combo.setMinimumWidth(450)
 
         if rev is None:
             rev = self.repo.dirstate.branch()
@@ -61,13 +58,15 @@ class MatchDialog(QDialog):
 
         ### matched revision info
         self.rev_to_match_info_text = QLabel()
-        self.rev_to_match_info_text.setShown(False)
+        self.rev_to_match_info_text.setVisible(False)
         style = csinfo.panelstyle(contents=('cset', 'branch', 'close', 'user',
                'dateage', 'parents', 'children', 'tags', 'graft', 'transplant',
                'p4', 'svn', 'converted'), selectable=True,
                expandable=True)
         factory = csinfo.factory(self.repo, style=style)
         self.rev_to_match_info = factory()
+        self.rev_to_match_info.setSizePolicy(QSizePolicy.Preferred,
+                                             QSizePolicy.Fixed)
         self.rev_to_match_info_lbl = QLabel(_('Revision to Match:'))
         self.grid.addWidget(self.rev_to_match_info_lbl, 1, 0,
                             Qt.AlignLeft | Qt.AlignTop)
@@ -145,7 +144,7 @@ class MatchDialog(QDialog):
 
         # dialog setting
         self.setLayout(box)
-        self.layout().setSizeConstraint(QLayout.SetFixedSize)
+        self.layout().setSizeConstraint(QLayout.SetMinAndMaxSize)
         self.setWindowTitle(_('Find matches - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-update'))
 
@@ -190,11 +189,11 @@ class MatchDialog(QDialog):
             """Show the csinfo widget or the info text label"""
             # hide first, then show
             if mode:
-                self.rev_to_match_info_text.setShown(False)
-                self.rev_to_match_info.setShown(True)
+                self.rev_to_match_info_text.setVisible(False)
+                self.rev_to_match_info.setVisible(True)
             else:
-                self.rev_to_match_info.setShown(False)
-                self.rev_to_match_info_text.setShown(True)
+                self.rev_to_match_info.setVisible(False)
+                self.rev_to_match_info_text.setVisible(True)
         def csinfo_update(ctx):
             self.rev_to_match_info.update(ctx)
             set_csinfo_mode(True)
@@ -262,7 +261,7 @@ class MatchDialog(QDialog):
 
     def show_options(self, visible):
         for chk in self._hideable_chks:
-            chk.setShown(visible)
+            chk.setVisible(visible)
 
     @pyqtSlot(QAbstractButton)
     def _selectSummaryOrDescription(self, btn):

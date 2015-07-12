@@ -812,6 +812,29 @@ class BadCompletionBlocker(QObject):
             le.deselect()
         return False
 
+class ActionPushButton(QPushButton):
+    """Button which properties are defined by QAction like QToolButton"""
+
+    def __init__(self, action, parent=None):
+        super(ActionPushButton, self).__init__(parent)
+        self.setAutoDefault(False)  # action won't be used as dialog default
+        self._defaultAction = action
+        self.addAction(action)
+        self.clicked.connect(action.trigger)
+        self._copyActionProps()
+
+    def actionEvent(self, event):
+        if (event.type() == QEvent.ActionChanged
+            and event.action() is self._defaultAction):
+            self._copyActionProps()
+        super(ActionPushButton, self).actionEvent(event)
+
+    def _copyActionProps(self):
+        action = self._defaultAction
+        self.setEnabled(action.isEnabled())
+        self.setText(action.text())
+        self.setToolTip(action.toolTip())
+
 class PMButton(QPushButton):
     """Toggle button with plus/minus icon images"""
 
@@ -898,6 +921,8 @@ class StatusLabel(QWidget):
 
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
+        # same policy as status bar of QMainWindow
+        self.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Fixed)
 
         box = QHBoxLayout()
         box.setContentsMargins(*(0,)*4)
@@ -938,7 +963,7 @@ class StatusLabel(QWidget):
                 icon = geticon(icon)
             elif not isinstance(icon, QIcon):
                 raise TypeError, '%s: bool, str or QIcon' % type(icon)
-            self.status_icon.setShown(True)
+            self.status_icon.setVisible(True)
             self.status_icon.setPixmap(icon.pixmap(16, 16))
 
     def clear_icon(self):

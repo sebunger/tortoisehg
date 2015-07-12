@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-02-19 14:08-0200\n"
+"POT-Creation-Date: 2015-04-27 14:22-0300\n"
 "PO-Revision-Date: 2014-11-01 22:39+0000\n"
 "Last-Translator: Karsten Tinnefeld <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-02-20 05:14+0000\n"
-"X-Generator: Launchpad (build 17341)\n"
+"X-Launchpad-Export-Date: 2015-04-28 05:12+0000\n"
+"X-Generator: Launchpad (build 17453)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHG-Symbolüberblendungsdienst"
@@ -30,10 +30,8 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "Über TortoiseHG"
 
-msgid "Copyright 2008-2014 Steve Borho and others"
+msgid "Copyright 2008-2015 Steve Borho and others"
 msgstr ""
-"Urheberrechtlich geschützt: im Zeitraum 2008 bis 2014 von Steve Borho und "
-"anderen erstellt"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr ""
@@ -392,6 +390,43 @@ msgstr "Das Lesezeichen '%s' wurde entfernt"
 msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "Das Lesezeichen '%s' wurde in '%s' umbenannt"
 
+msgid "TortoiseHg Bookmark Sync"
+msgstr ""
+
+msgid "Outgoing Bookmarks"
+msgstr ""
+
+msgid "&Push Bookmark"
+msgstr ""
+
+msgid "&Remove Bookmark"
+msgstr ""
+
+msgid "Incoming Bookmarks"
+msgstr ""
+
+msgid "P&ull Bookmark"
+msgstr ""
+
+msgid "R&emove Bookmark"
+msgstr ""
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr ""
+
 #, python-format
 msgid "%s - branch operation"
 msgstr "%s - Verzweigung"
@@ -550,6 +585,9 @@ msgstr "Einstellungen"
 
 msgid "Clone to revision:"
 msgstr "Revision klonen:"
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr ""
 
 msgid "Do not update the new working directory"
 msgstr "Das neue Arbeitsverzeichnis nicht aktualisieren"
@@ -1143,6 +1181,7 @@ msgstr "Werkzeugname"
 msgid "The tool name. It cannot contain spaces."
 msgstr "Der Werkzeugname darf keine Leerzeichen enthalten."
 
+#, python-brace-format
 msgid ""
 "The command that will be executed.\n"
 "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -1170,6 +1209,7 @@ msgstr ""
 "- {ALLFILES}: Alle Dateien, die von Mercurial in der ausgewählten Revision "
 "verfolgt werden."
 
+#, python-brace-format
 msgid ""
 "The directory where the command will be executed.\n"
 "If this is not set, the root of the current repository will be used "
@@ -2560,15 +2600,6 @@ msgstr "Jetzt übernehmen"
 msgid "Commit Later"
 msgstr "Später übernehmen"
 
-msgid "TortoiseHg Merge Commit"
-msgstr "TortoiseHg-Verschmelzungsübernahme"
-
-#, python-format
-msgid ""
-"Error interpreting commit date (%s).\n"
-"Using current date instead."
-msgstr ""
-
 msgid "Merge changeset"
 msgstr "Mit Änderungssatz zusammenführen"
 
@@ -3267,17 +3298,17 @@ msgstr "Ziel der Verschiebung"
 msgid "Swap source and destination"
 msgstr "Quelle und Ziel vertauschen"
 
-msgid "Keep original changesets"
-msgstr "Ursprüngliche Änderungssätze beibehalten"
+msgid "Keep original changesets (--keep)"
+msgstr ""
 
-msgid "Keep original branch names"
-msgstr "Ursprüngliche Zweignamen beibehalten"
+msgid "Keep original branch names (--keepbranches)"
+msgstr ""
 
-msgid "Collapse the rebased changesets"
-msgstr "Änderungslisten nach Basiswechsel zusammenklappen"
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr ""
 
-msgid "Rebase entire source branch"
-msgstr "Vollständigen Quellbaum verschieben"
+msgid "Rebase entire source branch (-b/--base)"
+msgstr ""
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3944,6 +3975,9 @@ msgstr "%s <eingehend>"
 #, python-format
 msgid "Found %d incoming changesets"
 msgstr "%d eingehende Änderungssätze gefunden"
+
+msgid "Pull"
+msgstr "Abrufen"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Eingehende Änderungssätze in Ihr Projektarchiv abrufen"
@@ -5350,8 +5384,11 @@ msgstr "Herauszulösende Revision"
 msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr "thg strip [-k] [-f] [-n] [[-r] Revision]"
 
-msgid "thg sync [PEER]"
-msgstr "thg sync [Partner]"
+msgid "open the bookmark sync window"
+msgstr ""
+
+msgid "thg sync [OPTION]... [PEER]"
+msgstr ""
 
 msgid "replace existing tag"
 msgstr "Vorhandenes Etikett ersetzen"
@@ -5894,6 +5931,14 @@ msgid ""
 msgstr ""
 "Der mit Übernahmen verbundene Benutzername. Das übliche Format ist "
 "<br>Vollständiger Name &lt;email@beispiel.de.test&gt;"
+
+msgid "Ask Username"
+msgstr ""
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
 
 msgid "Summary Line Length"
 msgstr "Länge Zusammenfassungszeile"
@@ -6534,6 +6579,7 @@ msgstr "Bestimmt den regulären Ausdruck bei der Auswahl von Ticket-IDs."
 msgid "Issue Link"
 msgstr "Ticket-Link"
 
+#, python-brace-format
 msgid ""
 "Defines the command to run when an issue number is recognized. You may "
 "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -7221,6 +7267,9 @@ msgstr "Ausgehende Änderungen für die ausgewählte URL erkennen"
 msgid "Push outgoing changes to selected URL"
 msgstr "Ausgehende Änderungen an die ausgewählte URL übertragen"
 
+msgid "Sync Bookmarks"
+msgstr ""
+
 msgid "Email outgoing changesets for remote repository"
 msgstr ""
 "Ausgehende Änderungssätze für das entfernte Archiv per E-Mail versenden"
@@ -7560,13 +7609,6 @@ msgstr ""
 "Das Unterarchiv '%s' besitzt einen nicht-trivialen Standardsynchronisierungs-"
 "URI:<p>%s<p>Durch den folgenden URI ersetzen?:<p>%s"
 
-msgid "Certificate Query Error"
-msgstr "Zertifikatsanfrage-Fehler"
-
-#, python-format
-msgid "Invalid port number: %s"
-msgstr "Ungültige Portnummer: %s"
-
 msgid "Security: "
 msgstr "Sicherheit: "
 
@@ -7647,6 +7689,9 @@ msgstr ""
 
 msgid "User Certificate Chain File"
 msgstr "Zertifikatskettendatei des Benutzers"
+
+msgid "Certificate Query Error"
+msgstr "Zertifikatsanfrage-Fehler"
 
 msgid "Unable to save authentication"
 msgstr "Authensierung kann nicht gespeichert werden"
@@ -8120,8 +8165,17 @@ msgstr "Arbeitsverzeichnis aktualisieren oder Revisionen wechseln"
 msgid "&Shelve..."
 msgstr "&Verstauen..."
 
-msgid "&Import..."
-msgstr "&Importieren..."
+msgid "&Import Patches..."
+msgstr ""
+
+msgid "U&nbundle..."
+msgstr ""
+
+msgid "&Merge..."
+msgstr ""
+
+msgid "Merge with the other head of the current branch"
+msgstr ""
 
 msgid "&Resolve..."
 msgstr "&Auflösen..."
@@ -8167,6 +8221,9 @@ msgstr "&Ausgehend"
 
 msgid "P&ush"
 msgstr "Ver&senden"
+
+msgid "&Sync Bookmarks..."
+msgstr ""
 
 #, python-format
 msgid ""
@@ -8290,6 +8347,21 @@ msgstr "Fehler beim Ausführen des Triggers \"Übernahme abgeschlossen\""
 
 msgid "Cannot open Plugin Options dialog"
 msgstr "Kann den Plugin-Einstellungen-Dialog nicht öffnen"
+
+msgid "[SOURCE]"
+msgstr ""
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr ""
+
+#, python-format
+msgid "host fingerprint for %s cannot be obtained (Python too old)"
+msgstr ""
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr ""
 
 msgid "move after the specified patch"
 msgstr "Hinter den angegebenen Patch verschieben"
@@ -9427,14 +9499,8 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Unable to create new repository"
 #~ msgstr "Das neue Projektarchiv konnte nicht erstellt werden"
 
-#~ msgid "Repository stripped, incoming preview cleared"
-#~ msgstr "Projektarchiv bereinigt, Eingangsvorschau geleert"
-
 #~ msgid "There is no Mercurial repository here (.hg not found)"
 #~ msgstr "Dies ist kein Mercurial-Archiv (Das Verzeichnis .hg fehlt)"
-
-#~ msgid "Repository stripped, revision set cleared"
-#~ msgstr "Projektarchiv bereinigt, Revisionsliste gelöscht"
 
 #~ msgid "No repository found here"
 #~ msgstr "Hier gibt es kein Projektarchiv"
@@ -9603,9 +9669,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 
 #~ msgid "Tag name is empty"
 #~ msgstr "Etikett unbeschriftet"
-
-#~ msgid "Source does not exists."
-#~ msgstr "Die Quelle ist nicht vorhanden."
 
 #~ msgid "New Patch Name"
 #~ msgstr "Neuer Flicken-Name"
@@ -10317,9 +10380,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "A specific revision up to which you would like to push or pull."
 #~ msgstr ""
 #~ "Eine spezifische Revision, bis zu der Sie ziehen oder verteilen möchten."
-
-#~ msgid "TortoiseHg Sync"
-#~ msgstr "TortoiseHg-Synchronisation"
 
 #~ msgid "&Yes (--force)"
 #~ msgstr "&Ja (--force)"
@@ -11934,20 +11994,11 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Revert files to revision %s?"
 #~ msgstr "Dateien in Revision %s wiederherstellen?"
 
-#~ msgid "Are you sure that you want to cancel synchronization?"
-#~ msgstr "Wollen Sie die Synchronisierung wirklich abbrechen?"
-
-#~ msgid "outgoing changesets to %s found"
-#~ msgstr "Ausgehende Änderungssätze für %s gefunden"
-
 #~ msgid "backup %r as %r\n"
 #~ msgstr "Sicherheitskopie von %r als %r\n"
 
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "Entferne Sicherheitskopie: %r\n"
-
-#~ msgid "Pull"
-#~ msgstr "Abrufen"
 
 #~ msgid "Push"
 #~ msgstr "Übertragen"
@@ -12017,35 +12068,8 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ "Ignoriere Änderungen, die sich nur auf leere Zeilen auswirken. Standard: "
 #~ "False"
 
-#~ msgid ""
-#~ "List of Servers from which \"projrc\" configuration files must be pulled. "
-#~ "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull "
-#~ "from the default sync path.Default is pull from NO servers."
-#~ msgstr ""
-#~ "Liste der Server, von denen \"projrc\"-Konfigurationsdateien abgerufen "
-#~ "werden müssen. Setzen Sie es auf \"*\", um von allen Servern abzurufen. "
-#~ "Setzen Sie es auf \"default\", um vom Vorgabe-Synchronisationspfad "
-#~ "abzurufen. Standard ist, von KEINEM Server abzurufen."
-
 #~ msgid "View missing"
 #~ msgstr "Fehlende Datei ansehen"
-
-#~ msgid ""
-#~ "Space separated list of tags that will not be shown.Useful example: "
-#~ "Specify \"qbase qparent qtip\" to hide the standard tags inserted by the "
-#~ "Mercurial Queues Extension. Default: None (leave blank)"
-#~ msgstr ""
-#~ "Leerzeichengetrennte Liste von Etiketten, die ausgeblendet werden sollen. "
-#~ "Praktisches Beispiel: geben Sie \"qbase qparent qtip\" an, um die von der "
-#~ "Mercurial-Patch-Warteschlangen-Erweiterung erstellten Standardetiketten "
-#~ "auszublenden. Standard: keine (leere Liste)"
-
-#~ msgid ""
-#~ "Error creating interpreting commit date (%s).\n"
-#~ "Using current date instead."
-#~ msgstr ""
-#~ "Fehler bei der Verarbeitung des Übernahmedatums (%s).\n"
-#~ "Verwende stattdessen die aktuelle Zeit."
 
 #~ msgid ""
 #~ "Color changesets by author name.  If not enabled, the changes are colored "

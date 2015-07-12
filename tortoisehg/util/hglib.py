@@ -18,6 +18,16 @@ from mercurial import revset as revsetmod
 from mercurial.node import nullrev
 from hgext import mq as mqmod
 
+try:
+    from mercurial import patch
+    parsepatch = patch.parsepatch
+    patchheader = patch.header
+except AttributeError:
+    # hg<3.4 (20aac24e2114, dc655360bccb)
+    from hgext import record
+    parsepatch = record.parsepatch
+    patchheader = record.header
+
 _encoding = encoding.encoding
 _fallbackencoding = encoding.fallbackencoding
 
@@ -727,10 +737,10 @@ def escapepath(path):
     else:
         return p
 
-def escaperev(rev):
+def escaperev(rev, default=None):
     """Convert revision number to command-line-safe string"""
     if rev is None:
-        return None
+        return default
     if rev == nullrev:
         return 'null'
     assert rev >= 0

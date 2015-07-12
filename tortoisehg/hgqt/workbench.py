@@ -301,10 +301,16 @@ class Workbench(QMainWindow):
                   tooltip=_('Update working directory or switch revisions'))
         newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
                   enabled='repoopen', menu='repository')
-        newaction(_("&Import..."), self._repofwd('thgimport'), icon='hg-import',
-                  enabled='repoopen', menu='repository')
+        newaction(_("&Import Patches..."), self._repofwd('thgimport'),
+                  icon='hg-import', enabled='repoopen', menu='repository')
+        newaction(_("U&nbundle..."), self._repofwd('unbundle'),
+                  icon='hg-unbundle', enabled='repoopen', menu='repository')
         newseparator(menu='repository')
-        newaction(_("&Resolve..."), self._repofwd('resolve'), icon='hg-merge',
+        newaction(_('&Merge...'), self._repofwd('mergeWithOtherHead'),
+                  icon='hg-merge', enabled='repoopen',
+                  menu='repository', toolbar='edit',
+                  tooltip=_('Merge with the other head of the current branch'))
+        newaction(_("&Resolve..."), self._repofwd('resolve'),
                   enabled='repoopen', menu='repository')
         newseparator(menu='repository')
         newaction(_("R&ollback/Undo..."), self._repofwd('rollback'),
@@ -351,6 +357,14 @@ class Workbench(QMainWindow):
         newaction(_('P&ush'), data='push', icon='hg-push',
                   enabled='repoopen', toolbar='sync')
         menuSync.addActions(self.synctbar.actions())
+        menuSync.addSeparator()
+
+        action = QAction(_('&Sync Bookmarks...'), self)
+        action.setIcon(qtlib.geticon('thg-sync-bookmarks'))
+        self._actionavails['repoopen'].append(action)
+        action.triggered.connect(self._runSyncBookmarks)
+        menuSync.addAction(action)
+
         self._lastRepoSyncPath = {}
         self.urlCombo = QComboBox(self)
         self.urlCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
@@ -802,6 +816,15 @@ class Workbench(QMainWindow):
             op = str(action.data().toString())
             w.setSyncUrl(self._syncUrlFor(op) or '')
             getattr(w, op)()
+
+    @pyqtSlot()
+    def _runSyncBookmarks(self):
+        w = self._currentRepoWidget()
+        if w:
+            # the sync bookmark dialog is bidirectional but is only able to
+            # handle one remote location therefore we use the push location
+            w.setSyncUrl(self._syncUrlFor('push'))
+            w.syncBookmark()
 
     @pyqtSlot()
     def _abortCommands(self):
