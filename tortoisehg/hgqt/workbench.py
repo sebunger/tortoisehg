@@ -823,7 +823,7 @@ class Workbench(QMainWindow):
         if w:
             # the sync bookmark dialog is bidirectional but is only able to
             # handle one remote location therefore we use the push location
-            w.setSyncUrl(self._syncUrlFor('push'))
+            w.setSyncUrl(self._syncUrlFor('push') or '')
             w.syncBookmark()
 
     @pyqtSlot()

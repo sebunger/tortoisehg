@@ -22,9 +22,9 @@ _fileactionsbytype = {
     'subrepo': ['openSubrepo', 'explore', 'terminal', 'copyPath', None,
                 'revertFile'],
     'file': ['visualDiffFile', 'visualDiffFileToLocal', None, 'editFile',
-             'saveFile', None, 'editLocalFile', 'openLocalFile', 'copyPath',
-             None, 'revertFile', None, 'navigateFileLog', 'navigateFileDiff',
-             'filterFile'],
+             'saveFile', None, 'editLocalFile', 'openLocalFile',
+             'exploreLocalFile', 'copyPath', None, 'revertFile', None,
+             'navigateFileLog', 'navigateFileDiff', 'filterFile'],
     'dir': ['visualDiffFile', 'visualDiffFileToLocal', None, 'revertFile',
             None, 'filterFile', None, 'explore', 'terminal', 'copyPath'],
     }

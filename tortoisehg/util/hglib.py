@@ -32,7 +32,7 @@ _encoding = encoding.encoding
 _fallbackencoding = encoding.fallbackencoding
 
 # extensions which can cause problem with TortoiseHg
-_extensions_blacklist = ('color', 'pager', 'progress')
+_extensions_blacklist = ('color', 'pager', 'progress', 'zeroconf')
 
 from tortoisehg.util import paths
 from tortoisehg.util.hgversion import hgversion

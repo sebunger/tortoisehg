@@ -340,6 +340,14 @@ class FilectxActions(QObject):
         filenames = _lcanonpaths(fds)
         qtlib.openfiles(repo, filenames)
 
+    @actionSlot(_('E&xplore Local'), 'system-file-manager', None,
+                _('Open parent folder of current file in the system file '
+                  'manager'),
+                (_isfile, _filestatus('MACI?')))
+    def exploreLocalFile(self, fds):
+        for fd in fds:
+            qtlib.openlocalurl(os.path.dirname(fd.absoluteFilePath()))
+
     @actionSlot(_('&Copy Patch'), 'copy-patch', None, '',
                 (_notpatch, _notsubroot, _filestatus('MAR!')))
     def copyPatch(self, fds):
