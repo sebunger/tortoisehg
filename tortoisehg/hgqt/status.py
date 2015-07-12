@@ -319,7 +319,7 @@ class StatusWidget(QWidget):
     def _setupFileMenu(self, menu):
         self._addFileActionsToMenu(menu, [
             'visualDiffFile', 'visualDiffLocalFile', 'copyPatch',
-            'editLocalFile', 'openLocalFile', 'editRejects',
+            'editLocalFile', 'openLocalFile', 'exploreLocalFile', 'editRejects',
             None, 'openSubrepo', 'explore', 'terminal', None, 'copyPath',
             'editMissingFile', None, 'revertWorkingFile', None,
             'navigateFileLog', None, 'forgetFile', 'addFile', 'addLargefile',

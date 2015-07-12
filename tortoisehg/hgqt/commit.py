@@ -587,6 +587,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         tokens.add(wfile)
         tokens.add(os.path.basename(wfile))
         try:
+            from mercurial import demandimport; demandimport.disable()
             from pygments.lexers import guess_lexer_for_filename
             from pygments.token import Token
             from pygments.util import ClassNotFound

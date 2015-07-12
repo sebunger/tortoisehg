@@ -31,7 +31,8 @@ if hasattr(sys, "frozen"):
             print 'starting'
     # insert installed bin/ folder at start of PATH
     binpath = os.path.join(os.path.dirname(sys.executable), 'bin')
-    os.environ['PATH'] = os.pathsep.join([binpath, os.environ['PATH']])
+    os.environ['PATH'] = os.pathsep.join([binpath, os.environ.get('PATH', '')])
+    sys.path.insert(0, binpath) # for pywintypes
     # os.Popen() needs this, and Mercurial still uses os.Popen
     if 'COMSPEC' not in os.environ:
         comspec = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
