@@ -203,29 +203,28 @@ class patchctx(object):
         files = {}
         pf = open(self._path, 'rb')
         try:
-            try:
-                # consume comments and headers
-                for i in range(self._ph.diffstartline):
-                    pf.readline()
-                for chunk in hglib.parsepatch(pf):
-                    if not isinstance(chunk, hglib.patchheader):
-                        continue
-                    top = patch.parsefilename(chunk.header[-2])
-                    bot = patch.parsefilename(chunk.header[-1])
-                    type, path = get_path(top, bot)
-                    if path not in chunk.files():
-                        type, path = 0, chunk.files()[-1]
-                    if path not in files:
-                        self._status[type].append(path)
-                        files[path] = [chunk]
-                        self._fileorder.append(path)
-                    files[path].extend(chunk.hunks)
-            except (patch.PatchError, AttributeError), e:
-                self._status[2].append(self._parseErrorFileName)
-                files[self._parseErrorFileName] = []
-                self._parseerror = e
-                if 'THGDEBUG' in os.environ:
-                    print e
+            # consume comments and headers
+            for i in range(self._ph.diffstartline):
+                pf.readline()
+            for chunk in patch.parsepatch(pf):
+                if not isinstance(chunk, patch.header):
+                    continue
+                top = patch.parsefilename(chunk.header[-2])
+                bot = patch.parsefilename(chunk.header[-1])
+                type, path = get_path(top, bot)
+                if path not in chunk.files():
+                    type, path = 0, chunk.files()[-1]
+                if path not in files:
+                    self._status[type].append(path)
+                    files[path] = [chunk]
+                    self._fileorder.append(path)
+                files[path].extend(chunk.hunks)
+        except (patch.PatchError, AttributeError), e:
+            self._status[2].append(self._parseErrorFileName)
+            files[self._parseErrorFileName] = []
+            self._parseerror = e
+            if 'THGDEBUG' in os.environ:
+                print e
         finally:
             pf.close()
         return files

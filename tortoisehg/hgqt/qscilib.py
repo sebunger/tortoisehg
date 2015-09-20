@@ -8,8 +8,6 @@
 
 import re, os, weakref
 
-from mercurial import util
-
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import qtlib
@@ -658,7 +656,7 @@ class KeyPressInterceptor(QObject):
     def _isinterceptable(self, event):
         if event.key() in self._keys:
             return True
-        if util.any(event.matches(e) for e in self._keyseqs):
+        if any(event.matches(e) for e in self._keyseqs):
             return True
         return False
 

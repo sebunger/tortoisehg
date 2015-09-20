@@ -171,11 +171,11 @@ class EmailDialog(QDialog):
             # QLineEdit may contain newline character
             return re.sub(r'\s', ' ', unicode(s))
 
-        opts['to'] = [headertext(self._qui.to_edit.currentText())]
-        opts['cc'] = [headertext(self._qui.cc_edit.currentText())]
+        opts['to'] = headertext(self._qui.to_edit.currentText())
+        opts['cc'] = headertext(self._qui.cc_edit.currentText())
         opts['from'] = headertext(self._qui.from_edit.currentText())
         opts['in_reply_to'] = headertext(self._qui.inreplyto_edit.text())
-        opts['flag'] = [headertext(self._qui.flag_edit.currentText())]
+        opts['flag'] = headertext(self._qui.flag_edit.currentText())
 
         if self._qui.bundle_radio.isChecked():
             assert self._outgoing  # only outgoing bundle is supported
@@ -184,13 +184,9 @@ class EmailDialog(QDialog):
         else:
             opts['rev'] = hglib.compactrevs(self._revs)
 
-        def diffformat():
-            n = self.getdiffformat()
-            if n == 'hg':
-                return {}
-            else:
-                return {n: True}
-        opts.update(diffformat())
+        fmt = self.getdiffformat()
+        if fmt != 'hg':
+            opts[fmt] = True
 
         opts.update(self.getextraopts())
 
@@ -265,7 +261,7 @@ class EmailDialog(QDialog):
                     w.setChecked(False)
 
         # --body is mandatory if no attach modes are specified
-        body.setEnabled(util.any(w.isChecked() for w in attachmodes))
+        body.setEnabled(any(w.isChecked() for w in attachmodes))
         if not body.isEnabled():
             body.setChecked(True)
 
@@ -279,7 +275,7 @@ class EmailDialog(QDialog):
         cmd = cmdui.CmdSessionDialog(self)
         cmd.setWindowTitle(_('Sending Email'))
         cmd.setLogVisible(False)
-        uih = cmdui.PasswordUiHandler(cmd)  # skip "intro" prompt
+        uih = cmdui.PasswordUiHandler(cmd)  # skip "intro" and "diffstat" prompt
         cmd.setSession(self._repoagent.runCommand(cmdline, uih))
         if cmd.exec_() == 0:
             self._writehistory()

@@ -1,6 +1,6 @@
-*****
+****
 Úvod
-*****
+****
 
 .. module:: introduction
     :synopsis: Introduce TortoiseHg and its various parts
@@ -10,13 +10,11 @@ Co je TortoiseHg?
 
 TortoiseHg je sada grafických nástrojů a extenzí uživatelského rozhraní programu `Mercurial <http://mercurial.selenic.com/wiki/>`_ pro necentralizovanou správu verzí.
 
-Ve Windows
-	se TortoiseHg skládá z grafické aplikace Verpánek (Workbench), z extenze uživatelského rozhranní s překryvnými ikonami a kontextovým menu v Průzkumníku a z programu pro příkazový řádek :file:`thg.exe` který spouští nástroje TortoiseHg. Binární pakety aplikace TortoiseHg pro Windows obsahují Mercurial i slučovací nástroj a je proto možné je použít bezprostředně po instalaci.
+Ve Windows 
+ se TortoiseHg skládá z grafické aplikace Verpánek (Workbench), z extenze uživatelského rozhranní s překryvnými ikonami a kontextovým menu v Průzkumníku a z programu pro příkazový řádek :file:`thg.exe` který spouští nástroje TortoiseHg. Binární pakety aplikace TortoiseHg pro Windows obsahují Mercurial i slučovací nástroj a je proto možné je použít bezprostředně po instalaci.
 	
-V Linuxu
-	se TortoiseHg skládá ze skriptu thg pro příkazový řádek a z extenze
-	Nautilusu, která poskytuje překryvné ikony a kontextové menu v 
-	průzkumíku souborů.
+V Linuxu 
+ se TortoiseHg skládá ze skriptu thg pro příkazový řádek a z extenze Nautilusu, která poskytuje překryvné ikony a kontextové menu v průzkumíku souborů.
 	Pro činnost TortoiseHg v Linuxu je potřebná oddělená instalace 
 	programu Mercurial. Binární pakety TortoiseHg znají Mercurial jako
 	závislou aplikaci, která je obvykle instalována automaticky.
@@ -55,8 +53,8 @@ Bezpečné jsou tyto dvě možnosti:
 
 Pokud se i potom vyskytnou problémy s extenzí rozhraní, doporučujeme znovu spustit instalátor s volbou *Repair* (Opravit).	
   
-Jazykové nastavení ve Windows
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Jazykové nastavení
+^^^^^^^^^^^^^^^^^^
 
 Uživatelské rozhraní TorotiseHg bylo přeloženo do mnoha jazyků. Jazykové balíčky nejsou potřebné, neboť všechny přeložené jazyky jsou nainstalované. Preferovaný jazyk lze nastavit v nástroji pro globální konfiguraci (:guilabel:`Settings > TortoiseHg > Jazyk aplikace`).
 

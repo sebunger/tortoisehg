@@ -457,9 +457,9 @@ class RepoRegistryView(QDockWidget):
                 _("Create a new group"), self.newGroup),
              ("rename", _("Re&name"), None,
                 _("Rename the entry"), self.startRename),
-             ("settings", _("Settin&gs"), 'settings_user',
+             ("settings", _("Settin&gs"), 'thg-userconfig',
                 _("View the repository's settings"), self.startSettings),
-             ("remove", _("Re&move from Registry"), 'menudelete',
+             ("remove", _("Re&move from Registry"), 'hg-strip',
                 _("Remove the node and all its subnodes."
                   " Repositories are not deleted from disk."),
                   self.removeSelected),
@@ -683,9 +683,9 @@ class RepoRegistryView(QDockWidget):
 
     def removeSubrepo(self):
         'menu action handler for removing an existing subrepository'
-        path = hglib.tounicode(self.selitem.internalPointer().rootpath())
-        containerpath = os.path.normpath(os.path.join(path, '..'))
-        root = paths.find_root(containerpath)
+        model = self.tview.model()
+        path = model.repoRoot(self.selitem)
+        root = model.repoRoot(self.selitem.parent())
         relsubpath = os.path.normcase(os.path.normpath(path[1+len(root):]))
         hgsubfilename = os.path.join(root, '.hgsub')
 

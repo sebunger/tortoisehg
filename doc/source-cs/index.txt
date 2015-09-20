@@ -6,6 +6,7 @@
 Vítejte v dokumentaci pro TortoiseHg!
 =====================================
 
+Contents:
 
 .. toctree::
     :maxdepth: 3

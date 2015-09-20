@@ -15,13 +15,24 @@
    sodipodi:version="0.32"
    inkscape:version="0.46"
    version="1.0"
-   sodipodi:docname="merge.svg"
+   sodipodi:docname="remove.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-filename="C:\src\thg\new-icons\icons\tortoise\commit-32.png"
+   inkscape:export-filename="E:\src\mercurial\thg\thg-icons\icons\tortoise\remove-32.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
      id="defs4">
+    <linearGradient
+       id="linearGradient3170">
+      <stop
+         style="stop-color:#f35656;stop-opacity:1;"
+         offset="0"
+         id="stop3172" />
+      <stop
+         style="stop-color:#e40f0f;stop-opacity:1;"
+         offset="1"
+         id="stop3174" />
+    </linearGradient>
     <linearGradient
        id="linearGradient3897">
       <stop
@@ -84,7 +95,7 @@
        inkscape:vp_x="0 : 526.18109 : 1"
        sodipodi:type="inkscape:persp3d" />
     <inkscape:perspective
-       id="perspective2596"
+       id="perspective3992"
        inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
        inkscape:vp_z="744.09448 : 526.18109 : 1"
        inkscape:vp_y="0 : 1000 : 0"
@@ -92,13 +103,13 @@
        sodipodi:type="inkscape:persp3d" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient3687"
-       id="linearGradient3374"
-       gradientUnits="userSpaceOnUse"
-       x1="65.14286"
-       y1="99.933609"
-       x2="65.14286"
-       y2="115.93361" />
+       xlink:href="#linearGradient3170"
+       id="linearGradient3176"
+       x1="56.50333"
+       y1="99.284218"
+       x2="72.847733"
+       y2="115.6289"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -110,11 +121,11 @@
      objecttolerance="10"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="5.6568543"
-     inkscape:cx="11.743989"
-     inkscape:cy="15.56913"
+     inkscape:zoom="19.40625"
+     inkscape:cx="15.283179"
+     inkscape:cy="17.10556"
      inkscape:document-units="px"
-     inkscape:current-layer="layer3"
+     inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:snap-bbox="true"
      inkscape:snap-nodes="true"
@@ -141,54 +152,17 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title>Merge</dc:title>
-        <dc:date>2008-04-26</dc:date>
+        <dc:title>Remove</dc:title>
+        <dc:date>2008-05-07</dc:date>
         <dc:creator>
           <cc:Agent>
             <dc:title>Peer Sommerlund</dc:title>
           </cc:Agent>
         </dc:creator>
-        <dc:description>Merge icon for TortoiseHg-</dc:description>
+        <dc:description>Remove icon for TortoiseHg</dc:description>
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <g
-     inkscape:groupmode="layer"
-     id="layer2"
-     inkscape:label="Bitmap"
-     style="display:none"
-     sodipodi:insensitive="true">
-    <image
-       y="0"
-       x="0"
-       id="image2598"
-       height="32"
-       width="32"
-       sodipodi:absref="E:\src\mercurial\thg\thg-icons\icons\tortoise\menumerge.ico"
-       xlink:href="menumerge.ico" />
-  </g>
-  <g
-     inkscape:groupmode="layer"
-     id="layer3"
-     inkscape:label="Hints"
-     style="display:none">
-    <rect
-       transform="matrix(0.7071068,-0.7071068,0.7071068,0.7071068,-49.142857,-92.933609)"
-       y="118.46933"
-       x="-20.079962"
-       height="5"
-       width="5.0000005"
-       id="rect3378"
-       style="opacity:1;fill:#7b8770;fill-opacity:1;stroke:#4e9a06;stroke-width:1;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline" />
-    <rect
-       style="opacity:1;fill:#7b8770;fill-opacity:1;stroke:#4e9a06;stroke-width:1;stroke-linecap:square;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:inline"
-       id="rect3376"
-       width="5.0000005"
-       height="5"
-       x="-31.343418"
-       y="107.20587"
-       transform="matrix(0.7071068,-0.7071068,0.7071068,0.7071068,-49.142857,-92.933609)" />
-  </g>
   <g
      inkscape:label="Vector"
      inkscape:groupmode="layer"
@@ -196,9 +170,12 @@
      transform="translate(-49.142857,-92.933609)"
      style="display:inline">
     <path
-       style="opacity:1;fill:url(#linearGradient3374);fill-opacity:1;fill-rule:evenodd;stroke:#4e9a06;stroke-width:1.04799997999999990;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="M 73.142857,94.433609 L 76.642857,97.933609 C 73.142857,101.43361 67.642857,103.93361 67.642857,109.93361 L 67.642857,116.43361 L 72.642857,116.43361 L 65.142857,123.43361 L 58.142857,116.43361 L 62.642857,116.43361 L 62.642857,109.93361 C 62.642857,103.93361 55.642857,99.933609 53.642857,97.933609 L 57.142857,94.433609 C 59.655574,97.440433 62.142857,97.933609 65.142857,102.43361 C 67.642857,98.933609 70.642857,96.933609 73.142857,94.433609 z"
-       id="path2900"
-       sodipodi:nodetypes="ccccccccccccc" />
+       sodipodi:type="inkscape:offset"
+       inkscape:radius="2.4501352"
+       inkscape:original="M 57.65625 97.4375 L 54.65625 100.4375 L 62.15625 107.9375 L 54.65625 115.4375 L 57.65625 118.4375 L 65.15625 110.9375 L 72.65625 118.4375 L 75.65625 115.4375 L 68.15625 107.9375 L 75.65625 100.4375 L 72.65625 97.4375 L 65.15625 104.9375 L 57.65625 97.4375 z "
+       style="opacity:1;fill:url(#linearGradient3176);fill-opacity:1;fill-rule:evenodd;stroke:#a40000;stroke-width:0.96144354;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="path2398"
+       d="M 57.375,95 C 56.828656,95.071162 56.322236,95.324371 55.9375,95.71875 L 52.9375,98.71875 C 51.998993,99.67241 51.998993,101.20259 52.9375,102.15625 L 58.71875,107.9375 L 52.9375,113.71875 C 51.998993,114.67241 51.998993,116.20259 52.9375,117.15625 L 55.9375,120.15625 C 56.89116,121.09476 58.42134,121.09476 59.375,120.15625 L 65.15625,114.375 L 70.9375,120.15625 C 71.89116,121.09476 73.42134,121.09476 74.375,120.15625 L 77.375,117.15625 C 78.313507,116.20259 78.313507,114.67241 77.375,113.71875 L 71.59375,107.9375 L 77.375,102.15625 C 78.313507,101.20259 78.313507,99.67241 77.375,98.71875 L 74.375,95.71875 C 73.42134,94.780243 71.89116,94.780243 70.9375,95.71875 L 65.15625,101.5 L 59.375,95.71875 C 58.852325,95.187488 58.11628,94.922972 57.375,95 z"
+       transform="matrix(1.0401115,0,0,1.0400938,-2.6269051,-3.3312907)" />
   </g>
 </svg>

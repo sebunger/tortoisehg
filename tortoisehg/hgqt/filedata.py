@@ -110,7 +110,7 @@ class _AbstractFileData(object):
 
     def isLoaded(self):
         loadables = [self.contents, self.ucontents, self.error, self.diff]
-        return util.any(e is not None for e in loadables)
+        return any(e is not None for e in loadables)
 
     def isNull(self):
         return self._ctx.rev() == nullrev and not self._wfile
@@ -246,12 +246,8 @@ class FileData(_AbstractFileData):
         return fctx, data
 
     def _checkRenamed(self, repo, ctx, pctx, wfile):
-        try:
-            m = match.exact(repo, '', [wfile])
-            copy = copies.pathcopies(pctx, ctx, match=m)
-        except TypeError:
-            # build full map on hg<3.4 (4906dc0e038c)
-            copy = copies.pathcopies(pctx, ctx)
+        m = match.exact(repo, '', [wfile])
+        copy = copies.pathcopies(pctx, ctx, match=m)
         oldname = copy.get(wfile)
         if not oldname:
             self.flabel += _(' <i>(was added)</i>')
@@ -392,7 +388,7 @@ class FileData(_AbstractFileData):
 
             # feed diffs through parsepatch() for more fine grained
             # chunk selection
-            filediffs = hglib.parsepatch(fp)
+            filediffs = patch.parsepatch(fp)
             if filediffs and filediffs[0].hunks:
                 self.changes = filediffs[0]
             else:

@@ -291,9 +291,9 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.tv.icase = icase
         self.regexple.selectAll()
         inc = hglib.fromunicode(self.incle.text())
-        if inc: inc = inc.split(', ')
+        if inc: inc = map(str.strip, inc.split(','))
         exc = hglib.fromunicode(self.excle.text())
-        if exc: exc = exc.split(', ')
+        if exc: exc = map(str.strip, exc.split(','))
         rev = hglib.fromunicode(self.revle.text()).strip()
 
         self.addHistory(pattern, inc or [], exc or [])

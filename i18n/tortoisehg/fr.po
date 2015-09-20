@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2015-05-13 20:45+0000\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-07-28 06:59+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2015-05-14 04:39+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-29 05:34+0000\n"
+"X-Generator: Launchpad (build 17646)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -3901,6 +3901,9 @@ msgstr "Chemin"
 msgid "C&hoose Log Columns..."
 msgstr "C&hoisir les colonnes de log..."
 
+msgid "&Resize Columns"
+msgstr "&Redimensionner les colonnes"
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "Aller à l'ancêtre de %s et %s"
@@ -4077,9 +4080,6 @@ msgstr "Mettre à jour..."
 msgid "Bro&wse at Revision"
 msgstr "Parcourir à la révision"
 
-msgid "&Similar Revisions..."
-msgstr "Révisions &similaires..."
-
 msgid "&Merge with Local..."
 msgstr "Fusionner avec la révision locale..."
 
@@ -4200,9 +4200,6 @@ msgstr "Rebaser..."
 msgid "Goto common ancestor"
 msgstr "Aller à l'ancêtre commun"
 
-msgid "Similar revisions..."
-msgstr "Révisions similaires..."
-
 msgid "Graft Selected to local..."
 msgstr "Greffer la sélection vers la révision locale..."
 
@@ -4306,6 +4303,21 @@ msgstr "Patches exportés"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d patches ont été exportés vers :<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr "Filtrer par"
+
+msgid "&Ancestors"
+msgstr "&Ancêtres"
+
+msgid "A&uthor"
+msgstr "A&uteur"
+
+msgid "&Branch"
+msgstr "&Branche"
+
+msgid "&More Options..."
+msgstr "Plus d'options..."
 
 msgid "Unable to merge"
 msgstr "Impossible de fusionner"
@@ -4921,7 +4933,7 @@ msgstr "afficher l'aide et quitter"
 
 msgid "set/override config option (use 'section.name=value')"
 msgstr ""
-"définir/redéfinr l'option de configuration (utiliser 'section.nom=valeur')"
+"définir/redéfinir l'option de configuration (utiliser 'section.nom=valeur')"
 
 msgid "enable debugging output"
 msgstr "activer la sortie de déboguage"
@@ -5072,7 +5084,7 @@ msgid "requires a single filename"
 msgstr "demande un seul nom de fichier"
 
 msgid "thg forget [FILE]..."
-msgstr "hg forget [FILE]..."
+msgstr "thg forget [FILE]..."
 
 msgid "revisions to graft"
 msgstr "révisions à greffer"
@@ -5357,19 +5369,19 @@ msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
 msgstr "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
 
 msgid "wait until the second ticks over"
-msgstr "attendre à la prochaine seconde"
+msgstr "attendre la prochaine seconde"
 
 msgid "notify the shell for paths given"
-msgstr "Notifie l'explorateur pour les chemins"
+msgstr "notifie l'explorateur pour les chemins fournis"
 
 msgid "remove the status cache"
-msgstr "Vider le statut de cache"
+msgstr "vider le cache de statut"
 
 msgid "show the contents of the status cache (no update)"
-msgstr "montrer le contenu de cache de statut ( sans mise à jour )"
+msgstr "afficher le contenu du cache de statut (sans mise à jour)"
 
-msgid "udpate all repos in current dir"
-msgstr "mettre à jour tous les référentiels dans le répertoire courrant"
+msgid "update all repos in current dir"
+msgstr "mettre à jour tous les dépôts dans le répertoire courant"
 
 msgid "thg thgstatus [OPTION]"
 msgstr "thg thgstatus [OPTION]"
@@ -5381,7 +5393,7 @@ msgid "thg userconfig"
 msgstr "thg userconfig"
 
 msgid "changeset to view in diff tool"
-msgstr "révision à voir dans l'outil de diff"
+msgstr "révision à afficher dans l'outil de diff"
 
 msgid "revisions to view in diff tool"
 msgstr "révisions à afficher dans l'outil de diff"
@@ -7618,8 +7630,8 @@ msgstr ""
 "Optionnel. Fichier de clés pour le certificat client au format PEM.\n"
 "Les variables d'environnement sont développées dans le nom de fichier."
 
-msgid "User Certificate Key File"
-msgstr "Fichier de clé de certificat de l'utilisateur"
+msgid "User Certificate Key"
+msgstr "Clé de certificat utilisateur"
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
@@ -7628,11 +7640,23 @@ msgstr ""
 "Optionnel. Fichier de chaîne de certificat client au format PEM.\n"
 "Les variables d'environnement sont développées dans le nom de fichier."
 
-msgid "User Certificate Chain File"
-msgstr "Fichier de chaîne de certificat de l'utilisateur"
+msgid "User Certificate Chain"
+msgstr "Chaîne de certificat utilisateur"
 
 msgid "Certificate Query Error"
 msgstr "Erreur de requête de certificat"
+
+msgid "Select User Certificate Key File"
+msgstr "Sélectionner un fichier de clé de certificat utilisateur"
+
+msgid "PEM files (*.pem *.key)"
+msgstr "Fichiers PEM (*.pem *.key)"
+
+msgid "Select User Certificate Chain File"
+msgstr "Sélectionner un fichier de chaîne de certificat utilisateur"
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr "Fichiers PEM (*.pem *.crt *.cer)"
 
 msgid "Unable to save authentication"
 msgstr "Impossible d'enregistrer l'authentification"
@@ -8292,11 +8316,6 @@ msgstr "[SOURCE]"
 #, python-format
 msgid "unsupported URL: %s"
 msgstr "URL non supportée : %s"
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
-msgstr ""
-"empreinte du serveur pour %s ne peut pas être obtenue (Python trop vieux)"
 
 #, python-format
 msgid "%s certificate error: no certificate received"
@@ -10487,6 +10506,9 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Push"
 #~ msgstr "Pousser"
 
+#~ msgid "Similar revisions..."
+#~ msgstr "Révisions similaires..."
+
 #~ msgid "Restart merge with"
 #~ msgstr "Redémarrer la fusion avec"
 
@@ -10588,6 +10610,12 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Remove versioned"
 #~ msgstr "Supprimer les fichiers versionnés"
 
+#~ msgid "User Certificate Key File"
+#~ msgstr "Fichier de clé de certificat de l'utilisateur"
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "Fichier de chaîne de certificat de l'utilisateur"
+
 #~ msgid "Backout..."
 #~ msgstr "Backout..."
 
@@ -10605,3 +10633,13 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ "correspond à la chaîne entière trouvée par issue.regex, {1} désigne le "
 #~ "premier groupe et ainsi de suite. Si aucun jeton {n} n'est trouvé dans "
 #~ "issue.link, la chaîne complète trouvée est ajoutée."
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "Révisions &similaires..."
+
+#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
+#~ msgstr ""
+#~ "empreinte du serveur pour %s ne peut pas être obtenue (Python trop vieux)"
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "mettre à jour tous les dépôts dans le répertoire actuel"

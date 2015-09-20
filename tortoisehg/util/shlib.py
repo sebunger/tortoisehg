@@ -111,21 +111,20 @@ if os.name == 'nt':
         update = False
         f = None
         try:
-            try:
-                f = repo.opener('thgstatus', 'rb')
-                for dn in sorted(dirstatus):
-                    s = dirstatus[dn]
-                    e = f.readline()
-                    if e.startswith('@@noicons'):
-                        break
-                    if e == '' or e[0] != s or e[1:-1] != dn:
-                        update = True
-                        break
-                if f.readline() != '':
-                    # extra line in f, needs update
+            f = repo.opener('thgstatus', 'rb')
+            for dn in sorted(dirstatus):
+                s = dirstatus[dn]
+                e = f.readline()
+                if e.startswith('@@noicons'):
+                    break
+                if e == '' or e[0] != s or e[1:-1] != dn:
                     update = True
-            except IOError:
+                    break
+            if f.readline() != '':
+                # extra line in f, needs update
                 update = True
+        except IOError:
+            update = True
         finally:
             if f != None:
                 f.close()

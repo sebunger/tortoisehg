@@ -184,8 +184,7 @@ class RepoWatcher(QObject):
         repo = self._repo
         q = getattr(repo, 'mq', None)
         newfilesmap = {
-            # no need to watch 'bookmarks' because repo._bookmarks.write
-            # touches 00changelog.i (see bookmarks.bmstore.write)
+            repo.join('bookmarks'): (LogChanged, False),
             repo.join('bookmarks.current'): (LogChanged, False),
             repo.join('branch'): (0, False),
             repo.join('dirstate'): (WorkingStateChanged, False),
@@ -233,7 +232,7 @@ class RepoWatcher(QObject):
                 continue
             last = self._lastmtimes.get(path, -1)
             cur = curmtimes.get(path, -1)
-            if last < cur:
+            if last != cur:  # mtime can go back on rollback
                 try:
                     curdata[readmeth] = readmeth(self)
                 except EnvironmentError:
@@ -248,7 +247,7 @@ class RepoWatcher(QObject):
         for path, (flag, _watched) in self._filesmap.iteritems():
             last = self._lastmtimes.get(path, -1)
             cur = curmtimes.get(path, -1)
-            if last < cur or (last >= 0 and cur < 0):
+            if last != cur:  # mtime can go back on rollback
                 self._ui.debug(' mtime: %s (%r -> %r)\n' % (path, last, cur))
                 changeflags |= flag
         for readmeth, (flag, _path) in self._datamap.iteritems():

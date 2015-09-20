@@ -12,6 +12,12 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import QApplication, QFont
 from PyQt4.QtNetwork import QLocalServer, QLocalSocket
 
+if os.name == 'nt' and getattr(sys, 'frozen', False):
+    # load QtSvg4.dll and QtXml4.dll by .pyd, so that imageformats/qsvg4.dll
+    # can find them without relying on unreliable PATH variable
+    from PyQt4 import QtSvg, QtXml
+    QtSvg.__name__, QtXml.__name__  # no demandimport, silence pyflakes
+
 if PYQT_VERSION < 0x40600 or QT_VERSION < 0x40600:
     sys.stderr.write('TortoiseHg requires at least Qt 4.6 and PyQt 4.6\n')
     sys.stderr.write('You have Qt %s and PyQt %s\n' %
@@ -24,6 +30,10 @@ from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import bugreport, qtlib, thgrepo, workbench
+
+if getattr(sys, 'frozen', False):
+    # load icons and translations
+    import icons_rc, translations_rc
 
 try:
     from thginithook import thginithook
@@ -117,13 +127,12 @@ class ExceptionCatcher(QObject):
     def excepthandler(self):
         'Display exception info; run in main (GUI) thread'
         try:
-            try:
-                self._showexceptiondialog()
-            except:
-                # make sure to quit mainloop first, so that it never leave
-                # zombie process.
-                self._mainapp.exit(1)
-                self._printexception()
+            self._showexceptiondialog()
+        except:
+            # make sure to quit mainloop first, so that it never leave
+            # zombie process.
+            self._mainapp.exit(1)
+            self._printexception()
         finally:
             self.errors = []
 
@@ -382,7 +391,7 @@ class QtRunner(QObject):
         _fixapplicationfont()
         qtlib.configstyles(ui)
         qtlib.initfontcache(ui)
-        self._mainapp.setWindowIcon(qtlib.geticon('thg-logo'))
+        self._mainapp.setWindowIcon(qtlib.geticon('thg'))
 
         self._repomanager = thgrepo.RepoManager(ui, self)
         self._reporeleaser = releaser = QSignalMapper(self)

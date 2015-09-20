@@ -1,6 +1,6 @@
-***********
+*********
 Předmluva
-***********
+*********
 
 .. module:: preface
     :synopsis: About this manual
@@ -22,17 +22,11 @@ Seznámení s obsahem
 
 V kapitole :doc:`intro` se seznámíme s instalací programu a s nastavením jeho jazykové verze. 
 
-Kapitola :doc:`whatsnew` uvádí rozdíly mezi TorotiseHg řady 2 a 1.
-
 Kapitola :doc:`quick` je stručným návodem na užívání programu.
 
 Hlavní kapitola :doc:`daily` zevrubně popisuje často používané nástroje programu. 
 
 Kapitola :doc:`settings` popisuje konfiguraci TortoiseHg.
-
-Kapitola :doc:`patches` popisuje práci s oprávkami (patches).
-
-Kapitola :doc:`extensions` popisuje extenze Mercurialu, které jsou součástí binárního paketu TortoiseHg.
 
 Kapitola :doc:`nonhg` popisuje použití TortoiseHg jako klientskou aplikaci pro nemercurialové servery.
 
@@ -41,8 +35,8 @@ Kapitola :doc:`faq` obsahuje seznam otázek a odpovědí - nepřeloženo.
 Kapitola :doc:`debugging` popisuje řešení možných problémů.
 
 
-TortoiseHg je volně šířený program!
-===================================
+TortoiseHg je volně dostupný program!
+=====================================
 
 TortoiseHg je šířen ve shodě s licenčními podmínkami 
 `GPLv2 <http://www.gnu.org/licenses/gpl-2.0.html>`_.  Lze jej instalovat 
@@ -112,13 +106,13 @@ Program TortoiseHg lze aktivovat buď jako kontextové menu v Průzkumníku Wind
 
 Z toho vyplývá, že bez znalosti jistého množství anglických slov se při používání TortoiseHg nelze obejít. Proto jsem si dovolil mnohá slova v manuálu i v lokalizaci nepřekládat.
 
-Slova patch a hunk překládám jako oprávka a porce, Workbench jako Verpánek.
+Slova Workbench překládám jako Verpánek, patch jako oprávka, hunk jako porce, rebase jako přeskupení, graft jako přesazení, collapse jako shluknout, ...
 
-Považuji za vhodné vymezit význam slova pracovní adresář. **Pracovní adresář** je pomyslná složka, která svůj obsah odvozuje z aktuálně nastavené aktuální revize.  
+Považuji za vhodné vymezit význam slova pracovní adresář. :strong:`Pracovní adresář` je pomyslná složka, která svůj obsah odvozuje z aktuálně nastavené aktuální revize.  
 
-Kořenový adresář projeku, který obsahuje složku s názvem *.hg* neboli **repozitář** je rovněž dynamický útvar a v tomto textu bude označován jako **repozitórium**. Pro každou revizi může mít repozitórium jiné složení souborů!
+Kořenový adresář projeku, který obsahuje složku s názvem :strong:`.hg` neboli :strong:`repozitář` je rovněž dynamický útvar a v tomto textu bude označován jako :strong:`repozitórium`. Pro každou revizi může mít repozitórium jiné složení souborů!
 
-Nutno dodat, že pojem *repozitář* se často (nepřesně) používá i pro *repozitórium*.
+Nutno dodat, že pojem :emphasis:`repozitář` se často (nepřesně) používá i pro :emphasis:`repozitórium`.
 
 Termíny changeset a revize jsou prakticky zaměnitelné. 
  

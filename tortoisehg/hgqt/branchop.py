@@ -20,7 +20,7 @@ class BranchOpDialog(QDialog):
     def __init__(self, repoagent, oldbranchop, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('%s - branch operation') % repoagent.displayName())
-        self.setWindowIcon(qtlib.geticon('branch'))
+        self.setWindowIcon(qtlib.geticon('hg-branch'))
         layout = QVBoxLayout()
         self.setLayout(layout)
         repo = repoagent.rawRepo()

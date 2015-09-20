@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Croatian <hg@li.org>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
 "PO-Revision-Date: 2013-08-10 15:26+0000\n"
 "Last-Translator: Mario Šarić <mario.saric@helix.hr>\n"
 "Language-Team: Croatian <hr@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:13+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-27 05:34+0000\n"
+"X-Generator: Launchpad (build 17628)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg poslužitelj prekrivnih ikona"
@@ -3694,6 +3694,9 @@ msgstr ""
 msgid "C&hoose Log Columns..."
 msgstr ""
 
+msgid "&Resize Columns"
+msgstr ""
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr ""
@@ -3863,9 +3866,6 @@ msgstr ""
 msgid "Bro&wse at Revision"
 msgstr ""
 
-msgid "&Similar Revisions..."
-msgstr ""
-
 msgid "&Merge with Local..."
 msgstr ""
 
@@ -3986,9 +3986,6 @@ msgstr ""
 msgid "Goto common ancestor"
 msgstr ""
 
-msgid "Similar revisions..."
-msgstr ""
-
 msgid "Graft Selected to local..."
 msgstr ""
 
@@ -4083,6 +4080,21 @@ msgstr ""
 
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
+msgstr ""
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
 msgstr ""
 
 msgid "Unable to merge"
@@ -5060,7 +5072,7 @@ msgstr ""
 msgid "show the contents of the status cache (no update)"
 msgstr ""
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr ""
 
 msgid "thg thgstatus [OPTION]"
@@ -6960,7 +6972,7 @@ msgid ""
 "are expanded in the filename."
 msgstr ""
 
-msgid "User Certificate Key File"
+msgid "User Certificate Key"
 msgstr ""
 
 msgid ""
@@ -6968,10 +6980,22 @@ msgid ""
 "are expanded in the filename."
 msgstr ""
 
-msgid "User Certificate Chain File"
+msgid "User Certificate Chain"
 msgstr ""
 
 msgid "Certificate Query Error"
+msgstr ""
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
 msgstr ""
 
 msgid "Unable to save authentication"
@@ -7596,10 +7620,6 @@ msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
-msgstr ""
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
 msgstr ""
 
 #, python-format

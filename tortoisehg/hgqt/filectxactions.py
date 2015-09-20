@@ -12,8 +12,6 @@ import os, re
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util
-
 from tortoisehg.hgqt import cmdcore, cmdui, lfprompt, qtlib, revert, visdiff
 from tortoisehg.hgqt import customtools, rejects
 from tortoisehg.util.i18n import _
@@ -24,7 +22,7 @@ def _lcanonpaths(fds):
 
 # predicates to filter files
 def _anydeleted(fds):
-    if util.any(e.rev() is None and e.rawContext().deleted() for e in fds):
+    if any(e.rev() is None and e.rawContext().deleted() for e in fds):
         return fds
     return []
 def _committed(fds):
@@ -301,15 +299,11 @@ class FilectxActions(QObject):
     def saveFile(self, fds):
         cmdlines = []
         for fd in fds:
-            wfile = fd.absoluteFilePath()
-            wfile, ext = os.path.splitext(os.path.basename(wfile))
+            wfile, ext = os.path.splitext(fd.absoluteFilePath())
             extfilter = [_("All files (*)")]
-            if wfile:
-                filename = "%s@%d%s" % (wfile, fd.rev(), ext)
-                if ext:
-                    extfilter.insert(0, "*%s" % ext)
-            else:
-                filename = "%s@%d" % (ext, fd.rev())
+            filename = "%s@%d%s" % (wfile, fd.rev(), ext)
+            if ext:
+                extfilter.insert(0, "*%s" % ext)
 
             result = QFileDialog.getSaveFileName(
                 self.parent(), _("Save file to"), filename,
@@ -520,7 +514,7 @@ class WctxActions(FilectxActions):
         wctx = fds[0].rawContext()
         self._editFileAt(fds, wctx.p2())
 
-    @actionSlot(_('&Add'), 'fileadd', None, '',
+    @actionSlot(_('&Add'), 'hg-add', None, '',
                 (_notsubroot, _filestatus('RI?')))
     def addFile(self, fds):
         repo = self._repoAgentFor(fds[0]).rawRepo()
@@ -549,7 +543,7 @@ class WctxActions(FilectxActions):
     def addLargefile(self, fds):
         self._runWorkingFileCommand('add', fds, {'large': True})
 
-    @actionSlot(_('&Forget'), 'filedelete', None, '',
+    @actionSlot(_('&Forget'), 'hg-remove', None, '',
                 (_notsubroot, _filestatus('MAC!')))
     def forgetFile(self, fds):
         self._runWorkingFileCommand('forget', fds)
@@ -568,7 +562,7 @@ class WctxActions(FilectxActions):
         opts = {'config': 'extensions.purge=', 'all': True}
         self._runWorkingFileCommand('purge', fds, opts)
 
-    @actionSlot(_('Re&move Versioned'), 'remove', None, '',
+    @actionSlot(_('Re&move Versioned'), 'hg-remove', None, '',
                 (_notsubroot, _filestatus('C')))
     def removeFile(self, fds):
         self._runWorkingFileCommand('remove', fds)
@@ -629,7 +623,7 @@ class WctxActions(FilectxActions):
         if dlg.exec_() == 0:
             self._notifyChanges()
 
-    @actionSlot(_('&Ignore...'), 'ignore', None, '',
+    @actionSlot(_('&Ignore...'), 'thg-ignore', None, '',
                 (_notsubroot, _filestatus('?')))
     def editHgignore(self, fds):
         from tortoisehg.hgqt.hgignore import HgignoreDialog
@@ -650,7 +644,7 @@ class WctxActions(FilectxActions):
         if dlg.exec_():
             self._notifyChanges()
 
-    @actionSlot(_('De&tect Renames...'), 'detect_rename', None, '',
+    @actionSlot(_('De&tect Renames...'), 'thg-guess', None, '',
                 (_isfile, _filestatus('A?!')))
     def guessRename(self, fds):
         from tortoisehg.hgqt.guess import DetectRenameDialog

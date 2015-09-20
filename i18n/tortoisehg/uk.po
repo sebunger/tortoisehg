@@ -7,32 +7,32 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2014-10-22 10:03+0000\n"
-"Last-Translator: onekosha <Unknown>\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-06-28 12:47+0000\n"
+"Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:14+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-27 05:35+0000\n"
+"X-Generator: Launchpad (build 17628)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
 
 msgid "Exit"
-msgstr "Вийти"
+msgstr "Закрити"
 
 msgid "hg lighthg"
-msgstr ""
+msgstr "hg lighthg"
 
 msgid "About"
 msgstr "Про програму..."
 
 msgid "Copyright 2008-2015 Steve Borho and others"
-msgstr ""
+msgstr "Авторські права Стів Бохо (Steve Borho) 2008-2015 та інших"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Декілька значків люб'язно надані проектами TortoiseSVN, Tango"
@@ -383,7 +383,7 @@ msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "Закладка '%s' змінила назву на '%s'"
 
 msgid "TortoiseHg Bookmark Sync"
-msgstr ""
+msgstr "TortoiseHg Bookmark Sync"
 
 msgid "Outgoing Bookmarks"
 msgstr ""
@@ -401,7 +401,7 @@ msgid "P&ull Bookmark"
 msgstr ""
 
 msgid "R&emove Bookmark"
-msgstr ""
+msgstr "В&идалити Закладку"
 
 #, python-format
 msgid "Pushed local bookmark: %s"
@@ -1314,7 +1314,7 @@ msgid "no matches found: %s"
 msgstr "не знайдено збігів: %s"
 
 msgid "Console"
-msgstr ""
+msgstr "Командний рядок"
 
 msgid "File &History / Annotate"
 msgstr ""
@@ -2365,7 +2365,7 @@ msgid "New Repository"
 msgstr "Нове сховище"
 
 msgid "&Create"
-msgstr ""
+msgstr "&Створити"
 
 msgid "Unable to create a config file"
 msgstr "Не можливо створити файл з налаштуваннями"
@@ -3377,7 +3377,7 @@ msgid "Select Source Folder"
 msgstr "Обрати сирцеву теку"
 
 msgid "Source does not exist."
-msgstr ""
+msgstr "Джерело не існує"
 
 msgid "The source must be within the repository tree."
 msgstr "Джерело повинно знаходитись всередині дерева сховища."
@@ -3870,6 +3870,9 @@ msgstr "Шлях"
 msgid "C&hoose Log Columns..."
 msgstr "Стовпці журналу..."
 
+msgid "&Resize Columns"
+msgstr ""
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "Перехід предку від %s до %s"
@@ -4042,9 +4045,6 @@ msgstr "Перемкнути..."
 msgid "Bro&wse at Revision"
 msgstr "Переглянути, як ревізію"
 
-msgid "&Similar Revisions..."
-msgstr "Схожі ревізії..."
-
 msgid "&Merge with Local..."
 msgstr "Злити з локальною..."
 
@@ -4165,9 +4165,6 @@ msgstr "Перемістити..."
 msgid "Goto common ancestor"
 msgstr "Перейти до спільного предка"
 
-msgid "Similar revisions..."
-msgstr "Схожі ревізії..."
-
 msgid "Graft Selected to local..."
 msgstr "Щепити обране до локальної..."
 
@@ -4270,6 +4267,21 @@ msgstr "Експортовані латки"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d латок буде експортовано до:<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
+msgstr ""
 
 msgid "Unable to merge"
 msgstr "Злиття не можливе"
@@ -5319,7 +5331,7 @@ msgstr "вилучити стан кешу"
 msgid "show the contents of the status cache (no update)"
 msgstr "відобразити вміст стану кеша (без поновлення)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr "оновити всі сховища у поточному каталозі"
 
 msgid "thg thgstatus [OPTION]"
@@ -5818,7 +5830,7 @@ msgstr ""
 "email@example.com&gt;."
 
 msgid "Ask Username"
-msgstr ""
+msgstr "Запитати ім'я користувача"
 
 msgid ""
 "If no username has been specified, the user will be prompted to enter a "
@@ -7497,8 +7509,8 @@ msgstr ""
 "Не обов'язково. Файл ключа сертификату користувача, в кодуванні PEM.\n"
 "В назві файлу можна використовувати змінні середовища."
 
-msgid "User Certificate Key File"
-msgstr "Файл з ключами користувача"
+msgid "User Certificate Key"
+msgstr ""
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
@@ -7507,11 +7519,23 @@ msgstr ""
 "Не обяв'язково. Ланцюг файл сертификату користувача, в кодуванні PEM.\n"
 "В назві файлу можна використовувати змінні середовища."
 
-msgid "User Certificate Chain File"
-msgstr "Файл ланцюжок сертифікатів користувача"
+msgid "User Certificate Chain"
+msgstr ""
 
 msgid "Certificate Query Error"
 msgstr "Помилка запиту сертифікату"
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr ""
 
 msgid "Unable to save authentication"
 msgstr "Зберігання аутентифікації не можливе"
@@ -7915,7 +7939,7 @@ msgid "Show &Patch Queue"
 msgstr "Черга латок"
 
 msgid "Show Conso&le"
-msgstr ""
+msgstr "Показати командний рядок"
 
 msgid "Place Console in Doc&k Area"
 msgstr ""
@@ -8166,10 +8190,6 @@ msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
-msgstr ""
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
 msgstr ""
 
 #, python-format
@@ -8678,6 +8698,9 @@ msgstr ""
 
 #~ msgid "hgtk remove [FILE]..."
 #~ msgstr "hgtk remove [ФАЙЛ]..."
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "оновити всі сховища у поточному каталозі"
 
 #~ msgid "hgtk thgstatus [OPTION]"
 #~ msgstr "hgtk thgstatus [ПАРАМЕТРИ]"
@@ -10223,6 +10246,12 @@ msgstr ""
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "частина %d вже прийнята для рядка %d (fuzz %d)\n"
 
+#~ msgid "User Certificate Key File"
+#~ msgstr "Файл з ключами користувача"
+
+#~ msgid "Similar revisions..."
+#~ msgstr "Схожі ревізії..."
+
 #~ msgid "Invalid date specification"
 #~ msgstr "Помилковий формат дати"
 
@@ -11242,6 +11271,9 @@ msgstr ""
 #~ msgid "finding source of "
 #~ msgstr "пошукування джерела у "
 
+#~ msgid "&Similar Revisions..."
+#~ msgstr "Схожі ревізії..."
+
 #~ msgid "&Yes (--force)"
 #~ msgstr "Так (--force)"
 
@@ -11421,6 +11453,9 @@ msgstr ""
 #~ "Не обрано файли для переміщення\n"
 #~ "\n"
 #~ "Нотатка: лише незмінені файли можуть бути переміщені."
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "Файл ланцюжок сертифікатів користувача"
 
 #~ msgid "name of file to write process ID to"
 #~ msgstr "ім'я файлу для запису ID процесу"

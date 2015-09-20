@@ -102,10 +102,13 @@ def snapshot(repo, files, ctx):
         try:
             if not os.path.isdir(destdir):
                 os.makedirs(destdir)
-            data = repo.wwritedata(wfn, ctx[wfn].data())
+            fctx = ctx[wfn]
+            data = repo.wwritedata(wfn, fctx.data())
             f = open(dest, 'wb')
             f.write(data)
             f.close()
+            if 'x' in fctx.flags():
+                util.setflags(dest, False, True)
             if ctx.rev() is None:
                 fns_and_mtime.append((dest, repo.wjoin(fn), 
                                     os.lstat(dest).st_mtime))

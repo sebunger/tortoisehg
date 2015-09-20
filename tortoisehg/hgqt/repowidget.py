@@ -166,7 +166,7 @@ class RepoWidget(QWidget):
 
         if 'pbranch' in self.repo.extensions():
             self.pbranchDemand = w = DemandWidget('createPatchBranchWidget', self)
-            idx = tt.addTab(w, qtlib.geticon('branch'), '')
+            idx = tt.addTab(w, qtlib.geticon('hg-branch'), '')
             tt.setTabToolTip(idx, _("Patch Branch", "tab tooltip"))
             self._namedTabs['pbranch'] = idx
 
@@ -1069,8 +1069,10 @@ class RepoWidget(QWidget):
               self.visualDiffToLocal)
         entry(menu, None, isctx, _('Bro&wse at Revision'), 'hg-annotate',
               self.manifestRevision)
-        entry(menu, None, isrev, _('&Similar Revisions...'), 'view-filter',
-              self.matchRevision)
+        act = self._createFilterBySelectedRevisionsMenu()
+        act.enableFunc = isrev
+        menu.addAction(act)
+        items.append(act)
         entry(menu)
         entry(menu, None, fixed, _('&Merge with Local...'), 'hg-merge',
               self.mergeWithRevision)
@@ -1133,7 +1135,7 @@ class RepoWidget(QWidget):
             entry(submenu, 'evolve', fixed, _('&Prune...'), 'edit-cut',
                   self._pruneSelected)
             if 'mq' in exs or 'strip' in exs:
-                entry(submenu, None, fixed, _('&Strip...'), 'menudelete',
+                entry(submenu, None, fixed, _('&Strip...'), 'hg-strip',
                       self.stripRevision)
 
         entry(menu, 'reviewboard', isrev, _('Post to Re&view Board...'), 'reviewboard',
@@ -1290,7 +1292,7 @@ class RepoWidget(QWidget):
                 (_('Rebase...'), rebaseDlg, 'hg-rebase', 'rebase'),
                 (None, None, None, None),
                 (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge', None),
-                (_('Similar revisions...'), self.matchRevision, 'view-filter', None),
+                (self._createFilterBySelectedRevisionsMenu, None, None, None),
                 (None, None, None, None),
                 (_('Graft Selected to local...'), self.graftRevisions, 'hg-transplant', None),
                 (None, None, None, None),
@@ -1302,10 +1304,14 @@ class RepoWidget(QWidget):
                 continue
             if ext and ext not in exs:
                 continue
-            a = QAction(name, self)
+            if callable(name):
+                a = name()
+            else:
+                a = QAction(name, self)
             if icon:
                 a.setIcon(qtlib.geticon(icon))
-            a.triggered.connect(cb)
+            if cb:
+                a.triggered.connect(cb)
             menu.addAction(a)
 
         if 'reviewboard' in self.repo.extensions():
@@ -1357,17 +1363,21 @@ class RepoWidget(QWidget):
                 (_('Copy Selected as Patch'), self.copyPatch, 'copy-patch'),
                 (None, None, None),
                 (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge'),
-                (_('Similar revisions...'), self.matchRevision, 'view-filter'),
+                (self._createFilterBySelectedRevisionsMenu, None, None),
                 (None, None, None),
                 (_('Graft Selected to local...'), self.graftRevisions, 'hg-transplant'),
                 ):
             if name is None:
                 menu.addSeparator()
                 continue
-            a = QAction(name, self)
+            if callable(name):
+                a = name()
+            else:
+                a = QAction(name, self)
             if icon:
                 a.setIcon(qtlib.geticon(icon))
-            a.triggered.connect(cb)
+            if cb:
+                a.triggered.connect(cb)
             menu.addAction(a)
 
         if 'evolve' in self.repo.extensions():
@@ -1527,10 +1537,30 @@ class RepoWidget(QWidget):
         if r in (0, 1):
             self.gotoParent()
 
-    def matchRevision(self):
-        revlist = self.rev
-        if len(self.menuselection) > 1:
-            revlist = '|'.join([str(rev) for rev in self.menuselection])
+    def _createFilterBySelectedRevisionsMenu(self):
+        menu = QMenu(_('Filter b&y'), self)
+        menu.setIcon(qtlib.geticon('view-filter'))
+        menu.triggered.connect(self._filterBySelectedRevisions)
+        for t, r in [(_('&Ancestors'), "ancestors(%s)"),
+                     (_('A&uthor'), "matching(%s, 'author')"),
+                     (_('&Branch'), "branch(%s)"),
+                     ]:
+            a = menu.addAction(t)
+            a.setData(r)
+        menu.addSeparator()
+        menu.addAction(_('&More Options...'))
+        return menu.menuAction()
+
+    @pyqtSlot(QAction)
+    def _filterBySelectedRevisions(self, action):
+        revs = hglib.compactrevs(sorted(self.repoview.selectedRevisions()))
+        expr = str(action.data().toString())
+        if not expr:
+            self._filterByMatchDialog(revs)
+            return
+        self.setFilter(expr % revs)
+
+    def _filterByMatchDialog(self, revlist):
         dlg = matching.MatchDialog(self._repoagent, revlist, self)
         if dlg.exec_():
             self.setFilter(dlg.revsetexpression)
@@ -2020,7 +2050,6 @@ class RepoWidget(QWidget):
     @pyqtSlot()
     def _notifyWorkingDirChanges(self):
         shlib.shell_notify([self.repo.root])
-        self._refreshCommitTabIfNeeded()
 
     @pyqtSlot()
     def _refreshCommitTabIfNeeded(self):

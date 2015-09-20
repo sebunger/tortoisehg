@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
 "PO-Revision-Date: 2015-02-16 16:26+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:15+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-27 05:36+0000\n"
+"X-Generator: Launchpad (build 17628)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -3719,6 +3719,9 @@ msgstr "路徑"
 msgid "C&hoose Log Columns..."
 msgstr "選擇紀錄的欄位(&h)..."
 
+msgid "&Resize Columns"
+msgstr ""
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr ""
@@ -3889,9 +3892,6 @@ msgstr "更新(&U)..."
 msgid "Bro&wse at Revision"
 msgstr "瀏覽此修訂版(&w)"
 
-msgid "&Similar Revisions..."
-msgstr "相似的修訂版(&S)..."
-
 msgid "&Merge with Local..."
 msgstr "跟本地做合併(&M)"
 
@@ -4012,9 +4012,6 @@ msgstr ""
 msgid "Goto common ancestor"
 msgstr ""
 
-msgid "Similar revisions..."
-msgstr "相似的修訂版..."
-
 msgid "Graft Selected to local..."
 msgstr ""
 
@@ -4115,6 +4112,21 @@ msgstr "補丁已匯出"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d個補丁已經匯出到<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
+msgstr ""
 
 msgid "Unable to merge"
 msgstr "不能合併"
@@ -5099,7 +5111,7 @@ msgstr "移除狀態快取"
 msgid "show the contents of the status cache (no update)"
 msgstr "顯示狀態快取的內容(無更新)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr ""
 
 msgid "thg thgstatus [OPTION]"
@@ -7019,7 +7031,7 @@ msgid ""
 "are expanded in the filename."
 msgstr ""
 
-msgid "User Certificate Key File"
+msgid "User Certificate Key"
 msgstr ""
 
 msgid ""
@@ -7027,10 +7039,22 @@ msgid ""
 "are expanded in the filename."
 msgstr ""
 
-msgid "User Certificate Chain File"
+msgid "User Certificate Chain"
 msgstr ""
 
 msgid "Certificate Query Error"
+msgstr ""
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
 msgstr ""
 
 msgid "Unable to save authentication"
@@ -7658,10 +7682,6 @@ msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
-msgstr ""
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
 msgstr ""
 
 #, python-format
@@ -9824,3 +9844,9 @@ msgstr ""
 
 #~ msgid "Backout..."
 #~ msgstr "回退 ..."
+
+#~ msgid "Similar revisions..."
+#~ msgstr "相似的修訂版..."
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "相似的修訂版(&S)..."

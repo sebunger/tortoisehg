@@ -1016,22 +1016,22 @@ class StatusType(object):
         self.trname = trname
 
 statusTypes = {
-    'M' : StatusType('modified', 'menucommit.ico', _('%s is modified'),
+    'M' : StatusType('modified', 'hg-modified', _('%s is modified'),
                      'status.modified', _('modified')),
-    'A' : StatusType('added', 'fileadd.ico', _('%s is added'),
+    'A' : StatusType('added', 'hg-add', _('%s is added'),
                      'status.added', _('added')),
-    'R' : StatusType('removed', 'filedelete.ico', _('%s is removed'),
+    'R' : StatusType('removed', 'hg-removed', _('%s is removed'),
                      'status.removed', _('removed')),
-    '?' : StatusType('unknown', 'shelve.ico', _('%s is not tracked (unknown)'),
+    '?' : StatusType('unknown', '', _('%s is not tracked (unknown)'),
                      'status.unknown', _('unknown')),
-    '!' : StatusType('deleted', 'menudelete.ico',
+    '!' : StatusType('deleted', '',
                      _('%s is deleted by non-hg command, but still tracked'),
                      'status.deleted', _('missing')),
-    'I' : StatusType('ignored', 'ignore.ico', _('%s is ignored'),
+    'I' : StatusType('ignored', '', _('%s is ignored'),
                      'status.ignored', _('ignored')),
     'C' : StatusType('clean', '', _('%s is not modified (clean)'),
                      'status.clean', _('clean')),
-    'S' : StatusType('subrepo', 'thg-subrepo.ico', _('%s is a dirty subrepo'),
+    'S' : StatusType('subrepo', 'thg-subrepo', _('%s is a dirty subrepo'),
                      'status.subrepo', _('subrepo')),
 }
 
@@ -1077,7 +1077,7 @@ class StatusFilterActionGroup(QObject):
     @pyqtSlot(str)
     def setStatus(self, text):
         """Set the status text"""
-        assert util.all(c in self._TYPES for c in text)
+        assert all(c in self._TYPES for c in text)
         for c in self._TYPES:
             self._actions[c].setChecked(c in text)
 

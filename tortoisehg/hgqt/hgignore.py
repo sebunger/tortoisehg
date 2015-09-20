@@ -35,7 +35,7 @@ class HgignoreDialog(QDialog):
         self._repoagent = repoagent
         self.pats = pats
         self.setWindowTitle(_('Ignore filter - %s') % repoagent.displayName())
-        self.setWindowIcon(qtlib.geticon('ignore'))
+        self.setWindowIcon(qtlib.geticon('thg-ignore'))
 
         vbox = QVBoxLayout()
         self.setLayout(vbox)

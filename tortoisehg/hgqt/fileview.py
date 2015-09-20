@@ -211,7 +211,7 @@ class HgFileView(QFrame):
                                     self._showSearchbar)
 
         self.actionShelf = QAction('Shelve', self)
-        self.actionShelf.setIcon(qtlib.geticon('shelve'))
+        self.actionShelf.setIcon(qtlib.geticon('hg-shelve'))
         self.actionShelf.setToolTip(_('Open shelve tool'))
         self.actionShelf.setVisible(False)
         self.actionShelf.triggered.connect(self._launchShelve)
@@ -959,7 +959,7 @@ class _AnnotateViewControl(_AbstractViewControl):
         wb = "Annotate/"
         for a in self._annoptactions:
             a.setChecked(s.value(wb + a.data().toString()).toBool())
-        if not util.any(a.isChecked() for a in self._annoptactions):
+        if not any(a.isChecked() for a in self._annoptactions):
             self._annoptactions[-1].setChecked(True)  # 'rev' by default
 
     def _saveAnnotateSettings(self):
@@ -981,7 +981,7 @@ class _AnnotateViewControl(_AbstractViewControl):
     @pyqtSlot()
     def _updateAnnotateOption(self):
         # make sure at least one option is checked
-        if not util.any(a.isChecked() for a in self._annoptactions):
+        if not any(a.isChecked() for a in self._annoptactions):
             self.sender().setChecked(True)
 
         self._updateView()

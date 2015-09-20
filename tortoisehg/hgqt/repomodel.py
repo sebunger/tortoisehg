@@ -752,8 +752,8 @@ class HgRepoListModel(QAbstractTableModel):
 
         for mark in ctx.bookmarks():
             style = 'log.bookmark'
-            if mark == self.repo._bookmarkcurrent:
-                bn = self.repo._bookmarks[self.repo._bookmarkcurrent]
+            if mark == hglib.activebookmark(self.repo):
+                bn = self.repo._bookmarks[hglib.activebookmark(self.repo)]
                 if bn in self.repo.dirstate.parents():
                     style = 'log.curbookmark'
             labels.append((hglib.tounicode(mark), style))
@@ -764,6 +764,15 @@ class HgRepoListModel(QAbstractTableModel):
             else:
                 style = 'log.tag'
             labels.append((hglib.tounicode(tag), style))
+
+        names = set(self.repo.ui.configlist('experimental', 'thg.displaynames'))
+        for name, ns in self.repo.names.iteritems():
+            if name not in names:
+                continue
+            # we will use the templatename as the color name since those
+            # two should be the same
+            for name in ns.names(self.repo, ctx.node()):
+                labels.append((hglib.tounicode(name), 'log.%s' % ns.colorname))
 
         return labels
 

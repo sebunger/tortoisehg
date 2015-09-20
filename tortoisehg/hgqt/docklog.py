@@ -479,7 +479,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
             raise ValueError(_('command parse error: %s') % e)
         for e in args:
             e = util.expandpath(e).decode('utf-8')
-            if util.any(c in e for c in '*?[]'):
+            if any(c in e for c in '*?[]'):
                 expanded = glob.glob(os.path.join(self._workingDirectory(), e))
                 if not expanded:
                     raise ValueError(_('no matches found: %s') % e)

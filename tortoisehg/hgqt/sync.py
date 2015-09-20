@@ -171,6 +171,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         self.urlentry = QLineEdit()
         self.urlentry.textChanged.connect(self.urlChanged)
+        self.urlentry.returnPressed.connect(self.saveclicked)
         tbar.addWidget(self.urlentry)
 
         # even though currentRowChanged fires pathSelected, clicked signal is
@@ -243,7 +244,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.targetcombo.addItem(_('branch: ') + uname, ('--branch', name))
             self.targetcombo.setItemData(self.targetcombo.count() - 1, name,
                                          Qt.ToolTipRole)
-        for name in self.repo._bookmarks.keys():
+        for name in sorted(self.repo._bookmarks):
             uname = hglib.tounicode(name)
             self.targetcombo.addItem(_('bookmark: ') + uname,
                                      ('--bookmark', name))
@@ -445,7 +446,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                 (_('Copy &Path'), self.copypath, ''),
                 separator,
                 (_('&Edit...'), self.editurl, 'general'),
-                (_('&Remove...'), self.removeurl, 'menudelete')):
+                (_('&Remove...'), self.removeurl, 'hg-strip')):
                 if text is None:
                     menu.addSeparator()
                     continue
@@ -1237,6 +1238,16 @@ class SaveDialog(QDialog):
                                 and self.urlentry.text()))
 
 
+def _addBrowseButton(edit, slot):
+    button = QPushButton(_('Browse...'))
+    button.setAutoDefault(False)
+    button.clicked.connect(slot)
+    hbox = QHBoxLayout()
+    hbox.addWidget(edit)
+    hbox.addWidget(button)
+    return hbox
+
+
 class SecureDialog(QDialog):
     def __init__(self, repoagent, urlu, parent):
         super(SecureDialog, self).__init__(parent)
@@ -1302,44 +1313,51 @@ class SecureDialog(QDialog):
         elif repo.ui.config('insecurehosts', u.host):
             self.insecureradio.setChecked(True)
 
+        self._authentries = {}  # key: QLineEdit
         authbox = QGroupBox(_('User Authentication'))
         form = QFormLayout()
         authbox.setLayout(form)
         self.layout().addWidget(authbox)
 
-        self.userentry = QLineEdit(u.user or auth.get('username', ''))
-        self.userentry.setToolTip(
+        k = 'username'
+        self._authentries[k] = e = QLineEdit(u.user or auth.get(k, ''))
+        e.setToolTip(
 _('''Optional. Username to authenticate with. If not given, and the remote
 site requires basic or digest authentication, the user will be prompted for
 it. Environment variables are expanded in the username letting you do
 foo.username = $USER.'''))
-        form.addRow(_('Username'), self.userentry)
+        form.addRow(_('Username'), e)
 
-        self.pwentry = QLineEdit(u.passwd or auth.get('password', ''))
-        self.pwentry.setEchoMode(QLineEdit.Password)
-        self.pwentry.setToolTip(
+        k = 'password'
+        self._authentries[k] = e = QLineEdit(u.passwd or auth.get(k, ''))
+        e.setEchoMode(QLineEdit.Password)
+        e.setToolTip(
 _('''Optional. Password to authenticate with. If not given, and the remote
 site requires basic or digest authentication, the user will be prompted for
 it.'''))
-        form.addRow(_('Password'), self.pwentry)
+        form.addRow(_('Password'), e)
         if 'mercurial_keyring' in repo.extensions():
-            self.pwentry.clear()
-            self.pwentry.setEnabled(False)
-            self.pwentry.setToolTip(_('Mercurial keyring extension is enabled. '
-                 'Passwords will be stored in a platform-native '
-                 'secure method.'))
+            e.clear()
+            e.setEnabled(False)
+            e.setToolTip(_('Mercurial keyring extension is enabled. '
+                           'Passwords will be stored in a platform-native '
+                           'secure method.'))
 
-        self.keyentry = QLineEdit(auth.get('key', ''))
-        self.keyentry.setToolTip(
+        k = 'key'
+        self._authentries[k] = e = QLineEdit(auth.get(k, ''))
+        e.setToolTip(
 _('''Optional. PEM encoded client certificate key file. Environment variables
 are expanded in the filename.'''))
-        form.addRow(_('User Certificate Key File'), self.keyentry)
+        form.addRow(_('User Certificate Key'),
+                    _addBrowseButton(e, self._browseClientKey))
 
-        self.chainentry = QLineEdit(auth.get('cert', ''))
-        self.chainentry.setToolTip(
+        k = 'cert'
+        self._authentries[k] = e = QLineEdit(auth.get(k, ''))
+        e.setToolTip(
 _('''Optional. PEM encoded client certificate chain file. Environment variables
 are expanded in the filename.'''))
-        form.addRow(_('User Certificate Chain File'), self.chainentry)
+        form.addRow(_('User Certificate Chain'),
+                    _addBrowseButton(e, self._browseClientCert))
 
         BB = QDialogButtonBox
         bb = QDialogButtonBox(BB.Help|BB.Save|BB.Cancel)
@@ -1350,8 +1368,9 @@ are expanded in the filename.'''))
         self.layout().addWidget(bb)
 
         self._updateUi()
-        self.userentry.selectAll()
-        QTimer.singleShot(0, lambda:self.userentry.setFocus())
+        e = self._authentries['username']
+        e.selectAll()
+        QTimer.singleShot(0, e.setFocus)
 
     @pyqtSlot()
     def _queryFingerprint(self):
@@ -1373,6 +1392,24 @@ are expanded in the filename.'''))
 
     def keyringHelp(self):
         qtlib.openhelpcontents('sync.html#security')
+
+    @pyqtSlot()
+    def _browseClientKey(self):
+        e = self._authentries['key']
+        n = QFileDialog.getOpenFileName(
+            self, _('Select User Certificate Key File'), e.text(),
+            ';;'.join([_('PEM files (*.pem *.key)'), _('All files (*)')]))
+        if n:
+            e.setText(n)
+
+    @pyqtSlot()
+    def _browseClientCert(self):
+        e = self._authentries['cert']
+        n = QFileDialog.getOpenFileName(
+            self, _('Select User Certificate Chain File'), e.text(),
+            ';;'.join([_('PEM files (*.pem *.crt *.cer)'), _('All files (*)')]))
+        if n:
+            e.setText(n)
 
     def accept(self):
         path = scmutil.userrcpath()
@@ -1402,16 +1439,10 @@ are expanded in the filename.'''))
         setorclear('hostfingerprints', self.host, fprint)
         setorclear('insecurehosts', self.host, insecure)
 
-        username = hglib.fromunicode(self.userentry.text())
-        password = hglib.fromunicode(self.pwentry.text())
-        key = hglib.fromunicode(self.keyentry.text())
-        chain = hglib.fromunicode(self.chainentry.text())
-
         cfg.set('auth', self.alias+'.prefix', self.host)
-        setorclear('auth', self.alias+'.username', username)
-        setorclear('auth', self.alias+'.password', password)
-        setorclear('auth', self.alias+'.key', key)
-        setorclear('auth', self.alias+'.cert', chain)
+        for k in ['username', 'password', 'key', 'cert']:
+            setorclear('auth', '%s.%s' % (self.alias, k),
+                       hglib.fromunicode(self._authentries[k].text()))
         setorclear('auth', self.alias+'.schemes', self.schemes)
 
         try:

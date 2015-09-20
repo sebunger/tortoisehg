@@ -34,7 +34,7 @@ class DetectRenameDialog(QDialog):
 
         self.setWindowTitle(_('Detect Copies/Renames in %s')
                             % repoagent.displayName())
-        self.setWindowIcon(qtlib.geticon('detect_rename'))
+        self.setWindowIcon(qtlib.geticon('thg-guess'))
         self.setWindowFlags(Qt.Window)
 
         layout = QVBoxLayout()
@@ -414,12 +414,11 @@ class RenameSearchThread(QThread):
         self.repo.ui.progress = emit
         self.threadid = int(self.currentThreadId())
         try:
-            try:
-                self.search(self.repo)
-            except KeyboardInterrupt:
-                pass
-            except Exception, e:
-                self.showMessage.emit(hglib.tounicode(str(e)))
+            self.search(self.repo)
+        except KeyboardInterrupt:
+            pass
+        except Exception, e:
+            self.showMessage.emit(hglib.tounicode(str(e)))
         finally:
             self.threadid = None
 

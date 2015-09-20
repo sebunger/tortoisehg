@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2015-01-09 14:23+0000\n"
-"Last-Translator: Aldwoni <aldwoni@gmail.com>\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-06-28 12:58+0000\n"
+"Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:10+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-27 05:32+0000\n"
+"X-Generator: Launchpad (build 17628)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -3874,6 +3874,9 @@ msgstr "Pad"
 msgid "C&hoose Log Columns..."
 msgstr "Kies Log Kolommen..."
 
+msgid "&Resize Columns"
+msgstr ""
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "Ga naar voorouder van %s en %s"
@@ -4049,9 +4052,6 @@ msgstr "Bijwerken..."
 msgid "Bro&wse at Revision"
 msgstr "Bladeren in Revisie"
 
-msgid "&Similar Revisions..."
-msgstr "Gelijkaardige Revisies..."
-
 msgid "&Merge with Local..."
 msgstr "Samenvoegen met Lokale revisie"
 
@@ -4172,9 +4172,6 @@ msgstr ""
 msgid "Goto common ancestor"
 msgstr "Ga naar gemeenschappelijke voorouder"
 
-msgid "Similar revisions..."
-msgstr "Gelijkende revisies..."
-
 msgid "Graft Selected to local..."
 msgstr "Graft keuze naar loakel rev..."
 
@@ -4278,6 +4275,21 @@ msgstr "De patches zijn geëxporteerd"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d patches werden geëxporteerd naar: <p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
+msgstr ""
 
 msgid "Unable to merge"
 msgstr "Kan niet samenvoegen"
@@ -5326,7 +5338,7 @@ msgstr "verwijder de status cache"
 msgid "show the contents of the status cache (no update)"
 msgstr "toon de inhoud van de status cache (niet bijwerken)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr "alle repos in de huidige map bijwerken"
 
 msgid "thg thgstatus [OPTION]"
@@ -7469,8 +7481,8 @@ msgstr ""
 "Omgevingsvariabelen\n"
 " worden geëxpandeerd in de bestandsnaam."
 
-msgid "User Certificate Key File"
-msgstr "Certificaatbestand van de Gebruiker"
+msgid "User Certificate Key"
+msgstr ""
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
@@ -7480,11 +7492,23 @@ msgstr ""
 "Omgevingsvariabelen\n"
 "worden geëxpandeerd in de bestandsnaam."
 
-msgid "User Certificate Chain File"
-msgstr "Kettingbestand Certificaat van de Gebruiker"
+msgid "User Certificate Chain"
+msgstr ""
 
 msgid "Certificate Query Error"
 msgstr "Certificate Query Fout"
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr ""
 
 msgid "Unable to save authentication"
 msgstr "Kan authenticatie niet opslaan"
@@ -8125,10 +8149,6 @@ msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
-msgstr ""
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
 msgstr ""
 
 #, python-format
@@ -9755,11 +9775,17 @@ msgstr ""
 #~ msgid "Diff"
 #~ msgstr "Diff"
 
+#~ msgid "Similar revisions..."
+#~ msgstr "Gelijkende revisies..."
+
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "Negeer witruimte bij het vergelijken van regels. Standaard: Uit"
 
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "TortoiseHg Shell Instellingen"
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "Gelijkaardige Revisies..."
 
 #~ msgid ""
 #~ "Defines the command to run when an issue number is recognized. You may "
@@ -9801,11 +9827,20 @@ msgstr ""
 #~ msgid "Character encoding name"
 #~ msgstr "Naam karakter encodering"
 
+#~ msgid "User Certificate Key File"
+#~ msgstr "Certificaatbestand van de Gebruiker"
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "Kettingbestand Certificaat van de Gebruiker"
+
 #~ msgid "tag '%s' is not a local tag"
 #~ msgstr "etiket '%s' is geen lokaal etiket"
 
 #~ msgid "tag '%s' is not a global tag"
 #~ msgstr "etiket '%s' is geen globaal etiket"
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "alle repos in de huidige map bijwerken"
 
 #~ msgid "Several icons are courtesy of the TortoiseSVN project"
 #~ msgstr ""

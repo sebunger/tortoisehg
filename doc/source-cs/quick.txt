@@ -16,7 +16,7 @@ Všechny nástroje TortoiseHg jsou přístupné ze třech míst:
    .. figure:: figures/desktop-workbench.png
     :alt: Desktop Context Menu
 	   
-   Spuštění Verpánku z plochy monitoru
+    Spuštění Verpánku z plochy monitoru
 
 
 2. Z kontextového menu **Explorer**
@@ -37,9 +37,9 @@ Nastavení programu
 
 Nejprve se musíme do programu TortoiseHg řádně zapsat. Uděláme to tak, že otevřeme dialog pro globální nastavení.
 
-Verpánek: :menuselection:`File > Settings`
+Verpánek: :menuselection: `File > Settings`
 
-Průzkumník: :menuselection:`TortoiseHg > Globální nastavení`
+Průzkumník: :menuselection: `TortoiseHg > Globální nastavení`
 
 Příkazem: **thg userconfig**
 
@@ -101,13 +101,13 @@ Vytvoření repozitória a repozitáře
 ==================================
 
 Jak bylo již uvedeno v Předmluvě (odst. 1.7), budeme z didaktických důvodů rozlišovat mezi repozitářem a repozitóriem. Za repozitář budeme považovat 
-složku .hg, za repozitórium jeho kořenový adresář. 
+složku .hg, za repozitórium její kořenový adresář. 
 
 Repozitórium můžeme vytvořit z existující složky, kde umístíme repozitář, nebo vytvoříme složku repozitória i repozitáře současně.
 
 Můžeme si vybrat jeden ze tří způsobů:
 
-Verpánek: :menuselection:`File > Nový repozitář`
+Verpánek: :menuselection:`File > Nový repozitář...`
 
 Průzkumník: :menuselection:`TortoiseHg > Vytvořit repozitář` z kontextového menu
 
@@ -130,7 +130,7 @@ Nové repozitórium se také přidá do Seznamu repozitářů , pokud tuto opera
 Nezařazená repozitória můžete přidat do Seznamu repozitářů výběrem :menuselection:`File > Otevřít repozitář...` nebo je můžete přetáhnout z Průzkumníka.
 
 .. note:: 
-    Mezi právě aktuálními revizemi a repozitóriem existuje tajemná symbióza. Jak později poznáme, mění se obsah repozitória podle aktuálně nastavené revize. Ponecháme-li aktuální starší revizi, můžeme případné novější soubory v Průzkumníku Windows (tedy v repozitóriu) nevidět!
+    Mezi právě aktuálními revizemi a repozitóriem existuje tajemná symbióza. Jak později poznáme, mění se obsah repozitória podle aktuálně nastavené revize. Ponecháme-li aktuální starší revizi, můžeme případné nověji přidané soubory v Průzkumníku Windows (tedy v repozitóriu) nevidět!
 
 .. warning::
 	Ručně editovat soubory ve složce :file:`.hg` je nebezpečné, může dojít k poškození repozitáře. Jedinou výjimkou je konfigurační soubor :file:`.hg/hgrc`. 
@@ -159,11 +159,9 @@ Ve svých repozitóriích můžeme mít z různých důvodů soubory, jež nechc
 
 1. Verpánek: aktivujte panel Commit, na zvýrazněném souboru vyvolejte kontextové menu a vyberte :menuselection:`Ignorovat...`.
 
-2. Explorer: vyberte :menuselection:`TortoiseHg > Upravit filtr Ignoruj`
+2. Explorer: vyberte :menuselection:`TortoiseHg > Ignorované soubory`
 
 3. Příkazem :command:`thg hgignore` otevřeme dialogové okno pro filtrování souborů.
-
-4. Seznam ignorovaných souborů lze také zpřístupnit přes kontextové menu v dialogovém okně :guilabel:`Status souboru`.
 
 Pro vybraný soubor určíte druh filtru (`Glob` nebo `Regexp`) a zadáte :command:`Přidat`. Změny filtru :guilabel:`ignore` se projeví okamžitě.
 
@@ -234,7 +232,7 @@ Předpokládejme, že jste provedl nějaké změny. Zda máte v (pomyslném) pra
 
 Šifry **A** (přidaný - zelená) a **M** (upravený - modrá) označují soubory, které lze komitovat přímo. Soubory označené **?** (neznámý - fialková), **!** (postrádaný - červená) či **R** (odebraný - červená) nutno nejprve přidat či vrátit do sledování.
 
-Spodní pole vpravo úlohy Commit vám zobrazí i změny v jednotlivých souborech nebo můžete použít svůj nástroj pro zobrazování rozdílů (kdiff3). V Mercurialu lze provést řadu komitů předtím, než se rozhodnete pro sdílení svých změn s repozitářem centrálním.
+Spodní pole vpravo karty Commit vám zobrazí i změny v jednotlivých souborech nebo můžete použít svůj nástroj pro zobrazování rozdílů (kdiff3). V Mercurialu lze provést řadu komitů předtím, než se rozhodnete pro sdílení svých změn s repozitářem centrálním.
 
 **Explorer**: Složky a soubory vašeho repozitória jsou označeny jednou z  překryvných ikon. Ty vám napoví, v jakém stavu se ten či onen soubor nebo složka nachází.
 
@@ -248,12 +246,12 @@ Spodní pole vpravo úlohy Commit vám zobrazí i změny v jednotlivých soubore
 Jste-li připraven zveřejnit své změny, provedete následující:
 
 1. Předáte změny do svého lokálního repozitáře (provedete komit).
-2. Aktivujete panel pro synchronizaci, vyberete cestu k centrálnímu repozitáři a stisknete tlačítko :guilabel:`Pull`, čímž vydáte příkaz ke stažení změn z tohoto repozitáře.
+2. Aktivujete kartu pro synchronizaci, vyberete cestu k centrálnímu repozitáři a stisknete tlačítko :guilabel:`Pull`, čímž vydáte příkaz ke stažení možných změn z tohoto repozitáře.
 3. Byly-li nějaké changesety staženy, provedete jejich případné sloučení s vašimi lokálními změnami a provedete jejich komit do repozitáře.
  
 V přehledu changesetů zviditelníte ten, se kterým chcete sloučení provést, aktivujete kontextové menu a vyberete :guilabel:`Merge with local...`. V dialogovém okně pro sloučení stisknete :command:`Sloučit` (merge) a posléze :command:`Commit`.
-4. Sloučenou práci prověříte svou testovací soupravou.
-5. Aktivujete panel pro synchronizaci, vyberete cestu k centrálnímu repozitáři a pošlete do něho své změny tlačítkem :command:`Push`.
+4. Sloučenou práci prověříte svým testovacím postupem.
+5. V kartě pro synchronizaci vyberete cestu k centrálnímu repozitáři a pošlete do něho své změny tlačítkem :command:`Push`.
 
 .. note:: Sloučení lze bezpečně v případě potřeby opakovat. 
 

@@ -154,7 +154,7 @@ class Workbench(QMainWindow):
         newaction(_("&Close Repository"), self.closeCurrentRepoTab,
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
-        newaction(_('&Settings'), self.editSettings, icon='settings_user',
+        newaction(_('&Settings'), self.editSettings, icon='thg-userconfig',
                   shortcut='Preferences', menu='file')
         newseparator(menu='file')
         newaction(_("E&xit"), self.close, shortcut='Quit', menu='file')
@@ -214,7 +214,7 @@ class Workbench(QMainWindow):
         # note that 'grep' and 'search' are equivalent
         taskdefs = {
             'commit': ('hg-commit', _('&Commit')),
-            'pbranch': ('branch', _('&Patch Branch')),
+            'pbranch': ('hg-branch', _('&Patch Branch')),
             'log': ('hg-log', _("Revision &Details")),
             'grep': ('hg-grep', _('&Search')),
             'sync': ('thg-sync', _('S&ynchronize')),
@@ -299,7 +299,7 @@ class Workbench(QMainWindow):
                   icon='hg-update', enabled='repoopen',
                   menu='repository', toolbar='edit',
                   tooltip=_('Update working directory or switch revisions'))
-        newaction(_("&Shelve..."), self._repofwd('shelve'), icon='shelve',
+        newaction(_("&Shelve..."), self._repofwd('shelve'), icon='hg-shelve',
                   enabled='repoopen', menu='repository')
         newaction(_("&Import Patches..."), self._repofwd('thgimport'),
                   icon='hg-import', enabled='repoopen', menu='repository')
@@ -334,7 +334,8 @@ class Workbench(QMainWindow):
         newaction(_("&Terminal"), self.terminal, shortcut='Shift+Ctrl+T',
                   icon='utilities-terminal', enabled='repoopen',
                   menu='repository')
-        newaction(_("&Web Server"), self.serve, menu='repository')
+        newaction(_("&Web Server"), self.serve, menu='repository',
+                  icon='hg-serve')
 
         newaction(_("&Help"), self.onHelp, menu='help', icon='help-browser')
         newaction(_("E&xplorer Help"), self.onHelpExplorer, menu='help')
@@ -345,8 +346,7 @@ class Workbench(QMainWindow):
                   visible=visiblereadme, shortcut='Ctrl+F1')
         newseparator(menu='help')
         newaction(_("About &Qt"), QApplication.aboutQt, menu='help')
-        newaction(_("&About TortoiseHg"), self.onAbout, menu='help',
-                  icon='thg-logo')
+        newaction(_("&About TortoiseHg"), self.onAbout, menu='help', icon='thg')
 
         newaction(_('&Incoming'), data='incoming', icon='hg-incoming',
                   enabled='repoopen', toolbar='sync', shortcut='Ctrl+Shift+,')

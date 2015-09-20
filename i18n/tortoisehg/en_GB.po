@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: English <United Kingdom)\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2015-05-13 15:20+0000\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-07-29 14:31+0000\n"
 "Last-Translator: Dee-earlsoft <Unknown>\n"
 "Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-05-14 04:40+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-30 05:46+0000\n"
+"X-Generator: Launchpad (build 17646)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -3861,6 +3861,9 @@ msgstr "Path"
 msgid "C&hoose Log Columns..."
 msgstr "C&hoose Log Columns..."
 
+msgid "&Resize Columns"
+msgstr "&Resize Columns"
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "Goto ancestor of %s and %s"
@@ -4033,9 +4036,6 @@ msgstr "&Update..."
 msgid "Bro&wse at Revision"
 msgstr "Bro&wse at Revision"
 
-msgid "&Similar Revisions..."
-msgstr "&Similar Revisions..."
-
 msgid "&Merge with Local..."
 msgstr "&Merge with Local..."
 
@@ -4156,9 +4156,6 @@ msgstr "Rebase..."
 msgid "Goto common ancestor"
 msgstr "Goto common ancestor"
 
-msgid "Similar revisions..."
-msgstr "Similar revisions..."
-
 msgid "Graft Selected to local..."
 msgstr "Graft Selected to local..."
 
@@ -4262,6 +4259,21 @@ msgstr "Patches exported"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr "Filter b&y"
+
+msgid "&Ancestors"
+msgstr "&Ancestors"
+
+msgid "A&uthor"
+msgstr "A&uthor"
+
+msgid "&Branch"
+msgstr "&Branch"
+
+msgid "&More Options..."
+msgstr "&More Options..."
 
 msgid "Unable to merge"
 msgstr "Unable to merge"
@@ -5309,8 +5321,8 @@ msgstr "remove the status cache"
 msgid "show the contents of the status cache (no update)"
 msgstr "show the contents of the status cache (no update)"
 
-msgid "udpate all repos in current dir"
-msgstr "udpate all repos in current dir"
+msgid "update all repos in current dir"
+msgstr "update all repos in current dir"
 
 msgid "thg thgstatus [OPTION]"
 msgstr "thg thgstatus [OPTION]"
@@ -7488,8 +7500,8 @@ msgstr ""
 "Optional. PEM encoded client certificate key file. Environment variables\n"
 "are expanded in the filename."
 
-msgid "User Certificate Key File"
-msgstr "User Certificate Key File"
+msgid "User Certificate Key"
+msgstr "User Certificate Key"
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
@@ -7498,11 +7510,23 @@ msgstr ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
 "are expanded in the filename."
 
-msgid "User Certificate Chain File"
-msgstr "User Certificate Chain File"
+msgid "User Certificate Chain"
+msgstr "User Certificate Chain"
 
 msgid "Certificate Query Error"
 msgstr "Certificate Query Error"
+
+msgid "Select User Certificate Key File"
+msgstr "Select User Certificate Key File"
+
+msgid "PEM files (*.pem *.key)"
+msgstr "PEM files (*.pem *.key)"
+
+msgid "Select User Certificate Chain File"
+msgstr "Select User Certificate Chain File"
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr "PEM files (*.pem *.crt *.cer)"
 
 msgid "Unable to save authentication"
 msgstr "Unable to save authentication"
@@ -8153,10 +8177,6 @@ msgstr "[SOURCE]"
 #, python-format
 msgid "unsupported URL: %s"
 msgstr "unsupported URL: %s"
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
-msgstr "host fingerprint for %s cannot be obtained (Python too old)"
 
 #, python-format
 msgid "%s certificate error: no certificate received"
@@ -9401,6 +9421,9 @@ msgstr "win32ill: interrupted while stopping message loop\n"
 
 #~ msgid "hgtk serve [OPTION]..."
 #~ msgstr "hgtk serve [OPTION]..."
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "udpate all repos in current dir"
 
 #~ msgid "hgtk thgstatus [OPTION]"
 #~ msgstr "hgtk thgstatus [OPTION]"
@@ -11407,3 +11430,18 @@ msgstr "win32ill: interrupted while stopping message loop\n"
 #~ "matched by issue.regex, while {1} refers to the first group and so on. If "
 #~ "no {n} tokensare found in issue.link, the entire matched string is "
 #~ "appended instead."
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "&Similar Revisions..."
+
+#~ msgid "Similar revisions..."
+#~ msgstr "Similar revisions..."
+
+#~ msgid "User Certificate Key File"
+#~ msgstr "User Certificate Key File"
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "User Certificate Chain File"
+
+#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
+#~ msgstr "host fingerprint for %s cannot be obtained (Python too old)"

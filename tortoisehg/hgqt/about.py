@@ -27,7 +27,7 @@ class AboutDialog(QDialog):
     def __init__(self, parent=None):
         super(AboutDialog, self).__init__(parent)
 
-        self.setWindowIcon(qtlib.geticon('thg_logo'))
+        self.setWindowIcon(qtlib.geticon('thg'))
         self.setWindowTitle(_('About'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -38,8 +38,7 @@ class AboutDialog(QDialog):
         self.logo_lbl.setMinimumSize(QSize(92, 50))
         self.logo_lbl.setScaledContents(False)
         self.logo_lbl.setAlignment(Qt.AlignCenter)
-        thglogofile = paths.get_tortoise_icon('thg_logo_92x50.png')
-        self.logo_lbl.setPixmap(QPixmap(thglogofile))
+        self.logo_lbl.setPixmap(QPixmap(qtlib.iconpath('thg_logo_92x50.png')))
         self.vbox.addWidget(self.logo_lbl)
 
         self.name_version_libs_lbl = QLabel()
@@ -178,7 +177,7 @@ class LicenseDialog(QDialog):
     def __init__(self, parent=None):
         super(LicenseDialog, self).__init__(parent)
 
-        self.setWindowIcon(qtlib.geticon('thg_logo'))
+        self.setWindowIcon(qtlib.geticon('thg'))
         self.setWindowTitle(_('License'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.resize(700, 400)

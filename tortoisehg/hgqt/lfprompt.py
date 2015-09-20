@@ -42,9 +42,12 @@ def promptForLfiles(parent, ui, repo, files):
             lfiles.append(wfile)
         else:
             # check for minimal size
-            filesize = os.path.getsize(repo.wjoin(wfile))
-            if filesize > minsize*1024*1024:
-                lfiles.append(wfile)
+            try:
+                filesize = os.path.getsize(repo.wjoin(wfile))
+                if filesize > minsize * 1024 * 1024:
+                    lfiles.append(wfile)
+            except OSError:
+                pass  # file not exist or inaccessible
     if lfiles:
         ret = _createPrompt(parent, files).run()
         if ret == 0:

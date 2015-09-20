@@ -8,6 +8,7 @@
 import os
 import sys
 import atexit
+import posixpath
 import shutil
 import shlex
 import stat
@@ -485,6 +486,13 @@ def descriptionhtmlizer(ui):
 
 _iconcache = {}
 
+if getattr(sys, 'frozen', False):
+    def iconpath(f, *insidef):
+        return posixpath.join(':/icons', f, *insidef)
+else:
+    def iconpath(f, *insidef):
+        return os.path.join(paths.get_icon_path(), f, *insidef)
+
 if hasattr(QIcon, 'hasThemeIcon'):  # PyQt>=4.7
     def _findthemeicon(name):
         if QIcon.hasThemeIcon(name):
@@ -493,37 +501,32 @@ else:
     def _findthemeicon(name):
         pass
 
-def _findicon(name):
-    # TODO: icons should be placed at single location before release
+def _findcustomicon(name):
+    # let a user set the icon of a custom tool button
     if os.path.isabs(name):
         path = name
         if QFile.exists(path):
             return QIcon(path)
-    else:
-        for pfx in (':/icons', os.path.join(paths.get_icon_path(), 'svg'),
-                    paths.get_icon_path()):
-            for ext in ('svg', 'png', 'ico'):
-                path = '%s/%s.%s' % (pfx, name, ext)
-                if QFile.exists(path):
-                    return QIcon(path)
-
     return None
 
 # http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
 _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
                         (QSize(), 'scalable/apps', '.svg'),
                         (QSize(), 'scalable/status', '.svg'),
+                        (QSize(16, 16), '16x16/actions', '.png'),
                         (QSize(16, 16), '16x16/apps', '.png'),
                         (QSize(16, 16), '16x16/mimetypes', '.png'),
+                        (QSize(16, 16), '16x16/status', '.png'),
                         (QSize(22, 22), '22x22/actions', '.png'),
                         (QSize(32, 32), '32x32/actions', '.png'),
+                        (QSize(32, 32), '32x32/status', '.png'),
                         (QSize(24, 24), '24x24/actions', '.png')]
 
 def getallicons():
     """Get a sorted, unique list of all available icons"""
     iconset = set()
     for size, subdir, sfx in _SCALABLE_ICON_PATHS:
-        path = ':/icons/%s' % (subdir)
+        path = iconpath(subdir)
         d = QDir(path)
         d.setNameFilters(['*%s' % sfx])
         for iconname in d.entryList():
@@ -534,7 +537,7 @@ def _findscalableicon(name):
     """Find icon from qrc by using freedesktop-like icon lookup"""
     o = QIcon()
     for size, subdir, sfx in _SCALABLE_ICON_PATHS:
-        path = ':/icons/%s/%s%s' % (subdir, name, sfx)
+        path = iconpath(subdir, name + sfx)
         if QFile.exists(path):
             for mode in (QIcon.Normal, QIcon.Active):
                 o.addFile(path, size, mode)
@@ -554,8 +557,8 @@ def geticon(name):
     except KeyError:
         _iconcache[name] = (_findthemeicon(name)
                             or _findscalableicon(name)
-                            or _findicon(name)
-                            or QIcon(':/icons/fallback.svg'))
+                            or _findcustomicon(name)
+                            or QIcon())
         return _iconcache[name]
 
 
@@ -706,8 +709,6 @@ class ChoicePrompt(QDialog):
     def __init__(self, title, message, parent, choices, default=None,
                  esc=None, files=None):
         QDialog.__init__(self, parent)
-
-        self.setWindowIcon(geticon('thg_logo'))
         self.setWindowTitle(hglib.tounicode(title))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
 
@@ -847,8 +848,8 @@ class PMButton(QPushButton):
         self.setFlat(True)
         self.setAutoDefault(False)
 
-        self.plus = geticon('expander-open')
-        self.minus = geticon('expander-close')
+        self.plus = QIcon(iconpath('expander-open.png'))
+        self.minus = QIcon(iconpath('expander-close.png'))
         icon = expanded and self.minus or self.plus
         self.setIcon(icon)
 

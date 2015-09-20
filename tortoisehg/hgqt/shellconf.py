@@ -195,7 +195,7 @@ class ShellConfigWindow(QDialog):
 
         self.setLayout(layout)
         self.setWindowTitle(_("Explorer Extension Settings - TortoiseHg"))
-        self.setWindowIcon(qtlib.geticon('settings_repo'))
+        self.setWindowIcon(qtlib.geticon('thg-repoconfig'))
 
         self.load_shell_configs()
 

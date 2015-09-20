@@ -10,8 +10,6 @@ import re
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util
-
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, qtlib
@@ -125,8 +123,8 @@ class BookmarkDialog(QDialog):
         else:
             ctx = self.repo[self.rev]
             cs_bookmarks = ctx.bookmarks()
-            if self.repo._bookmarkcurrent in cs_bookmarks:
-                bm = hglib.tounicode(self.repo._bookmarkcurrent)
+            if hglib.activebookmark(self.repo) in cs_bookmarks:
+                bm = hglib.tounicode(hglib.activebookmark(self.repo))
                 self.bookmarkCombo.setEditText(bm)
             elif cs_bookmarks:
                 bm = hglib.tounicode(cs_bookmarks[0])
@@ -450,8 +448,8 @@ class SyncBookmarkDialog(QDialog):
 
     @pyqtSlot()
     def _updateActions(self):
-        state = util.all(sess.isFinished() for sess
-                         in [self._cmdsession, self._insess, self._outsess])
+        state = all(sess.isFinished() for sess
+                    in [self._cmdsession, self._insess, self._outsess])
         for a in self._outactions:
             a.setEnabled(state and bool(self.selectedOutgoingBookmarks()))
         for a in self._inactions:

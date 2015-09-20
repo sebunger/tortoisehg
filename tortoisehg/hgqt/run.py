@@ -1185,7 +1185,7 @@ def tag(ui, repoagent, *pats, **opts):
      ('',  'remove', None, _('remove the status cache')),
      ('s', 'show', None, _('show the contents of the status cache '
                            '(no update)')),
-     ('',  'all', None, _('udpate all repos in current dir'))],
+     ('',  'all', None, _('update all repos in current dir'))],
     _('thg thgstatus [OPTION]'))
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""

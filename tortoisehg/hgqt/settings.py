@@ -554,7 +554,7 @@ class _fi(object):
             return self.visible()
 
 INFO = (
-({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg_logo'}, (
+({'name': 'general', 'label': 'TortoiseHg', 'icon': 'thg'}, (
     _fi(_('UI Language'), 'tortoisehg.ui.language',
         (genDeferredCombo, i18n.availablelanguages),
         _('Specify your preferred user interface language (restart needed)'),
@@ -631,7 +631,7 @@ INFO = (
         globalonly=True),
     )),
 
-({'name': 'log', 'label': _('Workbench'), 'icon': 'menulog'}, (
+({'name': 'log', 'label': _('Workbench'), 'icon': 'hg-log'}, (
     _fi(_('Single Workbench Window'), 'tortoisehg.workbench.single',
         genBoolRBGroup,
         _('Select whether you want to have a single workbench window. '
@@ -721,7 +721,7 @@ INFO = (
           'This option is expected to be removed if the performance issue is '
           'solved.')),
     )),
-({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'menucommit'},
+({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'hg-commit'},
  (
     _fi(_('Username'), 'ui.username', genEditCombo,
         _('Name associated with commits.  The common format is:<br>'
@@ -833,7 +833,7 @@ INFO = (
           'Default: "ssh" or "TortoisePlink.exe -ssh -2" (Windows)')),
     )),
 
-({'name': 'web', 'label': _('Server'), 'icon': 'proxy'}, (
+({'name': 'web', 'label': _('Server'), 'icon': 'hg-serve'}, (
     _fi(_('<b>Repository Details:</b>'), None, genSpacer, ''),
     _fi(_('Name'), 'web.name', genEditCombo,
         _('Repository name to use in the web interface, and by TortoiseHg '
@@ -1171,7 +1171,7 @@ class SettingsDialog(QDialog):
         self.setWindowTitle(_('TortoiseHg Settings'))
         self.setWindowFlags(self.windowFlags() & ~Qt.WindowContextHelpButtonHint
                             | Qt.WindowMaximizeButtonHint)
-        self.setWindowIcon(qtlib.geticon('settings_repo'))
+        self.setWindowIcon(qtlib.geticon('thg-repoconfig'))
 
         if not hasattr(wconfig.config(), 'write'):
             qtlib.ErrorMsgBox(_('Iniparse package not found'),
@@ -1203,7 +1203,7 @@ class SettingsDialog(QDialog):
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
         utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
-        self.conftabs.addTab(utab, qtlib.geticon('settings_user'),
+        self.conftabs.addTab(utab, qtlib.geticon('thg-userconfig'),
                              _("%s's global settings") % username())
         utab.restartRequested.connect(self._pushRestartRequest)
 
@@ -1235,7 +1235,7 @@ class SettingsDialog(QDialog):
 
             reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
             rtab = SettingsForm(rcpath=reporcpath, focus=focus)
-            self.conftabs.addTab(rtab, qtlib.geticon('settings_repo'),
+            self.conftabs.addTab(rtab, qtlib.geticon('thg-repoconfig'),
                                  _('%s repository settings')
                                  % repoagent.shortName())
             rtab.restartRequested.connect(self._pushRestartRequest)
@@ -1252,8 +1252,8 @@ class SettingsDialog(QDialog):
         self.conftabs.currentChanged.connect(self._currentFormChanged)
 
     def isDirty(self):
-        return util.any(self.conftabs.widget(i).isDirty()
-                        for i in xrange(self.conftabs.count()))
+        return any(self.conftabs.widget(i).isDirty()
+                   for i in xrange(self.conftabs.count()))
 
     @pyqtSlot(unicode)
     def _pushRestartRequest(self, key):
@@ -1268,7 +1268,7 @@ class SettingsDialog(QDialog):
                                'for the following changes to take effect:'),
                              ', '.join(sorted(self._restartreqs)))
             self._restartreqs.clear()
-        return util.all(results)
+        return all(results)
 
     def canExit(self):
         if self.isDirty():
@@ -1340,8 +1340,10 @@ class SettingsForm(QWidget):
         self.fnedit = QLineEdit()
         self.fnedit.setReadOnly(True)
         self.fnedit.setFrame(False)
-        self.fnedit.setFocusPolicy(Qt.NoFocus)
-        self.fnedit.setStyleSheet('QLineEdit { background: transparent; }')
+        self.fnedit.setFocusPolicy(Qt.ClickFocus)
+        p = self.fnedit.palette()
+        p.setColor(QPalette.Base, Qt.transparent)
+        self.fnedit.setPalette(p)
         edit = QPushButton(_('Edit File'))
         edit.clicked.connect(self.editClicked)
         self.editbtn = edit

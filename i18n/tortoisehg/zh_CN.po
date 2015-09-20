@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2015-04-05 02:03+0000\n"
-"Last-Translator: yfdyh000 <yfdyh000@gmail.com>\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-06-28 12:48+0000\n"
+"Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:15+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-27 05:36+0000\n"
+"X-Generator: Launchpad (build 17628)\n"
 "Language: zh_CN\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -3765,6 +3765,9 @@ msgstr "路径"
 msgid "C&hoose Log Columns..."
 msgstr "选择日志栏(&H)..."
 
+msgid "&Resize Columns"
+msgstr ""
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "转到 %s 和 %s 的祖先"
@@ -3934,9 +3937,6 @@ msgstr "更新(&U)..."
 msgid "Bro&wse at Revision"
 msgstr "浏览修订(&W)"
 
-msgid "&Similar Revisions..."
-msgstr "类似的修订(&S)..."
-
 msgid "&Merge with Local..."
 msgstr "与本地合并(&M)"
 
@@ -4057,9 +4057,6 @@ msgstr "变基..."
 msgid "Goto common ancestor"
 msgstr "转到共同的祖先"
 
-msgid "Similar revisions..."
-msgstr "类似的修订..."
-
 msgid "Graft Selected to local..."
 msgstr "嫁接选定到本地..."
 
@@ -4160,6 +4157,21 @@ msgstr "导出补丁成功"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d 补丁导出到:<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
+msgstr ""
 
 msgid "Unable to merge"
 msgstr "无法合并"
@@ -5147,7 +5159,7 @@ msgstr "删除状态缓存"
 msgid "show the contents of the status cache (no update)"
 msgstr "显示状态缓存的内容(无更新)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr "更新当前目录下的所有仓库"
 
 msgid "thg thgstatus [OPTION]"
@@ -7099,19 +7111,31 @@ msgid ""
 "are expanded in the filename."
 msgstr ""
 
-msgid "User Certificate Key File"
-msgstr "用户证书密钥文件"
+msgid "User Certificate Key"
+msgstr ""
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
 "are expanded in the filename."
 msgstr ""
 
-msgid "User Certificate Chain File"
-msgstr "用户证书链文件"
+msgid "User Certificate Chain"
+msgstr ""
 
 msgid "Certificate Query Error"
 msgstr "证书查询出错"
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr ""
 
 msgid "Unable to save authentication"
 msgstr "无法保存身份验证"
@@ -7746,10 +7770,6 @@ msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
-msgstr ""
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
 msgstr ""
 
 #, python-format
@@ -8477,6 +8497,9 @@ msgstr ""
 
 #~ msgid "Rename error"
 #~ msgstr "重命名出错"
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "更新当前目录下的所有仓库"
 
 #~ msgid "%s branch"
 #~ msgstr "%s 分支"
@@ -10799,3 +10822,15 @@ msgstr ""
 
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr "忽略对空行的修改. 默认: 否"
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "类似的修订(&S)..."
+
+#~ msgid "Similar revisions..."
+#~ msgstr "类似的修订..."
+
+#~ msgid "User Certificate Key File"
+#~ msgstr "用户证书密钥文件"
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "用户证书链文件"

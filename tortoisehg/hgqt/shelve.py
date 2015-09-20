@@ -26,7 +26,7 @@ class ShelveDialog(QDialog):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
 
-        self.setWindowIcon(qtlib.geticon('shelve'))
+        self.setWindowIcon(qtlib.geticon('hg-shelve'))
 
         self._repoagent = repoagent
         self.shelves = []

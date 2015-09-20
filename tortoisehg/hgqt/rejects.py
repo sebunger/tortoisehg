@@ -115,7 +115,7 @@ class RejectsDialog(QDialog):
         except IOError, e:
             pass
         try:
-            header = hglib.parsepatch(buf)[0]
+            header = patch.parsepatch(buf)[0]
             self.chunks = header.hunks
         except (patch.PatchError, IndexError), e:
             self.chunks = []

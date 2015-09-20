@@ -13,7 +13,7 @@ import os, re
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error, subrepo, util
+from mercurial import error, subrepo
 from mercurial import match as matchmod
 
 from tortoisehg.util import hglib
@@ -53,7 +53,7 @@ class ManifestModel(QAbstractItemModel):
         self._repoagent = repoagent
 
         self._namefilter = unicode(namefilter or '')
-        assert util.all(c in 'MARSC' for c in statusfilter)
+        assert all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
         self._changedfilesonly = False
         self._nodeop = _nodeopmap[bool(flat)]
@@ -141,7 +141,7 @@ class ManifestModel(QAbstractItemModel):
             return ic
         st = status.statusTypes[e.status]
         if st.icon:
-            icOverlay = qtlib.geticon(st.icon[:-4])
+            icOverlay = qtlib.geticon(st.icon)
             ic = qtlib.getoverlaidicon(ic, icOverlay)
 
         return ic
@@ -308,7 +308,7 @@ class ManifestModel(QAbstractItemModel):
     def setStatusFilter(self, status):
         """Filter file tree by change status 'MARSC'"""
         status = str(status)
-        assert util.all(c in 'MARSC' for c in status)
+        assert all(c in 'MARSC' for c in status)
         if self._statusfilter == status:
             return  # for performance reason
         self._statusfilter = status

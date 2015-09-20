@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2015-02-23 06:57+0000\n"
-"Last-Translator: Tovim <Unknown>\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-06-28 12:50+0000\n"
+"Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:10+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-27 05:31+0000\n"
+"X-Generator: Launchpad (build 17628)\n"
 "Language: cs\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
@@ -385,38 +385,38 @@ msgid "TortoiseHg Bookmark Sync"
 msgstr ""
 
 msgid "Outgoing Bookmarks"
-msgstr ""
+msgstr "Odchozí záložky"
 
 msgid "&Push Bookmark"
-msgstr ""
+msgstr "Vyslat (push) záložku"
 
 msgid "&Remove Bookmark"
-msgstr ""
+msgstr "Odebrat záložku"
 
 msgid "Incoming Bookmarks"
-msgstr ""
+msgstr "Příchozí záložky"
 
 msgid "P&ull Bookmark"
-msgstr ""
+msgstr "Přijmout (pull) záložku"
 
 msgid "R&emove Bookmark"
-msgstr ""
+msgstr "Odebrat záložku"
 
 #, python-format
 msgid "Pushed local bookmark: %s"
-msgstr ""
+msgstr "Vyslaná lokální záložka: %s"
 
 #, python-format
 msgid "Pulled remote bookmark: %s"
-msgstr ""
+msgstr "Přijmutá vzdálená záložka: %s"
 
 #, python-format
 msgid "Removed remote bookmark: %s"
-msgstr ""
+msgstr "Odebraná vzdálená záložka: %s"
 
 #, python-format
 msgid "Removed local bookmark: %s"
-msgstr ""
+msgstr "Odebraná lokální záložka: %s"
 
 #, python-format
 msgid "%s - branch operation"
@@ -574,7 +574,7 @@ msgid "Clone to revision:"
 msgstr "Klonovat k revizi:"
 
 msgid "A revision identifier, bookmark, tag or branch name"
-msgstr ""
+msgstr "Označení revize, záložka, tag nebo název větve"
 
 msgid "Do not update the new working directory"
 msgstr "Neaktualizovat nový pracovní adresář"
@@ -794,7 +794,7 @@ msgid "QNew"
 msgstr "QNew"
 
 msgid "Refresh current patch"
-msgstr "Refresh* aktuální oprávku"
+msgstr "Refresh aktuální oprávku"
 
 msgid "QRefresh"
 msgstr "QRefresh"
@@ -1165,7 +1165,7 @@ msgid "Tool name"
 msgstr "Název nástroje"
 
 msgid "The tool name. It cannot contain spaces."
-msgstr "Název nástroje. Nesmí obsahovat mezery."
+msgstr "Název nástroje nesmí obsahovat mezery."
 
 #, python-brace-format
 msgid ""
@@ -1182,14 +1182,14 @@ msgid ""
 "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 msgstr ""
 "Příkaz, který bude proveden.\n"
-"K provedení příkazu použijte \" hg\" (spíše než \"hg.exe\").\n"
-"Ke skladbě příkazu můžene použít několik {PROMĚNNÝCH} :\n"
-"- {ROOT}: Cesta ke kořeni aktuálního repozitáře.\n"
-"- {REV} / {REVID}: Číslo vybrané revize / případně hexadecimální hash ID.\n"
-"- {SELECTEDFILES}: Seznam souborů, vybraných uživatelem v seznamu "
-"podrobnosti revizí.\n"
+"K provedení příkazu Mercuriálu používejte raději \"hg\" než \"hg.exe\".\n"
+" K sestavení příkazu můžete použít několik {VARIABLES}:\n"
+"- {ROOT}: Cesta ke složce repozitória.\n"
+"- {REV} / {REVID}: číslo vybrané revize / případně hexadecimální ID (hash) "
+"revize.\n"
+"- {SELECTEDFILES}: Seznam vybraných souborů revize.\n"
 "- {FILES}: Seznam souborů, dotčených vybranou revizí.\n"
-"- {ALLFILES}: Všechny soubory, sledované Mercuriálem ve vybrané revizi."
+"- {ALLFILES}: Všechny sledované soubory ve vybrané revizi."
 
 #, python-brace-format
 msgid ""
@@ -1200,7 +1200,7 @@ msgid ""
 msgstr ""
 "Adresář, ve kterém bude příkaz proveden.\n"
 "Není-li zadáno, použije se kořen aktuálního repozitáře.\n"
-"Můžete použít tytéž {VARIABLES} jako v nastavení \"Command\".\n"
+"Můžete použít tytéž {VARIABLES} jako v nastavení  \"Command\".\n"
 
 msgid "Tool label"
 msgstr "Popisek nástroje"
@@ -1255,7 +1255,7 @@ msgstr ""
 "v kontextovém menu vybrané revize."
 
 msgid "Show Output Log"
-msgstr "Zobrazit Output Log"
+msgstr "Otevřít Output Log"
 
 msgid ""
 "When enabled, automatically show the Output Log when the command is run.\n"
@@ -1310,7 +1310,7 @@ msgid "Console"
 msgstr ""
 
 msgid "File &History / Annotate"
-msgstr ""
+msgstr "Historie souboru"
 
 msgid "Show the history of the selected file"
 msgstr "Zobrazit historii vybraného souboru"
@@ -1369,6 +1369,7 @@ msgstr ""
 
 msgid "Open parent folder of current file in the system file manager"
 msgstr ""
+"Otevřít rodičovskou složku stávajícího souboru v systémovém správci souborů"
 
 msgid "&Copy Patch"
 msgstr ""
@@ -1419,7 +1420,7 @@ msgid "&Forget"
 msgstr "&Zapomenout (forget)"
 
 msgid "&Delete Unversioned..."
-msgstr ""
+msgstr "Smazat neverzované..."
 
 msgid "Confirm Delete Unversioned"
 msgstr "Potvrdit smazání neverzovaných"
@@ -1470,7 +1471,7 @@ msgid "&Copy..."
 msgstr "&Kopírovat..."
 
 msgid "Re&name..."
-msgstr ""
+msgstr "Přejmenovat ..."
 
 msgid "&Ignore..."
 msgstr "&Ignorovat..."
@@ -1482,7 +1483,7 @@ msgid "Manually resolve rejected patch chunks"
 msgstr "Ručně vyřešit odmítnuté porce (chunks) oprávky (patch)."
 
 msgid "De&tect Renames..."
-msgstr ""
+msgstr "Změna názvu..."
 
 msgid "&Mark Resolved"
 msgstr ""
@@ -1497,7 +1498,7 @@ msgid "Was renamed from"
 msgstr "Byl přejmenován z"
 
 msgid "Restart Merge &with"
-msgstr ""
+msgstr "Opakovat sloučení s"
 
 msgid "Display the file anyway"
 msgstr "Přesto ten soubor zobrazit"
@@ -1825,7 +1826,7 @@ msgstr "Přejít na řádek"
 
 #, python-format
 msgid "Enter line number (1 - %d)"
-msgstr ""
+msgstr "Zadejte číslo řádku (1 - %d)"
 
 msgid "Show &Author"
 msgstr ""
@@ -2080,7 +2081,7 @@ msgid "<b>Unrevisioned Files</b>"
 msgstr "<b>Neverzované soubory</b>"
 
 msgid "Refresh file list"
-msgstr "Refresh* seznam souborů"
+msgstr "Refresh seznam souborů"
 
 #, python-format
 msgid "Min Similarity: %d%%"
@@ -2303,7 +2304,7 @@ msgid "Add"
 msgstr "Přidat"
 
 msgid "Edit File"
-msgstr "Editace souboru"
+msgstr "Editovat soubor"
 
 msgid "<b>Ignore Filter</b>"
 msgstr "<b>Ignore Filter</b>"
@@ -2637,7 +2638,7 @@ msgid "no guards"
 msgstr "no guards"
 
 msgid "Patch Queue"
-msgstr "Fronta oprávek"
+msgstr "Fronta oprávek (Patch Queue)"
 
 msgctxt "MQ QPush"
 msgid "Push all"
@@ -3170,7 +3171,7 @@ msgstr "\"%s\" není platný adresář"
 
 #, python-format
 msgid "Invalid configuration: %s"
-msgstr ""
+msgstr "Neplatná konfigurace: %s"
 
 msgid "Unable to start the following command:"
 msgstr "Nejde spustit následující příkaz:"
@@ -3547,7 +3548,7 @@ msgid "&Refresh Repository List"
 msgstr ""
 
 msgid "Refresh the Repository Registry list"
-msgstr "Refresh* seznam repozitářů"
+msgstr "Refresh seznam repozitářů"
 
 msgid "&Open"
 msgstr ""
@@ -3591,7 +3592,7 @@ msgid "Clone Repository"
 msgstr "Klonovat repozitář"
 
 msgid "E&xplore"
-msgstr "Explorer"
+msgstr "Prozkoumat"
 
 msgid "Open the repository in a file browser"
 msgstr "Otevřít repozitář v průzkumníku"
@@ -3867,6 +3868,9 @@ msgstr "Cesta"
 msgid "C&hoose Log Columns..."
 msgstr "Vybrat sloupce v Přehledu revizí..."
 
+msgid "&Resize Columns"
+msgstr ""
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "Přejít k předkovi  %s a %s"
@@ -4039,9 +4043,6 @@ msgstr "&Aktualizovat..."
 msgid "Bro&wse at Revision"
 msgstr "Podrobnosti revize"
 
-msgid "&Similar Revisions..."
-msgstr "&Podobné revize..."
-
 msgid "&Merge with Local..."
 msgstr ""
 
@@ -4162,11 +4163,8 @@ msgstr ""
 msgid "Goto common ancestor"
 msgstr "Přejít ke společnému předkovi"
 
-msgid "Similar revisions..."
-msgstr "Podobné revize..."
-
 msgid "Graft Selected to local..."
-msgstr "Gráftovat výběr k lokální..."
+msgstr "Gráftovat výběr k aktuální rev..."
 
 msgid "&Prune Selected..."
 msgstr ""
@@ -4267,6 +4265,21 @@ msgstr "Oprávky byly exportovány"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d oprávky byly exportovány do:<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
+msgstr ""
 
 msgid "Unable to merge"
 msgstr "Nelze sloučit"
@@ -4420,10 +4433,10 @@ msgid "&Edit Toolbar"
 msgstr ""
 
 msgid "&Refresh"
-msgstr "&Refresh* repozitář"
+msgstr "&Refresh repozitář"
 
 msgid "&Filter Toolbar"
-msgstr ""
+msgstr "Lišta filtru"
 
 #, python-format
 msgid "Resolve Conflicts - %s"
@@ -4554,13 +4567,13 @@ msgid "Ma&nifest Mode"
 msgstr ""
 
 msgid "Show all version-controlled files in tree view"
-msgstr "Zobrazit všechny sledované soubory ve stromovém uspořádání"
+msgstr "Zobrazit obsah repoitória, kromě složky .hg"
 
 msgid "&Flat List"
 msgstr "&Prostý seznam"
 
 msgid "### filter text ###"
-msgstr ""
+msgstr "### text filtru ###"
 
 msgid "Changed by &This Commit"
 msgstr ""
@@ -4910,7 +4923,7 @@ msgstr "thg annotate"
 
 #, python-format
 msgid "invalid line number: %s"
-msgstr ""
+msgstr "neplatné číslo řádku: %s"
 
 msgid "revision to archive"
 msgstr "revize pro archivaci"
@@ -5255,7 +5268,7 @@ msgid "thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]"
 msgstr ""
 
 msgid "Please enable the Gpg extension first."
-msgstr ""
+msgstr "Povolte prosím nejprve extenzi Gpg."
 
 msgid "show files without changes"
 msgstr "zobrazit soubory bez změn"
@@ -5273,7 +5286,7 @@ msgid "do not back up stripped revisions"
 msgstr "nezálohovat odtržené revize"
 
 msgid "do not modify working copy during strip"
-msgstr ""
+msgstr "Při odtrhování neměnit pracovní kopii (-k / --keep)"
 
 msgid "revision to strip"
 msgstr "odtrhované revize"
@@ -5314,7 +5327,7 @@ msgstr "odstranit status cache"
 msgid "show the contents of the status cache (no update)"
 msgstr "zobrazit obsah status cache (neaktualizovat)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr "aktualizovat všechny repozitáře ve stávajícím adresáři"
 
 msgid "thg thgstatus [OPTION]"
@@ -5810,12 +5823,14 @@ msgstr ""
 "com&gt;"
 
 msgid "Ask Username"
-msgstr ""
+msgstr "Požadovat jméno uživatele"
 
 msgid ""
 "If no username has been specified, the user will be prompted to enter a "
 "username.  Default: False"
 msgstr ""
+"Nebylo-li určeno jméno uživatele, vyzvat k zadání jeho jména.Implicitně: "
+"False"
 
 msgid "Summary Line Length"
 msgstr "Délka souhrnného řádku"
@@ -6421,6 +6436,11 @@ msgid ""
 "tokens are found in issue.link, the entire matched string is appended "
 "instead."
 msgstr ""
+"Definuje příkaz, který se spustí po zjištění čísla problému. Můžete vložit "
+"skupiny do issue.regex a odpovídající {n} tokenů do issue.link (kde n je "
+"nezáporné celé číslo). {0} odkazuje na celý řetězec, shodný s issue.regex, "
+"zatímco {1} odkazuje na první skupinu, atd. Nejsou-li v issue.link nalezeny "
+"žádné tokeny, je připojen celý řetězec."
 
 msgid "Inline Tags"
 msgstr "Úvodní tagy"
@@ -6602,6 +6622,10 @@ msgid ""
 "Set it to \"*\" to pull from all servers. Set it to \"default\" to pull from "
 "the default sync path. Default is pull from NO servers."
 msgstr ""
+"Seznam serverů, z nichž musí být staženy (pulled) konfigurační soubory "
+"\"prorc\". Pro stažení ze všech serverů nastavte \"*\". Pro stažení z "
+"implicitní synchronizační cesty nastavet \"default\". Implicitně je "
+"nastaveno stahování ze žádného serveru"
 
 msgid "Include"
 msgstr ""
@@ -6651,13 +6675,13 @@ msgid "GnuPG"
 msgstr ""
 
 msgid "Specify the path to GPG. Default: gpg"
-msgstr ""
+msgstr "Určit cestu k GPG. Implicitně: gpg"
 
 msgid "Key ID"
 msgstr ""
 
 msgid "GPG key ID associated with user. Default: None (leave blank)"
-msgstr ""
+msgstr "ID klíče GPG, spojeného s uživatelem. Implicitně: None (nevyplněno)"
 
 msgid "TortoiseHg Settings"
 msgstr "Nastavení TortoiseHg"
@@ -6808,7 +6832,7 @@ msgstr ""
 #, python-format
 msgid ""
 "You can change the icon set from <a href=\"%s\">TortoiseSVN's Settings</a>"
-msgstr ""
+msgstr "Můžete změnit sadu ikon z <a href=\"%s\">TortoiseSVN's Settings</a>"
 
 msgid "Explorer Extension Settings - TortoiseHg"
 msgstr ""
@@ -7474,8 +7498,8 @@ msgstr ""
 "Proměnné prostředí\n"
 "jsou rozbaleny v názvu souboru."
 
-msgid "User Certificate Key File"
-msgstr "User Certificate Key File"
+msgid "User Certificate Key"
+msgstr ""
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
@@ -7485,11 +7509,23 @@ msgstr ""
 "Proměnné prostředí\n"
 "jsou rozbaleny v názvu souboru."
 
-msgid "User Certificate Chain File"
-msgstr "User Certificate Chain File"
+msgid "User Certificate Chain"
+msgstr ""
 
 msgid "Certificate Query Error"
 msgstr "Certificate Query Error"
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr ""
 
 msgid "Unable to save authentication"
 msgstr "Nejde uložit autentizaci"
@@ -7620,7 +7656,7 @@ msgid "No backup (-n/--nobackup)"
 msgstr "Bez zálohy (-n/--nobackup)"
 
 msgid "Do not modify working copy during strip (-k/--keep)"
-msgstr ""
+msgstr "Při odtrhování (strip) neupravujte pracovní kopii (-k/--keep)"
 
 #, python-format
 msgid "<b>%d changeset</b> will be stripped"
@@ -7885,16 +7921,16 @@ msgid "&Close Repository"
 msgstr "&Zavřít repozitář"
 
 msgid "Sh&ow Repository Registry"
-msgstr "Zobrazit seznam repozitářů"
+msgstr "Otevřít seznam repozitářů"
 
 msgid "Show &Patch Queue"
-msgstr "Zobrazit frontu oprávek"
+msgstr "Otevřít frontu oprávek"
 
 msgid "Show Conso&le"
 msgstr "Otevřít konzolu"
 
 msgid "Place Console in Doc&k Area"
-msgstr ""
+msgstr "Umístit konzolu do úkonové plochy"
 
 msgid "R&epository Registry Options"
 msgstr "Nastavení seznamu repozitářů"
@@ -7903,7 +7939,7 @@ msgid "Save Open Repositories on E&xit"
 msgstr "Při exitu uložit otevřené repozitáře"
 
 msgid "Sa&ve Current Sync Paths on Exit"
-msgstr ""
+msgstr "Při exitu uložit stávající cesty pro synchronizaci"
 
 msgid "&Commit"
 msgstr "&Commit"
@@ -7921,10 +7957,10 @@ msgid "S&ynchronize"
 msgstr "S&ynchronizovat"
 
 msgid "Refresh current repository"
-msgstr "Refresh* aktuální repozitář"
+msgstr "Refresh aktuální repozitář"
 
 msgid "Refresh &Task Tab"
-msgstr "Refresh* úkonovou kartu"
+msgstr "Refresh úkonovou kartu"
 
 msgid "Refresh only the current task tab"
 msgstr "Obnovit (refresh) pouze aktuální úkonovou kartu"
@@ -7945,10 +7981,10 @@ msgid "Go to a specific revision"
 msgstr "Přejít k jiné revizi"
 
 msgid "Filter graph with revision sets or branches"
-msgstr "Pracovní lišta filtru se sadami revizí nebo větvemi"
+msgstr "Lišta filtru se sadami revizí nebo větvemi"
 
 msgid "&Workbench Toolbars"
-msgstr ""
+msgstr "Nástrojové lišty Verpánku"
 
 msgid "Update working directory or switch revisions"
 msgstr "Aktualizovat pracovní adresář k označené revizi"
@@ -7963,10 +7999,10 @@ msgid "U&nbundle..."
 msgstr ""
 
 msgid "&Merge..."
-msgstr ""
+msgstr "Sloučit..."
 
 msgid "Merge with the other head of the current branch"
-msgstr ""
+msgstr "Sloučit s dalším čelem aktuální větve"
 
 msgid "&Resolve..."
 msgstr "Řešit konflikt"
@@ -7987,7 +8023,7 @@ msgid "Re&cover"
 msgstr "Obnovit repozitář"
 
 msgid "&Web Server"
-msgstr ""
+msgstr "Webový server"
 
 msgid "E&xplorer Help"
 msgstr ""
@@ -8014,7 +8050,7 @@ msgid "P&ush"
 msgstr ""
 
 msgid "&Sync Bookmarks..."
-msgstr ""
+msgstr "Synchronizace záložek..."
 
 #, python-format
 msgid ""
@@ -8078,7 +8114,7 @@ msgid "Execute custom tool '%s'"
 msgstr "Spustit uživatelský nástroj '%s'"
 
 msgid "Custom Toolbar &Settings"
-msgstr ""
+msgstr "Nastavení uživatelské lišty"
 
 msgid "TortoiseHg Workbench"
 msgstr "TortoiseHg Workbench"
@@ -8140,10 +8176,6 @@ msgid "unsupported URL: %s"
 msgstr ""
 
 #, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
-msgstr ""
-
-#, python-format
 msgid "%s certificate error: no certificate received"
 msgstr ""
 
@@ -8192,7 +8224,7 @@ msgstr "SSL: neznámá chyba %s:%s"
 
 #, python-format
 msgid "SSL error: %s"
-msgstr "SSL chyba: %s"
+msgstr "chyba SSL: %s"
 
 msgid "hgsubversion packaged with thg"
 msgstr ""
@@ -11631,6 +11663,12 @@ msgstr ""
 #~ msgid "%s will be imported to the repository"
 #~ msgstr "%s bude importován do repozitáře"
 
+#~ msgid "User Certificate Key File"
+#~ msgstr "User Certificate Key File"
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "User Certificate Chain File"
+
 #~ msgid ""
 #~ "Commit message text for new changeset that reverses the effect of the "
 #~ "change being backed out."
@@ -11772,6 +11810,9 @@ msgstr ""
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "hunk %d byl již použit na řádku %d (fuzz %d)\n"
 
+#~ msgid "Similar revisions..."
+#~ msgstr "Podobné revize..."
+
 #~ msgid "Diff to Local"
 #~ msgstr "Diff vůči lokální kopii"
 
@@ -11787,9 +11828,15 @@ msgstr ""
 #~ msgid "Error when creating repository"
 #~ msgstr "Chyba při vytváření repozitáře"
 
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "aktualizovat všechny repozitáře ve stávajícím adresáři"
+
 #~ msgid ""
 #~ "If true, concatenate multiple lines of changeset summary until they reach "
 #~ "80 characters. Default: False"
 #~ msgstr ""
 #~ "Je-li zadáno True, jsou řádky sumární zprávy changesetu spojovány až od "
 #~ "celkové délky 80 znaků. Implicitně je False"
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "&Podobné revize..."

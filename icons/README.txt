@@ -18,7 +18,10 @@ Icon files should be placed according to xdg-theme-like structure::
 
     scalable/actions/*.svg ... icons for any size
     24x24/actions/*.png ...... fine-tuned bitmap icons (24x24)
-    *.ico .................... icons mainly used by shell extention or hgtk
+    *.png .................... miscellaneous pixmaps
+    *.ico .................... icons used by explorer/nautilus extensions
+                               and Windows exe
+    svg/*.svg ................ source of .ico files
 
 See also:
 http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html

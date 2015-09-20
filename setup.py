@@ -6,12 +6,10 @@
 # TortoiseHg package.  See installer\build.txt for details. The other
 # use is to report the current version of the TortoiseHg source.
 
-
 import time
 import sys
 import os
 import shutil
-import subprocess
 import cgi
 import tempfile
 import re
@@ -21,16 +19,27 @@ from distutils import log
 from distutils.core import setup, Command
 from distutils.command.build import build as _build_orig
 from distutils.command.clean import clean as _clean_orig
-from distutils.dep_util import newer, newer_group
 from distutils.spawn import spawn, find_executable
-from os.path import isdir, exists, join, walk, splitext
 from i18n.msgfmt import Msgfmt
 
 thgcopyright = 'Copyright (C) 2010-2015 Steve Borho and others'
 hgcopyright = 'Copyright (C) 2005-2015 Matt Mackall and others'
 
-class build_mo(Command):
+def _walklocales():
+    podir = 'i18n/tortoisehg'
+    for po in os.listdir(podir):
+        if not po.endswith('.po'):
+            continue
+        pofile = os.path.join(podir, po)
+        modir = os.path.join('locale', po[:-3], 'LC_MESSAGES')
+        mofile = os.path.join(modir, 'tortoisehg.mo')
+        yield pofile, modir, mofile
 
+def _msgfmt(pofile, mofile):
+    modata = Msgfmt(pofile).get()
+    open(mofile, "wb").write(modata)
+
+class build_mo(Command):
     description = "build translations (.mo files)"
     user_options = []
 
@@ -41,31 +50,17 @@ class build_mo(Command):
         pass
 
     def run(self):
-        podir = 'i18n/tortoisehg'
-        if not os.path.isdir(podir):
-            self.warn("could not find %s/ directory" % podir)
-            return
-
-        join = os.path.join
-        for po in os.listdir(podir):
-            if not po.endswith('.po'):
-                continue
-            pofile = join(podir, po)
-            modir = join('locale', po[:-3], 'LC_MESSAGES')
-            mofile = join(modir, 'tortoisehg.mo')
-            modata = Msgfmt(pofile).get()
+        for pofile, modir, mofile in _walklocales():
             self.mkpath(modir)
-            open(mofile, "wb").write(modata)
+            self.make_file(pofile, mofile, _msgfmt, (pofile, mofile))
 
 class import_po(Command):
-
     description = "import translations (.po file)"
-
-    user_options = [("package=", "p", "launchpad export package or bzr repo "
-                     "[defualt: launchpad-export.tar.gz]"),
-                    ("lang=", "l",
-                     "languages to be imported, separated by ','")
-                    ]
+    user_options = [
+        ("package=", "p", ("launchpad export package or bzr repo "
+                           "[defualt: launchpad-export.tar.gz]")),
+        ("lang=", "l", "languages to be imported, separated by ','"),
+        ]
 
     def initialize_options(self):
         self.package = None
@@ -126,7 +121,7 @@ class import_po(Command):
             if self.lang and lang.upper() not in self.lang:
                 continue
 
-            dest_file = join(dest_prefix, lang) + '.po'
+            dest_file = os.path.join(dest_prefix, lang) + '.po'
             msg = 'updating %s...' % dest_file
             cmd = ['msgcat',
                    '--no-location',
@@ -139,7 +134,6 @@ class import_po(Command):
             shutil.rmtree(self.package_path)
 
 class update_pot(Command):
-
     description = "extract translatable strings to tortoisehg.pot"
     user_options = []
 
@@ -151,7 +145,7 @@ class update_pot(Command):
 
     def run(self):
         if not find_executable('xgettext'):
-            self.warn("could not find xgettext executable, tortoisehg.pot"
+            self.warn("could not find xgettext executable, tortoisehg.pot "
                       "won't be built")
             return
 
@@ -190,59 +184,126 @@ class update_pot(Command):
         cmd += filelist
         self.make_file(filelist, potfile, spawn, (cmd,))
 
-class build_qt(Command):
-    description = "build PyQt GUIs (.ui) and resources (.qrc)"
-    user_options = [('force', 'f', 'forcibly compile everything'
-                     ' (ignore file timestamps)'),
-                    ('frozen', None, 'include resources for frozen exe')]
-    boolean_options = ('force', 'frozen')
+class build_config(Command):
+    description = 'create config module for unix installation'
+    user_options = [
+        ('build-lib=', 'd', 'directory to "build" (copy) to'),
+        ]
+
+    def initialize_options(self):
+        self.build_lib = None
+
+    def finalize_options(self):
+        self.set_undefined_options('build',
+                                   ('build_lib', 'build_lib'))
+
+    def _generate_config(self, cfgfile):
+        # dirty hack to get the install root
+        installcmd = self.get_finalized_command('install')
+        rootlen = len(installcmd.root or '')
+        sharedir = os.path.join(installcmd.install_data[rootlen:], 'share')
+        data = {
+            'bin_path': installcmd.install_scripts[rootlen:],
+            'license_path': os.path.join(sharedir, 'doc', 'tortoisehg',
+                                         'Copying.txt.gz'),
+            'locale_path': os.path.join(sharedir, 'locale'),
+            'icon_path': os.path.join(sharedir, 'pixmaps', 'tortoisehg',
+                                      'icons'),
+            'nofork': True,
+            }
+        # Distributions will need to supply their own
+        f = open(cfgfile, "w")
+        try:
+            for k, v in sorted(data.iteritems()):
+                f.write('%s = %r\n' % (k, v))
+        finally:
+            f.close()
+
+    def run(self):
+        cfgdir = os.path.join(self.build_lib, 'tortoisehg', 'util')
+        cfgfile = os.path.join(cfgdir, 'config.py')
+        self.mkpath(cfgdir)
+        self.make_file(__file__, cfgfile, self._generate_config, (cfgfile,))
+
+class build_ui(Command):
+    description = 'build PyQt user interfaces (.ui)'
+    user_options = [
+        ('force', 'f', 'forcibly compile everything (ignore file timestamps)'),
+        ]
+    boolean_options = ('force',)
 
     def initialize_options(self):
         self.force = None
-        self.frozen = False
 
     def finalize_options(self):
         self.set_undefined_options('build', ('force', 'force'))
 
-    def compile_ui(self, ui_file, py_file=None):
-        # Search for pyuic4 in python bin dir, then in the $Path.
-        if py_file is None:
-            py_file = splitext(ui_file)[0] + "_ui.py"
-        # setup.py is the source of "from i18n import _" line
-        if not (self.force or newer_group([ui_file, __file__], py_file)):
-            return
-        try:
-            from PyQt4 import uic
-            fp = open(py_file, 'w')
-            uic.compileUi(ui_file, fp)
-            fp.close()
-            log.info('compiled %s into %s' % (ui_file, py_file))
-        except Exception, e:
-            self.warn('Unable to compile user interface %s: %s' % (py_file, e))
-            if not exists(py_file) or not file(py_file).read():
-                raise SystemExit(1)
+    def _compile_ui(self, ui_file, py_file):
+        from PyQt4 import uic
+        fp = open(py_file, 'w')
+        uic.compileUi(ui_file, fp)
+        fp.close()
+
+    _wrappeduic = False
+    @classmethod
+    def _wrapuic(cls):
+        """wrap uic to use gettext's _() in place of tr()"""
+        if cls._wrappeduic:
             return
 
-    def compile_rc(self, qrc_file, py_file=None):
-        # Search for pyuic4 in python bin dir, then in the $Path.
-        if py_file is None:
-            py_file = splitext(qrc_file)[0] + "_rc.py"
-        if not(self.force or newer(qrc_file, py_file)):
-            return
+        from PyQt4.uic.Compiler import compiler, qtproxies, indenter
+
+        class _UICompiler(compiler.UICompiler):
+            def createToplevelWidget(self, classname, widgetname):
+                o = indenter.getIndenter()
+                o.level = 0
+                o.write('from tortoisehg.util.i18n import _')
+                return super(_UICompiler, self).createToplevelWidget(classname,
+                                                                     widgetname)
+        compiler.UICompiler = _UICompiler
+
+        class _i18n_string(qtproxies.i18n_string):
+            def __str__(self):
+                return "_('%s')" % self.string.encode('string-escape')
+        qtproxies.i18n_string = _i18n_string
+
+        cls._wrappeduic = True
+
+    def run(self):
+        self._wrapuic()
+        basepath = os.path.join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
+        for f in os.listdir(basepath):
+            if not f.endswith('.ui'):
+                continue
+            uifile = os.path.join(basepath, f)
+            pyfile = uifile[:-3] + '_ui.py'
+            # setup.py is the source of "from i18n import _" line
+            self.make_file([uifile, __file__], pyfile,
+                           self._compile_ui, (uifile, pyfile))
+
+class build_qrc(Command):
+    description = 'build PyQt resource files (.qrc)'
+    user_options = [
+        ('build-lib=', 'd', 'directory to "build" (copy) to'),
+        ('force', 'f', 'forcibly compile everything (ignore file timestamps)'),
+        ]
+    boolean_options = ('force',)
+
+    def initialize_options(self):
+        self.build_lib = None
+        self.force = None
+
+    def finalize_options(self):
+        self.set_undefined_options('build',
+                                   ('build_lib', 'build_lib'),
+                                   ('force', 'force'))
+
+    def _findrcc(self):
+        rcc = 'pyrcc4'
+        if os.name != 'nt':
+            return rcc
         import PyQt4
-        origpath = os.getenv('PATH')
-        path = origpath.split(os.pathsep)
-        pyqtfolder = os.path.dirname(PyQt4.__file__)
-        path.append(os.path.join(pyqtfolder, 'bin'))
-        os.putenv('PATH', os.pathsep.join(path))
-        if os.system('pyrcc4 "%s" -o "%s"' % (qrc_file, py_file)) > 0:
-            self.warn("Unable to generate python module %s for resource file %s"
-                      % (py_file, qrc_file))
-            if not exists(py_file) or not file(py_file).read():
-                raise SystemExit(1)
-        else:
-            log.info('compiled %s into %s' % (qrc_file, py_file))
-        os.putenv('PATH', origpath)
+        return os.path.join(os.path.dirname(PyQt4.__file__), rcc)
 
     def _generate_qrc(self, qrc_file, srcfiles, prefix):
         basedir = os.path.dirname(qrc_file)
@@ -259,82 +320,68 @@ class build_qt(Command):
         finally:
             f.close()
 
-    def build_rc(self, py_file, basedir, prefix='/'):
+    def _build_rc(self, srcfiles, py_file, basedir, prefix):
         """Generate compiled resource including any files under basedir"""
         # For details, see http://doc.qt.nokia.com/latest/resources.html
         qrc_file = os.path.join(basedir, '%s.qrc' % os.path.basename(basedir))
-        srcfiles = [os.path.join(root, e)
-                    for root, _dirs, files in os.walk(basedir) for e in files]
-        # NOTE: Here we cannot detect deleted files. In such case, we need
-        # to remove .qrc manually.
-        if not (self.force or newer_group(srcfiles, py_file)):
-            return
         try:
             self._generate_qrc(qrc_file, srcfiles, prefix)
-            self.compile_rc(qrc_file, py_file)
+            spawn([self._findrcc(), qrc_file, '-o', py_file])
         finally:
             os.unlink(qrc_file)
 
+    def _build_icons(self, basepath):
+        icondir = os.path.join(os.path.dirname(__file__), 'icons')
+        iconfiles = []
+        for root, dirs, files in os.walk(icondir):
+            if root == icondir:
+                dirs.remove('svg')  # drop source of .ico files
+            iconfiles.extend(os.path.join(root, f) for f in files
+                             if f.endswith(('.png', '.svg')))
+        pyfile = os.path.join(basepath, 'icons_rc.py')
+        # we cannot detect deleted icons
+        self.make_file(iconfiles, pyfile,
+                       self._build_rc, (iconfiles, pyfile, icondir, '/icons'),
+                       exec_msg='generating %s from %s' % (pyfile, icondir))
+
     def _build_translations(self, basepath):
         """Build translations_rc.py which inclues qt_xx.qm"""
-        from PyQt4.QtCore import QLibraryInfo
-        trpath = unicode(QLibraryInfo.location(QLibraryInfo.TranslationsPath))
-        d = tempfile.mkdtemp()
-        try:
-            for e in os.listdir(trpath):
-                if re.match(r'qt_[a-z]{2}(_[A-Z]{2})?\.ts$', e):
-                    r = os.system('lrelease "%s" -qm "%s"'
-                                  % (os.path.join(trpath, e),
-                                     os.path.join(d, e[:-3] + '.qm')))
-                    if r > 0:
-                        self.warn('Unable to generate Qt message file'
-                                  ' from %s' % e)
-            self.build_rc(os.path.join(basepath, 'translations_rc.py'),
-                          d, '/translations')
-        finally:
-            shutil.rmtree(d)
+        if os.name == 'nt':
+            import PyQt4
+            trpath = os.path.join(
+                os.path.dirname(PyQt4.__file__), 'translations')
+        else:
+            from PyQt4.QtCore import QLibraryInfo
+            trpath = unicode(
+                QLibraryInfo.location(QLibraryInfo.TranslationsPath))
+        builddir = os.path.join(self.get_finalized_command('build').build_base,
+                                'qt-translations')
+        self.mkpath(builddir)
+
+        # we have to copy .qm files to build directory because .qrc file must
+        # specify files by relative paths
+        qmfiles = []
+        for e in os.listdir(trpath):
+            if (not e.startswith(('qt_', 'qscintilla_'))
+                or e.startswith('qt_help_')
+                or not e.endswith('.qm')):
+                continue
+            f = os.path.join(builddir, e)
+            self.copy_file(os.path.join(trpath, e), f)
+            qmfiles.append(f)
+        pyfile = os.path.join(basepath, 'translations_rc.py')
+        self.make_file(qmfiles, pyfile, self._build_rc,
+                       (qmfiles, pyfile, builddir, '/translations'),
+                       exec_msg='generating %s from Qt translation' % pyfile)
 
     def run(self):
-        self._wrapuic()
-        basepath = join(os.path.dirname(__file__), 'tortoisehg', 'hgqt')
-        self.build_rc(os.path.join(basepath, 'icons_rc.py'),
-                      os.path.join(os.path.dirname(__file__), 'icons'),
-                      '/icons')
-        if self.frozen:
-            self._build_translations(basepath)
-        for dirpath, _, filenames in os.walk(basepath):
-            for filename in filenames:
-                if filename.endswith('.ui'):
-                    self.compile_ui(join(dirpath, filename))
-                elif filename.endswith('.qrc'):
-                    self.compile_rc(join(dirpath, filename))
-
-    _wrappeduic = False
-    @classmethod
-    def _wrapuic(cls):
-        """wrap uic to use gettext's _() in place of tr()"""
-        if cls._wrappeduic:
-            return
-
-        from PyQt4.uic.Compiler import compiler, qtproxies, indenter
-
-        class _UICompiler(compiler.UICompiler):
-            def createToplevelWidget(self, classname, widgetname):
-                o = indenter.getIndenter()
-                o.level = 0
-                o.write('from tortoisehg.util.i18n import _')
-                return super(_UICompiler, self).createToplevelWidget(classname, widgetname)
-        compiler.UICompiler = _UICompiler
-
-        class _i18n_string(qtproxies.i18n_string):
-            def __str__(self):
-                return "_('%s')" % self.string.encode('string-escape')
-        qtproxies.i18n_string = _i18n_string
-
-        cls._wrappeduic = True
+        basepath = os.path.join(self.build_lib, 'tortoisehg', 'hgqt')
+        self.mkpath(basepath)
+        self._build_icons(basepath)
+        self._build_translations(basepath)
 
 class clean_local(Command):
-    pats = ['*.py[co]', '*_ui.py', '*_rc.py', '*.mo', '*.orig', '*.rej']
+    pats = ['*.py[co]', '*_ui.py', '*.mo', '*.orig', '*.rej']
     excludedirs = ['.hg', 'build', 'dist']
     description = 'clean up generated files (%s)' % ', '.join(pats)
     user_options = []
@@ -352,17 +399,20 @@ class clean_local(Command):
 
     def _walkpaths(self, path):
         for root, _dirs, files in os.walk(path):
-            if any(root == join(path, e) or root.startswith(join(path, e, ''))
+            if any(root == os.path.join(path, e)
+                   or root.startswith(os.path.join(path, e, ''))
                    for e in self.excludedirs):
                 continue
             for e in files:
-                fpath = join(root, e)
+                fpath = os.path.join(root, e)
                 if any(fnmatch(fpath, p) for p in self.pats):
                     yield fpath
 
 class build(_build_orig):
     sub_commands = [
-        ('build_qt', None),
+        ('build_config', lambda self: os.name != 'nt'),
+        ('build_ui', None),
+        ('build_qrc', lambda self: 'py2exe' in self.distribution.commands),
         ('build_mo', None),
         ] + _build_orig.sub_commands
 
@@ -377,13 +427,15 @@ class clean(_clean_orig):
             self.run_command(e)
 
 cmdclass = {
-        'build': build,
-        'build_qt': build_qt ,
-        'build_mo': build_mo ,
-        'clean': clean,
-        'clean_local': clean_local,
-        'update_pot': update_pot ,
-        'import_po': import_po
+    'build': build,
+    'build_config': build_config,
+    'build_ui': build_ui,
+    'build_qrc': build_qrc,
+    'build_mo': build_mo,
+    'clean': clean,
+    'clean_local': clean_local,
+    'update_pot': update_pot,
+    'import_po': import_po,
     }
 
 def setup_windows(version):
@@ -429,9 +481,13 @@ def setup_windows(version):
         import hgext
         hgextdir = os.path.dirname(hgext.__file__)
         hgextmods = set(["hgext." + os.path.splitext(f)[0]
-                      for f in os.listdir(hgextdir)])
-        _data_files = [(root, [os.path.join(root, file_) for file_ in files])
-                            for root, dirs, files in os.walk('icons')]
+                         for f in os.listdir(hgextdir)])
+        # most icons are packed into Qt resource, but .ico files must reside
+        # in filesystem so that shell extension can read them
+        root = 'icons'
+        _data_files.append((root,
+                            [os.path.join(root, f) for f in os.listdir(root)
+                             if f.endswith('.ico') or f == 'README.txt']))
 
     # for PyQt, see http://www.py2exe.org/index.cgi/Py2exeAndPyQt
     includes = ['sip']
@@ -439,8 +495,8 @@ def setup_windows(version):
     # Qt4 plugins, see http://stackoverflow.com/questions/2206406/
     def qt4_plugins(subdir, *dlls):
         import PyQt4
-        pluginsdir = join(os.path.dirname(PyQt4.__file__), 'plugins')
-        return (subdir, [join(pluginsdir, subdir, e) for e in dlls])
+        pluginsdir = os.path.join(os.path.dirname(PyQt4.__file__), 'plugins')
+        return (subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls])
     _data_files.append(qt4_plugins('imageformats', 'qico4.dll', 'qsvg4.dll'))
 
     # Manually include other modules py2exe can't find by itself.
@@ -450,46 +506,51 @@ def setup_windows(version):
     if 'hgext.patchbomb' in hgextmods:
         includes += ['email.*', 'email.mime.*']
 
-    extra['options'] = {
-       "py2exe" : {
-           "skip_archive" : 0,
-
-           # Don't pull in all this MFC stuff used by the makepy UI.
-           "excludes" : "pywin,pywin.dialogs,pywin.dialogs.list"
-                        ",setup,distutils",  # required only for in-place use
-           "includes" : includes,
-           "optimize" : 1
-       }
-    }
-    shutil.copyfile('thg', 'thgw')
+    extra['options'] = {}
+    extra['options']['py2exe'] = {
+        "skip_archive": 0,
+        # Don't pull in all this MFC stuff used by the makepy UI.
+        "excludes": ("pywin,pywin.dialogs,pywin.dialogs.list,"
+                     "setup,distutils"),  # required only for in-place use
+        "includes": includes,
+        "optimize": 1,
+        }
     extra['console'] = [
-            {'script':'thg',
-             'icon_resources':[(0,'icons/thg_logo.ico')],
-             'description':'TortoiseHg GUI tools for Mercurial SCM',
-             'copyright':thgcopyright,
-             'product_version':version},
-            {'script':'contrib/hg',
-             'icon_resources':[(0,'icons/hg.ico')],
-             'description':'Mercurial Distributed SCM',
-             'copyright':hgcopyright,
-             'product_version':version},
-            {'script':'win32/docdiff.py',
-             'icon_resources':[(0,'icons/TortoiseMerge.ico')],
-             'copyright':thgcopyright,
-             'product_version':version}
-            ]
+        {'script': 'thg',
+         'icon_resources': [(0, 'icons/thg_logo.ico')],
+         'description': 'TortoiseHg GUI tools for Mercurial SCM',
+         'copyright': thgcopyright,
+         'product_version': version,
+         },
+        {'script': 'contrib/hg',
+         'icon_resources': [(0, 'icons/hg.ico')],
+         'description': 'Mercurial Distributed SCM',
+         'copyright': hgcopyright,
+         'product_version': version,
+         },
+        {'script': 'win32/docdiff.py',
+         'icon_resources': [(0, 'icons/TortoiseMerge.ico')],
+         'copyright': thgcopyright,
+         'product_version': version,
+         },
+        ]
     extra['windows'] = [
-            {'script':'thgw',
-             'icon_resources':[(0,'icons/thg_logo.ico')],
-             'description':'TortoiseHg GUI tools for Mercurial SCM',
-             'copyright':thgcopyright,
-             'product_version':version},
-            {'script':'TortoiseHgOverlayServer.py',
-             'icon_resources':[(0,'icons/thg_logo.ico')],
-             'description':'TortoiseHg Overlay Icon Server',
-             'copyright':thgcopyright,
-             'product_version':version}
-            ]
+        {'script': 'thg',
+         'dest_base': 'thgw',
+         'icon_resources': [(0, 'icons/thg_logo.ico')],
+         'description': 'TortoiseHg GUI tools for Mercurial SCM',
+         'copyright': thgcopyright,
+         'product_version': version,
+         },
+        {'script': 'TortoiseHgOverlayServer.py',
+         'icon_resources': [(0, 'icons/thg_logo.ico')],
+         'description': 'TortoiseHg Overlay Icon Server',
+         'copyright': thgcopyright,
+         'product_version': version,
+         },
+        ]
+    # put dlls in sub directory so that they won't pollute PATH
+    extra['zipfile'] = 'lib/library.zip'
 
     return _scripts, _packages, _data_files, extra
 
@@ -499,41 +560,19 @@ def setup_posix():
     _extra = {}
     _scripts = ['thg']
     _packages = ['tortoisehg', 'tortoisehg.hgqt', 'tortoisehg.util']
-    _data_files = [(os.path.join('share/pixmaps/tortoisehg', root),
-        [os.path.join(root, file_) for file_ in files])
-        for root, dirs, files in os.walk('icons')]
-    _data_files += [(os.path.join('share', root),
-        [os.path.join(root, file_) for file_ in files])
-        for root, dirs, files in os.walk('locale')]
-    _data_files += [('/usr/share/nautilus-python/extensions/',
+    _data_files = []
+    # .svg and .png are loaded by thg, .ico by nautilus extension
+    for root, dirs, files in os.walk('icons'):
+        if root == 'icons':
+            dirs.remove('svg')  # drop source of .ico files
+        _data_files.append((os.path.join('share/pixmaps/tortoisehg', root),
+                            [os.path.join(root, f) for f in files]))
+    _data_files.extend((os.path.join('share', modir), [mofile])
+                       for pofile, modir, mofile in _walklocales())
+    _data_files += [('share/nautilus-python/extensions',
                      ['contrib/nautilus-thg.py'])]
 
-    # Create a config.py.  Distributions will need to supply their own
-    cfgfile = os.path.join('tortoisehg', 'util', 'config.py')
-    if not os.path.exists(cfgfile) and not os.path.exists('.hg/requires'):
-        f = open(cfgfile, "w")
-        f.write('bin_path     = "/usr/bin"\n')
-        f.write('license_path = "/usr/share/doc/tortoisehg/Copying.txt.gz"\n')
-        f.write('locale_path  = "/usr/share/locale"\n')
-        f.write('icon_path    = "/usr/share/pixmaps/tortoisehg/icons"\n')
-        f.write('nofork       = True\n')
-        f.close()
-
     return _scripts, _packages, _data_files, _extra
-
-def runcmd(cmd, env):
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE, env=env)
-    out, err = p.communicate()
-    # If root is executing setup.py, but the repository is owned by
-    # another user (as in "sudo python setup.py install") we will get
-    # trust warnings since the .hg/hgrc file is untrusted. That is
-    # fine, we don't want to load it anyway.
-    err = [e for e in err.splitlines()
-           if not e.startswith('Not trusting file')]
-    if err:
-        return ''
-    return out
 
 if __name__ == '__main__':
     version = ''
@@ -547,7 +586,7 @@ if __name__ == '__main__':
         kw = dict([t.strip() for t in l.split(':', 1)]
                   for l in open('.hg_archival.txt'))
         if 'tag' in kw:
-            version =  kw['tag']
+            version = kw['tag']
         elif 'latesttag' in kw:
             version = '%(latesttag)s+%(latesttagdistance)s-%(node).12s' % kw
         else:
@@ -567,7 +606,6 @@ if __name__ == '__main__':
 
     if os.name == "nt":
         (scripts, packages, data_files, extra) = setup_windows(version)
-        desc = 'Windows shell extension for Mercurial VCS'
         # Windows binary file versions for exe/dll files must have the
         # form W.X.Y.Z, where W,X,Y,Z are numbers in the range 0..65535
         from tortoisehg.util.version import package_version
@@ -575,20 +613,18 @@ if __name__ == '__main__':
         productname = 'TortoiseHg'
     else:
         (scripts, packages, data_files, extra) = setup_posix()
-        desc = 'TortoiseHg dialogs for Mercurial VCS'
         setupversion = version
         productname = 'tortoisehg'
 
     setup(name=productname,
-            version=setupversion,
-            author='Steve Borho',
-            author_email='steve@borho.org',
-            url='http://tortoisehg.org',
-            description=desc,
-            license='GNU GPL2',
-            scripts=scripts,
-            packages=packages,
-            data_files=data_files,
-            cmdclass=cmdclass,
-            **extra
-        )
+          version=setupversion,
+          author='Steve Borho',
+          author_email='steve@borho.org',
+          url='http://tortoisehg.org',
+          description='TortoiseHg dialogs for Mercurial VCS',
+          license='GNU GPL2',
+          scripts=scripts,
+          packages=packages,
+          data_files=data_files,
+          cmdclass=cmdclass,
+          **extra)
