@@ -75,7 +75,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
             #self.actionReapply.triggered.connect(self.reapply_clicked)
 
             self.actionPNew = a = QWidgetAction(self)
-            a.setIcon(geticon("fileadd")) #STOCK_NEW
+            a.setIcon(geticon("hg-add")) #STOCK_NEW
             a.setToolTip(_('Start a new patch branch'))
             tb.addAction(self.actionPNew)
             self.actionPNew.triggered.connect(self.pnew_clicked)
@@ -819,7 +819,7 @@ class PNewDialog(QDialog):
     def __init__(self, parent=None):
         QDialog.__init__(self, parent)
         self.setWindowFlags(Qt.Window)
-        self.setWindowIcon(qtlib.geticon("fileadd"))
+        self.setWindowIcon(qtlib.geticon("hg-add"))
         self.setWindowTitle(_('New Patch Branch'))
 
         def AddField(var, label, optional=False):

@@ -171,7 +171,7 @@ class StripWidget(cmdui.AbstractCmdWidget):
 
 def createStripDialog(repoagent, rev=None, parent=None, opts={}):
     dlg = cmdui.CmdControlDialog(parent)
-    dlg.setWindowIcon(qtlib.geticon('menudelete'))
+    dlg.setWindowIcon(qtlib.geticon('hg-strip'))
     dlg.setWindowTitle(_('Strip - %s') % repoagent.displayName())
     dlg.setObjectName('strip')
     dlg.setRunButtonText(_('&Strip'))

@@ -8,8 +8,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import util
-
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
 from tortoisehg.hgqt import cmdcore, qtlib
@@ -120,11 +118,10 @@ class SignDialog(QDialog):
             self.customMessageToggle(False)
         self.keyLineEdit.setFocus()
 
-        expanded = util.any([self.replaceCheckBox.isChecked(),
-                  self.localCheckBox.isChecked(),
-                  self.nocommitCheckBox.isChecked(),
-                  self.customCheckBox.isChecked()
-                  ])
+        expanded = any([self.replaceCheckBox.isChecked(),
+                        self.localCheckBox.isChecked(),
+                        self.nocommitCheckBox.isChecked(),
+                        self.customCheckBox.isChecked()])
         expander.set_expanded(expanded)
         self.show_options(expanded)
 

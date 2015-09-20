@@ -84,7 +84,7 @@ def _packmsgs(msgs, label):
     >>> _packmsgs(['foo ', _labeledstr('bar', 'log.branch')], '')
     ['foo ', '\x01log.branch\nbar']
     """
-    if not util.any(isinstance(e, _labeledstr) for e in msgs):
+    if not any(isinstance(e, _labeledstr) for e in msgs):
         # pack into single message to avoid overhead of label header and
         # channel protocol; also it's convenient for command-server client
         # to receive the whole message at once.

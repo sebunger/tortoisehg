@@ -29,10 +29,6 @@ if hasattr(sys, "frozen"):
         if 'THGDEBUG' in os.environ:
             import win32traceutil
             print 'starting'
-    # insert installed bin/ folder at start of PATH
-    binpath = os.path.join(os.path.dirname(sys.executable), 'bin')
-    os.environ['PATH'] = os.pathsep.join([binpath, os.environ.get('PATH', '')])
-    sys.path.insert(0, binpath) # for pywintypes
     # os.Popen() needs this, and Mercurial still uses os.Popen
     if 'COMSPEC' not in os.environ:
         comspec = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
@@ -48,8 +44,8 @@ else:
     fpath = os.path.realpath(__file__)
     if os.path.exists(os.path.join(os.path.dirname(fpath), 'setup.py')):
         from distutils.dist import Distribution
-        from setup import build_qt
-        build_qt(Distribution()).run()
+        from setup import build_ui
+        build_ui(Distribution()).run()
 
     if 'HGPATH' in os.environ:
         hgpath = os.environ['HGPATH']

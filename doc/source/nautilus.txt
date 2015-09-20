@@ -23,4 +23,10 @@ lines like these::
 
 	GNOME/Nautilus screenshot
 
+While convenient in most cases, the overlay feature can cause slowdowns on
+big repositories. To disable overlays, edit your :file:`~/.hgrc` file and add::
+
+	[tortoisehg]
+	overlayicons = false
+
 .. vim: noet ts=4

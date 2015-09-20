@@ -6,12 +6,11 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import gettext, os, locale
-from mercurial import util
 from tortoisehg.util import paths
 
 _localeenvs = ('LANGUAGE', 'LC_ALL', 'LC_MESSAGES', 'LANG')
 def _defaultlanguage():
-    if os.name != 'nt' or util.any(e in os.environ for e in _localeenvs):
+    if os.name != 'nt' or any(e in os.environ for e in _localeenvs):
         return  # honor posix-style env var
 
     # On Windows, UI language can be determined by GetUserDefaultUILanguage(),

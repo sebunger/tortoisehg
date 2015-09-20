@@ -101,6 +101,9 @@ class HgRepoView(QTreeView):
         act = QAction(_('C&hoose Log Columns...'), self)
         act.triggered.connect(self.setHistoryColumns)
         menu.addAction(act)
+        act = QAction(_('&Resize Columns'), self)
+        act.triggered.connect(self._resizeIgnoreSettings)
+        menu.addAction(act)
         self.headermenu = menu
 
     @pyqtSlot(QPoint)
@@ -178,27 +181,35 @@ class HgRepoView(QTreeView):
         self._in_history = False
 
     @pyqtSlot()
-    def resizeColumns(self):
+    def _resizeIgnoreSettings(self):
+        self.resizeColumns(False)
+
+    @pyqtSlot()
+    def resizeColumns(self, usesettings=True):
         if not self.model():
             return
+
+        col_widths = []
+        if usesettings:
+            qs = QSettings()
+            key = '%s/column_widths/%s' % (self.cfgname,
+                                           hglib.shortrepoid(self.repo))
+            try:
+                col_widths = [int(w) for w in qs.value(key).toStringList()]
+            except ValueError:
+                pass
+
         hh = self.header()
         hh.setStretchLastSection(False)
-        self._resizeColumns()
+        self._resizeColumns(col_widths)
         hh.setStretchLastSection(True)
         self.resized = True
 
-    def _resizeColumns(self):
+    def _resizeColumns(self, col_widths):
         # _resizeColumns misbehaves if called with last section streched
         hh = self.header()
         model = self.model()
         fontm = QFontMetrics(self.font())
-
-        key = '%s/column_widths/%s' % (self.cfgname,
-                                       hglib.shortrepoid(self.repo))
-        try:
-            col_widths = [int(w) for w in QSettings().value(key).toStringList()]
-        except ValueError:
-            col_widths = []
 
         for c in range(model.columnCount()):
             if hh.isSectionHidden(c):

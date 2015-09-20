@@ -123,7 +123,7 @@ class RepoFilterBar(QToolBar):
         le.installEventFilter(self)
 
         self.clearBtn = QToolButton(self)
-        self.clearBtn.setIcon(qtlib.geticon('filedelete'))
+        self.clearBtn.setIcon(qtlib.geticon('hg-remove'))
         self.clearBtn.setToolTip(_('Clear current query and query text'))
         self.clearBtn.clicked.connect(self.onClearButtonClicked)
         self.addWidget(self.clearBtn)

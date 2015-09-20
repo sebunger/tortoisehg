@@ -38,10 +38,12 @@ def debuggethostfingerprint(ui, repo, source='default'):
     sock = socket.socket()
     try:
         sock.connect((host, port))
-        sock = sslutil.ssl_wrap_socket(sock, None, None, serverhostname=host)
-        if not util.safehasattr(sock, 'getpeercert'):  # python 2.5 ?
-            raise util.Abort(_('host fingerprint for %s cannot be obtained '
-                               '(Python too old)') % host)
+        try:
+            sock = sslutil.wrapsocket(sock, None, None, ui, serverhostname=host)
+        except AttributeError:
+            # hg<3.5 (21b536f01eda, 9d1c61715939)
+            sock = sslutil.ssl_wrap_socket(sock, None, None,
+                                           serverhostname=host)
         peercert = sock.getpeercert(True)
         if not peercert:
             raise util.Abort(_('%s certificate error: no certificate received')
@@ -101,11 +103,11 @@ def qreorder(ui, repo, *patches, **opts):
     """move patches to the beginning or after the specified patch"""
     after = opts['after'] or None
     q = repo.mq
-    if util.any(n not in q.series for n in patches):
+    if any(n not in q.series for n in patches):
         raise util.Abort(_('unknown patch to move specified'))
     if after in patches:
         raise util.Abort(_('invalid patch position specified'))
-    if util.any(q.isapplied(n) for n in patches):
+    if any(q.isapplied(n) for n in patches):
         raise util.Abort(_('cannot move applied patches'))
 
     if after is None:

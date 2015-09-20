@@ -239,21 +239,21 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                           '<i>You can disable this prompt by configuring '
                           'Settings/Workbench/Activate Bookmarks</i><p>') \
                         % (hglib.tounicode(rev), len(bookmarks)),
-                        self, bookmarks, self.repo._bookmarkcurrent).run()
+                        self, bookmarks, hglib.activebookmark(self.repo)).run()
                 if selectedbookmark:
                     rev = selectedbookmark
-                elif self.repo[rev] == self.repo[self.repo._bookmarkcurrent]:
+                elif self.repo[rev] == self.repo[hglib.activebookmark(self.repo)]:
                     deactivatebookmark = qtlib.QuestionMsgBox(
                         _('Deactivate current bookmark?'),
                         _('Do you really want to deactivate the <i>%s</i> '
                           'bookmark?')
-                        % hglib.tounicode(self.repo._bookmarkcurrent))
+                        % hglib.tounicode(hglib.activebookmark(self.repo)))
                     if deactivatebookmark:
                         cmdline = ['bookmark']
                         if self.verbose_chk.isChecked():
                             cmdline += ['--verbose']
                         cmdline += ['-i',
-                                    hglib.tounicode(self.repo._bookmarkcurrent)]
+                                    hglib.tounicode(hglib.activebookmark(self.repo))]
                         return self._repoagent.runCommand(cmdline, self)
                     return cmdcore.nullCmdSession()
 

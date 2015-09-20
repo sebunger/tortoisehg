@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2015-04-27 18:05+0000\n"
-"Last-Translator: Дьяченко Александр <DyachenkoA@hotmail.ru>\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-08-29 11:44+0000\n"
+"Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:13+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-08-30 05:14+0000\n"
+"X-Generator: Launchpad (build 17690)\n"
 "Language: ru\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -1379,10 +1379,10 @@ msgid "&Open Local"
 msgstr "&Открыть локальную копию"
 
 msgid "E&xplore Local"
-msgstr ""
+msgstr "П&росмотр локальной копии"
 
 msgid "Open parent folder of current file in the system file manager"
-msgstr ""
+msgstr "Открыть родительскую папку текущего файла в файловом менеджере"
 
 msgid "&Copy Patch"
 msgstr "&Копировать заплатку"
@@ -2453,7 +2453,7 @@ msgstr "&Совпадение"
 
 #, python-format
 msgid "Find matches - %s"
-msgstr "Найдено совпадений - %s"
+msgstr "Поиск совпадений - %s"
 
 msgid "Revisions to Match:"
 msgstr "Ревизии для совпадения:"
@@ -3907,6 +3907,9 @@ msgstr "Путь"
 msgid "C&hoose Log Columns..."
 msgstr "&Выбрать колонки журнала..."
 
+msgid "&Resize Columns"
+msgstr "&Подобрать размеры колонок"
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "Перейти к предку для %s и %s"
@@ -4079,9 +4082,6 @@ msgstr "&Обновить..."
 msgid "Bro&wse at Revision"
 msgstr "&Обзор в ревизии"
 
-msgid "&Similar Revisions..."
-msgstr "&Похожие ревизии..."
-
 msgid "&Merge with Local..."
 msgstr "&Слить с локальной копией"
 
@@ -4202,9 +4202,6 @@ msgstr "Перебазировать..."
 msgid "Goto common ancestor"
 msgstr "Перейти к общему предку"
 
-msgid "Similar revisions..."
-msgstr "Похожие ревизии..."
-
 msgid "Graft Selected to local..."
 msgstr "Нарастить выбранные к локальной копии"
 
@@ -4308,6 +4305,21 @@ msgstr "Экспортированные заплатки"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d заплаток экспортировано в:<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr "&Фильтр по"
+
+msgid "&Ancestors"
+msgstr "&Предкам"
+
+msgid "A&uthor"
+msgstr "&Автору"
+
+msgid "&Branch"
+msgstr "&Ветке"
+
+msgid "&More Options..."
+msgstr "&Больше настроек..."
 
 msgid "Unable to merge"
 msgstr "Слияние невозможно"
@@ -5363,7 +5375,7 @@ msgstr "удалить кэш статуса"
 msgid "show the contents of the status cache (no update)"
 msgstr "показать содержимое кэша статуса (без обновления)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr "обновить все хранилища в текущем каталоге"
 
 msgid "thg thgstatus [OPTION]"
@@ -6043,8 +6055,7 @@ msgid ""
 "equates to pull --rebase, updateorrebase equates to pull -u --rebase.  "
 "Default: none"
 msgstr ""
-"Операция, которая выполняется непосредственно после успешного затягивания."
-"\r\n"
+"Операция, которая выполняется непосредственно после успешного затягивания. "
 "update эквивалентно pull --update, fetch эквивалентно расширению fetch, "
 "rebase эквивалентно pull --rebase, updateorrebase эквивалентно pull -u --"
 "rebase. По умолчанию: none"
@@ -7614,8 +7625,8 @@ msgstr ""
 "Необязательно. Файл ключа сертификата пользователя, в кодировке PEM.\n"
 "В имени файла можно использовать переменные среды."
 
-msgid "User Certificate Key File"
-msgstr "Файл ключа сертификата пользователя"
+msgid "User Certificate Key"
+msgstr "Ключ сертификата пользователя"
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
@@ -7624,11 +7635,23 @@ msgstr ""
 "Необязательно. Файл цепочки сертификатов пользователя, в кодировке PEM.\n"
 "В имени файла можно использовать переменные среды."
 
-msgid "User Certificate Chain File"
-msgstr "Файл цепочки сертификатов пользователя"
+msgid "User Certificate Chain"
+msgstr "Цепочка сертификатов пользователя"
 
 msgid "Certificate Query Error"
 msgstr "Ошибка запроса сертификата"
+
+msgid "Select User Certificate Key File"
+msgstr "Выбрать файл ключа сертификата пользователя"
+
+msgid "PEM files (*.pem *.key)"
+msgstr "PEM файлы (*.pem *.key)"
+
+msgid "Select User Certificate Chain File"
+msgstr "Выбрать файл цепочки сертификатов пользователя"
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr "PEM файлы (*.pem *.crt *.cer)"
 
 msgid "Unable to save authentication"
 msgstr "Не удаётся сохранить аутентификацию"
@@ -8292,10 +8315,6 @@ msgstr "[ИСТОЧНИК]"
 #, python-format
 msgid "unsupported URL: %s"
 msgstr "неподдерживаемый URL: %s"
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
-msgstr "отпечаток хоста для %s не может быть получен (Python слишком стар)"
 
 #, python-format
 msgid "%s certificate error: no certificate received"
@@ -9043,6 +9062,9 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "overwrite existing shelve data"
 #~ msgstr "переписать существующие отложенные данные"
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "обновить все хранилища в текущем каталоге"
 
 #~ msgid "Merge target (other)"
 #~ msgstr "Цель слияния (другая)"
@@ -11808,6 +11830,12 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ "никаких лексем {n}, то вся совпавшая строка будет добавлена в конец "
 #~ "ссылки."
 
+#~ msgid "User Certificate Key File"
+#~ msgstr "Файл ключа сертификата пользователя"
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "Файл цепочки сертификатов пользователя"
+
 #~ msgid "unshelve backup aborted\n"
 #~ msgstr "восстановление отложенных изменений из резервной копии прервано\n"
 
@@ -11904,3 +11932,12 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "abandon shelved changes"
 #~ msgstr "Отказаться от отложенных изменений"
+
+#~ msgid "Similar revisions..."
+#~ msgstr "Похожие ревизии..."
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "&Похожие ревизии..."
+
+#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
+#~ msgstr "отпечаток хоста для %s не может быть получен (Python слишком стар)"

@@ -21,7 +21,7 @@ LABELS = { 'add': (_('Checkmark files to add'), _('Add')),
            'revert': (_('Checkmark files to revert'), _('Revert')),
            'remove': (_('Checkmark files to remove'), _('Remove')),}
 
-ICONS = { 'add': 'fileadd',
+ICONS = { 'add': 'hg-add',
            'forget': 'hg-remove',
            'revert': 'hg-revert',
            'remove': 'hg-remove',}
@@ -188,12 +188,11 @@ class QuickOpDialog(QDialog):
         if self.command == 'remove':
             self.repo.lfstatus = True
             try:
-                try:
-                    repostate = self.repo.status()
-                except (EnvironmentError, util.Abort), e:
-                    qtlib.WarningMsgBox(_('Unable to read repository status'),
-                                        hglib.tounicode(str(e)), parent=self)
-                    return
+                repostate = self.repo.status()
+            except (EnvironmentError, util.Abort), e:
+                qtlib.WarningMsgBox(_('Unable to read repository status'),
+                                    hglib.tounicode(str(e)), parent=self)
+                return
             finally:
                 self.repo.lfstatus = False
             if not self.chk.isChecked():

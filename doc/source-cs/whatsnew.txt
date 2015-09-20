@@ -22,7 +22,13 @@ Verpánek podporuje otevření a zobrazení více než jednoho repozitáře na k
 
 Každá repozitářová karta je propojena s úkonovými kartami (Podrobnosti revizí, Commit, Synchronizace, Hledat), které se zobrazují v úkonové ploše pod Přehledem revizí. Tyto karty se přepínají poklepem na ouška, ikonami v úkonové liště nebo výběrem nabídky v roletce :guilabel:`View`.
 
-K disposici jsou také tři parkovatelné panely - *Seznam repozitářů*, *Patch Queue* a *Output Log*. První zobrazuje stromovou strukturu lokálních repozitářů v počítači, druhý panel se použije při manipulaci s oprávkami (patches) a třetí panel zobrazuje aktuálně prováděné příkazy a lze jej použít jako konzolu pro zadávání příkazů. 
+K disposici jsou také tři parkovatelné panely - *Seznam repozitářů*, *Fronta oprávek* a Výstupní konzola* (Output Log). První zobrazuje stromovou strukturu lokálních repozitářů v počítači, druhý panel se použije při manipulaci s oprávkami (patches) a třetí panel zobrazuje aktuálně prováděné příkazy a lze jej použít i pro zadávání příkazů.
+
+Zobrazení příkazového řádku Mercuriálu
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+
+Ve snaze poučit uživatele o použitých příkazech Mercuriálu, jsou téměř všechny příkazy souběžně zobrazovány ve výstupní konzole, včetně následného výstupu z Mercuriálu.
+
 
 
 Nástroj Resolve, uvážlivá sloučení
@@ -37,16 +43,16 @@ Proceduru 'resolve' použije TortoiseHg implicitně k řešení všech konflikt�
 
 Zlepšené odkládání souborů
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-Tortoise 2.0 obsahuje nový odkládací nástroj 'shelve' který umí přesouvat změny z pracovního adresáře do šelfového souboru (shelf file) nebo do neaplikované oprávky MQ (MQ patch).
+Tortoise 2.0 obsahuje nový odkládací nástroj zvaný 'shelve' který umí přesouvat změny z pracovního adresáře do šelfového souboru (shelf file) nebo do neaplikované oprávky MQ (MQ patch).
 
 
 Sady revizí
 ^^^^^^^^^^^
 Lištu pro nastavení filtru v Repozitory Explorer jsme ve Verpánku nahradili Pracovní lištou filtru pro výběr sad revizí (implicitně není zobrazena). Sady revizí byly zavedeny v Mercurialu 1.6 a byly v každém dalším vydání integrovány se stoupajícím počtem příkazů. Je to mocný dotazovací nástroj pro vyhledávání revizí v repozitáři. 
 
-.. Verpánek obsahuje také editor sady revizí, který je zdrojem poučení o dostupných klíčových slovech a jejich argumentech, a má schopnost doplňovat otevřené závorky, počatá slova a další.
+Verpánek obsahuje také editor sady revizí, který je zdrojem poučení o dostupných klíčových slovech a jejich argumentech, a má schopnost doplňovat otevřené závorky, počatá slova a další.
 
-.. Příchozí a odchozí changesety jsou nyní v TortoiseHg 2.0 zobrazeny jako sady revizí. V předchozích verzích byly reprezentovány komentářem ke grafu.
+Příchozí a odchozí changesety jsou nyní v TortoiseHg 2.0 zobrazeny jako sady revizí. V předchozích verzích byly reprezentovány komentářem ke grafu.
 
 Technologie
 -----------

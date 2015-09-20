@@ -10,7 +10,7 @@ import os, re
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error, util
+from mercurial import error
 
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
@@ -735,7 +735,7 @@ class MQPatchesWidget(QDockWidget):
         self.qpopAllAct.setEnabled(appliedcnt > 0)
 
         indexes = selmodel.selectedRows()
-        anyapplied = util.any(model.isApplied(i) for i in indexes)
+        anyapplied = any(model.isApplied(i) for i in indexes)
         self.qdeleteAct.setEnabled(len(indexes) > 0 and not anyapplied)
         self.setGuardsAct.setEnabled(len(indexes) == 1)
         self.qrenameAct.setEnabled(len(indexes) == 1)

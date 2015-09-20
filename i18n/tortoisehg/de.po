@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2014-11-01 22:39+0000\n"
-"Last-Translator: Karsten Tinnefeld <Unknown>\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-06-28 12:54+0000\n"
+"Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:11+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-27 05:32+0000\n"
+"X-Generator: Launchpad (build 17628)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHG-Symbolüberblendungsdienst"
@@ -3936,6 +3936,9 @@ msgstr "Verzeichnis"
 msgid "C&hoose Log Columns..."
 msgstr "Protokoll&spalten wählen..."
 
+msgid "&Resize Columns"
+msgstr ""
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "Zum gemeinsamen Vorgänger von %s und %s wechseln"
@@ -4112,9 +4115,6 @@ msgstr "&Aktualisieren..."
 msgid "Bro&wse at Revision"
 msgstr "&Betrachten in Revision"
 
-msgid "&Similar Revisions..."
-msgstr "Ä&hnliche Revisionen..."
-
 msgid "&Merge with Local..."
 msgstr "Mit &lokaler Version verschmelzen..."
 
@@ -4236,9 +4236,6 @@ msgstr "Basisverschiebung..."
 msgid "Goto common ancestor"
 msgstr "Zum gemeinsamen Vorfahren wechseln"
 
-msgid "Similar revisions..."
-msgstr "Ähnliche Revisionen..."
-
 msgid "Graft Selected to local..."
 msgstr "Transplantation nach lokal ausgewählt..."
 
@@ -4342,6 +4339,21 @@ msgstr "Die Patches wurden exportiert"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d Patches wurden exportiert in:<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
+msgstr ""
 
 msgid "Unable to merge"
 msgstr "Das Zusammenführen hat nicht funktioniert"
@@ -5423,7 +5435,7 @@ msgstr "Zustandscache entfernen"
 msgid "show the contents of the status cache (no update)"
 msgstr "Inhalt des Zustandscaches anzeigen (nicht aktualisieren)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr "Alle Projektverzeichnisse im akutellen Verzeichnis aktualisieren"
 
 msgid "thg thgstatus [OPTION]"
@@ -7683,8 +7695,8 @@ msgstr ""
 "Umgebungsvariablen werden\n"
 "bei der Auswertung des Dateinamens aufgelöst."
 
-msgid "User Certificate Key File"
-msgstr "Schlüsseldatei mit dem Benutzerzertifikat"
+msgid "User Certificate Key"
+msgstr ""
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
@@ -7693,11 +7705,23 @@ msgstr ""
 "Wahlweise. Client-Zertifikatsketten-Datei im PEM-Format. Umgebungsvariablen\n"
 "werden bei Ermittlung des Dateinamens aufgelöst."
 
-msgid "User Certificate Chain File"
-msgstr "Zertifikatskettendatei des Benutzers"
+msgid "User Certificate Chain"
+msgstr ""
 
 msgid "Certificate Query Error"
 msgstr "Zertifikatsanfrage-Fehler"
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr ""
 
 msgid "Unable to save authentication"
 msgstr "Authensierung kann nicht gespeichert werden"
@@ -8362,10 +8386,6 @@ msgid "unsupported URL: %s"
 msgstr ""
 
 #, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
-msgstr ""
-
-#, python-format
 msgid "%s certificate error: no certificate received"
 msgstr ""
 
@@ -8945,6 +8965,9 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 
 #~ msgid "hgtk userconfig"
 #~ msgstr "hgtk userconfig"
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "Alle Projektverzeichnisse im akutellen Verzeichnis aktualisieren"
 
 #~ msgid "[-o] CMD"
 #~ msgstr "[-o] BEF"
@@ -10386,6 +10409,12 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "A specific revision up to which you would like to push or pull."
 #~ msgstr ""
 #~ "Eine spezifische Revision, bis zu der Sie ziehen oder verteilen möchten."
+
+#~ msgid "User Certificate Key File"
+#~ msgstr "Schlüsseldatei mit dem Benutzerzertifikat"
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "Zertifikatskettendatei des Benutzers"
 
 #~ msgid "&Yes (--force)"
 #~ msgstr "&Ja (--force)"
@@ -12000,6 +12029,9 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Revert files to revision %s?"
 #~ msgstr "Dateien in Revision %s wiederherstellen?"
 
+#~ msgid "Similar revisions..."
+#~ msgstr "Ähnliche Revisionen..."
+
 #~ msgid "backup %r as %r\n"
 #~ msgstr "Sicherheitskopie von %r als %r\n"
 
@@ -12076,6 +12108,9 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 
 #~ msgid "View missing"
 #~ msgstr "Fehlende Datei ansehen"
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "Ä&hnliche Revisionen..."
 
 #~ msgid ""
 #~ "Color changesets by author name.  If not enabled, the changes are colored "

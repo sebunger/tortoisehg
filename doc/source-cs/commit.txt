@@ -17,10 +17,11 @@ Popis prvků
 
 Výčet prvků nástrojové lišty úlohy komit:
 
-	:guilabel:`### filter text ###`
+	:guilabel:`### text filtru ###`
 		Pole pro zadání filtrovacího řetězce pro vyhledání souborů.
 	:guilabel:`Status`
 		Rozvinovací seznam různých módů souborů. V seznamu souborů se zobrazí pouze ty soubory, jejichž stavy jsou v seznamu Status zatrženy:
+
 	* *upravený* ( **M** odified ) znamená, že sledovaný soubor byl změněn.
 	* *přidaný* ( **A** dded ) znamená, že nesledovaný soubor byl přidán ke sledování.
 	* *odebraný* ( **R** emoved ) znamená, že sledovaný soubor byl odebrán příkazem :guilabel:`hg remove`.

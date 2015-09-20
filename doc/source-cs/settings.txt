@@ -213,7 +213,7 @@ Verpánek
 	``never`` :
 	  Nikdy žádný prompt pro aktivaci záložky neukazovat.
 	
-:guilabel:`Show Family Line:`
+:guilabel:`Zobrazit rodinnou linii:`
     Zobrazit nepřímou závislost revize na grafu při 	filtrování revsetem - true, false, neurčeno; implicitně true.
 
 
@@ -225,6 +225,9 @@ Commit
 
 :guilabel:`Jméno uživatele:`
 	Jméno spojené s komity.
+	
+:guilabel:`Doplnit jméno uživatele:`
+	Požádat o jméno uživatele, nebylo-li dosud zadáno. Implicitní nastavení je False.	
 	
 :guilabel:`Délka souhrnného řádku:`
 	Požadovaná délka řádku průvodní zprávy komitu. Tato

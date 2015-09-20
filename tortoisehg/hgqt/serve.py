@@ -21,8 +21,7 @@ class ServeDialog(QDialog):
         super(ServeDialog, self).__init__(parent)
         self.setWindowFlags((self.windowFlags() | Qt.WindowMinimizeButtonHint)
                             & ~Qt.WindowContextHelpButtonHint)
-        # TODO: choose appropriate icon
-        self.setWindowIcon(qtlib.geticon('proxy'))
+        self.setWindowIcon(qtlib.geticon('hg-serve'))
 
         self._qui = Ui_ServeDialog()
         self._qui.setupUi(self)
@@ -196,7 +195,7 @@ def _asconfigliststr(value):
     '"foo \\"bar\\""'
     """
     # ui.configlist() uses isspace(), which is locale-dependent
-    if util.any(c.isspace() or c == ',' for c in value):
+    if any(c.isspace() or c == ',' for c in value):
         return '"' + value.replace('"', '\\"') + '"'
     else:
         return value

@@ -9,7 +9,7 @@ Integrace s průzkumníkem Windows
 Kontextové nabídky
 ------------------
 
-Přístup k příkazům TortoiseHg je možný pomocí kontextového menu v průzkumníku Windows a dalších aplikacích, které používají standardní dialogy File/Open. Zde je kontextové menu pro revizovanou složku:
+Přístup k příkazům TortoiseHg je možný pomocí kontextového menu v průzkumníku Windows a dalších aplikacích, které používají standardní dialogy File/Open. Zde je kontextové menu pro složku repozitória:
 
 .. figure:: figures/cmenu-nofiles.png
 	:alt: Context menu
@@ -29,12 +29,12 @@ TortoiseHg sdílí překryvné ikony s TortoiseSVN (verze 1.5.x nebo pozdější
 
 Kontextové menu obsahuje volbu :guilabel:`Aktualizovat ikony` která přinutí aplikaci TortoiseHg oživit ikony v právě rozbaleném repozitáři nebo ve složce s repozitáři. Ikona hlavního panelu zezelená a ikony v adresáři se změní v otazníky ve chvíli, kdy probíhá tato aktualizace.
 
-Konfigurace prostředí
----------------------
+Konfigurace kontextové nabídky
+------------------------------
 
 Ovladač překryvů a kontextové nabídky jsou konfigurovatelné. V ploše otevřeného adresáře nebo dokonce v ploše obrazovky provedeme pravý poklep a vybereme :menuselection:`TortoiseHg > Nastavení kontext. nabídek`. 
 
-Na kartě "Kontextové menu" můžeme jednotlivé volby přesouvat ze submenu do hlavního menu a obráceně.
+Na kartě "Kontextové" můžeme jednotlivé volby přesouvat ze submenu do hlavního menu a obráceně.
 
 .. figure:: figures/shell-config-cmenu.png
 	:alt: Shell Configuration dialog
@@ -48,23 +48,21 @@ Na kartě "Ikony" upravíme nastavení, týkající se překryvných ikon a zobr
 
 	
 :guilabel:`Překryvy povoleny`
-    Umožnit zobrazení překryvných ikon na složkách a
-	souborech v repozitóriu;implicitně: ano                              
+  Umožnit zobrazení překryvných ikon na složkách a 	souborech v repozitóriu; implicitně: ano                
     
 :guilabel:`Pouze lokální disky`
     Zobrazení ikon pouze na lokálních discích. Zobrazení ikon na vzdálených složkách a souborech je náročnější na výkon počítače; implicitně: nezatrženo 
 
 :guilabel:`Povolené ovladače překryvů:`
-    Tato uživatelská nastavení poskytují možnost vypnout ovladače překryvných ikon ve sdílených komponentách TortoiseOverlays. Tyto komponenty jsou sdíleny všemi aplikacemi Tortoise (TortoiseHg, TortoiseSVN, atd) ve snaze vyhnout se registrování velkého množství ikonových slotů. Všechny tyto aplikace používají stejnou sadu ikonových slotů. Celkový počet dostupných slotů ve Windows je poměrně omezený a liší podle verzí Windows. Například u Windows 7 je k disposici pouze 8 volných slotů pro ovladače překryvných ikon. V tomto editačním poli lze nepotřebné ovladače ikon vypnout a tím snížit jejich celkovou spotřebu. Zvýší se tím šance, že důležité ovladače jako "Normal" (zelená značka) nebo "Modified" (červený vykřičník) obdrží svůj ikonový slot, i když je v počítači registrováno příliš mnoho ovladačů. Velmi se doporučuje zakázat nepoužívané ovladače, jako je Uzamčeno, Jen ke čtení, Ignorováno, Smazáno - pokud víme, že je nepoužívá jiná aplikace Tortoise. Určitě povolíme ovladače pro Přidáno a Neverzováno, protože jsou v TortoiseHg používány.
-	Implicitně jsou všechny volby zatrženy.
+    Tato uživatelská nastavení poskytují možnost vypnout ovladače překryvných ikon ve sdílených komponentách TortoiseOverlays. Tyto komponenty jsou sdíleny všemi aplikacemi Tortoise (TortoiseHg, TortoiseSVN, atd) ve snaze vyhnout se registrování velkého množství ikonových slotů. Všechny tyto aplikace používají stejnou sadu ikonových slotů. Celkový počet dostupných slotů ve Windows je poměrně omezený a liší podle verzí Windows. Například u Windows 7 je k disposici pouze 8 volných slotů pro ovladače překryvných ikon. V tomto editačním poli lze nepotřebné ovladače ikon vypnout a tím snížit jejich celkovou spotřebu. Zvýší se tím šance, že důležité ovladače jako "Normal" (zelená značka) nebo "Modified" (červený vykřičník) obdrží svůj ikonový slot, i když je v počítači registrováno příliš mnoho ovladačů. Velmi se doporučuje zakázat nepoužívané ovladače, jako je Uzamčeno, Jen ke čtení, Ignorováno, Smazáno - pokud víme, že je nepoužívá jiná aplikace Tortoise. Určitě povolíme ovladače pro Přidáno a Neverzováno, protože jsou v TortoiseHg používány. Implicitně jsou všechny volby zatrženy.
     
 .. warning::
-    Nastavení v poli "Povolené ovladače překryvů" ovlivňují všechny aplikace Tortoise uživatele. Aby se změny nastavení v tomto poli projevily, je požadován logoff/login.   
+    Nastavení v poli "Povolené ovladače překryvů" ovlivňují všechny aplikace Tortoise. Aby se změny nastavení v tomto poli projevily, je požadován logoff/login.   
 
 :guilabel:`Hlavní panel` 
-    Pro zobrazení ikony serveru překryvných ikon v dolní nástrojové liště Windows zatrhneme volbu "Zobrazit ikonu". Volba "Zvýraznit ikonu" způsobí, že tato ikona změní barvu (zezelená), když ikonový server aktualizuje cache soubory (:file:`.hg\dirstate` a :file:`.hg\thgstatus`) v repozitáři.
+  Pro zobrazení ikony serveru překryvných ikon v dolní nástrojové liště Windows zatrhneme volbu "Zobrazit ikonu". Volba "Zvýraznit ikonu" způsobí, že tato ikona změní barvu (zezelená), když ikonový server aktualizuje cache soubory (:file:`.hg\dirstate` a :file:`.hg\thgstatus`) v repozitáři.
     
-Překryvné ikony lze selektivně zakázat pro určitý repozitář v souboru :file:`.hg\thgstatus` zápisem jediného řádku::
+  Překryvné ikony lze selektivně zakázat pro určitý repozitář v souboru :file:`.hg\thgstatus` zápisem jediného řádku::
 
     @@noicons                
 

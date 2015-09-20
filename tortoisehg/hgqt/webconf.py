@@ -36,9 +36,9 @@ class WebconfForm(QWidget):
 
         setstdicon(self._qui.open_button, QStyle.SP_DialogOpenButton)
         setstdicon(self._qui.save_button, QStyle.SP_DialogSaveButton)
-        self._qui.add_button.setIcon(qtlib.geticon('fileadd'))
+        self._qui.add_button.setIcon(qtlib.geticon('hg-add'))
         self._qui.edit_button.setIcon(qtlib.geticon('edit-file'))
-        self._qui.remove_button.setIcon(qtlib.geticon('filedelete'))
+        self._qui.remove_button.setIcon(qtlib.geticon('hg-remove'))
 
     def dragEnterEvent(self, event):
         if self._getlocalpath_from_dropevent(event):

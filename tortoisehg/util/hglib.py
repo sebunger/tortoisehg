@@ -18,16 +18,6 @@ from mercurial import revset as revsetmod
 from mercurial.node import nullrev
 from hgext import mq as mqmod
 
-try:
-    from mercurial import patch
-    parsepatch = patch.parsepatch
-    patchheader = patch.header
-except AttributeError:
-    # hg<3.4 (20aac24e2114, dc655360bccb)
-    from hgext import record
-    parsepatch = record.parsepatch
-    patchheader = record.header
-
 _encoding = encoding.encoding
 _fallbackencoding = encoding.fallbackencoding
 
@@ -114,6 +104,13 @@ def fromutf(s):
         return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
 
+def activebookmark(repo):
+    try:
+        return repo._activebookmark
+    except AttributeError:
+        # hg<3.5 (a02d293a1079)
+        return repo._bookmarkcurrent
+
 def namedbranches(repo):
     branchmap = repo.branchmap()
     dead = repo.deadbranches
@@ -145,8 +142,8 @@ def _getfirstrevisionlabel(repo, ctx):
     bookmarks = ctx.bookmarks()
     if ctx in repo.parents():
         # keep bookmark unchanged when updating to current rev
-        if repo._bookmarkcurrent in bookmarks:
-            return repo._bookmarkcurrent
+        if activebookmark(repo) in bookmarks:
+            return activebookmark(repo)
     else:
         # more common switching bookmark, rather than deselecting it
         if bookmarks:
@@ -840,7 +837,7 @@ def buildcmdargs(name, *args, **opts):
             fullargs.append(_stringify(v))
 
     args = [_stringify(v) for v in args if v is not None]
-    if util.any(e.startswith('-') for e in args):
+    if any(e.startswith('-') for e in args):
         fullargs.append('--')
     fullargs.extend(args)
 

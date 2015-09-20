@@ -419,7 +419,7 @@ class ChunksWidget(QWidget):
                                 opts=diffopts):
                 buf.write(p)
             buf.seek(0)
-            chunks = hglib.parsepatch(buf)
+            chunks = patch.parsepatch(buf)
             if chunks:
                 header = chunks[0]
                 return [header] + header.hunks
@@ -745,7 +745,7 @@ class DiffBrowser(QFrame):
         elif type(self._ctx.rev()) is str:
             chunks = self._ctx._files[filename]
         else:
-            header = hglib.parsepatch(cStringIO.StringIO(fd.diff))[0]
+            header = patch.parsepatch(cStringIO.StringIO(fd.diff))[0]
             chunks = [header] + header.hunks
 
         utext = []

@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2013-05-10 20:06+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-06-28 13:04+0000\n"
+"Last-Translator: lloco73 <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:13+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-07-27 05:34+0000\n"
+"X-Generator: Launchpad (build 17628)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servisor de ícones de sobreposição do TortoiseHg"
@@ -172,7 +172,7 @@ msgid "Backout - %s"
 msgstr "Backout - %s"
 
 msgid "Prepare to backout"
-msgstr "Preparar backout"
+msgstr "Preparar para backout"
 
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
@@ -3730,6 +3730,9 @@ msgstr "Caminho"
 msgid "C&hoose Log Columns..."
 msgstr ""
 
+msgid "&Resize Columns"
+msgstr ""
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr ""
@@ -3900,9 +3903,6 @@ msgstr "At&ualizar..."
 msgid "Bro&wse at Revision"
 msgstr ""
 
-msgid "&Similar Revisions..."
-msgstr ""
-
 msgid "&Merge with Local..."
 msgstr ""
 
@@ -4023,9 +4023,6 @@ msgstr ""
 msgid "Goto common ancestor"
 msgstr ""
 
-msgid "Similar revisions..."
-msgstr ""
-
 msgid "Graft Selected to local..."
 msgstr ""
 
@@ -4120,6 +4117,21 @@ msgstr ""
 
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
+msgstr ""
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
 msgstr ""
 
 msgid "Unable to merge"
@@ -5110,7 +5122,7 @@ msgstr "remover a cache de estado"
 msgid "show the contents of the status cache (no update)"
 msgstr "mostrar o conteúdo do estado da cache (sem actualizar)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr "actualizar todos os repos no dir actual"
 
 msgid "thg thgstatus [OPTION]"
@@ -7039,7 +7051,7 @@ msgid ""
 "are expanded in the filename."
 msgstr ""
 
-msgid "User Certificate Key File"
+msgid "User Certificate Key"
 msgstr ""
 
 msgid ""
@@ -7047,10 +7059,22 @@ msgid ""
 "are expanded in the filename."
 msgstr ""
 
-msgid "User Certificate Chain File"
+msgid "User Certificate Chain"
 msgstr ""
 
 msgid "Certificate Query Error"
+msgstr ""
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
 msgstr ""
 
 msgid "Unable to save authentication"
@@ -7675,10 +7699,6 @@ msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
-msgstr ""
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
 msgstr ""
 
 #, python-format
@@ -8807,6 +8827,9 @@ msgstr ""
 
 #~ msgid "All files"
 #~ msgstr "Todos os ficheiros"
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "actualizar todos os repos no dir actual"
 
 #~ msgid "hgtk thgstatus [OPTION]"
 #~ msgstr "hgtk thgstatus [OPTION]"

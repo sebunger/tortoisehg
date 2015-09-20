@@ -2,45 +2,52 @@ Verpánek
 ========
 
 .. module:: workbench.dialog
-  :synopsis: Primary TortoiseHg application
+   :synopsis: Primary TortoiseHg application
 
-Verpánek neboli Workbench je primární aplikace TortoiseHg. Umožňuje procházet lokálními repozitáři, předávat (commit) změny do repozitáře , provádět vyhledávání, synchronizaci s jinými repozitáři a vykonávat různé provozní úlohy. Téměř každá procedura Mercurialu je dostupná z Verpánku. Všechna tlačítka pracují s aktuálním repozitářem. 
+Verpánek neboli Workbench je primární aplikace TortoiseHg. Umožňuje procházet lokálními repozitáři, předávat (commit) změny do repozitáře , provádět vyhledávání a synchronizaci s jinými repozitáři a vykonávat různé provozní úlohy. Téměř každá procedura Mercurialu je dostupná z Verpánku. Všechna tlačítka pracují s aktuálním repozitářem. 
 
 .. figure:: figures/workbench.png
     :alt: Workbench
 
 
+Pod klasickou lištou hlavního menu (File, View, Repozitář, Help) lze aktivovat/deaktivovat parkovací lištu (Dock Toolbar), v níž lze otevřít tyto nástrojové lišty: Editovací (Edit), Úkonovou (Task), Synchronizační (Sync) a Uživatelskou (Custom). Složení jednotlivých lišt bude uvedeno níže.
 
-Pod klasickou lištou hlavního menu (File, View, Repozitář, Help) se nachází poutec s nástrojovými lištami (Editovací, Parkovací, Úkonová, Uživatelská). Složení jednotlivých lišt bude uvedeno níže.
+V základní konfiguraci (s vypnutými lištami) má okno Verpánku tři části - Seznam repozitářů vlevo, Přehled revizí vpravo nahoře a Úkonovou plochu vpravo dole. Konfigurace úkonové plochy se mění podle právě zvoleného úkonu (Podrobnosti revizí, Commit, Hledat a Synchronizovat).
 
-V základní konfiguraci (s vypnutými nástroji Parkovací lišty) má okno Verpánku dvě části - Přehled revizí nahoře a Úkonovou plochu dole. Konfigurace úkonové plochy se mění podle právě aktivovaného úkonu (Podrobnosti revizí, Commit, Hledat a Synchronizovat).
+Při zapnuté Parkovací liště jsou přístupné tři přepínače (ikony) pro aktivaci/deaktivaci Seznamu repozitářů, Fronty oprávek (Patch Queue) a Výstupní konzoly (Output Log). Uvedené panely jsou přemístitelné a lze je umístit i mimo okna Verpánku.
 
-
-K uvedeným rezidentním plochám lze ve Verpánku aktivovat tři přemistitelné panely - Seznam repozitářů, Fronta oprávek (Patch Queue) a Output Log. 
 
 
 Hlavní panely (widgety) Verpánku jsou tyto:
 
-:guilabel:`Přehled revizí`
-  Panel pro zobrazení vícero repozitářů v kartách. Ve sloupcích jsou uváděny
-  základní informace o každém changesetu neboli revizi. Lze si nastavit,
-  které sloupce mají být viditelné (:menuselection:`View >
-  Vybrat sloupce přehledu...`) a v jakém pořadí. 
-:guilabel:`Seznam repozitářů - repozitórií`
-  Lze aktivovat ikonou nebo volbou :menuselection:`View > Zobrazit seznam
-  repozitářů`. Volba :menuselection:`View >Nastavení seznamu
-  repozitářů > Show Paths`  umožní zobrazení nejenom jmen
-  repozitářů ale i cest k nim.
-:guilabel:`Úkonová plocha`
-  Nástroje úkonové plochy lze aktivovat ze třech míst:
-
-  * jako položku roletky *View*
-  * výběrem ikony v Úkonové nástrojové liště
-  * výběrem ouška na okraji Úkonové plochy - zobrazení oušek lze 
-    zapnout/vypnout  v prostředí *File > Settings > Verpánek > Úkonová lišta*
-:guilabel:`Output Log`
+Přehled revizí
+  Panel pod nástrojovými lištami v záhlaví pro výčet revizí u
+  jednotlivých repozitářů, prezentovaných na samostatných kartách . Ve
+  sloupcích jsou uváděny základní informace o každém changesetu neboli
+  revizi repozitáře. Lze si nastavit, které sloupce mají být viditelné
+  (:menuselection:`View` > Vybrat sloupce přehledu...) a v jakém
+  pořadí.
+  
+Seznam repozitářů neboli repozitórií
+  Lze aktivovat ikonou nebo volbou :menuselection:`View` > Zobrazit
+  seznam repozitářů. Volba :menuselection:`View` > Nastavení seznamu 
+  repozitářů > Show Paths  umožní zobrazení nejenom jmen repozitářů ale
+  i cest k nim.
+  
+Úkonová plocha
+  Plocha pod přehledem revizí s poměnným obsahem. Nástroje úkonové
+  plochy lze aktivovat ze třech míst:
+  
+  * jako položku roletky :menuselection:`View`
+  * výběrem ikony v Úkonové liště
+  * výběrem ouška na okraji Úkonové plochy - zobrazení oušek lze
+  zapnout/vypnout  v prostředí :menuselection:`File` > Settings >
+  Verpánek > Úkonová lišta
+   
+	
+Výstupní konzola (Output Log)
   Tento přemístitelný panel, který vyvoláme tlačítkem s ikonou
-  nebo výběrem :menuselection:`View > Show Outpt Log` poskytuje
+  nebo výběrem :menuselection:`View > Otevřít konzolou`, poskytuje
   uživateli informaci o příkazech Mercurialu, které byly 
   provedeny během stávající seance. Můžete jej také použít jako
   příkazový řádek pro přímé zadávání příkazů Mercurialu. V
@@ -53,47 +60,128 @@ Hlavní menu
 
 Standardní lišta s roletkovými nabídkami pro přístup k nástrojům a pro spouštění různých úloh. 
 
-:guilabel:`File`
+:menuselection:`File`
 
     .. figure:: figures/file-menu.png
         :alt: File menu
 		
   
-:guilabel:`View`
+:menuselection:`View`
     
     .. figure:: figures/view-menu.png
 	    :alt: View menu
 		
-:guilabel:`Repozitář`
+:menuselection:`Repozitář`
 	
     .. figure:: figures/repository-menu.png
         :alt: Repository menu
 		
-:guilabel:`Help`	
+:menuselection:`Help`	
   Obsahuje info o programu a popis Verpánku. 
 	
 
+Parkovací lišta
+---------------
+
+Tato lišta zobrazí nebo skryje hlavní panely Verpánku.
+
+   .. figure:: figures/dock-toolbar.png
+       :alt: Dock Toolbar
+
+:guilabel:`Otevřít seznam repozitářů`
+     Ve skutečnosti jde o seznam repozitórií - kořenových adresářů se složkami :strong:`.hg`
+:guilabel:`Show Patch Queue`
+     Otevřít frontu oprávek
+:guilabel:`Show Output Log`
+     Otevřít konzolu, zobrazující výstup z příkazů Mercuriálu, které byly zadány buď některým nástrojem TortoiseHg nebo zadány v konzole.
+	 
+	
 Editovací lišta
 ---------------
 
     .. figure:: figures/edit-toolbar.png
         :alt: Edit Toolbar
 
-:guilabel:`Refresh current repository`
-  Znovu načíst (refresh) přehled revizí aktuálního repozitáře.
+:guilabel:`Obnovit (refresh) aktuální repozitář`
+  Znovu načíst přehled revizí aktuálního repozitáře.
+:guilabel:`Stop`:
+  Zastavit probíhající operaci.  
 :guilabel:`Přejít k aktuální revizi`:
-  Přejít k revizi, zadané jako aktuální.	
-:guilabel:`Přejít k určené revizi`:
+  Přejít k revizi, která je právě aktuální.	
+:guilabel:`Přejít k jiné revizi`:
   Přejít k libovolné určené revizi.
 :guilabel:`Zpět`:
-  Vrátit se k předchozí vybrané revizi.
+  Vrátit se k předchozí revizi.
 :guilabel:`Vpřed`
-  Přejít k následné revizi. 
-:guilabel:`Pracovní lišta filtru`
-  Ukázat a aktivovat nástrojovou lištu pro editaci filtru.
-:guilabel:`Aktualizace pracovního adresáře`
-  Dialog pro aktualizaci zadané revize.	 
+  Přejít k předchozí revizi. 
+:guilabel:`Lišta filtru`
+  Aktivovat nástrojovou lištu pro editaci filtru.
+:guilabel:`Aktualizovat pracovní adresář`
+  Aktualizovat pracovní adresář k označené revizi.	
+:guilabel:`Sloučit (merge)`
+  Sloučit s dalším čelem vybrané větve. 
 
+
+Úkonová lišta
+-------------
+
+   .. figure:: figures/task-toolbar.png
+       :alt: Task Toolbar
+
+	   
+Lišta (vpravo nahoře) je sestavena z ikon, které aktivují úkonové karty v úkonové ploše: Podrobnosti revize, Commit, Hledat a Synchronizovat.
+Při volbě Podrobnosti revize a Commit se úkonová plocha rozdělí vertikálně na dvě části - Seznam souborů aktuální revize vlevo a pracovní plochy vybraného úkonu vpravo. Zbývající úkony (Synchronizovat a Hledat) mají rovněž své vlastní členění úkonové plochy.
+
+:guilabel:`Podrobnosti revizí`
+   Pracovní plocha této karty  se zkládá ze třech polí:
+       
+* Rozbalovací plochy (+/-) :strong:`Changeset` obsahuje údaje o číslu revize, zkrácený heš, souhrnný text zprávy komitu, jméno a email komitenta, datum komitu, informace o rodičích a dětech
+* Textového pole se souhrnným i úplným textem zprávy komitu
+* Komentář k souboru, vybraného v seznamu souborů vlevo.
+
+.. figure:: figures/revdetails-tasktab.png
+	:alt: Revision Details
+
+
+:guilabel:`Commit`
+  Zde je možné přidávat nové soubory a provádět komit do repozitáře.
+
+.. figure:: figures/commit-tasktab.png
+	:alt: Commit Task Tab
+
+:guilabel:`Synchronizovat`
+ Umožňuje podrobné nastavení cesty ke vzdálenému repozitáři. Karta obsahuje rozšířenou nabídku synchronizačních úloh viz 5.9. Synchronizace.
+
+.. figure:: figures/sync-tasktab.png
+	:alt: Synchronise Task Tab
+
+
+:guilabel:`Hledat`
+     Slouží pro vyhledávání zadaného textu v souboru. 
+
+.. figure:: figures/search-tasktab.png
+	:alt: Search Task Tab
+
+
+Mezi vybranou revizí nebo oprávkou v Přehledu revizí a úkonovou kartou Commit či Podrobnosti revizí existují tyto relace:
+
+*  Poklep na revizi "Pracovní adresář" aktivuje kartu s úlohou Commit.
+*  Poklep na kteroukoliv jinou revizi aktivuje kartu Podrobnosti revizí. 
+ 
+Toto standardní chování lze potlačit klávesou :kbd:`Alt`, stisknutou před označením revize. Stávající panel zůstane potom zachován bez ohledu na to, jakou revizi či oprávku vyberete. 
+ 
+Synchronizační lišta
+--------------------
+
+.. figure:: figures/sync-toolbar.png
+	:alt: Sync Toolbar
+	
+	Sync toolbar
+
+Slouží k synchronizaci lokálního repozitáře s jinými repozitáři. Tato lišta obsahuje čtyři z osmi ikon, přítomných na kartě "Synchronizovat". 
+
+Popisy úkonů Incoming, Pull, Outgoing, Push jsou uvedeny v odstavci 5.9 Synchronizace.
+ 
 Pracovní lišta filtru
 ---------------------
 
@@ -106,7 +194,7 @@ Zobrazení této lišty (Filter Toolbaar) aktivujeme buď tlačítkem s ikonou v
 
 :guilabel:`Clear`
 	 Smaže aktuální dotaz (query). Vlastně anuluje zadání filtru.
-:guilabel:`Filter entry`
+:guilabel:`Zápis filtru`
 	 Zde lze zapsat filtrovací podmínku. Tento widget je rozvinovací
 	 seznam, obsahující přehled předchozích filtrovacích podmínek.
 :guilabel:`Trigger revision set query`
@@ -139,72 +227,6 @@ Verpánek se pokusí nalézt zadanou vyhledávací frázi v repozitáři, porovn
 
 Potřebujete-li provést hledání s klíčovým slovem, které obsahuje závorky, použijte příkaz :command:`keyword` ("fráze(foo)").	 
 
-  
-Parkovací lišta
----------------
-
-Tato lišta zobrazí nebo skryje hlavní panely Verpánku.
-
-   .. figure:: figures/dock-toolbar.png
-       :alt: Dock Toolbar
-
-:guilabel:`Zobrazit seznam repozitářů`
-     Ve skutečnosti jde o seznam repozitórií
-:guilabel:`Show Patch Queue`
-     Zobrazit frontu oprávek
-:guilabel:`Show Output Log`
-     Zobrazit panel, který zaznamenává probíhající akce 
- 
-
-
-Úkonová lišta
--------------
-
-   .. figure:: figures/task-toolbar.png
-       :alt: Task Toolbar
-
-Lišta (vpravo nahoře) je sestavena z ikon, které otevírají úkonové karty v úkonové ploše.
-Při volbě Podrobnosti revizí a Commit se úkonová plocha rozdělí vertikálně na dvě části - Seznam souborů vlevo a pracovní plochy vybraného úkonu vpravo. Zbývající úkony (Synchronizovat a Hledat) mají rovněž své vlastní členění úkonové plochy.
-
-:guilabel:`Podrobnosti revizí`
-   Pracovní plocha této karty  se zkládá ze třech polí:
-       
-* Rozbalovací plocha (+/-) *Changeset* obsahuje údaje o číslu revize, zkrácený heš, souhrnný text zprávy komitu, jméno a email komitenta, datum komitu, informace o rodičích a dětech
-* Textové pole se souhrnným i úplným textem zprávy komitu
-* Anotace souboru, vybraného v seznamu souborů vlevo.
-
-.. figure:: figures/revdetails-tasktab.png
-	:alt: Revision Details
-
-
-:guilabel:`Commit`
-  Zde je možné přidávat nové soubory a provádět komit do repozitáře.
-
-.. figure:: figures/commit-tasktab.png
-	:alt: Commit Task Tab
-
-:guilabel:`Synchronizovat`
- Umožňuje podrobné nastavení cesty ke vzdálenému repozitáři. Karta obsahuje rozšířenou nabídku synchronizačních úloh viz 5.9. Synchronizace.
-
-.. figure:: figures/sync-tasktab.png
-	:alt: Synchronise Task Tab
-
-
-:guilabel:`Hledat`
-     Slouží pro vyhledávání zadaného textu v souboru. 
-
-.. figure:: figures/search-tasktab.png
-	:alt: Search Task Tab
-
-
-Mezi vybranou revizí nebo oprávkou v Přehledu revizí a úkonovou kartou Commit či Podrobnosti revizí existují tyto relace:
-
-*  Poklep na revizi "Pracovní adresář" aktivuje kartu s úlohou Commit.
-*  Poklep na kteroukoliv jinou revizi aktivuje kartu Podrobnosti revizí. 
- 
-Toto standardní chování lze potlačit klávesou :kbd:`Alt`, stisknutou před označením revize. Stávající panel zůstane potom zachován bez ohledu na to, jakou revizi či oprávku vyberete.
-
-
 
 Výkonové implikace
 ------------------
@@ -228,7 +250,7 @@ Kontextová menu revizí
 Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v závislosti na počtu vybraných revizí. Kontextová menu se mohou také lišit v závislosti na typu vybrané revize (pracovní adresář, normální revize, oprávka mq). Dále uvádíme seznam všech existujících kontextových menu. 
 
 
-**Vybrána jen jedna revize** (nikoliv pracovní)
+:strong:`Vybrána jen jedna revize` (nikoliv pracovní)
 
   .. figure:: figures/single-revision-cmenu.png
      :alt: Single revision context menu
@@ -241,20 +263,18 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 	 diffovém nástroji.
 :guilabel:`Diff to local...`
 	 Zobrazí změny  mezi vybranou revizí a pracovním adresářem.
-:guilabel:`Browse at revision...`
-	 Otevře okno "Manifest" se zobrazením všech složek a souborů vybrané
-	 revize
-:guilabel:`Similar revisions...`
+:guilabel:`Podrobnosti revize`
+	 Otevře okno se zobrazením všech složek a souborů vybrané
+	 revize včetně informací o changesetu a zprávy komitu
+:guilabel:`Podobné revize...`
 	 Otevře okno "Najít shody" s nabídkou deseti volitelných parametrů
 	 shody
 :guilabel:`Merge with local...`
-	 Otevře okno "Merge"  pro sloučení vybrané revize s pracovním
-	 adresářem.
+	 Otevře okno "Merge"  pro sloučení vybrané revize s lokální revizí pracovního adresáře.
 :guilabel:`Tag...`
 	 Otevře okno pro zadání názvu vytvářeného tagu pro vybranou revizi.
 :guilabel:`Bookmark...`
-	 Otevře okno pro  zadání nazvu záložky pro vybranou revizi. Tato
-	 volba je přístupná při povolené extenzi 'bookmarks'.
+	 Otevře okno pro  zadání nazvu záložky pro vybranou revizi.
 :guilabel:`Backout...`
 	 Otevře okno "Backout" pro anulování vybrané revize. 
 :guilabel:`Copy Hash`
@@ -275,14 +295,14 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 	:guilabel:`Copy Patch`
 		Zkopíruje oprávku  do schránky.
 
-:guilabel:`Change Phase to ...`
+:guilabel:`Změna fáze ...`
 	Nabídne výběr fáze: public, draft, secret
     
 :guilabel:`Graft to local...`
-	Otevře okno pro vytvoření gráftu.    
+	Otevře okno pro vytvoření (changesetu) gráftu.    
 
 :guilabel:`Modify history`
-   Přístupné jen při povolené extenzi MQ:
+   :emphasis:`Přístupné jen při povolené extenzi MQ`:
   
    :guilabel:`Unapply Patch`
 		 Zrušit oprávku a vrátit se k rodiči. 
@@ -292,11 +312,16 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 		  Přemění oprávku MQ na normální changeset. 
    :guilabel:`Rename Patch`
 		  Přejmenovat oprávku
-   :guilabel:`Strip`
-		  Odstranit vybranou revizi a všechny její potomky z repozitáře.
-		  [#rcm1]_ 
+   :guilabel:`MQ Options`
+		  Podrobnější nastavení pro extenzi MQ		  
 
-**Vybrány dvě revize**
+   :emphasis:`Přístupné vždy`:
+
+		  :guilabel:`Strip`
+		  Odstranit vybranou revizi a všechny její potomky z repozitáře. [#rcm1]_ 
+
+		  
+:strong:`Vybrány dvě revize`
 
 :guilabel:`Visual diff...`
 	  Zobrazí vybrané revize v diffovém prohlížeči.
@@ -308,7 +333,7 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 :guilabel:`Email selected...`
 	  Otevře okno pro odeslání vybraných revizí.
 :guilabel:`Copy selected as patch...`
-	  Z vybraných revizí vytvoří oprávky a uloží je do schránky.    
+	  Z vybraných revizí vytvoří oprávku a uloží ji do schránky.    
 :guilabel:`Export DAG range...`
 	  Pro každou revizi vybraného rozsahu vytvoří oprávkový soubor a
 	  uloží je v zadaném místě.
@@ -328,8 +353,10 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 	  ...
 :guilabel:`Podobné revize ...`
       Otevře okno pro zadání parametrů pro hledání podobných revizí.   
-
-**Vybrány více než dvě revize**
+:guilabel:`Gráftovat výběr k aktuální revizi ...`
+      Přenést vybrané revize nad lokální revizi.
+	  
+:strong:`Vybrány více než dvě revize`
 
 :guilabel:`Export selected...`
 	  Vytvoří oprávkové soubory pro všechny vybrané revize.
@@ -350,38 +377,47 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 Kontextové menu souboru
 ------------------------
 
-Pravým poklepem na soubor v seznamu souborů (uprostřed dole) vyvoláme kontextové menu pro vybraný soubor:
+Pravým poklepem na soubor v seznamu souborů aktuální revize vyvoláme kontextové menu pro vybraný soubor:
 
 :guilabel:`Diff to Parent`
 	  Zobrazí změny mezi aktuální a rodičovskou verzí souboru v
 	  nastavenem diffovém nástroji.
-:guilabel:`Visual Diff to Local`
+:guilabel:`Diff to Local`
 	  Zobrazí rozdíly mezi aktuální a lokální verzí souboru.
-:guilabel:`View at Revision`
-	  Otevře verzi souboru v nastaveném či vhodném textovém editoru [#f1cm1]_.
-:guilabel:`Save at Revision`
+:guilabel:`Zobrazit verzi souboru`
+	  Otevře verzi souboru v nastaveném či vhodném textovém editoru [#f1cm2]_.
+:guilabel:`Uložit verzi souboru`
 	  Uloží soubor do zadané složky
 :guilabel:`Edit Local`
 	  Otevře soubor v nastaveném či vhodném textovém editoru.
 :guilabel:`Open Local`
 	  Otevře soubor v nastaveném či vhodném textovém editoru.
+:guilabel:`Explore Local`
+	  Otevře nadřazenou složku zkoumaného souboru.	  
 :guilabel:`Copy Path`
 	  Zkopíruje cestu k souboru do schránky.		   
 :guilabel:`Revert to revision`
 	  Vrátí soubor ke stavu označené revize [#f1cm3]_.
 :guilabel:`Historie souboru`
-	  Ukáže revize, které měnily tento soubor [#f1cm2]_.   
+	  Ukáže revize, které měnily tento soubor [#f1cm4]_.   
 :guilabel:`Porovnat revize souboru`
-	  Otevře nové okno, kde lze porovnat kteroukoukoli revizi souboru s
-	  libovolnou jinou revizí.
+	  Otevře nové okno, kde lze porovnat kteroukoukoli revizi souboru s libovolnou jinou revizí.
+:guilabel:`Selektivní výběr`
+	  Otevře lištu výběrového filtru.	
+:guilabel:`Seznam stavů`
+  Tuto nabídku lze také realizovat jako kontextové menu při poklepu kdekoli v prázdném místě Seznamu souborů. Umožňuje nastavit viditelnost souborů v závislosti na jejich statusu: :strong:`M` upravený, :strong:`A` přidaný, :strong:`R` odebraný, :strong:`C` čistý, :strong:`S` subrepo.
+  Volba "Prostý seznam" ovlivňuje způsob prezentace názvů  souborů.
+  Přepínač "Manifest mode" zařídí zobrazení celého obsahu repozitória, kromě složky :strong:`.hg`.
 
+  Tento přepínač je také přítomný jako ikona v levém horním rohu karty "Podrobnosti revizí", spolu s textovým polem pro zadání filtru.  
 
-.. [#f1cm1] :menuselection:`File > Global Settings > TortoiseHg >
+ 
+.. [#f1cm2] :menuselection:`File > Global Settings > TortoiseHg >
    Visual Editor`
-.. [#f1cm2] Ve které revizi byl soubor smazán se neukáže, protože to je
-   jenom "vnějšková" změna, která neovlivňuje historii souboru.
-.. [#f1cm3] Nový obsah se objeví jako lokální změna a musí být předána
-   (committed) repozitáři.
+.. [#f1cm3] Nový obsah se objeví jako lokální změna a musí být předána (committed) repozitáři.   
+.. [#f1cm4] Ve které revizi byl soubor smazán se neukáže, protože to je jenom "vnějšková" změna, která neovlivňuje historii souboru.
+
+
 
 Pravý poklep na názvu souboru při aktivované úloze Commit vyvolá pro vybraný soubor odlišné kontextové menu:
 
@@ -391,35 +427,36 @@ Pravý poklep na názvu souboru při aktivované úloze Commit vyvolá pro vybra
 	  Otevře diffový nástroj a zobrazí texty s označenými změnami.
 :guilabel:`Copy Patch`
 	  Zkopíruje oprávku (patch) do schránky.	
-:guilabel:`Edit`
+:guilabel:`Edit Local`
 	  Otevře soubor ve vhodném textovém editoru.
-:guilabel:`Open`
+:guilabel:`Open Local`
 	  Otevře soubor v nastaveném textovém editoru.
+:guilabel:`Explore Local`
+	  Otevře repozitórium pro aktuální revizi.	  
 :guilabel:`Copy Path`
 	  Zkopíruje cestu k souboru do schránky.	
 :guilabel:`Vrátit (revert)...`
-	  Otevře okno, kde lze diferencovaně rozhodnout o zrušení změn
-	  lokálního souboru (souboru pracovního adresáře).
+	  Otevře okno, kde lze diferencovaně rozhodnout o zrušení změn lokálního souboru (souboru pracovního adresáře).
 :guilabel:`Historie souboru ...`
 	  Otevře okno se zobrazením změn v jednotlivých revizích.	  
-:guilabel:`Zapomenout`
+:guilabel:`Zapomenout` (forget)
 	  Vyřadit soubor ze sledování.
 :guilabel:`Označit / Odznačit`
 	  Vložit / odebrat zatržítko.	
-:guilabel:`Copy ...`
+:guilabel:`Kopírovat...`
 	  Kopírovat soubor do zadané destinace.
-:guilabel:`Rename ...`
+:guilabel:`Přejmenovat...`
 	  Přejmenovat soubor.	
 	
--- **jde-li o neznámé (?) soubory pracovního adresáře**:
+-- :strong:`jde-li o neznámé (?) soubory pracovního adresáře`:
 
-V tomto případě se nabídka skládá z Edit, Open, Copy Path, Add, Označit, Odznačit, plus
+V tomto případě se nabídka skládá z Edit Local, Open Local, Explore Local, Copy Path, Add, Označit, Odznačit, Seznam stavů  - plus:
 
-:guilabel:`Detect Renames ...`
+:guilabel:`Změna názvu ...`
 	  Otevře okno pro nalezení přejmenovaných souborů.
-:guilabel:`Detect Renames ...`
+:guilabel:`Ignorovat ...`
 	  Otevře seznam ignorovaných souborů.
-:guilabel:`Delete Unversioned ...`
+:guilabel:`Smazat neverzované...`
 	  Smazat neverzované soubory.			
      
 
@@ -444,10 +481,10 @@ Příklady::
    issue.regex = \bissue(\d+)\b
    issue.link = http://bz.selenic.com/show_bug.cgi?id={1}
 
-Konzola Output Log
-------------------
+Výstupní konzola
+----------------
 
-V konzole, vestavěné do přemístitelného panelu Output Log, lze spouštět příkazy Mercurialu (hg), TortoiseHg (thg), řadu speciálních příkazů a omezený počet "shell commands". Příkazy se vždy provedou v kořenovém adresáři aktuálního repozitáře (repozitóriu). Prompt je aktualizován pro udržení souvislosti.
+V konzole, vestavěné do přemístitelného panelu Output Log, lze spouštět příkazy Mercurialu (hg), TortoiseHg (thg), řadu speciálních příkazů a omezený počet příkazů konzoly. Příkazy se vždy provedou v kořenovém adresáři aktuálního repozitáře (repozitóriu). Prompt je aktualizován pro udržení souvislosti.
 
 Začíná-li příkaz 'hg', je proveden v prováděcím prostředí TortoiseHg; což znamená, že výstup je poslán do Output Log ale požadavky na vstupy jsou obslouženy dialogovými okny.
 

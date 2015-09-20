@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-05-12 18:48-0300\n"
-"PO-Revision-Date: 2015-05-12 23:30+0000\n"
+"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"PO-Revision-Date: 2015-09-02 04:08+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2015-05-13 05:14+0000\n"
-"X-Generator: Launchpad (build 17493)\n"
+"X-Launchpad-Export-Date: 2015-09-02 05:15+0000\n"
+"X-Generator: Launchpad (build 17706)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servidor de Ícones Sobrepostos do TortoiseHg"
@@ -3902,6 +3902,9 @@ msgstr "Caminho"
 msgid "C&hoose Log Columns..."
 msgstr "Escol&her Colunas do Log..."
 
+msgid "&Resize Columns"
+msgstr "&Redimensionar Colunas"
+
 #, python-format
 msgid "Goto ancestor of %s and %s"
 msgstr "Ir para o ancestral de %s e %s"
@@ -4075,9 +4078,6 @@ msgstr "&Update... (Obter Revisão)"
 msgid "Bro&wse at Revision"
 msgstr "Ver na &Revisão"
 
-msgid "&Similar Revisions..."
-msgstr "Revisões &Similares..."
-
 msgid "&Merge with Local..."
 msgstr "&Mesclar com Local..."
 
@@ -4198,9 +4198,6 @@ msgstr "Rebasear..."
 msgid "Goto common ancestor"
 msgstr "Ir para ancestral comum"
 
-msgid "Similar revisions..."
-msgstr "Revisões similares..."
-
 msgid "Graft Selected to local..."
 msgstr "Enxertar Selecionadas na revisão local..."
 
@@ -4303,6 +4300,21 @@ msgstr "Patches exportados"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d patches foram exportados para:<p><a href=\"file:///%s\">%s</a>"
+
+msgid "Filter b&y"
+msgstr "Filtrar &por"
+
+msgid "&Ancestors"
+msgstr "&Ancestrais"
+
+msgid "A&uthor"
+msgstr "A&utor"
+
+msgid "&Branch"
+msgstr "&Ramo"
+
+msgid "&More Options..."
+msgstr "&Mais Opções..."
 
 msgid "Unable to merge"
 msgstr "Não é possível mesclar"
@@ -5357,7 +5369,7 @@ msgstr "remover o cache de estado"
 msgid "show the contents of the status cache (no update)"
 msgstr "mostrar o conteúdo do estado do cache (sem atualizar)"
 
-msgid "udpate all repos in current dir"
+msgid "update all repos in current dir"
 msgstr "atualizar todos os repos no dir atual"
 
 msgid "thg thgstatus [OPTION]"
@@ -5599,7 +5611,7 @@ msgstr ""
 "padrão é False."
 
 msgid "Monitor Repo Changes"
-msgstr "Monitoração de Mudanças em Repositórios"
+msgstr "Monitoração de Mudanças<br>em Repositórios"
 
 msgid ""
 "Specify the target filesystem where TortoiseHg monitors changes. Default: "
@@ -5642,7 +5654,7 @@ msgstr ""
 "apenas o nome do diretório raiz. Padrão: False"
 
 msgid "Auto-resolve merges"
-msgstr "Resolver mesclagens automaticamente"
+msgstr "Resolver mesclagens<br>automaticamente"
 
 msgid ""
 "Indicates whether TortoiseHg should attempt to automatically resolve changes "
@@ -6004,7 +6016,7 @@ msgstr ""
 "forçadas a <i>repositórios locais</i>.<br>Padrão: auto"
 
 msgid "Confirm adding unknown files"
-msgstr "Confirmar adição de arquivos desconhecidos"
+msgstr "Confirmar adição de<br>arquivos desconhecidos"
 
 msgid ""
 "Determines if TortoiseHg should show a confirmation dialog before adding new "
@@ -7595,8 +7607,8 @@ msgstr ""
 "Opcional. Arquivo de chaves de certificado de cliente, em formato PEM.\n"
 "Variáveis de ambiente no nome do arquivo serão expandidas."
 
-msgid "User Certificate Key File"
-msgstr "Arquivo de Chaves de Certificado do Usuário"
+msgid "User Certificate Key"
+msgstr "Chave do Certificado de Usuário"
 
 msgid ""
 "Optional. PEM encoded client certificate chain file. Environment variables\n"
@@ -7605,11 +7617,23 @@ msgstr ""
 "Opcional. Arquivo de cadeia de certificados de cliente, em formato PEM.\n"
 "Variáveis de ambiente no nome do arquivo serão expandidas."
 
-msgid "User Certificate Chain File"
-msgstr "Arquivo de Cadeia de Certificados de Usuário"
+msgid "User Certificate Chain"
+msgstr "Cadeia do Certificado de Usuário"
 
 msgid "Certificate Query Error"
 msgstr "Erro de Consulta de Certificado"
+
+msgid "Select User Certificate Key File"
+msgstr "Selecione o Arquivo da Chave do Certificado de Usuário"
+
+msgid "PEM files (*.pem *.key)"
+msgstr "Arquivos PEM (*.pem *.key)"
+
+msgid "Select User Certificate Chain File"
+msgstr "Selecione o Arquivo de Cadeia do Certificado de Usuário"
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr "Arquivos PEM (*.pem *.crt *.cer)"
 
 msgid "Unable to save authentication"
 msgstr "Não é possível gravar a autenticação"
@@ -8267,10 +8291,6 @@ msgstr "[ORIGEM]"
 #, python-format
 msgid "unsupported URL: %s"
 msgstr "URL não suportada: %s"
-
-#, python-format
-msgid "host fingerprint for %s cannot be obtained (Python too old)"
-msgstr "host fingerprint para %s não pode ser obtida (Python muito antigo)"
 
 #, python-format
 msgid "%s certificate error: no certificate received"
@@ -9144,6 +9164,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 
 #~ msgid "revisions to compare"
 #~ msgstr "revisões para comparar"
+
+#~ msgid "udpate all repos in current dir"
+#~ msgstr "atualizar todos os repos no dir atual"
 
 #~ msgid "hgtk thgstatus [OPTION]"
 #~ msgstr "hgtk thgstatus [OPÇÃO]"
@@ -11763,6 +11786,12 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ msgid "Merge "
 #~ msgstr "Mesclagem "
 
+#~ msgid "User Certificate Key File"
+#~ msgstr "Arquivo de Chaves de Certificado do Usuário"
+
+#~ msgid "User Certificate Chain File"
+#~ msgstr "Arquivo de Cadeia de Certificados de Usuário"
+
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "trecho %d já aplicado na linha %d (indistinção %d)\n"
 
@@ -11954,3 +11983,12 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ "Nenhum link para um tíquete foi encontrado na mensagem de consolidação. A "
 #~ "mensagem deve conter um link para um tíquete. Configure isto na seção de "
 #~ "configuração 'Issue'."
+
+#~ msgid "Similar revisions..."
+#~ msgstr "Revisões similares..."
+
+#~ msgid "&Similar Revisions..."
+#~ msgstr "Revisões &Similares..."
+
+#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
+#~ msgstr "host fingerprint para %s não pode ser obtida (Python muito antigo)"

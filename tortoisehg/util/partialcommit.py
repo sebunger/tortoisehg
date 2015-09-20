@@ -21,18 +21,12 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         fp = open(patchfilename, 'rb')
         store = patch.filestore()
         try:
-            try:
-                # patch files in tmp directory
-                try:
-                    patch.patchrepo(ui, repo, repo['.'], store, fp, 1,
-                                    prefix='')
-                except TypeError:
-                    # hg<3.4 (76225ab5a5da)
-                    patch.patchrepo(ui, repo, repo['.'], store, fp, 1)
-                store.keys = set(store.files.keys() + store.data.keys())
-                repo._filestore = store
-            except patch.PatchError, e:
-                raise util.Abort(str(e))
+            # patch files in tmp directory
+            patch.patchrepo(ui, repo, repo['.'], store, fp, 1, prefix='')
+            store.keys = set(store.files.keys() + store.data.keys())
+            repo._filestore = store
+        except patch.PatchError, e:
+            raise util.Abort(str(e))
         finally:
             fp.close()
 
