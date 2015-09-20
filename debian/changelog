@@ -1,3 +1,11 @@
+tortoisehg (3.5.1-1) unstable; urgency=low
+
+  * Imported Upstream version 3.5.1
+  * Update dependency on mercurial (3.4 or 3.5).
+  * Update symlink to thg logo for desktop file.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 20 Sep 2015 12:15:00 -0700
+
 tortoisehg (3.4.1-1) unstable; urgency=low
 
   * Imported Upstream version 3.4.1
