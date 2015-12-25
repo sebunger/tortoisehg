@@ -66,7 +66,7 @@ class ProgressMonitor(QWidget):
 
 
 class ThgStatusBar(QStatusBar):
-    linkActivated = pyqtSignal(QString)
+    linkActivated = pyqtSignal(str)
 
     def __init__(self, parent=None):
         QStatusBar.__init__(self, parent)
@@ -80,7 +80,7 @@ class ThgStatusBar(QStatusBar):
         self.setStyleSheet('QStatusBar::item { border: none }')
         self._updateBusyProgress()
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def showMessage(self, ustr, error=False):
         self.lbl.setText(ustr)
         if error:
@@ -110,7 +110,7 @@ class ThgStatusBar(QStatusBar):
         for key in keys:
             self._removeProgress(key)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def clearRepoProgress(self, root):
         root = unicode(root)
         keys = [k for k in self.topics if k[0] == root]
@@ -125,7 +125,7 @@ class ThgStatusBar(QStatusBar):
         self._updateBusyProgress()
 
     # TODO: migrate to setProgress() API
-    @pyqtSlot(QString, object, QString, QString, object)
+    @pyqtSlot(str, object, str, str, object)
     def progress(self, topic, pos, item, unit, total, root=None):
         'Progress signal received from repowidget'
         # topic is current operation
@@ -164,7 +164,7 @@ class ThgStatusBar(QStatusBar):
     def setProgress(self, progress):
         self.progress(*progress)
 
-    @pyqtSlot(unicode, cmdcore.ProgressMessage)
+    @pyqtSlot(str, cmdcore.ProgressMessage)
     def setRepoProgress(self, root, progress):
         self.progress(*(progress + (unicode(root),)))
 
@@ -213,7 +213,7 @@ class LogWidget(qscilib.ScintillaCompat):
             # NOTE: self.setMarkerForegroundColor() doesn't take effect,
             # because it's a *Background* marker.
 
-    @pyqtSlot(unicode, unicode)
+    @pyqtSlot(str, str)
     def appendLog(self, msg, label):
         """Append log text to the last line; scrolls down to there"""
         self.append(msg)
@@ -333,7 +333,7 @@ class CmdSessionControlWidget(QWidget):
     """Helper widget to implement dialog to run Mercurial commands"""
 
     finished = pyqtSignal(int)
-    linkActivated = pyqtSignal(unicode)
+    linkActivated = pyqtSignal(str)
     logVisibilityChanged = pyqtSignal(bool)
 
     # this won't provide commandFinished signal because the client code

@@ -85,10 +85,10 @@ def openlocalurl(path):
     '''
 
     if isinstance(path, str):
-        path = QString(hglib.tounicode(path))
-    elif isinstance(path, unicode):
-        path = QString(path)
-    if os.name == 'nt' and path.startsWith('\\\\'):
+        path = hglib.tounicode(path)
+    else:
+        path = unicode(path)
+    if os.name == 'nt' and path.startswith('\\\\'):
         # network share, special handling because of qt bug 13359
         # see http://bugreports.qt.nokia.com/browse/QTBUG-13359
         qurl = QUrl()
@@ -596,9 +596,26 @@ def getcheckboxpixmap(state, bgcolor, widget):
     style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
     return pix
 
+
+# On machines with a retina display running OSX (i.e. "darwin"), most icons are
+# too big because Qt4 does not support retina displays very well.
+# To fix that we let users force tortoishg to use smaller icons by setting a
+# THG_RETINA environment variable to True (or any value that mercurial parses
+# as True.
+IS_RETINA = False
+if sys.platform == 'darwin':
+    IS_RETINA = util.parsebool(os.environ.get('THG_RETINA', '0'))
+
+
+def _fixIconSizeForRetinaDisplay(s):
+    if IS_RETINA and s > 1:
+        s /= 2
+    return s
+
 def smallIconSize():
     style = QApplication.style()
     s = style.pixelMetric(QStyle.PM_SmallIconSize)
+    s = _fixIconSizeForRetinaDisplay(s)
     return QSize(s, s)
 
 def toolBarIconSize():
@@ -609,7 +626,14 @@ def toolBarIconSize():
     else:
         style = QApplication.style()
     s = style.pixelMetric(QStyle.PM_ToolBarIconSize)
+    s = _fixIconSizeForRetinaDisplay(s)
     return QSize(s, s)
+
+def treeviewRetinaIconSize():
+    return QSize(16, 16)
+
+def barRetinaIconSize():
+    return QSize(10, 10)
 
 class ThgFont(QObject):
     changed = pyqtSignal(QFont)

@@ -292,7 +292,7 @@ class SummaryPage(BasePage):
         self.completeChanged.emit()
         self.refreshFinished.emit()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def onLinkActivated(self, cmd):
         if cmd == 'skip':
             self.wizard().next()
@@ -398,7 +398,7 @@ class MergePage(BasePage):
                 self.tryAutoAdvance(True)
             self.completeChanged.emit()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def onLinkActivated(self, cmd):
         if cmd == 'resolve':
             dlg = resolve.ResolveDialog(self._repoagent, self)
@@ -542,7 +542,7 @@ class CommitPage(BasePage):
         self.msgEntry.setText(commit.mergecommitmessage(self.repo))
         self.msgEntry.moveCursorToEnd()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def onLinkActivated(self, cmd):
         if cmd == 'view':
             dlg = status.StatusDialog(self._repoagent, [], {}, self)

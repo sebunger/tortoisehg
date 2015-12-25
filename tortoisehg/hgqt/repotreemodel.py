@@ -180,7 +180,7 @@ class RepoTreeModel(QAbstractItemModel):
         if role == Qt.DisplayRole:
             if orientation == Qt.Horizontal:
                 if section == 1:
-                    return QString(_('Path'))
+                    return _('Path')
         return QVariant()
 
     def flags(self, index):
@@ -206,7 +206,7 @@ class RepoTreeModel(QAbstractItemModel):
         return res
 
     def mimeTypes(self):
-        return QStringList([repoRegMimeType, repoExternalMimeType])
+        return [repoRegMimeType, repoExternalMimeType]
 
     def mimeData(self, indexes):
         i = indexes[0]
@@ -218,7 +218,7 @@ class RepoTreeModel(QAbstractItemModel):
         if isinstance(item, repotreeitem.RepoItem):
             d.setUrls([QUrl.fromLocalFile(hglib.tounicode(item.rootpath()))])
         else:
-            d.setText(QString(item.name))
+            d.setText(item.name)
         return d
 
     def dropMimeData(self, data, action, row, column, parent):
@@ -408,7 +408,7 @@ class RepoTreeModel(QAbstractItemModel):
                 else:
                     grp.updateCommonPath('')
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _updateShortName(self, uroot):
         repoagent = self._repomanager.repoAgent(uroot)
         it = self.getRepoItem(hglib.fromunicode(uroot))
@@ -416,14 +416,14 @@ class RepoTreeModel(QAbstractItemModel):
             it.setShortName(repoagent.shortName())
             self._emitItemDataChanged(it)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _updateBaseNode(self, uroot):
         repo = self._repomanager.repoAgent(uroot).rawRepo()
         it = self.getRepoItem(hglib.fromunicode(uroot))
         if it:
             it.setBaseNode(hglib.repoidnode(repo))
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _updateItem(self, uroot):
         self._updateShortName(uroot)
         self._updateBaseNode(uroot)

@@ -28,7 +28,7 @@ class CompressDialog(QDialog):
 
         style = csinfo.panelstyle(selectable=True)
 
-        srcb = QGroupBox( _('Compress changesets up to and including'))
+        srcb = QGroupBox(_('Compress changesets up to and including'))
         srcb.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         srcb.setLayout(QVBoxLayout())
         srcb.layout().setContentsMargins(*(2,)*4)
@@ -36,7 +36,7 @@ class CompressDialog(QDialog):
         srcb.layout().addWidget(source)
         self.layout().addWidget(srcb)
 
-        destb = QGroupBox( _('Onto destination'))
+        destb = QGroupBox(_('Onto destination'))
         destb.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         destb.setLayout(QVBoxLayout())
         destb.layout().setContentsMargins(*(2,)*4)
@@ -73,9 +73,10 @@ class CompressDialog(QDialog):
     def _checkCompleted(self, clean):
         if not clean:
             self.compressbtn.setEnabled(False)
-            txt = _('Before compress, you must <a href="commit">'
-                    '<b>commit</b></a> or <a href="discard">'
-                    '<b>discard</b></a> changes.')
+            txt = _('Before compress, you must '
+                    '<a href="commit"><b>commit</b></a>, '
+                    '<a href="shelve"><b>shelve</b></a> to patch, '
+                    'or <a href="discard"><b>discard</b></a> changes.')
         else:
             self.compressbtn.setEnabled(True)
             txt = _('You may continue the compress')
@@ -89,7 +90,8 @@ class CompressDialog(QDialog):
         sess.commandFinished.connect(self.commandFinished)
         self.compressbtn.setEnabled(sess.isFinished())
 
-    def commandFinished(self, ret):
+    @pyqtSlot()
+    def commandFinished(self):
         self._cmdcontrol.showStatusMessage(_('Changes have been moved, you '
                                              'must now commit'))
         self.compressbtn.setText(_('Commit', 'action button'))

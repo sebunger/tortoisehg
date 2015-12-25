@@ -20,10 +20,10 @@ from tortoisehg.util.i18n import _
 class _LogWidgetForConsole(cmdui.LogWidget):
     """Wrapped LogWidget for ConsoleWidget"""
 
-    returnPressed = pyqtSignal(unicode)
+    returnPressed = pyqtSignal(str)
     """Return key pressed when cursor is on prompt line"""
-    historyRequested = pyqtSignal(unicode, int)  # keyword, direction
-    completeRequested = pyqtSignal(unicode)
+    historyRequested = pyqtSignal(str, int)  # keyword, direction
+    completeRequested = pyqtSignal(str)
 
     _prompt = '% '
 
@@ -288,7 +288,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
         for name in ('openPrompt', 'closePrompt', 'clear'):
             setattr(self, name, getattr(self._logwidget, name))
 
-    @pyqtSlot(unicode, int)
+    @pyqtSlot(str, int)
     def historySearch(self, text, direction):
         cmdline, idx = _searchhistory(self._commandHistory, unicode(text),
                                       direction, self._commandIdx)
@@ -350,7 +350,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
                     matches = [basecmdline % opt[1] for opt in cmdopts]
         return sorted(matches)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def completeCommandText(self, text):
         """Show the list of history or known commands matching the search text
 
@@ -417,7 +417,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
         text = hglib.tounicode(self._extproc.readAllStandardError().data())
         self._logwidget.appendLog(text, 'ui.warning')
 
-    @pyqtSlot(unicode, unicode)
+    @pyqtSlot(str, str)
     def appendLog(self, msg, label):
         """Append log text to the last line while keeping the prompt line"""
         self._logwidget.clearPrompt()
@@ -446,7 +446,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
         else:
             self.openPrompt()
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _runcommand(self, cmdline):
         cmdline = unicode(cmdline)
         self._commandIdx = 0
@@ -564,14 +564,14 @@ class LogDockWidget(QDockWidget):
         self._consoles.addWidget(w)
         return w
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _createConsoleFor(self, root):
         root = unicode(root)
         repoagent = self._repomanager.repoAgent(root)
         assert repoagent
         self._createConsole(repoagent)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _destroyConsoleFor(self, root):
         root = unicode(root)
         w = self._findConsoleFor(root)

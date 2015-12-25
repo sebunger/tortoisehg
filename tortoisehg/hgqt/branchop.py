@@ -5,8 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
@@ -74,14 +72,13 @@ class BranchOpDialog(QDialog):
             elif oldbranchop == False:
                 closebranch.setChecked(True)
             else:
-                assert type(oldbranchop) == QString
                 bc = branchCombo
-                names = [bc.itemText(i) for i in xrange(bc.count())]
-                if oldbranchop in names:
-                    bc.setCurrentIndex(names.index(oldbranchop))
+                i = bc.findText(oldbranchop)
+                if i >= 0:
+                    bc.setCurrentIndex(i)
                 else:
                     bc.addItem(oldbranchop)
-                    bc.setCurrentIndex(len(names))
+                    bc.setCurrentIndex(bc.count() - 1)
                 newbranch.setChecked(True)
             self.closebranch = closebranch
 
@@ -101,11 +98,11 @@ class BranchOpDialog(QDialog):
         '''Branch operation is one of:
             None  - leave wctx branch name untouched
             False - close current branch
-            QString - open new named branch
+            unicode - open new named branch
         '''
         if self.branchCombo.isEnabled():
             # branch name cannot start/end with whitespace (see dirstate._branch)
-            self.branchop = self.branchCombo.currentText().trimmed()
+            self.branchop = unicode(self.branchCombo.currentText()).strip()
         elif self.closebranch.isChecked():
             self.branchop = False
         else:

@@ -285,7 +285,7 @@ class HgignoreDialog(QDialog):
                 item = self.unknownlist.item(i)
                 self.unknownlist.setItemSelected(item, True)
                 self.unknownlist.setCurrentItem(item)
-                self.le.setText(QString(u))
+                self.le.setText(u)
         self.pats = []
 
     def writeIgnoreFile(self):

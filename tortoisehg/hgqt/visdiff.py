@@ -435,7 +435,7 @@ class FileSelectionDialog(QDialog):
             combo.setCurrentIndex(defrow)
 
             list.currentRowChanged.connect(self.updateToolSelection)
-            combo.currentIndexChanged['QString'].connect(self.onToolSelected)
+            combo.currentIndexChanged[str].connect(self.onToolSelected)
             self.toolCombo = combo
 
         BB = QDialogButtonBox
@@ -480,10 +480,10 @@ class FileSelectionDialog(QDialog):
         mod_a, add_a, rem_a = sa
         for f in sorted(mod_a | add_a | rem_a):
             status = get_status(f, mod_a, add_a, rem_a)
-            row = QString('%s %s' % (status, hglib.tounicode(f)))
+            row = '%s %s' % (status, hglib.tounicode(f))
             self.list.addItem(row)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def onToolSelected(self, tool):
         'user selected a tool from the tool combo'
         tool = hglib.fromunicode(tool)

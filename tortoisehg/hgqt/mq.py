@@ -19,19 +19,22 @@ from tortoisehg.hgqt import commit, qdelete, qfold, qrename, rejects
 
 def _checkForRejects(repo, rawoutput, parent=None):
     """Parse output of qpush/qpop to resolve hunk failure manually"""
-    rejre = re.compile('saving rejects to file (.*).rej')
-    rejfiles = [m.group(1) for m in rejre.finditer(rawoutput)
-                if os.path.exists(repo.wjoin(m.group(1)))]
-    for wfile in rejfiles:
+    rejre = re.compile(r'saving rejects to file (.*)\.rej')
+    rejfiles = dict((m.group(1), False) for m in rejre.finditer(rawoutput))
+    for wfile in sorted(rejfiles):
+        if not os.path.exists(repo.wjoin(wfile)):
+            continue
         ufile = hglib.tounicode(wfile)
         if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
                                 _('%s had rejected chunks, edit patched '
                                   'file together with rejects?') % ufile,
                                 parent=parent):
             dlg = rejects.RejectsDialog(repo.ui, repo.wjoin(wfile), parent)
-            dlg.exec_()
+            r = dlg.exec_()
+            rejfiles[wfile] = (r == QDialog.Accepted)
 
-    return len(rejfiles)
+    # empty rejfiles means we failed to parse output message
+    return bool(rejfiles) and all(rejfiles.itervalues())
 
 class QueueManagementActions(QObject):
     """Container for patch queue management actions"""
@@ -261,6 +264,9 @@ class PatchQueueActions(QObject):
         opts['keep_changes'] = self._opts['keep_changes']
         return self._runCommand('qpop', [patch], opts)
 
+    def finishRevision(self, rev):
+        return self._runCommand('qfinish', ['qbase::%s' % rev], {})
+
     def deletePatches(self, patches):
         dlg = qdelete.QDeleteDialog(patches, self.parent())
         if not dlg.exec_():
@@ -327,7 +333,7 @@ class PatchQueueActions(QObject):
         if ret == 2 and self._repoagent:
             repo = self._repoagent.rawRepo()
             output = hglib.fromunicode(self._cmdsession.warningString())
-            if _checkForRejects(repo, output, self.parent()) > 0:
+            if _checkForRejects(repo, output, self.parent()):
                 ret = 0  # no further error dialog
         if ret != 0:
             cmdui.errorMessageBox(self._cmdsession, self.parent())
@@ -475,6 +481,13 @@ class PatchQueueModel(QAbstractListModel):
                                guards and ', '.join(guards) or _('no guards'),
                                ctx.longsummary())
 
+    def topAppliedIndex(self, column=0):
+        """Index of the last applied, i.e. qtip, patch"""
+        for row, patch in enumerate(self._series):
+            if self._statusmap.get(patch) == 'applied':
+                return self.index(row, column)
+        return QModelIndex()
+
     def mimeTypes(self):
         return ['application/vnd.thg.mq.series', 'text/uri-list']
 
@@ -515,7 +528,7 @@ class PatchQueueModel(QAbstractListModel):
 
 
 class MQPatchesWidget(QDockWidget):
-    patchSelected = pyqtSignal(unicode)
+    patchSelected = pyqtSignal(str)
 
     def __init__(self, parent):
         QDockWidget.__init__(self, parent)
@@ -532,7 +545,7 @@ class MQPatchesWidget(QDockWidget):
         w.setLayout(mainlayout)
         self.setWidget(w)
 
-        self.patchActions = PatchQueueActions(self)
+        self._patchActions = PatchQueueActions(self)
 
         # top toolbar
         w = QWidget()
@@ -542,92 +555,99 @@ class MQPatchesWidget(QDockWidget):
         mainlayout.addWidget(w)
 
         # TODO: move QAction instances to PatchQueueActions
-        self.qpushAllAct = a = QAction(
-            qtlib.geticon('hg-qpush-all'), _('Push all', 'MQ QPush'), self)
-        a.setToolTip(_('Apply all patches'))
-        self.qpushAct = a = QAction(
+        self._qpushAct = a = QAction(
             qtlib.geticon('hg-qpush'), _('Push', 'MQ QPush'), self)
         a.setToolTip(_('Apply one patch'))
-        self.setGuardsAct = a = QAction(
-            qtlib.geticon('hg-qguard'), _('Set &Guards...'), self)
-        a.setToolTip(_('Configure guards for selected patch'))
-        self.qdeleteAct = a = QAction(
-            qtlib.geticon('hg-qdelete'), _('&Delete Patches...'), self)
-        a.setToolTip(_('Delete selected patches'))
-        self.qpopAct = a = QAction(
+        self._qpushAllAct = a = QAction(
+            qtlib.geticon('hg-qpush-all'), _('Push all', 'MQ QPush'), self)
+        a.setToolTip(_('Apply all patches'))
+        self._qpopAct = a = QAction(
             qtlib.geticon('hg-qpop'), _('Pop'), self)
         a.setToolTip(_('Unapply one patch'))
-        self.qpopAllAct = a = QAction(
+        self._qpopAllAct = a = QAction(
             qtlib.geticon('hg-qpop-all'), _('Pop all'), self)
         a.setToolTip(_('Unapply all patches'))
-        self.qrenameAct = QAction(_('Re&name Patch...'), self)
-        self.qtbar = tbar = QToolBar(_('Patch Queue Actions Toolbar'))
+        self._qgotoAct = QAction(
+            qtlib.geticon('hg-qgoto'), _('Go &to Patch'), self)
+        self._qfinishAct = a = QAction(
+            qtlib.geticon('qfinish'), _('&Finish Patch'), self)
+        a.setToolTip(_('Move applied patches into repository history'))
+        self._qdeleteAct = a = QAction(
+            qtlib.geticon('hg-qdelete'), _('&Delete Patches...'), self)
+        a.setToolTip(_('Delete selected patches'))
+        self._qrenameAct = QAction(_('Re&name Patch...'), self)
+        self._setGuardsAct = a = QAction(
+            qtlib.geticon('hg-qguard'), _('Set &Guards...'), self)
+        a.setToolTip(_('Configure guards for selected patch'))
+        tbar = QToolBar(_('Patch Queue Actions Toolbar'), self)
         tbar.setIconSize(qtlib.smallIconSize())
         tbarhbox.addWidget(tbar)
-        tbar.addAction(self.qpushAct)
-        tbar.addAction(self.qpushAllAct)
+        tbar.addAction(self._qpushAct)
+        tbar.addAction(self._qpushAllAct)
         tbar.addSeparator()
-        tbar.addAction(self.qpopAct)
-        tbar.addAction(self.qpopAllAct)
+        tbar.addAction(self._qpopAct)
+        tbar.addAction(self._qpopAllAct)
         tbar.addSeparator()
-        tbar.addAction(self.qdeleteAct)
+        tbar.addAction(self._qfinishAct)
+        tbar.addAction(self._qdeleteAct)
         tbar.addSeparator()
-        tbar.addAction(self.setGuardsAct)
+        tbar.addAction(self._setGuardsAct)
 
-        self.queueFrame = w = QFrame()
+        self._queueFrame = w = QFrame()
         mainlayout.addWidget(w)
 
         # Patch Queue Frame
         layout = QVBoxLayout()
         layout.setSpacing(5)
         layout.setContentsMargins(0, 0, 0, 0)
-        self.queueFrame.setLayout(layout)
+        self._queueFrame.setLayout(layout)
 
         qqueuehbox = QHBoxLayout()
         qqueuehbox.setSpacing(5)
         layout.addLayout(qqueuehbox)
-        self.qqueueComboWidget = QComboBox(self)
-        qqueuehbox.addWidget(self.qqueueComboWidget, 1)
-        self.qqueueConfigBtn = QToolButton(self)
-        self.qqueueConfigBtn.setText('...')
-        self.qqueueConfigBtn.setPopupMode(QToolButton.InstantPopup)
-        qqueuehbox.addWidget(self.qqueueConfigBtn)
+        self._qqueueComboWidget = QComboBox(self)
+        qqueuehbox.addWidget(self._qqueueComboWidget, 1)
+        self._qqueueConfigBtn = QToolButton(self)
+        self._qqueueConfigBtn.setText('...')
+        self._qqueueConfigBtn.setPopupMode(QToolButton.InstantPopup)
+        qqueuehbox.addWidget(self._qqueueConfigBtn)
 
-        self.qqueueActions = QueueManagementActions(self)
-        self.qqueueConfigBtn.setMenu(self.qqueueActions.createMenu(self))
+        self._qqueueActions = QueueManagementActions(self)
+        self._qqueueConfigBtn.setMenu(self._qqueueActions.createMenu(self))
 
-        self.queueListWidget = QListView(self)
-        self.queueListWidget.setDragDropMode(QAbstractItemView.InternalMove)
-        self.queueListWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.queueListWidget.setIconSize(qtlib.smallIconSize() * 0.75)
-        self.queueListWidget.setSelectionMode(
+        self._queueListWidget = QListView(self)
+        self._queueListWidget.setDragDropMode(QAbstractItemView.InternalMove)
+        self._queueListWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self._queueListWidget.setIconSize(qtlib.smallIconSize() * 0.75)
+        self._queueListWidget.setSelectionMode(
             QAbstractItemView.ExtendedSelection)
-        self.queueListWidget.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.queueListWidget.customContextMenuRequested.connect(
-            self.onMenuRequested)
-        layout.addWidget(self.queueListWidget, 1)
+        self._queueListWidget.setContextMenuPolicy(Qt.CustomContextMenu)
+        self._queueListWidget.customContextMenuRequested.connect(
+            self._onMenuRequested)
+        layout.addWidget(self._queueListWidget, 1)
 
         bbarhbox = QHBoxLayout()
         bbarhbox.setSpacing(5)
         layout.addLayout(bbarhbox)
-        self.guardSelBtn = QPushButton()
+        self._guardSelBtn = QPushButton()
         menu = QMenu(self)
-        menu.triggered.connect(self.onGuardSelectionChange)
-        self.guardSelBtn.setMenu(menu)
-        bbarhbox.addWidget(self.guardSelBtn)
+        menu.triggered.connect(self._onGuardSelectionChange)
+        self._guardSelBtn.setMenu(menu)
+        bbarhbox.addWidget(self._guardSelBtn)
 
-        self.qqueueComboWidget.activated[QString].connect(
-            self.onQQueueActivated)
+        self._qqueueComboWidget.activated[str].connect(self._onQQueueActivated)
 
-        self.queueListWidget.activated.connect(self.onGotoPatch)
+        self._queueListWidget.activated.connect(self._onGotoPatch)
 
-        self.qpushAllAct.triggered.connect(self.patchActions.pushAllPatches)
-        self.qpushAct.triggered[()].connect(self.patchActions.pushPatch)
-        self.qpopAllAct.triggered.connect(self.patchActions.popAllPatches)
-        self.qpopAct.triggered[()].connect(self.patchActions.popPatch)
-        self.setGuardsAct.triggered.connect(self.onGuardConfigure)
-        self.qdeleteAct.triggered.connect(self.onDelete)
-        self.qrenameAct.triggered.connect(self.onRenamePatch)
+        self._qpushAct.triggered[()].connect(self._patchActions.pushPatch)
+        self._qpushAllAct.triggered.connect(self._patchActions.pushAllPatches)
+        self._qpopAct.triggered[()].connect(self._patchActions.popPatch)
+        self._qpopAllAct.triggered.connect(self._patchActions.popAllPatches)
+        self._qgotoAct.triggered.connect(self._onGotoPatch)
+        self._qfinishAct.triggered.connect(self._onFinishRevision)
+        self._qdeleteAct.triggered.connect(self._onDelete)
+        self._qrenameAct.triggered.connect(self._onRenamePatch)
+        self._setGuardsAct.triggered.connect(self._onGuardConfigure)
 
         self.setAcceptDrops(True)
 
@@ -636,7 +656,7 @@ class MQPatchesWidget(QDockWidget):
         QTimer.singleShot(0, self.reload)
 
     @property
-    def repo(self):
+    def _repo(self):
         if self._repoagent:
             return self._repoagent.rawRepo()
 
@@ -648,45 +668,52 @@ class MQPatchesWidget(QDockWidget):
             self._repoagent = repoagent
             self._repoagent.repositoryChanged.connect(self.reload)
         self._changePatchQueueModel()
-        self.patchActions.setRepoAgent(repoagent)
-        self.qqueueActions.setRepoAgent(repoagent)
+        self._patchActions.setRepoAgent(repoagent)
+        self._qqueueActions.setRepoAgent(repoagent)
         QTimer.singleShot(0, self.reload)
 
     def _changePatchQueueModel(self):
-        oldmodel = self.queueListWidget.model()
+        oldmodel = self._queueListWidget.model()
         if self._repoagent:
             newmodel = PatchQueueModel(self._repoagent, self)
-            self.queueListWidget.setModel(newmodel)
+            self._queueListWidget.setModel(newmodel)
             newmodel.dataChanged.connect(self._updatePatchActions)
-            selmodel = self.queueListWidget.selectionModel()
-            selmodel.currentRowChanged.connect(self.onPatchSelected)
+            selmodel = self._queueListWidget.selectionModel()
+            selmodel.currentRowChanged.connect(self._onPatchSelected)
             selmodel.selectionChanged.connect(self._updatePatchActions)
             self._updatePatchActions()
         else:
-            self.queueListWidget.setModel(None)
+            self._queueListWidget.setModel(None)
         if oldmodel:
             oldmodel.setParent(None)
 
     @pyqtSlot()
-    def showActiveQueue(self):
-        combo = self.qqueueComboWidget
-        q = hglib.tounicode(self.repo.thgactivemqname)
+    def _showActiveQueue(self):
+        combo = self._qqueueComboWidget
+        q = hglib.tounicode(self._repo.thgactivemqname)
         index = combo.findText(q)
         combo.setCurrentIndex(index)
 
     @pyqtSlot(QPoint)
-    def onMenuRequested(self, pos):
+    def _onMenuRequested(self, pos):
         menu = QMenu(self)
-        menu.addAction(self.qdeleteAct)
-        menu.addAction(self.qrenameAct)
-        menu.addAction(self.setGuardsAct)
-        menu.exec_(self.queueListWidget.viewport().mapToGlobal(pos))
-        menu.setParent(None)
+        menu.addAction(self._qgotoAct)
+        menu.addAction(self._qfinishAct)
+        menu.addAction(self._qdeleteAct)
+        menu.addAction(self._qrenameAct)
+        menu.addAction(self._setGuardsAct)
+        menu.setAttribute(Qt.WA_DeleteOnClose)
+        menu.popup(self._queueListWidget.viewport().mapToGlobal(pos))
+
+    def _currentPatchName(self):
+        model = self._queueListWidget.model()
+        index = self._queueListWidget.currentIndex()
+        return model.patchName(index)
 
     @pyqtSlot()
-    def onGuardConfigure(self):
-        model = self.queueListWidget.model()
-        index = self.queueListWidget.currentIndex()
+    def _onGuardConfigure(self):
+        model = self._queueListWidget.model()
+        index = self._queueListWidget.currentIndex()
         patch = model.patchName(index)
         uguards = ' '.join(model.patchGuards(index))
         new, ok = qtlib.getTextInput(self,
@@ -695,63 +722,69 @@ class MQPatchesWidget(QDockWidget):
                       text=uguards)
         if not ok or new == uguards:
             return
-        self.patchActions.guardPatch(patch, unicode(new).split())
+        self._patchActions.guardPatch(patch, unicode(new).split())
 
     @pyqtSlot()
-    def onDelete(self):
-        model = self.queueListWidget.model()
-        selmodel = self.queueListWidget.selectionModel()
+    def _onDelete(self):
+        model = self._queueListWidget.model()
+        selmodel = self._queueListWidget.selectionModel()
         patches = map(model.patchName, selmodel.selectedRows())
-        self.patchActions.deletePatches(patches)
-
-    #@pyqtSlot(QModelIndex)
-    def onGotoPatch(self, index):
-        'Patch has been activated (return), issue qgoto'
-        patch = self.queueListWidget.model().patchName(index)
-        self.patchActions.gotoPatch(patch)
+        self._patchActions.deletePatches(patches)
 
     @pyqtSlot()
-    def onRenamePatch(self):
-        index = self.queueListWidget.currentIndex()
-        patch = self.queueListWidget.model().patchName(index)
-        self.patchActions.renamePatch(patch)
+    def _onGotoPatch(self):
+        patch = self._currentPatchName()
+        self._patchActions.gotoPatch(patch)
 
-    #@pyqtSlot(QModelIndex)
-    def onPatchSelected(self, index):
-        if index.isValid():
-            model = self.queueListWidget.model()
-            self.patchSelected.emit(model.patchName(index))
+    @pyqtSlot()
+    def _onFinishRevision(self):
+        patch = self._currentPatchName()
+        self._patchActions.finishRevision(patch)
+
+    @pyqtSlot()
+    def _onRenamePatch(self):
+        patch = self._currentPatchName()
+        self._patchActions.renamePatch(patch)
+
+    @pyqtSlot()
+    def _onPatchSelected(self):
+        patch = self._currentPatchName()
+        if patch:
+            self.patchSelected.emit(patch)
 
     @pyqtSlot()
     def _updatePatchActions(self):
-        model = self.queueListWidget.model()
-        selmodel = self.queueListWidget.selectionModel()
+        model = self._queueListWidget.model()
+        selmodel = self._queueListWidget.selectionModel()
 
         appliedcnt = model.appliedCount()
         seriescnt = model.rowCount()
-        self.qpushAllAct.setEnabled(seriescnt > appliedcnt)
-        self.qpushAct.setEnabled(seriescnt > appliedcnt)
-        self.qpopAct.setEnabled(appliedcnt > 0)
-        self.qpopAllAct.setEnabled(appliedcnt > 0)
+        self._qpushAllAct.setEnabled(seriescnt > appliedcnt)
+        self._qpushAct.setEnabled(seriescnt > appliedcnt)
+        self._qpopAct.setEnabled(appliedcnt > 0)
+        self._qpopAllAct.setEnabled(appliedcnt > 0)
 
         indexes = selmodel.selectedRows()
         anyapplied = any(model.isApplied(i) for i in indexes)
-        self.qdeleteAct.setEnabled(len(indexes) > 0 and not anyapplied)
-        self.setGuardsAct.setEnabled(len(indexes) == 1)
-        self.qrenameAct.setEnabled(len(indexes) == 1)
+        self._qgotoAct.setEnabled(len(indexes) == 1
+                                  and indexes[0] != model.topAppliedIndex())
+        self._qfinishAct.setEnabled(len(indexes) == 1 and anyapplied)
+        self._qdeleteAct.setEnabled(len(indexes) > 0 and not anyapplied)
+        self._setGuardsAct.setEnabled(len(indexes) == 1)
+        self._qrenameAct.setEnabled(len(indexes) == 1)
 
-    @pyqtSlot(QString)
-    def onQQueueActivated(self, text):
-        if text == hglib.tounicode(self.repo.thgactivemqname):
+    @pyqtSlot(str)
+    def _onQQueueActivated(self, text):
+        if text == hglib.tounicode(self._repo.thgactivemqname):
             return
 
         if qtlib.QuestionMsgBox(_('Confirm patch queue switch'),
                 _("Do you really want to activate patch queue '%s' ?") % text,
                 parent=self, defaultbutton=QMessageBox.No):
-            sess = self.qqueueActions.switchQueue(text)
-            sess.commandFinished.connect(self.showActiveQueue)
+            sess = self._qqueueActions.switchQueue(text)
+            sess.commandFinished.connect(self._showActiveQueue)
         else:
-            self.showActiveQueue()
+            self._showActiveQueue()
 
     @pyqtSlot()
     def reload(self):
@@ -759,56 +792,56 @@ class MQPatchesWidget(QDockWidget):
         if not self._repoagent:
             return
 
-        self.loadQQueues()
-        self.showActiveQueue()
+        self._loadQQueues()
+        self._showActiveQueue()
 
-        repo = self.repo
+        repo = self._repo
 
-        self.allguards = set()
+        self._allguards = set()
         for idx, patch in enumerate(repo.mq.series):
             patchguards = repo.mq.seriesguards[idx]
             if patchguards:
                 for guard in patchguards:
-                    self.allguards.add(guard[1:])
+                    self._allguards.add(guard[1:])
 
         for guard in repo.mq.active():
-            self.allguards.add(guard)
-        self.refreshSelectedGuards()
+            self._allguards.add(guard)
+        self._refreshSelectedGuards()
 
-        self.qqueueComboWidget.setEnabled(self.qqueueComboWidget.count() > 1)
+        self._qqueueComboWidget.setEnabled(self._qqueueComboWidget.count() > 1)
 
-    def loadQQueues(self):
-        repo = self.repo
-        combo = self.qqueueComboWidget
+    def _loadQQueues(self):
+        repo = self._repo
+        combo = self._qqueueComboWidget
         combo.clear()
         combo.addItems(hglib.getqqueues(repo))
 
-    def refreshSelectedGuards(self):
-        total = len(self.allguards)
-        count = len(self.repo.mq.active())
-        menu = self.guardSelBtn.menu()
+    def _refreshSelectedGuards(self):
+        total = len(self._allguards)
+        count = len(self._repo.mq.active())
+        menu = self._guardSelBtn.menu()
         menu.clear()
-        for guard in self.allguards:
+        for guard in self._allguards:
             a = menu.addAction(hglib.tounicode(guard))
             a.setCheckable(True)
-            a.setChecked(guard in self.repo.mq.active())
-        self.guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
-        self.guardSelBtn.setEnabled(bool(total))
+            a.setChecked(guard in self._repo.mq.active())
+        self._guardSelBtn.setText(_('Guards: %d/%d') % (count, total))
+        self._guardSelBtn.setEnabled(bool(total))
 
     @pyqtSlot(QAction)
-    def onGuardSelectionChange(self, action):
+    def _onGuardSelectionChange(self, action):
         guard = hglib.fromunicode(action.text())
-        newguards = self.repo.mq.active()[:]
+        newguards = self._repo.mq.active()[:]
         if action.isChecked():
             newguards.append(guard)
         elif guard in newguards:
             newguards.remove(guard)
-        self.patchActions.selectGuards(map(hglib.tounicode, newguards))
+        self._patchActions.selectGuards(map(hglib.tounicode, newguards))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.patchActions.abort()
-            self.qqueueActions.abort()
+            self._patchActions.abort()
+            self._qqueueActions.abort()
         else:
             return super(MQPatchesWidget, self).keyPressEvent(event)
 

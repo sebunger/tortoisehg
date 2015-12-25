@@ -18,7 +18,7 @@ from tortoisehg.hgqt import cslist, cmdcore, cmdui
 class PerforcePending(QDialog):
     'Dialog for selecting a revision'
 
-    showMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(str)
 
     def __init__(self, repoagent, pending, url, parent):
         QDialog.__init__(self, parent)
@@ -51,7 +51,7 @@ class PerforcePending(QDialog):
         layout.addWidget(bb)
         self.bb = bb
 
-        clcombo.activated[QString].connect(self.p4clActivated)
+        clcombo.activated[str].connect(self.p4clActivated)
         for changelist in self.pending:
             clcombo.addItem(hglib.tounicode(changelist))
         self.p4clActivated(clcombo.currentText())
@@ -61,7 +61,7 @@ class PerforcePending(QDialog):
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def p4clActivated(self, curcl):
         'User has selected a changelist, fill cslist'
         repo = self._repoagent.rawRepo()

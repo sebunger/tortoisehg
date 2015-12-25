@@ -91,8 +91,8 @@ def _tablebuilder(table):
 class FilectxActions(QObject):
     """Container for repository file actions"""
 
-    linkActivated = pyqtSignal(unicode)
-    filterRequested = pyqtSignal(QString)
+    linkActivated = pyqtSignal(str)
+    filterRequested = pyqtSignal(str)
     """Ask the repowidget to change its revset filter"""
     runCustomCommandRequested = pyqtSignal(str, list)
 

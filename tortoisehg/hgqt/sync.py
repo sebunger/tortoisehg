@@ -39,12 +39,12 @@ _extractnodeids = re.compile(r'^\s*([0-9a-f]{40})$', re.MULTILINE).findall
 class SyncWidget(QWidget, qtlib.TaskWidget):
     newCommand = pyqtSignal(cmdcore.CmdSession)
     outgoingNodes = pyqtSignal(object)
-    incomingBundle = pyqtSignal(QString, QString)
-    showMessage = pyqtSignal(unicode)
+    incomingBundle = pyqtSignal(str, str)
+    showMessage = pyqtSignal(str)
     pullCompleted = pyqtSignal()
     pushCompleted = pyqtSignal()
 
-    switchToRequest = pyqtSignal(QString)
+    switchToRequest = pyqtSignal(str)
 
     def __init__(self, repoagent, parent=None):
         QWidget.__init__(self, parent)
@@ -433,7 +433,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def canExit(self):
         return self._cmdsession.isFinished()
 
-    @pyqtSlot(QPoint, QString, QString, bool)
+    @pyqtSlot(QPoint, str, str, bool)
     def menuRequest(self, point, url, alias, editable):
         'menu event emitted by one of the two URL lists'
         if not self.cmenu:
@@ -971,7 +971,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             # the bundle, and let the user accept or reject them
             self.inclicked()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def removeAlias(self, alias):
         alias = hglib.fromunicode(alias)
         fn = self.repo.join('hgrc')
@@ -1460,8 +1460,8 @@ are expanded in the filename.'''))
 
 
 class PathsTree(QTreeView):
-    removeAlias = pyqtSignal(QString)
-    menuRequest = pyqtSignal(QPoint, QString, QString, bool)
+    removeAlias = pyqtSignal(str)
+    menuRequest = pyqtSignal(QPoint, str, str, bool)
 
     def __init__(self, parent, editable):
         QTreeView.__init__(self, parent)

@@ -290,7 +290,7 @@ class ManifestModel(QAbstractItemModel):
         """Return the current name filter"""
         return self._namefilter
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def setNameFilter(self, pattern):
         """Filter file name by partial match of glob pattern"""
         pattern = unicode(pattern)

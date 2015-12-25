@@ -101,7 +101,7 @@ class CmdWorker(QObject):
 
     serviceStateChanged = pyqtSignal(int)
     commandFinished = pyqtSignal(int)
-    outputReceived = pyqtSignal(unicode, unicode)
+    outputReceived = pyqtSignal(str, str)
     progressReceived = pyqtSignal(ProgressMessage)
 
     def serviceState(self):
@@ -514,8 +514,8 @@ class CmdSession(QObject):
     commandFinished = pyqtSignal(int)
     # in order to receive only notification messages of session state, use
     # "controlMessage"; otherwise use "outputReceived"
-    controlMessage = pyqtSignal(unicode)
-    outputReceived = pyqtSignal(unicode, unicode)
+    controlMessage = pyqtSignal(str)
+    outputReceived = pyqtSignal(str, str)
     progressReceived = pyqtSignal(ProgressMessage)
     readyRead = pyqtSignal()
 
@@ -681,7 +681,7 @@ class CmdSession(QObject):
         else:
             self._runNext()
 
-    @pyqtSlot(unicode, unicode)
+    @pyqtSlot(str, str)
     def _captureOutput(self, msg, label):
         if not label:
             return  # fast path
@@ -728,7 +728,7 @@ class CmdAgent(QObject):
     # Inactive session is not started by the agent, so agent.commandFinished
     # won't be emitted when waiting session is aborted.
     commandFinished = pyqtSignal(CmdSession)
-    outputReceived = pyqtSignal(unicode, unicode)
+    outputReceived = pyqtSignal(str, str)
     progressReceived = pyqtSignal(ProgressMessage)
 
     # isBusy() is False when the last commandFinished is emitted, but you
@@ -848,6 +848,6 @@ class CmdAgent(QObject):
         self.commandFinished.emit(sess)
         sess.setParent(None)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _forwardControlMessage(self, msg):
         self.outputReceived.emit(msg + '\n', 'control')

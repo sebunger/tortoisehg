@@ -5,8 +5,6 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciLexerMakefile
@@ -122,7 +120,7 @@ class MessageEntry(qscilib.Scintilla):
         self.summarylen = repo.summarylen
 
     def reflowBlock(self, line):
-        lines = self.text().split('\n', QString.KeepEmptyParts)
+        lines = unicode(self.text()).splitlines()
         if line >= len(lines):
             return None
         if not len(lines[line]) > 1:
@@ -158,11 +156,11 @@ class MessageEntry(qscilib.Scintilla):
 
         b = line
         while b and len(lines[b-1]) > 1:
-            linetext = unicode(lines[b].trimmed())
+            linetext = lines[b].strip()
             if istopboundary(linetext) or isanyboundary(linetext):
                 break
             if b >= 1:
-                nextlinetext = unicode(lines[b - 1].trimmed())
+                nextlinetext = lines[b - 1].strip()
                 if isbottomboundary(nextlinetext) \
                         or isanyboundary(nextlinetext):
                     break
@@ -170,10 +168,10 @@ class MessageEntry(qscilib.Scintilla):
 
         e = line
         while e+1 < len(lines) and len(lines[e+1]) > 1:
-            linetext = unicode(lines[e].trimmed())
+            linetext = lines[e].strip()
             if isbottomboundary(linetext) or isanyboundary(linetext):
                 break
-            nextlinetext =  unicode(lines[e+1].trimmed())
+            nextlinetext = lines[e + 1].strip()
             if isanyboundary(nextlinetext) or istopboundary(nextlinetext):
                 break
             e += 1
@@ -186,21 +184,21 @@ class MessageEntry(qscilib.Scintilla):
         curlinenum, curcol = self.getCursorPosition()
         if b <= curlinenum <= e:
             # insert a "marker" at the cursor position
-            group[curlinenum - b] = \
-                group[curlinenum - b].insert(curcol, MARKER)
-        firstlinetext = unicode(lines[b])
+            l = group[curlinenum - b]
+            group[curlinenum - b] = l[:curcol] + MARKER + l[curcol:]
+        firstlinetext = lines[b]
         if firstlinetext:
             indentcount = len(firstlinetext) - len(firstlinetext.lstrip())
             firstindent = firstlinetext[:indentcount]
         else:
             indentcount = 0
             firstindent = ''
-        group = QStringList([line.simplified() for line in group])
-        sentence = group.join(' ')
-        parts = sentence.split(' ', QString.SkipEmptyParts)
+        parts = []
+        for l in group:
+            parts.extend(l.split())
 
-        outlines = QStringList()
-        line = QStringList()
+        outlines = []
+        line = []
         partslen = indentcount - 1
         newcurlinenum, newcurcol = b, 0
         for part in parts:
@@ -208,27 +206,27 @@ class MessageEntry(qscilib.Scintilla):
                 # wherever the marker is found, that is where the cursor
                 # must be moved to after the reflow is done
                 newcurlinenum = b + len(outlines)
-                newcurcol = len(line.join(' ')) + 1 + part.indexOf(MARKER)
+                newcurcol = len(' '.join(line)) + 1 + part.index(MARKER)
                 part = part.replace(MARKER, '')
                 MARKER = None  # there is no need to search any more
                 if not part:
                     continue
             if partslen + len(line) + len(part) + 1 > self.summarylen:
                 if line:
-                    linetext = line.join(' ')
+                    linetext = ' '.join(line)
                     if len(outlines) == 0 and firstindent:
                         linetext = firstindent + linetext
                     outlines.append(linetext)
-                line, partslen = QStringList(), 0
+                line, partslen = [], 0
             line.append(part)
             partslen += len(part)
         if line:
-            outlines.append(line.join(' '))
+            outlines.append(' '.join(line))
 
         self.beginUndoAction()
         self.setSelection(b, 0, e+1, 0)
         self.removeSelectedText()
-        self.insertAt(outlines.join('\n')+'\n', b, 0)
+        self.insertAt('\n'.join(outlines) + '\n', b, 0)
         self.endUndoAction()
         # restore the cursor position
         self.setCursorPosition(newcurlinenum, newcurcol)

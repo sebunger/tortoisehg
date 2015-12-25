@@ -501,7 +501,7 @@ class QtRunner(QObject):
         self._workbench = workbench.Workbench(self._ui, self._repomanager)
         return self._workbench
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def openRepoInWorkbench(self, uroot):
         """Show the specified repository in Workbench; reuses the existing
         Workbench process"""

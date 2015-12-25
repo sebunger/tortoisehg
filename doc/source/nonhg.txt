@@ -112,14 +112,30 @@ conversions of Subversion repositories into Mercurial.
 
 *Installation*
 
-TortoiseHg Windows installers come with the python-svn bindings and
-hgsubversion. One only needs to enable the extension via the settings
-tool or manually::
+TortoiseHg Windows installers up to and including version 3.3.3 come
+with the python-svn bindings and hgsubversion included. Users of these
+versions can enable the hgsubversion extensions via the settings tool
+or manually::
 
 	[extensions]
 	hgsubversion =
 
 You can verify that worked by typing :command:`hg help hgsubversion`
+
+Beginning with release 3.4 of TortoiseHg, the subversion libraries and
+the Python 2.7 SWIG bindings for them have been removed from the
+TortoiseHg packages. This was done primarily because of security
+problems in the subversion DLLs that we as TortoiseHg maintainers have
+no control over, but also to avoid having to package a second complete
+revision control system (SVN) in every copy of TortoiseHg (and the
+major headaches these bindings have become).
+
+The python SWIG bindings are now provided as separate download.
+Instructions to download and use the python SWIG bindings is available
+at `Subversion bindings for Python 2.7`_.
+
+.. _Subversion bindings for Python 2.7:
+   https://bitbucket.org/tortoisehg/thg/wiki/libsvn
 
 See the hgsubversion wiki for details of use.  We recommend an
 hgsubversion version of at least 1.2.1 with Mercurial 1.8.

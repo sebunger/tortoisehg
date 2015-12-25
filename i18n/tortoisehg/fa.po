@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Persian <fa@li.org>\n"
-"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"POT-Creation-Date: 2015-11-01 17:40-0200\n"
 "PO-Revision-Date: 2010-04-05 13:42+0000\n"
 "Last-Translator: Persian <Unknown>\n"
 "Language-Team: Persian <fa@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-07-27 05:34+0000\n"
-"X-Generator: Launchpad (build 17628)\n"
+"X-Launchpad-Export-Date: 2015-11-02 05:13+0000\n"
+"X-Generator: Launchpad (build 17838)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -960,8 +960,9 @@ msgid "Compress - %s"
 msgstr ""
 
 msgid ""
-"Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
 
 msgid "You may continue the compress"
@@ -1844,8 +1845,9 @@ msgid "Graft changeset #%d of %d"
 msgstr ""
 
 msgid ""
-"Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
+"\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
+"changes."
 msgstr ""
 
 msgid "You may continue or start the graft"
@@ -2508,29 +2510,17 @@ msgid "Patch Queue"
 msgstr ""
 
 msgctxt "MQ QPush"
-msgid "Push all"
-msgstr ""
-
-msgid "Apply all patches"
-msgstr ""
-
-msgctxt "MQ QPush"
 msgid "Push"
 msgstr ""
 
 msgid "Apply one patch"
 msgstr ""
 
-msgid "Set &Guards..."
+msgctxt "MQ QPush"
+msgid "Push all"
 msgstr ""
 
-msgid "Configure guards for selected patch"
-msgstr ""
-
-msgid "&Delete Patches..."
-msgstr ""
-
-msgid "Delete selected patches"
+msgid "Apply all patches"
 msgstr ""
 
 msgid "Pop"
@@ -2545,7 +2535,28 @@ msgstr ""
 msgid "Unapply all patches"
 msgstr ""
 
+msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Finish Patch"
+msgstr ""
+
+msgid "Move applied patches into repository history"
+msgstr ""
+
+msgid "&Delete Patches..."
+msgstr ""
+
+msgid "Delete selected patches"
+msgstr ""
+
 msgid "Re&name Patch..."
+msgstr ""
+
+msgid "Set &Guards..."
+msgstr ""
+
+msgid "Configure guards for selected patch"
 msgstr ""
 
 msgid "Patch Queue Actions Toolbar"
@@ -3126,8 +3137,9 @@ msgid "Rebase - %s"
 msgstr ""
 
 msgid ""
-"Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before rebase, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
 
 msgid "You may continue the rebase"
@@ -3899,9 +3911,6 @@ msgstr ""
 msgid "Import to &MQ"
 msgstr ""
 
-msgid "&Finish Patch"
-msgstr ""
-
 msgid "MQ &Options"
 msgstr ""
 
@@ -4070,7 +4079,7 @@ msgstr ""
 msgid "Filter b&y"
 msgstr ""
 
-msgid "&Ancestors"
+msgid "&Ancestors and Descendants"
 msgstr ""
 
 msgid "A&uthor"

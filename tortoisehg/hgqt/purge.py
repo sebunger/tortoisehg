@@ -20,8 +20,8 @@ from PyQt4.QtGui import *
 
 class PurgeDialog(QDialog):
 
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    showMessage = pyqtSignal(QString)
+    progress = pyqtSignal(str, object, str, str, object)
+    showMessage = pyqtSignal(str)
 
     def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)
@@ -195,8 +195,8 @@ class PurgeDialog(QDialog):
             self.reject()
 
 class PurgeThread(QThread):
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    showMessage = pyqtSignal(QString)
+    progress = pyqtSignal(str, object, str, str, object)
+    showMessage = pyqtSignal(str)
 
     def __init__(self, repo, opts, parent):
         super(PurgeThread, self).__init__(parent)

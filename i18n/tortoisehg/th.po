@@ -1,34 +1,34 @@
-# Catalan translation for tortoisehg
-# Copyright (c) 2009 Rosetta Contributors and Canonical Ltd 2009
+# Thai translation for tortoisehg
+# Copyright (c) 2015 Rosetta Contributors and Canonical Ltd 2015
 # This file is distributed under the same license as the tortoisehg package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2009.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2015-11-01 17:40-0200\n"
-"PO-Revision-Date: 2011-03-07 18:36+0000\n"
-"Last-Translator: David Planella <david.planella@ubuntu.com>\n"
-"Language-Team: Catalan <ca@li.org>\n"
+"PO-Revision-Date: 2015-10-21 17:04+0000\n"
+"Last-Translator: Yanyong Kunok <Unknown>\n"
+"Language-Team: Thai <th@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-11-02 05:10+0000\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Launchpad-Export-Date: 2015-11-02 05:14+0000\n"
 "X-Generator: Launchpad (build 17838)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
 
 msgid "Exit"
-msgstr "Sortir"
+msgstr "ออก"
 
 msgid "hg lighthg"
 msgstr ""
 
 msgid "About"
-msgstr ""
+msgstr "เกี่ยวกับ"
 
 msgid "Copyright 2008-2015 Steve Borho and others"
 msgstr ""
@@ -37,14 +37,14 @@ msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr ""
 
 msgid "You can visit our site here"
-msgstr ""
+msgstr "เยี่ยมชมเราได้ที่นี่"
 
 msgid "&License"
-msgstr ""
+msgstr "&อนุญาต"
 
 #, python-format
 msgid "version %s"
-msgstr ""
+msgstr "รุ่น %s"
 
 #, python-format
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
@@ -52,43 +52,43 @@ msgstr ""
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr ""
+msgstr "TortoiseHg (%s) ใหม่พร้อมสำหรับ download!"
 
 msgid "License"
-msgstr ""
+msgstr "ใบอนุญาต"
 
 msgid "= Working Directory Parent ="
 msgstr ""
 
 msgid "Directory of files"
-msgstr "Directori d'arxius"
+msgstr ""
 
 msgid "Tar archives"
-msgstr "Arxius tar"
+msgstr ""
 
 msgid "Uncompressed tar archive"
-msgstr "Arxiu tar descomprimit"
+msgstr "tar ที่ยังไม่ถูกย่อ"
 
 msgid "Bzip2 tar archives"
-msgstr "Arxius tar bzip2"
+msgstr ""
 
 msgid "Tar archive compressed using bzip2"
-msgstr "Arxiu tar comprimit amb bzip2"
+msgstr "Tar ที่ย่อโดยใช้ bzip2"
 
 msgid "Gzip tar archives"
-msgstr "Arxius tar gzip"
+msgstr ""
 
 msgid "Tar archive compressed using gzip"
-msgstr "Arxiu tar comprimit amb gzip"
+msgstr "Tar ที่ย่อโดยใช้ gzip"
 
 msgid "Zip archives"
 msgstr ""
 
 msgid "Uncompressed zip archive"
-msgstr "Arxiu zip descomprimit"
+msgstr ""
 
 msgid "Zip archive compressed using deflate"
-msgstr "Arxiu zip comprimit amb deflate"
+msgstr "ย่อแบบ ZIp ใช้ deflate"
 
 msgid "Only files modified/created in this revision"
 msgstr ""
@@ -100,35 +100,35 @@ msgid "Revision:"
 msgstr ""
 
 msgid "Browse..."
-msgstr "Explora..."
+msgstr "เลือก..."
 
 msgid "Destination path:"
 msgstr ""
 
 msgid "Archive types:"
-msgstr "Tipus d'arxius:"
+msgstr "ประเภทการเก็บ"
 
 msgid "Hg command:"
-msgstr ""
+msgstr "คำสั่ง Hg"
 
 msgid "Select Destination Folder"
-msgstr "Seleccioneu una carpeta de destinació"
+msgstr ""
 
 msgid "Select Destination File"
-msgstr "Seleccioneu fitxer de destinació"
+msgstr "เลือก Destination File"
 
 msgid "All files (*)"
-msgstr ""
+msgstr "ไฟล์ทั้งหมด"
 
 msgid "Duplicate Name"
-msgstr ""
+msgstr "ทำซ้ำชื่อ"
 
 #, python-format
 msgid "The destination \"%s\" already exists as a file!"
 msgstr ""
 
 msgid "Confirm Overwrite"
-msgstr "Confirmeu la sobreeescriptura"
+msgstr "ยืนยันที่จะเขียนทับ"
 
 #, python-format
 msgid ""
@@ -136,6 +136,9 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"The directory \"%s\" ไม่ว่าง!\n"
+"\n"
+"ต้องการเขียนทับ?"
 
 #, python-format
 msgid ""
@@ -143,6 +146,9 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
+"มีไฟล์  \"%s\" อยู่แล้ว!\n"
+"\n"
+"ต้องการเขียนทับ?"
 
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
@@ -150,7 +156,7 @@ msgstr ""
 
 #, python-format
 msgid "Archive - %s"
-msgstr "Arxiu - %s"
+msgstr ""
 
 msgid "&Archive"
 msgstr ""
@@ -181,13 +187,13 @@ msgid "Not a head, backout will create a new head!"
 msgstr ""
 
 msgid "Current local revision"
-msgstr ""
+msgstr "รุ่นปรับปรุงปัจจุบัน"
 
 msgid "Working directory status"
-msgstr ""
+msgstr "สถานะของ directory"
 
 msgid "Checking..."
-msgstr ""
+msgstr "กำลังตรวจสอบ..."
 
 msgid ""
 "Before backout, you must <a href=\"commit\"><b>commit</b></a>, <a href="
@@ -220,7 +226,7 @@ msgid ""
 msgstr ""
 
 msgid "No merge conflicts, ready to commit"
-msgstr ""
+msgstr "ไม่พบปัญหาการผนวก, พร้อมสำหรับ commit"
 
 msgid "Commit backout and merge results"
 msgstr ""
@@ -235,13 +241,13 @@ msgid "Working Directory (merged)"
 msgstr ""
 
 msgid "Commit message"
-msgstr ""
+msgstr "ข้อความ Commit"
 
 msgid "Skip final confirmation page, close after commit."
-msgstr ""
+msgstr "หลังจาก commit ไม่ต้องมาที่หน้าการยืนยัน"
 
 msgid "Backed out changeset: "
-msgstr "Grup de canvis retirat: "
+msgstr ""
 
 msgid "Confirm Discard Message"
 msgstr ""
@@ -265,7 +271,7 @@ msgid "Please wait while committing merged files."
 msgstr ""
 
 msgid "Finished"
-msgstr ""
+msgstr "เรียบร้อย"
 
 msgid "Backout changeset"
 msgstr ""
@@ -275,69 +281,69 @@ msgid "Bisect - %s"
 msgstr ""
 
 msgid "Accept"
-msgstr ""
+msgstr "รับทราบ"
 
 msgid "Known good revision:"
-msgstr ""
+msgstr "รุ่นปรับปรุงที่ดี"
 
 msgid "Known bad revision:"
-msgstr ""
+msgstr "รุ่นที่มีปัญหา"
 
 msgid "Discard local changes (revert --all)"
-msgstr ""
+msgstr "ยกเลิกการเปลี่ยนแปลง ทั้งหมด (revert --all)"
 
 msgid "Revision is &Good"
-msgstr ""
+msgstr "รุ่นปรับปรุงที่ &ดี"
 
 msgid "Revision is &Bad"
-msgstr ""
+msgstr "รุ่นปรับปรุงที่ &ไม่ดี"
 
 msgid "&Skip this Revision"
-msgstr ""
+msgstr "&ข้ามรุ่นนีไป"
 
 msgid "Close"
-msgstr ""
+msgstr "ปิด"
 
 msgid "Error encountered."
-msgstr ""
+msgstr "มีการผิดพลาด"
 
 msgid "Culprit found."
-msgstr ""
+msgstr "พบ Culprit"
 
 msgid "Revision"
-msgstr ""
+msgstr "รุ่นปรับปรุง"
 
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr ""
+msgstr "ทดสอบรุ่นนี้แล้วรายงาน (ดี/ไม่ดี/ข้ามไปก่อน)"
 
 #, python-format
 msgid "%s (hint: %s)"
 msgstr ""
 
 msgid "Bookmark:"
-msgstr ""
+msgstr "บันทึกไว้"
 
 msgid "New Name:"
-msgstr ""
+msgstr "ชื่อใหม่:"
 
 msgid "Activate:"
 msgstr ""
 
 msgid "&Add"
-msgstr ""
+msgstr "เพิ่ม"
 
 msgid "Re&name"
-msgstr ""
+msgstr "เปลี่ยนชื่อ"
 
 msgid "&Remove"
-msgstr ""
+msgstr "เ&อาออก"
 
 msgid "&Move"
-msgstr ""
+msgstr "ย้าย"
 
 #, python-format
 msgid "Bookmark - %s"
-msgstr ""
+msgstr "บันทึก - %s"
 
 #, python-format
 msgid "A bookmark named \"%s\" already exists"
@@ -345,27 +351,27 @@ msgstr ""
 
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr ""
+msgstr "Bookmark '%s' ได้ถูกเพิ่มแล้ว"
 
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr ""
+msgstr "ชื่อ Bookmark \"%s\" ไม่มี"
 
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr ""
+msgstr "Bookmark '%s' ได้ถูกย้ายไปแล้ว"
 
 #, python-format
 msgid "Bookmark '%s' does not exist"
-msgstr ""
+msgstr "Bookmark '%s'  ไม่ไมี"
 
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr ""
+msgstr "Bookmark '%s' ได้ถูกลบออกแล้ว"
 
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr ""
+msgstr "Bookmark '%s'  เปลี่ยนชื่อเป็น '%s'"
 
 msgid "TortoiseHg Bookmark Sync"
 msgstr ""
@@ -412,55 +418,55 @@ msgid "Select branch of merge commit"
 msgstr ""
 
 msgid "Changes take effect on next commit"
-msgstr ""
+msgstr "การเปลี่นแปลงมีผลหลังจาก commit ครั้งถัดไป"
 
 msgid "No branch changes"
-msgstr "Sense canvis de branca"
+msgstr "ไม่มีการแปลี่นแปลงที่ branch"
 
 msgid "Open a new named branch"
 msgstr ""
 
 msgid "Close current branch"
-msgstr ""
+msgstr "ปิด branch นี"
 
 #, python-format
 msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 msgstr ""
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr "ตรวจสอบการปรับปรุง"
 
 msgid "Copy"
-msgstr ""
+msgstr "คัดลอก"
 
 msgid "Quit"
-msgstr ""
+msgstr "จบการทำงาน"
 
 msgid "TortoiseHg Bug Report"
-msgstr "TortoiseHg: Informe d'error"
+msgstr "รายงานข้อผิดพลาดของ TortoiseHg"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr ""
+msgstr "แนะนำว่าควรใช้ TortoiseHg  รุ่นล่าสุด"
 
 msgid "Your TortoiseHg is up to date."
-msgstr ""
+msgstr "TortoiseHg สมบูรณ์ล่าสุด"
 
 msgid "Save error report to"
-msgstr ""
+msgstr "ส่งข้อผิดพลาดไปที่"
 
 msgid "Text files (*.txt)"
 msgstr ""
 
 msgid "Error writing file"
-msgstr ""
+msgstr "เขียนไฟล์ผิดพลาด"
 
 msgid "TortoiseHg Error"
-msgstr ""
+msgstr "TortoiseHg ผิดพลาด"
 
 msgid ""
 "If you still have trouble, <a href=\"#bugreport\">please file a bug report</"
 "a>."
-msgstr ""
+msgstr "ถ้าพบปัญหาหรือข้อผิดพลาด  <a href=\"#bugreport\">แจ้งได้ที่นี่ </a>."
 
 msgid "Visual Diff"
 msgstr ""
@@ -469,19 +475,19 @@ msgid "View file changes in external diff tool"
 msgstr ""
 
 msgid "Edit Local"
-msgstr ""
+msgstr "แก้ไข Local"
 
 msgid "Edit current file in working copy"
 msgstr ""
 
 msgid "Revert to Revision"
-msgstr ""
+msgstr "ยกเลิกกลับมา"
 
 msgid "Revert file(s) to contents at this revision"
 msgstr ""
 
 msgid "Patch failed to apply"
-msgstr ""
+msgstr "ไม่สามารถปรับปรุงได้"
 
 msgid "Manually resolve rejected chunks?"
 msgstr ""
@@ -496,7 +502,7 @@ msgid "Completely remove file from patch?"
 msgstr ""
 
 msgid "Revert all file changes?"
-msgstr ""
+msgstr "ยกเลิกการเปลี่ยนทั้งหมด?"
 
 msgid "No chunks remain"
 msgstr ""
@@ -514,24 +520,24 @@ msgid "Add or remove patches must be merged in the working directory"
 msgstr ""
 
 msgid "Unable to remove"
-msgstr ""
+msgstr "ไม่สามารถเอาออก"
 
 #, python-format
 msgid ""
 "Unable to remove file %s,\n"
 "permission denied"
-msgstr ""
+msgstr "ไม่อนุญาต ให้เอา  file %s ออก,"
 
 msgctxt "files"
 msgid "All"
-msgstr ""
+msgstr "ทั้งหมด"
 
 msgctxt "files"
 msgid "None"
-msgstr ""
+msgstr "ไม่มี"
 
 msgid "Toggle display of text search bar"
-msgstr ""
+msgstr "สลับการแสดงของ text search bar"
 
 msgid "Diff Toolbar"
 msgstr ""
@@ -541,16 +547,16 @@ msgid "Chunks selected: %d / %d"
 msgstr ""
 
 msgid "Please wait while the file is opened ..."
-msgstr ""
+msgstr "กรุณารอขณะ ไฟล์เปิด"
 
 msgid "Source:"
-msgstr ""
+msgstr "ต้นฉบับ:"
 
 msgid "Destination:"
 msgstr ""
 
 msgid "Options"
-msgstr ""
+msgstr "เลือก"
 
 msgid "Clone to revision:"
 msgstr ""
@@ -565,28 +571,28 @@ msgid "Use pull protocol to copy metadata"
 msgstr ""
 
 msgid "Use uncompressed transfer"
-msgstr ""
+msgstr "ใช้การส่งที่ไม่ต้องย่อข้อมูล"
 
 msgid "Include patch queue"
 msgstr ""
 
 msgid "Use proxy server"
-msgstr ""
+msgstr "ใช้ proxy server"
 
 msgid "Do not verify host certificate"
-msgstr ""
+msgstr "ไม่ต้องใช้ host certificate"
 
 msgid "Remote command:"
-msgstr ""
+msgstr "คำสั่งควบคุมจากอีกแห่ง"
 
 msgid "Start revision:"
-msgstr ""
+msgstr "รุ่นแรก"
 
 msgid "Select source repository"
-msgstr ""
+msgstr "เลือก source repository"
 
 msgid "Select destination repository"
-msgstr ""
+msgstr "เลือก destination repository"
 
 msgid "Select patch folder"
 msgstr ""
@@ -599,10 +605,10 @@ msgid "&Clone"
 msgstr ""
 
 msgid "failed to start command\n"
-msgstr ""
+msgstr "ไม่สามารถเริ่มคำสั่ง\n"
 
 msgid "error while running command\n"
-msgstr ""
+msgstr "ผิดพลาดขณะสั่งการ\n"
 
 #, python-format
 msgid "process exited unexpectedly with code %d"
@@ -610,7 +616,7 @@ msgstr ""
 
 #, python-format
 msgid "failed to encode command: %s"
-msgstr ""
+msgstr "ไม่สามารถถอดรหัสคำสั่ง : %s"
 
 #, python-format
 msgid "timed out while reading: %r..."
@@ -625,7 +631,7 @@ msgstr ""
 
 #, python-format
 msgid "invalid \"hello\" message: %r"
-msgstr ""
+msgstr "ข้อความ \"hello\" ไม่ถูกต้อง : %r"
 
 msgid "no \"runcommand\" capability"
 msgstr ""
@@ -639,29 +645,29 @@ msgid "failed to encode input: %s"
 msgstr ""
 
 msgid "Terminated by user"
-msgstr ""
+msgstr "ยกเลิกโดยผู้ใช้"
 
 #, python-format
 msgid "[command terminated by user %s]"
-msgstr ""
+msgstr "[คำสั่งถูกยกเลิกโดยผู้ใช้ %s]"
 
 #, python-format
 msgid "[command interrupted %s]"
-msgstr ""
+msgstr "[คำสั่งถูกขัดจังหวะ %s]"
 
 #, python-format
 msgid "[command returned code %d %%s]"
-msgstr ""
+msgstr "[คำสั่ง ตอบกลับมาด้วย code %d %%s]"
 
 #, python-format
 msgid "[command completed successfully %s]"
-msgstr ""
+msgstr "[คำสั่งเสร็จสมบูรณ์ %s]"
 
 msgid "Running..."
-msgstr ""
+msgstr "กำลังทำงาน..."
 
 msgid "Failed!"
-msgstr ""
+msgstr "ไม่สำเร็จ"
 
 msgid "Clea&r Log"
 msgstr ""
@@ -670,48 +676,50 @@ msgid "TortoiseHg Prompt"
 msgstr ""
 
 msgid "Show Detail"
-msgstr ""
+msgstr "รายละเอียด"
 
 msgid "Hide Detail"
-msgstr ""
+msgstr "ซ่อน"
 
 msgid "Confirm Exit"
-msgstr ""
+msgstr "ยืนยันว่าออก"
 
 msgid ""
 "Mercurial command is still running.\n"
 "Are you sure you want to terminate?"
 msgstr ""
+"Mercurial กำลังทำตามคำสั่ง.\n"
+"มั่นใจว่าต้องการยกเลิกจริง?"
 
 msgid "&Run"
-msgstr ""
+msgstr "เริ่ม"
 
 msgid "TortoiseHg Command Dialog"
 msgstr ""
 
 msgid "Command Error"
-msgstr ""
+msgstr "คำสั่งผิดพลาด"
 
 #, python-format
 msgid "[Code: %d]"
 msgstr ""
 
 msgid "Merge"
-msgstr ""
+msgstr "ผนวก"
 
 #, python-format
 msgid "Merge with %s"
-msgstr ""
+msgstr "ผนวกด้วย %s"
 
 msgid "Patch Name Required"
 msgstr ""
 
 msgid "You must enter a patch name"
-msgstr ""
+msgstr "ต้องใส่ patch name"
 
 msgctxt "start progress"
 msgid "Commit"
-msgstr ""
+msgstr "ยืนยัน"
 
 msgctxt "start progress"
 msgid "MQ Action"
@@ -719,7 +727,7 @@ msgstr ""
 
 msgctxt "start progress"
 msgid "Rollback"
-msgstr ""
+msgstr "ย้อนกลับ"
 
 msgid "Commit Dialog Toolbar"
 msgstr ""
@@ -728,38 +736,38 @@ msgid "Branch: "
 msgstr ""
 
 msgid "Copy message"
-msgstr ""
+msgstr "ลอกข้อความ"
 
 msgid "Copy one of the recent commit messages"
 msgstr ""
 
 msgid "Show Issues"
-msgstr ""
+msgstr "แสดงปัญหา"
 
 msgid "Please wait..."
-msgstr ""
+msgstr "กรุณารอ..."
 
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
-msgstr ""
+msgstr "ไม่สามารถดึง issue tracker '%s': %s"
 
 msgid "Issue Tracker"
-msgstr ""
+msgstr "ปัญหา Tracker"
 
 msgid "Show Issues..."
-msgstr ""
+msgstr "แสดงปัญหา..."
 
 msgid "Stop"
-msgstr ""
+msgstr "ยุติ"
 
 msgid "### patch name ###"
 msgstr ""
 
 msgid "Commit changes"
-msgstr ""
+msgstr "ยืนยันการเปลี่ยน"
 
 msgid "Commit"
-msgstr ""
+msgstr "ยืนยันการเปลี่ยน"
 
 msgid "Amend current revision"
 msgstr ""
@@ -793,7 +801,7 @@ msgid "&Commit to current branch"
 msgstr ""
 
 msgid "Cancel"
-msgstr "Cancel·lar"
+msgstr "ยกเลิก"
 
 msgid "Confirm New Branch"
 msgstr ""
@@ -803,7 +811,7 @@ msgid "Create new named branch \"%s\" with this commit?\n"
 msgstr ""
 
 msgid "Create &Branch"
-msgstr ""
+msgstr "สร้าง &Branch"
 
 msgid "Close Branch: "
 msgstr ""
@@ -827,16 +835,16 @@ msgstr ""
 
 #, python-format
 msgid "Rollback commit to revision %d"
-msgstr ""
+msgstr "ย้อนไปใช้ รุ่นที่ %d"
 
 msgid "Confirm Undo"
-msgstr ""
+msgstr "ยืนยัน การยกเลิก"
 
 msgid "Discard current commit message?"
-msgstr ""
+msgstr "ยกเลิกการส่งข้อความ"
 
 msgid "Message Translation Failure"
-msgstr ""
+msgstr "การแปลข้อความไม่สำเร็จ"
 
 msgid ""
 "Unable to translate message to local encoding\n"
@@ -845,13 +853,13 @@ msgid ""
 msgstr ""
 
 msgid "&Replace"
-msgstr ""
+msgstr "แทนที่"
 
 msgid "Nothing Committed"
-msgstr ""
+msgstr "ไม่ไม่การส่ง"
 
 msgid "Please enter commit message"
-msgstr ""
+msgstr "กรุณา เพิ่มข้อความ เพื่อการส่ง"
 
 msgid ""
 "No issue link was found in the commit message.  The commit message should "
@@ -860,48 +868,48 @@ msgid ""
 msgstr ""
 
 msgid "No files checked"
-msgstr ""
+msgstr "ไฟล์ไม่ถูกเลือก"
 
 msgid "No modified files checkmarked for commit"
-msgstr ""
+msgstr "ไม่มีการเลือกไฟล์ที่ถูกแก้ไข"
 
 msgid "Confirm Add"
-msgstr ""
+msgstr "ยืนยันเพิ่ม"
 
 msgid "Add selected untracked files?"
 msgstr ""
 
 msgid "Confirm Remove"
-msgstr ""
+msgstr "ยืนยันการย้ายออก"
 
 msgid "Remove selected deleted files?"
-msgstr ""
+msgstr "นำไฟล์ที่ถูกลบไว้ออก"
 
 msgid "Nothing changed."
-msgstr ""
+msgstr "ไม่มีอะไรเปลี่ยนแปลง"
 
 msgctxt "window title"
 msgid "Commit"
-msgstr ""
+msgstr "ยืนยันการเปลี่ยน"
 
 #, python-format
 msgid "%s - commit options"
 msgstr ""
 
 msgid "Set username:"
-msgstr ""
+msgstr "ระบุ username:"
 
 msgid "Save in Repo"
-msgstr ""
+msgstr "เก็บใน Repo"
 
 msgid "Save Global"
-msgstr ""
+msgstr "เก็บใน Global"
 
 msgid "Set Date:"
-msgstr ""
+msgstr "ระบุ วัน:"
 
 msgid "Update"
-msgstr ""
+msgstr "ปรับปรุง"
 
 msgid "Push After Commit:"
 msgstr ""
@@ -913,13 +921,13 @@ msgid "Recurse into subrepositories (--subrepos)"
 msgstr ""
 
 msgid "Unable to save username"
-msgstr ""
+msgstr "ไม่สามารถใช้ชื่อนี้ (username)"
 
 msgid "Iniparse must be installed."
-msgstr ""
+msgstr "ต้องติดตั้ง Iniparse"
 
 msgid "Unable to write configuration file"
-msgstr ""
+msgstr "เขียน  configuration file ไม่ได้"
 
 msgid "Unable to save after commit push"
 msgstr ""
@@ -931,10 +939,10 @@ msgid "Unable to save recurse in subrepos."
 msgstr ""
 
 msgid "Invalid date format"
-msgstr ""
+msgstr "รูปแบบของวันที่ผิดพลาด"
 
 msgid "No username configured"
-msgstr ""
+msgstr "ยังไม่มี username"
 
 #, python-format
 msgid "%s - commit"
@@ -944,7 +952,7 @@ msgid "TortoiseHg Commit"
 msgstr ""
 
 msgid "Are you sure that you want to cancel the commit operation?"
-msgstr ""
+msgstr "แน่ใจว่าต้องการยกเลิก การ commit ?"
 
 msgid "Compress changesets up to and including"
 msgstr ""
@@ -953,11 +961,11 @@ msgid "Onto destination"
 msgstr ""
 
 msgid "Compress"
-msgstr ""
+msgstr "ย่อข้อมูล"
 
 #, python-format
 msgid "Compress - %s"
-msgstr ""
+msgstr "ย่อ- %s"
 
 msgid ""
 "Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
@@ -966,44 +974,44 @@ msgid ""
 msgstr ""
 
 msgid "You may continue the compress"
-msgstr ""
+msgstr "ดำเนินการย่อข้อมูล"
 
 msgid "Changes have been moved, you must now commit"
-msgstr ""
+msgstr "มีการเปลี่ยนแปลงเกิดขึ้น ต้องยืนยัน"
 
 msgctxt "action button"
 msgid "Commit"
-msgstr ""
+msgstr "ยืนยันการเปลี่ยน"
 
 msgid "Compress is complete, old history untouched"
-msgstr ""
+msgstr "การย่อข้อมูลสมบูรณ์,ไม่มีการแก้ไขประวัติ"
 
 msgid "must be specified repository"
-msgstr ""
+msgstr "ระบุ repository"
 
 msgid "must be specified 'type' in style"
-msgstr ""
+msgstr "ระบุ  'type' in style"
 
 msgid "Summary:"
-msgstr ""
+msgstr "สรุป:"
 
 msgid "User:"
-msgstr ""
+msgstr "ผู้ใช้:"
 
 msgid "Date:"
-msgstr ""
+msgstr "วันที่:"
 
 msgid "Age:"
-msgstr ""
+msgstr "อายุ:"
 
 msgid "Branch:"
 msgstr ""
 
 msgid "Close:"
-msgstr ""
+msgstr "ยุติ"
 
 msgid "Tags:"
-msgstr ""
+msgstr "แทกส์:"
 
 msgid "Graft:"
 msgstr ""
@@ -1012,7 +1020,7 @@ msgid "Transplant:"
 msgstr ""
 
 msgid "Obsolete state:"
-msgstr ""
+msgstr "ไม่ใช้แล้ว:"
 
 msgid "Perforce:"
 msgstr ""
@@ -1027,10 +1035,10 @@ msgid "Original Parent:"
 msgstr ""
 
 msgid "No items to display"
-msgstr ""
+msgstr "ไม่มีอะไรแสดง"
 
 msgid "Use compact view"
-msgstr ""
+msgstr "แสดงแบบย่อ"
 
 msgid "Patch:"
 msgstr ""
@@ -1043,52 +1051,52 @@ msgid "Select a GUI location to edit:"
 msgstr ""
 
 msgid "Select the toolbar or menu to change"
-msgstr ""
+msgstr "เลือกเปลี่ยน  toolbar or menu"
 
 msgid "Tools shown on selected location"
-msgstr ""
+msgstr "เครื่องมือ แสดง selected location"
 
 msgid "Delete from list"
-msgstr ""
+msgstr "ลบจากรายการ"
 
 msgid "Add to list"
-msgstr ""
+msgstr "เพิ่มรายการ"
 
 msgid "Add separator"
-msgstr ""
+msgstr "เพิ่มเส้นแบ่ง"
 
 msgid "List of all tools"
-msgstr ""
+msgstr "รายการเครื่องมือทั้งหมด"
 
 msgid "New Tool ..."
-msgstr ""
+msgstr "เครื่องมือใหม่ ..."
 
 msgid "Edit Tool ..."
-msgstr ""
+msgstr "แก้ เครื่องมือ ..."
 
 msgid "Delete Tool"
-msgstr ""
+msgstr "ลบ เครื่องมือ"
 
 msgid "Type"
-msgstr ""
+msgstr "ประเภท"
 
 msgid "Name"
-msgstr ""
+msgstr "ชื่อ"
 
 msgid "Command"
-msgstr ""
+msgstr "คำสั่ง"
 
 msgid "New hook"
-msgstr ""
+msgstr "hook ใหม่"
 
 msgid "Edit hook"
-msgstr ""
+msgstr "แก้ hook"
 
 msgid "Delete hook"
-msgstr ""
+msgstr "ลบ hook"
 
 msgid "Replace existing hook?"
-msgstr ""
+msgstr "แทน hook เดิม"
 
 #, python-format
 msgid ""
@@ -1096,27 +1104,30 @@ msgid ""
 "\n"
 "Do you want to replace it?"
 msgstr ""
+"มี hook เดิมอยู่แล้ว %s.%s.\n"
+"\n"
+"จะแทนที่ไหม?"
 
 msgid "OK"
-msgstr ""
+msgstr "ได้"
 
 msgid "Missing information"
-msgstr ""
+msgstr "ข้อมูลไม่ครบ"
 
 msgid "All items"
-msgstr ""
+msgstr "ทั้งหมด"
 
 msgid "Working directory"
-msgstr ""
+msgstr "direcory ปัจจุบัน"
 
 msgid "All revisions"
-msgstr ""
+msgstr "ทุกรุ่น"
 
 msgid "All contexts"
 msgstr ""
 
 msgid "Fixed revisions"
-msgstr ""
+msgstr "รุ่นที่แก้ไขแล้ว"
 
 msgid "Applied patches"
 msgstr ""
@@ -1131,10 +1142,10 @@ msgid "Configure Custom Tool"
 msgstr ""
 
 msgid "Tool name"
-msgstr ""
+msgstr "ชื่อเครื่องมือ"
 
 msgid "The tool name. It cannot contain spaces."
-msgstr ""
+msgstr "ชื่อครื่องมื่อไม่ให้มีช่องว่าง"
 
 #, python-brace-format
 msgid ""
@@ -1160,7 +1171,7 @@ msgid ""
 msgstr ""
 
 msgid "Tool label"
-msgstr ""
+msgstr "ป้ายชื่อ เครื่องมือ"
 
 msgid ""
 "The tool label, which is what will be shown on the repowidget context menu.\n"
@@ -1169,7 +1180,7 @@ msgid ""
 msgstr ""
 
 msgid "Tooltip"
-msgstr ""
+msgstr "คำแนะนำเครื่องมือ"
 
 msgid ""
 "The tooltip that will be shown on the tool button.\n"
@@ -1199,7 +1210,7 @@ msgid ""
 msgstr ""
 
 msgid "Show Output Log"
-msgstr ""
+msgstr "log แสดงผล"
 
 msgid ""
 "When enabled, automatically show the Output Log when the command is run.\n"
@@ -1207,62 +1218,62 @@ msgid ""
 msgstr ""
 
 msgid "You must set a tool name."
-msgstr ""
+msgstr "ต้องใส่ชื่อเครื่องมือ"
 
 msgid "The tool name cannot have any spaces in it."
-msgstr ""
+msgstr "ชื่อเครื่องมือต้องไม่มีช่องว่างเลย"
 
 msgid "You must set a command to run."
-msgstr ""
+msgstr "ต้องระบบคำสั่งก่อนเริ่มทำงาน"
 
 msgid "Configure Hook"
-msgstr ""
+msgstr "ปรับแต่ง Hook"
 
 msgid "Hook type"
-msgstr ""
+msgstr "ประเภทของ Hook"
 
 msgid "Select when your command will be run"
-msgstr ""
+msgstr "เลือกเวลาให้คำสั่งทำงาน"
 
 msgid "The hook name. It cannot contain spaces."
-msgstr ""
+msgstr "ชื่อของ hoook ต้องไม่มีช่องว่าง"
 
 msgid ""
 "The command that will be executed.\n"
 "To execute a python function prepend the command with \"python:\".\n"
-msgstr ""
+msgstr "คำสั่งกำลังจะดำเนินการ\n"
 
 msgid "You must set a valid hook type."
-msgstr ""
+msgstr "ระบบ ประเภทของ hook ให้ถูกต้อง"
 
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
-msgstr ""
+msgstr "ชื่อของ hook ต้องไม่มีช่องว่าง tabs หรือ '='"
 
 #, python-format
 msgid "command parse error: %s"
-msgstr ""
+msgstr "การเรียงคำสั่งผิดพลาด : %s"
 
 #, python-format
 msgid "no matches found: %s"
-msgstr ""
+msgstr "ไม่เหมือน : %s"
 
 msgid "Console"
-msgstr ""
+msgstr "ระบบควบคุม"
 
 msgid "File &History / Annotate"
 msgstr ""
 
 msgid "Show the history of the selected file"
-msgstr ""
+msgstr "แสดง history ของไฟล์ที่เลือกไว้"
 
 msgid "Co&mpare File Revisions"
-msgstr ""
+msgstr "เปรียบเทียบ รุ่น"
 
 msgid "Compare revisions of the selected file"
-msgstr ""
+msgstr "เปรียบเทียบรุ่นในไฟล์"
 
 msgid "Filter Histor&y"
-msgstr ""
+msgstr "ระบุโดย Histor&y"
 
 msgid "Query about changesets affecting the selected files"
 msgstr ""
@@ -1280,7 +1291,7 @@ msgid "Diff to &Local"
 msgstr ""
 
 msgid "View changes to current in external diff tool"
-msgstr ""
+msgstr "แสดงการเปลี่ยนแปลงจากเครื่องมือ diff นอกโปรแกรม"
 
 msgid "&View at Revision"
 msgstr ""
@@ -1295,7 +1306,7 @@ msgid "Save file as it appeared at this revision"
 msgstr ""
 
 msgid "Save file to"
-msgstr "Guarda arxiu a"
+msgstr "เก็บข้อมูลไว้ที่"
 
 msgid "&Edit Local"
 msgstr ""
@@ -1331,16 +1342,16 @@ msgid "E&xplore Folder"
 msgstr ""
 
 msgid "Open the selected folder in the system file manager"
-msgstr ""
+msgstr "เปิด folder โดย file manager ของระบบ"
 
 msgid "Open &Terminal"
-msgstr ""
+msgstr "เปิด &Terminal"
 
 msgid "Open a shell terminal in the selected folder"
-msgstr ""
+msgstr "เปิด shell terminal ใน folder นี้"
 
 msgid "Custom Tools"
-msgstr ""
+msgstr "ปรับแต่งเครื่องมือ"
 
 msgid "Diff &Local"
 msgstr ""
@@ -1352,7 +1363,7 @@ msgid "View O&ther"
 msgstr ""
 
 msgid "Add &Largefiles..."
-msgstr ""
+msgstr "เพิ่ม &Largefiles..."
 
 msgid "&Forget"
 msgstr ""
@@ -1367,7 +1378,7 @@ msgid "Delete the following unversioned files?"
 msgstr ""
 
 msgid "&Delete"
-msgstr ""
+msgstr "ลบ"
 
 msgid "Re&move Versioned"
 msgstr ""
@@ -1385,7 +1396,7 @@ msgid "&Local"
 msgstr ""
 
 msgid "&Other"
-msgstr ""
+msgstr "อื่น ๆ"
 
 msgid "Confirm Revert"
 msgstr ""
@@ -1397,7 +1408,7 @@ msgid "&Revert with backup"
 msgstr ""
 
 msgid "&Discard changes"
-msgstr ""
+msgstr "ยกเลิกการเปลี่ยนแปลง"
 
 msgid "Revert the following files?"
 msgstr ""
@@ -1406,13 +1417,13 @@ msgid "&Revert"
 msgstr ""
 
 msgid "&Copy..."
-msgstr ""
+msgstr "คัด&ลอก..."
 
 msgid "Re&name..."
-msgstr ""
+msgstr "เปลี่ยนชื่อ"
 
 msgid "&Ignore..."
-msgstr ""
+msgstr "เมิน"
 
 msgid "Edit Re&jects"
 msgstr ""
@@ -1433,16 +1444,16 @@ msgid "Restart Mer&ge"
 msgstr ""
 
 msgid "Was renamed from"
-msgstr ""
+msgstr "ถูกเปลี่ยนจาก"
 
 msgid "Restart Merge &with"
 msgstr ""
 
 msgid "Display the file anyway"
-msgstr ""
+msgstr "อย่างไรก็จะแสดง file"
 
 msgid "Diff not displayed: "
-msgstr ""
+msgstr "ที่แตกต่าง ไม่แสดง "
 
 #, python-format
 msgid ""
@@ -1460,15 +1471,15 @@ msgid "File or diffs not displayed: "
 msgstr ""
 
 msgid " <i>(was added)</i>"
-msgstr ""
+msgstr " <i>(ถูกเพิ่ม)</i>"
 
 #, python-format
 msgid " <i>(copied from %s)</i>"
-msgstr ""
+msgstr " <i>(copied จาก%s)</i>"
 
 #, python-format
 msgid " <i>(renamed from %s)</i>"
-msgstr ""
+msgstr " <i>(เปลี่ยนชื่อจาก%s)</i>"
 
 msgid " <i>(is a symlink)</i>"
 msgstr ""
@@ -1480,10 +1491,10 @@ msgid ""
 msgstr ""
 
 msgid " <i>(was deleted)</i>"
-msgstr ""
+msgstr " <i>(ถูกลบ)</i>"
 
 msgid " <i>(was added, now missing)</i>"
-msgstr ""
+msgstr " <i>(ถูกเพิ่ม, หายไปแล้ว)</i>"
 
 msgid " <i>(is unversioned)</i>"
 msgstr ""
@@ -1509,19 +1520,19 @@ msgid ""
 msgstr ""
 
 msgid "Subrepo created and set to initial revision."
-msgstr ""
+msgstr "Subrepo ถูกสร้าง และถูกทำให้เป็น initial revision."
 
 msgid "Subrepo initialized to revision:"
 msgstr ""
 
 msgid "Subrepo removed from repository."
-msgstr ""
+msgstr "Subrepo ถูกถอดออกจาก repository."
 
 msgid "Previously the subrepository was at the following revision:"
 msgstr ""
 
 msgid "Subrepo was not changed."
-msgstr ""
+msgstr "Subrepo ไม่ได้มีการเปลี่ยนแปลง."
 
 msgid "[WARNING] Missing subrepo. Update to this revision to clone it."
 msgstr ""
@@ -1530,17 +1541,17 @@ msgid "[WARNING] Incomplete subrepo. Update to this revision to pull it."
 msgstr ""
 
 msgid "Subrepo state is:"
-msgstr ""
+msgstr "Subrepo สถานะคือ:"
 
 msgid "Revision has changed to:"
-msgstr ""
+msgstr "Revisionถูกเปลี่ยนเป็น:"
 
 #, python-format
 msgid "changeset: %s (not found on subrepository)"
 msgstr ""
 
 msgid "From:"
-msgstr ""
+msgstr "จาก:"
 
 msgid ""
 "[WARNING] Missing changed subrepository. Update to this revision to clone it."
@@ -1568,7 +1579,7 @@ msgid "The subrepository is dirty."
 msgstr ""
 
 msgid "File Status:"
-msgstr ""
+msgstr "สถานะไฟล์:"
 
 msgid "(is a changed sub-repository)"
 msgstr ""
@@ -1592,7 +1603,7 @@ msgid "(is a new and dirty sub-repository)"
 msgstr ""
 
 msgid "open..."
-msgstr ""
+msgstr "เปิด..."
 
 #, python-format
 msgid "Hg file log viewer [%s] - %s"
@@ -1602,10 +1613,10 @@ msgid "File History Log Columns"
 msgstr ""
 
 msgid "Back"
-msgstr ""
+msgstr "ย้อนกลับ"
 
 msgid "Forward"
-msgstr ""
+msgstr "ข้างหน้า"
 
 msgid "Diff Selected &Changesets"
 msgstr ""
@@ -1614,10 +1625,10 @@ msgid "&Diff Selected File Revisions"
 msgstr ""
 
 msgid "Show Revision &Details"
-msgstr ""
+msgstr "แสดงรุ่นและรายละเอียด"
 
 msgid "Too many rows selected for menu"
-msgstr ""
+msgstr "เลือกแถวมากไปสำหรับเมนู"
 
 msgid "File Differences Log Columns"
 msgstr ""
@@ -1647,7 +1658,7 @@ msgid "Japanese"
 msgstr ""
 
 msgid "Thai"
-msgstr ""
+msgstr "ไทย"
 
 msgid "Central and Eastern Europe"
 msgstr ""
@@ -1720,7 +1731,7 @@ msgid "Next Diff"
 msgstr ""
 
 msgid "Previous Diff"
-msgstr ""
+msgstr "Diff ก่อนหน้า"
 
 msgid "Open shelve tool"
 msgstr ""
@@ -1738,35 +1749,35 @@ msgid "E&ncoding"
 msgstr ""
 
 msgid "&Search in Current File"
-msgstr ""
+msgstr "ค้นไฟล์นี้"
 
 msgid "Search in All &History"
-msgstr ""
+msgstr "ค้นทั้งหมด ประวัติด้วย"
 
 msgid "Go to Line"
-msgstr ""
+msgstr "ไปที่บรรทัด"
 
 #, python-format
 msgid "Enter line number (1 - %d)"
-msgstr ""
+msgstr "ใส่เลขบรรทัด (1 - %d)"
 
 msgid "Show &Author"
-msgstr ""
+msgstr "แสดง &Author"
 
 msgid "Show &Date"
-msgstr ""
+msgstr "แสดง วันที่"
 
 msgid "Show &Revision"
-msgstr ""
+msgstr "แสดง รุ่น&Revision"
 
 msgid "Annotate Op&tions"
 msgstr ""
 
 msgid "Search Selected Text"
-msgstr ""
+msgstr "ค้นในข้อความที่เลือกไว้"
 
 msgid "In Current &File"
-msgstr ""
+msgstr "ใน ไฟล์นี้"
 
 msgid "In &Current Revision"
 msgstr ""
@@ -1778,10 +1789,10 @@ msgid "In All &History"
 msgstr ""
 
 msgid "Go to"
-msgstr ""
+msgstr "ไปที่"
 
 msgid "View File at"
-msgstr ""
+msgstr "แสดงไฟล์แบบ"
 
 msgid "Diff File to"
 msgstr ""
@@ -1822,7 +1833,7 @@ msgid "Use my user name instead of graft committer user name"
 msgstr ""
 
 msgid "Use current date"
-msgstr ""
+msgstr "ใช้วันปัจจุบัน"
 
 msgid "Append graft info to log message"
 msgstr ""
@@ -1831,7 +1842,7 @@ msgid "Graft"
 msgstr ""
 
 msgid "Abort"
-msgstr ""
+msgstr "ยกเลิก"
 
 #, python-format
 msgid "Graft - %s"
@@ -1871,10 +1882,10 @@ msgid "You may continue the graft"
 msgstr ""
 
 msgid "Exiting with an unfinished graft is not recommended."
-msgstr ""
+msgstr "ไม่แนะนำให้ออกโดยที่ทำ graft ยังไม่เสร็จ."
 
 msgid "Consider aborting the graft first."
-msgstr ""
+msgstr "พิจารณายกเลิก  graft ก่อน."
 
 msgid "&Exit"
 msgstr ""
@@ -1889,13 +1900,13 @@ msgid "Ignore case"
 msgstr ""
 
 msgid "Search"
-msgstr ""
+msgstr "ค้น"
 
 msgid "Working Copy"
 msgstr ""
 
 msgid "All History"
-msgstr ""
+msgstr "ประวัติทั้งหมด"
 
 msgid "Report only the first match per file"
 msgstr ""
@@ -1904,10 +1915,10 @@ msgid "Follow copies and renames"
 msgstr ""
 
 msgid "Includes:"
-msgstr ""
+msgstr "รวม:"
 
 msgid "Excludes:"
-msgstr ""
+msgstr "ไม่รวม:"
 
 msgid ""
 "Comma separated list of exclusion file patterns. Exclusion patterns are "
@@ -1940,26 +1951,26 @@ msgid "%d matches found"
 msgstr ""
 
 msgid "No matches found"
-msgstr ""
+msgstr "ไม่พบข้อมูลที่ตรงกัน"
 
 msgid "Searching"
-msgstr ""
+msgstr "กำลังค้น"
 
 msgid "history"
-msgstr ""
+msgstr "ประวัติ"
 
 msgid "Interrupted"
-msgstr ""
+msgstr "ถูกขัดจังหวะ"
 
 msgid "files"
-msgstr ""
+msgstr "ไฟล์"
 
 #, python-format
 msgid "Skipping %s, unable to read"
 msgstr ""
 
 msgid "Vi&ew File"
-msgstr ""
+msgstr "แสดงไฟล์"
 
 msgid "&View Changeset"
 msgstr ""
@@ -1968,22 +1979,22 @@ msgid "Annotate &File"
 msgstr ""
 
 msgid "File"
-msgstr ""
+msgstr "ไฟล์"
 
 msgid "Line"
-msgstr ""
+msgstr "บรรทัดที่"
 
 msgid "Rev"
-msgstr ""
+msgstr "รุ่น"
 
 msgid "User"
-msgstr ""
+msgstr "ผู้ใช้"
 
 msgid "Match Text"
-msgstr ""
+msgstr "เทียบอักขระ"
 
 msgid "TortoiseHg Search"
-msgstr ""
+msgstr "ค้น TortoiseHg"
 
 #, python-format
 msgid "Detect Copies/Renames in %s"
@@ -1993,20 +2004,20 @@ msgid "<b>Unrevisioned Files</b>"
 msgstr ""
 
 msgid "Refresh file list"
-msgstr ""
+msgstr "ปรับปรุงรายการไฟล์"
 
 #, python-format
 msgid "Min Similarity: %d%%"
 msgstr ""
 
 msgid "Only consider deleted files"
-msgstr ""
+msgstr "เลือกเฉพาะไฟล์ที่ถูกลบ"
 
 msgid "Uncheck to consider all revisioned files for copy sources"
 msgstr ""
 
 msgid "Find Renames"
-msgstr ""
+msgstr "ค้น การเปลี่ยนชื่อ"
 
 msgid "Find copy and/or rename sources"
 msgstr ""
@@ -2015,22 +2026,22 @@ msgid "<b>Candidate Matches</b>"
 msgstr ""
 
 msgid "Accept All Matches"
-msgstr ""
+msgstr "ยอมรับทั้งหมดที่เหมือนกัน"
 
 msgid "Accept Selected Matches"
-msgstr ""
+msgstr "ยอมรับทั้งหมดที่เหมือนกันที่เลือกไว้"
 
 msgid "<b>Differences from Source to Dest</b>"
 msgstr ""
 
 msgid "Search already in progress"
-msgstr ""
+msgstr "ได้กำลังทำการค้นหา"
 
 msgid "Cannot start a new search"
-msgstr ""
+msgstr "เริ่มค้นใหม่ไม่ได้"
 
 msgid "No files to find"
-msgstr ""
+msgstr "ไม่พบไฟล์"
 
 msgid "There are no files that may have been renamed"
 msgstr ""
@@ -2056,25 +2067,25 @@ msgid "%d%%"
 msgstr ""
 
 msgid "Source"
-msgstr ""
+msgstr "ต้นฉบับ"
 
 msgid "Dest"
 msgstr ""
 
 msgid "% Match"
-msgstr ""
+msgstr "% เหมือน"
 
 msgid "Sending Email"
-msgstr ""
+msgstr "กำลังส่ง Email"
 
 msgid "Email"
 msgstr ""
 
 msgid "To:"
-msgstr ""
+msgstr "ถึง:"
 
 msgid "Cc:"
-msgstr ""
+msgstr "สำเนาถึง:"
 
 msgid "In-Reply-To:"
 msgstr ""
@@ -2163,22 +2174,22 @@ msgid "Changesets"
 msgstr ""
 
 msgid "Select &All"
-msgstr ""
+msgstr "เลือก&ทั้งหมด"
 
 msgid "Select &None"
 msgstr ""
 
 msgid "Edit"
-msgstr ""
+msgstr "แก้ไข"
 
 msgid "Preview"
-msgstr ""
+msgstr "แสดงตัวอย่าง"
 
 msgid "&Settings"
-msgstr ""
+msgstr "&ตั้งค่า"
 
 msgid "Send &Email"
-msgstr ""
+msgstr "ส่ง &Email"
 
 msgid "&Close"
 msgstr ""
@@ -2194,10 +2205,10 @@ msgid "Regexp"
 msgstr ""
 
 msgid "Add"
-msgstr ""
+msgstr "เพิ่ม"
 
 msgid "Edit File"
-msgstr ""
+msgstr "แก้ไขไฟล์"
 
 msgid "<b>Ignore Filter</b>"
 msgstr ""
@@ -2206,16 +2217,16 @@ msgid "<b>Untracked Files</b>"
 msgstr ""
 
 msgid "Backspace or Del to remove row(s)"
-msgstr ""
+msgstr "กด Backspace หรือ Del เพื่อการลบแถว"
 
 msgid "Add ignore filter..."
 msgstr ""
 
 msgid "selected files"
-msgstr ""
+msgstr "ไฟล์ที่ถูกเลือก"
 
 msgid "Ignore "
-msgstr ""
+msgstr "เมิน "
 
 msgid "Invalid glob expression"
 msgstr ""
@@ -2227,39 +2238,41 @@ msgid "Unable to read repository status"
 msgstr ""
 
 msgid "New file created"
-msgstr ""
+msgstr "ไฟล์ใหม่ถูกสร้าง"
 
 msgid ""
 "TortoiseHg has created a new .hgignore file.  Would you like to add this "
 "file to the source code control repository?"
 msgstr ""
+"TortoiseHg ได้สร้างไฟล์ .hgignore ใหม่. ต้องการที่จะเพิ่มใน source code control "
+"repository ไหม?"
 
 msgid "Unable to write .hgignore file"
-msgstr ""
+msgstr "เขียนไฟล์  .hgignore ไม่ได้"
 
 msgid "Copy working directory files from skeleton"
-msgstr ""
+msgstr "คัดลอกไฟล์ working directory จาก skeleton"
 
 msgid "Add special files (.hgignore, ...)"
-msgstr ""
+msgstr "เพิ่ม พิเศษ(.hgignore, ...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
-msgstr ""
+msgstr "ทำ ให้ repo compatible กับ Mercurial <1.7"
 
 msgid "New Repository"
-msgstr ""
+msgstr "Repository ใหม่"
 
 msgid "&Create"
-msgstr ""
+msgstr "สร้าง"
 
 msgid "Unable to create a config file"
-msgstr ""
+msgstr "สร้าง config file ไม่ได้"
 
 msgid "Insufficient access rights."
-msgstr ""
+msgstr "ปัญหาของสิทธิในการเข้าถึง"
 
 msgid "Show Log"
-msgstr ""
+msgstr "แสดง Log"
 
 msgid ""
 "Some of the files that you have selected are of a size over 10 MB.  You may "
@@ -2270,37 +2283,37 @@ msgid ""
 msgstr ""
 
 msgid "Add as &Largefiles"
-msgstr ""
+msgstr "เพิ่ม  &Largefiles"
 
 msgid "Add as &Normal Files"
-msgstr ""
+msgstr "เพิ่ม &Normal Files"
 
 msgid "Find revisions matching fields of:"
 msgstr ""
 
 msgid "Revision to Match:"
-msgstr ""
+msgstr "รุ่นที่ตรง:"
 
 msgid "Fields to match:"
 msgstr ""
 
 msgid "Summary (first description line)"
-msgstr ""
+msgstr "สรุป (รายละเอียดบรรทัดแรก)"
 
 msgid "Description"
-msgstr ""
+msgstr "รายละเอียด"
 
 msgid "Author"
-msgstr ""
+msgstr "ผู้สร้าง"
 
 msgid "Date"
-msgstr ""
+msgstr "วันที่"
 
 msgid "Files"
-msgstr "Fitxers"
+msgstr "ไฟล์"
 
 msgid "Diff contents"
-msgstr ""
+msgstr "ข้อมูลที่แตกต่างกัน"
 
 msgid "Subrepo states"
 msgstr ""
@@ -2333,10 +2346,10 @@ msgstr ""
 
 #, python-format
 msgid "Merge - %s"
-msgstr ""
+msgstr "ผนวก - %s"
 
 msgid "Do you want to exit?"
-msgstr ""
+msgstr "ออก?"
 
 msgid ""
 "To finish merging, you must commit the working directory.\n"
@@ -2345,25 +2358,27 @@ msgid ""
 msgstr ""
 
 msgid "Prepare to merge"
-msgstr ""
+msgstr "เตรียมผนวก"
 
 msgid "Verify merge targets and ensure your working directory is clean."
-msgstr ""
+msgstr "ตรวจที่ๆจะผนวกและให้แน่ใจว่าworking directory เรียบร้อย."
 
 msgid "Not a head revision!"
-msgstr ""
+msgstr "ไม่ใช่ส่วน head revision!"
 
 msgid "Merge from (other revision)"
-msgstr ""
+msgstr "ผนวกจาก (รุ่นอื่น)"
 
 msgid "Merge to (working directory)"
-msgstr ""
+msgstr "ผนวกมาที่  (working directory)"
 
 msgid ""
 "The working directory is already <b>merged</b>. <a href=\"skip"
 "\"><b>Continue</b></a> or <a href=\"discard\"><b>discard</b></a> existing "
 "merge."
 msgstr ""
+"working directory ได้ถูก <b>ผนวกแล้ว</b>. <a href=\"skip\"><b>ทำต่อ</b></a> or "
+"<a href=\"discard\"><b>ยกเลิก</b></a> ที่ผนวกนี้."
 
 msgid ""
 "Before merging, you must <a href=\"commit\"><b>commit</b></a>, <a href="
@@ -2372,19 +2387,19 @@ msgid ""
 msgstr ""
 
 msgid "Or use:"
-msgstr ""
+msgstr "หรือ ใช้:"
 
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr ""
 
 msgid "Discard all changes from merge target (other) revision"
-msgstr ""
+msgstr "ยกเลิกการเปลี่ยนแปลงทั้งหมด จากการผนวกต่างรุ่น"
 
 msgid "&Discard"
 msgstr ""
 
 msgid "Confirm Discard Changes"
-msgstr ""
+msgstr "ยืนยันยกเลิกการเปลี่ยนแปลง"
 
 #, python-format
 msgid ""
@@ -2392,16 +2407,19 @@ msgid ""
 "\n"
 "Are you sure this is what you want to do?"
 msgstr ""
+"การเปลี่ยนแปลง %s และ unmerged parents ทั้งหมดจะถูกยกเลิก.\n"
+"\n"
+"แน่ใจว่าต้องการ?"
 
 msgctxt "working dir state"
 msgid "Clean"
 msgstr ""
 
 msgid "Merging..."
-msgstr ""
+msgstr "กำลังผสมผสาน..."
 
 msgid "Automatically advance to next page when merge is complete."
-msgstr ""
+msgstr "ไปหน้าถัดไปหลังจากผนวกแล้ว."
 
 #, python-format
 msgid ""
@@ -2412,18 +2430,19 @@ msgstr ""
 msgid ""
 "No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
 msgstr ""
+"ไม่พบข้อผิดพลาดการผนวก, พร้อมสำหรับ commit or <a href=\"resolve\"><b>ตรวจ</b></a>"
 
 msgid "Commit merge results"
 msgstr ""
 
 msgid "Commit Options"
-msgstr ""
+msgstr "ตัวเลือก Commit"
 
 msgid "Commit Now"
-msgstr ""
+msgstr "เริ่ม Commit ได้"
 
 msgid "Commit Later"
-msgstr ""
+msgstr "Commit ทีหลัง"
 
 msgid "Merge changeset"
 msgstr ""
@@ -2448,13 +2467,13 @@ msgid "&Commit to Queue..."
 msgstr ""
 
 msgid "Create &New Queue..."
-msgstr ""
+msgstr "สร้าง Queue ใหม่..."
 
 msgid "&Rename Active Queue..."
-msgstr ""
+msgstr "เปลี่ยนชื่อ Active Queue..."
 
 msgid "&Delete Queue..."
-msgstr ""
+msgstr "ลบ Queue..."
 
 msgid "&Purge Queue..."
 msgstr ""
@@ -2466,26 +2485,26 @@ msgid "New patch queue name"
 msgstr ""
 
 msgid "Create"
-msgstr ""
+msgstr "สร้าง"
 
 msgid "Rename Patch Queue"
-msgstr ""
+msgstr "เปลี่ยนชื่อ Patch Queue"
 
 #, python-format
 msgid "Rename patch queue '%s' to"
 msgstr ""
 
 msgid "Rename"
-msgstr ""
+msgstr "เปลี่ยนชื่อ"
 
 msgid "Delete Patch Queue"
-msgstr ""
+msgstr "ลบ Patch Queue"
 
 msgid "Delete reference to"
 msgstr ""
 
 msgid "Delete"
-msgstr ""
+msgstr "ลบ"
 
 msgid "Purge Patch Queue"
 msgstr ""
@@ -2497,11 +2516,11 @@ msgid "Purge"
 msgstr ""
 
 msgid "Rename Patch"
-msgstr ""
+msgstr "เปลี่ยนชื่อ Patch"
 
 #, python-format
 msgid "Rename patch <b>%s</b> to:"
-msgstr ""
+msgstr "เปลี่ยนชื่อ patch <b>%s</b> to:"
 
 msgid "no guards"
 msgstr ""
@@ -2545,13 +2564,13 @@ msgid "Move applied patches into repository history"
 msgstr ""
 
 msgid "&Delete Patches..."
-msgstr ""
+msgstr "ลบ Patches..."
 
 msgid "Delete selected patches"
-msgstr ""
+msgstr "ลบ patchesที่เลือก"
 
 msgid "Re&name Patch..."
-msgstr ""
+msgstr "เปลี่ยนชื่อ Patch..."
 
 msgid "Set &Guards..."
 msgstr ""
@@ -2563,7 +2582,7 @@ msgid "Patch Queue Actions Toolbar"
 msgstr ""
 
 msgid "Configure guards"
-msgstr ""
+msgstr "ปรับแต่ง guards"
 
 #, python-format
 msgid "Input new guards for %s:"
@@ -2603,7 +2622,7 @@ msgid "Patch Branch Toolbar"
 msgstr ""
 
 msgid "Merge all pending dependencies"
-msgstr ""
+msgstr "ผนวก dependencies ที่ยังค้างอยู่ทั้งหมด"
 
 msgid "Backout current patch branch"
 msgstr ""
@@ -2615,10 +2634,10 @@ msgid "Start a new patch branch"
 msgstr ""
 
 msgid "Edit patch dependency graph"
-msgstr ""
+msgstr "แก้ patch dependency graph"
 
 msgid "will be closed"
-msgstr ""
+msgstr "จะยุติ"
 
 #, python-format
 msgid "needs merge of %i heads\n"
@@ -2630,58 +2649,58 @@ msgstr ""
 
 #, python-format
 msgid "needs merge with %s\n"
-msgstr ""
+msgstr "ต้องการผนวก กับ %s\n"
 
 #, python-format
 msgid "needs update of diff base to tip of %s\n"
 msgstr ""
 
 msgid "&Goto (update workdir)"
-msgstr ""
+msgstr "ไปที่ (update workdir)"
 
 msgid "&Merge"
-msgstr ""
+msgstr "ผนวก"
 
 msgid "No patch branch selected"
-msgstr ""
+msgstr "ไม่มี patch branch ที่ถูกเลือกไว้"
 
 msgid "No editor found"
-msgstr ""
+msgstr "ไม่พบ editor"
 
 msgid ""
 "Mercurial was unable to find an editor. Please configure Mercurial to use an "
 "editor installed on your system."
-msgstr ""
+msgstr "Mercurial ไม่พบ editor. กรุณาระบุให้ Mercurial ใช้ editor ของระบบที่มีอยู่."
 
 msgid "Graph"
 msgstr ""
 
 msgid "Status"
-msgstr ""
+msgstr "สถานะ"
 
 msgid "Title"
 msgstr ""
 
 msgid "Message"
-msgstr ""
+msgstr "ข้อความ"
 
 msgid "New Patch Branch"
-msgstr ""
+msgstr "Patch Branch ใหม่"
 
 msgid "Patch message:"
-msgstr ""
+msgstr "ข้อความ Patch :"
 
 msgid "Patch date:"
-msgstr ""
+msgstr "วันที่ Patch:"
 
 msgid "Patch user:"
-msgstr ""
+msgstr "Patch ผู้ใช้:"
 
 msgid "Invalid Settings - The ReviewBoard server is not setup"
-msgstr ""
+msgstr "มีผิดพลาดที่ Settings - ReviewBoard server ยังไม่ได้ติดตั้ง"
 
 msgid "Invalid Settings - Please provide your ReviewBoard username"
-msgstr ""
+msgstr "พบข้อผิดพลาด ใน Settings - ใส่ ReviewBoard username ด้วย"
 
 #, python-format
 msgid ""
@@ -2690,12 +2709,16 @@ msgid ""
 "\n"
 " %s"
 msgstr ""
+"พบข้อผิดพลาด ใน reviewboard plugin. กรุณาdownload the Mercurial reviewboard "
+"plugin version 3.5 หรือสูงกว่าจาก website นี้.\n"
+"\n"
+" %s"
 
 msgid "Review Board"
 msgstr ""
 
 msgid "Password:"
-msgstr ""
+msgstr "รหัสผ่าน:"
 
 msgid "Error"
 msgstr ""
@@ -2709,7 +2732,7 @@ msgid "Review published to %s\n"
 msgstr ""
 
 msgid "Success"
-msgstr ""
+msgstr "สำเร็จ"
 
 msgid "Repository ID:"
 msgstr ""
@@ -2724,7 +2747,7 @@ msgid "Update the fields of this existing request"
 msgstr ""
 
 msgid "Update Review"
-msgstr ""
+msgstr "ปรับปรุง Review"
 
 msgid "Create diff with all outgoing changes"
 msgstr ""
@@ -2739,7 +2762,7 @@ msgid "%p%"
 msgstr ""
 
 msgid "Connecting to Review Board..."
-msgstr ""
+msgstr "กำลังเชื่อมต่อ Review Board..."
 
 msgid "Post &Review"
 msgstr ""
@@ -2782,90 +2805,86 @@ msgstr ""
 #, python-format
 msgid "Delete %d unknown file"
 msgid_plural "Delete %d unknown files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ลบ %d unknown file"
 
 #, python-format
 msgid "Delete %d ignored file"
 msgid_plural "Delete %d ignored files"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ลบ %d ignored file"
 
 #, python-format
 msgid "Delete %d file in .hg/Trashcan"
 msgid_plural "Delete %d files in .hg/Trashcan"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ลบ %d file ใน .hg/Trashcan"
 
 msgid "Confirm file deletions"
-msgstr ""
+msgstr "ยืนยัน การลบไฟล์"
 
 msgid "Are you sure you want to delete these files and/or folders?"
-msgstr ""
+msgstr "แน่ใจว่าจะลบ files และ/หรือ folders?"
 
 msgid "Deletion failures"
-msgstr ""
+msgstr "ลบไม่ได้"
 
 #, python-format
 msgid "Unable to delete %d file or folder"
 msgid_plural "Unable to delete %d files or folders"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "ไม่สามารถลบ %d file หรือ folder"
 
 msgid "Deleting trash folder..."
-msgstr ""
+msgstr "กำลังลบ trash folder..."
 
 #, python-format
 msgid "Deleted %d files"
-msgstr ""
+msgstr "ไฟล์ %d ถูกลบแล้ว"
 
 #, python-format
 msgid "Deleted %d files and %d folders"
-msgstr ""
+msgstr "%d files และ %d folders ถูกลบแล้ว"
 
 msgid "Delete Patches"
-msgstr ""
+msgstr "ลบ Patches"
 
 msgid "Remove patches from queue?"
-msgstr ""
+msgstr "ลบ patches ออกจาก queue?"
 
 msgid "Keep patch files"
-msgstr ""
+msgstr "เก็บ patch files ไว้"
 
 #, python-format
 msgid "Patch fold - %s"
 msgstr ""
 
 msgid "New patch message:"
-msgstr ""
+msgstr "ข้อความ patch ใหม่:"
 
 msgid "Patches to fold"
 msgstr ""
 
 msgid "Rename Error"
-msgstr ""
+msgstr "เปลี่ยนชื่อผิดพลาด"
 
 msgid "Could not rename existing patchfile"
-msgstr ""
+msgstr "เปลี่ยนชื่อ patchfile นี้ไม่ได้"
 
 msgid "Could not delete existing patchfile"
-msgstr ""
+msgstr "ลบชื่อ patchfile นี้ไม่ได้"
 
 msgid "QRename - Check patchname"
 msgstr ""
 
 #, python-format
 msgid "Patch name <b>%s</b> already exists:"
-msgstr ""
+msgstr "Patch ชื่อ <b>%s</b> มีอยู่แล้ว:"
 
 msgid "Add .OLD extension to existing patchfile"
-msgstr ""
+msgstr "เพิ่ม .OLD extension ไปที่ patchfile เดิม"
 
 msgid "Overwrite existing patchfile"
-msgstr ""
+msgstr "เขียนทับ patchfile เดิม"
 
 msgid "Go back and change new patchname"
-msgstr ""
+msgstr "กลับไปเปลี่ยน patchname ใหม่"
 
 msgid "&Undo"
 msgstr ""
@@ -2874,7 +2893,7 @@ msgid "&Redo"
 msgstr ""
 
 msgid "Cu&t"
-msgstr ""
+msgstr "&ตัด"
 
 msgid "&Copy"
 msgstr ""
@@ -2968,28 +2987,28 @@ msgid "An error occurred while reading the file."
 msgstr ""
 
 msgid "Text Translation Failure"
-msgstr ""
+msgstr "การแปลไม่สำเร็จ"
 
 msgid "Could not translate the file content from native encoding."
-msgstr ""
+msgstr "ไม่สามารถแปลไฟล์จาก  native encoding."
 
 msgid "Several characters would be lost."
 msgstr ""
 
 msgid "Unable to write file"
-msgstr ""
+msgstr "เขียนไฟล์ไม่ได้"
 
 msgid "Could not translate the file content to native encoding."
-msgstr ""
+msgstr "แปลไฟล์เป็น native encoding ไม่ได้."
 
 msgid "Could not open the specified file for writing."
-msgstr ""
+msgstr "เปิดไฟล์เพื่อเขียนไม่ได้"
 
 msgid "An error occurred while writing the file."
-msgstr ""
+msgstr "เกิดข้อผิดพลาดขณะเขียนไฟล์"
 
 msgid "Try refreshing your repository."
-msgstr ""
+msgstr "พยายาม refreshing  repository."
 
 #, python-format
 msgid ""
@@ -3005,72 +3024,72 @@ msgstr ""
 
 #, python-format
 msgid "Operation aborted:<br><br>%(arg0)s."
-msgstr ""
+msgstr "Operation ถูกยกเลิก:<br><br>%(arg0)s."
 
 msgid "Repository is locked"
-msgstr ""
+msgstr "Repository ถูก locked"
 
 msgid "hint:"
 msgstr ""
 
 msgid "Repository Error"
-msgstr ""
+msgstr "ผิดพลาด Repository"
 
 msgid "No visual editor configured"
-msgstr ""
+msgstr "ไม่พบการปรับแต่ง visual editor"
 
 msgid "Please configure a visual editor."
-msgstr ""
+msgstr "กรุณาปรับแต่ง visual editor."
 
 msgid "Editor launch failure"
-msgstr ""
+msgstr "ไม่สามารถใช้ Editor"
 
 msgid "Failed to open path in terminal"
-msgstr ""
+msgstr "ไม่สามารถเเปิด path ใน terminal"
 
 #, python-format
 msgid "\"%s\" is not a valid directory"
-msgstr ""
+msgstr "\"%s\" เป็น directory ที่ไม่ถูกต้อง"
 
 #, python-format
 msgid "Invalid configuration: %s"
-msgstr ""
+msgstr "มีผิดพลาดใน configuration: %s"
 
 msgid "Unable to start the following command:"
-msgstr ""
+msgstr "คำสั่งนี้ไม่สามารถเริ่มงานได้:"
 
 msgid "No shell configured"
-msgstr ""
+msgstr "ไม่ได้ ปรับแต่ง shell"
 
 msgid "A terminal shell must be configured"
-msgstr ""
+msgstr "ต้องปรับแต่ง terminal shell"
 
 msgid "Please enter a username"
-msgstr ""
+msgstr "กรุณาใส่ username"
 
 msgid "You must identify yourself to Mercurial"
-msgstr ""
+msgstr "ต้องระบุตัวตน เพื่อใช้ Mercurial"
 
 msgid "Unable to translate input to local encoding."
-msgstr ""
+msgstr "ไม่สามารถแปล input ไปยัง local encoding."
 
 msgid "Checkmark files to add"
-msgstr ""
+msgstr "Checkmark ไฟล์เพื่อการเพิ่ม"
 
 msgid "Checkmark files to forget"
-msgstr ""
+msgstr "Checkmark ไฟล์เพื่อให้ลืม"
 
 msgid "Forget"
 msgstr ""
 
 msgid "Checkmark files to revert"
-msgstr ""
+msgstr "Checkmark ไฟล์ เพื่อ revert"
 
 msgid "Revert"
 msgstr ""
 
 msgid "Checkmark files to remove"
-msgstr ""
+msgstr "Checkmark ไฟล์เพื่อ ลบออก"
 
 msgid "Remove"
 msgstr ""
@@ -3080,16 +3099,16 @@ msgid "%s - hg %s"
 msgstr ""
 
 msgid "Do not save backup files (*.orig)"
-msgstr ""
+msgstr "ไม่ต้องเก็บ ไฟล์สำรอง (*.orig)"
 
 msgid "Force removal of modified files (--force)"
 msgstr ""
 
 msgid "Add &Largefiles"
-msgstr ""
+msgstr "เพิ่ม &Largefiles"
 
 msgid "No files selected"
-msgstr ""
+msgstr "ไม่มีแฟ้มถูกเลือก"
 
 msgid "No operation to perform"
 msgstr ""
@@ -3112,7 +3131,7 @@ msgid "To rebase destination"
 msgstr ""
 
 msgid "Swap source and destination"
-msgstr ""
+msgstr "สลับ source and destination"
 
 msgid "Keep original changesets (--keep)"
 msgstr ""
@@ -3143,16 +3162,16 @@ msgid ""
 msgstr ""
 
 msgid "You may continue the rebase"
-msgstr ""
+msgstr "ดำเนินการ  rebase ต่อ"
 
 msgid "Rebase is complete"
-msgstr ""
+msgstr "Rebase สำเร็จ"
 
 msgid "Rebase failed"
-msgstr ""
+msgstr "Rebase ไม่สำเร็จ"
 
 msgid "Rebase aborted"
-msgstr ""
+msgstr "Rebase ถูกยกเลิก"
 
 msgid ""
 "Rebase generated merge <b>conflicts</b> that must be <a href=\"resolve"
@@ -3160,10 +3179,10 @@ msgid ""
 msgstr ""
 
 msgid "Exiting with an unfinished rebase is not recommended."
-msgstr ""
+msgstr "ไม่แนะนำให้ยกเลิก เมื่อ rebase ยังไม่เสร็จ"
 
 msgid "Consider aborting the rebase first."
-msgstr ""
+msgstr "ทบทวนการยกเลิก rebase ก่อน."
 
 #, python-format
 msgid "Merge rejected patch chunks into %s"
@@ -3179,13 +3198,13 @@ msgid "Reload File"
 msgstr ""
 
 msgid "Are you sure you want to reload this file?"
-msgstr ""
+msgstr "แน่ใจว่าต้องการ Reload ไฟล์นี้?"
 
 msgid "All unsaved changes will be lost."
-msgstr ""
+msgstr "ที่ไม่ได้เก็บไว้จะหาย"
 
 msgid "Warning"
-msgstr ""
+msgstr "คำเตือน"
 
 msgid ""
 "You have marked all rejected patch chunks as resolved yet you have not "
@@ -3208,16 +3227,16 @@ msgid "Copy source -> destination"
 msgstr ""
 
 msgid "Copy Error"
-msgstr ""
+msgstr "Copy ผิดพลาด"
 
 msgid "Select Source File"
-msgstr ""
+msgstr "เลือก Source ไฟล์"
 
 msgid "Select Source Folder"
-msgstr "Seleccioneu una carpeta d'origen"
+msgstr "เลือก Source Folder"
 
 msgid "Source does not exist."
-msgstr ""
+msgstr "Source ไม่มี."
 
 msgid "The source must be within the repository tree."
 msgstr ""
@@ -3226,10 +3245,10 @@ msgid "The destination must be within the repository tree."
 msgstr ""
 
 msgid "Destination file already exists."
-msgstr ""
+msgstr "Destination file มีอยู่แล้ว."
 
 msgid "Are you sure you want to overwrite it ?"
-msgstr ""
+msgstr "แน่ใจที่จะเขียนทับ?"
 
 #, python-format
 msgid "Copy - %s"
@@ -3237,25 +3256,25 @@ msgstr ""
 
 #, python-format
 msgid "Rename - %s"
-msgstr ""
+msgstr "เปลี่ยนชื่อ - %s"
 
 msgid "Show all"
-msgstr ""
+msgstr "แสดงทั้งหมด"
 
 msgid "### revision set query ###"
 msgstr ""
 
 msgid "Clear current query and query text"
-msgstr ""
+msgstr "ล้าง query นี้และ query text"
 
 msgid "Trigger revision set query"
 msgstr ""
 
 msgid "Open advanced query editor"
-msgstr ""
+msgstr "เปิด advanced query editor"
 
 msgid "Delete selected query from history"
-msgstr ""
+msgstr "ลบ query ที่เลือกไว้จาก history"
 
 msgid "filter"
 msgstr ""
@@ -3264,25 +3283,25 @@ msgid "Toggle filtering of non-matched changesets"
 msgstr ""
 
 msgid "Show/Hide hidden changesets"
-msgstr ""
+msgstr "แสดง/ซ่อน hidden changesets"
 
 msgid "Toggle graft relations visibility"
-msgstr ""
+msgstr "สลับ graft relations visibility"
 
 msgid "Keyword Search"
-msgstr ""
+msgstr "ค้น Keyword"
 
 msgid "Revision Set"
 msgstr ""
 
 msgid "Display graph the named branch only"
-msgstr ""
+msgstr "แสดงแค่  graph the named branch"
 
 msgid "Display only active branches"
-msgstr ""
+msgstr "แสดงแค่ active branches"
 
 msgid "Display closed branches"
-msgstr ""
+msgstr "แสดง closed branches"
 
 msgid "Include all ancestors"
 msgstr ""
@@ -3301,7 +3320,7 @@ msgstr ""
 
 msgctxt "column header"
 msgid "Description"
-msgstr ""
+msgstr "รายละเอียด"
 
 msgctxt "column header"
 msgid "Author"
@@ -3309,11 +3328,11 @@ msgstr ""
 
 msgctxt "column header"
 msgid "Tags"
-msgstr ""
+msgstr "แทกส์"
 
 msgctxt "column header"
 msgid "Latest tags"
-msgstr ""
+msgstr "แทกส์ ล่าสุด"
 
 msgctxt "column header"
 msgid "Node"
@@ -3321,11 +3340,11 @@ msgstr ""
 
 msgctxt "column header"
 msgid "Age"
-msgstr ""
+msgstr "อายุ"
 
 msgctxt "column header"
 msgid "Local Time"
-msgstr ""
+msgstr "เวลาท้องถิ่น"
 
 msgctxt "column header"
 msgid "UTC Time"
@@ -3333,7 +3352,7 @@ msgstr ""
 
 msgctxt "column header"
 msgid "Changes"
-msgstr ""
+msgstr "การเปลี่ยนแปลง"
 
 msgctxt "column header"
 msgid "Converted From"
@@ -3345,17 +3364,17 @@ msgstr ""
 
 msgctxt "column header"
 msgid "Filename"
-msgstr ""
+msgstr "ชื่อไฟล์"
 
 msgid "Searching..."
-msgstr ""
+msgstr "กำลังค้น..."
 
 #, python-format
 msgid "filling (%d)"
 msgstr ""
 
 msgid "Mercurial User"
-msgstr ""
+msgstr "ผู้ใช้ Mercurial"
 
 #, python-format
 msgid "Unsupported repository type (%s)"
@@ -3365,7 +3384,7 @@ msgid "Cannot open non Mercurial repositories or subrepositories"
 msgstr ""
 
 msgid "Confirm Delete"
-msgstr ""
+msgstr "ยืนยันการลบ"
 
 #, python-format
 msgid "Delete Group '%s' and all its entries?"
@@ -3396,13 +3415,13 @@ msgid "&Open"
 msgstr ""
 
 msgid "Open the repository in a new tab"
-msgstr ""
+msgstr "เปิด repository ใน tab ใหม่"
 
 msgid "&Open All"
 msgstr ""
 
 msgid "Open all repositories in new tabs"
-msgstr ""
+msgstr "เปิด repositorie ทั้งหมดใน tab ใหม่"
 
 msgid "New &Group"
 msgstr ""
@@ -3442,13 +3461,13 @@ msgid "&Terminal"
 msgstr ""
 
 msgid "Open a shell terminal in the repository root"
-msgstr ""
+msgstr "เปิด shell terminal ใน repository root"
 
 msgid "&Add Repository..."
-msgstr ""
+msgstr "เพิ่ม Repository..."
 
 msgid "Add a repository to this group"
-msgstr ""
+msgstr "เพิ่ม  repository ใน group นี้"
 
 msgid "A&dd Subrepository..."
 msgstr ""
@@ -3460,22 +3479,22 @@ msgid "Remo&ve Subrepository..."
 msgstr ""
 
 msgid "Remove this subrepository from the current revision"
-msgstr ""
+msgstr "ลบ subrepository นี้ จาก revision ปัจจุบัน"
 
 msgid "Copy the root path of the repository to the clipboard"
 msgstr ""
 
 msgid "Sort by &Name"
-msgstr ""
+msgstr "จัดเรียง ตาม &ชื่อ"
 
 msgid "Sort the group by short name"
-msgstr ""
+msgstr "จัดเรียง group ตาม  short name"
 
 msgid "Sort by &Path"
-msgstr ""
+msgstr "จัดเรียงตาม &Path"
 
 msgid "Sort the group by full path"
-msgstr ""
+msgstr "จัดเรียง group โดย full path"
 
 msgid "&Sort by .hgsub"
 msgstr ""
@@ -3484,21 +3503,21 @@ msgid "Order the subrepos as in .hgsub"
 msgstr ""
 
 msgid "Select repository directory to add"
-msgstr ""
+msgstr "เลือก repository directory เพื่อเพิ่ม"
 
 msgid "Select an existing repository to add as a subrepo"
-msgstr ""
+msgstr "เลื่อก repository นี้เพื่อ เพิ่มเป็น subrepo"
 
 msgid "Cannot add subrepository"
-msgstr ""
+msgstr "เพิ่ม subrepository ไม่ได้"
 
 #, python-format
 msgid "%s is not a valid repository"
-msgstr ""
+msgstr "%s เป็น repository ที่ไม่ถูกต้อง"
 
 #, python-format
 msgid "\"%s\" is not a folder"
-msgstr ""
+msgstr "\"%s\" ไม่ใช่  folder"
 
 msgid "A repository cannot be added as a subrepo of itself"
 msgstr ""
@@ -3512,14 +3531,14 @@ msgid ""
 msgstr ""
 
 msgid "Cannot open repository"
-msgstr ""
+msgstr "เปิด repository ไม่ได้"
 
 #, python-format
 msgid "The selected repository:<br><br>%s<br><br>cannot be open!"
-msgstr ""
+msgstr "repository นี้:<br><br>%s<br><br>เปิดไม่ได้!"
 
 msgid "Subrepository already exists"
-msgstr ""
+msgstr "Subrepository มีอยู่แล้ว"
 
 #, python-format
 msgid ""
@@ -3528,21 +3547,21 @@ msgid ""
 msgstr ""
 
 msgid "Failed to add subrepository"
-msgstr ""
+msgstr "เพิ่ม subrepository ไม่สำเร็จ"
 
 #, python-format
 msgid "Cannot open the .hgsub file in:<br><br>%s"
-msgstr ""
+msgstr "เปิด .hgsub ใน:<br><br>%s ไม่ได้"
 
 msgid "Failed to add repository"
-msgstr ""
+msgstr "เพิ่ม repository ไม่สำเร็จ"
 
 #, python-format
 msgid "The .hgsub file already contains the line:<br><br>%s"
-msgstr ""
+msgstr ".hgsub มี:<br><br>%s บรรทัด อยู่แล้ว"
 
 msgid "Subrepo added to .hgsub file"
-msgstr ""
+msgstr "Subrepo ถูกเพิ่มในไฟล์ o .hgsub"
 
 #, python-format
 msgid ""
@@ -3554,21 +3573,22 @@ msgstr ""
 
 #, python-format
 msgid "Cannot update the .hgsub file in:<br><br>%s"
-msgstr ""
+msgstr "ไม่สามารถปรับปรุงไฟล์ .hgsub ใน:<br><br>%s"
 
 msgid "Could not open .hgsub file"
-msgstr ""
+msgstr "เปิดไฟล์ .hgsub  ไมได้"
 
 msgid "Cannot read the .hgsub file.<p>Subrepository removal failed."
-msgstr ""
+msgstr "อ่านไฟล์ .hgsub ไม่ได้.<p>เอา Subrepository ออกไม่สำเร็จ."
 
 msgid "Subrepository not found"
-msgstr ""
+msgstr "ไม่พบ Subrepository"
 
 msgid ""
 "The selected subrepository was not found on the .hgsub file.<p>Perhaps it "
 "has already been removed?"
 msgstr ""
+"ไฟล์ subrepository ที่ถูกเลือก ไม่พบใน ไฟล์.hgsub.<p>อาจเป็นเพราะถูกเอาออกไปแล้ว?"
 
 msgid "&Yes"
 msgstr ""
@@ -3577,16 +3597,18 @@ msgid "&No"
 msgstr ""
 
 msgid "Remove the selected repository?"
-msgstr ""
+msgstr "เอา  repository ที่ถูกเลือกออก?"
 
 #, python-format
 msgid ""
 "Do you really want to remove the repository \"<i>%s</i>\" from its parent "
 "repository \"<i>%s</i>\""
 msgstr ""
+"แน่ใจว่าต้องการเอา  repository  \"<i>%s</i>\" ออก จาก parent repository \"<i>"
+"%s</i>\""
 
 msgid "Subrepository removed from .hgsub"
-msgstr ""
+msgstr "Subrepository ถูกลบออกจาก .hgsub แล้ว"
 
 msgid ""
 "The selected subrepository has been removed from the .hgsub file.<p>Remember "
@@ -3595,25 +3617,25 @@ msgid ""
 msgstr ""
 
 msgid "Could not update .hgsub file"
-msgstr ""
+msgstr "ไม่สามารถ update ไฟล์ .hgsub"
 
 msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
-msgstr ""
+msgstr "ไม่สามารถ update ไฟล์ .hgsub.<p>การถอน Subrepository ออก ไม่สำเร็จ."
 
 msgid "New Group"
 msgstr ""
 
 msgid "Could not get subrepository list"
-msgstr ""
+msgstr "ไม่ได้รับ subrepository list"
 
 #, python-format
 msgid ""
 "It was not possible to get the subrepository list for the repository in:"
 "<br><br><i>%s</i>"
-msgstr ""
+msgstr "ไม่ได้รับ subrepository list จาก repository ใน:<br><br><i>%s</i>"
 
 msgid "Could not open some subrepositories"
-msgstr ""
+msgstr "ไม่สามารถเปิด subrepositories"
 
 #, python-format
 msgid ""
@@ -3623,14 +3645,14 @@ msgid ""
 msgstr ""
 
 msgid "Updating repository registry"
-msgstr ""
+msgstr "กำลังปรับปรุง repository registry"
 
 #, python-format
 msgid "Loading repository %s"
 msgstr ""
 
 msgid "Repository Registry updated"
-msgstr ""
+msgstr "Repository Registry ถูกปรับปรุงแล้ว"
 
 msgid "Close tab"
 msgstr ""
@@ -3651,7 +3673,7 @@ msgid "Reopen last closed tab group"
 msgstr ""
 
 msgid "Failed to open repository"
-msgstr ""
+msgstr "เปิด repository ไม่สำเร็จ"
 
 msgid "&Sort"
 msgstr ""
@@ -3676,11 +3698,11 @@ msgid "Error loading subrepos"
 msgstr ""
 
 msgid "Unable to update repository name"
-msgstr ""
+msgstr "ไม่สามารถปรับปรุง repository name"
 
 #, python-format
 msgid "An error occurred while updating the repository hgrc file (%s)"
-msgstr ""
+msgstr "เิดผิดพลาดขณะปรับปรุงไฟล์ repository hgrc (%s)"
 
 msgid "default"
 msgstr ""
@@ -3700,7 +3722,7 @@ msgstr ""
 
 #, python-format
 msgid "Can't find revision '%s'"
-msgstr ""
+msgstr "ไม่พบ revision '%s'"
 
 msgid "Drag to change order"
 msgstr ""
@@ -3710,7 +3732,7 @@ msgstr ""
 
 msgctxt "tab tooltip"
 msgid "Revision details"
-msgstr ""
+msgstr "รายละเอียด Revision"
 
 msgctxt "tab tooltip"
 msgid "Commit"
@@ -3718,7 +3740,7 @@ msgstr ""
 
 msgctxt "tab tooltip"
 msgid "Search"
-msgstr ""
+msgstr "ค้น"
 
 msgctxt "tab tooltip"
 msgid "Console log"
@@ -3738,7 +3760,7 @@ msgstr ""
 
 #, python-format
 msgid "Found %d incoming changesets"
-msgstr ""
+msgstr "พบ  %d incoming changesets"
 
 msgid "Pull"
 msgstr ""
@@ -3813,17 +3835,17 @@ msgid "No transaction available"
 msgstr ""
 
 msgid "There is no rollback transaction available"
-msgstr ""
+msgstr "ไม่เหลือ rollback transaction"
 
 msgid "Undo last commit?"
-msgstr ""
+msgstr "ยกเลิก commit ก่อนหน้านี้?"
 
 #, python-format
 msgid "Undo most recent commit (%d), preserving file changes?"
 msgstr ""
 
 msgid "Undo last transaction?"
-msgstr ""
+msgstr "ยกเลิก  transaction ล่าสุด?"
 
 #, python-format
 msgid "Rollback to revision %d (undo %s)?"
@@ -3833,7 +3855,7 @@ msgid "Unable to determine working copy revision\n"
 msgstr ""
 
 msgid "Remove current working revision?"
-msgstr ""
+msgstr "ลบ revision ปัจจุบัน?"
 
 #, python-format
 msgid ""
@@ -3936,7 +3958,7 @@ msgid "Unable to write diff file"
 msgstr ""
 
 msgid "Unable to compress history"
-msgstr ""
+msgstr "จัดเก็บ history แบบย่อไม่ได้"
 
 msgid "Selected changeset pair not related"
 msgstr ""
@@ -3951,7 +3973,7 @@ msgid "Export Selected..."
 msgstr ""
 
 msgid "Email Selected..."
-msgstr ""
+msgstr "Email ที่เลือก..."
 
 msgid "Copy Selected as Patch"
 msgstr ""
@@ -3972,13 +3994,13 @@ msgid "Bisect - Bad, Good..."
 msgstr ""
 
 msgid "Compress History..."
-msgstr ""
+msgstr "History ย่อ..."
 
 msgid "Rebase..."
 msgstr ""
 
 msgid "Goto common ancestor"
-msgstr ""
+msgstr "ไปที่  common ancestor"
 
 msgid "Graft Selected to local..."
 msgstr ""
@@ -4002,13 +4024,13 @@ msgid "Fold patches..."
 msgstr ""
 
 msgid "Delete patches..."
-msgstr ""
+msgstr "ลบ patches..."
 
 msgid "Rename patch..."
-msgstr ""
+msgstr "เปลี่ยนชื่อ patch..."
 
 msgid "Pull to here..."
-msgstr ""
+msgstr "Pull มา ที่นี่..."
 
 msgid "Visual diff..."
 msgstr ""
@@ -4020,7 +4042,7 @@ msgid "Patch Files (*.patch)"
 msgstr ""
 
 msgid "Cannot export revision"
-msgstr ""
+msgstr "Export revision ไม่ได้"
 
 #, python-format
 msgid ""
@@ -4028,6 +4050,9 @@ msgid ""
 "\n"
 "%s\n"
 msgstr ""
+"ไม่สามารถ export revision %s เข้าไปใน ไฟล์ named:\n"
+"\n"
+"%s\n"
 
 msgid "There is already an existing folder with that same name."
 msgstr ""
@@ -4046,19 +4071,19 @@ msgid ""
 msgstr ""
 
 msgid "What do you want to do?\n"
-msgstr ""
+msgstr "จะทำอะไรเอ่ย?\n"
 
 msgid "Replace the existing patch files.\n"
-msgstr ""
+msgstr "แทนที่ patch files นี้.\n"
 
 msgid "Append the changes to the existing patch files.\n"
 msgstr ""
 
 msgid "Abort the export operation.\n"
-msgstr ""
+msgstr "ยกเลิกการ export .\n"
 
 msgid "Patch files already exist"
-msgstr ""
+msgstr "Patch files มีอยู่แล้ว"
 
 msgid "Patch exported"
 msgstr ""
@@ -4092,13 +4117,13 @@ msgid "&More Options..."
 msgstr ""
 
 msgid "Unable to merge"
-msgstr ""
+msgstr "merge ไม่ได้"
 
 msgid "You cannot merge a revision with itself"
 msgstr ""
 
 msgid "Unable to backout"
-msgstr ""
+msgstr "backout ไม่ได้"
 
 msgid "Write bundle"
 msgstr ""
@@ -4153,19 +4178,21 @@ msgid "&Force"
 msgstr ""
 
 msgid "Cannot import selected revision"
-msgstr ""
+msgstr "ไม่สามารถ import revision ที่ถูกเลือก"
 
 #, python-format
 msgid ""
 "The selected revision (rev #%d) cannot be imported because it is not a "
 "descendant of qparent (rev #%d)"
 msgstr ""
+"ไม่สามารถ imported revision (rev #%d) ที่ถูกเลือกนี้ เพราะ it  is not a descendant "
+"of qparent (rev #%d)"
 
 msgid "Invalid command"
-msgstr ""
+msgstr "คำสั่งไม่ถูกต้อง"
 
 msgid "The selected command is empty"
-msgstr ""
+msgstr "คำสั่งที่ถูกเลือกไม่มี"
 
 #, python-format
 msgid ""
@@ -4179,20 +4206,23 @@ msgid ""
 "\n"
 "Please check that the \"thg\" command is valid."
 msgstr ""
+"\n"
+"\n"
+"กรุณาตรวจความถูกต้องคำสั่ง  \"thg\"."
 
 msgid "Failed to execute custom TortoiseHg command"
-msgstr ""
+msgstr "Execute คำสั่ง(custom) TortoiseHg ไม่สำเร็จ"
 
 #, python-format
 msgid "The command \"%s\" failed (code %d)."
-msgstr ""
+msgstr "คำสั่ง \"%s\" ไม่สำเร็จ (code %d)."
 
 msgid "Failed to execute custom command"
-msgstr ""
+msgstr "Execute คำสั่ง(custom) ไม่สำเร็จ"
 
 #, python-format
 msgid "The command \"%s\" could not be executed."
-msgstr ""
+msgstr "ไม่สามารถดำเนิน การคำสั่ง  \"%s\" ได้."
 
 #, python-format
 msgid ""
@@ -4221,7 +4251,7 @@ msgid "Local revision information"
 msgstr ""
 
 msgid "Other revision information"
-msgstr ""
+msgstr "ข้อมูล revision อื่นๆ"
 
 msgid "Unresolved conflicts"
 msgstr ""
@@ -4720,7 +4750,7 @@ msgid "use pull protocol to copy metadata"
 msgstr ""
 
 msgid "use uncompressed transfer (fast over LAN)"
-msgstr ""
+msgstr "ใช้ uncompressed transfer (fast over LAN)"
 
 msgid "thg clone [OPTION]... [SOURCE] [DEST]"
 msgstr ""
@@ -4771,7 +4801,7 @@ msgid "select the specified revision"
 msgstr ""
 
 msgid "side-by-side comparison of revisions"
-msgstr ""
+msgstr "side-by-side การเปรียบเทียบของ revisions"
 
 msgid "thg filelog [OPTION]... FILE"
 msgstr ""
@@ -4825,6 +4855,8 @@ msgid ""
 "list of commands:\n"
 "\n"
 msgstr ""
+"รายการคำสั่ง:\n"
+"\n"
 
 #, python-format
 msgid ""
@@ -4881,13 +4913,13 @@ msgid "cannot specify both -k/--query and filenames"
 msgstr ""
 
 msgid "revision to display"
-msgstr ""
+msgstr "revision ที่แสดง"
 
 msgid "thg manifest [-r REV] [FILE]"
 msgstr ""
 
 msgid "revision to merge"
-msgstr ""
+msgstr "revision ที่ผนวก"
 
 msgid "thg merge [[-r] REV]"
 msgstr ""
@@ -4935,7 +4967,7 @@ msgid "Resuming rebase already in progress"
 msgstr ""
 
 msgid "You must provide source and dest arguments"
-msgstr ""
+msgstr "ต้องให้ค่า source และ dest"
 
 msgid "thg rejects [FILE]"
 msgstr ""
@@ -4968,7 +5000,7 @@ msgid "thg revert [FILE]..."
 msgstr ""
 
 msgid "revision to update"
-msgstr ""
+msgstr "revision เพื่อปรับปรุง"
 
 msgid "thg rupdate [[-r] REV]"
 msgstr ""
@@ -5040,7 +5072,7 @@ msgid "thg sync [OPTION]... [PEER]"
 msgstr ""
 
 msgid "replace existing tag"
-msgstr ""
+msgstr "แทน  tag ที่มีอยู่"
 
 msgid "make the tag local"
 msgstr ""
@@ -5049,25 +5081,25 @@ msgid "revision to tag"
 msgstr ""
 
 msgid "remove a tag"
-msgstr ""
+msgstr "ลบ tag"
 
 msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
 msgstr ""
 
 msgid "wait until the second ticks over"
-msgstr ""
+msgstr "รอจนกระทั่ง ticks ครั้งที่สองผ่านไป"
 
 msgid "notify the shell for paths given"
 msgstr ""
 
 msgid "remove the status cache"
-msgstr ""
+msgstr "ลบสถานะ  cache"
 
 msgid "show the contents of the status cache (no update)"
 msgstr ""
 
 msgid "update all repos in current dir"
-msgstr ""
+msgstr "ปรับปรุง repos ทั้งหมดใน dir ปัจจุบัน"
 
 msgid "thg thgstatus [OPTION]"
 msgstr ""
@@ -5091,7 +5123,7 @@ msgid "launch visual diff tool"
 msgstr ""
 
 msgid "print license"
-msgstr ""
+msgstr "พิมพ์ license"
 
 msgid "thg version [OPTION]"
 msgstr ""
@@ -5116,13 +5148,13 @@ msgid "Perform a push before updating (-p/--push)"
 msgstr ""
 
 msgid "Allow pushing new branches (--new-branch)"
-msgstr ""
+msgstr "อนุญาตให้ pushing branches ใหม่ (--new-branch)"
 
 msgid "Force push to remote location (-f/--force)"
 msgstr ""
 
 msgid "remove working directory"
-msgstr ""
+msgstr "ลบ working directory"
 
 msgid "unknown revision!"
 msgstr ""
@@ -5145,7 +5177,7 @@ msgid "Running at %s"
 msgstr ""
 
 msgid "Stopped"
-msgstr ""
+msgstr "หยุดแล้ว"
 
 msgid "TortoiseHg Web Server"
 msgstr ""
@@ -5157,16 +5189,16 @@ msgid "Port:"
 msgstr ""
 
 msgid "Status:"
-msgstr ""
+msgstr "สถานะ:"
 
 msgid "Start"
 msgstr ""
 
 msgid "Settings"
-msgstr ""
+msgstr "การตั้งค่า"
 
 msgid "<unspecified>"
-msgstr ""
+msgstr "<ไม่เจาะจง>"
 
 msgid "&True"
 msgstr ""
@@ -5401,7 +5433,7 @@ msgid ""
 msgstr ""
 
 msgid "Long Summary"
-msgstr ""
+msgstr "สรุปแบบยาว"
 
 msgid ""
 "If true, concatenate multiple lines of changeset summary and truncate them "
@@ -5436,7 +5468,7 @@ msgid ""
 msgstr ""
 
 msgid "Hide Tags"
-msgstr ""
+msgstr "ซ่อน Tags"
 
 msgid ""
 "Space separated list of tags that will not be shown. Useful example: Specify "
@@ -5459,7 +5491,7 @@ msgid ""
 msgstr ""
 
 msgid "Show Family Line"
-msgstr ""
+msgstr "แสดงเส้น Family"
 
 msgid ""
 "Show indirect revision dependency on the revision graph when filtered by "
@@ -5489,7 +5521,7 @@ msgid ""
 msgstr ""
 
 msgid "Summary Line Length"
-msgstr ""
+msgstr "ความกว้าง ของ Summary Line"
 
 msgid ""
 "Suggested length of commit message lines. A red vertical line will mark this "
@@ -5498,7 +5530,7 @@ msgid ""
 msgstr ""
 
 msgid "Close After Commit"
-msgstr ""
+msgstr "ปิดหลังจาก Commit"
 
 msgid "Close the commit tool after every successful commit.  Default: False"
 msgstr ""
@@ -5529,7 +5561,7 @@ msgid ""
 msgstr ""
 
 msgid "English Messages"
-msgstr ""
+msgstr "ข้อความ English"
 
 msgid ""
 "Generate English commit messages even if LANGUAGE or LANG environment "
@@ -5576,7 +5608,7 @@ msgid ""
 msgstr ""
 
 msgid "Confirm adding unknown files"
-msgstr ""
+msgstr "ยืนยันการเพิ่ม unknown files"
 
 msgid ""
 "Determines if TortoiseHg should show a confirmation dialog before adding new "
@@ -5586,7 +5618,7 @@ msgid ""
 msgstr ""
 
 msgid "Confirm deleting files"
-msgstr ""
+msgstr "ยืนยันการ ลบไฟล์"
 
 msgid ""
 "Determines if TortoiseHg should show a confirmation dialog before removing "
@@ -5620,7 +5652,7 @@ msgid ""
 msgstr ""
 
 msgid "Confirm Push"
-msgstr ""
+msgstr "ยืนยัน Push"
 
 msgid ""
 "Determines if TortoiseHg should show a confirmation dialog before pushing "
@@ -5638,7 +5670,7 @@ msgid ""
 msgstr ""
 
 msgid "SSH Command"
-msgstr ""
+msgstr "คำสั่ง SSH"
 
 msgid ""
 "Command to use for SSH connections.<p>Default: \"ssh\" or \"TortoisePlink."
@@ -5680,7 +5712,7 @@ msgid "Textual description of the repository's purpose or contents."
 msgstr ""
 
 msgid "Contact"
-msgstr ""
+msgstr "การติดต่อ"
 
 msgid "Name or email address of the person in charge of the repository."
 msgstr ""
@@ -5689,7 +5721,7 @@ msgid "Style"
 msgstr ""
 
 msgid "Which template map style to use"
-msgstr ""
+msgstr "เลือก template map style เพื่อใช้งาน"
 
 msgid "Archive Formats"
 msgstr ""
@@ -5732,7 +5764,7 @@ msgid "Maximum number of changes to list on the changelog. Default: 10"
 msgstr ""
 
 msgid "Allow Push"
-msgstr ""
+msgstr "อนุญาต Push"
 
 msgid ""
 "Whether to allow pushing to the repository. If empty or not set, push is not "
@@ -5744,7 +5776,7 @@ msgid ""
 msgstr ""
 
 msgid "Deny Push"
-msgstr ""
+msgstr "ไม่อนุญาต Push"
 
 msgid ""
 "Whether to deny pushing to the repository. If empty or not set, push is not "
@@ -5775,31 +5807,31 @@ msgid "Optional. User name to authenticate with at the proxy server"
 msgstr ""
 
 msgid "Password"
-msgstr ""
+msgstr "รหัสผ่าน"
 
 msgid "Optional. Password to authenticate with at the proxy server"
 msgstr ""
 
 msgid "From"
-msgstr ""
+msgstr "จาก"
 
 msgid "Email address to use in the \"From\" header and for the SMTP envelope"
 msgstr ""
 
 msgid "To"
-msgstr ""
+msgstr "ถึง"
 
 msgid "Comma-separated list of recipient email addresses"
 msgstr ""
 
 msgid "Cc"
-msgstr ""
+msgstr "สำเนาถึง"
 
 msgid "Comma-separated list of carbon copy recipient email addresses"
 msgstr ""
 
 msgid "Bcc"
-msgstr ""
+msgstr "แอบสำเนาถึง"
 
 msgid "Comma-separated list of blind carbon copy recipient email addresses"
 msgstr ""
@@ -5883,13 +5915,13 @@ msgid ""
 msgstr ""
 
 msgid "No Dates"
-msgstr ""
+msgstr "ไม่มี วันที่"
 
 msgid "Do not include modification dates in diff headers. Default: False"
 msgstr ""
 
 msgid "Show Function"
-msgstr ""
+msgstr "แสดง Function"
 
 msgid "Show which function each change is in. Default: False"
 msgstr ""
@@ -5930,10 +5962,10 @@ msgid ""
 msgstr ""
 
 msgid "Fonts"
-msgstr ""
+msgstr "แบบอักษร"
 
 msgid "Message Font"
-msgstr ""
+msgstr "Font ข้อความ"
 
 msgid "Font used to display commit messages. Default: monospace 10"
 msgstr ""
@@ -5945,7 +5977,7 @@ msgid "Font used to display text differences. Default: monospace 10"
 msgstr ""
 
 msgid "List Font"
-msgstr ""
+msgstr "รายชื่อ Font"
 
 msgid "Font used to display file lists. Default: sans 9"
 msgstr ""
@@ -5963,16 +5995,16 @@ msgid "Font used to display output messages. Default: sans 8"
 msgstr ""
 
 msgid "Extensions"
-msgstr ""
+msgstr "ส่วนขยาย"
 
 msgid "Tools"
-msgstr ""
+msgstr "เครื่องมือ"
 
 msgid "Hooks"
 msgstr ""
 
 msgid "Issue Tracking"
-msgstr ""
+msgstr "Tracking ปัญหา"
 
 msgid "Issue Regex"
 msgstr ""
@@ -6017,7 +6049,7 @@ msgid ""
 msgstr ""
 
 msgid "Configure Issue Tracker"
-msgstr ""
+msgstr "ปรับแต่ง Issue Tracker"
 
 msgid "Configure the selected COM Bug Tracker plugin."
 msgstr ""
@@ -6085,7 +6117,7 @@ msgid ""
 msgstr ""
 
 msgid "Size"
-msgstr ""
+msgstr "ขนาด"
 
 msgid ""
 "Files of at least the specified size (in megabytes) will be added as bfiles"
@@ -6107,7 +6139,7 @@ msgid ""
 msgstr ""
 
 msgid "Minimum Size"
-msgstr ""
+msgstr "ขนาดเล็กสุด"
 
 msgid ""
 "Files of at least the specified size (in megabytes) will be added as "
@@ -6146,7 +6178,7 @@ msgid ""
 msgstr ""
 
 msgid "Include"
-msgstr ""
+msgstr "รวม"
 
 msgid ""
 "List of settings that will be pulled from the project configuration file. "
@@ -6154,7 +6186,7 @@ msgid ""
 msgstr ""
 
 msgid "Exclude"
-msgstr ""
+msgstr "ไม่รวม"
 
 msgid ""
 "List of settings that will NOT be pulled from the project configuration "
@@ -6189,7 +6221,7 @@ msgid "GPG key ID associated with user. Default: None (leave blank)"
 msgstr ""
 
 msgid "TortoiseHg Settings"
-msgstr ""
+msgstr "การติดตั้ง TortoiseHg"
 
 msgid "Iniparse package not found"
 msgstr ""
@@ -6202,10 +6234,10 @@ msgid "%s's global settings"
 msgstr ""
 
 msgid "No repository found"
-msgstr ""
+msgstr "ไม่พบ repository"
 
 msgid "no repo at "
-msgstr ""
+msgstr "ไม่มี repo ที่ "
 
 #, python-format
 msgid "%s project settings (.hg/projrc)"
@@ -6226,22 +6258,22 @@ msgid "&No (discard changes)"
 msgstr ""
 
 msgid "Reload"
-msgstr ""
+msgstr "เรียกซ้ำ"
 
 msgid "Settings File:"
-msgstr ""
+msgstr "ไฟล์ติดตั้ง:"
 
 msgid "Confirm Save"
-msgstr ""
+msgstr "ยืนยันการเก็บ"
 
 msgid "Save changes before editing?"
-msgstr ""
+msgstr "เก็บก่อนแก้ไข?"
 
 msgid "&Save"
-msgstr ""
+msgstr "เก็บ"
 
 msgid "Confirm Reload"
-msgstr ""
+msgstr "ยืนยันเรียกซ้ำ"
 
 msgid ""
 "Unsaved changes will be lost.\n"
@@ -6292,7 +6324,7 @@ msgid "Warning: affects all Tortoises, logoff required after change"
 msgstr ""
 
 msgid "Added"
-msgstr ""
+msgstr "เพิ่มแล้ว"
 
 msgid "Locked*"
 msgstr ""
@@ -6304,10 +6336,10 @@ msgid "Unversioned"
 msgstr ""
 
 msgid "Readonly*"
-msgstr ""
+msgstr "อ่านได้อย่างเดียว*"
 
 msgid "Deleted*"
-msgstr ""
+msgstr "ลบแล้ว*"
 
 msgid "*: not used by TortoiseHg"
 msgstr ""
@@ -6316,7 +6348,7 @@ msgid "Taskbar"
 msgstr ""
 
 msgid "Show Icon"
-msgstr ""
+msgstr "แสดง Icon"
 
 msgid "Highlight Icon"
 msgstr ""
@@ -6336,16 +6368,16 @@ msgid "Explorer Extension Settings - TortoiseHg"
 msgstr ""
 
 msgid "Clear"
-msgstr ""
+msgstr "ลบ"
 
 msgid "Clear the current shelf file"
-msgstr ""
+msgstr "ลบไฟล์  shelf ปัจจุบัน"
 
 msgid "Delete the current shelf file"
 msgstr ""
 
 msgid "Left Toolbar"
-msgstr ""
+msgstr "Toolbar ซ้าย"
 
 msgid "Delete selected chunks"
 msgstr ""
@@ -6357,7 +6389,7 @@ msgid "Move selected file right"
 msgstr ""
 
 msgid "Edit file"
-msgstr ""
+msgstr "แก้ file"
 
 msgid "Move selected chunks right"
 msgstr ""
@@ -6372,7 +6404,7 @@ msgid "New Shelf"
 msgstr ""
 
 msgid "Right Toolbar"
-msgstr ""
+msgstr "Toolbar ขวา"
 
 msgid "Move selected chunks left"
 msgstr ""
@@ -6398,36 +6430,36 @@ msgid "Delete selected chunks from shelf file %s?"
 msgstr ""
 
 msgid "Are you sure?"
-msgstr ""
+msgstr "แน่ใจ?"
 
 msgid "TortoiseHg New Shelf Name"
 msgstr ""
 
 msgid "Specify name of new shelf"
-msgstr ""
+msgstr "ระบุชื่อของ new shelf"
 
 msgid "Bad filename"
-msgstr ""
+msgstr "filename ไม่ถูก"
 
 #, python-format
 msgid "A shelf name cannot contain %s"
 msgstr ""
 
 msgid "File already exists"
-msgstr ""
+msgstr "มีไฟล์นี้อยู่แล้ว"
 
 msgid "A shelf file of that name already exists"
 msgstr ""
 
 msgid "New shelf created"
-msgstr ""
+msgstr "New shelf ได้ถูกสร้าง"
 
 #, python-format
 msgid "Delete shelf file %s?"
-msgstr ""
+msgstr "ลบ  shelf file %s?"
 
 msgid "Shelf deleted"
-msgstr ""
+msgstr "Shelf ถูกลบ"
 
 msgid "Revert all working copy changes?"
 msgstr ""
@@ -6460,7 +6492,7 @@ msgid "No commit"
 msgstr ""
 
 msgid "Use custom commit message:"
-msgstr ""
+msgstr "ใช้ custom commit ข้อความ:"
 
 msgid "&Sign"
 msgstr ""
@@ -6470,7 +6502,7 @@ msgid "Sign - %s"
 msgstr ""
 
 msgid "Signature has been added"
-msgstr ""
+msgstr "Signature ได้ถูกเพิ่มแล้ว"
 
 msgid "Repository command still running"
 msgstr ""
@@ -6496,19 +6528,19 @@ msgstr ""
 
 #, python-format
 msgid "%s - status"
-msgstr ""
+msgstr "%s - สถานะ"
 
 msgid "Check"
-msgstr ""
+msgstr "ตรวจสอบ"
 
 msgid "Uncheck"
 msgstr ""
 
 msgid "status"
-msgstr ""
+msgstr "สถานะ"
 
 msgid "Failed to refresh"
-msgstr ""
+msgstr "refresh ไม่สำเร็จ"
 
 msgid "No appropriate files"
 msgstr ""
@@ -6517,13 +6549,13 @@ msgid "No files found for this operation"
 msgstr ""
 
 msgid "Stat"
-msgstr ""
+msgstr "สถิติ"
 
 msgid "M"
 msgstr ""
 
 msgid "Filename"
-msgstr ""
+msgstr "ชื่อไฟล์"
 
 msgid "Size (KB)"
 msgstr ""
@@ -6543,42 +6575,42 @@ msgid "%s is modified"
 msgstr ""
 
 msgid "modified"
-msgstr ""
+msgstr "มีการแก้ไข"
 
 #, python-format
 msgid "%s is added"
-msgstr ""
+msgstr "%s ถูกเพิ่ม"
 
 msgid "added"
-msgstr ""
+msgstr "เพิ่มแล้ว"
 
 #, python-format
 msgid "%s is removed"
-msgstr ""
+msgstr "%s ถูกลบออก"
 
 msgid "removed"
-msgstr ""
+msgstr "ลบแล้ว"
 
 #, python-format
 msgid "%s is not tracked (unknown)"
 msgstr ""
 
 msgid "unknown"
-msgstr ""
+msgstr "ไม่ทราบ"
 
 #, python-format
 msgid "%s is deleted by non-hg command, but still tracked"
 msgstr ""
 
 msgid "missing"
-msgstr ""
+msgstr "หาย"
 
 #, python-format
 msgid "%s is ignored"
 msgstr ""
 
 msgid "ignored"
-msgstr ""
+msgstr "เพิกเฉย"
 
 #, python-format
 msgid "%s is not modified (clean)"
@@ -6619,7 +6651,7 @@ msgid "Unbundle"
 msgstr ""
 
 msgid "Stop current operation"
-msgstr ""
+msgstr "หยุดการทำงานปัจจุบัน"
 
 msgid "<b>Selected Options:</b>"
 msgstr ""
@@ -6628,13 +6660,13 @@ msgid "Path Edit Toolbar"
 msgstr ""
 
 msgid "Security"
-msgstr ""
+msgstr "ความปลอดภัย"
 
 msgid "Manage HTTPS connection security and user authentication"
 msgstr ""
 
 msgid "Save"
-msgstr ""
+msgstr "เก็บ"
 
 msgid "Save current URL under an alias"
 msgstr ""
@@ -6659,10 +6691,10 @@ msgid "Post Pull: "
 msgstr ""
 
 msgid "&Edit..."
-msgstr ""
+msgstr "&แก้ไข..."
 
 msgid "&Remove..."
-msgstr ""
+msgstr "ลบ..."
 
 msgid "Repository not local"
 msgstr ""
@@ -6678,10 +6710,10 @@ msgid "Delete %s from your repo configuration file?"
 msgstr ""
 
 msgid "No host specified"
-msgstr ""
+msgstr "ไม่เจาะจง host"
 
 msgid "Please set a valid URL to continue."
-msgstr ""
+msgstr "กรุณาใส่ URL ที่ถูกต้องเพื่อดำเนินการต่อ."
 
 msgid "No remote repository URL or path set"
 msgstr ""
@@ -6721,15 +6753,15 @@ msgstr ""
 
 #, python-format
 msgid "Pulling from %s..."
-msgstr ""
+msgstr "ดึงมาจากfrom %s..."
 
 #, python-format
 msgid "Pull from %s completed"
-msgstr ""
+msgstr "ดึงมาจาก %s completed"
 
 #, python-format
 msgid "Pull from %s aborted, ret %d"
-msgstr ""
+msgstr "ดึงมาจาก %s aborted, ret %d"
 
 msgid "Merge caused file conflicts"
 msgstr ""
@@ -6762,7 +6794,7 @@ msgstr ""
 
 #, python-format
 msgid "%s (pending)"
-msgstr ""
+msgstr "%s (ค้างอยู่)"
 
 msgid "Unable to parse p4pending output"
 msgstr ""
@@ -6835,7 +6867,7 @@ msgid "Bundle files (*.hg)"
 msgstr ""
 
 msgid "Unable to remove URL"
-msgstr ""
+msgstr "ลบ URL ออกไม่ได้"
 
 msgid "Post Pull Behavior"
 msgstr ""
@@ -6847,7 +6879,7 @@ msgid "None - simply pull changesets"
 msgstr ""
 
 msgid "Update - pull, then try to update"
-msgstr ""
+msgstr "ปรับปรุง - pull, หลังจากนั้นพยายามปรับปรุง"
 
 msgid "Fetch - use fetch (auto merge pulled changes)"
 msgstr ""
@@ -6868,22 +6900,22 @@ msgid "UpdateOrRebase - use rebase extension (rebase is not active!)"
 msgstr ""
 
 msgid "<a href=\"config\">Launch settings tool...</a>"
-msgstr ""
+msgstr "<a href=\"config\">เริ่ม การปรับแต่งเครื่องมือ...</a>"
 
 msgid "Unable to save post pull operation"
 msgstr ""
 
 msgid "Save Path"
-msgstr ""
+msgstr "เก็บ Path"
 
 msgid "Alias"
-msgstr ""
+msgstr "ชื่อที่ใช้แทน"
 
 msgid "URL"
 msgstr ""
 
 msgid "Remove authentication data from URL"
-msgstr ""
+msgstr "ลบ ข้อมูล authentication ออกจาก URL"
 
 msgid ""
 "User authentication data should be associated with the hostname using the "
@@ -6891,7 +6923,7 @@ msgid ""
 msgstr ""
 
 msgid "Update subrepo paths"
-msgstr ""
+msgstr "ปรับปรุง paths ของ subrepo"
 
 #, python-format
 msgid ""
@@ -6900,14 +6932,14 @@ msgid ""
 msgstr ""
 
 msgid "Unable to save an URL"
-msgstr ""
+msgstr "ไม่สามารถเก็บ URL"
 
 msgid "Confirm URL replace"
-msgstr ""
+msgstr "ยืนยัน ทับแทน URL"
 
 #, python-format
 msgid "%s already exists, replace URL?"
-msgstr ""
+msgstr "%s มีแล้ว, ใช้ URL แทน?"
 
 #, python-format
 msgid ""
@@ -6916,7 +6948,7 @@ msgid ""
 msgstr ""
 
 msgid "Security: "
-msgstr ""
+msgstr "ความปลอดภัย: "
 
 #, python-format
 msgid "<b>Host:</b> %s"
@@ -7031,7 +7063,7 @@ msgid "Replace existing tag (-f/--force)"
 msgstr ""
 
 msgid "Use English commit message"
-msgstr ""
+msgstr "ใช้ ภาษาอังกฤษ ในการ commit ข้อความ"
 
 msgid "local"
 msgstr ""
@@ -7057,7 +7089,7 @@ msgstr ""
 
 #, python-format
 msgid "Removed tag %s"
-msgstr ""
+msgstr "ลบ tag %s ออก"
 
 #, python-format
 msgid "Tag '%s' has been removed"
@@ -7074,13 +7106,13 @@ msgid "Browse Directory..."
 msgstr ""
 
 msgid "Import from Clipboard"
-msgstr ""
+msgstr "Import จาก Clipboard"
 
 msgid "Do not strip paths (-p0), required for SVN patches"
 msgstr ""
 
 msgid "Preview:"
-msgstr ""
+msgstr "แสดงตัวอย่าง:"
 
 msgid "Shelf"
 msgstr ""
@@ -7118,7 +7150,7 @@ msgid "Discard local changes, no backup (-f/--force)"
 msgstr ""
 
 msgid "No backup (-n/--nobackup)"
-msgstr ""
+msgstr "ไม่ backup (-n/--nobackup)"
 
 msgid "Do not modify working copy during strip (-k/--keep)"
 msgstr ""
@@ -7127,7 +7159,6 @@ msgstr ""
 msgid "<b>%d changeset</b> will be stripped"
 msgid_plural "<b>%d changesets</b> will be stripped"
 msgstr[0] ""
-msgstr[1] ""
 
 msgid "Unknown revision!"
 msgstr ""
@@ -7161,10 +7192,10 @@ msgid "Parent 2:"
 msgstr ""
 
 msgid "Pull subrepos from:"
-msgstr ""
+msgstr "ดึง subrepos จาก:"
 
 msgid "List updated files (--verbose)"
-msgstr ""
+msgstr "รายการไฟล์ที่ถูกปรับปรุง (--verbose)"
 
 msgid "Discard local changes, no backup (-C/--clean)"
 msgstr ""
@@ -7207,7 +7238,7 @@ msgid ""
 msgstr ""
 
 msgid "Discard - discard local changes, no backup"
-msgstr ""
+msgstr "ยกเลิก- discard local changes, no backup"
 
 msgid "&Shelve"
 msgstr ""
@@ -7216,14 +7247,14 @@ msgid "Shelve - move local changes to a patch"
 msgstr ""
 
 msgid "Merge - allow to merge with local changes"
-msgstr ""
+msgstr "ผนวก- allow to merge with local changes"
 
 msgid "Confirm Update"
-msgstr ""
+msgstr "ยืนยันการปรับปรุง"
 
 #, python-format
 msgid "Update - %s"
-msgstr ""
+msgstr "ปรับปรุง - %s"
 
 msgid "[non-existant]"
 msgstr ""
@@ -7248,19 +7279,19 @@ msgid "[original]"
 msgstr ""
 
 msgid "Unable to find changeset"
-msgstr ""
+msgstr "ไม่พบ changeset"
 
 msgid "You likely need to refresh this application"
 msgstr ""
 
 msgid "No file changes"
-msgstr ""
+msgstr "ไม่พบไฟล์ที่มีการเปลี่ยนแปลง"
 
 msgid "There are no file changes to view"
 msgstr ""
 
 msgid "working changes"
-msgstr ""
+msgstr "กำลังเปลี่ยนแปลง"
 
 #, python-format
 msgid "changeset %d:%s"
@@ -7277,10 +7308,10 @@ msgid " filtered"
 msgstr ""
 
 msgid "Temporary files are removed when this dialog is closed"
-msgstr ""
+msgstr "ไฟล์ Temporary ถูกลบเมื่อ dialog นี้ปิด"
 
 msgid "Select Tool:"
-msgstr ""
+msgstr "เลือกเครื่องมือ:"
 
 msgid "Dir diff to p1"
 msgstr ""
@@ -7295,19 +7326,19 @@ msgid "Directory diff"
 msgstr ""
 
 msgid "Confirm Discard"
-msgstr ""
+msgstr "ยืนยันยกเลิก"
 
 msgid "Discard outstanding changes to working directory?"
 msgstr ""
 
 msgid "Config files (*.conf *.config *.ini)"
-msgstr ""
+msgstr "ไฟล์ปรับแต่ง (*.conf *.config *.ini)"
 
 msgid "Open hgweb config"
-msgstr ""
+msgstr "เปิด hgweb config"
 
 msgid "Save hgweb config"
-msgstr ""
+msgstr "เก็บ hgweb config"
 
 msgid "Path:"
 msgstr ""
@@ -7316,10 +7347,10 @@ msgid "Local Path:"
 msgstr ""
 
 msgid "Select Repository"
-msgstr ""
+msgstr "เลือก Repository"
 
 msgid "Add Path to Serve"
-msgstr ""
+msgstr "เพิ่ม Path ไป Serve"
 
 msgid "Edit Path to Serve"
 msgstr ""
@@ -7331,22 +7362,22 @@ msgid "Webconf"
 msgstr ""
 
 msgid "Config File:"
-msgstr ""
+msgstr "ไฟล์ปรับแต่ง:"
 
 msgid "Open"
-msgstr ""
+msgstr "เปิด"
 
 msgid "New &Workbench"
 msgstr ""
 
 msgid "&New Repository..."
-msgstr ""
+msgstr "สร้าง Repository ใหม่ ..."
 
 msgid "Clon&e Repository..."
 msgstr ""
 
 msgid "&Open Repository..."
-msgstr ""
+msgstr "เปิด Repository..."
 
 msgid "&File"
 msgstr ""
@@ -7382,7 +7413,7 @@ msgid "Show &Patch Queue"
 msgstr ""
 
 msgid "Show Conso&le"
-msgstr ""
+msgstr "แสดง Conso&le"
 
 msgid "Place Console in Doc&k Area"
 msgstr ""
@@ -7406,7 +7437,7 @@ msgid "Revision &Details"
 msgstr ""
 
 msgid "&Search"
-msgstr ""
+msgstr "&ค้นหา"
 
 msgid "S&ynchronize"
 msgstr ""
@@ -7427,7 +7458,7 @@ msgid "Load all revisions into graph"
 msgstr ""
 
 msgid "Go to current revision"
-msgstr ""
+msgstr "ไปที่ revision ปัจจุบัน"
 
 msgid "&Goto Revision..."
 msgstr ""
@@ -7643,7 +7674,7 @@ msgid "cannot move into applied patches"
 msgstr ""
 
 msgid "abort: "
-msgstr ""
+msgstr "ยกเลิก: "
 
 msgid "hint: "
 msgstr ""
@@ -7703,50 +7734,43 @@ msgstr ""
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d ปี"
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d เดือน"
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d สัปดาห์"
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d วัน"
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d ชั่วโมง"
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d นาที"
 
 #, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d วินาที"
 
 msgid "in the future"
 msgstr ""
 
 msgid "now"
-msgstr ""
+msgstr "ขณะนี้"
 
 msgid "Commit..."
 msgstr ""
@@ -7755,28 +7779,28 @@ msgid "Commit changes in repository"
 msgstr ""
 
 msgid "Create Repository Here"
-msgstr ""
+msgstr "สร้าง Repository ที่นี่"
 
 msgid "Create a new repository"
-msgstr ""
+msgstr "สร้าง repository ใหม่"
 
 msgid "Clone..."
 msgstr ""
 
 msgid "Create clone here from source"
-msgstr ""
+msgstr "สร้าง clone ที่นี่ จาก source"
 
 msgid "File Status"
-msgstr ""
+msgstr "สถานะไฟล์"
 
 msgid "Repository status & changes"
 msgstr ""
 
 msgid "Add Files..."
-msgstr ""
+msgstr "เพิ่มไฟล์..."
 
 msgid "Add files to version control"
-msgstr ""
+msgstr "เพิ่มไฟล์สู่ version control"
 
 msgid "Revert Files..."
 msgstr ""
@@ -7788,13 +7812,13 @@ msgid "Forget Files..."
 msgstr ""
 
 msgid "Remove files from version control"
-msgstr ""
+msgstr "ลบไฟล์จาก version control"
 
 msgid "Remove Files..."
-msgstr ""
+msgstr "ลบไฟล์..."
 
 msgid "Rename File"
-msgstr ""
+msgstr "เปลี่ยนชื่อไฟล์"
 
 msgid "Rename file or directory"
 msgstr ""
@@ -7803,7 +7827,7 @@ msgid "View change history in repository"
 msgstr ""
 
 msgid "File History"
-msgstr ""
+msgstr "ประวัติไฟล์"
 
 msgid "View change history of selected files"
 msgstr ""
@@ -7821,19 +7845,19 @@ msgid "Synchronize with remote repository"
 msgstr ""
 
 msgid "Start web server for this repository"
-msgstr ""
+msgstr "เริ่ม web server สำหรับ repository นี้"
 
 msgid "Update..."
-msgstr ""
+msgstr "ปรับปรุง..."
 
 msgid "Update working directory"
 msgstr ""
 
 msgid "Update Icons"
-msgstr ""
+msgstr "ปรับปรุง Icons"
 
 msgid "Update icons for this repository"
-msgstr ""
+msgstr "ปรับปรุง icons สำหรับ repository นี้"
 
 msgid "Global Settings"
 msgstr ""
@@ -7842,7 +7866,7 @@ msgid "Configure user wide settings"
 msgstr ""
 
 msgid "Repository Settings"
-msgstr ""
+msgstr "ปรับแต่ง Repository"
 
 msgid "Configure repository settings"
 msgstr ""
@@ -7854,10 +7878,10 @@ msgid "Configure Explorer extension"
 msgstr ""
 
 msgid "About TortoiseHg"
-msgstr ""
+msgstr "TortoiseHg"
 
 msgid "Show About Dialog"
-msgstr ""
+msgstr "แสดง About Dialog"
 
 msgid "Diff to parent"
 msgstr ""
@@ -7878,7 +7902,7 @@ msgid "Detect renames and copies"
 msgstr ""
 
 msgid "Search History"
-msgstr ""
+msgstr "ประวัติการค้นหา"
 
 msgid "Search file revisions for patterns"
 msgstr ""
@@ -7894,11 +7918,11 @@ msgid "unrecognized response: %s"
 msgstr ""
 
 msgid "password: "
-msgstr ""
+msgstr "รหัสผ่าน "
 
 #, python-format
 msgid "repository %s not found"
-msgstr ""
+msgstr "ไม่พบ repository %s"
 
 msgid "win32ill: cannot create window for messages"
 msgstr ""
@@ -7910,84 +7934,9 @@ msgstr ""
 msgid "win32ill: interrupted while stopping message loop\n"
 msgstr ""
 
-#~ msgid "Backout commit message"
-#~ msgstr "Missatge per al grup de canvis a retirar"
-
-#~ msgid "Backout"
-#~ msgstr "Retirar"
-
-#~ msgid "Changeset Description"
-#~ msgstr "Descripció de grup de canvis"
-
-#~ msgid "Several icons are courtesy of the TortoiseSVN project"
-#~ msgstr "Algunes icones són cortesia del projecte TortoiseSVN"
-
-#~ msgid "[All Files]"
-#~ msgstr "[Tots Arxius]"
-
-#~ msgid " %s is larger than the specified max diff size"
-#~ msgstr " %s es més gran que el tamany máxim especificat pel al dif"
-
-#~ msgid "Revert %s to contents at revision %d?"
-#~ msgstr "¿Revertir %s al contigut de la versió %d?"
-
-#~ msgid "TortoiseHg Clone"
-#~ msgstr "TortoiseHg: Clonar"
-
-#~ msgid "Confirm revert file to old revision"
-#~ msgstr "Confirma revertir arxiu a alta revisió"
-
-#~ msgid "Branch Operations"
-#~ msgstr "Operacions de branca"
-
-#~ msgid "Clone"
-#~ msgstr "Clonar"
-
-#~ msgid "_Undo"
-#~ msgstr "_Desfer"
-
-#~ msgid "Close current named branch"
-#~ msgstr "Tanca la branca amb nom actual"
-
-#~ msgid "(version %s)"
-#~ msgstr "(versió %s)"
-
-#~ msgid "with %s"
-#~ msgstr "amb %s"
-
-#~ msgid "A new version of TortoiseHg is ready for download!"
-#~ msgstr "Una nova versió de TortoiseHg està llesta per descarregar !"
-
-#~ msgid "Copyright 2008-2010 Steve Borho and others"
-#~ msgstr "Copyright 2008-2010 Steve Borho i altres"
-
-#~ msgid "Archive"
-#~ msgstr "Arxiu"
-
-#~ msgid "Archived successfully"
-#~ msgstr "Arxivat satisfactòriament"
-
-#~ msgid "Failed to archive"
-#~ msgstr "Error a l'arxivar"
-
 #~ msgid ""
-#~ "The destination \"%s\" already exists!\n"
-#~ "\n"
-#~ "Do you want to overwrite it?"
+#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
 #~ msgstr ""
-#~ "La destinació \"%s\" ja existeix!\n"
-#~ "Vol sobreescriure-la ?"
-
-#~ msgid ""
-#~ "The directory \"%s\" isn't empty!\n"
-#~ "\n"
-#~ "Do you want to overwrite it?"
-#~ msgstr ""
-#~ "El directori \"%s\" no està buit!\n"
-#~ "Vol sobreescriure'l?"
-
-#~ msgid "Compressed zip archives"
-#~ msgstr "Arxius zip comprimits"
-
-#~ msgid "All Files (*.*)"
-#~ msgstr "Tots els fitxers (*.*)"
+#~ "ก่อนที่จะ rebase, ต้อง <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."

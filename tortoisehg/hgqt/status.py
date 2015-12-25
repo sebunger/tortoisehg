@@ -39,15 +39,15 @@ class StatusWidget(QWidget):
     '''Working copy status widget
        SIGNALS:
        progress()                   - for progress bar
-       showMessage(unicode)         - for status bar
-       titleTextChanged(QString)    - for window title
+       showMessage(str)             - for status bar
+       titleTextChanged(str)        - for window title
     '''
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    titleTextChanged = pyqtSignal(QString)
-    linkActivated = pyqtSignal(QString)
-    showMessage = pyqtSignal(unicode)
-    fileDisplayed = pyqtSignal(QString, QString)
-    grepRequested = pyqtSignal(unicode, dict)
+    progress = pyqtSignal(str, object, str, str, object)
+    titleTextChanged = pyqtSignal(str)
+    linkActivated = pyqtSignal(str)
+    showMessage = pyqtSignal(str)
+    fileDisplayed = pyqtSignal(str, str)
+    grepRequested = pyqtSignal(str, dict)
     runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repoagent, pats, opts, parent=None, checkable=True,
@@ -401,7 +401,7 @@ class StatusWidget(QWidget):
             self.setFilter(match)
 
     # better to handle error in reloadComplete in place of separate signal?
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def reloadFailed(self, msg):
         qtlib.ErrorMsgBox(_('Failed to refresh'), msg, parent=self)
 
@@ -494,7 +494,7 @@ class StatusWidget(QWidget):
             self.opts[val.name] = s in status
         self.refreshWctx()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def setFilter(self, match):
         model = self.tv.model()
         if model:
@@ -523,7 +523,7 @@ class StatusWidget(QWidget):
             self.checkAllNoneBtn.setTristate(state == Qt.PartiallyChecked)
             self.checkAllNoneBtn.setCheckState(state)
 
-    @pyqtSlot(QString, bool)
+    @pyqtSlot(str, bool)
     def checkToggled(self, wfile, checked):
         'user has toggled a checkbox, update partial chunk selection status'
         wfile = hglib.fromunicode(wfile)
@@ -619,7 +619,7 @@ class StatusWidget(QWidget):
 class StatusThread(QThread):
     '''Background thread for generating a workingctx'''
 
-    showMessage = pyqtSignal(QString)
+    showMessage = pyqtSignal(str)
 
     def __init__(self, repo, pctx, pats, opts, parent=None):
         super(StatusThread, self).__init__()
@@ -699,7 +699,7 @@ class WctxFileTree(QTreeView):
 
 class WctxModel(QAbstractTableModel):
     checkCountChanged = pyqtSignal()
-    checkToggled = pyqtSignal(QString, bool)
+    checkToggled = pyqtSignal(str, bool)
 
     def __init__(self, repoagent, wctx, wstatus, ms, pctx, savechecks, opts,
                  checked, parent, checkable=True, defcheck='MAR!S'):

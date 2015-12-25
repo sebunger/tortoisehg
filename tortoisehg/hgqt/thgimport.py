@@ -160,8 +160,8 @@ class ImportDialog(QDialog):
                                                 _FILE_FILTER)
         if filelist:
             # Qt file browser uses '/' in paths, even on Windows.
-            nl = QStringList([QDir.toNativeSeparators(x) for x in filelist])
-            self.src_combo.setEditText(nl.join(os.pathsep))
+            nl = [unicode(QDir.toNativeSeparators(x)) for x in filelist]
+            self.src_combo.setEditText(os.pathsep.join(nl))
             self.src_combo.setFocus()
 
     def browsedir(self):

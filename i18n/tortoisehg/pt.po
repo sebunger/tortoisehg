@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"POT-Creation-Date: 2015-11-01 17:40-0200\n"
 "PO-Revision-Date: 2015-06-28 13:04+0000\n"
 "Last-Translator: lloco73 <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-07-27 05:34+0000\n"
-"X-Generator: Launchpad (build 17628)\n"
+"X-Launchpad-Export-Date: 2015-11-02 05:13+0000\n"
+"X-Generator: Launchpad (build 17838)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servisor de ícones de sobreposição do TortoiseHg"
@@ -972,11 +972,10 @@ msgid "Compress - %s"
 msgstr "Comprimir- %s"
 
 msgid ""
-"Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Antes de comprimir, tem de <a href=\"commit\"><b>submeter</b></a> ou<a href="
-"\"discard\"><b>ignorar</b></a> as alterações."
 
 msgid "You may continue the compress"
 msgstr "Pode continuar a comprimir"
@@ -1864,8 +1863,9 @@ msgid "Graft changeset #%d of %d"
 msgstr ""
 
 msgid ""
-"Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
+"\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
+"changes."
 msgstr ""
 
 msgid "You may continue or start the graft"
@@ -2554,30 +2554,18 @@ msgid "Patch Queue"
 msgstr "Patch em espera"
 
 msgctxt "MQ QPush"
-msgid "Push all"
-msgstr ""
-
-msgid "Apply all patches"
-msgstr "Aplicar todos os patches"
-
-msgctxt "MQ QPush"
 msgid "Push"
 msgstr ""
 
 msgid "Apply one patch"
 msgstr "Aplicar um patch"
 
-msgid "Set &Guards..."
+msgctxt "MQ QPush"
+msgid "Push all"
 msgstr ""
 
-msgid "Configure guards for selected patch"
-msgstr "Configurar guardas para o patch seleccionado"
-
-msgid "&Delete Patches..."
-msgstr ""
-
-msgid "Delete selected patches"
-msgstr "Eliminar pastches seleccionados"
+msgid "Apply all patches"
+msgstr "Aplicar todos os patches"
 
 msgid "Pop"
 msgstr "Pop"
@@ -2591,8 +2579,29 @@ msgstr "Pop a todos"
 msgid "Unapply all patches"
 msgstr "Não aplicar todos os patches"
 
+msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Finish Patch"
+msgstr ""
+
+msgid "Move applied patches into repository history"
+msgstr ""
+
+msgid "&Delete Patches..."
+msgstr ""
+
+msgid "Delete selected patches"
+msgstr "Eliminar pastches seleccionados"
+
 msgid "Re&name Patch..."
 msgstr ""
+
+msgid "Set &Guards..."
+msgstr ""
+
+msgid "Configure guards for selected patch"
+msgstr "Configurar guardas para o patch seleccionado"
 
 msgid "Patch Queue Actions Toolbar"
 msgstr ""
@@ -3177,8 +3186,9 @@ msgid "Rebase - %s"
 msgstr "Rebase - %s"
 
 msgid ""
-"Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before rebase, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
 
 msgid "You may continue the rebase"
@@ -3951,9 +3961,6 @@ msgstr ""
 msgid "Import to &MQ"
 msgstr ""
 
-msgid "&Finish Patch"
-msgstr ""
-
 msgid "MQ &Options"
 msgstr ""
 
@@ -4122,7 +4129,7 @@ msgstr ""
 msgid "Filter b&y"
 msgstr ""
 
-msgid "&Ancestors"
+msgid "&Ancestors and Descendants"
 msgstr ""
 
 msgid "A&uthor"
@@ -11095,6 +11102,13 @@ msgstr ""
 
 #~ msgid "Commit backout before merging with current working parent"
 #~ msgstr "Submeter backout antes de unir com o parente actual"
+
+#~ msgid ""
+#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Antes de comprimir, tem de <a href=\"commit\"><b>submeter</b></a> ou<a "
+#~ "href=\"discard\"><b>ignorar</b></a> as alterações."
 
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "hunk %d já aplicado na linha %d (fuzz %d)\n"

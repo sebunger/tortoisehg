@@ -132,13 +132,13 @@ _topicmap = {
 class CommitWidget(QWidget, qtlib.TaskWidget):
     'A widget that encompasses a StatusWidget and commit extras'
     commitButtonEnable = pyqtSignal(bool)
-    linkActivated = pyqtSignal(QString)
-    showMessage = pyqtSignal(unicode)
-    grepRequested = pyqtSignal(unicode, dict)
+    linkActivated = pyqtSignal(str)
+    showMessage = pyqtSignal(str)
+    grepRequested = pyqtSignal(str, dict)
     runCustomCommandRequested = pyqtSignal(str, list)
     commitComplete = pyqtSignal()
 
-    progress = pyqtSignal(QString, object, QString, QString, object)
+    progress = pyqtSignal(str, object, str, str, object)
 
     def __init__(self, repoagent, pats, opts, parent=None, rev=None):
         QWidget.__init__(self, parent)
@@ -565,7 +565,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         wholecmdlines.extend(cmdlines)
         self._runCommand(curraction._name, wholecmdlines)
 
-    @pyqtSlot(QString, QString)
+    @pyqtSlot(str, str)
     def fileDisplayed(self, wfile, contents):
         'Status widget is displaying a new file'
         if not (wfile and contents):

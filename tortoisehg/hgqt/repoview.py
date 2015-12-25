@@ -31,7 +31,7 @@ class HgRepoView(QTreeView):
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
     menuRequested = pyqtSignal(QPoint, object)
-    showMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(str)
     columnsVisibilityChanged = pyqtSignal()
 
     def __init__(self, repoagent, cfgname, colselect, parent=None):

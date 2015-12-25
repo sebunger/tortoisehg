@@ -15,6 +15,7 @@ from mercurial.i18n import _ as hggettext
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib
+from tortoisehg.hgqt import qtlib
 
 # Strings and regexes used to convert hashes and subrepo paths into links
 _hashregex = re.compile(r'\b[0-9a-fA-F]{12,}')
@@ -83,7 +84,7 @@ class InfoBar(QFrame):
     """
 
     finished = pyqtSignal(int)  # mimic QDialog
-    linkActivated = pyqtSignal(unicode)
+    linkActivated = pyqtSignal(str)
 
     infobartype = INFO
 
@@ -108,6 +109,8 @@ class InfoBar(QFrame):
         self.layout().addStretch()
         self._closebutton = QPushButton(self, flat=True, autoDefault=False,
             icon=self.style().standardIcon(QStyle.SP_TitleBarCloseButton))
+        if qtlib.IS_RETINA:
+            self._closebutton.setIconSize(qtlib.barRetinaIconSize())
         self._closebutton.clicked.connect(self.close)
         self.layout().addWidget(self._closebutton)
 
@@ -222,7 +225,7 @@ class ConfirmInfoBar(InfoBar):
 class InfoBarPlaceholder(QWidget):
     """Manage geometry of view according to visibility of InfoBar"""
 
-    linkActivated = pyqtSignal(unicode)
+    linkActivated = pyqtSignal(str)
 
     def __init__(self, repoagent, parent=None):
         super(InfoBarPlaceholder, self).__init__(parent)
@@ -338,14 +341,14 @@ class InfoBarPlaceholder(QWidget):
         super(InfoBarPlaceholder, self).resizeEvent(event)
         self._updateInfoBarGeometry()
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def showMessage(self, msg):
         if msg:
             self.setInfoBar(StatusInfoBar, msg)
         else:
             self.clearInfoBar(priority=StatusInfoBar.infobartype)
 
-    @pyqtSlot(unicode, unicode)
+    @pyqtSlot(str, str)
     def showOutput(self, msg, label, maxlines=2, maxwidth=140):
         labelslist = unicode(label).split()
         if 'ui.error' in labelslist:

@@ -326,7 +326,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
 
 class CloneDialog(cmdui.CmdControlDialog):
 
-    clonedRepository = pyqtSignal(QString, QString)
+    clonedRepository = pyqtSignal(str, str)
 
     def __init__(self, ui, args=None, opts={}, parent=None):
         super(CloneDialog, self).__init__(parent)

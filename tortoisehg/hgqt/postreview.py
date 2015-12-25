@@ -387,7 +387,7 @@ class PostReviewDialog(QDialog):
         self.writeSettings()
         super(PostReviewDialog, self).accept()
 
-    @pyqtSlot(unicode, unicode)
+    @pyqtSlot(str, str)
     def _captureOutput(self, msg, label):
         if label != 'control':
             self._cmdoutputs.append(unicode(msg))

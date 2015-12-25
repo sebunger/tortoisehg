@@ -10,7 +10,7 @@ V kontextové nabídce průzkumníka Windows vybereme :menuselection:`TortoiseHg
 .. figure:: figures/clone.png
 	:alt: Clone dialog
 
-	Dialogové okno Clone
+	Dialogové okno Klonovat
 	
 :guilabel:`Zdroj`
 	Cesta k repozitáři (nebo URL), který má být klonován. Pro výběr lokálního adresáře použijeme tlačítko :guilabel:`Vyhledat...`. 
