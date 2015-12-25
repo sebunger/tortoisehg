@@ -1,3 +1,10 @@
+tortoisehg (3.6.2-1) unstable; urgency=low
+
+  * Imported Upstream version 3.6.2
+  * Update dependency on Mercurial 3.5 or 3.6.
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Fri, 25 Dec 2015 20:32:01 +0100
+
 tortoisehg (3.5.1-1) unstable; urgency=low
 
   * Imported Upstream version 3.5.1
