@@ -28,8 +28,8 @@ qsci = Qsci.QsciScintilla
 
 class ChunksWidget(QWidget):
 
-    linkActivated = pyqtSignal(QString)
-    showMessage = pyqtSignal(QString)
+    linkActivated = pyqtSignal(str)
+    showMessage = pyqtSignal(str)
     chunksSelected = pyqtSignal(bool)
     fileSelected = pyqtSignal(bool)
     fileModelEmpty = pyqtSignal(bool)
@@ -426,7 +426,7 @@ class ChunksWidget(QWidget):
             else:
                 return []
 
-    @pyqtSlot(QString, QString)
+    @pyqtSlot(str, str)
     def displayFile(self, file, status):
         if isinstance(file, (unicode, QString)):
             file = hglib.fromunicode(file)
@@ -500,8 +500,8 @@ class ElideLabel(QLabel):
 class DiffBrowser(QFrame):
     """diff browser"""
 
-    linkActivated = pyqtSignal(QString)
-    showMessage = pyqtSignal(QString)
+    linkActivated = pyqtSignal(str)
+    showMessage = pyqtSignal(str)
     chunksSelected = pyqtSignal(bool)
 
     def __init__(self, parent):
@@ -778,11 +778,11 @@ class DiffBrowser(QFrame):
                 self.toggleChunk(c)
         self.updateSummary()
 
-    @pyqtSlot(unicode, bool, bool, bool)
+    @pyqtSlot(str, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
         self.sci.find(exp, icase, wrap, forward)
 
-    @pyqtSlot(unicode, bool)
+    @pyqtSlot(str, bool)
     def highlightText(self, match, icase=False):
         self._lastSearch = match, icase
         self.sci.highlightText(match, icase)

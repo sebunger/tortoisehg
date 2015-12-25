@@ -291,7 +291,7 @@ class RepoAgent(QObject):
     busyChanged = pyqtSignal(bool)
 
     commandFinished = pyqtSignal(cmdcore.CmdSession)
-    outputReceived = pyqtSignal(unicode, unicode)
+    outputReceived = pyqtSignal(str, str)
     progressReceived = pyqtSignal(cmdcore.ProgressMessage)
 
     def __init__(self, repo):
@@ -557,15 +557,15 @@ class RepoAgent(QObject):
 class RepoManager(QObject):
     """Cache open RepoAgent instances and bundle their signals"""
 
-    repositoryOpened = pyqtSignal(unicode)
-    repositoryClosed = pyqtSignal(unicode)
+    repositoryOpened = pyqtSignal(str)
+    repositoryClosed = pyqtSignal(str)
 
-    configChanged = pyqtSignal(unicode)
-    repositoryChanged = pyqtSignal(unicode, int)
-    repositoryDestroyed = pyqtSignal(unicode)
+    configChanged = pyqtSignal(str)
+    repositoryChanged = pyqtSignal(str, int)
+    repositoryDestroyed = pyqtSignal(str)
 
-    busyChanged = pyqtSignal(unicode, bool)
-    progressReceived = pyqtSignal(unicode, cmdcore.ProgressMessage)
+    busyChanged = pyqtSignal(str, bool)
+    progressReceived = pyqtSignal(str, cmdcore.ProgressMessage)
 
     _SIGNALMAP = [
         # source, dest
@@ -616,7 +616,7 @@ class RepoManager(QObject):
         self.repositoryOpened.emit(path)
         return agent
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def releaseRepoAgent(self, path):
         """Decrement refcount of RepoAgent and close it if possible"""
         path = hglib.normreporoot(path)
@@ -634,7 +634,7 @@ class RepoManager(QObject):
         else:
             self._tryCloseRepoAgent(path)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _tryCloseRepoAgent(self, path):
         path = unicode(path)
         agent, refcount = self._openagents[path]
@@ -668,7 +668,7 @@ class RepoManager(QObject):
         assert isinstance(agent, RepoAgent)
         self.repositoryChanged.emit(agent.rootPath(), flags)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _mapBusyChanged(self, path):
         agent, _refcount = self._openagents[unicode(path)]
         self.busyChanged.emit(path, agent.isBusy())

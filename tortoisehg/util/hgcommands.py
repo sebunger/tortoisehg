@@ -38,12 +38,7 @@ def debuggethostfingerprint(ui, repo, source='default'):
     sock = socket.socket()
     try:
         sock.connect((host, port))
-        try:
-            sock = sslutil.wrapsocket(sock, None, None, ui, serverhostname=host)
-        except AttributeError:
-            # hg<3.5 (21b536f01eda, 9d1c61715939)
-            sock = sslutil.ssl_wrap_socket(sock, None, None,
-                                           serverhostname=host)
+        sock = sslutil.wrapsocket(sock, None, None, ui, serverhostname=host)
         peercert = sock.getpeercert(True)
         if not peercert:
             raise util.Abort(_('%s certificate error: no certificate received')

@@ -323,7 +323,7 @@ class FileLogDialog(_AbstractFileDialog):
         self.revdetails.show()
         self.revdetails.raise_()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def onLinkActivated(self, link):
         link = unicode(link)
         if ':' in link:

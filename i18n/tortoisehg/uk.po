@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"POT-Creation-Date: 2015-11-01 17:40-0200\n"
 "PO-Revision-Date: 2015-06-28 12:47+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-07-27 05:35+0000\n"
-"X-Generator: Launchpad (build 17628)\n"
+"X-Launchpad-Export-Date: 2015-11-02 05:14+0000\n"
+"X-Generator: Launchpad (build 17838)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
@@ -988,11 +988,10 @@ msgid "Compress - %s"
 msgstr "Стиснути - %s"
 
 msgid ""
-"Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Перед стисканням Вам потрібно <a href=\"commit\"><b>зафіксувати</b></a> або "
-"<a href=\"discard\"><b>відкинути</b></a> зміни."
 
 msgid "You may continue the compress"
 msgstr "Ви маєте продовжити стискання"
@@ -1929,11 +1928,10 @@ msgid "Graft changeset #%d of %d"
 msgstr "Прищепити #%d в набір змін %d"
 
 msgid ""
-"Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
+"\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
+"changes."
 msgstr ""
-"Перед щепленням, ви повинні <a href=\"commit\"><b>зафіксувати</b></a> або <a "
-"href=\"discard\"><b>відкинути</b></a> зміни."
 
 msgid "You may continue or start the graft"
 msgstr "Ви бажаєте продовжити або почати щеплення"
@@ -2644,30 +2642,18 @@ msgid "Patch Queue"
 msgstr "Черга латок"
 
 msgctxt "MQ QPush"
-msgid "Push all"
-msgstr "Виштовхнути все"
-
-msgid "Apply all patches"
-msgstr "Застосувати всі латки"
-
-msgctxt "MQ QPush"
 msgid "Push"
 msgstr "Виштовхнути"
 
 msgid "Apply one patch"
 msgstr "Затосувати одну латку"
 
-msgid "Set &Guards..."
-msgstr "Встановити захист..."
+msgctxt "MQ QPush"
+msgid "Push all"
+msgstr "Виштовхнути все"
 
-msgid "Configure guards for selected patch"
-msgstr "Налаштувати захист обраним латкам"
-
-msgid "&Delete Patches..."
-msgstr "Знищити латки..."
-
-msgid "Delete selected patches"
-msgstr "Знищити обрані латки"
+msgid "Apply all patches"
+msgstr "Застосувати всі латки"
 
 msgid "Pop"
 msgstr "Pop"
@@ -2681,8 +2667,29 @@ msgstr "Pop все"
 msgid "Unapply all patches"
 msgstr "Відхилити всі латки"
 
+msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Finish Patch"
+msgstr "Остаточна латка"
+
+msgid "Move applied patches into repository history"
+msgstr ""
+
+msgid "&Delete Patches..."
+msgstr "Знищити латки..."
+
+msgid "Delete selected patches"
+msgstr "Знищити обрані латки"
+
 msgid "Re&name Patch..."
 msgstr "Змінити назву латки..."
+
+msgid "Set &Guards..."
+msgstr "Встановити захист..."
+
+msgid "Configure guards for selected patch"
+msgstr "Налаштувати захист обраним латкам"
 
 msgid "Patch Queue Actions Toolbar"
 msgstr "Пенал діючої черги латок"
@@ -3280,11 +3287,10 @@ msgid "Rebase - %s"
 msgstr "Перемістити - %s"
 
 msgid ""
-"Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before rebase, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Перед переміщенням Вам потрібно виконати <a href=\"commit\"><b>фіксацію</b></"
-"a> або <a href=\"discard\"><b>відмовитись від</b></a> змін."
 
 msgid "You may continue the rebase"
 msgstr "Можна продовжити переміщення"
@@ -4093,9 +4099,6 @@ msgstr "Не прийняті латки"
 msgid "Import to &MQ"
 msgstr "Імпортувати з MQ"
 
-msgid "&Finish Patch"
-msgstr "Остаточна латка"
-
 msgid "MQ &Options"
 msgstr "MQ параметри"
 
@@ -4271,7 +4274,7 @@ msgstr "%d латок буде експортовано до:<p><a href=\"file:/
 msgid "Filter b&y"
 msgstr ""
 
-msgid "&Ancestors"
+msgid "&Ancestors and Descendants"
 msgstr ""
 
 msgid "A&uthor"
@@ -10249,6 +10252,13 @@ msgstr ""
 #~ msgid "User Certificate Key File"
 #~ msgstr "Файл з ключами користувача"
 
+#~ msgid ""
+#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Перед стисканням Вам потрібно <a href=\"commit\"><b>зафіксувати</b></a> "
+#~ "або <a href=\"discard\"><b>відкинути</b></a> зміни."
+
 #~ msgid "Similar revisions..."
 #~ msgstr "Схожі ревізії..."
 
@@ -11133,6 +11143,13 @@ msgstr ""
 #~ msgstr "Виберіть спільного предка ревізії"
 
 #~ msgid ""
+#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Перед щепленням, ви повинні <a href=\"commit\"><b>зафіксувати</b></a> або "
+#~ "<a href=\"discard\"><b>відкинути</b></a> зміни."
+
+#~ msgid ""
 #~ "\n"
 #~ "[command interrupted]"
 #~ msgstr ""
@@ -11357,6 +11374,13 @@ msgstr ""
 #~ "Показувати панель різниць знизу переліка файлів для діалога стану, "
 #~ "відкладання та фіксації. Типово: ні (різниці показують праворуч від "
 #~ "переліку файлів)."
+
+#~ msgid ""
+#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Перед переміщенням Вам потрібно виконати <a href=\"commit\"><b>фіксацію</"
+#~ "b></a> або <a href=\"discard\"><b>відмовитись від</b></a> змін."
 
 #~ msgid "Rebase on top of selected"
 #~ msgstr "Перемістити на крок вище вибраної"

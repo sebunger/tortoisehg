@@ -31,11 +31,11 @@ _fileactionsbytype = {
 
 class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 
-    showMessage = pyqtSignal(QString)
-    linkActivated = pyqtSignal(unicode)
-    grepRequested = pyqtSignal(unicode, dict)
+    showMessage = pyqtSignal(str)
+    linkActivated = pyqtSignal(str)
+    grepRequested = pyqtSignal(str, dict)
     revisionSelected = pyqtSignal(int)
-    revsetFilterRequested = pyqtSignal(unicode)
+    revsetFilterRequested = pyqtSignal(str)
     runCustomCommandRequested = pyqtSignal(str, list)
 
     def __init__(self, repoagent, parent, rev=None):

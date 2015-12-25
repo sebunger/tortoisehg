@@ -24,14 +24,16 @@ def settingsfilename():
 
 
 class RepoTreeView(QTreeView):
-    showMessage = pyqtSignal(QString)
+    showMessage = pyqtSignal(str)
     menuRequested = pyqtSignal(object, object)
-    openRepo = pyqtSignal(QString, bool)
+    openRepo = pyqtSignal(str, bool)
     dropAccepted = pyqtSignal()
     updateSettingsFile = pyqtSignal()
 
     def __init__(self, parent):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
+        if qtlib.IS_RETINA:
+            self.setIconSize(qtlib.treeviewRetinaIconSize())
         self.selitem = None
         self.msg = ''
 
@@ -167,15 +169,7 @@ class RepoTreeView(QTreeView):
 
     def mouseDoubleClickEvent(self, event):
         if self.selitem and self.selitem.internalPointer().isRepo():
-            # We can only open mercurial repositories and subrepositories
-            repotype = self.selitem.internalPointer().repotype()
-            if repotype == 'hg':
-                self.showFirstTabOrOpen()
-            else:
-                qtlib.WarningMsgBox(
-                    _('Unsupported repository type (%s)') % repotype,
-                    _('Cannot open non Mercurial repositories or subrepositories'),
-                    parent=self)
+            self.showFirstTabOrOpen()
         else:
             # a double-click on non-repo rows opens an editor
             super(RepoTreeView, self).mouseDoubleClickEvent(event)
@@ -195,8 +189,17 @@ class RepoTreeView(QTreeView):
     def showFirstTabOrOpen(self):
         'Enter or double click events, show existing or open a new repowidget'
         if self.selitem and self.selitem.internalPointer().isRepo():
-            root = self.selitem.internalPointer().rootpath()
-            self.openRepo.emit(hglib.tounicode(root), True)
+            # We can only open mercurial repositories and subrepositories
+            repotype = self.selitem.internalPointer().repotype()
+            if repotype == 'hg':
+                root = self.selitem.internalPointer().rootpath()
+                self.openRepo.emit(hglib.tounicode(root), True)
+            else:
+                qtlib.WarningMsgBox(
+                    _('Unsupported repository type (%s)') % repotype,
+                    _('Cannot open non Mercurial repositories or '
+                      'subrepositories'),
+                    parent=self)
 
     def removeSelected(self):
         'remove selected repository'
@@ -222,11 +225,11 @@ class RepoTreeView(QTreeView):
 
 class RepoRegistryView(QDockWidget):
 
-    showMessage = pyqtSignal(QString)
-    openRepo = pyqtSignal(QString, bool)
-    removeRepo = pyqtSignal(QString)
-    cloneRepoRequested = pyqtSignal(QString)
-    progressReceived = pyqtSignal(QString, object, QString, QString, object)
+    showMessage = pyqtSignal(str)
+    openRepo = pyqtSignal(str, bool)
+    removeRepo = pyqtSignal(str)
+    cloneRepoRequested = pyqtSignal(str)
+    progressReceived = pyqtSignal(str, object, str, str, object)
 
     def __init__(self, repomanager, parent):
         QDockWidget.__init__(self, parent)
@@ -402,7 +405,7 @@ class RepoRegistryView(QDockWidget):
         s.setValue('expanded', paths)
 
     # TODO: better to handle repositoryOpened signal by model
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _addAndScanRepo(self, uroot):
         """Add repo if not exists; called when the workbench has opened it"""
         uroot = unicode(uroot)
@@ -840,7 +843,7 @@ class RepoRegistryView(QDockWidget):
                   '<br><br><i>%s</i>')
                 % (root, "<br>".join(invalidpaths)), parent=self)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def scanRepo(self, uroot):
         m = self.tview.model()
         index = m.indexFromRepoRoot(uroot)

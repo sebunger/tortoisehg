@@ -362,7 +362,7 @@ class Scintilla(ScintillaCompat):
             qs.value(prefix+'/autocomplete', -1).toInt()[0])
 
 
-    @pyqtSlot(unicode, bool, bool, bool)
+    @pyqtSlot(str, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
         """Find the next/prev occurence; returns True if found
 
@@ -380,7 +380,7 @@ class Scintilla(ScintillaCompat):
     def _resetfindcond(self):
         self.__findcond = ()
 
-    @pyqtSlot(unicode, bool)
+    @pyqtSlot(str, bool)
     def highlightText(self, match, icase=False):
         """Highlight text matching to the given regexp pattern [unicode]
 
@@ -489,10 +489,10 @@ class Scintilla(ScintillaCompat):
 
 
 class SearchToolBar(QToolBar):
-    conditionChanged = pyqtSignal(unicode, bool, bool)
+    conditionChanged = pyqtSignal(str, bool, bool)
     """Emitted (pattern, icase, wrap) when search condition changed"""
 
-    searchRequested = pyqtSignal(unicode, bool, bool, bool)
+    searchRequested = pyqtSignal(str, bool, bool, bool)
     """Emitted (pattern, icase, wrap, forward) when requested"""
 
     def __init__(self, parent=None):
@@ -621,7 +621,7 @@ class SearchToolBar(QToolBar):
     def setWrapAround(self, wrap):
         self._wrapchk.setChecked(wrap)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def search(self, text):
         """Request search with the given pattern"""
         self.setPattern(text)

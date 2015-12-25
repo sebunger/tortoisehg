@@ -23,8 +23,8 @@ from PyQt4.QtGui import *
 
 class SearchWidget(QWidget, qtlib.TaskWidget):
     '''Working copy and repository search widget'''
-    showMessage = pyqtSignal(QString)
-    progress = pyqtSignal(QString, object, QString, QString, object)
+    showMessage = pyqtSignal(str)
+    progress = pyqtSignal(str, object, str, str, object)
     revisionSelected = pyqtSignal(int)
 
     def __init__(self, repoagent, upats, parent=None, **opts):
@@ -360,8 +360,8 @@ class DataWrapper(object):
 class HistorySearchThread(QThread):
     '''Background thread for searching repository history'''
     matchedRow = pyqtSignal(DataWrapper)
-    showMessage = pyqtSignal(unicode)
-    progress = pyqtSignal(QString, object, QString, QString, object)
+    showMessage = pyqtSignal(str)
+    progress = pyqtSignal(str, object, str, str, object)
 
     def __init__(self, repo, pattern, icase, inc, exc, follow):
         super(HistorySearchThread, self).__init__()
@@ -436,8 +436,8 @@ class HistorySearchThread(QThread):
 class CtxSearchThread(QThread):
     '''Background thread for searching a changectx'''
     matchedRow = pyqtSignal(object)
-    showMessage = pyqtSignal(unicode)
-    progress = pyqtSignal(QString, object, QString, QString, object)
+    showMessage = pyqtSignal(str)
+    progress = pyqtSignal(str, object, str, str, object)
 
     def __init__(self, repo, regexp, ctx, inc, exc, once, recurse):
         super(CtxSearchThread, self).__init__()

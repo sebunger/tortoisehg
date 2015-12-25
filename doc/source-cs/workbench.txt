@@ -40,9 +40,9 @@ Seznam repozitářů neboli repozitórií
   
   * jako položku roletky :menuselection:`View`
   * výběrem ikony v Úkonové liště
-  * výběrem ouška na okraji Úkonové plochy - zobrazení oušek lze
-  zapnout/vypnout  v prostředí :menuselection:`File` > Settings >
-  Verpánek > Úkonová lišta
+  * výběrem ouška na okraji Úkonové plochy - zobrazení oušek lze  
+    zapnout/vypnout  v prostředí :menuselection:`File` > Settings >
+    Verpánek > Úkonová lišta
    
 	
 Výstupní konzola (Output Log)
@@ -255,7 +255,7 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
   .. figure:: figures/single-revision-cmenu.png
      :alt: Single revision context menu
    
-:guilabel:`Update...`
+:guilabel:`Aktualizovat...`
 	 Aktualizovat pracovní adresář k označené revizi. Otevře se dialogové
 	 okno s podrobnostmi o aktualizaci.
 :guilabel:`Diff to parent...`
@@ -266,9 +266,10 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 :guilabel:`Podrobnosti revize`
 	 Otevře okno se zobrazením všech složek a souborů vybrané
 	 revize včetně informací o changesetu a zprávy komitu
-:guilabel:`Podobné revize...`
-	 Otevře okno "Najít shody" s nabídkou deseti volitelných parametrů
-	 shody
+:guilabel:`Filtrovat podle`
+	 Ancestors and Descendants, Author, Branch, More options...
+	 Nabídka deseti kriterií: Shrnutí, Popis, Autor, Datum, Soubory, Obsah dílů, Stav subrepozitáře, Větev, Rodiče, Fáze.
+		
 :guilabel:`Merge with local...`
 	 Otevře okno "Merge"  pro sloučení vybrané revize s lokální revizí pracovního adresáře.
 :guilabel:`Tag...`
@@ -276,7 +277,8 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 :guilabel:`Bookmark...`
 	 Otevře okno pro  zadání nazvu záložky pro vybranou revizi.
 :guilabel:`Backout...`
-	 Otevře okno "Backout" pro anulování vybrané revize. 
+	 Otevře okno "Backout" pro anulování vybrané revize.
+	 
 :guilabel:`Copy Hash`
 	 Zkopíruje úplný heš vybrané revize do schránky. `V operačním systému X11 se do primárního výběru při označení revize automaticky kopíruje krátký heš; vlepí se stlačením prostředního tlačítka myši`. 
       

@@ -152,9 +152,9 @@ class BlockMatch(BlockList):
     areas.
     """
 
-    rangeChanged = pyqtSignal(int, int, QString)
-    valueChanged = pyqtSignal(int, QString)
-    pageStepChanged = pyqtSignal(int, QString)
+    rangeChanged = pyqtSignal(int, int, str)
+    valueChanged = pyqtSignal(int, str)
+    pageStepChanged = pyqtSignal(int, str)
 
     def __init__(self, *args):
         QWidget.__init__(self, *args)

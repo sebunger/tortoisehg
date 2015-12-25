@@ -432,8 +432,11 @@ class HooksFrame(QFrame):
         hooks = self.curvalue
         for hooktype in hooks:
             for keyname in hooks[hooktype]:
-                try:
+                if keyname:
                     keyname = '%s.%s' % (hooktype, keyname)
+                else:
+                    keyname = hooktype
+                try:
                     del ini[section][keyname]
                 except KeyError:
                     pass

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"POT-Creation-Date: 2015-11-01 17:40-0200\n"
 "PO-Revision-Date: 2015-06-28 12:54+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-07-27 05:32+0000\n"
-"X-Generator: Launchpad (build 17628)\n"
+"X-Launchpad-Export-Date: 2015-11-02 05:11+0000\n"
+"X-Generator: Launchpad (build 17838)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHG-Symbolüberblendungsdienst"
@@ -1001,11 +1001,10 @@ msgid "Compress - %s"
 msgstr "Komprimieren - %s"
 
 msgid ""
-"Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Vor der Komprimierung müssen Sie die Änderungen <a href=\"commit"
-"\"><b>übernehmen</b></a> oder <a href=\"discard\"><b>verwerfen</b></a>"
 
 msgid "You may continue the compress"
 msgstr "Sie können die Komprimierung fortsetzen"
@@ -1958,11 +1957,10 @@ msgid "Graft changeset #%d of %d"
 msgstr "Transplantations-Änderungsliste #%d von %d"
 
 msgid ""
-"Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
+"\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
+"changes."
 msgstr ""
-"Vor der Transplantation müssen Sie alle Änderungen <a href=\"commit"
-"\"><b>übernehmen</b></a> or <a href=\"discard\"><b>verwerfen</b></a>."
 
 msgid "You may continue or start the graft"
 msgstr "Sie können die Transplanatation fortsetzen oder starten"
@@ -2693,30 +2691,18 @@ msgid "Patch Queue"
 msgstr "Patch-Warteschlange"
 
 msgctxt "MQ QPush"
-msgid "Push all"
-msgstr "Alle übertragen"
-
-msgid "Apply all patches"
-msgstr "Alle Patches anwenden"
-
-msgctxt "MQ QPush"
 msgid "Push"
 msgstr "Übertragen"
 
 msgid "Apply one patch"
 msgstr "Einen Patch anwenden"
 
-msgid "Set &Guards..."
-msgstr "&Guards setzen..."
+msgctxt "MQ QPush"
+msgid "Push all"
+msgstr "Alle übertragen"
 
-msgid "Configure guards for selected patch"
-msgstr "Wachen für den ausgewählten Patch konfigurieren"
-
-msgid "&Delete Patches..."
-msgstr "Patches &löschen..."
-
-msgid "Delete selected patches"
-msgstr "Die ausgewählten Patches löschen"
+msgid "Apply all patches"
+msgstr "Alle Patches anwenden"
 
 msgid "Pop"
 msgstr "Ziehen"
@@ -2730,8 +2716,29 @@ msgstr "Alle ziehen"
 msgid "Unapply all patches"
 msgstr "Alle Patches rückwärts anwenden"
 
+msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Finish Patch"
+msgstr "&Patch abschließen"
+
+msgid "Move applied patches into repository history"
+msgstr ""
+
+msgid "&Delete Patches..."
+msgstr "Patches &löschen..."
+
+msgid "Delete selected patches"
+msgstr "Die ausgewählten Patches löschen"
+
 msgid "Re&name Patch..."
 msgstr "Patch &umbenennen"
+
+msgid "Set &Guards..."
+msgstr "&Guards setzen..."
+
+msgid "Configure guards for selected patch"
+msgstr "Wachen für den ausgewählten Patch konfigurieren"
 
 msgid "Patch Queue Actions Toolbar"
 msgstr "Patch-Warteschlangen-Werkzeugleiste"
@@ -3329,11 +3336,10 @@ msgid "Rebase - %s"
 msgstr "Verschiebung - %s"
 
 msgid ""
-"Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before rebase, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Vor der Verschiebung müssen Sie die Änderungen <a href=\"commit"
-"\"><b>übernehmen</b></a> or <a href=\"discard\"><b>verwerfen</b></a>."
 
 msgid "You may continue the rebase"
 msgstr "Sie können die Verschiebung fortsetzen"
@@ -4163,9 +4169,6 @@ msgstr "Patch &rückwärts anwenden"
 msgid "Import to &MQ"
 msgstr "In &MQ importieren"
 
-msgid "&Finish Patch"
-msgstr "&Patch abschließen"
-
 msgid "MQ &Options"
 msgstr "MQ-&Optionen"
 
@@ -4343,7 +4346,7 @@ msgstr "%d Patches wurden exportiert in:<p><a href=\"file:///%s\">%s</a>"
 msgid "Filter b&y"
 msgstr ""
 
-msgid "&Ancestors"
+msgid "&Ancestors and Descendants"
 msgstr ""
 
 msgid "A&uthor"
@@ -9519,6 +9522,13 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Source path is empty"
 #~ msgstr "Das Quellverzeichnis ist leer."
 
+#~ msgid ""
+#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Vor der Komprimierung müssen Sie die Änderungen <a href=\"commit"
+#~ "\"><b>übernehmen</b></a> oder <a href=\"discard\"><b>verwerfen</b></a>"
+
 #~ msgid "Please enter the directory path"
 #~ msgstr "Bitte geben Sie das Verzeichnis an"
 
@@ -12063,6 +12073,13 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Restart merge with"
 #~ msgstr "Zusammenführung neu beginnen mit"
 
+#~ msgid ""
+#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Vor der Verschiebung müssen Sie die Änderungen <a href=\"commit"
+#~ "\"><b>übernehmen</b></a> or <a href=\"discard\"><b>verwerfen</b></a>."
+
 #~ msgid "binary patch is %d bytes, not %d"
 #~ msgstr "Der binäre Patch hat %d Byte, nicht %d"
 
@@ -12108,6 +12125,13 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 
 #~ msgid "View missing"
 #~ msgstr "Fehlende Datei ansehen"
+
+#~ msgid ""
+#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Vor der Transplantation müssen Sie alle Änderungen <a href=\"commit"
+#~ "\"><b>übernehmen</b></a> or <a href=\"discard\"><b>verwerfen</b></a>."
 
 #~ msgid "&Similar Revisions..."
 #~ msgstr "Ä&hnliche Revisionen..."

@@ -1255,7 +1255,7 @@ class SettingsDialog(QDialog):
         return any(self.conftabs.widget(i).isDirty()
                    for i in xrange(self.conftabs.count()))
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _pushRestartRequest(self, key):
         self._restartreqs.add(unicode(key))
 
@@ -1317,7 +1317,7 @@ class SettingsDialog(QDialog):
 class SettingsForm(QWidget):
     """Widget for each settings file"""
 
-    restartRequested = pyqtSignal(unicode)
+    restartRequested = pyqtSignal(str)
 
     def __init__(self, rcpath, focus=None, parent=None, readonly=False):
         super(SettingsForm, self).__init__(parent)

@@ -60,7 +60,7 @@ Dík všem, kteří do projektu TortoiseHg přispívají. Pro vybudování skute
 použitelné aplikace je potřebný kolektiv vývojářů, překladatelů a uživatelů.
 Dík patří zejména těm uživatelům, kteří nelenují oznámit chybu nebo se podělit o svůj názor.
 
-Instalátor TortoiseHg pro Windows obsahuje ovladač TortoiseOverlays, převzaty z projektu 
+Instalátor TortoiseHg pro Windows obsahuje ovladač TortoiseOverlays, převzatý z projektu 
 `TortoiseSVN <http://tortoisesvn.net>`_.
 
 Prohlížeč historie v TortoiseHg je založen na aplikaci `hgview <http://www.logilab.org/project/hgview>`_, kterou vytvořil David Douard s kolektivem s finanční podporou `Logilab <http://www.logilab.fr>`_.
@@ -86,7 +86,7 @@ V návodu jsou používány následující typografické konvence:
 :file:`.hg/hgrc`
 	Označuje jméno adresáře a souboru.
 
-:command:`hgtk log`
+:command:`hg log`
 	Označuje příkaz jež má být zadán na příkazové řádce terminálu (např. cmd.exe).
 
 ``myproxy:8000``

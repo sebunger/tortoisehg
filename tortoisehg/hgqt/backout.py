@@ -313,7 +313,7 @@ class BackoutPage(BasePage):
                 self.tryAutoAdvance(True)
             self.completeChanged.emit()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def onLinkActivated(self, cmd):
         if cmd == 'resolve':
             dlg = resolve.ResolveDialog(self._repoagent, self)
@@ -459,7 +459,7 @@ class CommitPage(BasePage):
         self.msgEntry.setText(msg + str(self.repo[self._backoutrev]))
         self.msgEntry.moveCursorToEnd()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def onLinkActivated(self, cmd):
         if cmd == 'view':
             dlg = status.StatusDialog(self._repoagent, [], {}, self)

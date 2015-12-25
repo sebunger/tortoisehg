@@ -105,11 +105,7 @@ def fromutf(s):
 
 
 def activebookmark(repo):
-    try:
-        return repo._activebookmark
-    except AttributeError:
-        # hg<3.5 (a02d293a1079)
-        return repo._bookmarkcurrent
+    return repo._activebookmark
 
 def namedbranches(repo):
     branchmap = repo.branchmap()

@@ -224,7 +224,7 @@ class ExceptionMsgBox(QDialog):
         desktopgeom = qApp.desktop().availableGeometry()
         self.resize(desktopgeom.size() * 0.20)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def _openlink(self, ref):
         ref = str(ref)
         if ref == '#bugreport':

@@ -107,7 +107,7 @@ _logical = (
 
 class RevisionSetQuery(QDialog):
 
-    queryIssued = pyqtSignal(QString)
+    queryIssued = pyqtSignal(str)
 
     def __init__(self, repoagent, parent=None):
         QDialog.__init__(self, parent)

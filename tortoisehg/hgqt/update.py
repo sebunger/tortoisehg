@@ -177,7 +177,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                 '.hgsubstate' in new_ctx
             self.path_combo_label.setVisible(showpathcombo)
             self.path_combo.setVisible(showpathcombo)
-        except (error.LookupError, error.RepoLookupError, error.RepoError):
+        except (error.LookupError, error.RepoError, EnvironmentError):
             self.target_info.setText(_('unknown revision!'))
         self.commandChanged.emit()
 
@@ -185,7 +185,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         new_rev = hglib.fromunicode(self.rev_combo.currentText())
         try:
             new_ctx = self.repo[new_rev]
-        except (error.LookupError, error.RepoLookupError, error.RepoError):
+        except (error.LookupError, error.RepoError, EnvironmentError):
             return False
         return (self.discard_chk.isChecked()
                 or len(self.ctxs) == 2
@@ -278,7 +278,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
             cur = self.repo.hgchangectx('.')
             try:
                 node = self.repo.hgchangectx(rev)
-            except (error.LookupError, error.RepoLookupError, error.RepoError):
+            except (error.LookupError, error.RepoError, EnvironmentError):
                 return cmdcore.nullCmdSession()
             def isclean():
                 '''whether WD is changed'''

@@ -31,6 +31,7 @@ class ShelveDialog(QDialog):
         self._repoagent = repoagent
         self.shelves = []
         self.patches = []
+        self._patchnames = {}  # path: mq patch name
 
         layout = QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
@@ -418,6 +419,7 @@ class ShelveDialog(QDialog):
         # store fully qualified paths
         self.shelves = [os.path.join(self.repo.shelfdir, s) for s in shelves]
         self.patches = [self.repo.mq.join(p) for p in patches]
+        self._patchnames = dict(zip(self.patches, patches))
 
         self.comboRefreshInProgress = True
         self.comboa.clear()
@@ -463,6 +465,7 @@ class ShelveDialog(QDialog):
             self.clearShelfButtonA.setEnabled(True)
         else:
             rev = self.currentPatchA()
+            rev = self._patchnames.get(rev, rev)
             self.delShelfButtonA.setEnabled(index <= len(self.shelves))
             self.clearShelfButtonA.setEnabled(index <= len(self.shelves))
         self.browsea.setContext(self.repo.changectx(rev))
@@ -473,6 +476,7 @@ class ShelveDialog(QDialog):
         if self.comboRefreshInProgress:
             return
         rev = self.currentPatchB()
+        rev = self._patchnames.get(rev, rev)
         self.delShelfButtonB.setEnabled(0 <= index < len(self.shelves))
         self.clearShelfButtonB.setEnabled(0 <= index < len(self.shelves))
         self.browseb.setContext(self.repo.changectx(rev))
@@ -495,11 +499,11 @@ class ShelveDialog(QDialog):
         if self.browseb.splitter.sizes()[0] != pos:
             self.browseb.splitter.moveSplitter(pos, index)
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def linkActivated(self, linktext):
         pass
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def showMessage(self, message):
         self.statusbar.showMessage(message)
 

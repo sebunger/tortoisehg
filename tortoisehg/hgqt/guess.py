@@ -394,8 +394,8 @@ class MatchModel(QAbstractTableModel):
 class RenameSearchThread(QThread):
     '''Background thread for searching repository history'''
     match = pyqtSignal(object)
-    progress = pyqtSignal(QString, object, QString, QString, object)
-    showMessage = pyqtSignal(unicode)
+    progress = pyqtSignal(str, object, str, str, object)
+    showMessage = pyqtSignal(str)
 
     def __init__(self, repo, ufiles, minpct, copies):
         super(RenameSearchThread, self).__init__()

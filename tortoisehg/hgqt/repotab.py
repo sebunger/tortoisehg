@@ -29,14 +29,14 @@ class _TabBar(QTabBar):
 class RepoTabWidget(QWidget):
     """Manage stack of RepoWidgets of open repositories"""
 
-    currentRepoChanged = pyqtSignal(unicode, unicode)  # curpath, prevpath
+    currentRepoChanged = pyqtSignal(str, str)  # curpath, prevpath
     currentTabChanged = pyqtSignal(int)
     currentTaskTabChanged = pyqtSignal()
     currentTitleChanged = pyqtSignal()
     historyChanged = pyqtSignal()
     makeLogVisible = pyqtSignal(bool)
-    progressReceived = pyqtSignal(unicode, cmdcore.ProgressMessage)
-    showMessageSignal = pyqtSignal(unicode)
+    progressReceived = pyqtSignal(str, cmdcore.ProgressMessage)
+    showMessageSignal = pyqtSignal(str)
     toolbarVisibilityChanged = pyqtSignal(bool)
 
     # look-up of tab-index and stack-index:
@@ -49,13 +49,19 @@ class RepoTabWidget(QWidget):
         super(RepoTabWidget, self).__init__(parent)
         self._ui = ui
         self._repomanager = repomanager
-        repomanager.repositoryDestroyed.connect(self.closeRepo)
+        # delay until the next event loop so that the current tab won't be
+        # gone in the middle of switching tabs (issue #4253)
+        repomanager.repositoryDestroyed.connect(self.closeRepo,
+                                                Qt.QueuedConnection)
 
         vbox = QVBoxLayout(self)
         vbox.setContentsMargins(0, 0, 0, 0)
         vbox.setSpacing(0)
 
         self._tabbar = tabbar = _TabBar(self)
+
+        if qtlib.IS_RETINA:
+            tabbar.setIconSize(qtlib.barRetinaIconSize())
         tabbar.setDocumentMode(True)
         tabbar.setExpanding(False)
         tabbar.setTabsClosable(True)
@@ -117,7 +123,7 @@ class RepoTabWidget(QWidget):
         else:
             return self.count()
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def closeRepo(self, root):
         """Close tabs of the specified repository"""
         root = hglib.normreporoot(root)
@@ -336,7 +342,7 @@ class RepoTabWidget(QWidget):
         self._stack.addWidget(rw)
         return rw
 
-    @qtlib.senderSafeSlot(unicode, object, unicode, unicode, object)
+    @qtlib.senderSafeSlot(str, object, str, str, object)
     def _mapProgressReceived(self, topic, pos, item, unit, total):
         rw = self.sender()
         assert isinstance(rw, repowidget.RepoWidget)
@@ -344,7 +350,7 @@ class RepoTabWidget(QWidget):
             unicode(topic), pos, unicode(item), unicode(unit), total)
         self.progressReceived.emit(rw.repoRootPath(), progress)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _openLinkedRepo(self, path):
         uri = unicode(path).split('?', 1)
         path = hglib.normreporoot(uri[0])

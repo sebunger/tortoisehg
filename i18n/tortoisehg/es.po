@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-07-26 09:25-0300\n"
-"PO-Revision-Date: 2015-06-28 12:38+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2015-11-01 17:40-0200\n"
+"PO-Revision-Date: 2015-11-30 22:59+0000\n"
+"Last-Translator: Mauro Fernández <fernandez.mauro92@yahoo.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-07-27 05:35+0000\n"
-"X-Generator: Launchpad (build 17628)\n"
+"X-Launchpad-Export-Date: 2015-12-01 05:12+0000\n"
+"X-Generator: Launchpad (build 17850)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servidor de Iconos Superpuestos de TortoiseHG"
@@ -52,10 +52,10 @@ msgstr "con Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr ""
+msgstr "¡Una nueva versión de TortoiseHg (%s) está lista para descargar!"
 
 msgid "License"
-msgstr ""
+msgstr "Licencia"
 
 msgid "= Working Directory Parent ="
 msgstr "= Directorio de trabajo de nivel superior ="
@@ -118,7 +118,7 @@ msgid "Select Destination File"
 msgstr "Seleccionar archivo de destino"
 
 msgid "All files (*)"
-msgstr ""
+msgstr "Todos los archivos (*)"
 
 msgid "Duplicate Name"
 msgstr "Nombre duplicado"
@@ -329,7 +329,7 @@ msgid "New Name:"
 msgstr "Nombre nuevo:"
 
 msgid "Activate:"
-msgstr ""
+msgstr "Activar:"
 
 msgid "&Add"
 msgstr "&Añadir"
@@ -436,10 +436,10 @@ msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 msgstr ""
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr "Buscando actualizaciones…"
 
 msgid "Copy"
-msgstr ""
+msgstr "Copiar"
 
 msgid "Quit"
 msgstr "Salir"
@@ -448,7 +448,7 @@ msgid "TortoiseHg Bug Report"
 msgstr "TortoiseHg: Informe de fallo"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr ""
+msgstr "Se recomienda actualizar a un TortoiseHg más reciente"
 
 msgid "Your TortoiseHg is up to date."
 msgstr ""
@@ -469,6 +469,8 @@ msgid ""
 "If you still have trouble, <a href=\"#bugreport\">please file a bug report</"
 "a>."
 msgstr ""
+"Si sigues teniendo problemas, <a href=\"#bugreport\">por favor documenta un "
+"reporte de bug</a>."
 
 msgid "Visual Diff"
 msgstr "Diff visual"
@@ -510,10 +512,10 @@ msgid "No chunks remain"
 msgstr "No quedan paquetes"
 
 msgid "file has been deleted, refresh"
-msgstr ""
+msgstr "El archivo ha sido eliminado, refrescar"
 
 msgid "file has been modified, refresh"
-msgstr ""
+msgstr "El archivo ha sido modificado, refrescar"
 
 msgid "Unable to merge chunks"
 msgstr ""
@@ -522,13 +524,15 @@ msgid "Add or remove patches must be merged in the working directory"
 msgstr ""
 
 msgid "Unable to remove"
-msgstr ""
+msgstr "No es posible eliminar"
 
 #, python-format
 msgid ""
 "Unable to remove file %s,\n"
 "permission denied"
 msgstr ""
+"No es posible eliminar el archivo %s,\n"
+"permiso denegado"
 
 msgctxt "files"
 msgid "All"
@@ -549,7 +553,7 @@ msgid "Chunks selected: %d / %d"
 msgstr ""
 
 msgid "Please wait while the file is opened ..."
-msgstr ""
+msgstr "Por favor espera mientras el archivo es abierto"
 
 msgid "Source:"
 msgstr "Fuente:"
@@ -614,11 +618,11 @@ msgstr "error al ejecutar el comando\n"
 
 #, python-format
 msgid "process exited unexpectedly with code %d"
-msgstr ""
+msgstr "proceso terminado inesperadamente con código %d"
 
 #, python-format
 msgid "failed to encode command: %s"
-msgstr ""
+msgstr "falló al codificar comando: %s"
 
 #, python-format
 msgid "timed out while reading: %r..."
@@ -629,33 +633,33 @@ msgstr ""
 
 #, python-format
 msgid "unexpected response on required channel %r"
-msgstr ""
+msgstr "respuesta inesperada en canal requerido %r"
 
 #, python-format
 msgid "invalid \"hello\" message: %r"
-msgstr ""
+msgstr "mensaje \"hello\" inválido: %r"
 
 msgid "no \"runcommand\" capability"
 msgstr ""
 
 #, python-format
 msgid "corrupted command result: %r"
-msgstr ""
+msgstr "resultado de comando corrupto: %r"
 
 #, python-format
 msgid "failed to encode input: %s"
-msgstr ""
+msgstr "fallla al codificar entrada: %s"
 
 msgid "Terminated by user"
 msgstr "Finalizado por el usuario"
 
 #, python-format
 msgid "[command terminated by user %s]"
-msgstr ""
+msgstr "[comando terminado por el usuario %s]"
 
 #, python-format
 msgid "[command interrupted %s]"
-msgstr ""
+msgstr "[comando interrumpido %s]"
 
 #, python-format
 msgid "[command returned code %d %%s]"
@@ -669,7 +673,7 @@ msgid "Running..."
 msgstr "Ejecutando..."
 
 msgid "Failed!"
-msgstr ""
+msgstr "¡Falló!"
 
 msgid "Clea&r Log"
 msgstr ""
@@ -678,7 +682,7 @@ msgid "TortoiseHg Prompt"
 msgstr "Línea de órdenes de TortoiseHg"
 
 msgid "Show Detail"
-msgstr ""
+msgstr "Mostrar Detalle"
 
 msgid "Hide Detail"
 msgstr ""
@@ -690,19 +694,21 @@ msgid ""
 "Mercurial command is still running.\n"
 "Are you sure you want to terminate?"
 msgstr ""
+"Comando Mercurial aún se está ejecutando.\n"
+"¿Seguro que quieres cancelar?"
 
 msgid "&Run"
-msgstr ""
+msgstr "&Ejecutar"
 
 msgid "TortoiseHg Command Dialog"
 msgstr ""
 
 msgid "Command Error"
-msgstr ""
+msgstr "Error del comando"
 
 #, python-format
 msgid "[Code: %d]"
-msgstr ""
+msgstr "[Código: %d]"
 
 msgid "Merge"
 msgstr "Combinar"
@@ -745,7 +751,7 @@ msgid "Show Issues"
 msgstr ""
 
 msgid "Please wait..."
-msgstr ""
+msgstr "Espera..."
 
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
@@ -968,8 +974,9 @@ msgid "Compress - %s"
 msgstr ""
 
 msgid ""
-"Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
 
 msgid "You may continue the compress"
@@ -1853,8 +1860,9 @@ msgid "Graft changeset #%d of %d"
 msgstr ""
 
 msgid ""
-"Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
+"\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
+"changes."
 msgstr ""
 
 msgid "You may continue or start the graft"
@@ -2525,30 +2533,18 @@ msgid "Patch Queue"
 msgstr ""
 
 msgctxt "MQ QPush"
-msgid "Push all"
-msgstr ""
-
-msgid "Apply all patches"
-msgstr "Aplciar todos los parches"
-
-msgctxt "MQ QPush"
 msgid "Push"
 msgstr ""
 
 msgid "Apply one patch"
 msgstr ""
 
-msgid "Set &Guards..."
+msgctxt "MQ QPush"
+msgid "Push all"
 msgstr ""
 
-msgid "Configure guards for selected patch"
-msgstr ""
-
-msgid "&Delete Patches..."
-msgstr ""
-
-msgid "Delete selected patches"
-msgstr ""
+msgid "Apply all patches"
+msgstr "Aplciar todos los parches"
 
 msgid "Pop"
 msgstr ""
@@ -2562,7 +2558,28 @@ msgstr ""
 msgid "Unapply all patches"
 msgstr "No aplicar todos los parches"
 
+msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Finish Patch"
+msgstr ""
+
+msgid "Move applied patches into repository history"
+msgstr ""
+
+msgid "&Delete Patches..."
+msgstr ""
+
+msgid "Delete selected patches"
+msgstr ""
+
 msgid "Re&name Patch..."
+msgstr ""
+
+msgid "Set &Guards..."
+msgstr ""
+
+msgid "Configure guards for selected patch"
 msgstr ""
 
 msgid "Patch Queue Actions Toolbar"
@@ -3143,8 +3160,9 @@ msgid "Rebase - %s"
 msgstr ""
 
 msgid ""
-"Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before rebase, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
 
 msgid "You may continue the rebase"
@@ -3916,9 +3934,6 @@ msgstr ""
 msgid "Import to &MQ"
 msgstr ""
 
-msgid "&Finish Patch"
-msgstr ""
-
 msgid "MQ &Options"
 msgstr ""
 
@@ -4087,7 +4102,7 @@ msgstr ""
 msgid "Filter b&y"
 msgstr ""
 
-msgid "&Ancestors"
+msgid "&Ancestors and Descendants"
 msgstr ""
 
 msgid "A&uthor"
@@ -7818,7 +7833,7 @@ msgid "in the future"
 msgstr ""
 
 msgid "now"
-msgstr ""
+msgstr "ahora"
 
 msgid "Commit..."
 msgstr "Realizar..."
@@ -7973,11 +7988,11 @@ msgid "repository %s not found"
 msgstr "repositorio %s no encontrado"
 
 msgid "win32ill: cannot create window for messages"
-msgstr ""
+msgstr "win32ill: No se puede crear la ventana para mensajes"
 
 #, python-format
 msgid "win32ill: unsupported platform: %s\n"
-msgstr ""
+msgstr "win32ill: Plataforma no soportada: %s\n"
 
 msgid "win32ill: interrupted while stopping message loop\n"
 msgstr ""

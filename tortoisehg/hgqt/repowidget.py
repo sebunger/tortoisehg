@@ -38,21 +38,21 @@ from PyQt4.QtGui import *
 class RepoWidget(QWidget):
 
     currentTaskTabChanged = pyqtSignal()
-    showMessageSignal = pyqtSignal(QString)
+    showMessageSignal = pyqtSignal(str)
     toolbarVisibilityChanged = pyqtSignal(bool)
 
     # TODO: progress can be removed if all actions are run as hg command
-    progress = pyqtSignal(QString, object, QString, QString, object)
+    progress = pyqtSignal(str, object, str, str, object)
     makeLogVisible = pyqtSignal(bool)
 
     revisionSelected = pyqtSignal(object)
 
-    titleChanged = pyqtSignal(unicode)
+    titleChanged = pyqtSignal(str)
     """Emitted when changed the expected title for the RepoWidget tab"""
 
     busyIconChanged = pyqtSignal()
 
-    repoLinkClicked = pyqtSignal(unicode)
+    repoLinkClicked = pyqtSignal(str)
     """Emitted when clicked a link to open repository"""
 
     def __init__(self, repoagent, parent=None, bundle=None):
@@ -191,7 +191,7 @@ class RepoWidget(QWidget):
                         for name, idx in self._namedTabs.iteritems())
         return indexmap.get(self.taskTabsWidget.currentIndex())
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def switchToNamedTaskTab(self, tabname):
         tabname = str(tabname)
         if tabname in self._namedTabs:
@@ -253,7 +253,7 @@ class RepoWidget(QWidget):
             path = self.repo.wjoin(path)
         self.repoLinkClicked.emit(hglib.tounicode(path))
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _openLink(self, link):
         link = unicode(link)
         handlers = {'cset': self.goto,
@@ -334,13 +334,13 @@ class RepoWidget(QWidget):
             self._busyIconNames.remove(iconname)
         self.busyIconChanged.emit()
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def setFilter(self, filter):
         self.filterbar.setQuery(filter)
         self.filterbar.setVisible(True)
         self.filterbar.runQuery()
 
-    @pyqtSlot(QString, QString)
+    @pyqtSlot(str, str)
     def setBundle(self, bfile, bsource=None):
         if self._repoagent.overlayUrl():
             self.clearBundle()
@@ -563,8 +563,11 @@ class RepoWidget(QWidget):
                 if '\0' in earlybytes:
                     continue
                 pf.seek(0)
-                filename, message, user, date, branch, node, p1, p2 = \
-                        patch.extract(self.repo.ui, pf)
+                data = patch.extract(self.repo.ui, pf)
+                try:
+                    filename = data.get('filename')
+                except AttributeError:  # hg<3.6 (b9be8ab6e628)
+                    filename = data[0]
                 if filename:
                     filepaths.append(p)
                     os.unlink(filename)
@@ -690,7 +693,7 @@ class RepoWidget(QWidget):
 
     ## End workbench event forwards
 
-    @pyqtSlot(unicode, dict)
+    @pyqtSlot(str, dict)
     def grep(self, pattern='', opts={}):
         """Open grep task tab"""
         opts = dict((str(k), str(v)) for k, v in opts.iteritems())
@@ -830,7 +833,7 @@ class RepoWidget(QWidget):
         else:
             self.taskTabsWidget.tabBar().hide()
 
-    @pyqtSlot(QString, bool)
+    @pyqtSlot(str, bool)
     def setBranch(self, branch, allparents):
         self.repomodel.setBranch(branch, allparents=allparents)
         self.titleChanged.emit(self.title())
@@ -1079,7 +1082,7 @@ class RepoWidget(QWidget):
         entry(menu)
         entry(menu, None, fixed, _('&Tag...'), 'hg-tag',
               self.tagToRevision)
-        entry(menu, None, fixed, _('Boo&kmark...'), 'hg-bookmarks',
+        entry(menu, None, isrev, _('Boo&kmark...'), 'hg-bookmarks',
               self.bookmarkRevision)
         entry(menu, 'gpg', fixed, _('Sig&n...'), 'hg-sign',
               self.signRevision)
@@ -1541,9 +1544,10 @@ class RepoWidget(QWidget):
         menu = QMenu(_('Filter b&y'), self)
         menu.setIcon(qtlib.geticon('view-filter'))
         menu.triggered.connect(self._filterBySelectedRevisions)
-        for t, r in [(_('&Ancestors'), "ancestors(%s)"),
-                     (_('A&uthor'), "matching(%s, 'author')"),
-                     (_('&Branch'), "branch(%s)"),
+        for t, r in [(_('&Ancestors and Descendants'),
+                      "ancestors({revs}) or descendants({revs})"),
+                     (_('A&uthor'), "matching({revs}, 'author')"),
+                     (_('&Branch'), "branch({revs})"),
                      ]:
             a = menu.addAction(t)
             a.setData(r)
@@ -1558,7 +1562,7 @@ class RepoWidget(QWidget):
         if not expr:
             self._filterByMatchDialog(revs)
             return
-        self.setFilter(expr % revs)
+        self.setFilter(expr.format(revs=revs))
 
     def _filterByMatchDialog(self, revlist):
         dlg = matching.MatchDialog(self._repoagent, revlist, self)
@@ -1887,8 +1891,7 @@ class RepoWidget(QWidget):
 
     def qfinishRevision(self):
         """Finish applied patches up to and including selected revision"""
-        cmdline = ['qfinish', 'qbase::%s' % self.rev]
-        self._runCommand(cmdline)
+        self._mqActions.finishRevision(hglib.tounicode(str(self.rev)))
 
     @pyqtSlot()
     def qgotoParentRevision(self):

@@ -395,7 +395,7 @@ PANEL_TMPL = '<tr><td style="padding-right:6px">%s</td><td>%s</td></tr>'
 
 class SummaryPanel(SummaryBase, QWidget):
 
-    linkActivated = pyqtSignal(QString)
+    linkActivated = pyqtSignal(str)
 
     def __init__(self, target, style, custom, repo, info):
         SummaryBase.__init__(self, target, custom, repo, info)

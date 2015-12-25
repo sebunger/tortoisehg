@@ -47,14 +47,14 @@ _ChunkSelectionMarkerMask = (
 class HgFileView(QFrame):
     "file diff, content, and annotation viewer"
 
-    linkActivated = pyqtSignal(QString)
-    fileDisplayed = pyqtSignal(QString, QString)
-    showMessage = pyqtSignal(QString)
+    linkActivated = pyqtSignal(str)
+    fileDisplayed = pyqtSignal(str, str)
+    showMessage = pyqtSignal(str)
     revisionSelected = pyqtSignal(int)
     shelveToolExited = pyqtSignal()
     chunkSelectionChanged = pyqtSignal()
 
-    grepRequested = pyqtSignal(unicode, dict)
+    grepRequested = pyqtSignal(str, dict)
     """Emitted (pattern, opts) when user request to search changelog"""
 
     def __init__(self, repoagent, parent):
@@ -404,7 +404,7 @@ class HgFileView(QFrame):
         if not self._fd.isNull():
             self._applyTextEncoding()
 
-    @pyqtSlot(unicode, int, int)
+    @pyqtSlot(str, int, int)
     def _setSource(self, path, rev, line):
         # BUG: not work for subrepo
         self.revisionSelected.emit(rev)
@@ -528,11 +528,11 @@ class HgFileView(QFrame):
             self.maxWidth += fm.width(longestline)
         self._updateScrollBar()
 
-    @pyqtSlot(unicode, bool, bool, bool)
+    @pyqtSlot(str, bool, bool, bool)
     def find(self, exp, icase=True, wrap=False, forward=True):
         self.sci.find(exp, icase, wrap, forward)
 
-    @pyqtSlot(unicode, bool)
+    @pyqtSlot(str, bool)
     def highlightText(self, match, icase=False):
         self._lastSearch = match, icase
         self.sci.highlightText(match, icase)
@@ -595,7 +595,7 @@ class HgFileView(QFrame):
         self.actionNextDiff.setEnabled(self._findNextChunk() >= 0)
         self.actionPrevDiff.setEnabled(self._findPrevChunk() >= 0)
 
-    @pyqtSlot(unicode, int, int)
+    @pyqtSlot(str, int, int)
     def _editSelected(self, path, rev, line):
         """Open editor to show the specified file"""
         path = hglib.fromunicode(path)
@@ -610,11 +610,11 @@ class HgFileView(QFrame):
         if dlg:
             dlg.exec_()
 
-    @pyqtSlot(unicode, int)
+    @pyqtSlot(str, int)
     def _visualDiffRevision(self, path, rev):
         self._visualDiff(path, change=rev)
 
-    @pyqtSlot(unicode, int)
+    @pyqtSlot(str, int)
     def _visualDiffToLocal(self, path, rev):
         self._visualDiff(path, rev=[str(rev)])
 
@@ -903,14 +903,14 @@ class _MessageViewControl(_AbstractViewControl):
 class _AnnotateViewControl(_AbstractViewControl):
     """Display annotation margin and colorize file content in HgFileView"""
 
-    showMessage = pyqtSignal(QString)
+    showMessage = pyqtSignal(str)
 
-    editSelectedRequested = pyqtSignal(unicode, int, int)
-    grepRequested = pyqtSignal(unicode, dict)
+    editSelectedRequested = pyqtSignal(str, int, int)
+    grepRequested = pyqtSignal(str, dict)
     searchSelectedTextRequested = pyqtSignal()
-    setSourceRequested = pyqtSignal(unicode, int, int)
-    visualDiffRevisionRequested = pyqtSignal(unicode, int)
-    visualDiffToLocalRequested = pyqtSignal(unicode, int)
+    setSourceRequested = pyqtSignal(str, int, int)
+    visualDiffRevisionRequested = pyqtSignal(str, int)
+    visualDiffToLocalRequested = pyqtSignal(str, int)
 
     def __init__(self, repoagent, sci, fd, parent=None):
         super(_AnnotateViewControl, self).__init__(parent)

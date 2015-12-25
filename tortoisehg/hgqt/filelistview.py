@@ -23,7 +23,7 @@ from PyQt4.QtGui import *
 class HgFileListView(QTreeView):
     """Display files and statuses between two revisions or patch"""
 
-    fileSelected = pyqtSignal(QString, QString)
+    fileSelected = pyqtSignal(str, str)
     clearDisplay = pyqtSignal()
 
     def __init__(self, parent):

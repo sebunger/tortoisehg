@@ -438,7 +438,7 @@ class Workbench(QMainWindow):
         self.urlCombo.blockSignals(False)
         self._updateSyncUrlToolTip(self.urlCombo.currentIndex())
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _setupUrlComboIfCurrent(self, root):
         w = self._currentRepoWidget()
         if w.repoRootPath() == root:
@@ -646,7 +646,7 @@ class Workbench(QMainWindow):
         self._setConsoleTaskTabVisible(not docked and visible)
         self._updateShowConsoleAction()
 
-    @pyqtSlot(QString, bool)
+    @pyqtSlot(str, bool)
     def openRepo(self, root, reuse, bundle=None):
         """Open tab of the specified repo [unicode]"""
         root = unicode(root)
@@ -657,12 +657,12 @@ class Workbench(QMainWindow):
         if not self.repoTabsWidget.openRepo(root, bundle):
             return
 
-    @pyqtSlot(QString)
+    @pyqtSlot(str)
     def showRepo(self, root):
         """Activate the repo tab or open it if not available [unicode]"""
         self.openRepo(root, True)
 
-    @pyqtSlot(unicode, QString)
+    @pyqtSlot(str, str)
     def setRevsetFilter(self, path, filter):
         if self.repoTabsWidget.selectRepo(path):
             w = self.repoTabsWidget.currentWidget()
@@ -755,7 +755,7 @@ class Workbench(QMainWindow):
         self._updateMenu()
         self._updateWindowTitle()
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _onCurrentRepoChanged(self, curpath):
         curpath = unicode(curpath)
         self._console.setCurrentRepoRoot(curpath or None)
@@ -837,7 +837,7 @@ class Workbench(QMainWindow):
     def _updateAbortAction(self, repoagent):
         self.actionAbort.setEnabled(repoagent.isBusy())
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def _onBusyChanged(self, root):
         repoagent = self._repomanager.repoAgent(root)
         self._updateAbortAction(repoagent)
@@ -867,7 +867,7 @@ class Workbench(QMainWindow):
         if ok:
             self.gotorev(rev)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def gotorev(self, rev):
         w = self._currentRepoWidget()
         if w:
@@ -887,7 +887,7 @@ class Workbench(QMainWindow):
             self.openRepo(dlg.destination(), False)
 
     @pyqtSlot()
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def cloneRepository(self, uroot=None):
         """ Run clone dialog """
         # it might be better to reuse existing CloneDialog
@@ -904,7 +904,7 @@ class Workbench(QMainWindow):
         dlg.clonedRepository.connect(self._openClonedRepo)
         return dlg
 
-    @pyqtSlot(unicode, unicode)
+    @pyqtSlot(str, str)
     def _openClonedRepo(self, root, sourceroot):
         self.reporegistry.addClonedRepo(root, sourceroot)
         self.showRepo(root)

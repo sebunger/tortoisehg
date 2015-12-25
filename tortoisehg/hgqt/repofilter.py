@@ -71,10 +71,10 @@ def _querytype(repo, query):
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
 
-    setRevisionSet = pyqtSignal(unicode)
+    setRevisionSet = pyqtSignal(str)
     filterToggled = pyqtSignal(bool)
 
-    branchChanged = pyqtSignal(unicode, bool)
+    branchChanged = pyqtSignal(str, bool)
     """Emitted (branch, allparents) when branch selection changed"""
 
     showHiddenChanged = pyqtSignal(bool)
@@ -411,7 +411,7 @@ class RepoFilterBar(QToolBar):
         else:
             self.setBranch(curbranch)
 
-    @pyqtSlot(unicode)
+    @pyqtSlot(str)
     def setBranch(self, branch):
         """Change the current branch by name [unicode]"""
         if not branch:

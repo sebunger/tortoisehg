@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"POT-Creation-Date: 2015-11-01 17:40-0200\n"
 "PO-Revision-Date: 2015-06-28 12:50+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-07-27 05:31+0000\n"
-"X-Generator: Launchpad (build 17628)\n"
+"X-Launchpad-Export-Date: 2015-11-02 05:10+0000\n"
+"X-Generator: Launchpad (build 17838)\n"
 "Language: cs\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
@@ -987,11 +987,10 @@ msgid "Compress - %s"
 msgstr "Compress - %s"
 
 msgid ""
-"Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Před komprimací musíte provést<a href=\"commit\"><b>commit</b></a> nebo "
-"změny <a href=\"discard\"><b>vyřadit</b></a>."
 
 msgid "You may continue the compress"
 msgstr "Můžete pokračovat v komprimaci"
@@ -1926,11 +1925,10 @@ msgid "Graft changeset #%d of %d"
 msgstr "Changeset gráftu #%d z %d"
 
 msgid ""
-"Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
+"\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
+"changes."
 msgstr ""
-"Před gráftem musíte změny <a href=\"commit\"><b>komitovat</b></a> nebo <a "
-"href=\"discard\"><b>vyřadit</b></a>."
 
 msgid "You may continue or start the graft"
 msgstr "Můžete pokračovat nebo začít vytvářet gráft"
@@ -2641,30 +2639,18 @@ msgid "Patch Queue"
 msgstr "Fronta oprávek (Patch Queue)"
 
 msgctxt "MQ QPush"
-msgid "Push all"
-msgstr ""
-
-msgid "Apply all patches"
-msgstr "Aplikovat všechny oprávky"
-
-msgctxt "MQ QPush"
 msgid "Push"
 msgstr ""
 
 msgid "Apply one patch"
 msgstr "Aplikovat jednu oprávku"
 
-msgid "Set &Guards..."
+msgctxt "MQ QPush"
+msgid "Push all"
 msgstr ""
 
-msgid "Configure guards for selected patch"
-msgstr "Nastavit guardy pro vybranou oprávku"
-
-msgid "&Delete Patches..."
-msgstr ""
-
-msgid "Delete selected patches"
-msgstr "Smazat vybrané oprávky"
+msgid "Apply all patches"
+msgstr "Aplikovat všechny oprávky"
 
 msgid "Pop"
 msgstr ""
@@ -2678,8 +2664,29 @@ msgstr ""
 msgid "Unapply all patches"
 msgstr "Zrušit aplikaci všech oprávek"
 
+msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Finish Patch"
+msgstr ""
+
+msgid "Move applied patches into repository history"
+msgstr ""
+
+msgid "&Delete Patches..."
+msgstr ""
+
+msgid "Delete selected patches"
+msgstr "Smazat vybrané oprávky"
+
 msgid "Re&name Patch..."
 msgstr ""
+
+msgid "Set &Guards..."
+msgstr ""
+
+msgid "Configure guards for selected patch"
+msgstr "Nastavit guardy pro vybranou oprávku"
 
 msgid "Patch Queue Actions Toolbar"
 msgstr ""
@@ -3278,11 +3285,10 @@ msgid "Rebase - %s"
 msgstr "Přeskupit - %s"
 
 msgid ""
-"Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before rebase, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Před přeskupením (rebase) musíte provést <a href=\"commit\"><b>commit</b></"
-"a> nebo změny <a href=\"discard\"><b>vyřadit</b> (discard) </a>."
 
 msgid "You may continue the rebase"
 msgstr "Můžete pokračovat v přeskupování (rebase)"
@@ -4091,9 +4097,6 @@ msgstr ""
 msgid "Import to &MQ"
 msgstr ""
 
-msgid "&Finish Patch"
-msgstr ""
-
 msgid "MQ &Options"
 msgstr ""
 
@@ -4269,7 +4272,7 @@ msgstr "%d oprávky byly exportovány do:<p><a href=\"file:///%s\">%s</a>"
 msgid "Filter b&y"
 msgstr ""
 
-msgid "&Ancestors"
+msgid "&Ancestors and Descendants"
 msgstr ""
 
 msgid "A&uthor"
@@ -11825,8 +11828,29 @@ msgstr ""
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "Konfigurace kontextové nabídky Windows"
 
+#~ msgid ""
+#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Před komprimací musíte provést<a href=\"commit\"><b>commit</b></a> nebo "
+#~ "změny <a href=\"discard\"><b>vyřadit</b></a>."
+
+#~ msgid ""
+#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Před gráftem musíte změny <a href=\"commit\"><b>komitovat</b></a> nebo <a "
+#~ "href=\"discard\"><b>vyřadit</b></a>."
+
 #~ msgid "Error when creating repository"
 #~ msgstr "Chyba při vytváření repozitáře"
+
+#~ msgid ""
+#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Před přeskupením (rebase) musíte provést <a href=\"commit\"><b>commit</"
+#~ "b></a> nebo změny <a href=\"discard\"><b>vyřadit</b> (discard) </a>."
 
 #~ msgid "udpate all repos in current dir"
 #~ msgstr "aktualizovat všechny repozitáře ve stávajícím adresáři"

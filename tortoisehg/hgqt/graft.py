@@ -164,9 +164,10 @@ class GraftDialog(QDialog):
     def _onCheckFinished(self, clean):
         if not clean:
             self.graftbtn.setEnabled(False)
-            txt = _('Before graft, you must <a href="commit">'
-                    '<b>commit</b></a> or <a href="discard">'
-                    '<b>discard</b></a> changes.')
+            txt = _('Before graft, you must '
+                    '<a href="commit"><b>commit</b></a>, '
+                    '<a href="shelve"><b>shelve</b></a> to patch, '
+                    'or <a href="discard"><b>discard</b></a> changes.')
         else:
             self.graftbtn.setEnabled(True)
             txt = _('You may continue or start the graft')

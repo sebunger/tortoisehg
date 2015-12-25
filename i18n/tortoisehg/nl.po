@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-07-26 09:25-0300\n"
+"POT-Creation-Date: 2015-11-01 17:40-0200\n"
 "PO-Revision-Date: 2015-06-28 12:58+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-07-27 05:32+0000\n"
-"X-Generator: Launchpad (build 17628)\n"
+"X-Launchpad-Export-Date: 2015-11-02 05:11+0000\n"
+"X-Generator: Launchpad (build 17838)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -994,11 +994,10 @@ msgid "Compress - %s"
 msgstr "Comprimeren -%s"
 
 msgid ""
-"Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Voor het comprimeren moet u een <a href=\"commit\"><b>commit</b></a> doen of "
-"de wijzigingen <a href=\"discard\"><b>verwerpen</b></a>."
 
 msgid "You may continue the compress"
 msgstr "U mag verder gaan met comprimeren"
@@ -1927,11 +1926,10 @@ msgid "Graft changeset #%d of %d"
 msgstr "Graft changeset #%d of %d"
 
 msgid ""
-"Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
+"\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
+"changes."
 msgstr ""
-"Vooraleer een graft uit te voeren moet u de wijzigingen <a href=\"committen"
-"\"<b>commit</b></a> of <a href=\"verwerpen\"<b>discard</b></a>."
 
 msgid "You may continue or start the graft"
 msgstr "U mag de graft verderzetten of starten"
@@ -2649,30 +2647,18 @@ msgid "Patch Queue"
 msgstr "Patch Queue"
 
 msgctxt "MQ QPush"
-msgid "Push all"
-msgstr "Push alles"
-
-msgid "Apply all patches"
-msgstr "Alle patches toepassen"
-
-msgctxt "MQ QPush"
 msgid "Push"
 msgstr "Push"
 
 msgid "Apply one patch"
 msgstr "Eén patch toepassen"
 
-msgid "Set &Guards..."
-msgstr ""
+msgctxt "MQ QPush"
+msgid "Push all"
+msgstr "Push alles"
 
-msgid "Configure guards for selected patch"
-msgstr "Guards instellen voor de gekozen patch"
-
-msgid "&Delete Patches..."
-msgstr ""
-
-msgid "Delete selected patches"
-msgstr "Verwijder gekozen patches"
+msgid "Apply all patches"
+msgstr "Alle patches toepassen"
 
 msgid "Pop"
 msgstr "Pop"
@@ -2686,8 +2672,29 @@ msgstr "Pop alle patches"
 msgid "Unapply all patches"
 msgstr "Alle patches wegnemen"
 
+msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Finish Patch"
+msgstr "Patch Afwerken"
+
+msgid "Move applied patches into repository history"
+msgstr ""
+
+msgid "&Delete Patches..."
+msgstr ""
+
+msgid "Delete selected patches"
+msgstr "Verwijder gekozen patches"
+
 msgid "Re&name Patch..."
 msgstr "Patch Her&noemen..."
+
+msgid "Set &Guards..."
+msgstr ""
+
+msgid "Configure guards for selected patch"
+msgstr "Guards instellen voor de gekozen patch"
 
 msgid "Patch Queue Actions Toolbar"
 msgstr "Patch Wachtrij Acties Toolbar"
@@ -3280,11 +3287,10 @@ msgid "Rebase - %s"
 msgstr "Rebase - %s"
 
 msgid ""
-"Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-"\"discard\"><b>discard</b></a> changes."
+"Before rebase, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
 msgstr ""
-"Vooraleer een rebase te doen moet u wijzigingen <a href=\"commit"
-"\"><b>committen</b></a> or <a href=\"discard\"><b>verwerpen</b></a>"
 
 msgid "You may continue the rebase"
 msgstr "U mag de rebase verderzetten"
@@ -4100,9 +4106,6 @@ msgstr ""
 msgid "Import to &MQ"
 msgstr "Importeer in MQ"
 
-msgid "&Finish Patch"
-msgstr "Patch Afwerken"
-
 msgid "MQ &Options"
 msgstr ""
 
@@ -4279,7 +4282,7 @@ msgstr "%d patches werden geëxporteerd naar: <p><a href=\"file:///%s\">%s</a>"
 msgid "Filter b&y"
 msgstr ""
 
-msgid "&Ancestors"
+msgid "&Ancestors and Descendants"
 msgstr ""
 
 msgid "A&uthor"
@@ -9124,6 +9127,13 @@ msgstr ""
 #~ msgid "bad hunk #%d old text line %d"
 #~ msgstr "slecht blok #%d oude tekst regel %d"
 
+#~ msgid ""
+#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Vooraleer een rebase te doen moet u wijzigingen <a href=\"commit"
+#~ "\"><b>committen</b></a> or <a href=\"discard\"><b>verwerpen</b></a>"
+
 #~ msgid "Backout..."
 #~ msgstr "Backout..."
 
@@ -9781,6 +9791,13 @@ msgstr ""
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "Negeer witruimte bij het vergelijken van regels. Standaard: Uit"
 
+#~ msgid ""
+#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Vooraleer een graft uit te voeren moet u de wijzigingen <a href="
+#~ "\"committen\"<b>commit</b></a> of <a href=\"verwerpen\"<b>discard</b></a>."
+
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "TortoiseHg Shell Instellingen"
 
@@ -9848,6 +9865,13 @@ msgstr ""
 
 #~ msgid "Source path is empty"
 #~ msgstr "Doelpad is leeg"
+
+#~ msgid ""
+#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
+#~ "\"discard\"><b>discard</b></a> changes."
+#~ msgstr ""
+#~ "Voor het comprimeren moet u een <a href=\"commit\"><b>commit</b></a> doen "
+#~ "of de wijzigingen <a href=\"discard\"><b>verwerpen</b></a>."
 
 #~ msgid "Unable to save file"
 #~ msgstr "Kan bestand niet opslaan"

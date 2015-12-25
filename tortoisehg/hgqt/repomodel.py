@@ -140,7 +140,7 @@ class HgRepoListModel(QAbstractTableModel):
     """
     Model used for displaying the revisions of a Hg *local* repository
     """
-    showMessage = pyqtSignal(unicode)
+    showMessage = pyqtSignal(str)
 
     # emitted when listed revisions are updated because of repository or
     # filter option change; a view might have to change current index
@@ -580,7 +580,7 @@ class HgRepoListModel(QAbstractTableModel):
                     and not self._querysess.isFinished()))
 
     def mimeTypes(self):
-        return QStringList([mqpatchmimetype])
+        return [mqpatchmimetype]
 
     def supportedDropActions(self):
         return Qt.MoveAction

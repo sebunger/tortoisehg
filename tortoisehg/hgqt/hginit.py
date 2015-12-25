@@ -104,7 +104,7 @@ class InitWidget(cmdui.AbstractCmdWidget):
 
 class InitDialog(cmdui.CmdControlDialog):
 
-    newRepository = pyqtSignal(unicode)
+    newRepository = pyqtSignal(str)
 
     def __init__(self, ui, destdir='.', parent=None):
         super(InitDialog, self).__init__(parent)
