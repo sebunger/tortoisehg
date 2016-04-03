@@ -18,7 +18,7 @@ import time
 from PyQt4.QtCore import *
 
 from mercurial import hg, error, bundlerepo, extensions, filemerge, node
-from mercurial import localrepo, merge, subrepo
+from mercurial import localrepo, subrepo
 from mercurial import ui as uimod
 from hgext import mq
 
@@ -1023,7 +1023,7 @@ def genPatchContext(repo, patchpath, rev=None):
     return ctx
 
 def recursiveMergeStatus(repo):
-    ms = merge.mergestate(repo)
+    ms = hglib.readmergestate(repo)
     for wfile in ms:
         yield repo.root, wfile, ms[wfile]
     try:
@@ -1048,7 +1048,8 @@ def relatedRepositories(repoid):
         for e in repotreemodel.iterRepoItemFromXml(f):
             if e.basenode() == repoid:
                 # TODO: both in unicode because this is Qt-layer function?
-                yield e.rootpath(), hglib.fromunicode(e.shortname())
+                yield (hglib.fromunicode(e.rootpath()),
+                       hglib.fromunicode(e.shortname()))
     except:
         f.close()
         raise

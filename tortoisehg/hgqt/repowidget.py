@@ -359,7 +359,7 @@ class RepoWidget(QWidget):
         w.acceptButton.setText(_('Pull'))
         w.acceptButton.setToolTip(_('Pull incoming changesets into '
                                     'your repository'))
-        w.rejectButton.setText(_('Reject'))
+        w.rejectButton.setText(_('Cancel'))
         w.rejectButton.setToolTip(_('Reject incoming changesets'))
         w.accepted.connect(self.acceptBundle)
         w.rejected.connect(self.clearBundle)
@@ -564,14 +564,11 @@ class RepoWidget(QWidget):
                     continue
                 pf.seek(0)
                 data = patch.extract(self.repo.ui, pf)
-                try:
-                    filename = data.get('filename')
-                except AttributeError:  # hg<3.6 (b9be8ab6e628)
-                    filename = data[0]
+                filename = data.get('filename')
                 if filename:
                     filepaths.append(p)
                     os.unlink(filename)
-            except Exception:
+            except EnvironmentError:
                 pass
         return filepaths
 
@@ -625,7 +622,7 @@ class RepoWidget(QWidget):
         self._dialogs.open(RepoWidget._createShelveDialog)
 
     def _createShelveDialog(self):
-        dlg = shelve.ShelveDialog(self._repoagent, self)
+        dlg = shelve.ShelveDialog(self._repoagent)
         dlg.finished.connect(self._refreshCommitTabIfNeeded)
         return dlg
 
@@ -1089,6 +1086,8 @@ class RepoWidget(QWidget):
         entry(menu)
         entry(menu, None, fixed, _('&Backout...'), 'hg-revert',
               self.backoutToRevision)
+        entry(menu, None, isctx, _('Revert &All Files...'), 'hg-revert',
+              self.revertToRevision)
         entry(menu)
 
         entry(menu, None, isrev, _('Copy &Hash'), 'copy-hash',
@@ -1539,6 +1538,27 @@ class RepoWidget(QWidget):
         r = dlg.exec_()
         if r in (0, 1):
             self.gotoParent()
+
+    @pyqtSlot()
+    def lockTool(self):
+        from locktool import LockDialog
+        dlg = LockDialog(self._repoagent, self)
+        if dlg:
+            dlg.exec_()
+
+    @pyqtSlot()
+    def revertToRevision(self):
+        if not qtlib.QuestionMsgBox(
+                _('Confirm Revert'),
+                _('Reverting all files will discard changes and '
+                  'leave affected files in a modified state.<br>'
+                  '<br>Are you sure you want to use revert?<br><br>'
+                  '(use update to checkout another revision)'),
+                parent=self):
+            return
+        cmdline = hglib.buildcmdargs('revert', all=True, rev=self.rev)
+        sess = self._runCommand(cmdline)
+        sess.commandFinished.connect(self._refreshCommitTabIfNeeded)
 
     def _createFilterBySelectedRevisionsMenu(self):
         menu = QMenu(_('Filter b&y'), self)

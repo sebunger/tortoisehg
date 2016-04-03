@@ -411,7 +411,7 @@ class ResolveDialog(QDialog):
                   and self._cmdsession.isFinished())
         for c in self.rmenuitems:
             c.setEnabled(enable)
-        merge = len(self.repo.parents()) > 1
+        merge = len(self.repo[None].parents()) > 1
         for c in self.rmmenuitems:
             c.setEnabled(enable and merge)
 

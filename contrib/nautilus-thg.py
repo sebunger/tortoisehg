@@ -131,19 +131,19 @@ class HgExtensionDefault(GObject.GObject):
             debugf(e)
             return None
 
-    def run_dialog(self, menuitem, hgtkcmd, cwd = None):
+    def run_dialog(self, menuitem, hgtkcmd, cwd = None, files = None):
         '''
         hgtkcmd - hgtk subcommand
         '''
         if cwd: #bg
-            self.files = []
+            files = []
         else:
             cwd = self.cwd
         repo = self.get_repo_for_path(cwd)
 
         cmdopts = [sys.executable, self.hgtk, hgtkcmd]
 
-        if hgtkcmd not in nofilecmds and self.files:
+        if hgtkcmd not in nofilecmds and files:
             pipe = subprocess.PIPE
             cmdopts += ['--listfile', '-']
         else:
@@ -151,13 +151,12 @@ class HgExtensionDefault(GObject.GObject):
 
         proc = subprocess.Popen(cmdopts, cwd=cwd, stdin=pipe, shell=False)
         if pipe:
-            proc.stdin.write('\n'.join(self.files))
+            proc.stdin.write('\n'.join(files))
             proc.stdin.close()
 
     def buildMenu(self, vfs_files, bg):
         '''Build menu'''
         self.pos = 0
-        self.files = []
         files = []
         for vfs_file in vfs_files:
             f = self.get_path_for_vfs_file(vfs_file)
@@ -173,19 +172,20 @@ class HgExtensionDefault(GObject.GObject):
         repo = self.get_repo_for_path(cwd)
         if repo:
             menus = self.menu.get_commands(repo, cwd, files)
-            self.files = files
         else:
             menus = self.menu.get_norepo_commands(cwd, files)
+            files = []
         self.cwd = cwd
-        return self._buildMenu(menus)
+        return self._buildMenu(menus, files)
 
-    def _buildMenu(self, menus):
+    def _buildMenu(self, menus, files):
         '''Build one level of a menu'''
         items = []
-        if self.files:
+        if files:
             passcwd = None
         else: #bg
             passcwd = self.cwd
+
         for menu_info in menus:
             idstr = '%s::%02d%s' % (idstr_prefix ,self.pos, menu_info.hgcmd)
             self.pos += 1
@@ -198,11 +198,11 @@ class HgExtensionDefault(GObject.GObject):
                             tip=menu_info.helptext)
                     submenu = Nautilus.Menu()
                     item.set_submenu(submenu)
-                    for subitem in self._buildMenu(menu_info.get_menus()):
+                    for subitem in self._buildMenu(menu_info.get_menus(), files):
                         submenu.append_item(subitem)
                     items.append(item)
                 else: #submenu not suported
-                    for subitem in self._buildMenu(menu_info.get_menus()):
+                    for subitem in self._buildMenu(menu_info.get_menus(), files):
                         items.append(subitem)
             else:
                 if menu_info.state:
@@ -211,7 +211,7 @@ class HgExtensionDefault(GObject.GObject):
                                  menu_info.helptext,
                                  self.icon(menu_info.icon))
                     item.connect('activate', self.run_dialog, menu_info.hgcmd,
-                            passcwd)
+                            passcwd, files)
                     items.append(item)
         return items
 
@@ -219,8 +219,6 @@ class HgExtensionDefault(GObject.GObject):
         '''Build context menu for current directory'''
         if vfs_file and self.menu:
             return self.buildMenu([vfs_file], True)
-        else:
-            self.files = []
 
     def get_file_items(self, window, vfs_files):
         '''Build context menu for selected files/directories'''

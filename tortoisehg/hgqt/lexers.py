@@ -14,7 +14,7 @@ from tortoisehg.hgqt import qtlib
 if hasattr(QtGui.QColor, 'getHslF'):
     def _fixdarkcolors(lexer):
         """Invert lightness of low-contrast colors on dark theme"""
-        if not qtlib.isdarktheme():
+        if not qtlib.isDarkTheme():
             return  # fast path
 
         # QsciLexer defines 128 styles by default

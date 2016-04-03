@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'TortoiseHg'
-copyright = u'2010-2015, Steve Borho and others'
+copyright = u'2010-2016, Steve Borho and others'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -58,7 +58,7 @@ release = '3.6.0'
 language = 'cs'
 
 # There are two options for replacing |today|: either, you set today to some
-# non-false value, then it is used: 
+# non-false value, then it is used:
 #today = ''
 # Else, today_fmt is used as the format for a strftime call.
 #today_fmt = '%B %d, %Y'

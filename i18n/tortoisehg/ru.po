@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
-"PO-Revision-Date: 2015-11-03 17:55+0000\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"PO-Revision-Date: 2016-03-15 15:51+0000\n"
 "Last-Translator: Дьяченко Александр <DyachenkoA@hotmail.ru>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-11-04 05:33+0000\n"
-"X-Generator: Launchpad (build 17838)\n"
+"X-Launchpad-Export-Date: 2016-03-16 05:43+0000\n"
+"X-Generator: Launchpad (build 17947)\n"
 "Language: ru\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -32,8 +32,8 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "О программе"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
-msgstr "Авторское право 2008-2015 Steve Borho и другие"
+msgid "Copyright 2008-2016 Steve Borho and others"
+msgstr "Copyright 2008-2016 Steve Borho и другие"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Некоторые значки предоставлены проектами TortoiseSVN и Tango"
@@ -863,12 +863,14 @@ msgid "Message Translation Failure"
 msgstr "Не удалось перевести сообщение."
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
 "Не удаётся перевести сообщение в локальную кодировку.\n"
-"Попробуйте установить переменную среды HGENCODING\n"
+"Попробуйте установить переменную среды HGENCODING.\n"
+"\n"
 "Заменить непереводимые символы знаком \"?\"?\n"
 
 msgid "&Replace"
@@ -1312,14 +1314,6 @@ msgstr "Вы должны установить корректный тип ло�
 
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "Имя ловушки не может содержать пробелы, табуляторы или символы '='."
-
-#, python-format
-msgid "command parse error: %s"
-msgstr "ошибка разбора команды: %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "не найдено совпадений: %s"
 
 msgid "Console"
 msgstr "Консоль"
@@ -2416,6 +2410,94 @@ msgstr "Добавить как &большие-файлы"
 msgid "Add as &Normal Files"
 msgstr "Добавить как &нормальные файлы"
 
+msgid "Invalid Patterns"
+msgstr "Неверные шаблоны"
+
+msgid "Failed to process largefiles.patterns."
+msgstr "Не удалось обработать largefiles.patterns."
+
+msgid "Word docs (*.doc *.docx)"
+msgstr "Word документы (*.doc *.docx)"
+
+msgid "PDF docs (*.pdf)"
+msgstr "PDF документы (*.pdf)"
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr "Excel файлы (*.xls *.xlsx)"
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr "TortoiseHg средство блокировки - %s"
+
+msgid "Refresh lock information"
+msgstr "Обновить информацию о блокировках"
+
+msgid "Lock a file not described in .hglocks"
+msgstr "Заблокировать файл не описанный в  .hglocks"
+
+msgid "Stop current operation"
+msgstr "Остановить текущую операцию"
+
+msgid "Locked And Lockable Files:"
+msgstr "Заблокированные и блокируемые файлы:"
+
+msgid "Path"
+msgstr "Путь"
+
+msgid "Locking User"
+msgstr "Заблокировавший пользователь"
+
+msgid "Purpose"
+msgstr "Цель"
+
+msgid "Simplelock extension not enabled"
+msgstr "Расширение Simplelock не включено"
+
+msgid "Please enable and configure simplelock"
+msgstr "Пожалуйста включите и настройте simplelock"
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr "Открыть (не объединяемый) файл, который вы хотите заблокировать"
+
+msgid "File was not within current repository"
+msgstr "Файл был не в пределах текущего хранилища"
+
+#, python-format
+msgid "Locking %s"
+msgstr "Блокировка %s"
+
+#, python-format
+msgid "Unlocking %s"
+msgstr "Разблокировка %s"
+
+msgid "Refreshing locks..."
+msgstr "Обновление блокировок..."
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr "Блокировка %s успешна"
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr "Блокировка %s не удалась, повторите"
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr "Разблокировка %s не удалась, повторите"
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr "Разблокировка %s успешна"
+
+msgid "Ready, double click to lock or unlock"
+msgstr "Готово, двойной щелчок, чтобы заблокировать или разблокировать"
+
+msgid "Ready"
+msgstr "Готово"
+
+msgid "You can only release your own locks"
+msgstr "Вы можете освободить только свои собственные блокировки"
+
 msgid "Find revisions matching fields of:"
 msgstr "Найти ревизии, совпадающие по полям с:"
 
@@ -2528,8 +2610,8 @@ msgstr "Или используйте:"
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr "Принудительно слить с ожидающими изменениями (-f/--force)"
 
-msgid "Discard all changes from merge target (other) revision"
-msgstr "Отбросить все изменения вплоть до целевой (другой) ревизии слияния"
+msgid "Discard all changes from the other revision"
+msgstr "Отбросить все изменения из другой ревизии"
 
 msgid "&Discard"
 msgstr "&Отбросить"
@@ -3557,20 +3639,6 @@ msgstr "заполняем (%d)"
 msgid "Mercurial User"
 msgstr "Пользователь Mercurial"
 
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr "Неподдерживаемый тип хранилища (%s)"
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr "Нельзя открыть хранилища или подхранилища, не принадлежащие Mercurial"
-
-msgid "Confirm Delete"
-msgstr "Подтвердите удаление"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr "Удалить группу '%s' и все её элементы?"
-
 msgid "Repository Registry"
 msgstr "Реестр хранилищ"
 
@@ -3824,8 +3892,22 @@ msgstr ""
 "Невозможно обновить файл .hgsub.<p>Удаление подхранилища закончилось "
 "неудачей."
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr "Неподдерживаемый тип хранилища (%s)"
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr "Нельзя открыть хранилища или подхранилища, не принадлежащие Mercurial"
+
 msgid "New Group"
 msgstr "Новая группа"
+
+msgid "Confirm Delete"
+msgstr "Подтвердите удаление"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr "Удалить группу '%s' и все её элементы?"
 
 msgid "Could not get subrepository list"
 msgstr "Не удалось получить список подхранилищ"
@@ -3916,9 +3998,6 @@ msgstr "Ошибка при обновлении файла hgrc хранили�
 msgid "default"
 msgstr "по умолчанию"
 
-msgid "Path"
-msgstr "Путь"
-
 msgid "C&hoose Log Columns..."
 msgstr "&Выбрать колонки журнала..."
 
@@ -3976,9 +4055,6 @@ msgstr "Затянуть"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Затянуть входящие наборы изменений в ваше хранилище"
-
-msgid "Reject"
-msgstr "Отклонить"
 
 msgid "Reject incoming changesets"
 msgstr "Отклонить входящие наборы изменений"
@@ -4111,6 +4187,9 @@ msgstr "&Подписать&..."
 
 msgid "&Backout..."
 msgstr "&Обратить изменения..."
+
+msgid "Revert &All Files..."
+msgstr "Отменить изменения во &всех файлах..."
 
 msgid "Copy &Hash"
 msgstr "Копировать &хэш"
@@ -4317,6 +4396,16 @@ msgstr "Экспортированные заплатки"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d заплаток экспортировано в:<p><a href=\"file:///%s\">%s</a>"
+
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
+msgstr ""
+"Возвращение всех файлов вызывает отмену всех изменений и оставляет "
+"затронутые файлы в изменённом состоянии.<br><br>Вы правда хотите "
+"использовать возвращение?<br><br>(используйте обновление, чтобы перейти к "
+"другой ревизии)"
 
 msgid "Filter b&y"
 msgstr "&Фильтр по"
@@ -4679,16 +4768,6 @@ msgstr "второй родитель ревизии %d (т.е. ревизия %
 
 msgid "null revision (i.e. remove file(s))"
 msgstr "не существующая ревизия (т.е. удалить файл(ы))"
-
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
-msgstr ""
-"Возвращение всех файлов вызывает отмену всех изменений и оставляет "
-"затронутые файлы в изменённом состоянии.<br><br>Вы правда хотите "
-"использовать возвращение?<br><br>(используйте обновление, чтобы перейти к "
-"другой ревизии)"
 
 msgid "Changeset:"
 msgstr "Набор изменений:"
@@ -5185,6 +5264,9 @@ msgstr "thg import [ПАРАМЕТРЫ] [ИСТОЧНИК]..."
 msgid "thg init [DEST]"
 msgstr "thg init [НАЗНАЧЕНИЕ]"
 
+msgid "thg lock"
+msgstr "thg lock"
+
 msgid "search for a given text or revset"
 msgstr "поиск по заданному тексту или набору ревизий"
 
@@ -5579,6 +5661,16 @@ msgstr ""
 "конфигурационных файлов Mercurial. Если не указан, то TortoiseHg будет "
 "использовать первую подходящую программу, обнаруженную в вашей системе."
 
+msgid "CLI Editor"
+msgstr "Редактор командной строки"
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+"Редактор используемый Mercurial в командах командной строки, чтобы собрать "
+"многострочный ввод от пользователя. В частности, сообщения фиксации."
+
 msgid "Shell"
 msgstr "Оболочка"
 
@@ -5655,10 +5747,12 @@ msgstr "GUI в отдельном процессе"
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
 msgstr ""
 "При запуске с командой строки, запускать фоновый процесс для графического "
-"интерфейса пользователя. По умолчанию: Да"
+"интерфейса пользователя. Этот параметр игнорируется, когда TortoiseHg "
+"запущен как приложение OS X. По умолчанию: Да"
 
 msgid "Full Path Title"
 msgstr "Полный путь в заголовке"
@@ -6683,6 +6777,19 @@ msgid ""
 "Path to the directory where a system-wide cache of bfiles will be stored"
 msgstr "Путь к каталогу, где будет находиться общесистемный кэш Б-файлов"
 
+msgid "Simplelock"
+msgstr "Simplelock"
+
+msgid "Lock Clone"
+msgstr "Клон хранилища блокировок"
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+"Местоположение локального клона хранилища для организации блокировок.<p>Это "
+"хранилище должно содержать текстовый файл \"locked\""
+
 msgid "Largefiles"
 msgstr "Большие-файлы"
 
@@ -7249,9 +7356,6 @@ msgstr "Управлять ожидающими наборами изменен�
 msgid "Unbundle"
 msgstr "Разукомплектовать"
 
-msgid "Stop current operation"
-msgstr "Остановить текущую операцию"
-
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Выбранные параметры:</b>"
 
@@ -7309,6 +7413,9 @@ msgstr "Подтвердите уничтожение пути"
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr "Удалить %s из файла конфигурации вашего хранилища?"
+
+msgid "Select repository"
+msgstr "Выберите хранилище"
 
 msgid "No host specified"
 msgstr "Хост не указан"
@@ -8132,6 +8239,12 @@ msgstr "Фильтровать граф по наборам ревизий ил�
 msgid "&Workbench Toolbars"
 msgstr "&Панели рабочей среды"
 
+msgid "&Lock File..."
+msgstr "&Блокировать файл..."
+
+msgid "Lock or unlock files"
+msgstr "Блокировать или разблокировать файлы"
+
 msgid "Update working directory or switch revisions"
 msgstr "Обновить рабочий каталог или переключить ревизии"
 
@@ -8466,6 +8579,14 @@ msgstr "в будущем"
 
 msgid "now"
 msgstr "сейчас"
+
+#, python-format
+msgid "command parse error: %s"
+msgstr "ошибка разбора команды: %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "не найдено совпадений: %s"
 
 msgid "Commit..."
 msgstr "Фиксировать..."
@@ -9198,9 +9319,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ "либо internal:dump - чтобы оставить файлы в рабочем каталоге для ручного "
 #~ "слияния."
 
-#~ msgid "CLI Editor"
-#~ msgstr "Редактор Командной Строки"
-
 #~ msgid "hgtk %s: %s\n"
 #~ msgstr "hgtk %s: %s\n"
 
@@ -9831,6 +9949,9 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "Reject incoming previewed changesets"
 #~ msgstr "Отклонить просмотренные входящие наборы изменений"
+
+#~ msgid "Reject"
+#~ msgstr "Отклонить"
 
 #~ msgid "Save patches to"
 #~ msgstr "Сохранить заплатки в"
@@ -10617,6 +10738,9 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "Rev/ID"
 #~ msgstr "Ревизия/ID"
+
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr "Отбросить все изменения вплоть до целевой (другой) ревизии слияния"
 
 #~ msgid "Cannot merge"
 #~ msgstr "Слияние невозможно"
@@ -11697,6 +11821,13 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ msgstr "Обратить изменения..."
 
 #~ msgid ""
+#~ "When running from the command line, fork a background process to run "
+#~ "graphical dialogs.  Default: True"
+#~ msgstr ""
+#~ "При запуске с командой строки, запускать фоновый процесс для графического "
+#~ "интерфейса пользователя. По умолчанию: Да"
+
+#~ msgid ""
 #~ "Color changesets by author name.  If not enabled, the changes are colored "
 #~ "green for merge, red for non-trivial parents, black for normal. Default: "
 #~ "False"
@@ -11832,6 +11963,15 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "прервано: восстановление резервной копии не удалось, %s\n"
+
+#~ msgid ""
+#~ "Unable to translate message to local encoding\n"
+#~ "Consider setting HGENCODING environment variable\n"
+#~ "Replace untranslatable characters with \"?\"?\n"
+#~ msgstr ""
+#~ "Не удаётся перевести сообщение в локальную кодировку.\n"
+#~ "Попробуйте установить переменную среды HGENCODING\n"
+#~ "Заменить непереводимые символы знаком \"?\"?\n"
 
 #~ msgid ""
 #~ "Defines the command to run when an issue number is recognized. You may "
@@ -11971,6 +12111,9 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ msgstr ""
 #~ "Перед наращением ветви, вы должны <a href=\"commit\"><b>фиксировать</b></"
 #~ "a> или <a href=\"discard\"><b>отбросить</b></a> изменения."
+
+#~ msgid "Copyright 2008-2015 Steve Borho and others"
+#~ msgstr "Авторское право 2008-2015 Steve Borho и другие"
 
 #~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
 #~ msgstr "отпечаток хоста для %s не может быть получен (Python слишком стар)"

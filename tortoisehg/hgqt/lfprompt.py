@@ -7,8 +7,9 @@
 
 import os
 
-from mercurial import match
+from mercurial import error, match
 from tortoisehg.hgqt import qtlib
+from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
 
 def _createPrompt(parent, files):
@@ -33,7 +34,14 @@ def promptForLfiles(parent, ui, repo, files):
     patterns = ui.config(section, 'patterns', default=())
     if patterns:
         patterns = patterns.split(' ')
-        matcher = match.match(repo.root, '', list(patterns))
+        try:
+            matcher = match.match(repo.root, '', list(patterns))
+        except error.Abort as e:
+            qtlib.WarningMsgBox(_('Invalid Patterns'),
+                                _('Failed to process largefiles.patterns.'),
+                                hglib.tounicode(str(e)),
+                                parent=parent)
+            return None
     else:
         matcher = None
     for wfile in files:

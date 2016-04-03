@@ -1249,10 +1249,12 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
         self._sci.markerDefine(p, _ExcludedChunkStartMarker)
 
         self._sci.markerDefine(qsci.Background, _ExcludedLineMarker)
-        self._sci.setMarkerBackgroundColor(QColor('lightgrey'),
-                                           _ExcludedLineMarker)
-        self._sci.setMarkerForegroundColor(QColor('darkgrey'),
-                                           _ExcludedLineMarker)
+        if qtlib.isDarkTheme(self._sci.palette()):
+            bg, fg = QColor(44, 44, 44), QColor(86, 86, 86)
+        else:
+            bg, fg = QColor('lightgrey'), QColor('darkgrey')
+        self._sci.setMarkerBackgroundColor(bg, _ExcludedLineMarker)
+        self._sci.setMarkerForegroundColor(fg, _ExcludedLineMarker)
         self._sci.setMarginType(_ChunkSelectionMargin, qsci.SymbolMargin)
         self._sci.setMarginMarkerMask(_ChunkSelectionMargin,
                                       _ChunkSelectionMarkerMask)

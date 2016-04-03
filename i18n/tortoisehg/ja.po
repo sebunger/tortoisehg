@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
 "PO-Revision-Date: 2015-09-07 12:25+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-11-02 05:12+0000\n"
-"X-Generator: Launchpad (build 17838)\n"
+"X-Launchpad-Export-Date: 2016-02-29 05:31+0000\n"
+"X-Generator: Launchpad (build 17925)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
@@ -32,7 +32,7 @@ msgstr ""
 msgid "About"
 msgstr "バージョン情報"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
+msgid "Copyright 2008-2016 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -857,13 +857,11 @@ msgid "Message Translation Failure"
 msgstr "メッセージの翻訳失敗"
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
-"メッセージをローカルエンコーディングへ変換できませんでした。\n"
-"HGENCODING 環境変数を設定してみてください。\n"
-"変換できない文字を \"?\" へ置き換えますか?\n"
 
 msgid "&Replace"
 msgstr "置き換え(&R)"
@@ -1280,14 +1278,6 @@ msgstr "正しいフックタイプを指定して下さい。"
 
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "フック名に空白・タブ・「=」は使えません。"
-
-#, python-format
-msgid "command parse error: %s"
-msgstr "コマンドの解釈時エラー: %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "見つかりません: %s"
 
 msgid "Console"
 msgstr "コンソール"
@@ -2355,6 +2345,94 @@ msgstr "大容量ファイルとして追加 (&L)"
 msgid "Add as &Normal Files"
 msgstr "通常ファイルとして追加 (&N)"
 
+msgid "Invalid Patterns"
+msgstr ""
+
+msgid "Failed to process largefiles.patterns."
+msgstr ""
+
+msgid "Word docs (*.doc *.docx)"
+msgstr ""
+
+msgid "PDF docs (*.pdf)"
+msgstr ""
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr ""
+
+msgid "Refresh lock information"
+msgstr ""
+
+msgid "Lock a file not described in .hglocks"
+msgstr ""
+
+msgid "Stop current operation"
+msgstr "現在の操作を中断する"
+
+msgid "Locked And Lockable Files:"
+msgstr ""
+
+msgid "Path"
+msgstr "パス"
+
+msgid "Locking User"
+msgstr ""
+
+msgid "Purpose"
+msgstr ""
+
+msgid "Simplelock extension not enabled"
+msgstr ""
+
+msgid "Please enable and configure simplelock"
+msgstr ""
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr ""
+
+msgid "File was not within current repository"
+msgstr ""
+
+#, python-format
+msgid "Locking %s"
+msgstr ""
+
+#, python-format
+msgid "Unlocking %s"
+msgstr ""
+
+msgid "Refreshing locks..."
+msgstr ""
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr ""
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr ""
+
+msgid "Ready, double click to lock or unlock"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "You can only release your own locks"
+msgstr ""
+
 msgid "Find revisions matching fields of:"
 msgstr "フィールド検索元リビジョン:"
 
@@ -2465,8 +2543,8 @@ msgstr "あるいは:"
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr "作業領域中の未コミット変更ごとマージを実施(-f/--force)"
 
-msgid "Discard all changes from merge target (other) revision"
-msgstr "全ての変更点をマージ対象(other)のリビジョンから破棄する"
+msgid "Discard all changes from the other revision"
+msgstr ""
 
 msgid "&Discard"
 msgstr "破棄(&D)"
@@ -3458,20 +3536,6 @@ msgstr "読み込み中 (%d)"
 msgid "Mercurial User"
 msgstr "Mercurial ユーザ"
 
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr "未サポートなリポジトリ形式です (%s)"
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr ""
-
-msgid "Confirm Delete"
-msgstr "削除の確認"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr "グループ '%s' とその中のすべてのエントリを一覧から削除しますか?"
-
 msgid "Repository Registry"
 msgstr "リポジトリ一覧"
 
@@ -3705,8 +3769,22 @@ msgstr ""
 msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
 msgstr ""
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr "未サポートなリポジトリ形式です (%s)"
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr ""
+
 msgid "New Group"
 msgstr "グループを追加"
+
+msgid "Confirm Delete"
+msgstr "削除の確認"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr "グループ '%s' とその中のすべてのエントリを一覧から削除しますか?"
 
 msgid "Could not get subrepository list"
 msgstr "サブリポジトリ一覧を取得できません"
@@ -3795,9 +3873,6 @@ msgstr "リポジトリの hgrc ファイル (%s) を更新中にエラーが起
 msgid "default"
 msgstr "デフォルト"
 
-msgid "Path"
-msgstr "パス"
-
 msgid "C&hoose Log Columns..."
 msgstr "ログの表示列を選択(&H)..."
 
@@ -3855,9 +3930,6 @@ msgstr "プル"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "プル (取り込み対象のチェンジセットをあなたのリポジトリに取り込みます)"
-
-msgid "Reject"
-msgstr "破棄する"
 
 msgid "Reject incoming changesets"
 msgstr "取り込み対象のチェンジセットを却下します"
@@ -3990,6 +4062,9 @@ msgstr "署名(&N)..."
 
 msgid "&Backout..."
 msgstr "変更の打ち消し (&backout)..."
+
+msgid "Revert &All Files..."
+msgstr ""
 
 msgid "Copy &Hash"
 msgstr "ハッシュ値をコピー(&H)"
@@ -4196,6 +4271,15 @@ msgstr "パッチをエクスポートしました"
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr ""
 "%d つのパッチを以下にエキスポートしました:<p><a href=\"file:///%s\">%s</a>"
+
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
+msgstr ""
+"すべてのファイルを復旧すると変更は破棄され、影響があるファイルは変更状態のま"
+"まになります。<br><br>本当に復旧しますか?<br><br>(別のリビジョンをチェックア"
+"ウトするには「更新」を使ってください)"
 
 msgid "Filter b&y"
 msgstr ""
@@ -4534,15 +4618,6 @@ msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
 msgstr ""
-
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
-msgstr ""
-"すべてのファイルを復旧すると変更は破棄され、影響があるファイルは変更状態のま"
-"まになります。<br><br>本当に復旧しますか?<br><br>(別のリビジョンをチェックア"
-"ウトするには「更新」を使ってください)"
 
 msgid "Changeset:"
 msgstr "チェンジセット:"
@@ -5028,6 +5103,9 @@ msgstr "thg import [オプション] [ソース]..."
 msgid "thg init [DEST]"
 msgstr "thg init [作成先ディレクトリ]"
 
+msgid "thg lock"
+msgstr ""
+
 msgid "search for a given text or revset"
 msgstr ""
 
@@ -5415,6 +5493,14 @@ msgid ""
 "first applicable tool it finds."
 msgstr ""
 
+msgid "CLI Editor"
+msgstr "コマンドラインエディタ"
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+
 msgid "Shell"
 msgstr "シェル"
 
@@ -5483,10 +5569,9 @@ msgstr "GUI をフォーク"
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
 msgstr ""
-"コマンドラインで動作している時、GUIダイアログをバックグラウンドプロセスとして"
-"フォークします。デフォルトは有効です。"
 
 msgid "Full Path Title"
 msgstr "絶対パス表示"
@@ -6355,6 +6440,17 @@ msgid ""
 "Path to the directory where a system-wide cache of bfiles will be stored"
 msgstr ""
 
+msgid "Simplelock"
+msgstr ""
+
+msgid "Lock Clone"
+msgstr ""
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+
 msgid "Largefiles"
 msgstr "大容量ファイル"
 
@@ -6887,9 +6983,6 @@ msgstr ""
 msgid "Unbundle"
 msgstr "バンドルファイルの適用"
 
-msgid "Stop current operation"
-msgstr "現在の操作を中断する"
-
 msgid "<b>Selected Options:</b>"
 msgstr "<b>選択したオプション:</b>"
 
@@ -6945,6 +7038,9 @@ msgstr ""
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr "%s をリポジトリの設定ファイルから削除しますか?"
+
+msgid "Select repository"
+msgstr ""
 
 msgid "No host specified"
 msgstr ""
@@ -7727,6 +7823,12 @@ msgstr "リビジョンセットやブランチで履歴をフィルター"
 msgid "&Workbench Toolbars"
 msgstr "&Workbench ツールバー"
 
+msgid "&Lock File..."
+msgstr ""
+
+msgid "Lock or unlock files"
+msgstr ""
+
 msgid "Update working directory or switch revisions"
 msgstr "作業領域の内容更新またはリビジョンの切り替え"
 
@@ -8041,6 +8143,14 @@ msgstr "未来"
 
 msgid "now"
 msgstr "たった今"
+
+#, python-format
+msgid "command parse error: %s"
+msgstr "コマンドの解釈時エラー: %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "見つかりません: %s"
 
 msgid "Commit..."
 msgstr "コミット..."
@@ -9313,9 +9423,6 @@ msgstr ""
 #~ msgid "Launch browser to view repository"
 #~ msgstr "ブラウザを起動してリポジトリを表示する"
 
-#~ msgid "CLI Editor"
-#~ msgstr "コマンドラインエディタ"
-
 #~ msgid "Archive"
 #~ msgstr "アーカイブ"
 
@@ -9825,6 +9932,9 @@ msgstr ""
 
 #~ msgid "Reject incoming previewed changesets"
 #~ msgstr "受信したチェンジセットを破棄する"
+
+#~ msgid "Reject"
+#~ msgstr "破棄する"
 
 #~ msgid "Repository is empty"
 #~ msgstr "リポジトリが空です"
@@ -10729,6 +10839,9 @@ msgstr ""
 #~ "\n"
 #~ "===== 2番目の親との差分 %d:%s =====\n"
 
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr "全ての変更点をマージ対象(other)のリビジョンから破棄する"
+
 #~ msgid "Uncommitted local changes"
 #~ msgstr "未コミットの作業ディレクトリでの変更"
 
@@ -11209,6 +11322,15 @@ msgstr ""
 #~ msgid "bad shelve backup directory name"
 #~ msgstr "バックアップファイルの保存先として利用できないディレクトリ名です"
 
+#~ msgid ""
+#~ "Unable to translate message to local encoding\n"
+#~ "Consider setting HGENCODING environment variable\n"
+#~ "Replace untranslatable characters with \"?\"?\n"
+#~ msgstr ""
+#~ "メッセージをローカルエンコーディングへ変換できませんでした。\n"
+#~ "HGENCODING 環境変数を設定してみてください。\n"
+#~ "変換できない文字を \"?\" へ置き換えますか?\n"
+
 #~ msgid "delete of shelve backup failed"
 #~ msgstr "バックアップファイルを削除できません"
 
@@ -11252,6 +11374,13 @@ msgstr ""
 #~ msgstr ""
 #~ "リベースの前に、<a href=\"commit\"><b>コミット</b></a>か変更を<a href="
 #~ "\"discard\"><b>破棄</b></a>してください"
+
+#~ msgid ""
+#~ "When running from the command line, fork a background process to run "
+#~ "graphical dialogs.  Default: True"
+#~ msgstr ""
+#~ "コマンドラインで動作している時、GUIダイアログをバックグラウンドプロセスと"
+#~ "してフォークします。デフォルトは有効です。"
 
 #~ msgid "User Certificate Key File"
 #~ msgstr "ユーザー証明書のキーファイル"

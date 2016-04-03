@@ -25,16 +25,14 @@ def settingsfilename():
 
 class RepoTreeView(QTreeView):
     showMessage = pyqtSignal(str)
-    menuRequested = pyqtSignal(object, object)
-    openRepo = pyqtSignal(str, bool)
+    openRequested = pyqtSignal(QModelIndex)
+    removeRequested = pyqtSignal(QModelIndex)
     dropAccepted = pyqtSignal()
-    updateSettingsFile = pyqtSignal()
 
     def __init__(self, parent):
         QTreeView.__init__(self, parent, allColumnsShowFocus=True)
         if qtlib.IS_RETINA:
             self.setIconSize(qtlib.treeviewRetinaIconSize())
-        self.selitem = None
         self.msg = ''
 
         self.setHeaderHidden(True)
@@ -53,17 +51,6 @@ class RepoTreeView(QTreeView):
         self.setEditTriggers(QAbstractItemView.DoubleClicked
                              | QAbstractItemView.EditKeyPressed)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
-        QShortcut('Return', self, self.showFirstTabOrOpen).setContext(
-                  Qt.WidgetShortcut)
-        QShortcut('Enter', self, self.showFirstTabOrOpen).setContext(
-                  Qt.WidgetShortcut)
-        QShortcut('Delete', self, self.removeSelected).setContext(
-                  Qt.WidgetShortcut)
-
-    def contextMenuEvent(self, event):
-        if not self.selitem:
-            return
-        self.menuRequested.emit(event.globalPos(), self.selitem)
 
     def dragEnterEvent(self, event):
         if event.source() is self:
@@ -148,6 +135,20 @@ class RepoTreeView(QTreeView):
         self.viewport().update()
         self.setAutoScroll(True)
 
+    def keyPressEvent(self, event):
+        if (event.key() in (Qt.Key_Enter, Qt.Key_Return)
+            and self.state() != QAbstractItemView.EditingState):
+            index = self.currentIndex()
+            if index.isValid():
+                self.openRequested.emit(index)
+                return
+        if event.key() == Qt.Key_Delete:
+            index = self.currentIndex()
+            if index.isValid():
+                self.removeRequested.emit(index)
+                return
+        super(RepoTreeView, self).keyPressEvent(event)
+
     def mouseMoveEvent(self, event):
         self.msg  = ''
         pos = event.pos()
@@ -168,60 +169,17 @@ class RepoTreeView(QTreeView):
             self.showMessage.emit('')
 
     def mouseDoubleClickEvent(self, event):
-        if self.selitem and self.selitem.internalPointer().isRepo():
-            self.showFirstTabOrOpen()
+        index = self.indexAt(event.pos())
+        if index.isValid() and index.internalPointer().isRepo():
+            self.openRequested.emit(index)
         else:
             # a double-click on non-repo rows opens an editor
             super(RepoTreeView, self).mouseDoubleClickEvent(event)
-
-    def selectionChanged(self, selected, deselected):
-        selection = self.selectedIndexes()
-        if len(selection) == 0:
-            self.selitem = None
-        else:
-            self.selitem = selection[0]
 
     def sizeHint(self):
         size = super(RepoTreeView, self).sizeHint()
         size.setWidth(QFontMetrics(self.font()).width('M') * 15)
         return size
-
-    def showFirstTabOrOpen(self):
-        'Enter or double click events, show existing or open a new repowidget'
-        if self.selitem and self.selitem.internalPointer().isRepo():
-            # We can only open mercurial repositories and subrepositories
-            repotype = self.selitem.internalPointer().repotype()
-            if repotype == 'hg':
-                root = self.selitem.internalPointer().rootpath()
-                self.openRepo.emit(hglib.tounicode(root), True)
-            else:
-                qtlib.WarningMsgBox(
-                    _('Unsupported repository type (%s)') % repotype,
-                    _('Cannot open non Mercurial repositories or '
-                      'subrepositories'),
-                    parent=self)
-
-    def removeSelected(self):
-        'remove selected repository'
-        s = self.selitem
-        if not s:
-            return
-        item = s.internalPointer()
-        if 'remove' not in item.menulist():  # check capability
-            return
-        if not item.okToDelete():
-            labels = [(QMessageBox.Yes, _('&Delete')),
-                      (QMessageBox.No, _('Cancel'))]
-            if not qtlib.QuestionMsgBox(_('Confirm Delete'),
-                                    _("Delete Group '%s' and all its entries?")%
-                                    item.name, labels=labels, parent=self):
-                return
-        m = self.model()
-        row = s.row()
-        parent = s.parent()
-        m.removeRows(row, 1, parent)
-        self.selectionChanged(None, None)
-        self.updateSettingsFile.emit()
 
 class RepoRegistryView(QDockWidget):
 
@@ -257,10 +215,11 @@ class RepoRegistryView(QDockWidget):
         tv.setFirstColumnSpanned(0, QModelIndex(), True)
         tv.setColumnHidden(1, True)
 
+        tv.setContextMenuPolicy(Qt.CustomContextMenu)
+        tv.customContextMenuRequested.connect(self._onMenuRequested)
         tv.showMessage.connect(self.showMessage)
-        tv.menuRequested.connect(self.onMenuRequest)
-        tv.openRepo.connect(self.openRepo)
-        tv.updateSettingsFile.connect(self.updateSettingsFile)
+        tv.openRequested.connect(self._openRepoAt)
+        tv.removeRequested.connect(self._removeAt)
         tv.dropAccepted.connect(self.dropAccepted)
 
         self.createActions()
@@ -510,13 +469,16 @@ class RepoRegistryView(QDockWidget):
                 act.triggered.connect(cb)
             self.addAction(act)
 
-    def onMenuRequest(self, point, selitem):
-        menulist = selitem.internalPointer().menulist()
+    @pyqtSlot(QPoint)
+    def _onMenuRequested(self, pos):
+        index = self.tview.currentIndex()
+        if not index.isValid():
+            return
+        menulist = index.internalPointer().menulist()
         if not menulist:
             return
         self.addtomenu(self.contextmenu, menulist)
-        self.selitem = selitem
-        self.contextmenu.exec_(point)
+        self.contextmenu.popup(self.tview.viewport().mapToGlobal(pos))
 
     def addtomenu(self, menu, actlist):
         menu.clear()
@@ -533,17 +495,22 @@ class RepoRegistryView(QDockWidget):
     ## Menu action handlers
     #
 
+    def _currentRepoRoot(self):
+        model = self.tview.model()
+        index = self.tview.currentIndex()
+        return model.repoRoot(index)
+
     def cloneRepo(self):
-        root = self.selitem.internalPointer().rootpath()
-        self.cloneRepoRequested.emit(hglib.tounicode(root))
+        self.cloneRepoRequested.emit(self._currentRepoRoot())
 
     def explore(self):
-        root = self.selitem.internalPointer().rootpath()
-        qtlib.openlocalurl(root)
+        qtlib.openlocalurl(self._currentRepoRoot())
 
     def terminal(self):
-        repoitem = self.selitem.internalPointer()
-        qtlib.openshell(repoitem.rootpath(),
+        model = self.tview.model()
+        index = self.tview.currentIndex()
+        repoitem = index.internalPointer()
+        qtlib.openshell(hglib.fromunicode(model.repoRoot(index)),
                         hglib.fromunicode(repoitem.shortname()))
 
     def addNewRepo(self):
@@ -556,12 +523,12 @@ class RepoRegistryView(QDockWidget):
             m = self.tview.model()
             uroot = paths.find_root(unicode(path))
             if uroot and not m.isKnownRepoRoot(uroot, standalone=True):
-                index = m.addRepo(uroot, parent=self.selitem)
+                index = m.addRepo(uroot, parent=self.tview.currentIndex())
                 self._scanAddedRepo(index)
 
     def addSubrepo(self):
         'menu action handler for adding a new subrepository'
-        root = hglib.tounicode(self.selitem.internalPointer().rootpath())
+        root = self._currentRepoRoot()
         caption = _('Select an existing repository to add as a subrepo')
         FD = QFileDialog
         path = unicode(FD.getExistingDirectory(caption=caption,
@@ -687,8 +654,9 @@ class RepoRegistryView(QDockWidget):
     def removeSubrepo(self):
         'menu action handler for removing an existing subrepository'
         model = self.tview.model()
-        path = model.repoRoot(self.selitem)
-        root = model.repoRoot(self.selitem.parent())
+        index = self.tview.currentIndex()
+        path = model.repoRoot(index)
+        root = model.repoRoot(index.parent())
         relsubpath = os.path.normcase(os.path.normpath(path[1+len(root):]))
         hgsubfilename = os.path.join(root, '.hgsub')
 
@@ -743,38 +711,56 @@ class RepoRegistryView(QDockWidget):
                 parent=self)
 
     def startSettings(self):
-        root = self.selitem.internalPointer().rootpath()
+        root = hglib.fromunicode(self._currentRepoRoot())
         sd = settings.SettingsDialog(configrepo=True, focus='web.name',
                                      parent=self, root=root)
         sd.finished.connect(sd.deleteLater)
         sd.exec_()
 
     def openAll(self):
-        for root in self.selitem.internalPointer().childRoots():
-            self.openRepo.emit(hglib.tounicode(root), False)
+        index = self.tview.currentIndex()
+        for root in index.internalPointer().childRoots():
+            self.openRepo.emit(root, False)
 
     def open(self, root=None):
         'open context menu action, open repowidget unconditionally'
         if not root:
-            root = self.selitem.internalPointer().rootpath()
-            repotype = self.selitem.internalPointer().repotype()
+            model = self.tview.model()
+            index = self.tview.currentIndex()
+            root = model.repoRoot(index)
+            repotype = index.internalPointer().repotype()
         else:
-            root = hglib.fromunicode(root)
             if os.path.exists(os.path.join(root, '.hg')):
                 repotype = 'hg'
             else:
                 repotype = 'unknown'
         if repotype == 'hg':
-            self.openRepo.emit(hglib.tounicode(root), False)
+            self.openRepo.emit(root, False)
         else:
             qtlib.WarningMsgBox(
                 _('Unsupported repository type (%s)') % repotype,
                 _('Cannot open non Mercurial repositories or subrepositories'),
                 parent=self)
 
+    @pyqtSlot(QModelIndex)
+    def _openRepoAt(self, index):
+        model = self.tview.model()
+        root = model.repoRoot(index)
+        if root:
+            # We can only open mercurial repositories and subrepositories
+            repotype = index.internalPointer().repotype()
+            if repotype == 'hg':
+                self.openRepo.emit(root, True)
+            else:
+                qtlib.WarningMsgBox(
+                    _('Unsupported repository type (%s)') % repotype,
+                    _('Cannot open non Mercurial repositories or '
+                      'subrepositories'),
+                    parent=self)
+
     def copyPath(self):
         clip = QApplication.clipboard()
-        clip.setText(hglib.tounicode(self.selitem.internalPointer().rootpath()))
+        clip.setText(self._currentRepoRoot())
 
     def startRename(self):
         self.tview.edit(self.tview.currentIndex())
@@ -783,29 +769,46 @@ class RepoRegistryView(QDockWidget):
         self.tview.model().addGroup(_('New Group'))
 
     def removeSelected(self):
-        ip = self.selitem.internalPointer()
-        if ip.isRepo():
-            root = ip.rootpath()
-        else:
-            root = None
+        root = self._currentRepoRoot()
+        self._removeAt(self.tview.currentIndex())
+        if root:
+            self.removeRepo.emit(root)
 
-        self.tview.removeSelected()
-
-        if root is not None:
-            self.removeRepo.emit(hglib.tounicode(root))
+    @pyqtSlot(QModelIndex)
+    def _removeAt(self, index):
+        item = index.internalPointer()
+        if 'remove' not in item.menulist():  # check capability
+            return
+        if not item.okToDelete():
+            labels = [(QMessageBox.Yes, _('&Delete')),
+                      (QMessageBox.No, _('Cancel'))]
+            if not qtlib.QuestionMsgBox(_('Confirm Delete'),
+                                        _("Delete Group '%s' and all its "
+                                          "entries?") % item.name,
+                                        labels=labels, parent=self):
+                return
+        m = self.tview.model()
+        m.removeRows(index.row(), 1, index.parent())
+        self.updateSettingsFile()
 
     def sortbyname(self):
-        childs = self.selitem.internalPointer().childs
+        index = self.tview.currentIndex()
+        childs = index.internalPointer().childs
         self.tview.model().sortchilds(childs, lambda x: x.shortname().lower())
 
     def sortbypath(self):
-        childs = self.selitem.internalPointer().childs
-        self.tview.model().sortchilds(
-            childs, lambda x: os.path.normcase(util.normpath(x.rootpath())))
+        index = self.tview.currentIndex()
+        childs = index.internalPointer().childs
+        def keyfunc(x):
+            l = hglib.fromunicode(x.rootpath())
+            return os.path.normcase(util.normpath(l))
+        self.tview.model().sortchilds(childs, keyfunc)
 
     def sortbyhgsub(self):
-        ip = self.selitem.internalPointer()
-        repo = hg.repository(ui.ui(), ip.rootpath())
+        model = self.tview.model()
+        index = self.tview.currentIndex()
+        ip = index.internalPointer()
+        repo = hg.repository(ui.ui(), hglib.fromunicode(model.repoRoot(index)))
         ctx = repo['.']
         wfile = '.hgsub'
         if wfile not in ctx:
@@ -816,9 +819,10 @@ class RepoRegistryView(QDockWidget):
         abspath = lambda x: util.normpath(repo.wjoin(x))
         hgsuborder = [abspath(getsubpath(x)) for x in data]
         def keyfunc(x):
+            l = hglib.fromunicode(x.rootpath())
             try:
-                return hgsuborder.index(util.normpath(x.rootpath()))
-            except:
+                return hgsuborder.index(util.normpath(l))
+            except ValueError:
                 # If an item is not found, place it at the top
                 return 0
         self.tview.model().sortchilds(ip.childs, keyfunc)
@@ -845,6 +849,7 @@ class RepoRegistryView(QDockWidget):
 
     @pyqtSlot(str)
     def scanRepo(self, uroot):
+        uroot = unicode(uroot)
         m = self.tview.model()
         index = m.indexFromRepoRoot(uroot)
         if index.isValid():

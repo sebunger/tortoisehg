@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
 "PO-Revision-Date: 2015-09-16 10:35+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-11-02 05:14+0000\n"
-"X-Generator: Launchpad (build 17838)\n"
+"X-Launchpad-Export-Date: 2016-02-29 05:34+0000\n"
+"X-Generator: Launchpad (build 17925)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -30,7 +30,7 @@ msgstr ""
 msgid "About"
 msgstr "關於"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
+msgid "Copyright 2008-2016 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -851,8 +851,9 @@ msgid "Message Translation Failure"
 msgstr "訊息轉譯失敗"
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
 
@@ -1252,14 +1253,6 @@ msgstr "你必須設定一個有效的掛勾類型"
 
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "掛勾名子不能包含任何空白,Tab 或'='符號"
-
-#, python-format
-msgid "command parse error: %s"
-msgstr "命令剖析錯誤: %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "找不到符合的: %s"
 
 msgid "Console"
 msgstr ""
@@ -2303,6 +2296,94 @@ msgstr "以大型檔案方式加入(&L)"
 msgid "Add as &Normal Files"
 msgstr "以一般檔案形式加入(&N)"
 
+msgid "Invalid Patterns"
+msgstr ""
+
+msgid "Failed to process largefiles.patterns."
+msgstr ""
+
+msgid "Word docs (*.doc *.docx)"
+msgstr ""
+
+msgid "PDF docs (*.pdf)"
+msgstr ""
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr ""
+
+msgid "Refresh lock information"
+msgstr ""
+
+msgid "Lock a file not described in .hglocks"
+msgstr ""
+
+msgid "Stop current operation"
+msgstr "停止目前的操作"
+
+msgid "Locked And Lockable Files:"
+msgstr ""
+
+msgid "Path"
+msgstr "路徑"
+
+msgid "Locking User"
+msgstr ""
+
+msgid "Purpose"
+msgstr ""
+
+msgid "Simplelock extension not enabled"
+msgstr ""
+
+msgid "Please enable and configure simplelock"
+msgstr ""
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr ""
+
+msgid "File was not within current repository"
+msgstr ""
+
+#, python-format
+msgid "Locking %s"
+msgstr ""
+
+#, python-format
+msgid "Unlocking %s"
+msgstr ""
+
+msgid "Refreshing locks..."
+msgstr ""
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr ""
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr ""
+
+msgid "Ready, double click to lock or unlock"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "You can only release your own locks"
+msgstr ""
+
 msgid "Find revisions matching fields of:"
 msgstr ""
 
@@ -2412,8 +2493,8 @@ msgstr "Or 使用:"
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr ""
 
-msgid "Discard all changes from merge target (other) revision"
-msgstr "合併目的(其他)修訂版時移除掉所有的變更"
+msgid "Discard all changes from the other revision"
+msgstr ""
 
 msgid "&Discard"
 msgstr "丟棄(&D)"
@@ -3393,20 +3474,6 @@ msgstr ""
 msgid "Mercurial User"
 msgstr "Mercurial 使用者"
 
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr "不支援的儲存庫型態 (%s)"
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr "不能開啟非Mercurial的儲存庫或子儲存庫"
-
-msgid "Confirm Delete"
-msgstr "確認刪除"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr ""
-
 msgid "Repository Registry"
 msgstr "儲存庫登錄"
 
@@ -3636,8 +3703,22 @@ msgstr ""
 msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
 msgstr ""
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr "不支援的儲存庫型態 (%s)"
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr "不能開啟非Mercurial的儲存庫或子儲存庫"
+
 msgid "New Group"
 msgstr "新群組"
+
+msgid "Confirm Delete"
+msgstr "確認刪除"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr ""
 
 msgid "Could not get subrepository list"
 msgstr "不能取得子儲存庫列表"
@@ -3721,9 +3802,6 @@ msgstr "更新儲存庫 hgrc 檔 (%s) 時出現錯誤"
 msgid "default"
 msgstr "預設值"
 
-msgid "Path"
-msgstr "路徑"
-
 msgid "C&hoose Log Columns..."
 msgstr "選擇紀錄的欄位(&h)..."
 
@@ -3781,9 +3859,6 @@ msgstr "拉收"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "拉收可拉收的變更集到你的儲存庫"
-
-msgid "Reject"
-msgstr "拒絕"
 
 msgid "Reject incoming changesets"
 msgstr "Reject可拉收的變更集"
@@ -3914,6 +3989,9 @@ msgstr "簽名(&n)..."
 
 msgid "&Backout..."
 msgstr "回退(&B)..."
+
+msgid "Revert &All Files..."
+msgstr ""
 
 msgid "Copy &Hash"
 msgstr "複製Hash值(&H)"
@@ -4117,6 +4195,12 @@ msgstr "補丁已匯出"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d個補丁已經匯出到<p><a href=\"file:///%s\">%s</a>"
+
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
+msgstr ""
 
 msgid "Filter b&y"
 msgstr ""
@@ -4436,12 +4520,6 @@ msgid "revision %d's second parent (i.e. revision %d)"
 msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
-msgstr ""
-
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
 msgstr ""
 
 msgid "Changeset:"
@@ -4915,6 +4993,9 @@ msgstr ""
 msgid "thg init [DEST]"
 msgstr ""
 
+msgid "thg lock"
+msgstr ""
+
 msgid "search for a given text or revset"
 msgstr ""
 
@@ -5292,6 +5373,14 @@ msgid ""
 "first applicable tool it finds."
 msgstr ""
 
+msgid "CLI Editor"
+msgstr "命令行編輯器"
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+
 msgid "Shell"
 msgstr "命令列(shell)"
 
@@ -5352,8 +5441,9 @@ msgstr ""
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
-msgstr "當使用命令列執行的時候,衍生一個背景行程來執行視窗對話框. 預設:True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
+msgstr ""
 
 msgid "Full Path Title"
 msgstr "完整路徑標題"
@@ -6165,6 +6255,17 @@ msgid ""
 "Path to the directory where a system-wide cache of bfiles will be stored"
 msgstr ""
 
+msgid "Simplelock"
+msgstr ""
+
+msgid "Lock Clone"
+msgstr ""
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+
 msgid "Largefiles"
 msgstr "大檔案"
 
@@ -6687,9 +6788,6 @@ msgstr ""
 msgid "Unbundle"
 msgstr "解開包裹"
 
-msgid "Stop current operation"
-msgstr "停止目前的操作"
-
 msgid "<b>Selected Options:</b>"
 msgstr "<b>選擇的選項:</b>"
 
@@ -6745,6 +6843,9 @@ msgstr "確認刪除路徑"
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr "從你的儲存庫設定檔裡刪除%s ?"
+
+msgid "Select repository"
+msgstr ""
 
 msgid "No host specified"
 msgstr "沒有指定主機"
@@ -7514,6 +7615,12 @@ msgstr "顯示/隱藏過濾器"
 msgid "&Workbench Toolbars"
 msgstr "工作台工具列(&W)"
 
+msgid "&Lock File..."
+msgstr ""
+
+msgid "Lock or unlock files"
+msgstr ""
+
 msgid "Update working directory or switch revisions"
 msgstr "更新工作目錄或轉移至修訂版"
 
@@ -7815,6 +7922,14 @@ msgstr "未來"
 
 msgid "now"
 msgstr "現在"
+
+#, python-format
+msgid "command parse error: %s"
+msgstr "命令剖析錯誤: %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "找不到符合的: %s"
 
 msgid "Commit..."
 msgstr "提交..."
@@ -8610,6 +8725,9 @@ msgstr ""
 #~ msgid "Current patch: %s,  "
 #~ msgstr "當前補丁: %s,  "
 
+#~ msgid "Reject"
+#~ msgstr "拒絕"
+
 #~ msgid "Browse"
 #~ msgstr "瀏覽"
 
@@ -8681,9 +8799,6 @@ msgstr ""
 
 #~ msgid "Tag is local"
 #~ msgstr "本地標籤"
-
-#~ msgid "CLI Editor"
-#~ msgstr "命令行編輯器"
 
 #~ msgid "Message Line Length"
 #~ msgstr "訊息行數"
@@ -9398,6 +9513,11 @@ msgstr ""
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "TortoiseHg命令列設置"
 
+#~ msgid ""
+#~ "When running from the command line, fork a background process to run "
+#~ "graphical dialogs.  Default: True"
+#~ msgstr "當使用命令列執行的時候,衍生一個背景行程來執行視窗對話框. 預設:True"
+
 #~ msgid "Verify"
 #~ msgstr "驗證"
 
@@ -9871,3 +9991,6 @@ msgstr ""
 
 #~ msgid "&Similar Revisions..."
 #~ msgstr "相似的修訂版(&S)..."
+
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr "合併目的(其他)修訂版時移除掉所有的變更"

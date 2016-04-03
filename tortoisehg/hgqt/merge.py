@@ -118,7 +118,7 @@ class BasePage(QWizardPage):
         self.wizard().setOption(QWizard.NoDefaultButton, False)
 
     def canExit(self):
-        if len(self.repo.parents()) == 2:
+        if len(self.repo[None].parents()) == 2:
             main = _('Do you want to exit?')
             text = _('To finish merging, you must commit '
                      'the working directory.\n\n'
@@ -219,8 +219,8 @@ class SummaryPage(BasePage):
         wdbox.addWidget(force_chk)
 
         ### discard option
-        discard_chk = QCheckBox(_('Discard all changes from merge target '
-                                  '(other) revision'))
+        discard_chk = QCheckBox(_('Discard all changes from the other '
+                                  'revision'))
         self.registerField('discard', discard_chk)
         self.layout().addWidget(discard_chk)
 
@@ -327,7 +327,7 @@ class MergePage(BasePage):
 
     def currentPage(self):
         super(MergePage, self).currentPage()
-        if len(self.repo.parents()) > 1:
+        if len(self.repo[None].parents()) > 1:
             self.mergecomplete = True
             self.completeChanged.emit()
             return
@@ -550,13 +550,14 @@ class CommitPage(BasePage):
             self.refresh()
 
     def isComplete(self):
-        return len(self.repo.parents()) == 2 and len(self.msgEntry.text()) > 0
+        return (len(self.repo[None].parents()) == 2 and
+                len(self.msgEntry.text()) > 0)
 
     def validatePage(self):
         if not self._cmdsession.isFinished():
             return False
 
-        if len(self.repo.parents()) == 1:
+        if len(self.repo[None].parents()) == 1:
             # commit succeeded, repositoryChanged() called wizard().next()
             if self.field('skiplast').toBool():
                 self.wizard().close()
@@ -590,7 +591,7 @@ class CommitPage(BasePage):
 
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
-        if len(self.repo.parents()) == 1:
+        if len(self.repo[None].parents()) == 1:
             if not self._cmdsession.isFinished():
                 # call self.wizard().next() after the current command finishes
                 self.delayednext = True

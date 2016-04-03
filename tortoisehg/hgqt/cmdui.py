@@ -12,6 +12,7 @@ from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla
 
 from tortoisehg.util.i18n import _
+from tortoisehg.util import hglib
 from tortoisehg.hgqt import cmdcore, qtlib, qscilib
 
 def startProgress(topic, status):
@@ -285,15 +286,12 @@ class InteractiveUiHandler(cmdcore.UiHandler):
             return text
 
     def _getChoiceInput(self):
-        parts = self._prompttext.split('$$')
-        msg = parts[0].rstrip(' ')
-        choices = [p.strip(' ') for p in parts[1:]]
-        resps = [p[p.index('&') + 1].lower() for p in choices]
+        msg, choicepairs = hglib.extractchoices(self._prompttext)
         dlg = QMessageBox(QMessageBox.Question, _('TortoiseHg Prompt'), msg,
                           QMessageBox.NoButton, self._parentWidget())
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
-        for r, t in zip(resps, choices):
+        for r, t in choicepairs:
             button = dlg.addButton(t, QMessageBox.ActionRole)
             button.response = r
             if r == self._promptdefault:

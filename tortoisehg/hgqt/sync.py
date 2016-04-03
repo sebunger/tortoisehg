@@ -173,6 +173,12 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.urlentry.textChanged.connect(self.urlChanged)
         self.urlentry.returnPressed.connect(self.saveclicked)
         tbar.addWidget(self.urlentry)
+        tbar.addWidget(qtlib.Spacer(2, 2))
+
+        self.browsebutton = QPushButton(_('Browse...'))
+        self.browsebutton.setAutoDefault(False)
+        self.browsebutton.clicked.connect(self._browseUrl)
+        tbar.addWidget(self.browsebutton)
 
         # even though currentRowChanged fires pathSelected, clicked signal is
         # also connected to it. otherwise urlentry won't be updated when the
@@ -527,6 +533,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if dlg.exec_() == QDialog.Accepted:
             self.curalias = hglib.fromunicode(dlg.aliasentry.text())
             self.reload()
+
+    @pyqtSlot()
+    def _browseUrl(self):
+        FD = QFileDialog
+        caption = _("Select repository")
+        path = FD.getExistingDirectory(self, caption, self.urlentry.text())
+        if path:
+            self.urlentry.setText(QDir.toNativeSeparators(path))
 
     def secureclicked(self):
         if not parseurl(self.currentUrl()).host:

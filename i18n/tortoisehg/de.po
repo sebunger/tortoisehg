@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
-"PO-Revision-Date: 2015-06-28 12:54+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"PO-Revision-Date: 2016-02-05 20:19+0000\n"
+"Last-Translator: Manuel Stumpf <manuelstumpf@web.de>\n"
 "Language-Team: German <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-11-02 05:11+0000\n"
-"X-Generator: Launchpad (build 17838)\n"
+"X-Launchpad-Export-Date: 2016-02-29 05:30+0000\n"
+"X-Generator: Launchpad (build 17925)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHG-Symbolüberblendungsdienst"
@@ -30,7 +30,7 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "Über TortoiseHG"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
+msgid "Copyright 2008-2016 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -102,7 +102,7 @@ msgid "Revision:"
 msgstr "Revision:"
 
 msgid "Browse..."
-msgstr "Betrachten..."
+msgstr "Durchsuchen..."
 
 msgid "Destination path:"
 msgstr "Zielpfad:"
@@ -391,41 +391,41 @@ msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "Das Lesezeichen '%s' wurde in '%s' umbenannt"
 
 msgid "TortoiseHg Bookmark Sync"
-msgstr ""
+msgstr "TortoiseHg Lesezeichen Synchronisierung"
 
 msgid "Outgoing Bookmarks"
-msgstr ""
+msgstr "Ausgehende Lesezeichen"
 
 msgid "&Push Bookmark"
-msgstr ""
+msgstr "Lesezeichen &übertragen"
 
 msgid "&Remove Bookmark"
-msgstr ""
+msgstr "Lesezeichen &löschen"
 
 msgid "Incoming Bookmarks"
-msgstr ""
+msgstr "Eingehende Lesezeichen"
 
 msgid "P&ull Bookmark"
-msgstr ""
+msgstr "Lesezeichen &abrufen"
 
 msgid "R&emove Bookmark"
-msgstr ""
+msgstr "Lesezeichen &löschen"
 
 #, python-format
 msgid "Pushed local bookmark: %s"
-msgstr ""
+msgstr "Lokales Lesezeichen übertragen: %s"
 
 #, python-format
 msgid "Pulled remote bookmark: %s"
-msgstr ""
+msgstr "Entferntes Lesezeichen abgerufen: %s"
 
 #, python-format
 msgid "Removed remote bookmark: %s"
-msgstr ""
+msgstr "Entferntes Lesezeichen gelöscht: %s"
 
 #, python-format
 msgid "Removed local bookmark: %s"
-msgstr ""
+msgstr "Lokales Lesezeichen entfernt: %s"
 
 #, python-format
 msgid "%s - branch operation"
@@ -587,7 +587,7 @@ msgid "Clone to revision:"
 msgstr "Revision klonen:"
 
 msgid "A revision identifier, bookmark, tag or branch name"
-msgstr ""
+msgstr "Eine Revisions ID, Lesezeichen, Etikett oder Zweigname"
 
 msgid "Do not update the new working directory"
 msgstr "Das neue Arbeitsverzeichnis nicht aktualisieren"
@@ -874,13 +874,11 @@ msgid "Message Translation Failure"
 msgstr "Übersetzung des Kommentars gescheitert"
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
-"Nicht imstande, den Kommentar in die lokale Kodierung zu übertragen\n"
-"Erwägen Sie, die Umgebungsvariable HGENCODING zu setzen\n"
-"Nicht-übertragbare Zeichen als \"?\" wiedergeben?\n"
 
 msgid "&Replace"
 msgstr "&Ersetzen"
@@ -1325,16 +1323,8 @@ msgstr ""
 "Der Hook-Name darf weder Leerzeichen noch Tabulatoren oder '='-Zeichen "
 "enthalten."
 
-#, python-format
-msgid "command parse error: %s"
-msgstr "Fehler beim Verarbeiten (parse) des Befehls: %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "Keine Treffer gefunden: %s"
-
 msgid "Console"
-msgstr ""
+msgstr "Konsole"
 
 msgid "File &History / Annotate"
 msgstr ""
@@ -1353,13 +1343,13 @@ msgstr "Datei&historie"
 
 msgid "Query about changesets affecting the selected files"
 msgstr ""
-"Anfrage bezüglich Änderungslisten mit Einfluss auf die ausgewählten Dateien"
+"Anfrage bezüglich Änderungssätzen mit Einfluss auf die ausgewählten Dateien"
 
 msgid "Diff &Changeset to Parent"
-msgstr "Änderungsliste mit Vorgänger &diffen"
+msgstr "Änderungssatz mit Vorgänger &diffen"
 
 msgid "Diff Changeset to Loc&al"
-msgstr "Änderungsliste mit &lokaler Kopie diffen"
+msgstr "Änderungssatz mit &lokaler Kopie diffen"
 
 msgid "&Diff to Parent"
 msgstr "&Diff mit Vorgänger"
@@ -1392,10 +1382,10 @@ msgid "&Open Local"
 msgstr "Lokal &öffnen"
 
 msgid "E&xplore Local"
-msgstr ""
+msgstr "Lokal &durchsuchen"
 
 msgid "Open parent folder of current file in the system file manager"
-msgstr ""
+msgstr "Übergeordnetes Verzeichnis der aktuellen Datei im Dateimanager öffnen"
 
 msgid "&Copy Patch"
 msgstr "Patch &kopieren"
@@ -1639,7 +1629,7 @@ msgstr "Die Revision hat sich geändert in:"
 
 #, python-format
 msgid "changeset: %s (not found on subrepository)"
-msgstr "Änderungsliste: %s (im Unterarchiv nicht gefunden)"
+msgstr "Änderungssatz: %s (im Unterarchiv nicht gefunden)"
 
 msgid "From:"
 msgstr "Von:"
@@ -1714,7 +1704,7 @@ msgid "Forward"
 msgstr "Weiter"
 
 msgid "Diff Selected &Changesets"
-msgstr "Ausgewählte Ä&nderungslisten diffen"
+msgstr "Ausgewählte Ä&nderungssätze diffen"
 
 msgid "&Diff Selected File Revisions"
 msgstr "Ausgewählte Datei&revisionen diffen"
@@ -1950,11 +1940,11 @@ msgid "Graft - %s"
 msgstr "Transplantieren - %s"
 
 msgid "Graft changeset"
-msgstr "Transplantations-Änderungsliste"
+msgstr "Transplantations-Änderungssatz"
 
 #, python-format
 msgid "Graft changeset #%d of %d"
-msgstr "Transplantations-Änderungsliste #%d von %d"
+msgstr "Transplantations-Änderungssatz #%d von %d"
 
 msgid ""
 "Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
@@ -2081,7 +2071,7 @@ msgid "Vi&ew File"
 msgstr "Datei &zeigen"
 
 msgid "&View Changeset"
-msgstr "&Änderungsliste zeigen"
+msgstr "&Änderungssatz zeigen"
 
 msgid "Annotate &File"
 msgstr "&Datei annotieren"
@@ -2218,10 +2208,10 @@ msgid ""
 msgstr ""
 "Hg-Patch-Dateien (als Ergebnis des Befehls export) sind mit den meisten "
 "Patch-Programmen (patch etc.) kompatibel. Sie enthalten einen Dateikopf, der "
-"die wichtigsten Metadaten der Änderung enthält."
+"die wichtigsten Metadaten des Änderungssatzes enthält."
 
 msgid "Send changesets as Hg patches"
-msgstr "Änderungen als Hg-Patches verschicken"
+msgstr "Änderungssätze als Hg-Patches versenden"
 
 msgid ""
 "Git patches can describe binary files, copies, and permission changes, but "
@@ -2384,7 +2374,7 @@ msgid "Unable to write .hgignore file"
 msgstr "Datei .hgignore kann nicht geschrieben werden"
 
 msgid "Copy working directory files from skeleton"
-msgstr ""
+msgstr "Kopiere Arbeitsverzeichnis Dateien von Skelett"
 
 msgid "Add special files (.hgignore, ...)"
 msgstr "Spezialdaten (.hgignore, etc.) hinzufügen"
@@ -2396,7 +2386,7 @@ msgid "New Repository"
 msgstr "Neues Archiv"
 
 msgid "&Create"
-msgstr ""
+msgstr "&Erstellen"
 
 msgid "Unable to create a config file"
 msgstr "Die Konfigurationsdatei kann nicht erstellt werden"
@@ -2426,6 +2416,95 @@ msgstr "Als &Binärriesen hinzufügen"
 
 msgid "Add as &Normal Files"
 msgstr "Als &normale Dateien hinzufügen"
+
+msgid "Invalid Patterns"
+msgstr "Ungültige Muster"
+
+msgid "Failed to process largefiles.patterns."
+msgstr ""
+
+msgid "Word docs (*.doc *.docx)"
+msgstr "Word Dateien (*.doc, *.docx)"
+
+msgid "PDF docs (*.pdf)"
+msgstr "PDF Dateien (*.pdf)"
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr "Excel Dateien (*xls, *.xlsx)"
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr "TortoiseHg Sperr-Werkzeug - %s"
+
+msgid "Refresh lock information"
+msgstr "Sperr Informationen auffrischen"
+
+msgid "Lock a file not described in .hglocks"
+msgstr "Eine nicht in .hglocks aufgelistete Datei sperren"
+
+msgid "Stop current operation"
+msgstr "Den momentanen Vorgang abbrechen"
+
+msgid "Locked And Lockable Files:"
+msgstr "Gesperrte und sperrbare Dateien:"
+
+msgid "Path"
+msgstr "Verzeichnis"
+
+msgid "Locking User"
+msgstr "Sperrender Benutzer"
+
+msgid "Purpose"
+msgstr "Zweck"
+
+msgid "Simplelock extension not enabled"
+msgstr "Simplelock Erweiterung nicht aktiviert"
+
+msgid "Please enable and configure simplelock"
+msgstr "Bitte aktivieren und konfigurieren Sie Simplelock"
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr ""
+"Öffnen Sie eine (nicht zusammenführbare) Datei, die Sie sperren möchten"
+
+msgid "File was not within current repository"
+msgstr "Datei befand sich nicht innerhalb des aktuelle Projektarchivs"
+
+#, python-format
+msgid "Locking %s"
+msgstr "Sperre %s"
+
+#, python-format
+msgid "Unlocking %s"
+msgstr "Entsperre %s"
+
+msgid "Refreshing locks..."
+msgstr "Aktualisiere Sperren"
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr "Sperren von %s erfolgreich"
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr "Sperren von %s fehlgeschlagen, erneut versuchen"
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr "Ensperren von %s fehlgeschlagen, erneut versuchen"
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr "Entsperren von %s erfolgreich"
+
+msgid "Ready, double click to lock or unlock"
+msgstr "Bereit, Doppelklicken zum Sperren oder Entsperren"
+
+msgid "Ready"
+msgstr "Bereit"
+
+msgid "You can only release your own locks"
+msgstr "Sie können nur ihre eigenen Sperren entsperren."
 
 msgid "Find revisions matching fields of:"
 msgstr "Finde Revisionen mit passenden Feldern zu:"
@@ -2544,10 +2623,8 @@ msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr ""
 "Eine Zusammenführung mit ausstehenden Änderungen erzwingen (-f/--force)"
 
-msgid "Discard all changes from merge target (other) revision"
+msgid "Discard all changes from the other revision"
 msgstr ""
-"Alle Änderungen durch die Zusammenführung mit der (anderen) Zielrevision "
-"verwerfen"
 
 msgid "&Discard"
 msgstr "&Verwerfen"
@@ -2717,13 +2794,13 @@ msgid "Unapply all patches"
 msgstr "Alle Patches rückwärts anwenden"
 
 msgid "Go &to Patch"
-msgstr ""
+msgstr "Gehe zu Pa&tch"
 
 msgid "&Finish Patch"
 msgstr "&Patch abschließen"
 
 msgid "Move applied patches into repository history"
-msgstr ""
+msgstr "Verschiebe angewendete Patches in Repository Historie"
 
 msgid "&Delete Patches..."
 msgstr "Patches &löschen..."
@@ -3312,10 +3389,10 @@ msgid "Swap source and destination"
 msgstr "Quelle und Ziel vertauschen"
 
 msgid "Keep original changesets (--keep)"
-msgstr ""
+msgstr "Ursprüngliche Änderungssätze beibehalten (--keep)"
 
 msgid "Keep original branch names (--keepbranches)"
-msgstr ""
+msgstr "Ursprüngliche Zweignamen beibehalten (--keepbranches)"
 
 msgid "Collapse the rebased changesets (--collapse)"
 msgstr ""
@@ -3433,7 +3510,7 @@ msgid "Select Source Folder"
 msgstr "Quellordner auswählen"
 
 msgid "Source does not exist."
-msgstr ""
+msgstr "Quelle existiert nicht."
 
 msgid "The source must be within the repository tree."
 msgstr "Die Quelle muss im Projektarchiv-Baum liegen."
@@ -3480,7 +3557,7 @@ msgid "Toggle filtering of non-matched changesets"
 msgstr "Anzeigen der unpassenden Änderungssätze ein- oder ausschalten"
 
 msgid "Show/Hide hidden changesets"
-msgstr "Versteckte Änderungslisten zeigen/verstecken"
+msgstr "Versteckte Änderungssätze zeigen/verstecken"
 
 msgid "Toggle graft relations visibility"
 msgstr "Graft-Verbindungen visuell umschalten"
@@ -3572,21 +3649,6 @@ msgstr "wird aufgefüllt (%d)"
 
 msgid "Mercurial User"
 msgstr "Benutzer von Mercurial"
-
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr "Der Archivtyp (%s) wird nicht unterstützt"
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr ""
-"Kann Archive oder Unterarchive, die nicht zu Mercurial gehören, nicht öffnen"
-
-msgid "Confirm Delete"
-msgstr "Entfernen bestätigen"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr "Die Gruppe '%s' mit allen Einträgen entfernen?"
 
 msgid "Repository Registry"
 msgstr "Archivkatalog"
@@ -3843,8 +3905,23 @@ msgstr ""
 "Konnte die Datei .hgsub nicht aktualisieren.<p/>Löschen des Unterarchivs "
 "gescheitert."
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr "Der Archivtyp (%s) wird nicht unterstützt"
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr ""
+"Kann Archive oder Unterarchive, die nicht zu Mercurial gehören, nicht öffnen"
+
 msgid "New Group"
 msgstr "Neue Gruppe"
+
+msgid "Confirm Delete"
+msgstr "Entfernen bestätigen"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr "Die Gruppe '%s' mit allen Einträgen entfernen?"
 
 msgid "Could not get subrepository list"
 msgstr "Konnte die Unterarchiv-Liste nicht ermitteln"
@@ -3936,14 +4013,11 @@ msgstr "Ein Fehler ist aufgetreten beim Ändern der hgrc-Datei des Archivs (%s)"
 msgid "default"
 msgstr "Standard"
 
-msgid "Path"
-msgstr "Verzeichnis"
-
 msgid "C&hoose Log Columns..."
 msgstr "Protokoll&spalten wählen..."
 
 msgid "&Resize Columns"
-msgstr ""
+msgstr "&Spaltengröße anpassen"
 
 #, python-format
 msgid "Goto ancestor of %s and %s"
@@ -3997,9 +4071,6 @@ msgstr "Abrufen"
 msgid "Pull incoming changesets into your repository"
 msgstr "Eingehende Änderungssätze in Ihr Projektarchiv abrufen"
 
-msgid "Reject"
-msgstr "Verwerfen"
-
 msgid "Reject incoming changesets"
 msgstr "Eingehende Änderungssätze verwerfen"
 
@@ -4019,21 +4090,20 @@ msgid "Push all"
 msgstr "Alle übertragen"
 
 msgid "no outgoing changesets"
-msgstr "Keine ausgehenden Änderungslisten"
+msgstr "Keine ausgehenden Änderungssätze"
 
 #, python-format
 msgid "no outgoing changesets in current branch (%s) / %d in total"
-msgstr "Keine ausgehenden Änderungslisten im aktuellen Zweig (%s) / %d gesamt"
+msgstr "Keine ausgehenden Änderungssätze im aktuellen Zweig (%s) / %d gesamt"
 
 #, python-format
 msgid "no outgoing changesets up to current revision (#%d) / %d in total"
 msgstr ""
-"Keine ausgehenden Änderungslisten bis zur aktuellen Revision (#%d) / %d "
-"gesamt"
+"Keine ausgehenden Änderungssätze bis zur aktuellen Revision (#%d) / %d gesamt"
 
 #, python-format
 msgid "no outgoing changesets up to revision #%d / %d in total"
-msgstr "Keine ausgehenden Änderungslisten bis Revision #%d / %d gesamt"
+msgstr "Keine ausgehenden Änderungssätze bis Revision #%d / %d gesamt"
 
 #, python-format
 msgid "%d outgoing changesets"
@@ -4041,16 +4111,16 @@ msgstr "%d ausgehende Änderungssätze"
 
 #, python-format
 msgid "%d outgoing changesets in current branch (%s) / %d in total"
-msgstr "%d ausgehende Änderungslisten im aktuellen Zweig (%s) / %d gesamt"
+msgstr "%d ausgehende Änderungssätze im aktuellen Zweig (%s) / %d gesamt"
 
 #, python-format
 msgid "%d outgoing changesets up to current revision (#%d) / %d in total"
 msgstr ""
-"%d ausgehende Änderungslisten bis zur aktuellen Revision (#%d) / %d gesamt"
+"%d ausgehende Änderungssätze bis zur aktuellen Revision (#%d) / %d gesamt"
 
 #, python-format
 msgid "%d outgoing changesets up to revision #%d / %d in total"
-msgstr "%d ausgehende Änderungslisten bis Revision #%d / %d gesamt"
+msgstr "%d ausgehende Änderungssätze bis Revision #%d / %d gesamt"
 
 msgid "Nothing to push"
 msgstr "Nichts zu übertragn"
@@ -4136,6 +4206,9 @@ msgstr "Sig&nieren..."
 msgid "&Backout..."
 msgstr "&Rücksetzen..."
 
+msgid "Revert &All Files..."
+msgstr "&Alle Dateien rücksetzen"
+
 msgid "Copy &Hash"
 msgstr "&Hash kopieren"
 
@@ -4198,7 +4271,7 @@ msgstr "Die Historie konnte nicht komprimiert werden"
 
 msgid "Selected changeset pair not related"
 msgstr ""
-"Die beiden ausgewählten Änderungslisten stehen in keiner Beziehung zueinander"
+"Die beiden ausgewählten Änderungssätze stehen in keiner Beziehung zueinander"
 
 msgid "Visual Diff..."
 msgstr "Grafisches Diff..."
@@ -4343,20 +4416,30 @@ msgstr "Die Patches wurden exportiert"
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d Patches wurden exportiert in:<p><a href=\"file:///%s\">%s</a>"
 
-msgid "Filter b&y"
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
 msgstr ""
+"Durch das Wiederherstellen aller Dateien werden zwischenzeitliche Änderungen "
+"verworfen und die betroffenen Dateien als modifiziert gekennzeichnet."
+"<br><br>Sind Sie sicher, dass Sie sie wiederherstellen wollen?"
+"<br><br>(Verwenden Sie Aktualisieren, um eine andere Revision abzurufen.)"
+
+msgid "Filter b&y"
+msgstr "&Filtern nach"
 
 msgid "&Ancestors and Descendants"
-msgstr ""
+msgstr "&Vorgänger und Nachfolger"
 
 msgid "A&uthor"
-msgstr ""
+msgstr "A&utor"
 
 msgid "&Branch"
-msgstr ""
+msgstr "&Zweig"
 
 msgid "&More Options..."
-msgstr ""
+msgstr "Mehr &Einstellungen..."
 
 msgid "Unable to merge"
 msgstr "Das Zusammenführen hat nicht funktioniert"
@@ -4707,16 +4790,6 @@ msgstr "Zweiter Vorgänger von Revision %d (also Revision %d)"
 msgid "null revision (i.e. remove file(s))"
 msgstr "Nullrevision (das heißt, Datei(en) gelöscht)"
 
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
-msgstr ""
-"Durch das Wiederherstellen aller Dateien werden zwischenzeitliche Änderungen "
-"verworfen und die betroffenen Dateien als modifiziert gekennzeichnet."
-"<br><br>Sind Sie sicher, dass Sie sie wiederherstellen wollen?"
-"<br><br>(Verwenden Sie Aktualisieren, um eine andere Revision abzurufen.)"
-
 msgid "Changeset:"
 msgstr "Änderungssatz:"
 
@@ -4733,7 +4806,7 @@ msgid "Head is closed!"
 msgstr "Die Kopfrevision ist abgeschlossen!"
 
 msgid "Changesets where username contains string."
-msgstr "Änderungssatz, bei denen der Autor einen bestimmten Text enthält."
+msgstr "Änderungssätze, bei denen der Autor einen bestimmten Text enthält."
 
 msgid ""
 "Search commit message, user name, and names of changed files for string."
@@ -4749,8 +4822,8 @@ msgid ""
 "Changesets not found in the specified destination repository, or the default "
 "push location."
 msgstr ""
-"einige Änderungssätze wurde weder im angegebenen Zielarchiv noch im Standard-"
-"Übertragungsziel gefunden"
+"Einige Änderungssätze wurde weder im angegebenen Zielarchiv noch im Standard-"
+"Übertragungsziel gefunden."
 
 msgid "The named bookmark or all bookmarks."
 msgstr "Das bezeichnete Lesezeichen oder alle Lesezeichen."
@@ -4759,7 +4832,7 @@ msgid "The named tag or all tags."
 msgstr "Das beschriftete Etikett oder alle Etiketten."
 
 msgid "Changeset is tagged."
-msgstr "Der Änderungsstz ist etikettiert."
+msgstr "Der Änderungssatz ist etikettiert."
 
 msgid "Changeset is a named branch head."
 msgstr "Der Änderungssatz ist Kopf eines benannten Zweigs."
@@ -4778,7 +4851,7 @@ msgstr ""
 "selenic.com/mercurial/hg.1.html#dates\">Hilfe zu Datumsangaben</a>)"
 
 msgid "Greatest common ancestor of the two changesets."
-msgstr "Der größte gemeinsame Vorfahre von zwei Änderungssätzen"
+msgstr "Der größte gemeinsame Vorfahre zweier Änderungssätze"
 
 msgid ""
 "Find revisions that \"match\" one or more fields of the given set of "
@@ -4830,7 +4903,7 @@ msgid "Changesets that are ancestors of a changeset in set."
 msgstr "Änderungssätze, die Vorgänger von Änderungssätzen in der Auswahl sind."
 
 msgid "Child changesets of changesets in set."
-msgstr "Kind-Änderungssätzen von Änderungssätzen in der Auswahl."
+msgstr "Kind-Änderungssätze von Änderungssätzen in der Auswahl."
 
 msgid "The set of all parents for all changesets in set."
 msgstr ""
@@ -5235,6 +5308,9 @@ msgstr "thg import [Parameter] [Quelle]..."
 msgid "thg init [DEST]"
 msgstr "thg init [Ziel]"
 
+msgid "thg lock"
+msgstr ""
+
 msgid "search for a given text or revset"
 msgstr ""
 
@@ -5284,16 +5360,16 @@ msgid "thg purge"
 msgstr "TortoiseHg-Bereinigung"
 
 msgid "keep original changesets"
-msgstr "Den ursprünglichen Änderungssatz beibehalten"
+msgstr "Die ursprünglichen Änderungssätze beibehalten"
 
 msgid "keep original branch names"
 msgstr "Ursprüngliche Zweignamen beibehalten"
 
 msgid "rebase from the specified changeset"
-msgstr "Von der angegebenen Änderungssätzen verschiebenen"
+msgstr "Von den angegebenen Änderungssätzen verschiebenen"
 
 msgid "rebase onto the specified changeset"
-msgstr "Auf die angegebenen Änderungssatz verschieben"
+msgstr "Auf den angegebenen Änderungssatz verschieben"
 
 msgid "thg rebase -s REV -d REV [--keep]"
 msgstr "thg rebase -s Revision -d Revision [--keep]"
@@ -5406,7 +5482,7 @@ msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr "thg strip [-k] [-f] [-n] [[-r] Revision]"
 
 msgid "open the bookmark sync window"
-msgstr ""
+msgstr "öffne das Lesezeichen Syncronisier-Fenster"
 
 msgid "thg sync [OPTION]... [PEER]"
 msgstr ""
@@ -5632,6 +5708,16 @@ msgstr ""
 "Mercurial-Konfigurationsdateien an. Falls Sie nichts angeben, wird "
 "TortoiseHg das erstbeste Werkzeug wählen."
 
+msgid "CLI Editor"
+msgstr "CLI Editor"
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+"Der von Mercurial Kommandozeilen Befehlen verwendete Editor, um mehrzeilige "
+"Eingaben vom Benutzer einzulesen. Haupsächlich Übernahme Kommentare."
+
 msgid "Shell"
 msgstr "Shell"
 
@@ -5644,6 +5730,12 @@ msgid ""
 "K title %(reponame)s<br>Default, OS X: not set<br>Default, other: xterm -T "
 "\"%(reponame)s\""
 msgstr ""
+"Befehl um die bevorzugte Shell Anwendung zu starten. Falls der Befehl die "
+"Zeichenkette %(reponame)s enthält, wird der name des Projektarchivs an "
+"Stelle von %(reponame)s eingefügt. Ebenso stellt %(root)s den vollständigen "
+"Pfad ins Projektarchiv dar. (Neustart erforderlich)<br>Standard, Windows: "
+"cmd.exe /K title %(reponame)s<br>Standard, OS X: nicht "
+"eingestellt<br>Standard, andere: xterm -T \"%(reponame)s\""
 
 msgid "Immediate Operations"
 msgstr "Ohne Nachfrage ausführen"
@@ -5702,10 +5794,9 @@ msgstr "Grafischen Dialog im Hintergrund starten"
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
 msgstr ""
-"Bei Ausführung in der Konsole werden grafische Dialoge in einem Hintergrund-"
-"Prozess ausgeführt. Standard: Wahr"
 
 msgid "Full Path Title"
 msgstr "Vollständigen Pfad in der Titelleiste anzeigen"
@@ -5737,12 +5828,14 @@ msgstr ""
 "diese zu prüfen und manuell auszubügeln. Standard: True."
 
 msgid "New Repo Skeleton"
-msgstr ""
+msgstr "Neues Repo Skelett"
 
 msgid ""
 "If specified, files in the directory, e.g. .hgignore, are copied to the "
 "newly-created repository."
 msgstr ""
+"Falls angegeben, werden Dateien in dieses Verzeichnisses in neu erstellte "
+"Projektarchive kopiert, z.B. .hgignore."
 
 msgid "Workbench"
 msgstr "Werkbank"
@@ -5799,7 +5892,7 @@ msgid "Author Coloring"
 msgstr "Nach Autor einfärben"
 
 msgid "Color changesets by author name. Default: False"
-msgstr "Änderungslisten nach Autor färben. Standard: falsch"
+msgstr "Änderungssätze nach Autor färben. Standard: falsch"
 
 msgid "Full Authorname"
 msgstr "Voller Name des Autors"
@@ -5845,8 +5938,8 @@ msgid ""
 "If true, concatenate multiple lines of changeset summary and truncate them "
 "at 80 characters as necessary. Default: False"
 msgstr ""
-"Ob eine mehrzeilige Änderungslisten-Zusammenfassung aneinandergehängt und "
-"bei Bedarf auf 80 Zeilen beschränkt wird. Standard: falsch"
+"Ob eine mehrzeilige Änderungssatz-Zusammenfassung aneinandergehängt und bei "
+"Bedarf auf 80 Zeilen beschränkt wird. Standard: falsch"
 
 msgid "Log Batch Size"
 msgstr "Protokoll-Länge"
@@ -5954,12 +6047,14 @@ msgstr ""
 "<br>Vollständiger Name &lt;email@beispiel.de.test&gt;"
 
 msgid "Ask Username"
-msgstr ""
+msgstr "Benutzername abfragen"
 
 msgid ""
 "If no username has been specified, the user will be prompted to enter a "
 "username.  Default: False"
 msgstr ""
+"Falls kein Benutzername angegeben ist, wird der Benutzer aufgefordert einen "
+"Benutzernamen einzugeben. Standard: aus"
 
 msgid "Summary Line Length"
 msgstr "Länge Zusammenfassungszeile"
@@ -6154,7 +6249,7 @@ msgid ""
 "dialog. Default: True"
 msgstr ""
 "Legt fest, ob TortoiseHg einen Bestätigungsdialog anzeigt, bevor es "
-"Änderungslisten überträgt. Falls nicht, wird die Übertragung ohne jegliche "
+"Änderungssätze überträgt. Falls nicht, wird die Übertragung ohne jegliche "
 "Bestätigung ausgeführt. Standard: True"
 
 msgid "Target Combo"
@@ -6214,8 +6309,8 @@ msgid ""
 "changesets are set to public in the client. Default: True"
 msgstr ""
 "Kontrolliert die Entwurfsphase, wenn als Server eingesetzt. Wenn gesetzt, "
-"werden übertragene Änderungslisten sowohl im Client als auch im Server als "
-"öffentlich gekennzeichnet und abgerufene oder duplizierte Änderungslisten im "
+"werden übertragene Änderungssätze sowohl im Client als auch im Server als "
+"öffentlich gekennzeichnet und abgerufene oder duplizierte Änderungssätze im "
 "Client als öffentlich gekennzeichnet. Standard: true"
 
 msgid "<b>Web Server:</b>"
@@ -6278,7 +6373,7 @@ msgstr "Maximale Dateien"
 
 msgid "Maximum number of files to list per changeset. Default: 10"
 msgstr ""
-"Maximele Dateianzahl, die je Änderungssatz angezeigt wird. Standard: 10"
+"Maximale Dateianzahl, die je Änderungssatz angezeigt wird. Standard: 10"
 
 msgid "Max Changes"
 msgstr "Maximale Änderungen"
@@ -6660,7 +6755,7 @@ msgstr ""
 "li></ul><p>Standard: never"
 
 msgid "Changeset Link"
-msgstr "Änderungslisten-Verweis"
+msgstr "Änderungssatz-Verweis"
 
 msgid ""
 "A \"template string\" that, when set, turns the revision number and short "
@@ -6740,6 +6835,17 @@ msgid ""
 "Path to the directory where a system-wide cache of bfiles will be stored"
 msgstr ""
 "Verzeichnis, in dem ein systemweiter Cache von Binärdateien erstellt wird"
+
+msgid "Simplelock"
+msgstr "Simplelock"
+
+msgid "Lock Clone"
+msgstr "Sperre Klonen"
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
 
 msgid "Largefiles"
 msgstr "Binärriesen"
@@ -7015,7 +7121,7 @@ msgid ""
 msgstr ""
 
 msgid "Explorer Extension Settings - TortoiseHg"
-msgstr ""
+msgstr "Explorer Erweiterungen Einstellungen - TortoiseHg"
 
 msgid "Clear"
 msgstr "Aufräumen"
@@ -7289,7 +7395,7 @@ msgid "Push outgoing changes to selected URL"
 msgstr "Ausgehende Änderungen an die ausgewählte URL übertragen"
 
 msgid "Sync Bookmarks"
-msgstr ""
+msgstr "Lesezeichen Syncronisieren"
 
 msgid "Email outgoing changesets for remote repository"
 msgstr ""
@@ -7300,9 +7406,6 @@ msgstr "Ausstehende Perforce-Änderungslisten verwalten"
 
 msgid "Unbundle"
 msgstr "Entbündeln"
-
-msgid "Stop current operation"
-msgstr "Den momentanen Vorgang abbrechen"
 
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Ausgewählte Einstellungen:</b>"
@@ -7360,6 +7463,9 @@ msgstr "Pfadentfernung bestätigen"
 msgid "Delete %s from your repo configuration file?"
 msgstr "%s aus Ihrer Archivkonfigurationsdatei löschen?"
 
+msgid "Select repository"
+msgstr "Wähle Projektarchiv"
+
 msgid "No host specified"
 msgstr "Kein Rechner angegeben"
 
@@ -7393,7 +7499,7 @@ msgstr "Die Synchronisation läuft bereits"
 
 #, python-format
 msgid "Getting incoming changesets from %s..."
-msgstr "Besorge eingehende Änderungssätze von %s..."
+msgstr "Rufe eingehende Änderungssätze von %s ab..."
 
 #, python-format
 msgid "Found incoming changesets from %s"
@@ -7427,7 +7533,7 @@ msgstr "Es gibt aufzulösende Dateikonflikte"
 
 #, python-format
 msgid "Finding outgoing changesets to %s..."
-msgstr "Die ausgehenden Änderungssätze für %s werden ermittelt..."
+msgstr "Ausgehende Änderungssätze für %s werden ermittelt..."
 
 #, python-format
 msgid "%d outgoing changesets to %s"
@@ -7510,8 +7616,8 @@ msgid ""
 "creation of a new branch.  Do you want to create a new branch in the remote "
 "repository?"
 msgstr ""
-"Mindestens eine der Änderungssätze, die Sie zu übertragen versuchen, enthält "
-"die Erzeugung eines neuen Zweigs. Wollen Sie einen neuen Zweig im entfernten "
+"Mindestens ein Änderungssatz, den Sie zu übertragen versuchen, enthält die "
+"Erzeugung eines neuen Zweigs. Wollen Sie einen neuen Zweig im entfernten "
 "Archiv erzeugen?"
 
 msgid "Determining outgoing changesets to email..."
@@ -7540,7 +7646,7 @@ msgid "Select post-pull operation for this repository"
 msgstr "Ausgewählte Folgeoperation nach dem Abrufen in dieses Projektarchiv"
 
 msgid "None - simply pull changesets"
-msgstr "Nichts tun - nur die Änderungssätze abrufen"
+msgstr "Nichts tun - nur Änderungssätze abrufen"
 
 msgid "Update - pull, then try to update"
 msgstr "Update - abrufen, dann Aktualisierung versuchen"
@@ -7718,13 +7824,13 @@ msgid "Select User Certificate Key File"
 msgstr ""
 
 msgid "PEM files (*.pem *.key)"
-msgstr ""
+msgstr "PEM Dateien (*.pem *.key)"
 
 msgid "Select User Certificate Chain File"
 msgstr ""
 
 msgid "PEM files (*.pem *.crt *.cer)"
-msgstr ""
+msgstr "PEM Dateien (*.pem *.crt *.cer)"
 
 msgid "Unable to save authentication"
 msgstr "Authensierung kann nicht gespeichert werden"
@@ -7776,11 +7882,11 @@ msgstr "Verschieben"
 
 #, python-format
 msgid "Moved tag %s to changeset %s (from changeset %s)"
-msgstr "Etikett %s in Änderungssatz %s verschoben (aus dem Änderungssatz %s)"
+msgstr "Etikett %s zu Änderungssatz %s verschoben (aus dem Änderungssatz %s)"
 
 #, python-format
 msgid "Added tag %s for changeset %s"
-msgstr "Etikett %s für den Änderungssatz %s ergänzt"
+msgstr "Etikett %s zum Änderungssatz %s hinzugefügt"
 
 #, python-format
 msgid "Tag '%s' has been moved"
@@ -8133,10 +8239,10 @@ msgid "Show &Patch Queue"
 msgstr "&Patch-Warteschlange anzeigen"
 
 msgid "Show Conso&le"
-msgstr ""
+msgstr "Konsole anzeigen"
 
 msgid "Place Console in Doc&k Area"
-msgstr ""
+msgstr "Konsole im Dock Bereich platzieren"
 
 msgid "R&epository Registry Options"
 msgstr "Archivregistrierungs-&Einstellungen"
@@ -8145,7 +8251,7 @@ msgid "Save Open Repositories on E&xit"
 msgstr "Offene Archive beim Be&enden speichern"
 
 msgid "Sa&ve Current Sync Paths on Exit"
-msgstr ""
+msgstr "Speichere aktuelle Synchronisierungs Pfade beim Beenden"
 
 msgid "&Commit"
 msgstr "Ü&bernehmen"
@@ -8192,6 +8298,12 @@ msgstr "Grafische Darstellung bezüglich Revisionsmengen oder Zweigen filtern"
 msgid "&Workbench Toolbars"
 msgstr "&Werkbank-Symbolleisten"
 
+msgid "&Lock File..."
+msgstr ""
+
+msgid "Lock or unlock files"
+msgstr ""
+
 msgid "Update working directory or switch revisions"
 msgstr "Arbeitsverzeichnis aktualisieren oder Revisionen wechseln"
 
@@ -8199,16 +8311,16 @@ msgid "&Shelve..."
 msgstr "&Verstauen..."
 
 msgid "&Import Patches..."
-msgstr ""
+msgstr "Patches %importieren"
 
 msgid "U&nbundle..."
-msgstr ""
+msgstr "E&ntbündeln..."
 
 msgid "&Merge..."
-msgstr ""
+msgstr "&Zusammenführen ..."
 
 msgid "Merge with the other head of the current branch"
-msgstr ""
+msgstr "Mit dem anderen Kopf des aktuellen Zweigs zusammenführen"
 
 msgid "&Resolve..."
 msgstr "&Auflösen..."
@@ -8256,7 +8368,7 @@ msgid "P&ush"
 msgstr "Ver&senden"
 
 msgid "&Sync Bookmarks..."
-msgstr ""
+msgstr "Lesezeichen &synchronisieren"
 
 #, python-format
 msgid ""
@@ -8382,15 +8494,15 @@ msgid "Cannot open Plugin Options dialog"
 msgstr "Kann den Plugin-Einstellungen-Dialog nicht öffnen"
 
 msgid "[SOURCE]"
-msgstr ""
+msgstr "[QUELLE]"
 
 #, python-format
 msgid "unsupported URL: %s"
-msgstr ""
+msgstr "Nicht unterstützte URL: %s"
 
 #, python-format
 msgid "%s certificate error: no certificate received"
-msgstr ""
+msgstr "%s Zertifikat Fehler: kein Zertifikat empfangen"
 
 msgid "move after the specified patch"
 msgstr "Hinter den angegebenen Patch verschieben"
@@ -8519,6 +8631,14 @@ msgstr "in der Zukunft"
 
 msgid "now"
 msgstr "jetzt"
+
+#, python-format
+msgid "command parse error: %s"
+msgstr "Fehler beim Verarbeiten (parse) des Befehls: %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "Keine Treffer gefunden: %s"
 
 msgid "Commit..."
 msgstr "Übernehmen..."
@@ -9205,9 +9325,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Bottom Diffs"
 #~ msgstr "Vergleich unten"
 
-#~ msgid "CLI Editor"
-#~ msgstr "CLI Editor"
-
 #~ msgid "Specify the visual editor used to view files, etc"
 #~ msgstr ""
 #~ "Geben sie den visuellen Editor an, mit dem zum Beispiel Dateien angezeigt "
@@ -9652,6 +9769,11 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Annotate"
 #~ msgstr "Kommentieren"
 
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr ""
+#~ "Alle Änderungen durch die Zusammenführung mit der (anderen) Zielrevision "
+#~ "verwerfen"
+
 #~ msgid "tag '%s' is not a local tag"
 #~ msgstr "Das Etikett '%s' ist nicht lokal"
 
@@ -9708,6 +9830,9 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 
 #~ msgid "Tag name is empty"
 #~ msgstr "Etikett unbeschriftet"
+
+#~ msgid "Reject"
+#~ msgstr "Verwerfen"
 
 #~ msgid "New Patch Name"
 #~ msgstr "Neuer Flicken-Name"
@@ -11915,6 +12040,15 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Archive revision:"
 #~ msgstr "Archiv-Revision:"
 
+#~ msgid ""
+#~ "Unable to translate message to local encoding\n"
+#~ "Consider setting HGENCODING environment variable\n"
+#~ "Replace untranslatable characters with \"?\"?\n"
+#~ msgstr ""
+#~ "Nicht imstande, den Kommentar in die lokale Kodierung zu übertragen\n"
+#~ "Erwägen Sie, die Umgebungsvariable HGENCODING zu setzen\n"
+#~ "Nicht-übertragbare Zeichen als \"?\" wiedergeben?\n"
+
 #~ msgid "Message format needs to be configured"
 #~ msgstr "Das Kommentarformat muss konfiguriert werden"
 
@@ -12137,6 +12271,13 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgstr "Ä&hnliche Revisionen..."
 
 #~ msgid ""
+#~ "When running from the command line, fork a background process to run "
+#~ "graphical dialogs.  Default: True"
+#~ msgstr ""
+#~ "Bei Ausführung in der Konsole werden grafische Dialoge in einem "
+#~ "Hintergrund-Prozess ausgeführt. Standard: Wahr"
+
+#~ msgid ""
 #~ "Color changesets by author name.  If not enabled, the changes are colored "
 #~ "green for merge, red for non-trivial parents, black for normal. Default: "
 #~ "False"
@@ -12144,3 +12285,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ "Änderungssatz nach Autor einfärben. Im Regelfall werden Änderungen zum "
 #~ "Zusammenführen grün markiert, Änderungen mit nicht-trivialen Vorgängern "
 #~ "rot und gewöhnliche schwarz. Standard: Falsch"
+
+#~ msgid "Copyright 2008-2015 Steve Borho and others"
+#~ msgstr "Copyright 2008-2015 Steve Borho und Andere"

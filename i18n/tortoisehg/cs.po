@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
-"PO-Revision-Date: 2015-06-28 12:50+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"PO-Revision-Date: 2016-01-09 08:51+0000\n"
+"Last-Translator: Tovim <Unknown>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2015-11-02 05:10+0000\n"
-"X-Generator: Launchpad (build 17838)\n"
+"X-Launchpad-Export-Date: 2016-02-29 05:29+0000\n"
+"X-Generator: Launchpad (build 17925)\n"
 "Language: cs\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
@@ -33,7 +33,7 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "O programu"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
+msgid "Copyright 2008-2016 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -341,7 +341,7 @@ msgid "&Add"
 msgstr "&Add"
 
 msgid "Re&name"
-msgstr "Re&name"
+msgstr "Přejmenovat"
 
 msgid "&Remove"
 msgstr "&Remove"
@@ -860,13 +860,11 @@ msgid "Message Translation Failure"
 msgstr "Nezdařil se překlad zprávy"
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
-"Zpráva nejde přeložit do lokálního kódování\n"
-"Zkuste vytvořit proměnnou prostředí HGENCODING\n"
-"Nahraďte nepřeložitelná písmena znaky \"?\"?\n"
 
 msgid "&Replace"
 msgstr "&Nahradit"
@@ -991,6 +989,9 @@ msgid ""
 "\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
 "b></a> changes."
 msgstr ""
+"Před komprimací nutno provést<a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> za účelem oprávky nebo <a href=\"discard"
+"\"><b>odvržení </b></a> změn."
 
 msgid "You may continue the compress"
 msgstr "Můžete pokračovat v komprimaci"
@@ -1297,14 +1298,6 @@ msgstr "Nutno zadat platný typ hooku."
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "Název hooku nesmí obsahovat mezery, tabulátory nebo znaky '='."
 
-#, python-format
-msgid "command parse error: %s"
-msgstr "command parse error: %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "žádné shody nenalezeny: %s"
-
 msgid "Console"
 msgstr ""
 
@@ -1416,7 +1409,7 @@ msgid "Add &Largefiles..."
 msgstr ""
 
 msgid "&Forget"
-msgstr "&Zapomenout (forget)"
+msgstr "&Zapomenout"
 
 msgid "&Delete Unversioned..."
 msgstr "Smazat neverzované..."
@@ -1929,6 +1922,9 @@ msgid ""
 "\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
 "changes."
 msgstr ""
+"Před gráftem nutno provést oprávku <a href=\"commit\"><b>commit</b></a>, <a "
+"href=\"shelve\"><b>shelve</b></a> nebo změny <a href=\"discard\"><b>discard</"
+"b></a>."
 
 msgid "You may continue or start the graft"
 msgstr "Můžete pokračovat nebo začít vytvářet gráft"
@@ -2387,6 +2383,94 @@ msgstr ""
 msgid "Add as &Normal Files"
 msgstr ""
 
+msgid "Invalid Patterns"
+msgstr ""
+
+msgid "Failed to process largefiles.patterns."
+msgstr ""
+
+msgid "Word docs (*.doc *.docx)"
+msgstr ""
+
+msgid "PDF docs (*.pdf)"
+msgstr ""
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr ""
+
+msgid "Refresh lock information"
+msgstr ""
+
+msgid "Lock a file not described in .hglocks"
+msgstr ""
+
+msgid "Stop current operation"
+msgstr "Zastavit probíhající operaci"
+
+msgid "Locked And Lockable Files:"
+msgstr ""
+
+msgid "Path"
+msgstr "Cesta"
+
+msgid "Locking User"
+msgstr ""
+
+msgid "Purpose"
+msgstr ""
+
+msgid "Simplelock extension not enabled"
+msgstr ""
+
+msgid "Please enable and configure simplelock"
+msgstr ""
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr ""
+
+msgid "File was not within current repository"
+msgstr ""
+
+#, python-format
+msgid "Locking %s"
+msgstr ""
+
+#, python-format
+msgid "Unlocking %s"
+msgstr ""
+
+msgid "Refreshing locks..."
+msgstr ""
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr ""
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr ""
+
+msgid "Ready, double click to lock or unlock"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "You can only release your own locks"
+msgstr ""
+
 msgid "Find revisions matching fields of:"
 msgstr "Nalézt shodná pole revizí:"
 
@@ -2497,8 +2581,8 @@ msgstr "Nebo použít:"
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr "Vynutit sloučení s nevyřízenými změnami (-f/--force)"
 
-msgid "Discard all changes from merge target (other) revision"
-msgstr "Vyřadit všechny změny z cílové revize sloučení"
+msgid "Discard all changes from the other revision"
+msgstr ""
 
 msgid "&Discard"
 msgstr "&Vyřadit"
@@ -3521,20 +3605,6 @@ msgstr "filling (%d)"
 msgid "Mercurial User"
 msgstr "Uživatel Mercurialu"
 
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr "Nepodporovaný typ repozitáře (%s)"
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr "Ne-Mercurialové repozitáře či subrepozitáře nejde otevřít"
-
-msgid "Confirm Delete"
-msgstr "Potvrdit smazání"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr "Smazat skupinu '%s' a všechny její záznamy?"
-
 msgid "Repository Registry"
 msgstr "Seznam repozitářů"
 
@@ -3557,7 +3627,7 @@ msgid "Refresh the Repository Registry list"
 msgstr "Refresh seznam repozitářů"
 
 msgid "&Open"
-msgstr ""
+msgstr "Aktivovat repozitář"
 
 msgid "Open the repository in a new tab"
 msgstr "Otevřít repozitář v nové kartě"
@@ -3584,7 +3654,7 @@ msgid "View the repository's settings"
 msgstr "Zobrazit nastavení repozitáře"
 
 msgid "Re&move from Registry"
-msgstr "Odebrat ze seznamu rep."
+msgstr "Odebrat repozitář"
 
 msgid ""
 "Remove the node and all its subnodes. Repositories are not deleted from disk."
@@ -3592,13 +3662,13 @@ msgstr ""
 "Odstranit node a všechny jeho sub-nody. Repozitáře se z disku nesmažou."
 
 msgid "Clon&e..."
-msgstr ""
+msgstr "Klonovat..."
 
 msgid "Clone Repository"
 msgstr "Klonovat repozitář"
 
 msgid "E&xplore"
-msgstr "Prozkoumat"
+msgstr "Otevřít složku"
 
 msgid "Open the repository in a file browser"
 msgstr "Otevřít repozitář v průzkumníku"
@@ -3616,7 +3686,7 @@ msgid "Add a repository to this group"
 msgstr "Přidat repozitář do této skupiny"
 
 msgid "A&dd Subrepository..."
-msgstr ""
+msgstr "Přidat subrepozitář"
 
 msgid "Convert an existing repository into a subrepository"
 msgstr "Přeměnit existující repozitář na subrepozitář"
@@ -3780,8 +3850,22 @@ msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
 msgstr ""
 "Soubor .hgsub nejde aktualizovat.<p>Odebrání subrepozitáře se nezdařilo."
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr "Nepodporovaný typ repozitáře (%s)"
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr "Ne-Mercurialové repozitáře či subrepozitáře nejde otevřít"
+
 msgid "New Group"
 msgstr "Nová skupina"
+
+msgid "Confirm Delete"
+msgstr "Potvrdit smazání"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr "Smazat skupinu '%s' a všechny její záznamy?"
 
 msgid "Could not get subrepository list"
 msgstr "Nejde získat repozitářový seznam"
@@ -3868,9 +3952,6 @@ msgstr "Vyskytla se chyba při aktualizaci souboru hgrc (%s) repozitáře"
 msgid "default"
 msgstr "default"
 
-msgid "Path"
-msgstr "Cesta"
-
 msgid "C&hoose Log Columns..."
 msgstr "Vybrat sloupce v Přehledu revizí..."
 
@@ -3928,9 +4009,6 @@ msgstr "Pull"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Převzít (pull) příchozí changesty do svého repozitáře"
-
-msgid "Reject"
-msgstr "Odmítnout"
 
 msgid "Reject incoming changesets"
 msgstr "Odmítnout příchozí changesety"
@@ -4062,6 +4140,9 @@ msgid "Sig&n..."
 msgstr ""
 
 msgid "&Backout..."
+msgstr ""
+
+msgid "Revert &All Files..."
 msgstr ""
 
 msgid "Copy &Hash"
@@ -4269,8 +4350,17 @@ msgstr "Oprávky byly exportovány"
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d oprávky byly exportovány do:<p><a href=\"file:///%s\">%s</a>"
 
-msgid "Filter b&y"
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
 msgstr ""
+"Akce  \"revert\"  u všech souborů vyřadí změny a ponechá soubory v "
+"modifikovaném stavu.<br><br>Jste si jist, že tuto akci chcete provést?"
+"<br><br>(použijte aktualizaci pro přechod k jiné revizi)"
+
+msgid "Filter b&y"
+msgstr "Filtrovat podle"
 
 msgid "&Ancestors and Descendants"
 msgstr ""
@@ -4627,15 +4717,6 @@ msgstr "druhý rodič revize %d (revize %d)"
 msgid "null revision (i.e. remove file(s))"
 msgstr "nulová revize (to jest odebrat soubor(y))"
 
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
-msgstr ""
-"Akce  \"revert\"  u všech souborů vyřadí změny a ponechá soubory v "
-"modifikovaném stavu.<br><br>Jste si jist, že tuto akci chcete provést?"
-"<br><br>(použijte aktualizaci pro přechod k jiné revizi)"
-
 msgid "Changeset:"
 msgstr "Changeset:"
 
@@ -4952,7 +5033,7 @@ msgid "thg bisect"
 msgstr "thg bisect"
 
 msgid "revision"
-msgstr ""
+msgstr "revize"
 
 msgid "thg bookmarks [-r REV] [NAME]"
 msgstr ""
@@ -5127,6 +5208,9 @@ msgstr "thg import [OPTION] [SOURCE]..."
 
 msgid "thg init [DEST]"
 msgstr "thg init [DEST]"
+
+msgid "thg lock"
+msgstr ""
 
 msgid "search for a given text or revset"
 msgstr ""
@@ -5519,6 +5603,14 @@ msgstr ""
 "Mercurialu. Nebude-li zadáno, použije TortoiseHg první vhodný nástroj, který "
 "nalezne"
 
+msgid "CLI Editor"
+msgstr "Editor CLI"
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+
 msgid "Shell"
 msgstr "Terminál"
 
@@ -5590,10 +5682,9 @@ msgstr "Rozdělit GUI"
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
 msgstr ""
-"Při spuštění příkazu z příkazového řádku spustí proces na pozadí pro "
-"zobrazení grafických dialogů. Implicitně: True"
 
 msgid "Full Path Title"
 msgstr "Název úplné cesty"
@@ -6568,6 +6659,17 @@ msgid ""
 msgstr ""
 "Cesta k adresáři, který obsahuje 'system-wide cache' pro uložení 'bfiles'"
 
+msgid "Simplelock"
+msgstr ""
+
+msgid "Lock Clone"
+msgstr ""
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+
 msgid "Largefiles"
 msgstr ""
 
@@ -7123,9 +7225,6 @@ msgstr "Manage pending perforce changelists"
 msgid "Unbundle"
 msgstr "Rozbalit"
 
-msgid "Stop current operation"
-msgstr "Zastavit probíhající operaci"
-
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Vybrané možnosti:</b>"
 
@@ -7181,6 +7280,9 @@ msgstr "Potvrdit smazání cesty"
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr "Smazat %s z konfiguračního souboru vašeho repozitáře?"
+
+msgid "Select repository"
+msgstr ""
 
 msgid "No host specified"
 msgstr ""
@@ -7989,6 +8091,12 @@ msgstr "Lišta filtru se sadami revizí nebo větvemi"
 msgid "&Workbench Toolbars"
 msgstr "Nástrojové lišty Verpánku"
 
+msgid "&Lock File..."
+msgstr ""
+
+msgid "Lock or unlock files"
+msgstr ""
+
 msgid "Update working directory or switch revisions"
 msgstr "Aktualizovat pracovní adresář k označené revizi"
 
@@ -8309,6 +8417,14 @@ msgstr "v budoucnosti"
 
 msgid "now"
 msgstr "nyní"
+
+#, python-format
+msgid "command parse error: %s"
+msgstr "command parse error: %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "žádné shody nenalezeny: %s"
 
 msgid "Commit..."
 msgstr "Commit..."
@@ -9242,6 +9358,9 @@ msgstr ""
 #~ msgid "Reject incoming previewed changesets"
 #~ msgstr "Odmítnout zobrazené příchozí changesety"
 
+#~ msgid "Reject"
+#~ msgstr "Odmítnout"
+
 #~ msgid "Bundle Preview"
 #~ msgstr "Náhled svazku"
 
@@ -9672,9 +9791,6 @@ msgstr ""
 #~ "možnost lze přikázat výběrem  'internal:merge'. Volba 'internal:prompt' "
 #~ "vždy vybere lokální nástroj a volba 'internal:dump' ponechá soubory v "
 #~ "pracovním adresáři pro ruční sloučení."
-
-#~ msgid "CLI Editor"
-#~ msgstr "Editor CLI"
 
 #~ msgid "Bottom Diffs"
 #~ msgstr "Diff. panel dole"
@@ -11819,6 +11935,13 @@ msgstr ""
 #~ msgid "Diff to Local"
 #~ msgstr "Diff vůči lokální kopii"
 
+#~ msgid ""
+#~ "When running from the command line, fork a background process to run "
+#~ "graphical dialogs.  Default: True"
+#~ msgstr ""
+#~ "Při spuštění příkazu z příkazového řádku spustí proces na pozadí pro "
+#~ "zobrazení grafických dialogů. Implicitně: True"
+
 #~ msgid "Verify"
 #~ msgstr "Ověřit repo"
 
@@ -11827,6 +11950,15 @@ msgstr ""
 
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "Konfigurace kontextové nabídky Windows"
+
+#~ msgid ""
+#~ "Unable to translate message to local encoding\n"
+#~ "Consider setting HGENCODING environment variable\n"
+#~ "Replace untranslatable characters with \"?\"?\n"
+#~ msgstr ""
+#~ "Zpráva nejde přeložit do lokálního kódování\n"
+#~ "Zkuste vytvořit proměnnou prostředí HGENCODING\n"
+#~ "Nahraďte nepřeložitelná písmena znaky \"?\"?\n"
 
 #~ msgid ""
 #~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
@@ -11844,6 +11976,9 @@ msgstr ""
 
 #~ msgid "Error when creating repository"
 #~ msgstr "Chyba při vytváření repozitáře"
+
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr "Vyřadit všechny změny z cílové revize sloučení"
 
 #~ msgid ""
 #~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="

@@ -30,7 +30,7 @@ if hasattr(sys, "frozen"):
             import win32traceutil
             print 'starting'
     # os.Popen() needs this, and Mercurial still uses os.Popen
-    if 'COMSPEC' not in os.environ:
+    if 'COMSPEC' not in os.environ and os.name == 'nt':
         comspec = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
                                'system32', 'cmd.exe')
         os.environ['COMSPEC'] = comspec
@@ -43,8 +43,9 @@ else:
     # compile .ui and .qrc for in-place use
     fpath = os.path.realpath(__file__)
     if os.path.exists(os.path.join(os.path.dirname(fpath), 'setup.py')):
-        from distutils.dist import Distribution
+        # allow setuptools to patch distutils before we import Distribution
         from setup import build_ui
+        from distutils.dist import Distribution
         build_ui(Distribution()).run()
 
     if 'HGPATH' in os.environ:
@@ -63,6 +64,8 @@ demandimport.ignore.append('numpy')  # comtypes.npsupport does try-import
 demandimport.ignore.append('tortoisehg.util.config')
 demandimport.ignore.append('icons_rc')
 demandimport.ignore.append('translations_rc')
+# pygments seems to have trouble on loading plugins (see #4271, #4298)
+demandimport.ignore.extend(['pkgutil', 'pkg_resources'])
 demandimport.enable()
 
 # Verify we can reach TortoiseHg sources first

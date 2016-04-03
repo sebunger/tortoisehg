@@ -216,7 +216,7 @@ class RepoTreeModel(QAbstractItemModel):
         d = QMimeData()
         d.setData(repoRegMimeType, buf)
         if isinstance(item, repotreeitem.RepoItem):
-            d.setUrls([QUrl.fromLocalFile(hglib.tounicode(item.rootpath()))])
+            d.setUrls([QUrl.fromLocalFile(item.rootpath())])
         else:
             d.setText(item.name)
         return d
@@ -276,19 +276,19 @@ class RepoTreeModel(QAbstractItemModel):
             row = rgi.childCount()
 
         # make sure all paths are properly normalized
-        root = os.path.normpath(hglib.fromunicode(uroot))
+        uroot = os.path.normpath(uroot)
 
         # Check whether the repo that we are adding is a subrepo
-        knownitem = self.getRepoItem(root, lookForSubrepos=True)
+        knownitem = self.getRepoItem(uroot, lookForSubrepos=True)
         itemIsSubrepo = isinstance(knownitem,
                                    (repotreeitem.StandaloneSubrepoItem,
                                     repotreeitem.SubrepoItem))
 
         self.beginInsertRows(parent, row, row)
         if itemIsSubrepo:
-            ri = repotreeitem.StandaloneSubrepoItem(root)
+            ri = repotreeitem.StandaloneSubrepoItem(uroot)
         else:
-            ri = repotreeitem.RepoItem(root)
+            ri = repotreeitem.RepoItem(uroot)
         rgi.insertChild(row, ri)
         self.endInsertRows()
 
@@ -303,8 +303,7 @@ class RepoTreeModel(QAbstractItemModel):
                 return e
 
     def indexFromRepoRoot(self, uroot, column=0, standalone=False):
-        item = self.getRepoItem(hglib.fromunicode(uroot),
-                                lookForSubrepos=not standalone)
+        item = self.getRepoItem(uroot, lookForSubrepos=not standalone)
         return self._indexFromItem(item, column)
 
     def isKnownRepoRoot(self, uroot, standalone=False):
@@ -324,7 +323,7 @@ class RepoTreeModel(QAbstractItemModel):
         item = index.internalPointer()
         if not isinstance(item, repotreeitem.RepoItem):
             return
-        return hglib.tounicode(item.rootpath())
+        return item.rootpath()
 
     def addGroup(self, name):
         ri = self.rootItem
@@ -399,7 +398,7 @@ class RepoTreeModel(QAbstractItemModel):
         return map(hglib.tounicode, invalidpaths)
 
     def updateCommonPaths(self, showShortPaths=None):
-        if not showShortPaths is None:
+        if showShortPaths is not None:
             self.showShortPaths = showShortPaths
         for grp in self.rootItem.childs:
             if isinstance(grp, repotreeitem.RepoGroupItem):
@@ -410,16 +409,18 @@ class RepoTreeModel(QAbstractItemModel):
 
     @pyqtSlot(str)
     def _updateShortName(self, uroot):
+        uroot = unicode(uroot)
         repoagent = self._repomanager.repoAgent(uroot)
-        it = self.getRepoItem(hglib.fromunicode(uroot))
+        it = self.getRepoItem(uroot)
         if it:
             it.setShortName(repoagent.shortName())
             self._emitItemDataChanged(it)
 
     @pyqtSlot(str)
     def _updateBaseNode(self, uroot):
+        uroot = unicode(uroot)
         repo = self._repomanager.repoAgent(uroot).rawRepo()
-        it = self.getRepoItem(hglib.fromunicode(uroot))
+        it = self.getRepoItem(uroot)
         if it:
             it.setBaseNode(hglib.repoidnode(repo))
 

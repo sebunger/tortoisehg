@@ -273,10 +273,9 @@ class BackoutPage(BasePage):
         if self._parentbackout:
             self.wizard().next()
             return
-        cmdline = ['backout']
-        tool = self.field('autoresolve').toBool() and 'merge' or 'fail'
-        cmdline += ['--tool=internal:' + tool]
-        cmdline += ['--rev', str(self._backoutrev)]
+        tool = self.field('autoresolve').toBool() and ':merge' or ':fail'
+        cmdline = hglib.buildcmdargs('backout', self._backoutrev, tool=tool,
+                                     no_commit=True)
         self._cmdlog.clearLog()
         sess = self._repoagent.runCommand(cmdline, self)
         sess.commandFinished.connect(self.onCommandFinished)
@@ -486,14 +485,15 @@ class CommitPage(BasePage):
             self.setTitle(_('Backing out and committing...'))
             self.setSubTitle(_('Please wait while making backout.'))
             message = unicode(self.msgEntry.text())
-            cmdline = ['backout', '--verbose', '--message', message, '--rev',
-                       str(self._backoutrev), '--user', user]
+            cmdline = hglib.buildcmdargs('backout', self._backoutrev,
+                                         verbose=True,
+                                         message=message, user=user)
         else:
             self.setTitle(_('Committing...'))
             self.setSubTitle(_('Please wait while committing merged files.'))
             message = unicode(self.msgEntry.text())
-            cmdline = ['commit', '--verbose', '--message', message,
-                       '--user', user]
+            cmdline = hglib.buildcmdargs('commit', verbose=True,
+                                         message=message, user=user)
         commandlines = [cmdline]
         pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
         if pushafter:

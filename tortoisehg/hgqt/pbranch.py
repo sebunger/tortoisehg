@@ -436,7 +436,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
     def update_sensitivity(self):
         """ Update the sensitivity of entire UI """
         in_pbranch = True #TODO
-        is_merge = len(self.repo.parents()) > 1
+        is_merge = len(self.repo[None].parents()) > 1
         self.actionPMerge.setEnabled(in_pbranch)
         self.actionBackport.setEnabled(in_pbranch)
         self.actionReapply.setEnabled(True)

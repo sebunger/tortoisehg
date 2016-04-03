@@ -252,7 +252,6 @@ class RepoItem(RepoTreeItem):
     def isRepo(self):
         return True
 
-    # TODO: return unicode instead of localstr because shortname() is unicode
     def rootpath(self):
         return self._root
 
@@ -260,7 +259,7 @@ class RepoItem(RepoTreeItem):
         if self._shortname:
             return self._shortname
         else:
-            return hglib.tounicode(os.path.basename(self._root))
+            return os.path.basename(self._root)
 
     def repotype(self):
         return 'hg'
@@ -311,7 +310,7 @@ class RepoItem(RepoTreeItem):
                 # do not show a slash at the beginning of the short path
                 spath = spath[1:]
 
-        return hglib.tounicode(spath)
+        return spath
 
     def menulist(self):
         acts = ['open', 'clone', 'addsubrepo', None, 'explore',
@@ -326,7 +325,7 @@ class RepoItem(RepoTreeItem):
             | Qt.ItemIsEditable)
 
     def dump(self, xw):
-        xw.writeAttribute('root', hglib.tounicode(self._root))
+        xw.writeAttribute('root', self._root)
         xw.writeAttribute('shortname', self.shortname())
         xw.writeAttribute('basenode', node.hex(self.basenode()))
         if self._sharedpath:
@@ -336,7 +335,7 @@ class RepoItem(RepoTreeItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(hglib.fromunicode(a.value('', 'root').toString()),
+        obj = cls(unicode(a.value('', 'root').toString()),
                   unicode(a.value('', 'shortname').toString()),
                   node.bin(str(a.value('', 'basenode').toString())),
                   unicode(a.value('', 'sharedpath').toString()))
@@ -344,7 +343,7 @@ class RepoItem(RepoTreeItem):
         return obj
 
     def details(self):
-        return _('Local Repository %s') % hglib.tounicode(self._root)
+        return _('Local Repository %s') % self._root
 
     def appendSubrepos(self, repo=None):
         self._sharedpath = ''
@@ -354,12 +353,12 @@ class RepoItem(RepoTreeItem):
             if repo is None:
                 if not os.path.exists(self._root):
                     self._valid = False
-                    return [self._root]
+                    return [hglib.fromunicode(self._root)]
                 elif (not os.path.exists(os.path.join(self._root, '.hgsub'))
                       and not os.path.exists(
                           os.path.join(self._root, '.hg', 'sharedpath'))):
                     return []  # skip repo creation, which is expensive
-                repo = hg.repository(ui.ui(), self._root)
+                repo = hg.repository(ui.ui(), hglib.fromunicode(self._root))
             if repo.sharedpath != repo.path:
                 self._sharedpath = hglib.tounicode(repo.sharedpath)
             wctx = repo['.']
@@ -369,7 +368,8 @@ class RepoItem(RepoTreeItem):
                 abssubpath = repo.wjoin(subpath)
                 subtype = wctx.substate[subpath][2]
                 sriIsValid = os.path.isdir(abssubpath)
-                sri = _newSubrepoItem(abssubpath, repotype=subtype)
+                sri = _newSubrepoItem(hglib.tounicode(abssubpath),
+                                      repotype=subtype)
                 sri._valid = sriIsValid
                 self.appendChild(sri)
 
@@ -394,7 +394,7 @@ class RepoItem(RepoTreeItem):
             if sri:
                 sri._valid = False
                 invalidRepoList.append(abssubpath)
-            invalidRepoList.append(self._root)
+            invalidRepoList.append(hglib.fromunicode(self._root))
         except Exception, e:
             # If any other sort of exception happens, show the corresponding
             # error message, but do not crash!
@@ -406,18 +406,18 @@ class RepoItem(RepoTreeItem):
             if sri:
                 sri._valid = False
                 invalidRepoList.append(abssubpath)
-            invalidRepoList.append(self._root)
+            invalidRepoList.append(hglib.fromunicode(self._root))
 
             # Show a warning message indicating that there was an error
             if repo:
-                rootpath = repo.root
+                rootpath = hglib.tounicode(repo.root)
             else:
                 rootpath = self._root
             warningMessage = (_('An exception happened while loading the ' \
                 'subrepos of:<br><br>"%s"<br><br>') + \
                 _('The exception error message was:<br><br>%s<br><br>') +\
                 _('Click OK to continue or Abort to exit.')) \
-                % (hglib.tounicode(rootpath), hglib.tounicode(e.message))
+                % (rootpath, hglib.tounicode(e.message))
             res = qtlib.WarningMsgBox(_('Error loading subrepos'),
                                 warningMessage,
                                 buttons = QMessageBox.Ok | QMessageBox.Abort)
@@ -429,7 +429,8 @@ class RepoItem(RepoTreeItem):
     def setData(self, column, value):
         if column == 0:
             shortname = hglib.fromunicode(value.toString())
-            abshgrcpath = os.path.join(self.rootpath(), '.hg', 'hgrc')
+            abshgrcpath = os.path.join(hglib.fromunicode(self.rootpath()),
+                                       '.hg', 'hgrc')
             if not hgrcutil.setConfigValue(abshgrcpath, 'web.name', shortname):
                 qtlib.WarningMsgBox(_('Unable to update repository name'),
                     _('An error occurred while updating the repository hgrc '
@@ -516,13 +517,13 @@ class AlienSubrepoItem(RepoItem):
         return self._repotype
 
     def dump(self, xw):
-        xw.writeAttribute('root', hglib.tounicode(self._root))
+        xw.writeAttribute('root', self._root)
         xw.writeAttribute('repotype', self._repotype)
 
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(hglib.fromunicode(a.value('', 'root').toString()),
+        obj = cls(unicode(a.value('', 'root').toString()),
                   str(a.value('', 'repotype').toString()))
         xr.skipCurrentElement()  # no child
         return obj
@@ -614,7 +615,7 @@ class RepoGroupItem(RepoTreeItem):
         argument. This is commonly used to set the group common path to an empty
         string, thus disabling the "show short paths" functionality.
         """
-        if not cpath is None:
+        if cpath is not None:
             self._commonpath = cpath
         elif len(self.childs) == 0:
             # If a group has no repo items, the common path is empty
@@ -624,8 +625,6 @@ class RepoGroupItem(RepoTreeItem):
                       for child in self.childs
                       if not isinstance(child, RepoGroupItem)]
             self._commonpath = os.path.dirname(os.path.commonprefix(childs))
-
-        return self._commonpath
 
     def getCommonPath(self):
         return self._commonpath
