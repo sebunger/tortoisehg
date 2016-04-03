@@ -579,6 +579,11 @@ INFO = (
           'section of your Mercurial configuration files.  If left '
           'unspecified, TortoiseHg will use the first applicable tool '
           'it finds.')),
+    _fi(_('CLI Editor'), 'ui.editor',
+        (genEditableDeferredCombo, findEditors),
+        _('The editor used by Mercurial command line commands to '
+          'collect multiline input from the user.  Most notably, '
+          'commit messages.')),
     _fi(_('Shell'), 'tortoisehg.shell',
         (genEditableDeferredCombo, findTerminals),
         _('Specify the command to launch your preferred terminal shell '
@@ -612,7 +617,8 @@ INFO = (
           'A value of zero implies no limit.  Default: 1024 (1MB)')),
     _fi(_('Fork GUI'), 'tortoisehg.guifork', genBoolRBGroup,
         _('When running from the command line, fork a background '
-          'process to run graphical dialogs.  Default: True'),
+          'process to run graphical dialogs. This setting is ignored when '
+          'TortoiseHg runs as an OS X application bundle.  Default: True'),
         globalonly=True),
     _fi(_('Full Path Title'), 'tortoisehg.fullpath', genBoolRBGroup,
         _('Show a full directory path of the repository in the dialog title '
@@ -1097,6 +1103,13 @@ INFO = (
           'stored')),
     )),
 
+({'name': 'simplelock', 'label': _('Simplelock'), 'icon': 'thg-password',
+  'extension': 'simplelock'}, (
+    _fi(_('Lock Clone'), 'simplelock.repo', genEditCombo,
+        _('Location of local clone of organizational lock repository.<p>'
+          'This repository must contain a "locked" text file')),
+    )),
+
 ({'name': 'largefiles', 'label': _('Largefiles'), 'icon': 'kiln',
   'extension': 'largefiles'}, (
     _fi(_('Patterns'), 'largefiles.patterns', genEditCombo,
@@ -1202,6 +1215,8 @@ class SettingsDialog(QDialog):
         self._activeformidx = configrepo and CONF_REPO or CONF_GLOBAL
         self.conftabs = QTabWidget()
         layout.addWidget(self.conftabs)
+        if qtlib.IS_RETINA:
+            self.conftabs.setIconSize(qtlib.barRetinaIconSize())
         utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('thg-userconfig'),
                              _("%s's global settings") % username())
@@ -1359,6 +1374,8 @@ class SettingsForm(QWidget):
         layout.addLayout(bothbox, 8)
         pageList = QListWidget()
         pageList.setResizeMode(QListView.Fixed)
+        if qtlib.IS_RETINA:
+            pageList.setIconSize(qtlib.listviewRetinaIconSize())
         stack = QStackedWidget()
         bothbox.addWidget(pageList, 0)
         bothbox.addWidget(stack, 1)

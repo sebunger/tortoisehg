@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
-"PO-Revision-Date: 2015-11-21 20:05+0000\n"
-"Last-Translator: Thomas LAROCHE <Unknown>\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"PO-Revision-Date: 2016-03-05 12:07+0000\n"
+"Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2015-11-22 05:12+0000\n"
-"X-Generator: Launchpad (build 17850)\n"
+"X-Launchpad-Export-Date: 2016-03-06 05:19+0000\n"
+"X-Generator: Launchpad (build 17936)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -32,8 +32,8 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "À propos"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
-msgstr "Copyright 2008-2015 Steve Borho et d'autres"
+msgid "Copyright 2008-2016 Steve Borho and others"
+msgstr "Copyright 2008-2016 Steve Borho et d'autres"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Plusieurs icônes sont offertes par les projets TortoiseSVN et Tango"
@@ -869,12 +869,14 @@ msgid "Message Translation Failure"
 msgstr "Erreur de transposition de message"
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
-"Impossible de transposer le message dans l'encodage local\n"
-"Envisager de configurer la variable d'environnement HGENCODING\n"
+"Impossible de transposer le message dans l'encodage local.\n"
+"Envisager de configurer la variable d'environnement HGENCODING.\n"
+"\n"
 "Remplacer les caractères non-transposables par \"?\" ?\n"
 
 msgid "&Replace"
@@ -1317,14 +1319,6 @@ msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr ""
 "Le nom du hook ne peut pas contenir d'espace, de tabulation ou de caractère "
 "'='."
-
-#, python-format
-msgid "command parse error: %s"
-msgstr "erreur d'analyse de la commande : %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "aucune correspondance trouvée : %s"
 
 msgid "Console"
 msgstr "Console"
@@ -2414,6 +2408,94 @@ msgstr "Ajouter comme &Largefiles"
 msgid "Add as &Normal Files"
 msgstr "Ajouter comme fichiers &normaux"
 
+msgid "Invalid Patterns"
+msgstr "Motifs invalides"
+
+msgid "Failed to process largefiles.patterns."
+msgstr "Impossible de traiter largefiles.patterns."
+
+msgid "Word docs (*.doc *.docx)"
+msgstr "Documents Word (*.doc *.docx)"
+
+msgid "PDF docs (*.pdf)"
+msgstr "Documents PDF (*.pdf)"
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr "Fichiers Excel (*.xls *.xlsx)"
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr "Outil de verrouillage TortoiseHg - %s"
+
+msgid "Refresh lock information"
+msgstr "Rafraîchir l'information de verrouillage"
+
+msgid "Lock a file not described in .hglocks"
+msgstr "Verrouiller un fichier non décrit dans .hglocks"
+
+msgid "Stop current operation"
+msgstr "Arrêter l'opération en cours"
+
+msgid "Locked And Lockable Files:"
+msgstr "Fichiers verrouillés et verrouillables :"
+
+msgid "Path"
+msgstr "Chemin"
+
+msgid "Locking User"
+msgstr "Utilisateur qui verrouille"
+
+msgid "Purpose"
+msgstr "But"
+
+msgid "Simplelock extension not enabled"
+msgstr "Extension simplelock pas activée"
+
+msgid "Please enable and configure simplelock"
+msgstr "Activez et configurez simplelock"
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr "Ouvrir un fichier (non fusionnable) que vous voulez verrouiller"
+
+msgid "File was not within current repository"
+msgstr "Fichier n'était pas dans le dépôt actuel"
+
+#, python-format
+msgid "Locking %s"
+msgstr "Verrouillage de %s"
+
+#, python-format
+msgid "Unlocking %s"
+msgstr "Déverrouillage de %s"
+
+msgid "Refreshing locks..."
+msgstr "Rafraîchissement des verrous..."
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr "Verrouillage réussi de %s"
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr "Verrouillage raté de %s, réessayez"
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr "Déverrouillage raté de %s, réessayez"
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr "Déverrouillage réussi de %s"
+
+msgid "Ready, double click to lock or unlock"
+msgstr "Prêt, double cliquer pour verrouiller ou déverrouiller"
+
+msgid "Ready"
+msgstr "Prêt"
+
+msgid "You can only release your own locks"
+msgstr "Vous pouvez relâcher uniquement vos verrous"
+
 msgid "Find revisions matching fields of:"
 msgstr "Trouver les révisions correspondant aux champs de :"
 
@@ -2528,9 +2610,8 @@ msgstr "Ou utiliser :"
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr "Forcer une fusion avec les modifications en suspens (-f/--force)"
 
-msgid "Discard all changes from merge target (other) revision"
-msgstr ""
-"Abandonner tous les changements de la révision (autre) cible de la fusion"
+msgid "Discard all changes from the other revision"
+msgstr "Abandonner tous les changements de l'autre révision"
 
 msgid "&Discard"
 msgstr "Abandonner"
@@ -3551,20 +3632,6 @@ msgstr "remplissage (%d)"
 msgid "Mercurial User"
 msgstr "Utilisateur Mercurial"
 
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr "Type de dépôt non pris en charge (%s)"
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr "Impossible d'ouvrir des dépôts ou des sous-dépôts non Mercurial"
-
-msgid "Confirm Delete"
-msgstr "Confirmer la suppression"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr "Supprimer le groupe '%s' et toutes ses entrées ?"
-
 msgid "Repository Registry"
 msgstr "Registre des dépôts"
 
@@ -3816,8 +3883,22 @@ msgstr ""
 "Ne peut pas mettre à jour le fichier .hgsub.<p>La suppression du sous-dépôt "
 "a échoué."
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr "Type de dépôt non pris en charge (%s)"
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr "Impossible d'ouvrir des dépôts ou des sous-dépôts non Mercurial"
+
 msgid "New Group"
 msgstr "Nouveau groupe"
+
+msgid "Confirm Delete"
+msgstr "Confirmer la suppression"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr "Supprimer le groupe '%s' et toutes ses entrées ?"
 
 msgid "Could not get subrepository list"
 msgstr "Ne peut pas obtenir la liste de sous-dépôts"
@@ -3910,9 +3991,6 @@ msgstr ""
 msgid "default"
 msgstr "par défaut"
 
-msgid "Path"
-msgstr "Chemin"
-
 msgid "C&hoose Log Columns..."
 msgstr "C&hoisir les colonnes de log..."
 
@@ -3970,9 +4048,6 @@ msgstr "Récupérer"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Tirer les révisions entrantes dans votre dépôt"
-
-msgid "Reject"
-msgstr "Rejeter"
 
 msgid "Reject incoming changesets"
 msgstr "Rejeter les révisions entrantes"
@@ -4109,6 +4184,9 @@ msgstr "Sig&ner..."
 
 msgid "&Backout..."
 msgstr "&Backout..."
+
+msgid "Revert &All Files..."
+msgstr "Rét&ablir tous les fichiers..."
 
 msgid "Copy &Hash"
 msgstr "Copier le &hash"
@@ -4315,6 +4393,16 @@ msgstr "Patches exportés"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d patches ont été exportés vers :<p><a href=\"file:///%s\">%s</a>"
+
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
+msgstr ""
+"Rétablir tous les fichiers annulera tous les changements et laissera les "
+"fichiers concernés dans un état modifié.<br><br>Êtes-vous sûr de vouloir "
+"rétablir ?<br><br>(utiliser la commande Mettre à jour pour obtenir une autre "
+"révision)"
 
 msgid "Filter b&y"
 msgstr "Filtrer par"
@@ -4677,16 +4765,6 @@ msgstr "second parent de la révision %d (c'est-à-dire révision %d)"
 
 msgid "null revision (i.e. remove file(s))"
 msgstr "révision nulle (c'est-à-dire supprimer le(s) fichier(s))"
-
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
-msgstr ""
-"Rétablir tous les fichiers annulera tous les changements et laissera les "
-"fichiers concernés dans un état modifié.<br><br>Êtes-vous sûr de vouloir "
-"rétablir ?<br><br>(utiliser la commande Mettre à jour pour obtenir une autre "
-"révision)"
 
 msgid "Changeset:"
 msgstr "Révision :"
@@ -5190,6 +5268,9 @@ msgstr "thg import [OPTION] [SOURCE]..."
 msgid "thg init [DEST]"
 msgstr "thg init [DEST]"
 
+msgid "thg lock"
+msgstr "thg lock"
+
 msgid "search for a given text or revset"
 msgstr "recherche d'un texte donné ou d'un ensemble de révisions"
 
@@ -5582,6 +5663,16 @@ msgstr ""
 "vos fichiers de configuration Mercurial. Si non spécifié, TortoiseHg "
 "utilisera le premier outil trouvé qui s'applique."
 
+msgid "CLI Editor"
+msgstr "Éditeur en ligne de commande"
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+"L'éditeur utilisé par les commandes Mercurial pour récupérer des entrées sur "
+"plusieurs lignes. Particulièrement, les messages de commit."
+
 msgid "Shell"
 msgstr "Shell"
 
@@ -5660,10 +5751,12 @@ msgstr "Créer un processus pour l'interface graphique"
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
 msgstr ""
-"Lors de l'exécution depuis la ligne de commande, crée un processus d'arrière-"
-"plan pour les boîtes de dialogue. Par défaut : Vrai"
+"Quand lancé depuis la ligne de commande, créer un processus d'arrière-plan "
+"pour les dialogues graphiques. Cette préférence est ignorée quand TortoiseHg "
+"est une application OS X. Par défaut : True"
 
 msgid "Full Path Title"
 msgstr "Chemin complet dans le titre"
@@ -6692,6 +6785,19 @@ msgid ""
 "Path to the directory where a system-wide cache of bfiles will be stored"
 msgstr "Chemin vers le répertoire où un cache système de bfiles sera stocké"
 
+msgid "Simplelock"
+msgstr "Simplelock"
+
+msgid "Lock Clone"
+msgstr "Clone de verrouillage"
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+"Emplacement du clone local du dépôt de verrou de l'organisation.<p>Ce dépôt "
+"doit contenir un fichier texte « verrouillé »"
+
 msgid "Largefiles"
 msgstr "Largefiles"
 
@@ -7259,9 +7365,6 @@ msgstr "Gérer les listes de changements Perforce en attente"
 msgid "Unbundle"
 msgstr "Dépaqueter (unbundle)"
 
-msgid "Stop current operation"
-msgstr "Arrêter l'opération en cours"
-
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Options sélectionnées :</b>"
 
@@ -7317,6 +7420,9 @@ msgstr "Confirmer la suppression du chemin"
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr "Supprimer %s du fichier de configuration de votre dépôt ?"
+
+msgid "Select repository"
+msgstr "Sélectionner un dépôt"
 
 msgid "No host specified"
 msgstr "Aucun hôte spécifié"
@@ -8135,6 +8241,12 @@ msgstr "Filtrer le graphe avec des ensembles de révisions ou des branches"
 msgid "&Workbench Toolbars"
 msgstr "Barres d'outils du &Workbench"
 
+msgid "&Lock File..."
+msgstr "Verrouiller un fichier..."
+
+msgid "Lock or unlock files"
+msgstr "Verrouiller ou déverrouiller des fichiers"
+
 msgid "Update working directory or switch revisions"
 msgstr "Mettre à jour le répertoire de travail ou changer de révision"
 
@@ -8460,6 +8572,14 @@ msgstr "dans le futur"
 
 msgid "now"
 msgstr "maintenant"
+
+#, python-format
+msgid "command parse error: %s"
+msgstr "erreur d'analyse de la commande : %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "aucune correspondance trouvée : %s"
 
 msgid "Commit..."
 msgstr "Committer..."
@@ -9517,6 +9637,9 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Keywords"
 #~ msgstr "Mots-clés"
 
+#~ msgid "Reject"
+#~ msgstr "Rejeter"
+
 #~ msgid "Universal Date"
 #~ msgstr "Date Universelle"
 
@@ -10570,6 +10693,13 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Ignore changes in the amount of white space. Default: False"
 #~ msgstr "Ignorer les changements dans le nombre d'espaces. Par défaut : Faux"
 
+#~ msgid ""
+#~ "When running from the command line, fork a background process to run "
+#~ "graphical dialogs.  Default: True"
+#~ msgstr ""
+#~ "Lors de l'exécution depuis la ligne de commande, crée un processus "
+#~ "d'arrière-plan pour les boîtes de dialogue. Par défaut : Vrai"
+
 #~ msgid "Character encoding name"
 #~ msgstr "Nom de l'encodage des caractères"
 
@@ -10579,6 +10709,10 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgstr ""
 #~ "Avant de \"rebaser\", vous devez <a href=\"commit\"><b>committer</b></a> "
 #~ "ou <a href=\"discard\"><b>abandonner</b></a> les changements."
+
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr ""
+#~ "Abandonner tous les changements de la révision (autre) cible de la fusion"
 
 #~ msgid "Recover"
 #~ msgstr "Récupérer"
@@ -10646,6 +10780,15 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgstr "Backout..."
 
 #~ msgid ""
+#~ "Unable to translate message to local encoding\n"
+#~ "Consider setting HGENCODING environment variable\n"
+#~ "Replace untranslatable characters with \"?\"?\n"
+#~ msgstr ""
+#~ "Impossible de transposer le message dans l'encodage local\n"
+#~ "Envisager de configurer la variable d'environnement HGENCODING\n"
+#~ "Remplacer les caractères non-transposables par \"?\" ?\n"
+
+#~ msgid ""
 #~ "Defines the command to run when an issue number is recognized. You may "
 #~ "include groups in issue.regex, and corresponding {n} tokens in issue.link "
 #~ "(where n is a non-negative integer). {0} refers to the entire string "
@@ -10669,6 +10812,9 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgstr ""
 #~ "Avant de greffer, vous devez <a href=\"commit\"><b>committer</b></a> ou "
 #~ "<a href=\"discard\"><b>abandonner</b></a> les changements."
+
+#~ msgid "Copyright 2008-2015 Steve Borho and others"
+#~ msgstr "Copyright 2008-2015 Steve Borho et d'autres"
 
 #~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
 #~ msgstr ""

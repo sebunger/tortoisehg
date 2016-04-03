@@ -7,7 +7,7 @@
 
 import os, socket
 
-from mercurial import cmdutil, extensions, sslutil, util
+from mercurial import cmdutil, commands, extensions, sslutil, util
 
 from tortoisehg.util import hgversion
 from tortoisehg.util.i18n import agettext as _
@@ -128,3 +128,8 @@ def uisetup(ui):
         cmdtable.update(_mqcmdtable)
     except KeyError:
         pass
+
+    # ignore --no-commit on hg<3.7 (ce76c4d2b85c)
+    _aliases, entry = cmdutil.findcmd('backout', commands.table)
+    if not any(op for op in entry[1] if op[1] == 'no-commit'):
+        entry[1].append(('', 'no-commit', None, '(EXPERIMENTAL)'))

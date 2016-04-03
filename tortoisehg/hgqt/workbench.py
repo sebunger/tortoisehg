@@ -294,6 +294,11 @@ class Workbench(QMainWindow):
 
         newseparator(toolbar='edit')
         menuSync = self.menuRepository.addMenu(_('S&ynchronize'))
+        a = newaction(_("&Lock File..."), self._repofwd('lockTool'),
+                    icon='thg-password', enabled='repoopen',
+                    menu='repository', toolbar='edit',
+                    tooltip=_('Lock or unlock files'))
+        self.lockToolAction = a
         newseparator(menu='repository')
         newaction(_("&Update..."), self._repofwd('updateToRevision'),
                   icon='hg-update', enabled='repoopen',
@@ -729,6 +734,7 @@ class Workbench(QMainWindow):
                 a.setChecked(False)
             if self.actionSelectTaskPbranch is not None:
                 self.actionSelectTaskPbranch.setVisible(False)
+            self.lockToolAction.setVisible(False)
         else:
             exts = repoWidget.repo.extensions()
             if self.actionSelectTaskPbranch is not None:
@@ -736,6 +742,7 @@ class Workbench(QMainWindow):
             name = repoWidget.currentTaskTabName()
             for action in self.actionGroupTaskView.actions():
                 action.setChecked(str(action.data().toString()) == name)
+            self.lockToolAction.setVisible('simplelock' in exts)
         self._updateShowConsoleAction()
 
         for i, a in enumerate(a for a in self.actionGroupTaskView.actions()
@@ -906,6 +913,8 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(str, str)
     def _openClonedRepo(self, root, sourceroot):
+        root = unicode(root)
+        sourceroot = unicode(sourceroot)
         self.reporegistry.addClonedRepo(root, sourceroot)
         self.showRepo(root)
 

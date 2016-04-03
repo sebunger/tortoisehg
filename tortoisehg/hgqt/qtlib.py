@@ -255,7 +255,7 @@ def openshell(root, reponame, ui=None):
                    _('A terminal shell must be configured'))
 
 
-def isdarktheme(palette=None):
+def isDarkTheme(palette=None):
     """True if white-on-black color scheme is preferable"""
     if not palette:
         palette = QApplication.palette()
@@ -486,7 +486,7 @@ def descriptionhtmlizer(ui):
 
 _iconcache = {}
 
-if getattr(sys, 'frozen', False):
+if getattr(sys, 'frozen', False) and os.name == 'nt':
     def iconpath(f, *insidef):
         return posixpath.join(':/icons', f, *insidef)
 else:
@@ -628,6 +628,9 @@ def toolBarIconSize():
     s = style.pixelMetric(QStyle.PM_ToolBarIconSize)
     s = _fixIconSizeForRetinaDisplay(s)
     return QSize(s, s)
+
+def listviewRetinaIconSize():
+    return QSize(16, 16)
 
 def treeviewRetinaIconSize():
     return QSize(16, 16)
@@ -1253,6 +1256,8 @@ def _configuredusername(ui):
         and not os.environ.get('EMAIL')):
         return None
     try:
+        if ui.configbool('ui', 'askusername'):
+            ui.setconfig('ui', 'askusername', False)
         return ui.username()
     except error.Abort:
         return None
@@ -1347,7 +1352,7 @@ class PaletteSwitcher(object):
     def __init__(self, targetwidget):
         self._targetwref = weakref.ref(targetwidget)  # avoid circular ref
         self._defaultpalette = targetwidget.palette()
-        if not isdarktheme(self._defaultpalette):
+        if not isDarkTheme(self._defaultpalette):
             filterbgcolor = QColor('#FFFFB7')
         else:
             filterbgcolor = QColor('darkgrey')

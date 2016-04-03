@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
-"PO-Revision-Date: 2015-06-28 12:58+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"PO-Revision-Date: 2016-02-13 18:28+0000\n"
+"Last-Translator: Aldwoni <aldwoni@gmail.com>\n"
 "Language-Team: Dutch <nl@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2015-11-02 05:11+0000\n"
-"X-Generator: Launchpad (build 17838)\n"
+"X-Launchpad-Export-Date: 2016-02-29 05:29+0000\n"
+"X-Generator: Launchpad (build 17925)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -25,13 +25,13 @@ msgid "Exit"
 msgstr "Afsluiten"
 
 msgid "hg lighthg"
-msgstr ""
+msgstr "hg lighthg"
 
 msgid "About"
 msgstr "Info"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
-msgstr ""
+msgid "Copyright 2008-2016 Steve Borho and others"
+msgstr "Copyright 2008-2016 Steve Borho en anderen"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr ""
@@ -302,7 +302,7 @@ msgid "Known bad revision:"
 msgstr "Gekende slechte revisie:"
 
 msgid "Discard local changes (revert --all)"
-msgstr ""
+msgstr "Verwijder lokale veranderingen (revert --all)"
 
 msgid "Revision is &Good"
 msgstr "Revisie is &Goed"
@@ -311,7 +311,7 @@ msgid "Revision is &Bad"
 msgstr "Revisie is &Slecht"
 
 msgid "&Skip this Revision"
-msgstr ""
+msgstr "&Sla deze herziening over"
 
 msgid "Close"
 msgstr "Sluiten"
@@ -387,10 +387,10 @@ msgid "Bookmark '%s' has been renamed to '%s'"
 msgstr "Bladwijzer '%s' werd hernoemd naar '%s'"
 
 msgid "TortoiseHg Bookmark Sync"
-msgstr ""
+msgstr "TortoiseHg Bookmark Sync"
 
 msgid "Outgoing Bookmarks"
-msgstr ""
+msgstr "Uitgaande Bladwijzers"
 
 msgid "&Push Bookmark"
 msgstr ""
@@ -399,7 +399,7 @@ msgid "&Remove Bookmark"
 msgstr ""
 
 msgid "Incoming Bookmarks"
-msgstr ""
+msgstr "Binnenkomende Bladwijzers"
 
 msgid "P&ull Bookmark"
 msgstr ""
@@ -867,13 +867,11 @@ msgid "Message Translation Failure"
 msgstr "Bericht Vertalen gefaald"
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
-"Kan bericht niet vertalen naar lokale codering\n"
-"Overweeg om omgevingsvariabele HGENCODING in te stellen\n"
-"Onvertaalbare tekens vervangen met \"?\"?\n"
 
 msgid "&Replace"
 msgstr "Vervangen"
@@ -1303,14 +1301,6 @@ msgstr "U moet een geldig hook type instellen."
 
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "De hook naam mag geen spaties, tabs of '=' tekens bevatten."
-
-#, python-format
-msgid "command parse error: %s"
-msgstr "fout bij ontleden opdracht: %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "geen overeenkomsten gevonden: %s"
 
 msgid "Console"
 msgstr ""
@@ -2391,6 +2381,94 @@ msgstr "Voeg toe als Grote Bestanden"
 msgid "Add as &Normal Files"
 msgstr "Voeg toe als Normale Bestanden"
 
+msgid "Invalid Patterns"
+msgstr ""
+
+msgid "Failed to process largefiles.patterns."
+msgstr ""
+
+msgid "Word docs (*.doc *.docx)"
+msgstr ""
+
+msgid "PDF docs (*.pdf)"
+msgstr ""
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr ""
+
+msgid "Refresh lock information"
+msgstr ""
+
+msgid "Lock a file not described in .hglocks"
+msgstr ""
+
+msgid "Stop current operation"
+msgstr "Stop huidige bewerking"
+
+msgid "Locked And Lockable Files:"
+msgstr ""
+
+msgid "Path"
+msgstr "Pad"
+
+msgid "Locking User"
+msgstr ""
+
+msgid "Purpose"
+msgstr ""
+
+msgid "Simplelock extension not enabled"
+msgstr ""
+
+msgid "Please enable and configure simplelock"
+msgstr ""
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr ""
+
+msgid "File was not within current repository"
+msgstr ""
+
+#, python-format
+msgid "Locking %s"
+msgstr ""
+
+#, python-format
+msgid "Unlocking %s"
+msgstr ""
+
+msgid "Refreshing locks..."
+msgstr ""
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr ""
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr ""
+
+msgid "Ready, double click to lock or unlock"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "You can only release your own locks"
+msgstr ""
+
 msgid "Find revisions matching fields of:"
 msgstr "Zoek revisies die overeenkomen met velden van:"
 
@@ -2504,8 +2582,8 @@ msgstr "Of gebruik:"
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr "Forceer samenvoeging met uitstaande wijzigingen (-f/--force)"
 
-msgid "Discard all changes from merge target (other) revision"
-msgstr "Verwerp alle wijzigingen van de samenvoeg-doelrevisie (andere)"
+msgid "Discard all changes from the other revision"
+msgstr ""
 
 msgid "&Discard"
 msgstr "&Verwerpen"
@@ -3523,20 +3601,6 @@ msgstr "bezig met opvullen (%d)"
 msgid "Mercurial User"
 msgstr "Mercurial Gebruiker"
 
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr "Repository type (%s) wordt niet ondersteund"
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr "Kan geen niet-Mercurial repositories of subrepositories openen"
-
-msgid "Confirm Delete"
-msgstr "Bevestig Verwijderen"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr "Groep '%s' en al zijn elementen Verwijderen?"
-
 msgid "Repository Registry"
 msgstr "Repository Register"
 
@@ -3779,8 +3843,22 @@ msgstr ""
 msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
 msgstr ""
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr "Repository type (%s) wordt niet ondersteund"
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr "Kan geen niet-Mercurial repositories of subrepositories openen"
+
 msgid "New Group"
 msgstr "Nieuwe Groep"
+
+msgid "Confirm Delete"
+msgstr "Bevestig Verwijderen"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr "Groep '%s' en al zijn elementen Verwijderen?"
 
 msgid "Could not get subrepository list"
 msgstr "Kon repository lijst niet bekomen"
@@ -3874,9 +3952,6 @@ msgstr ""
 msgid "default"
 msgstr "standaard"
 
-msgid "Path"
-msgstr "Pad"
-
 msgid "C&hoose Log Columns..."
 msgstr "Kies Log Kolommen..."
 
@@ -3934,9 +4009,6 @@ msgstr "Pull"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Pull inkomende changesets in de repository"
-
-msgid "Reject"
-msgstr "Verwerpen"
 
 msgid "Reject incoming changesets"
 msgstr "Verwerp inkomende changesets"
@@ -4072,6 +4144,9 @@ msgstr ""
 
 msgid "&Backout..."
 msgstr "&Backout..."
+
+msgid "Revert &All Files..."
+msgstr ""
 
 msgid "Copy &Hash"
 msgstr "&Hash Kopiëren"
@@ -4278,6 +4353,16 @@ msgstr "De patches zijn geëxporteerd"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d patches werden geëxporteerd naar: <p><a href=\"file:///%s\">%s</a>"
+
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
+msgstr ""
+"Alle bestanden omkeren zal de wijzigingen teniet doen en de betrokken "
+"bestanden in een gewijzigde staat achterlaten.<br><br>Bent u zeker dat u "
+"omkeren wilt gebruiken ?<br><br>(gebruik bijwerken (update) om een andere "
+"revisie uit te lezen)"
 
 msgid "Filter b&y"
 msgstr ""
@@ -4634,16 +4719,6 @@ msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
 msgstr ""
-
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
-msgstr ""
-"Alle bestanden omkeren zal de wijzigingen teniet doen en de betrokken "
-"bestanden in een gewijzigde staat achterlaten.<br><br>Bent u zeker dat u "
-"omkeren wilt gebruiken ?<br><br>(gebruik bijwerken (update) om een andere "
-"revisie uit te lezen)"
 
 msgid "Changeset:"
 msgstr "Changeset:"
@@ -5140,6 +5215,9 @@ msgstr "thg import [OPTIES] [DOEL]..."
 msgid "thg init [DEST]"
 msgstr "thg init [DOEL]"
 
+msgid "thg lock"
+msgstr ""
+
 msgid "search for a given text or revset"
 msgstr ""
 
@@ -5531,6 +5609,14 @@ msgstr ""
 "uw Mercurial configuratiebestanden. Indien dit niet gespecifiëerd wordt zal "
 "TortoiseHg de eerste toepasbare tool gebruiken die het kan vinden."
 
+msgid "CLI Editor"
+msgstr "CLI Editor"
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+
 msgid "Shell"
 msgstr "Shell"
 
@@ -5597,10 +5683,9 @@ msgstr "Fork de GUI"
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
 msgstr ""
-"Als we vanaf de opdrachtregel werken, splits een achtergrondproces af om de "
-"grafische schermen te draaien. Standaard: Ja"
 
 msgid "Full Path Title"
 msgstr "Titel met Volledig Pad"
@@ -6548,6 +6633,17 @@ msgid ""
 msgstr ""
 "Pad naar de map waar een systeemwijde cache van bfiles zal opgeslagen worden"
 
+msgid "Simplelock"
+msgstr ""
+
+msgid "Lock Clone"
+msgstr ""
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+
 msgid "Largefiles"
 msgstr "Largefiles"
 
@@ -7107,9 +7203,6 @@ msgstr "Beheer hangende perforce changelists"
 msgid "Unbundle"
 msgstr "Ontbundelen"
 
-msgid "Stop current operation"
-msgstr "Stop huidige bewerking"
-
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Gekozen Opties:</b>"
 
@@ -7165,6 +7258,9 @@ msgstr "Bevestig schrappen van pad"
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr "%s schrappen uit het repository instellingenbestand ?"
+
+msgid "Select repository"
+msgstr ""
 
 msgid "No host specified"
 msgstr ""
@@ -7972,6 +8068,12 @@ msgstr "Filter graaf met revisie sets of met takken"
 msgid "&Workbench Toolbars"
 msgstr "&Werkbank Werkbalken"
 
+msgid "&Lock File..."
+msgstr ""
+
+msgid "Lock or unlock files"
+msgstr ""
+
 msgid "Update working directory or switch revisions"
 msgstr ""
 
@@ -8286,6 +8388,14 @@ msgstr "in de toekomst"
 msgid "now"
 msgstr "nu"
 
+#, python-format
+msgid "command parse error: %s"
+msgstr "fout bij ontleden opdracht: %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "geen overeenkomsten gevonden: %s"
+
 msgid "Commit..."
 msgstr "Commit..."
 
@@ -8577,8 +8687,14 @@ msgstr ""
 #~ msgid "Error when creating repository"
 #~ msgstr "Fout tijdens aanmaken repository"
 
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr "Verwerp alle wijzigingen van de samenvoeg-doelrevisie (andere)"
+
 #~ msgid "Undo"
 #~ msgstr "Ongedaan maken"
+
+#~ msgid "Reject"
+#~ msgstr "Verwerpen"
 
 #~ msgid "Push"
 #~ msgstr "Push"
@@ -9506,9 +9622,6 @@ msgstr ""
 #~ msgid "Specify the visual editor used to view files, etc"
 #~ msgstr "Geef de visuele editor op om bestanden te bekijken, enz"
 
-#~ msgid "CLI Editor"
-#~ msgstr "CLI Editor"
-
 #~ msgid ""
 #~ "The editor to use during a commit and other instances where Mercurial "
 #~ "needs multiline input from the user.  Used by command line commands, "
@@ -9850,6 +9963,13 @@ msgstr ""
 #~ msgid "User Certificate Chain File"
 #~ msgstr "Kettingbestand Certificaat van de Gebruiker"
 
+#~ msgid ""
+#~ "When running from the command line, fork a background process to run "
+#~ "graphical dialogs.  Default: True"
+#~ msgstr ""
+#~ "Als we vanaf de opdrachtregel werken, splits een achtergrondproces af om "
+#~ "de grafische schermen te draaien. Standaard: Ja"
+
 #~ msgid "tag '%s' is not a local tag"
 #~ msgstr "etiket '%s' is geen lokaal etiket"
 
@@ -9865,6 +9985,15 @@ msgstr ""
 
 #~ msgid "Source path is empty"
 #~ msgstr "Doelpad is leeg"
+
+#~ msgid ""
+#~ "Unable to translate message to local encoding\n"
+#~ "Consider setting HGENCODING environment variable\n"
+#~ "Replace untranslatable characters with \"?\"?\n"
+#~ msgstr ""
+#~ "Kan bericht niet vertalen naar lokale codering\n"
+#~ "Overweeg om omgevingsvariabele HGENCODING in te stellen\n"
+#~ "Onvertaalbare tekens vervangen met \"?\"?\n"
 
 #~ msgid ""
 #~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="

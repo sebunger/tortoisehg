@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import glob, os, shlex
+import os
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -451,7 +451,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
         cmdline = unicode(cmdline)
         self._commandIdx = 0
         try:
-            args = list(self._parsecmdline(cmdline))
+            args = hglib.parsecmdline(cmdline, self._workingDirectory())
         except ValueError, e:
             self.closePrompt()
             self._logwidget.appendLog(unicode(e) + '\n', 'ui.error')
@@ -469,24 +469,6 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
             self._cmdtable[cmd](self, args)
         except KeyError:
             return self._runextcommand(cmdline)
-
-    def _parsecmdline(self, cmdline):
-        """Split command line string to imitate a unix shell"""
-        try:
-            # shlex can't process unicode on Python < 2.7.3
-            args = shlex.split(cmdline.encode('utf-8'))
-        except ValueError, e:
-            raise ValueError(_('command parse error: %s') % e)
-        for e in args:
-            e = util.expandpath(e).decode('utf-8')
-            if any(c in e for c in '*?[]'):
-                expanded = glob.glob(os.path.join(self._workingDirectory(), e))
-                if not expanded:
-                    raise ValueError(_('no matches found: %s') % e)
-                for p in expanded:
-                    yield p
-            else:
-                yield e
 
     def _runextcommand(self, cmdline):
         self._extproc.setWorkingDirectory(self._workingDirectory())

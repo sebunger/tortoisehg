@@ -464,7 +464,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             elif curraction._name == 'commit':
                 refreshwctx = refresh and oldpctx is not None
                 self.stwidget.setPatchContext(None)
-                allowcs = len(self.repo.parents()) == 1
+                allowcs = len(self.repo[None].parents()) == 1
         if curraction._name in ('qref', 'amend'):
             if self.lastAction not in ('qref', 'amend'):
                 self.lastCommitMsgs['commit'] = (self.msgte.text(),
@@ -511,7 +511,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         branch = hglib.fromunicode(self.branchop)
         if branch in repo.branchmap():
             # response: 0=Yes, 1=No, 2=Cancel
-            if branch in [p.branch() for p in repo.parents()]:
+            if branch in [p.branch() for p in repo[None].parents()]:
                 resp = 0
             else:
                 rev = repo[branch].rev()
@@ -633,7 +633,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     def details(self):
         mode = 'commit'
-        if len(self.repo.parents()) > 1:
+        if len(self.repo[None].parents()) > 1:
             mode = 'merge'
         dlg = DetailsDialog(self._repoagent, self.opts, self.userhist, self,
                             mode=mode)
@@ -864,8 +864,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         except UnicodeEncodeError:
             res = qtlib.CustomPrompt(
                     _('Message Translation Failure'),
-                    _('Unable to translate message to local encoding\n'
-                      'Consider setting HGENCODING environment variable\n'
+                    _('Unable to translate message to local encoding.\n'
+                      'Consider setting HGENCODING environment variable.\n\n'
                       'Replace untranslatable characters with "?"?\n'), self,
                      (_('&Replace'), _('Cancel')), 0, 1, []).run()
             if res == 0:
@@ -918,12 +918,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             if commandlines is None:
                 return
         partials = []
-        if len(repo.parents()) > 1:
+        if len(repo[None].parents()) > 1:
             merge = True
             self.files = []
         else:
             merge = False
-            files = self.stwidget.getChecked('MAR?!S')
+            files = self.stwidget.getChecked('MAR?!IS')
             # make list of files with partial change selections
             for fname, c in self.stwidget.partials.iteritems():
                 if c.excludecount > 0 and c.excludecount < len(c.hunks):
@@ -1029,7 +1029,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
         cmdline.append('--')
         cmdline.extend(map(hglib.escapepath, self.files))
-        if len(repo.parents()) == 1:
+        if len(repo[None].parents()) == 1:
             for fname in self.opts.get('autoinc', '').split(','):
                 fname = fname.strip()
                 if fname:

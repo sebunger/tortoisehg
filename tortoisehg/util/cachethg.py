@@ -8,7 +8,7 @@
 import os
 import sys
 
-from mercurial import hg, util, ui, node, merge, error, scmutil
+from mercurial import hg, util, ui, node, error, scmutil
 from tortoisehg.util import paths, debugthg, hglib
 
 debugging = False
@@ -210,8 +210,7 @@ def get_states(upath, repo=None):
         return UNKNOWN
 
     debugf("status() took %g ticks", (GetTickCount() - tc1))
-    mergestate = repo.dirstate.parents()[1] != node.nullid and \
-              hasattr(merge, 'mergestate')
+    mergestate = repo.dirstate.parents()[1] != node.nullid
 
     # cached file info
     tc = GetTickCount()
@@ -220,7 +219,7 @@ def get_states(upath, repo=None):
     add(os.path.join(root, '.hg'), NOT_IN_REPO)
     states = STATUS_STATES
     if mergestate:
-        mstate = merge.mergestate(repo)
+        mstate = hglib.readmergestate(repo)
         unresolved = [f for f in mstate if mstate[f] == 'u']
         if unresolved:
             modified = repostate[0]

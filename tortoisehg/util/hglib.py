@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+import cStringIO
+import glob
 import os
 import re
 import sys
@@ -14,6 +16,7 @@ import time
 from mercurial import ui, util, extensions
 from mercurial import encoding, templatefilters, filemerge, error, pathutil
 from mercurial import dispatch as dispatchmod
+from mercurial import merge as mergemod
 from mercurial import revset as revsetmod
 from mercurial.node import nullrev
 from hgext import mq as mqmod
@@ -136,7 +139,7 @@ def _getfirstrevisionlabel(repo, ctx):
     # see context.changectx for look-up order of labels
 
     bookmarks = ctx.bookmarks()
-    if ctx in repo.parents():
+    if ctx in repo[None].parents():
         # keep bookmark unchanged when updating to current rev
         if activebookmark(repo) in bookmarks:
             return activebookmark(repo)
@@ -193,6 +196,12 @@ def getqqueues(repo):
     except (util.Abort, EnvironmentError):
         qqueues = []
     return qqueues
+
+try:
+    readmergestate = mergemod.mergestate.read
+except AttributeError:
+    # hg<3.7 (2ddc92bae4a7, 3185c01c551c)
+    readmergestate = mergemod.mergestate
 
 def readundodesc(repo):
     """Read short description and changelog size of last transaction"""
@@ -553,6 +562,26 @@ def shortreponame(ui):
         return
     return name
 
+def extractchoices(prompttext):
+    """Extract prompt message and list of choice (char, label) pairs
+
+    This is slightly different from ui.extractchoices() in that
+    a. prompttext may be a unicode
+    b. choice label includes &-accessor
+
+    >>> extractchoices("awake? $$ &Yes $$ &No")
+    ('awake? ', [('y', '&Yes'), ('n', '&No')])
+    >>> extractchoices("line\\nbreak? $$ &Yes $$ &No")
+    ('line\\nbreak? ', [('y', '&Yes'), ('n', '&No')])
+    >>> extractchoices("want lots of $$money$$?$$Ye&s$$N&o")
+    ('want lots of $$money$$?', [('s', 'Ye&s'), ('o', 'N&o')])
+    """
+    m = re.match(r'(?s)(.+?)\$\$([^\$]*&[^ \$].*)', prompttext)
+    msg = m.group(1)
+    choices = [p.strip(' ') for p in m.group(2).split('$$')]
+    resps = [p[p.index('&') + 1].lower() for p in choices]
+    return msg, zip(resps, choices)
+
 def displaytime(date):
     return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
 
@@ -867,3 +896,65 @@ def prettifycmdline(cmdline):
     'clone svn+http://:***@example.org:8080/trunk/'
     """
     return ' '.join(_reprcmdarg(e) for e in cmdline)
+
+def parsecmdline(cmdline, cwd):
+    r"""Split command line string to imitate a unix shell
+
+    >>> origfuncs = glob.glob, os.path.expanduser, os.path.expandvars
+    >>> glob.glob = lambda p: [p.replace('*', e) for e in ['foo', 'bar', 'baz']]
+    >>> os.path.expanduser = lambda p: re.sub(r'^~', '/home/foo', p)
+    >>> os.path.expandvars = lambda p: p.replace('$var', 'bar')
+
+    emulates glob/variable expansion rule for simple cases:
+
+    >>> parsecmdline('foo * "qux quux" "*"  "*"', '.')
+    [u'foo', u'foo', u'bar', u'baz', u'qux quux', u'*', u'*']
+    >>> parsecmdline('foo /*', '.')
+    [u'foo', u'/foo', u'/bar', u'/baz']
+    >>> parsecmdline('''foo ~/bar '~/bar' "~/bar"''', '.')
+    [u'foo', u'/home/foo/bar', u'~/bar', u'~/bar']
+    >>> parsecmdline('''foo $var '$var' "$var"''', '.')
+    [u'foo', u'bar', u'$var', u'bar']
+
+    but the following cases are unsupported:
+
+    >>> parsecmdline('"foo"*"bar"', '.')  # '*' should be expanded
+    [u'foo*bar']
+    >>> parsecmdline(r'\*', '.')  # '*' should be a literal
+    [u'foo', u'bar', u'baz']
+
+    >>> glob.glob, os.path.expanduser, os.path.expandvars = origfuncs
+    """
+    _ = _gettext  # TODO: use unicode version globally
+    # shlex can't process unicode on Python < 2.7.3
+    cmdline = cmdline.encode('utf-8')
+    src = cStringIO.StringIO(cmdline)
+    lex = shlex.shlex(src, posix=True)
+    lex.whitespace_split = True
+    lex.commenters = ''
+    args = []
+    while True:
+        # peek first char of next token to guess its type. this isn't perfect
+        # but can catch common cases.
+        q = cmdline[src.tell():].lstrip(lex.whitespace)[:1]
+        try:
+            e = lex.get_token()
+        except ValueError as err:
+            raise ValueError(_('command parse error: %s') % err)
+        if e == lex.eof:
+            return args
+        e = e.decode('utf-8')
+        if q not in lex.quotes or q in lex.escapedquotes:
+            e = os.path.expandvars(e)  # $var or "$var"
+        if q not in lex.quotes:
+            e = os.path.expanduser(e)  # ~user
+        if q not in lex.quotes and any(c in e for c in '*?[]'):
+            expanded = glob.glob(os.path.join(cwd, e))
+            if not expanded:
+                raise ValueError(_('no matches found: %s') % e)
+            if os.path.isabs(e):
+                args.extend(expanded)
+            else:
+                args.extend(p[len(cwd) + 1:] for p in expanded)
+        else:
+            args.append(e)

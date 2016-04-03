@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, util, error, context, merge, scmutil
+from mercurial import hg, util, error, context, scmutil
 
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
@@ -393,7 +393,7 @@ class StatusWidget(QWidget):
             self.updateModel(self.refthread.wctx, self.refthread.wstatus,
                              self.refthread.patchecked)
         self.refthread = None
-        if len(self.repo.parents()) > 1:
+        if len(self.repo[None].parents()) > 1:
             # nuke partial selections if wctx has a merge in-progress
             self.partials = {}
         match = self.le.text()
@@ -421,7 +421,7 @@ class StatusWidget(QWidget):
                 qtlib.WarningMsgBox(_('No appropriate files'),
                                     _('No files found for this operation'),
                                     parent=self)
-        ms = merge.mergestate(self.repo)
+        ms = hglib.readmergestate(self.repo)
         tm = WctxModel(self._repoagent, wctx, wstatus, ms, self.pctx,
                        self.savechecks, self.opts, checked, self,
                        checkable=self.checkable, defcheck=self.defcheck)

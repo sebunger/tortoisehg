@@ -31,7 +31,7 @@ from tortoisehg.util import hglib, i18n
 from tortoisehg.util import version as thgversion
 from tortoisehg.hgqt import bugreport, qtlib, thgrepo, workbench
 
-if getattr(sys, 'frozen', False):
+if getattr(sys, 'frozen', False) and os.name == 'nt':
     # load icons and translations
     import icons_rc, translations_rc
 
@@ -334,7 +334,7 @@ def _fixapplicationfont():
 
 def _gettranslationpath():
     """Return path to Qt's translation file (.qm)"""
-    if getattr(sys, 'frozen', False):
+    if getattr(sys, 'frozen', False) and os.name == 'nt':
         return ':/translations'
     else:
         return QLibraryInfo.location(QLibraryInfo.TranslationsPath)

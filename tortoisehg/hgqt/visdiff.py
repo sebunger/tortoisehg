@@ -8,12 +8,10 @@
 import os
 import subprocess
 import stat
-import shutil
 import threading
-import tempfile
 import re
 
-from mercurial import hg, util, error, match, scmutil, copies
+from mercurial import util, error, match, scmutil, copies
 
 from tortoisehg.util.i18n import _
 from tortoisehg.util import hglib

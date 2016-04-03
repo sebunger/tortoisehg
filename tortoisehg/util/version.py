@@ -38,7 +38,7 @@ def liveversion():
     elif len(l) == 1: # no tag found
         u.pushbuffer()
         commands.parents(u, repo, template='{latesttag}+{latesttagdistance}-')
-        version = u.popbuffer() + l[0]
+        version = u.popbuffer().rpartition(':')[2] + l[0]
     return repo[None].branch(), version
 
 def version():

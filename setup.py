@@ -16,14 +16,21 @@ import re
 import tarfile
 from fnmatch import fnmatch
 from distutils import log
-from distutils.core import setup, Command
+if 'FORCE_SETUPTOOLS' in os.environ:
+    from setuptools import setup
+else:
+    if 'py2app' in sys.argv[1:]:
+        sys.exit("py2app requires FORCE_SETUPTOOLS=1 to be set in os.environ.")
+
+    from distutils.core import setup
+from distutils.core import Command
 from distutils.command.build import build as _build_orig
 from distutils.command.clean import clean as _clean_orig
 from distutils.spawn import spawn, find_executable
 from i18n.msgfmt import Msgfmt
 
-thgcopyright = 'Copyright (C) 2010-2015 Steve Borho and others'
-hgcopyright = 'Copyright (C) 2005-2015 Matt Mackall and others'
+thgcopyright = 'Copyright (C) 2010-2016 Steve Borho and others'
+hgcopyright = 'Copyright (C) 2005-2016 Matt Mackall and others'
 
 def _walklocales():
     podir = 'i18n/tortoisehg'
@@ -58,7 +65,7 @@ class import_po(Command):
     description = "import translations (.po file)"
     user_options = [
         ("package=", "p", ("launchpad export package or bzr repo "
-                           "[defualt: launchpad-export.tar.gz]")),
+                           "[default: launchpad-export.tar.gz]")),
         ("lang=", "l", "languages to be imported, separated by ','"),
         ]
 
@@ -224,6 +231,34 @@ class build_config(Command):
         cfgfile = os.path.join(cfgdir, 'config.py')
         self.mkpath(cfgdir)
         self.make_file(__file__, cfgfile, self._generate_config, (cfgfile,))
+
+class build_py2app_config(build_config):
+    description = 'create config module for standalone OS X bundle'
+
+    def _generate_config(self, cfgfile):
+        # Since py2app seems to ignore the build dir in favor of the src tree,
+        # ignore the given path and generate it in the source tree.  The file
+        # is conditionalized such that it won't interfere when run from source.
+        cwd = os.path.dirname(__file__)
+        cfgfile = os.path.join(cwd, 'tortoisehg', 'util', 'config.py')
+        data = {
+            'license_path': 'COPYING.txt',
+            'locale_path': 'locale',
+            'icon_path': 'icons',
+        }
+        rsrc_dir = 'os.environ["RESOURCEPATH"]'
+
+        f = open(cfgfile, "w")
+        try:
+            f.write("import os, sys\n"
+                    "\n"
+                    "if 'THG_OSX_APP' in os.environ:\n"
+                    "    nofork = True\n")
+            for k, v in sorted(data.iteritems()):
+                f.write("    %s = os.path.join(%s, '%s')\n" % (k, rsrc_dir, v))
+            f.write("    bin_path = os.path.dirname(sys.executable)\n")
+        finally:
+            f.close()
 
 class build_ui(Command):
     description = 'build PyQt user interfaces (.ui)'
@@ -410,7 +445,11 @@ class clean_local(Command):
 
 class build(_build_orig):
     sub_commands = [
-        ('build_config', lambda self: os.name != 'nt'),
+        ('build_config',
+         lambda self: (os.name != 'nt' and
+                       'py2app' not in self.distribution.commands)),
+        ('build_py2app_config',
+         lambda self: 'py2app' in self.distribution.commands),
         ('build_ui', None),
         ('build_qrc', lambda self: 'py2exe' in self.distribution.commands),
         ('build_mo', None),
@@ -429,6 +468,7 @@ class clean(_clean_orig):
 cmdclass = {
     'build': build,
     'build_config': build_config,
+    'build_py2app_config': build_py2app_config,
     'build_ui': build_ui,
     'build_qrc': build_qrc,
     'build_mo': build_mo,
@@ -510,7 +550,7 @@ def setup_windows(version):
     extra['options']['py2exe'] = {
         "skip_archive": 0,
         # Don't pull in all this MFC stuff used by the makepy UI.
-        "excludes": ("pywin,pywin.dialogs,pywin.dialogs.list,"
+        "excludes": ("pywin,pywin.dialogs,pywin.dialogs.list,setuptools"
                      "setup,distutils"),  # required only for in-place use
         "includes": includes,
         "optimize": 1,
@@ -554,6 +594,65 @@ def setup_windows(version):
 
     return _scripts, _packages, _data_files, extra
 
+def setup_osx(version):
+    _extra = {}
+
+    # This causes py2app to copy the scripts into build/ and then adjust the
+    # mode, but the build dir is ignored for some reason.
+    _scripts = ['thg']
+
+    _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg']
+    _data_files = []
+
+    def qt4_plugins(subdir, *libs):
+        from PyQt4.QtCore import QLibraryInfo
+        pluginsdir = unicode(QLibraryInfo.location(QLibraryInfo.PluginsPath))
+
+        return ('qt_plugins/' + subdir,
+                [os.path.join(pluginsdir, subdir, e) for e in libs])
+
+    _data_files.append(qt4_plugins('imageformats', 'libqsvg.dylib'))
+
+    _py2app_options = {
+        'arch': 'x86_64',
+        'argv_emulation': False,
+        'no_chdir': True,
+        'excludes': ['Carbon', 'curses', 'distools', 'distutils', 'docutils',
+                     'PyQt4.phonon', 'PyQt4.QtDeclarative', 'PyQt4.QtDesigner',
+                     'PyQt4.QtHelp', 'PyQt4.QtMultimedia', 'PyQt4.QtOpenGL',
+                     'PyQt4.QtScript', 'PyQt4.QtScriptTools', 'PyQt4.QtSql',
+                     'PyQt4.QtTest', 'PyQt4.QtWebKit', 'PyQt4.QtXmlPatterns',
+                     'py2app', 'setup', 'setuptools', 'unittest', 'PIL'],
+
+        'extra_scripts': ['contrib/hg'],
+        'iconfile': 'contrib/TortoiseHg.icns',
+        'includes': ['email.mime.text', 'sip'],
+        'packages': ['hgext', 'mercurial', 'pygments', 'tortoisehg'],
+
+        'plist': {
+            'CFBundleDisplayName': 'TortoiseHg',
+            'CFBundleExecutable': 'TortoiseHg',
+            'CFBundleIdentifier': 'org.tortoisehg.thg',
+            'CFBundleName': 'TortoiseHg',
+            'CFBundleShortVersionString': version,
+            'CFBundleVersion': version,
+            'LSEnvironment': {
+                # because launched app can't inherit environment variables from
+                # console, the encoding would be set to "ascii" by default
+                'HGENCODING': 'utf-8',
+                'THG_OSX_APP': '1',
+            },
+            'NSHumanReadableCopyright': thgcopyright,
+        },
+
+        'resources': ['COPYING.txt', 'icons', 'locale'],
+    }
+
+    _extra['app'] = ['thg']
+    _extra['setup_requires'] = ['py2app']
+    _extra['options'] = {'py2app': _py2app_options}
+
+    return _scripts, _packages, _data_files, _extra
 
 def setup_posix():
     # Specific definitios for Posix installations
@@ -610,6 +709,10 @@ if __name__ == '__main__':
         # form W.X.Y.Z, where W,X,Y,Z are numbers in the range 0..65535
         from tortoisehg.util.version import package_version
         setupversion = package_version()
+        productname = 'TortoiseHg'
+    elif sys.platform == "darwin" and 'py2app' in sys.argv[1:]:
+        (scripts, packages, data_files, extra) = setup_osx(version)
+        setupversion = version
         productname = 'TortoiseHg'
     else:
         (scripts, packages, data_files, extra) = setup_posix()

@@ -7,7 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 shortlicense = '''
-Copyright (C) 2008-2015 Steve Borho <steve@borho.org> and others.
+Copyright (C) 2008-2016 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
@@ -64,6 +64,9 @@ def portable_fork(ui, opts):
     if 'THG_GUI_SPAWN' in os.environ or (
         not opts.get('fork') and opts.get('nofork')):
         os.environ['THG_GUI_SPAWN'] = '1'
+        return
+    elif 'THG_OSX_APP' in os.environ:
+        # guifork seems to break Mac app bundles
         return
     elif ui.configbool('tortoisehg', 'guifork', None) is not None:
         if not ui.configbool('tortoisehg', 'guifork'):
@@ -857,6 +860,12 @@ def init(ui, dest='.', **opts):
     dlg = hginit.InitDialog(ui, hglib.tounicode(dest))
     dlg.newRepository.connect(qtrun.openRepoInWorkbench)
     return dlg
+
+@command('^lock|unlock', [], _('thg lock'))
+def lock(ui, repoagent, **opts):
+    """lock dialog"""
+    from tortoisehg.hgqt import locktool
+    return locktool.LockDialog(repoagent)
 
 @command('^log|history|explorer|workbench',
     [('k', 'query', '', _('search for a given text or revset')),

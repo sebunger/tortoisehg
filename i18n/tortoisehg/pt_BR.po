@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
-"PO-Revision-Date: 2015-11-01 20:32+0000\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"PO-Revision-Date: 2016-02-28 14:04+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2015-11-02 05:14+0000\n"
-"X-Generator: Launchpad (build 17838)\n"
+"X-Launchpad-Export-Date: 2016-02-29 05:34+0000\n"
+"X-Generator: Launchpad (build 17925)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servidor de Ícones Sobrepostos do TortoiseHg"
@@ -30,8 +30,8 @@ msgstr "hg lighthg"
 msgid "About"
 msgstr "Sobre"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
-msgstr "Copyright 2008-2015 Steve Borho e outros"
+msgid "Copyright 2008-2016 Steve Borho and others"
+msgstr "Copyright 2008-2016 Steve Borho e outros"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Vários ícones são cortesia dos projetos TortoiseSVN e Tango"
@@ -863,12 +863,14 @@ msgid "Message Translation Failure"
 msgstr "Falha em Tradução de Mensagem"
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
-"Incapaz de traduzir uma mensagem para a codificação local\n"
-"Considere ajustar a variável de ambiente HGENCODING\n"
+"Incapaz de traduzir uma mensagem para a codificação local.\n"
+"Considere ajustar a variável de ambiente HGENCODING.\n"
+"\n"
 "Substituir caracteres não traduzíveis por \"?\"?\n"
 
 msgid "&Replace"
@@ -1308,14 +1310,6 @@ msgstr "Você deve selecionar um tipo de gancho válido."
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr ""
 "O nome do gancho não pode conter espaços, tabulações ou caracteres '='."
-
-#, python-format
-msgid "command parse error: %s"
-msgstr "erro de análise de comando: %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "nenhuma ocorrência encontrada: %s"
 
 msgid "Console"
 msgstr "Console"
@@ -2409,6 +2403,94 @@ msgstr "Adiciona como &Largefiles"
 msgid "Add as &Normal Files"
 msgstr "Adiciona como Arquivos &Normais"
 
+msgid "Invalid Patterns"
+msgstr "Padrões Inválidos"
+
+msgid "Failed to process largefiles.patterns."
+msgstr "Erro ao processar largefiles.patterns."
+
+msgid "Word docs (*.doc *.docx)"
+msgstr "Documentos do Word (*.doc *.docx)"
+
+msgid "PDF docs (*.pdf)"
+msgstr "Documentos PDF (*.pdf)"
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr "Arquivos Excel (*.xls *.xlsx)"
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr "Ferramenta de Bloqueio do TortoiseHg - %s"
+
+msgid "Refresh lock information"
+msgstr "Atualiza informação de bloqueio"
+
+msgid "Lock a file not described in .hglocks"
+msgstr "Bloqueia um arquivo não descrito em .hglocks"
+
+msgid "Stop current operation"
+msgstr "Interrompe a operação atual"
+
+msgid "Locked And Lockable Files:"
+msgstr "Arquivos Bloqueados e Bloqueáveis:"
+
+msgid "Path"
+msgstr "Caminho"
+
+msgid "Locking User"
+msgstr "Bloqueando Usuário"
+
+msgid "Purpose"
+msgstr "Propósito"
+
+msgid "Simplelock extension not enabled"
+msgstr "Extensão simplelock não habilitada"
+
+msgid "Please enable and configure simplelock"
+msgstr "Por favor habilite e configure a extensão simplelock"
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr "Abra um arquivo (não mesclável) que você deseja bloquear"
+
+msgid "File was not within current repository"
+msgstr "O arquivo não estava dentro do repositório atual"
+
+#, python-format
+msgid "Locking %s"
+msgstr "Bloqueando %s"
+
+#, python-format
+msgid "Unlocking %s"
+msgstr "Desbloqueando %s"
+
+msgid "Refreshing locks..."
+msgstr "Atualizando bloqueios..."
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr "Bloqueio de %s realizado com sucesso"
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr "O bloqueio de %s falhou, tente novamente"
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr "O desbloqueio de %s falhou, tente novamente"
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr "Desbloqueio de %s realizado com sucesso"
+
+msgid "Ready, double click to lock or unlock"
+msgstr "Pronto, duplo clique para bloquear ou desbloquear"
+
+msgid "Ready"
+msgstr "Pronto"
+
+msgid "You can only release your own locks"
+msgstr "Você só pode liberar seus próprios bloqueios"
+
 msgid "Find revisions matching fields of:"
 msgstr "Encontrar revisões com campos correspondentes a:"
 
@@ -2523,8 +2605,8 @@ msgstr "Ou use:"
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr "Forçar mesclagem com mudanças pendentes (-f/--force)"
 
-msgid "Discard all changes from merge target (other) revision"
-msgstr "Descartar todas as mudanças da revisão alvo da mesclagem (outra)"
+msgid "Discard all changes from the other revision"
+msgstr "Descarta todas as mudanças da outra revisão"
 
 msgid "&Discard"
 msgstr "&Descartar"
@@ -3552,20 +3634,6 @@ msgstr "preenchendo (%d)"
 msgid "Mercurial User"
 msgstr "Usuário do Mercurial"
 
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr "Tipo de repositório não suportado (%s)"
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr "Não é possível abrir sub-repositórios que não sejam do Mercurial"
-
-msgid "Confirm Delete"
-msgstr "Confirmar Remoção"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr "Apagar Grupo '%s' e todas as suas entradas?"
-
 msgid "Repository Registry"
 msgstr "Registro de Repositórios"
 
@@ -3819,8 +3887,22 @@ msgstr ""
 "Não foi possível atualizar o arquivo .hgsub.<p>A remoção do sub-repositório "
 "falhou."
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr "Tipo de repositório não suportado (%s)"
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr "Não é possível abrir sub-repositórios que não sejam do Mercurial"
+
 msgid "New Group"
 msgstr "Novo Grupo"
+
+msgid "Confirm Delete"
+msgstr "Confirmar Remoção"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr "Apagar Grupo '%s' e todas as suas entradas?"
 
 msgid "Could not get subrepository list"
 msgstr "Não foi possível obter lista de sub-repositórios"
@@ -3911,9 +3993,6 @@ msgstr "Ocorreu um erro ao atualizar o arquivo hgrc do repositório (%s)"
 msgid "default"
 msgstr "padrão"
 
-msgid "Path"
-msgstr "Caminho"
-
 msgid "C&hoose Log Columns..."
 msgstr "Escol&her Colunas do Log..."
 
@@ -3971,9 +4050,6 @@ msgstr "Pull"
 
 msgid "Pull incoming changesets into your repository"
 msgstr "Traz revisões de entrada para o seu repositório (pull)"
-
-msgid "Reject"
-msgstr "Rejeitar"
 
 msgid "Reject incoming changesets"
 msgstr "Rejeita revisões de entrada"
@@ -4107,6 +4183,9 @@ msgstr "Assi&nar..."
 
 msgid "&Backout..."
 msgstr "&Backout... (Anular)"
+
+msgid "Revert &All Files..."
+msgstr "Reverter Todos os &Arquivos..."
 
 msgid "Copy &Hash"
 msgstr "Copiar &Hash"
@@ -4312,6 +4391,15 @@ msgstr "Patches exportados"
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
 msgstr "%d patches foram exportados para:<p><a href=\"file:///%s\">%s</a>"
+
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
+msgstr ""
+"Reverter todos os arquivos irá descartar mudanças e deixar os arquivos "
+"afetados em estado modificado.<br><br>Tem certeza de que deseja reverter?"
+"<br><br>(use o comando update para obter outra revisão)"
 
 msgid "Filter b&y"
 msgstr "Filtrar &por"
@@ -4672,15 +4760,6 @@ msgstr "segundo pai da revisão %d (ou seja, a revisão %d)"
 
 msgid "null revision (i.e. remove file(s))"
 msgstr "revisão nula (ou seja, remove os arquivos)"
-
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
-msgstr ""
-"Reverter todos os arquivos irá descartar mudanças e deixar os arquivos "
-"afetados em estado modificado.<br><br>Tem certeza de que deseja reverter?"
-"<br><br>(use o comando update para obter outra revisão)"
 
 msgid "Changeset:"
 msgstr "Revisão:"
@@ -5179,6 +5258,9 @@ msgstr "thg import [OPÇÃO] [ORIGEM]..."
 msgid "thg init [DEST]"
 msgstr "thg init [DEST]"
 
+msgid "thg lock"
+msgstr "thg lock"
+
 msgid "search for a given text or revset"
 msgstr "procura por um texto ou revset"
 
@@ -5572,6 +5654,16 @@ msgstr ""
 "arquivos de configuração do Mercurial.  Se não for especificado, o "
 "TortoiseHg usará a primeira ferramenta adequada que encontrar."
 
+msgid "CLI Editor"
+msgstr "Editor CLI"
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+"O editor usado pelos comandos do Mercurial para receber do usuário entradas "
+"de múltiplas linhas. Mais notavelmente, mensagens de consolidação."
+
 msgid "Shell"
 msgstr "Shell"
 
@@ -5650,10 +5742,12 @@ msgstr "Bifurcar GUI"
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
 msgstr ""
 "Ao executar pela linha de comando, cria um processo em segundo plano para "
-"executar janelas gráficas. Valor padrão: True"
+"executar janelas gráficas. Esta configuração é ignorada ao executar o "
+"TortoiseHg como um pacote de aplicativo do OSX. Valor padrão: True"
 
 msgid "Full Path Title"
 msgstr "Título com Caminho Completo"
@@ -5759,7 +5853,7 @@ msgid ""
 "name without email is shown. Default: False"
 msgstr ""
 "Mostra o nome completo do autor na visualização de log. Se não for "
-"habilitado, mostra apenas umaparte curta, geralmente o nome sem o endereço "
+"habilitado, mostra apenas uma parte curta, geralmente o nome sem o endereço "
 "de email. Padrão: False"
 
 msgid "Task Tabs"
@@ -6668,6 +6762,19 @@ msgid ""
 msgstr ""
 "Caminho para o diretório onde será armazenado um cache de sistema de bfiles"
 
+msgid "Simplelock"
+msgstr "Simplelock"
+
+msgid "Lock Clone"
+msgstr "Clone de Bloqueio"
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+"Clone local do repositório de organização de bloqueio.<p>Este repositório "
+"deve conter um arquivo texto \"locked\""
+
 msgid "Largefiles"
 msgstr "Largefiles"
 
@@ -7236,9 +7343,6 @@ msgstr "Gerenciar changelists pendentes do perforce"
 msgid "Unbundle"
 msgstr "Unbundle"
 
-msgid "Stop current operation"
-msgstr "Interrompe a operação atual"
-
 msgid "<b>Selected Options:</b>"
 msgstr "<b>Opções Selecionadas:</b>"
 
@@ -7294,6 +7398,9 @@ msgstr "Confirmação de remoção de caminho"
 #, python-format
 msgid "Delete %s from your repo configuration file?"
 msgstr "Remover %s de seu arquivo de configuração de repositório?"
+
+msgid "Select repository"
+msgstr "Selecione o repositório"
 
 msgid "No host specified"
 msgstr "Servidor não especificado"
@@ -8107,6 +8214,12 @@ msgstr "Filtra o grafo por conjunto de revisões ou ramo"
 msgid "&Workbench Toolbars"
 msgstr "Barras de Ferramentas da &Workbench"
 
+msgid "&Lock File..."
+msgstr "B&loquear Arquivo..."
+
+msgid "Lock or unlock files"
+msgstr "Bloqueia ou desbloqueia arquivos"
+
 msgid "Update working directory or switch revisions"
 msgstr "Atualiza o diretório de trabalho ou muda de revisão"
 
@@ -8435,6 +8548,14 @@ msgstr "no futuro"
 
 msgid "now"
 msgstr "agora"
+
+#, python-format
+msgid "command parse error: %s"
+msgstr "erro de análise de comando: %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "nenhuma ocorrência encontrada: %s"
 
 msgid "Commit..."
 msgstr "Commit (consolidar)..."
@@ -9516,9 +9637,6 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ msgid "Specify the visual editor used to view files, etc"
 #~ msgstr "Especifique o editor visual para ver arquivos, etc"
 
-#~ msgid "CLI Editor"
-#~ msgstr "Editor CLI"
-
 #~ msgid "Bottom Diffs"
 #~ msgstr "Diffs Embaixo"
 
@@ -10297,6 +10415,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 
 #~ msgid "Reject incoming previewed changesets"
 #~ msgstr "Rejeita revisões remotas da pré-visualização"
+
+#~ msgid "Reject"
+#~ msgstr "Rejeitar"
 
 #~ msgid "Bundle Preview"
 #~ msgstr "Pré-Visualização de Bundle"
@@ -11795,6 +11916,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ msgid "Yes (&discard changes)"
 #~ msgstr "Sim (&descartar mudanças)"
 
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr "Descartar todas as mudanças da revisão alvo da mesclagem (outra)"
+
 #~ msgid "Merge "
 #~ msgstr "Mesclagem "
 
@@ -11826,6 +11950,13 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ msgstr ""
 #~ "Antes do rebaseamento, você deve <a href=\"commit\"><b>consolidar</b></a> "
 #~ "ou <a href=\"discard\"><b>descartar</b></a> as mudanças pendentes."
+
+#~ msgid ""
+#~ "When running from the command line, fork a background process to run "
+#~ "graphical dialogs.  Default: True"
+#~ msgstr ""
+#~ "Ao executar pela linha de comando, cria um processo em segundo plano para "
+#~ "executar janelas gráficas. Valor padrão: True"
 
 #~ msgctxt "changesets"
 #~ msgid "All"
@@ -12010,6 +12141,15 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ "mensagem deve conter um link para um tíquete. Configure isto na seção de "
 #~ "configuração 'Issue'."
 
+#~ msgid ""
+#~ "Unable to translate message to local encoding\n"
+#~ "Consider setting HGENCODING environment variable\n"
+#~ "Replace untranslatable characters with \"?\"?\n"
+#~ msgstr ""
+#~ "Incapaz de traduzir uma mensagem para a codificação local\n"
+#~ "Considere ajustar a variável de ambiente HGENCODING\n"
+#~ "Substituir caracteres não traduzíveis por \"?\"?\n"
+
 #~ msgid "Similar revisions..."
 #~ msgstr "Revisões similares..."
 
@@ -12022,6 +12162,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 
 #~ msgid "&Similar Revisions..."
 #~ msgstr "Revisões &Similares..."
+
+#~ msgid "Copyright 2008-2015 Steve Borho and others"
+#~ msgstr "Copyright 2008-2015 Steve Borho e outros"
 
 #~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
 #~ msgstr "host fingerprint para %s não pode ser obtida (Python muito antigo)"

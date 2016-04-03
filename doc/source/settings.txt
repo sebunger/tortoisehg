@@ -100,6 +100,10 @@ TortoiseHg
 	of your Mercurial configuration files.  If left unspecified, TortoiseHg
 	will use the first applicable tool it finds.
 
+:guilabel:`CLI Editor:`
+	The editor used by Mercurial command line commands to collect
+	multiline input from the user.  Most notably, commit messages.
+
 :guilabel:`Shell:`
 	Specify the command to launch your preferred terminal shell
 	application. If the value includes the string ``%(reponame)s``, the

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2015-11-01 17:40-0200\n"
+"POT-Creation-Date: 2016-02-28 09:35-0300\n"
 "PO-Revision-Date: 2015-10-21 17:04+0000\n"
 "Last-Translator: Yanyong Kunok <Unknown>\n"
 "Language-Team: Thai <th@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2015-11-02 05:14+0000\n"
-"X-Generator: Launchpad (build 17838)\n"
+"X-Launchpad-Export-Date: 2016-02-29 05:33+0000\n"
+"X-Generator: Launchpad (build 17925)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -30,7 +30,7 @@ msgstr ""
 msgid "About"
 msgstr "เกี่ยวกับ"
 
-msgid "Copyright 2008-2015 Steve Borho and others"
+msgid "Copyright 2008-2016 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -847,8 +847,9 @@ msgid "Message Translation Failure"
 msgstr "การแปลข้อความไม่สำเร็จ"
 
 msgid ""
-"Unable to translate message to local encoding\n"
-"Consider setting HGENCODING environment variable\n"
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
 "Replace untranslatable characters with \"?\"?\n"
 msgstr ""
 
@@ -1248,14 +1249,6 @@ msgstr "ระบบ ประเภทของ hook ให้ถูกต้�
 
 msgid "The hook name cannot contain any spaces, tabs or '=' characters."
 msgstr "ชื่อของ hook ต้องไม่มีช่องว่าง tabs หรือ '='"
-
-#, python-format
-msgid "command parse error: %s"
-msgstr "การเรียงคำสั่งผิดพลาด : %s"
-
-#, python-format
-msgid "no matches found: %s"
-msgstr "ไม่เหมือน : %s"
 
 msgid "Console"
 msgstr "ระบบควบคุม"
@@ -2288,6 +2281,94 @@ msgstr "เพิ่ม  &Largefiles"
 msgid "Add as &Normal Files"
 msgstr "เพิ่ม &Normal Files"
 
+msgid "Invalid Patterns"
+msgstr ""
+
+msgid "Failed to process largefiles.patterns."
+msgstr ""
+
+msgid "Word docs (*.doc *.docx)"
+msgstr ""
+
+msgid "PDF docs (*.pdf)"
+msgstr ""
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr ""
+
+msgid "Refresh lock information"
+msgstr ""
+
+msgid "Lock a file not described in .hglocks"
+msgstr ""
+
+msgid "Stop current operation"
+msgstr "หยุดการทำงานปัจจุบัน"
+
+msgid "Locked And Lockable Files:"
+msgstr ""
+
+msgid "Path"
+msgstr ""
+
+msgid "Locking User"
+msgstr ""
+
+msgid "Purpose"
+msgstr ""
+
+msgid "Simplelock extension not enabled"
+msgstr ""
+
+msgid "Please enable and configure simplelock"
+msgstr ""
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr ""
+
+msgid "File was not within current repository"
+msgstr ""
+
+#, python-format
+msgid "Locking %s"
+msgstr ""
+
+#, python-format
+msgid "Unlocking %s"
+msgstr ""
+
+msgid "Refreshing locks..."
+msgstr ""
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr ""
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr ""
+
+msgid "Ready, double click to lock or unlock"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "You can only release your own locks"
+msgstr ""
+
 msgid "Find revisions matching fields of:"
 msgstr ""
 
@@ -2392,8 +2473,8 @@ msgstr "หรือ ใช้:"
 msgid "Force a merge with outstanding changes (-f/--force)"
 msgstr ""
 
-msgid "Discard all changes from merge target (other) revision"
-msgstr "ยกเลิกการเปลี่ยนแปลงทั้งหมด จากการผนวกต่างรุ่น"
+msgid "Discard all changes from the other revision"
+msgstr ""
 
 msgid "&Discard"
 msgstr ""
@@ -3376,20 +3457,6 @@ msgstr ""
 msgid "Mercurial User"
 msgstr "ผู้ใช้ Mercurial"
 
-#, python-format
-msgid "Unsupported repository type (%s)"
-msgstr ""
-
-msgid "Cannot open non Mercurial repositories or subrepositories"
-msgstr ""
-
-msgid "Confirm Delete"
-msgstr "ยืนยันการลบ"
-
-#, python-format
-msgid "Delete Group '%s' and all its entries?"
-msgstr ""
-
 msgid "Repository Registry"
 msgstr ""
 
@@ -3622,7 +3689,21 @@ msgstr "ไม่สามารถ update ไฟล์ .hgsub"
 msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
 msgstr "ไม่สามารถ update ไฟล์ .hgsub.<p>การถอน Subrepository ออก ไม่สำเร็จ."
 
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr ""
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr ""
+
 msgid "New Group"
+msgstr ""
+
+msgid "Confirm Delete"
+msgstr "ยืนยันการลบ"
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
 msgstr ""
 
 msgid "Could not get subrepository list"
@@ -3707,9 +3788,6 @@ msgstr "เิดผิดพลาดขณะปรับปรุงไฟล
 msgid "default"
 msgstr ""
 
-msgid "Path"
-msgstr ""
-
 msgid "C&hoose Log Columns..."
 msgstr ""
 
@@ -3766,9 +3844,6 @@ msgid "Pull"
 msgstr ""
 
 msgid "Pull incoming changesets into your repository"
-msgstr ""
-
-msgid "Reject"
 msgstr ""
 
 msgid "Reject incoming changesets"
@@ -3898,6 +3973,9 @@ msgid "Sig&n..."
 msgstr ""
 
 msgid "&Backout..."
+msgstr ""
+
+msgid "Revert &All Files..."
 msgstr ""
 
 msgid "Copy &Hash"
@@ -4099,6 +4177,12 @@ msgstr ""
 
 #, python-format
 msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
+msgstr ""
+
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
 msgstr ""
 
 msgid "Filter b&y"
@@ -4424,12 +4508,6 @@ msgid "revision %d's second parent (i.e. revision %d)"
 msgstr ""
 
 msgid "null revision (i.e. remove file(s))"
-msgstr ""
-
-msgid ""
-"Reverting all files will discard changes and leave affected files in a "
-"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
-"update to checkout another revision)"
 msgstr ""
 
 msgid "Changeset:"
@@ -4897,6 +4975,9 @@ msgstr ""
 msgid "thg init [DEST]"
 msgstr ""
 
+msgid "thg lock"
+msgstr ""
+
 msgid "search for a given text or revset"
 msgstr ""
 
@@ -5274,6 +5355,14 @@ msgid ""
 "first applicable tool it finds."
 msgstr ""
 
+msgid "CLI Editor"
+msgstr ""
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+
 msgid "Shell"
 msgstr ""
 
@@ -5332,7 +5421,8 @@ msgstr ""
 
 msgid ""
 "When running from the command line, fork a background process to run "
-"graphical dialogs.  Default: True"
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
 msgstr ""
 
 msgid "Full Path Title"
@@ -6130,6 +6220,17 @@ msgid ""
 "Path to the directory where a system-wide cache of bfiles will be stored"
 msgstr ""
 
+msgid "Simplelock"
+msgstr ""
+
+msgid "Lock Clone"
+msgstr ""
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+
 msgid "Largefiles"
 msgstr ""
 
@@ -6650,9 +6751,6 @@ msgstr ""
 msgid "Unbundle"
 msgstr ""
 
-msgid "Stop current operation"
-msgstr "หยุดการทำงานปัจจุบัน"
-
 msgid "<b>Selected Options:</b>"
 msgstr ""
 
@@ -6707,6 +6805,9 @@ msgstr ""
 
 #, python-format
 msgid "Delete %s from your repo configuration file?"
+msgstr ""
+
+msgid "Select repository"
 msgstr ""
 
 msgid "No host specified"
@@ -7472,6 +7573,12 @@ msgstr ""
 msgid "&Workbench Toolbars"
 msgstr ""
 
+msgid "&Lock File..."
+msgstr ""
+
+msgid "Lock or unlock files"
+msgstr ""
+
 msgid "Update working directory or switch revisions"
 msgstr ""
 
@@ -7772,6 +7879,14 @@ msgstr ""
 msgid "now"
 msgstr "ขณะนี้"
 
+#, python-format
+msgid "command parse error: %s"
+msgstr "การเรียงคำสั่งผิดพลาด : %s"
+
+#, python-format
+msgid "no matches found: %s"
+msgstr "ไม่เหมือน : %s"
+
 msgid "Commit..."
 msgstr ""
 
@@ -7933,6 +8048,9 @@ msgstr ""
 
 msgid "win32ill: interrupted while stopping message loop\n"
 msgstr ""
+
+#~ msgid "Discard all changes from merge target (other) revision"
+#~ msgstr "ยกเลิกการเปลี่ยนแปลงทั้งหมด จากการผนวกต่างรุ่น"
 
 #~ msgid ""
 #~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
