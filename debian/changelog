@@ -1,8 +1,13 @@
-tortoisehg (3.7.3-1) UNRELEASED; urgency=medium
+tortoisehg (3.7.3-1) unstable; urgency=medium
 
-  * Imported Upstream version 3.7.3.
+  * Imported Upstream version 3.7.3 (Closes: #817869).
+  * Update dependency on Mercurial 3.6 or 3.7.
+  * Bump debhelper compat to 9.
+  * Use HTTPS for Vcs URLs.
+  * Remove menu entry as it already provides a desktop entry (CTTE #741573).
+  * Update Standards-Version to 3.9.7.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Sat, 02 Apr 2016 18:24:10 -0700
+ -- Ludovico Cavedon <cavedon@debian.org>  Sat, 02 Apr 2016 19:07:34 -0700
 
 tortoisehg (3.6.2-1) unstable; urgency=low
 
