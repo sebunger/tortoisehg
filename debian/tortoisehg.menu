@@ -1,7 +1,0 @@
-?package(tortoisehg):\
-    needs="X11"\
-    section="Applications/Programming"\
-    title="TortoiseHG Workbench"\
-    command="thg --nofork"\
-    hints="SVN,VCS"\
-    icon="/usr/share/pixmaps/thg_logo.xpm"

@@ -4,7 +4,6 @@ usr/share/pixmaps
 usr/lib/python*
 debian/hgtk usr/bin/
 etc
-debian/thg_logo.xpm usr/share/pixmaps/
 debian/thg_logo.png usr/share/icons/hicolor/48x48/apps/
 contrib/thg.desktop usr/share/applications/
 
