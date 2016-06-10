@@ -158,6 +158,9 @@ class CloneWidget(cmdui.AbstractCmdWidget):
 
         self.remote_chk, self.remote_text = chktext(_('Remote command:'))
 
+        self.largefiles_chk = QCheckBox(_('Use largefiles'))
+        optbox.addWidget(self.largefiles_chk)
+
         # allow to specify start revision for p4 & svn repos.
         self.startrev_chk, self.startrev_text = chktext(_('Start revision:'),
                                                         stretch=40)
@@ -186,6 +189,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         self.insecure_chk.toggled.connect(self._composeCommand)
         self.remote_chk.toggled.connect(self._composeCommand)
         self.remote_text.textChanged.connect(self._composeCommand)
+        self.largefiles_chk.toggled.connect(self._composeCommand)
         self.startrev_chk.toggled.connect(self._composeCommand)
 
         # prepare to show
@@ -249,10 +253,11 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             'uncompressed': self.uncomp_chk.isChecked(),
             'pull': self.pproto_chk.isChecked(),
             'verbose': True,
+            'config': [],
             }
         if (self.ui.config('http_proxy', 'host')
             and not self.proxy_chk.isChecked()):
-            opts['config'] = 'http_proxy.host='
+            opts['config'].append('http_proxy.host=')
         if self.remote_chk.isChecked():
             opts['remotecmd'] = unicode(self.remote_text.text()).strip() or None
         if self.rev_chk.isChecked():
@@ -260,6 +265,8 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         if self.startrev_chk.isChecked():
             opts['startrev'] = (unicode(self.startrev_text.text()).strip()
                                 or None)
+        if self.largefiles_chk.isChecked():
+            opts['config'].append('extensions.largefiles=')
 
         src = self.source()
         dest = self.destination()

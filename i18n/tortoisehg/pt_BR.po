@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-02-28 09:35-0300\n"
-"PO-Revision-Date: 2016-02-28 14:04+0000\n"
+"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"PO-Revision-Date: 2016-05-01 03:21+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2016-02-29 05:34+0000\n"
-"X-Generator: Launchpad (build 17925)\n"
+"X-Launchpad-Export-Date: 2016-05-02 05:26+0000\n"
+"X-Generator: Launchpad (build 17995)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servidor de Ícones Sobrepostos do TortoiseHg"
@@ -599,6 +599,9 @@ msgstr "Não verificar o certificado do host"
 
 msgid "Remote command:"
 msgstr "Comando remoto:"
+
+msgid "Use largefiles"
+msgstr "Usar largefiles"
 
 msgid "Start revision:"
 msgstr "Revisão inicial:"
@@ -4103,6 +4106,9 @@ msgstr "%d revisões a serem enviadas até a revisão (#%d) / %d no total"
 msgid "Nothing to push"
 msgstr "Nenhuma revisão a ser enviada"
 
+msgid "No revision found"
+msgstr "Nenhuma revisão encontrada"
+
 #, python-format
 msgid "%s - verify repository"
 msgstr "%s - verificar repositório"
@@ -5296,6 +5302,13 @@ msgstr "uma revisão a ser postada"
 
 msgid "thg postreview [-r] REV..."
 msgstr "thg postreview [-r] REV..."
+
+msgid "reviewboard extension not enabled"
+msgstr "extensão reviewboard não habilitada"
+
+#, python-format
+msgid "see <a href=\"%(url)s\">%(url)s</a>"
+msgstr "veja <a href=\"%(url)s\">%(url)s</a>"
 
 msgid "no revisions specified"
 msgstr "nenhuma revisão especificada"

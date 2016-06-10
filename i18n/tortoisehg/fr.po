@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-02-28 09:35-0300\n"
-"PO-Revision-Date: 2016-03-05 12:07+0000\n"
+"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"PO-Revision-Date: 2016-05-10 12:17+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2016-03-06 05:19+0000\n"
-"X-Generator: Launchpad (build 17936)\n"
+"X-Launchpad-Export-Date: 2016-05-11 05:23+0000\n"
+"X-Generator: Launchpad (build 18025)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -605,6 +605,9 @@ msgstr "Ne pas vérifier le certificat de l'hôte"
 
 msgid "Remote command:"
 msgstr "Commande distante :"
+
+msgid "Use largefiles"
+msgstr "Utiliser largefiles"
 
 msgid "Start revision:"
 msgstr "Révision de début :"
@@ -4103,6 +4106,9 @@ msgstr "%d révisions sortantes jusqu'à la révision #%d / %d au total"
 msgid "Nothing to push"
 msgstr "Rien à pousser"
 
+msgid "No revision found"
+msgstr "Aucune révision trouvée"
+
 #, python-format
 msgid "%s - verify repository"
 msgstr "%s - vérifier le dépôt"
@@ -5306,6 +5312,13 @@ msgstr "une révision à poster"
 
 msgid "thg postreview [-r] REV..."
 msgstr "thg postreview [-r] REV..."
+
+msgid "reviewboard extension not enabled"
+msgstr "extension reviewboard pas activée"
+
+#, python-format
+msgid "see <a href=\"%(url)s\">%(url)s</a>"
+msgstr "voir <a href=\"%(url)s\">%(url)s</a>"
 
 msgid "no revisions specified"
 msgstr "aucune révision spécifiée"
@@ -7692,7 +7705,7 @@ msgid "<b>Host:</b> %s"
 msgstr "<b>Hôte :</b> %s"
 
 msgid "Secure HTTPS Connection"
-msgstr "Connexion HTTPS Securisée"
+msgstr "Connexion HTTPS sécurisée"
 
 msgid "Verify with Certificate Authority certificates (best)"
 msgstr ""

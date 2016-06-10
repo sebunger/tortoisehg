@@ -872,7 +872,9 @@ class Workbench(QMainWindow):
                                      _("Goto revision"),
                                      _("Enter revision identifier"))
         if ok:
-            self.gotorev(rev)
+            w = self._currentRepoWidget()
+            assert w
+            w.gotoRev(rev)
 
     @pyqtSlot(str)
     def gotorev(self, rev):

@@ -395,38 +395,36 @@ class RepoFilterBar(QToolBar):
         priomap = {self._repo.dirstate.branch(): -2, 'default': -1}
         branches = sorted(branches, key=lambda e: priomap.get(e, 0))
 
+        branches = map(hglib.tounicode, branches)
+
         self._branchCombo.blockSignals(True)
         self._branchCombo.clear()
         self._branchCombo.addItem(self._allBranchesLabel)
-        for branch in branches:
-            self._branchCombo.addItem(hglib.tounicode(branch))
-            self._branchCombo.setItemData(self._branchCombo.count() - 1,
-                                          hglib.tounicode(branch),
-                                          Qt.ToolTipRole)
+        self._branchCombo.setItemData(self._branchCombo.count() - 1, '')
+        for i, branch in enumerate(branches, self._branchCombo.count()):
+            self._branchCombo.addItem(branch)
+            self._branchCombo.setItemData(i, branch, Qt.ToolTipRole)
+            self._branchCombo.setItemData(i, branch)
         self._branchCombo.setEnabled(self.filterEnabled and bool(branches))
         self._branchCombo.blockSignals(False)
 
-        if curbranch and curbranch not in branches:
+        if not self.setBranch(curbranch):
             self._emitBranchChanged()  # falls back to "show all"
-        else:
-            self.setBranch(curbranch)
 
     @pyqtSlot(str)
     def setBranch(self, branch):
         """Change the current branch by name [unicode]"""
-        if not branch:
-            index = 0
-        else:
-            index = self._branchCombo.findText(branch)
+        index = self._branchCombo.findData(branch)
         if index >= 0:
             self._branchCombo.setCurrentIndex(index)
+            return True
+        return False
 
     def branch(self):
         """Return the current branch name [unicode]"""
-        if self._branchCombo.currentIndex() == 0:
-            return ''
-        else:
-            return unicode(self._branchCombo.currentText())
+        index = self._branchCombo.currentIndex()
+        branch = self._branchCombo.itemData(index).toString()
+        return unicode(branch)
 
     def branchAncestorsIncluded(self):
         return self._allparAction.isChecked()

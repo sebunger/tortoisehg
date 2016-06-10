@@ -16,6 +16,7 @@ import time
 from mercurial import ui, util, extensions
 from mercurial import encoding, templatefilters, filemerge, error, pathutil
 from mercurial import dispatch as dispatchmod
+from mercurial import match as matchmod
 from mercurial import merge as mergemod
 from mercurial import revset as revsetmod
 from mercurial.node import nullrev
@@ -25,7 +26,13 @@ _encoding = encoding.encoding
 _fallbackencoding = encoding.fallbackencoding
 
 # extensions which can cause problem with TortoiseHg
-_extensions_blacklist = ('color', 'pager', 'progress', 'zeroconf')
+_extensions_blacklist = (
+    'blackbox',  # mucks uimod.ui (hg 851c41a21869, issue #4489)
+    'color',
+    'pager',
+    'progress',
+    'zeroconf',
+)
 
 from tortoisehg.util import paths
 from tortoisehg.util.hgversion import hgversion
@@ -198,10 +205,12 @@ def getqqueues(repo):
     return qqueues
 
 try:
-    readmergestate = mergemod.mergestate.read
+    subdirmatcher = matchmod.subdirmatcher
 except AttributeError:
-    # hg<3.7 (2ddc92bae4a7, 3185c01c551c)
-    readmergestate = mergemod.mergestate
+    # hg<3.8 (d3f1b7ee5e70)
+    subdirmatcher = matchmod.narrowmatcher
+
+readmergestate = mergemod.mergestate.read
 
 def readundodesc(repo):
     """Read short description and changelog size of last transaction"""

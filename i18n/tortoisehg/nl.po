@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"POT-Creation-Date: 2016-04-30 11:02-0300\n"
 "PO-Revision-Date: 2016-02-13 18:28+0000\n"
 "Last-Translator: Aldwoni <aldwoni@gmail.com>\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-02-29 05:29+0000\n"
-"X-Generator: Launchpad (build 17925)\n"
+"X-Launchpad-Export-Date: 2016-05-01 05:19+0000\n"
+"X-Generator: Launchpad (build 17995)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -604,6 +604,9 @@ msgstr "Host certificaat niet kontroleren"
 
 msgid "Remote command:"
 msgstr "Externe opdracht:"
+
+msgid "Use largefiles"
+msgstr ""
 
 msgid "Start revision:"
 msgstr "Begin revisie:"
@@ -4064,6 +4067,9 @@ msgstr "%d uitgaande changesetst tot en met revisie #%d / %d in totaal"
 msgid "Nothing to push"
 msgstr "Er is niets om te pushen"
 
+msgid "No revision found"
+msgstr ""
+
 #, python-format
 msgid "%s - verify repository"
 msgstr "%s - verify repository"
@@ -5252,6 +5258,13 @@ msgid "a revision to post"
 msgstr ""
 
 msgid "thg postreview [-r] REV..."
+msgstr ""
+
+msgid "reviewboard extension not enabled"
+msgstr ""
+
+#, python-format
+msgid "see <a href=\"%(url)s\">%(url)s</a>"
 msgstr ""
 
 msgid "no revisions specified"

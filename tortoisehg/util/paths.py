@@ -55,7 +55,10 @@ def get_hg_command():
     """List of command to execute hg (equivalent to mercurial.util.hgcmd)"""
     global _hg_command
     if _hg_command is None:
-        _hg_command = _find_hg_command()
+        if 'HG' in os.environ:
+            _hg_command = os.environ['HG'].split()
+        else:
+            _hg_command = _find_hg_command()
     return _hg_command
 
 if os.name == 'nt':

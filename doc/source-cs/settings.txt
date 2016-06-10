@@ -67,10 +67,8 @@ TortoiseHg
 	Určit externí program pro porovnávání diffů (příkaz
 	extdiff)
 
-:guilabel:`Textový editor:`
-	Vybrat editor, uvedený v sekci``[editor-tools]``
-	konfiguračních souborů Mercurialu. Bez určení vybere
-	TortoiseHg první použitelný nástroj, který najde.
+:guilabel:`CLI editor:`
+    Editor, který Mercurial použije pro více řádkový vstup od uživatele, což jsou zejména zprávy komitů.
 
 :guilabel:`Terminál:`
 	Vybrat příkaz ke spuštění oblíbené konzoly. Pokud
@@ -163,9 +161,9 @@ Verpánek
 :guilabel:`Celé jméno autora:`
 	Není-li povoleno, zobrazí se ve zkrácené verzi.
 	
-:guilabel:`Ouška úkonových karet:`
+:guilabel:`Poloha úkonových karet:`
 	Orientace lišty (east, west, off) s oušky úkonových
-	karet.
+	karet. Při volbě off nejsou ouška zobrazena.
 	
 :guilabel:`Pořadí úloh úkonové lišty:`
 	Výpisem názvů lze určit počet a pořadí nástrojů lišty.
@@ -215,6 +213,9 @@ Verpánek
 	
 :guilabel:`Zobrazit rodinnou linii:`
     Zobrazit nepřímou závislost revize na grafu při 	filtrování revsetem - true, false, neurčeno; implicitně true.
+	
+	.. note::
+	   Počítání rodinné linie může být v některých případech pomalé. Očekává se, že tato volba bude odstraněna po vyřešení problému s výkonem.
 
 
 .. module:: commit.settings
@@ -226,7 +227,7 @@ Commit
 :guilabel:`Jméno uživatele:`
 	Jméno spojené s komity.
 	
-:guilabel:`Doplnit jméno uživatele:`
+:guilabel:`Požadovat jméno uživatele:`
 	Požádat o jméno uživatele, nebylo-li dosud zadáno. Implicitní nastavení je False.	
 	
 :guilabel:`Délka souhrnného řádku:`
@@ -264,7 +265,7 @@ Commit
 	Určit fázi oprávek MQ-secret místo draft. Implicitně
 	je False.
 	
-:guilabel:`Ověřit fázi subrepa:`
+:guilabel:`Ověřit fázi subrepozitáře:`
 	Ověřit fázi aktuální revize každého subrepozitáře Pro
 	jiná nastavení než "ignore" se toto ověření provádí
 	před komitem v rodičovském repozitáři. Implicitně je
@@ -589,9 +590,9 @@ Sledování problémů
 	zprávě komitu.
 	
 :guilabel:`Issue Tracker Plugin`
-	Konfiguruje plugin COM pro sledování chyb.
+	Konfiguruje pluginy COM pro sledování chyb.
 	
-:guilabel:`Konfigurovat IT`
+:guilabel:`Konfigurovat Issue Tracker`
 	Konfiguroat vybraný plugin COM Bug Tracker.
 
 	

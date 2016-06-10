@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"POT-Creation-Date: 2016-04-30 11:02-0300\n"
 "PO-Revision-Date: 2015-09-07 12:25+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2016-02-29 05:31+0000\n"
-"X-Generator: Launchpad (build 17925)\n"
+"X-Launchpad-Export-Date: 2016-05-01 05:21+0000\n"
+"X-Generator: Launchpad (build 17995)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
@@ -594,6 +594,9 @@ msgstr "ホスト証明書を検証しない"
 
 msgid "Remote command:"
 msgstr "リモートコマンド:"
+
+msgid "Use largefiles"
+msgstr ""
 
 msgid "Start revision:"
 msgstr "指定リビジョンから:"
@@ -3983,6 +3986,9 @@ msgstr "%d 件の反映候補リビジョン (リビジョン #%d まで) / 全 
 msgid "Nothing to push"
 msgstr "反映対象がありません"
 
+msgid "No revision found"
+msgstr ""
+
 #, python-format
 msgid "%s - verify repository"
 msgstr "%s - リポジトリを検証"
@@ -5141,6 +5147,13 @@ msgstr ""
 
 msgid "thg postreview [-r] REV..."
 msgstr "thg postreview [-r] REV..."
+
+msgid "reviewboard extension not enabled"
+msgstr ""
+
+#, python-format
+msgid "see <a href=\"%(url)s\">%(url)s</a>"
+msgstr ""
 
 msgid "no revisions specified"
 msgstr ""

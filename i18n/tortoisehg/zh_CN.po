@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"POT-Creation-Date: 2016-04-30 11:02-0300\n"
 "PO-Revision-Date: 2015-09-03 18:15+0000\n"
 "Last-Translator: yfdyh000 <yfdyh000@gmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2016-02-29 05:34+0000\n"
-"X-Generator: Launchpad (build 17925)\n"
+"X-Launchpad-Export-Date: 2016-05-01 05:24+0000\n"
+"X-Generator: Launchpad (build 17995)\n"
 "Language: zh_CN\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -589,6 +589,9 @@ msgstr "不验证主机证书"
 
 msgid "Remote command:"
 msgstr "远程命令:"
+
+msgid "Use largefiles"
+msgstr ""
 
 msgid "Start revision:"
 msgstr "开始版本:"
@@ -3962,6 +3965,9 @@ msgstr ""
 msgid "Nothing to push"
 msgstr "没什么可推送的"
 
+msgid "No revision found"
+msgstr ""
+
 #, python-format
 msgid "%s - verify repository"
 msgstr "%s - 验证仓库"
@@ -5098,6 +5104,13 @@ msgstr "要发布的修订"
 
 msgid "thg postreview [-r] REV..."
 msgstr "thg postreview [-r] REV..."
+
+msgid "reviewboard extension not enabled"
+msgstr ""
+
+#, python-format
+msgid "see <a href=\"%(url)s\">%(url)s</a>"
+msgstr ""
 
 msgid "no revisions specified"
 msgstr "没有指定修订版本"
