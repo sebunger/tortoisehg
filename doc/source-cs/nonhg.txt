@@ -77,22 +77,26 @@ hgsubversion, jak název napovídá, umožňuje použít Mercurial jako klientsk
 
 **Instalace**
 
-Instalační program TotroiseHg pro Window obsahuje pojítka python-svn a vlastní hgsubversion. Je pouze zapotřebí povolit
-extenzi hgsubversion v nástroji Settings nebo ručně v konfiguračním souboru Mercurial.ini::
+Instalační program TotroiseHg pro Window až k vezi 3.3.3 obsahuje pojítka python-svn a hgsubversion. Uživatelé těchto verzí mohou extenzi hgsubversion povolit konfiguračním nástrojem nebo ručně v konfig souboru Mercurial.ini::
 
 	[extensions]
 	hgsubversion = 
 
 Funkčnost instalace si ověříme zadáním `hg help hgsubversion`
 
-Podrobnosti nalezneme na stránkách wiki pro hgsubversion. Doporučujeme verzi minimálnfě 1.2.1 s Mercurialem 1.8.
+Počínaje verzí TortoiseHg 3.4 jsou knihovny subversion a příslušná poutka pro SWIG Pythonu 2.7 z instalace odebrány. Důvodem byly primárně bezpečnostní problémy v knihovnách DLL pro subversion, nad nimiž nemají správci TortoiseHg žádnou kontrolu. Důvodem byla rovněž snaha vyhnout se potřebě přikládat ke každému vydání TortoiseHg další kompletní systém správy revizí - SVN.
+
+Poutka (bindings) pro SWIG Pythonu jsou nyní k disposici jako samostatný download. Pokyny pro stažení a použití těchto poutek jsou dostupné na `Subversion bindings for Python 2.7`_.
+
+.. _Subversion bindings for Python 2.7:
+   https://bitbucket.org/tortoisehg/thg/wiki/libsvn
 
 .. warning::
-   Při klonování serveru Subversion se vřele doporučuje klonovat jenom několik prvních revizí a zbytek přetáhnout (pull). Vyskytne-li se chyba při klonování, bývá smazán celý neúplný klon. Akce pull je mnohem shovívavější. 
+	Při klonování serveru pro Subversion se doporučuje klonovat pouze několik prvních revizí a ostatní stáhnout akcí pull. Chování příkazu clone je nastaveno tak, že se při neúspěšném provedeni neúplný klon smaže, zatímco realizace příkazu pull je mnohem tolerantnější.
 
-**Integrace TortoiseHg**
+*Integrace TortoiseHg*
 
-Importované changesety ze Subversion se ve Verpánku zobrazí s původními čísly v Subversion.
+Importované changesety Subversion zobrazí původní číslo changesetu na kartě Podrobnosti revizí ve Verpánku.
 
 hg-git (git)
 ============ 
@@ -103,15 +107,15 @@ hg-git (git)
 
 hg-git, jak název naznačuje, nám umožní použít Mercurial jako klientskou aplikaci pro server git. Lze jej použít také pro přímý převod repozitáře Git do Mercurialu.
 
-**Instalace**
+*Instalace*
 
-Instalační program TotroiseHg pro Window obsahuje pojítka python-git (označovaná jako dulwich)a vlastní hg-git. Je pouze zapotřebí povolit extenzi hg-git v nástroji Settings nebo ručně v konfiguračním souboru Mercurial.ini::
+Instalační programy TortoiseHg pro Windows obsahují poutka (bindings) pro python-git (zvaná Dulich) a hg-git. Je možné je povolit nástrojem Settings nebo ručně::
 
 	[extensions]
-	hggit = 
+	hggit =
 
-Funkčnost instlace si ověříme zadáním `hg help hggit`
-
+Úspěšnost nastavení lze ověřit příkazem :command:`hg help hggit`.
+   
 Podrobnosti viz dokumentace hggit.
 
 Mějme na vědomí, že příkazy 'příchozí' a 'odchozí' při komunikaci s repozitáři git mají deformované zobrazení. Jsme tedy odkázání na prostá push a pull, což není neobvyklé při propojení s nástroji externího systému revizí.

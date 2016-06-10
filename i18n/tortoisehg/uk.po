@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-02-28 09:35-0300\n"
+"POT-Creation-Date: 2016-04-30 11:02-0300\n"
 "PO-Revision-Date: 2016-03-13 10:18+0000\n"
 "Last-Translator: onekosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2016-03-14 05:19+0000\n"
-"X-Generator: Launchpad (build 17939)\n"
+"X-Launchpad-Export-Date: 2016-05-01 05:23+0000\n"
+"X-Generator: Launchpad (build 17995)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
@@ -598,6 +598,9 @@ msgstr "Не перевіряти сертифікат вузла"
 
 msgid "Remote command:"
 msgstr "Зовнішня команда:"
+
+msgid "Use largefiles"
+msgstr ""
 
 msgid "Start revision:"
 msgstr "Початок правки:"
@@ -4071,6 +4074,9 @@ msgstr "%d вихідних наборів змін в правці #%d / %d в 
 msgid "Nothing to push"
 msgstr "Нічого виштовхувати"
 
+msgid "No revision found"
+msgstr ""
+
 #, python-format
 msgid "%s - verify repository"
 msgstr "%s - перевірка сховища"
@@ -5260,6 +5266,13 @@ msgstr "надіслати правку"
 
 msgid "thg postreview [-r] REV..."
 msgstr "thg postreview [-r] РЕВ..."
+
+msgid "reviewboard extension not enabled"
+msgstr ""
+
+#, python-format
+msgid "see <a href=\"%(url)s\">%(url)s</a>"
+msgstr ""
 
 msgid "no revisions specified"
 msgstr "відсутні визначени правки"

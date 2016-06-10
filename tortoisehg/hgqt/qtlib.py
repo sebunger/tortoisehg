@@ -1256,8 +1256,6 @@ def _configuredusername(ui):
         and not os.environ.get('EMAIL')):
         return None
     try:
-        if ui.configbool('ui', 'askusername'):
-            ui.setconfig('ui', 'askusername', False)
         return ui.username()
     except error.Abort:
         return None

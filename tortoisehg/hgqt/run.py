@@ -75,26 +75,33 @@ def portable_fork(ui, opts):
         return
     os.environ['THG_GUI_SPAWN'] = '1'
     try:
-        _forkbg()
+        _forkbg(ui)
     except OSError, inst:
         ui.warn(_('failed to fork GUI process: %s\n') % inst.strerror)
 
 # native window API can't be used after fork() on Mac OS X
 if os.name == 'posix' and sys.platform != 'darwin':
-    def _forkbg():
+    def _forkbg(ui):
         pid = os.fork()
         if pid > 0:
             sys.exit(0)
+        # disables interaction with tty, keeping logs sent to stdout/stderr
+        nullfd = os.open(os.devnull, os.O_RDONLY)
+        os.dup2(nullfd, ui.fin.fileno())
+        os.close(nullfd)
 
 else:
     _origwdir = os.getcwd()
 
-    def _forkbg():
+    def _forkbg(ui):
         # Spawn background process and exit
         cmdline = list(paths.get_thg_command())
         cmdline.extend(sys.argv[1:])
         os.chdir(_origwdir)
-        subprocess.Popen(cmdline, creationflags=qtlib.openflags)
+        # "nul" device is tty on Windows! creates pipe instead
+        p = subprocess.Popen(cmdline, stdin=subprocess.PIPE,
+                             creationflags=qtlib.openflags)
+        p.stdin.close()
         sys.exit(0)
 
 # Windows and Nautilus shellext execute
@@ -318,6 +325,8 @@ def runcommand(ui, args):
     if cmd in console_commands.split():
         d = lambda: checkedfunc(ui, *args, **cmdoptions)
     else:
+        # disables interaction with tty as it would block GUI events
+        ui.setconfig('ui', 'interactive', 'off', 'qtrun')
         portable_fork(ui, options)
         d = lambda: qtrun(checkedfunc, ui, *args, **cmdoptions)
     return _runcommand(lui, options, cmd, d)
@@ -962,6 +971,11 @@ def postreview(ui, repoagent, *pats, **opts):
     """post changesets to reviewboard"""
     from tortoisehg.hgqt import postreview as postreviewmod
     repo = repoagent.rawRepo()
+    if 'reviewboard' not in repo.extensions():
+        url = 'https://www.mercurial-scm.org/wiki/ReviewboardExtension'
+        raise util.Abort(_('reviewboard extension not enabled'),
+                         hint=(_('see <a href="%(url)s">%(url)s</a>')
+                               % {'url': url}))
     revs = opts.get('rev') or None
     if not revs and len(pats):
         revs = pats[0]

@@ -168,7 +168,7 @@ class ExceptionCatcher(QObject):
         # may show modal confirmation dialog in closeEvent().
         QTimer.singleShot(0, self._mainapp.closeAllWindows)
 
-    if os.name == 'posix' and util.safehasattr(signal, 'set_wakeup_fd'):
+    if os.name == 'posix':
         # Wake up Python interpreter via pipe so that SIGINT can be handled
         # immediately.  (http://qt-project.org/doc/qt-4.8/unix-signals.html)
 
@@ -208,7 +208,7 @@ class ExceptionCatcher(QObject):
 
         def _initWakeup(self):
             self._wakeuptimer = 0
-            if self._ui.interactive():
+            if self._ui._isatty(self._ui.fin):
                 self._wakeuptimer = self.startTimer(200)
 
         def _releaseWakeup(self):

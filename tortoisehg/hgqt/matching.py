@@ -222,7 +222,7 @@ class MatchDialog(QDialog):
                     % len(rset))
             else:
                 self.rev_to_match_info_lbl.setText(_('Revision to Match:'))
-                csinfo_update(rset[0])
+                csinfo_update(rset.first())
             validrevset = True
         except (error.LookupError, error.RepoLookupError):
             csinfo_set_text(_('<b>Unknown revision!</b>'))

@@ -520,6 +520,39 @@ class RepoWidget(QWidget):
         """Returns the current active revision"""
         return self.repoview.current_rev
 
+    def gotoRev(self, revspec):
+        """Select and scroll to the specified revision"""
+        try:
+            # try instant look up
+            if hglib.fromunicode(revspec) in self.repo:
+                self.repoview.goto(revspec)
+                return
+        except error.LookupError:
+            pass  # ambiguous node
+
+        cmdline = hglib.buildcmdargs('log', rev=revspec, template='{rev}\n')
+        sess = self._runCommand(cmdline)
+        sess.setCaptureOutput(True)
+        sess.commandFinished.connect(self._onGotoRevQueryFinished)
+
+    @qtlib.senderSafeSlot(int)
+    def _onGotoRevQueryFinished(self, ret):
+        sess = self.sender()
+        if ret != 0:
+            # warnings (e.g. "ambiguous identifier") aren't captured by
+            # showOutput(), so we have to set the error explicitly.
+            self.setInfoBar(infobar.CommandErrorInfoBar,
+                            sess.errorString() or sess.warningString())
+            return
+        output = str(sess.readAll())
+        if not output:
+            # TODO: maybe this should be a warning bar since there would be no
+            # information in log window.
+            self.setInfoBar(infobar.CommandErrorInfoBar, _('No revision found'))
+            return
+        rev = int(output.splitlines()[-1])  # pick last rev as "hg update" does
+        self.repoview.goto(rev)
+
     def showMessage(self, msg):
         self.currentMessage = msg
         if self.isVisible():

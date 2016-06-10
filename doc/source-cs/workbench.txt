@@ -4,7 +4,7 @@ Verpánek
 .. module:: workbench.dialog
    :synopsis: Primary TortoiseHg application
 
-Verpánek neboli Workbench je primární aplikace TortoiseHg. Umožňuje procházet lokálními repozitáři, předávat (commit) změny do repozitáře , provádět vyhledávání a synchronizaci s jinými repozitáři a vykonávat různé provozní úlohy. Téměř každá procedura Mercurialu je dostupná z Verpánku. Všechna tlačítka pracují s aktuálním repozitářem. 
+Verpánek neboli Workbench je primární aplikace TortoiseHg. Umožňuje procházet lokálními repozitáři,  předávat (commit) změny do repozitáře ,  provádět vyhledávání a synchronizaci s jinými repozitáři a vykonávat různé provozní úlohy. Téměř každá procedura Mercurialu je dostupná z Verpánku. Všechna tlačítka pracují s aktuálním repozitářem. 
 
 .. figure:: figures/workbench.png
     :alt: Workbench
@@ -194,26 +194,25 @@ Zobrazení této lišty (Filter Toolbaar) aktivujeme buď tlačítkem s ikonou v
 
 :guilabel:`Clear`
 	 Smaže aktuální dotaz (query). Vlastně anuluje zadání filtru.
-:guilabel:`Zápis filtru`
-	 Zde lze zapsat filtrovací podmínku. Tento widget je rozvinovací
-	 seznam, obsahující přehled předchozích filtrovacích podmínek.
-:guilabel:`Trigger revision set query`
+:guilabel:`Roletka`
+	 Zde lze zapsat filtrovací podmínku do textového pole roletkového seznamu, obsahujícího předchozí filtrovací podmínky 
+:guilabel:`Aktivovat průzkum`
 	 Aplikuje dotaz na zadanou sadu revizí.
-:guilabel:`Open advanced query editor`
+:guilabel:`Otevřít editor průzkumu`
 	 Otvírá dialogové okno "Revision Set Query". Zde můžete upřesnit svůj dotaz.
 :guilabel:`Delete`
 	 Smaže zadaný vyhledávací dotaz (query).
 :guilabel:`Filtr`
 	 Přepínač pro aktivaci filtru. Aktivní filtr prosévá changesety a
 	 barevně označí ty, které podmínce nevyhovují.
-:guilabel:`Hidden`
-	 Ukázat/Skrýt skryté changesety	 
+:guilabel:`Ukázat / Skrýt`
+	 Ukázat/skrýt skryté changesety	 
 :guilabel:`Graft`
 	 Přepínač viditelnosti gráftu 
 :guilabel:`Větev`
 	 Výběrový seznam s možností zadat typ větve - aktivní, uzavřené, všechny
 :guilabel:`Custom Filter Combo`
-	 Rozvinovací seznam jednotlivých typů větví.
+	 Rozvinovací seznam jednotlivých typů větví (stable, default, hgtk).
   
 V situaci, kdy je zobrazován seznam příchozích changesetů, vynoří se na počátku filtrovací lišty dvě tlačítka:
 
@@ -264,7 +263,7 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 :guilabel:`Diff to local...`
 	 Zobrazí změny  mezi vybranou revizí a pracovním adresářem.
 :guilabel:`Podrobnosti revize`
-	 Otevře okno se zobrazením všech složek a souborů vybrané
+	 Otevře okno Manifest se zobrazením všech složek a souborů vybrané
 	 revize včetně informací o changesetu a zprávy komitu
 :guilabel:`Filtrovat podle`
 	 Ancestors and Descendants, Author, Branch, More options...
@@ -278,11 +277,14 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 	 Otevře okno pro  zadání nazvu záložky pro vybranou revizi.
 :guilabel:`Backout...`
 	 Otevře okno "Backout" pro anulování vybrané revize.
+
+:guilabel:`Revert All Files...`
+	U všech souborů vyřadí nekomitované změny a ponechá soubory v nezměněném stavu.
 	 
 :guilabel:`Copy Hash`
-	 Zkopíruje úplný heš vybrané revize do schránky. `V operačním systému X11 se do primárního výběru při označení revize automaticky kopíruje krátký heš; vlepí se stlačením prostředního tlačítka myši`. 
+	 Zkopíruje úplný heš vybrané revize do schránky. -- `V operačním systému X11 se do primárního výběru při označení revize automaticky kopíruje krátký heš; vlepí se stlačením prostředního tlačítka myši`. 
       
-:guilabel:`Export`
+:guilabel:`Export >`
 	:guilabel:`Export patch`
 		  Generuje oprávkový soubor, obsahující změny revize.
 	:guilabel:`Email patch...`
@@ -295,15 +297,16 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 		Vytvoří svazek a uloží jej do repozitória (kořenové složky repozitáře).       
 
 	:guilabel:`Copy Patch`
-		Zkopíruje oprávku  do schránky.
+		Zkopíruje změny revize do schránky.
+		*Přístupné jen při povolené extenzi MQ*
 
 :guilabel:`Změna fáze ...`
 	Nabídne výběr fáze: public, draft, secret
     
 :guilabel:`Graft to local...`
-	Otevře okno pro vytvoření (changesetu) gráftu.    
+	Otevře dialog Graft pro zkopírování vybrané revize.  
 
-:guilabel:`Modify history`
+:guilabel:`Modify history >`
    :emphasis:`Přístupné jen při povolené extenzi MQ`:
   
    :guilabel:`Unapply Patch`
@@ -315,11 +318,8 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
    :guilabel:`Rename Patch`
 		  Přejmenovat oprávku
    :guilabel:`MQ Options`
-		  Podrobnější nastavení pro extenzi MQ		  
-
-   :emphasis:`Přístupné vždy`:
-
-		  :guilabel:`Strip`
+		  Podrobnější nastavení pro extenzi MQ.
+   :guilabel:`Strip`
 		  Odstranit vybranou revizi a všechny její potomky z repozitáře. [#rcm1]_ 
 
 		  
@@ -352,9 +352,10 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 :guilabel:`Compress history...`
 	  Otevře okno, v němž lze zkomprimovat zadaný rozsah revizí. 
 :guilabel:`Přejít ke společnému předkovi...`
-	  ...
-:guilabel:`Podobné revize ...`
-      Otevře okno pro zadání parametrů pro hledání podobných revizí.   
+	  TODO 
+:guilabel:`Filtrovat podle >`
+   Ancestors and Descendants, Author, Branch, Více možností --> Zadání dalších parametrů pro úlohu "Nalézt shodná pole revizí".
+ 
 :guilabel:`Gráftovat výběr k aktuální revizi ...`
       Přenést vybrané revize nad lokální revizi.
 	  
@@ -368,10 +369,10 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 	  Z vybraných revizí vytvoří oprávky a uloží je do schránky.   
 :guilabel:`Přejít ke společnému předkovi`
 	  viz
-:guilabel:`Podobné revize ...`
-	  Otevře okno pro zadání parametrů pro hledání podobných revizí. 
-:guilabel:`Gráftovat výběr k lokální ...`
-	  Přenést vybrané revize nad lokální revizi. 
+:guilabel:`Filtrovat podle >`
+	  Ancestors and Descendants, Author, Branch, Více možností --> viz
+:guilabel:`Gráftovat výběr k aktuální ...`
+	  Přenést vybrané revize nad aktuální revizi. 
 	  
 .. [#rcm1] Tento příkaz uloží odtržené revize do svazku souborů, které mohou  být později znovu použity. Viz také `Editing History <http://mercurial.selenic.com/wiki/EditingHistory>`_
 
@@ -398,7 +399,7 @@ Pravým poklepem na soubor v seznamu souborů aktuální revize vyvoláme kontex
 	  Otevře nadřazenou složku zkoumaného souboru.	  
 :guilabel:`Copy Path`
 	  Zkopíruje cestu k souboru do schránky.		   
-:guilabel:`Revert to revision`
+:guilabel:`Vrátit k revizi`
 	  Vrátí soubor ke stavu označené revize [#f1cm3]_.
 :guilabel:`Historie souboru`
 	  Ukáže revize, které měnily tento soubor [#f1cm4]_.   
@@ -423,7 +424,7 @@ Pravým poklepem na soubor v seznamu souborů aktuální revize vyvoláme kontex
 
 Pravý poklep na názvu souboru při aktivované úloze Commit vyvolá pro vybraný soubor odlišné kontextové menu:
 
--- **jde-li o upravené (M) soubory pracovního adresáře**:
+:strong:`Jde-li o upravené (M) soubory pracovního adresáře`:
 
 :guilabel:`Diff to Parent`
 	  Otevře diffový nástroj a zobrazí texty s označenými změnami.
@@ -448,9 +449,11 @@ Pravý poklep na názvu souboru při aktivované úloze Commit vyvolá pro vybra
 :guilabel:`Kopírovat...`
 	  Kopírovat soubor do zadané destinace.
 :guilabel:`Přejmenovat...`
-	  Přejmenovat soubor.	
-	
--- :strong:`jde-li o neznámé (?) soubory pracovního adresáře`:
+	  Přejmenovat soubor.
+:guilabel:`Seznam stavů`>
+   Manifest Mode | M, A, R, C, S | Prostý seznam
+
+:strong:`Jde-li o neznámé (?) soubory pracovního adresáře`:
 
 V tomto případě se nabídka skládá z Edit Local, Open Local, Explore Local, Copy Path, Add, Označit, Odznačit, Seznam stavů  - plus:
 
@@ -465,7 +468,7 @@ V tomto případě se nabídka skládá z Edit Local, Open Local, Explore Local,
 Analýza zpráv komitů
 --------------------
 
-V poli +/- **Changeset** na kartě Podrobnosti revizí a Manifest jsou detekovány a podtrženy heše, adresy HTTP(s) a označení chybových zpráv, nalezené ve zprávách komitů. Tyto podtržené údaje jsou aktivní linky k changesetům v Přehledu revizí. 
+V poli +/- **Changeset** na kartě Podrobnosti revizí jsou detekovány a podtrženy heše, adresy HTTP(s) a označení chybových zpráv, nalezené ve zprávách komitů. Tyto podtržené údaje jsou aktivní linky k changesetům v Přehledu revizí. 
 
 URL adresy HTTP a HTTPS se podobně změní na klikatelné linky které se otevřou ve vašem implicitním webovém prohlížeči.
 
@@ -516,6 +519,9 @@ Nastavitelné možnosti
 ---------------------
 
 Nastavitelné parametry Verpánku  lze zadat v dialogu  :menuselection:`File > Settings > Verpánek` viz odstavec 6.1.2 kapitoly 6. Nastavení parametrů.
+Konkretní barvu u parametru "Zabarvení podle autora" lze zadat v souboru :file:`Mercurial.ini`
+zápisem authorcolor.USERNAME = color v sekci [tortoisehg].
+
 
 
 
