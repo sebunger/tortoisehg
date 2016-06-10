@@ -1,3 +1,14 @@
+tortoisehg (3.8.3-1) unstable; urgency=medium
+
+  * Team upload (collab-maint)
+  * Update VCS fields
+  * Update break against mercurial
+  * Imported Upstream version 3.8.3 (Closes: #824018).
+  * New upstream release
+  * Bump std-version to 3.9.8
+
+ -- Gianfranco Costamagna <locutusofborg@debian.org>  Fri, 10 Jun 2016 14:36:24 +0200
+
 tortoisehg (3.7.3-1) unstable; urgency=medium
 
   * Imported Upstream version 3.7.3 (Closes: #817869).

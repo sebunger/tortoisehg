@@ -6,15 +6,15 @@ Uploaders: Max Bowsher <maxb@f2s.com>
 Build-Depends: debhelper (>= 9), python (>= 2.6.6-3~)
 Build-Depends-Indep: docbook-xsl, docbook-xml,
  xsltproc, python-sphinx, pyqt4-dev-tools
-Standards-Version: 3.9.7
+Standards-Version: 3.9.8
 Homepage: http://tortoisehg.bitbucket.org/
 Vcs-Git: https://anonscm.debian.org/git/collab-maint/tortoisehg.git
-Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/tortoisehg.git
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/tortoisehg.git
 X-Python-Version: >= 2.4
 
 Package: tortoisehg
 Architecture: all
-Depends: mercurial (>= 3.6~), mercurial (<< 3.8~), python-gobject (>= 2.12.1),
+Depends: mercurial (>= 3.7~), mercurial (<< 3.9~), python-gobject (>= 2.12.1),
  python-qt4 (>= 4.7), python-qscintilla2, ${shlibs:Depends}, ${misc:Depends},
  ${python:Depends}
 Recommends: libjs-jquery, libjs-underscore, python-iniparse, python-pygments
