@@ -39,7 +39,7 @@ class InitWidget(cmdui.AbstractCmdWidget):
         if ui.config('tortoisehg', 'initskel'):
             l = _('Copy working directory files from skeleton')
         else:
-            l = _('Add special files (.hgignore, ...)')
+            l = _('Create special files (.hgignore, ...)')
         self._add_files_chk = QCheckBox(l)
         self._make_pre_1_7_chk = QCheckBox(
                 _('Make repo compatible with Mercurial <1.7'))

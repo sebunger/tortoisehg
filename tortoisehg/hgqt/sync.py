@@ -1315,6 +1315,7 @@ class SecureDialog(QDialog):
         self._querybutton = qb = QPushButton(_('Query'))
         qb.clicked.connect(self._queryFingerprint)
         self.fprintradio.toggled.connect(self._updateUi)
+        self.insecureradio.toggled.connect(self._updateUi)
         hbox.addWidget(qb)
         vbox.addWidget(self.cacertradio)
         vbox.addWidget(self.fprintradio)
@@ -1326,6 +1327,18 @@ class SecureDialog(QDialog):
             self.fprintradio.setChecked(True)
         elif repo.ui.config('insecurehosts', u.host):
             self.insecureradio.setChecked(True)
+
+        self._protocolcombo = e = QComboBox(self)
+        e.addItem(_('<unspecified>'), '')
+        e.addItem(_('TLS 1.0'), 'tls1.0')
+        e.addItem(_('TLS 1.1'), 'tls1.1')
+        e.addItem(_('TLS 1.2'), 'tls1.2')
+        protocol = repo.ui.config('hostsecurity', '%s:minimumprotocol' % u.host)
+        e.setCurrentIndex(e.findData(hglib.tounicode(protocol or '')))
+        hbox = QHBoxLayout()
+        hbox.addWidget(QLabel(_('Minimum Protocol')))
+        hbox.addWidget(self._protocolcombo)
+        vbox.addLayout(hbox)
 
         self._authentries = {}  # key: QLineEdit
         authbox = QGroupBox(_('User Authentication'))
@@ -1388,7 +1401,8 @@ are expanded in the filename.'''))
 
     @pyqtSlot()
     def _queryFingerprint(self):
-        cmdline = hglib.buildcmdargs('debuggethostfingerprint', self._url)
+        cmdline = hglib.buildcmdargs('debuggethostfingerprint', self._url,
+                                     insecure=True)
         self._querysess = sess = self._repoagent.runCommand(cmdline, self)
         sess.setCaptureOutput(True)
         sess.commandFinished.connect(self._onQueryFingerprintFinished)
@@ -1453,6 +1467,10 @@ are expanded in the filename.'''))
         setorclear('hostfingerprints', self.host, fprint)
         setorclear('insecurehosts', self.host, insecure)
 
+        e = self._protocolcombo
+        protocol = hglib.fromunicode(e.itemData(e.currentIndex()).toString())
+        setorclear('hostsecurity', '%s:minimumprotocol' % self.host, protocol)
+
         cfg.set('auth', self.alias+'.prefix', self.host)
         for k in ['username', 'password', 'key', 'cert']:
             setorclear('auth', '%s.%s' % (self.alias, k),
@@ -1471,6 +1489,7 @@ are expanded in the filename.'''))
     def _updateUi(self):
         self._querybutton.setEnabled(self.fprintradio.isChecked()
                                      and self._querysess.isFinished())
+        self._protocolcombo.setEnabled(not self.insecureradio.isChecked())
 
 
 class PathsTree(QTreeView):

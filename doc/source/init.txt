@@ -18,7 +18,7 @@ the folder, type :command:`thg init`.
 	Is the directory where the repository will be created. It is
 	always filled with the current directory, so if you launch the
 	dialog from the right directory there is no reason to change it.
-:guilabel:`Add special files (.hgignore, ...)`
+:guilabel:`Create special files (.hgignore, ...)`
 	If selected TortoiseHg creates an empty :file:`.hgignore` file
 	in the working directory.
 :guilabel:`Make repo compatible with Mercurial <1.7`

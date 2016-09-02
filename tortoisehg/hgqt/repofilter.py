@@ -68,6 +68,24 @@ def _querytype(repo, query):
         pass
     return 'keyword'
 
+
+class SelectAllLineEdit(QLineEdit):
+    def __init__(self, parent=None):
+        super(SelectAllLineEdit, self).__init__(parent)
+        self.just_got_focus = False
+
+    def focusInEvent(self, ev):
+        if ev.reason() == Qt.MouseFocusReason:
+            self.just_got_focus = True
+        super(SelectAllLineEdit, self).focusInEvent(ev)
+
+    def mouseReleaseEvent(self, ev):
+        if self.just_got_focus:
+            self.just_got_focus = False
+            self.selectAll()
+        super(SelectAllLineEdit, self).mouseReleaseEvent(ev)
+
+
 class RepoFilterBar(QToolBar):
     """Toolbar for RepoWidget to filter changesets"""
 
@@ -350,9 +368,16 @@ class RepoFilterBar(QToolBar):
         self._branchLabel.setMenu(self._branchMenu)
 
         self._branchCombo = QComboBox()
+        self._branchCombo.setEditable(True)
+        self._branchCombo.setInsertPolicy(QComboBox.NoInsert)
+        self._branchCombo.setLineEdit(SelectAllLineEdit())
+        self._branchCombo.lineEdit().editingFinished.connect(
+            self._lineBranchChanged)
         self._branchCombo.setMinimumContentsLength(10)
         self._branchCombo.setMaxVisibleItems(30)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
+        completer = QCompleter(self._branchCombo.model(), self._branchCombo)
+        self._branchCombo.setCompleter(completer)
 
         self.addWidget(self._branchLabel)
         self.addWidget(qtlib.Spacer(2, 2))
@@ -406,9 +431,10 @@ class RepoFilterBar(QToolBar):
             self._branchCombo.setItemData(i, branch, Qt.ToolTipRole)
             self._branchCombo.setItemData(i, branch)
         self._branchCombo.setEnabled(self.filterEnabled and bool(branches))
+        self.setBranch(curbranch)
         self._branchCombo.blockSignals(False)
 
-        if not self.setBranch(curbranch):
+        if self.branch() != curbranch:
             self._emitBranchChanged()  # falls back to "show all"
 
     @pyqtSlot(str)
@@ -417,8 +443,6 @@ class RepoFilterBar(QToolBar):
         index = self._branchCombo.findData(branch)
         if index >= 0:
             self._branchCombo.setCurrentIndex(index)
-            return True
-        return False
 
     def branch(self):
         """Return the current branch name [unicode]"""
@@ -439,6 +463,12 @@ class RepoFilterBar(QToolBar):
     def _emitBranchChanged(self):
         self.branchChanged.emit(self.branch(),
                                 self.branchAncestorsIncluded())
+
+    @pyqtSlot()
+    def _lineBranchChanged(self):
+        written_branch = self._branchCombo.currentText()
+        if not written_branch:
+            self._branchCombo.setCurrentIndex(0)
 
     @pyqtSlot()
     def refresh(self):

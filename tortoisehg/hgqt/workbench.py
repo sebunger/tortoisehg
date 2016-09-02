@@ -102,6 +102,7 @@ class Workbench(QMainWindow):
         tw.currentTitleChanged.connect(self._updateWindowTitle)
         tw.historyChanged.connect(self._updateHistoryActions)
         tw.makeLogVisible.connect(self._setConsoleVisible)
+        tw.taskTabVisibilityChanged.connect(self._updateTaskTabVisibilityAction)
         tw.toolbarVisibilityChanged.connect(self._updateToolBarActions)
 
         self.setCentralWidget(tw)
@@ -154,6 +155,8 @@ class Workbench(QMainWindow):
         newaction(_("&Close Repository"), self.closeCurrentRepoTab,
                   shortcut='Close', enabled='repoopen', menu='file')
         newseparator(menu='file')
+        self.menuFile.addActions(self.repoTabsWidget.tabSwitchActions())
+        newseparator(menu='file')
         newaction(_('&Settings'), self.editSettings, icon='thg-userconfig',
                   shortcut='Preferences', menu='file')
         newseparator(menu='file')
@@ -200,6 +203,11 @@ class Workbench(QMainWindow):
         newaction(_("Sa&ve Current Sync Paths on Exit"), checkable=True,
                   menu='view')
         newseparator(menu='view')
+
+        a = newaction(_('Show Tas&k Tab'), shortcut='Alt+0', checkable=True,
+                      enabled='repoopen', menu='view')
+        a.triggered.connect(self._setRepoTaskTabVisible)
+        self.actionTaskTabVisible = a
 
         self.actionGroupTaskView = QActionGroup(self)
         self.actionGroupTaskView.triggered.connect(self._onSwitchRepoTaskTab)
@@ -608,6 +616,13 @@ class Workbench(QMainWindow):
             rw.switchToNamedTaskTab(str(action.data().toString()))
 
     @pyqtSlot(bool)
+    def _setRepoTaskTabVisible(self, visible):
+        rw = self._currentRepoWidget()
+        if not rw:
+            return
+        rw.setTaskTabVisible(visible)
+
+    @pyqtSlot(bool)
     def _setConsoleVisible(self, visible):
         if self._actionDockedConsole.isChecked():
             self._setDockedConsoleVisible(visible)
@@ -706,6 +721,7 @@ class Workbench(QMainWindow):
 
         # Update actions affected by repo open/close/change
         self._updateTaskViewMenu()
+        self._updateTaskTabVisibilityAction()
         self._updateToolBarActions()
 
     @pyqtSlot()
@@ -748,6 +764,11 @@ class Workbench(QMainWindow):
         for i, a in enumerate(a for a in self.actionGroupTaskView.actions()
                               if a.isVisible()):
             a.setShortcut('Alt+%d' % (i + 1))
+
+    @pyqtSlot()
+    def _updateTaskTabVisibilityAction(self):
+        rw = self._currentRepoWidget()
+        self.actionTaskTabVisible.setChecked(bool(rw) and rw.isTaskTabVisible())
 
     @pyqtSlot()
     def _updateHistoryActions(self):

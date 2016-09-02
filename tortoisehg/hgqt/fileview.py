@@ -201,7 +201,7 @@ class HgFileView(QFrame):
         for text in '12':
             a = self._parentToggleGroup.addAction(text)
             a.setCheckable(True)
-            a.setShortcut('Ctrl+%s' % text)
+            a.setShortcut('Ctrl+Shift+%s' % text)
 
         self.actionFind = self.searchbar.toggleViewAction()
         self.actionFind.setIcon(qtlib.geticon('edit-find'))

@@ -740,6 +740,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                     text = engmsg and msgset['id'] or msgset['str']
                     self.setMessage(unicode(text) %
                                     hglib.tounicode(self.repo[None].branch()))
+            self.msgte.setFocus()
             self.refresh()
 
     def canUndo(self):

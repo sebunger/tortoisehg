@@ -20,26 +20,12 @@ from mercurial import util, error
 
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _
-from tortoisehg.hgqt import cmdcore, filedata, graph
+from tortoisehg.hgqt import cmdcore, filedata, graph, graphopt
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
 mqpatchmimetype = 'application/thg-mqunappliedpatch'
-
-# TODO: Remove these two when we adopt GTK author color scheme
-COLORS = ["blue",
-          "darkgreen",
-          "green",
-          "darkblue",
-          "purple",
-          "dodgerblue",
-          Qt.darkYellow,
-          "magenta",
-          "darkmagenta",
-          "darkcyan",
-          ]
-COLORS = [str(QColor(x).name()) for x in COLORS]
 
 # pick names from "hg help templating" if any
 GraphColumn = 0
@@ -83,17 +69,6 @@ TROUBLED_COLOR = QColor(172, 34, 34)
 
 GraphNodeRole = Qt.UserRole + 0
 LabelsRole = Qt.UserRole + 1  # [(text, style), ...]
-
-def _hashcolor(data, modulo=None):
-    """function to reliably map a string to a color index
-
-    The algorithm used is very basic and can be improved if needed.
-    """
-    if modulo is None:
-        modulo = len(COLORS)
-    idx = sum([ord(c) for c in data])
-    idx %= modulo
-    return idx
 
 def _parsebranchcolors(value):
     r"""Parse tortoisehg.branchcolors setting
@@ -188,7 +163,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     def _initBranchColors(self):
         # Always assign the first color to the default branch
-        self._branch_colors['default'] = COLORS[0]
+        self._branch_colors['default'] = graph.COLORS[0]
 
         # Set the colors specified in the tortoisehg.brachcolors config key
         self._branch_colors.update(_parsebranchcolors(
@@ -220,11 +195,19 @@ class HgRepoListModel(QAbstractTableModel):
             opts['showfamilyline'] = \
                 self.repo.ui.configbool('tortoisehg', 'showfamilyline', True)
             grapher = graph.revision_grapher(self.repo, opts)
-            return graph.Graph(self.repo, grapher, include_mq=False)
+            if self.repo.ui.configbool('tortoisehg', 'graphopt', False):
+                return graphopt.Graph(self.repo, opts)
+            return graph.Graph(self.repo, grapher)
         else:
             opts['allparents'] = self._allparents
             grapher = graph.revision_grapher(self.repo, opts)
-            return graph.Graph(self.repo, grapher, include_mq=True)
+            if self.repo.ui.configbool('tortoisehg', 'graphopt', False):
+                g = graphopt.Graph(self.repo, opts)
+            else:
+                g = graph.Graph(self.repo, grapher)
+            if self.repo.thgmqunappliedpatches:
+                g = graph.GraphWithMq(g, self.repo.thgmqunappliedpatches)
+            return g
 
     @pyqtSlot()
     def _reloadGraph(self):
@@ -265,7 +248,11 @@ class HgRepoListModel(QAbstractTableModel):
                 raise
             self._expandRowCount()  # old rows may be mapped to inserted rows
             for rev, ois in oldindexmap.iteritems():
-                row = self.graph.index(rev)
+                try:
+                    row = self.graph.index(rev)
+                except ValueError:
+                    # rev stripped or patch (un-)applied, map to invalid index
+                    row = -1
                 nis = [self.index(row, i.column(), i.parent()) for i in ois]
                 self.changePersistentIndexList(ois, nis)
             self._shrinkRowCount()  # old rows should be mapped before removal
@@ -451,15 +438,15 @@ class HgRepoListModel(QAbstractTableModel):
     def _user_color(self, user):
         'deprecated, please replace with hgtk color scheme'
         if user not in self._user_colors:
-            idx = _hashcolor(user)
-            self._user_colors[user] = COLORS[idx]
+            idx = graph.hashcolor(user)
+            self._user_colors[user] = graph.COLORS[idx]
         return self._user_colors[user]
 
     def _namedbranch_color(self, branch):
         'deprecated, please replace with hgtk color scheme'
         if branch not in self._branch_colors:
-            idx = _hashcolor(branch)
-            self._branch_colors[branch] = COLORS[idx]
+            idx = graph.hashcolor(branch)
+            self._branch_colors[branch] = graph.COLORS[idx]
         return self._branch_colors[branch]
 
     def data(self, index, role=Qt.DisplayRole):
@@ -642,7 +629,8 @@ class HgRepoListModel(QAbstractTableModel):
         if self._filterbranch:
             # look for the first active revision as last ditch; should be
             # removed if filterbranch is merged with revset
-            for row, gnode in enumerate(self.graph.nodes):
+            for row in xrange(len(self.graph)):
+                gnode = self.graph[row]
                 if not isinstance(gnode.rev, int):
                     continue
                 index = self.index(row, 0)
@@ -653,10 +641,11 @@ class HgRepoListModel(QAbstractTableModel):
     def indexFromRev(self, rev):
         self._ensureBuilt(rev)
         self._expandRowCount()
-        row = self.graph.index(rev)
-        if row >= 0:
-            return self.index(row, 0)
-        return QModelIndex()
+        try:
+            row = self.graph.index(rev)
+        except ValueError:
+            return QModelIndex()
+        return self.index(row, 0)
 
     def _getbranch(self, ctx):
         b = hglib.tounicode(ctx.branch())

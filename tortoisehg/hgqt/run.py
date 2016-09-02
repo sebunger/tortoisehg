@@ -308,8 +308,7 @@ def runcommand(ui, args):
     else:
         lui = ui
 
-    hglib.wrapextensionsloader()  # enable blacklist of extensions
-    extensions.loadall(lui)
+    hglib.loadextensions(lui)
 
     args += get_files_from_listfile()
 

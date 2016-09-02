@@ -11,7 +11,7 @@ try:
 except ImportError:
     icon_path, bin_path, license_path, locale_path = None, None, None, None
 
-import os, sys
+import os, sys, shlex
 import mercurial
 
 _hg_command = None
@@ -56,7 +56,11 @@ def get_hg_command():
     global _hg_command
     if _hg_command is None:
         if 'HG' in os.environ:
-            _hg_command = os.environ['HG'].split()
+            try:
+                _hg_command = shlex.split(os.environ['HG'],
+                                          posix=(os.name != 'nt'))
+            except ValueError:
+                _hg_command = [os.environ['HG']]
         else:
             _hg_command = _find_hg_command()
     return _hg_command

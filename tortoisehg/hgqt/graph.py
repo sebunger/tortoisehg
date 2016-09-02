@@ -214,11 +214,10 @@ Given such cases, we can determine family line location as below:
 
 import time
 import os
-import itertools
 import collections
 
 from mercurial import revset as revsetmod
-from mercurial import graphmod, phases
+from mercurial import phases
 
 from tortoisehg.util import obsoleteutil
 
@@ -233,6 +232,32 @@ NODE_SHAPE_APPLIEDPATCH = 2
 NODE_SHAPE_UNAPPLIEDPATCH = 3
 NODE_SHAPE_REVISION_DRAFT = 4
 NODE_SHAPE_REVISION_SECRET = 5
+
+# TODO: Remove these two when we adopt GTK author color scheme
+COLORS = [
+    '#0000ff',  # blue
+    '#006400',  # dark green
+    '#008000',  # green
+    '#00008b',  # dark blue
+    '#800080',  # purple
+    '#1e90ff',  # dodger blue
+    '#808000',  # dark yellow
+    '#ff00ff',  # magenta
+    '#8b008b',  # dark magenta
+    '#008b8b',  # dark cyan
+]
+
+
+def hashcolor(data, modulo=None):
+    """function to reliably map a string to a color index
+
+    The algorithm used is very basic and can be improved if needed.
+    """
+    if modulo is None:
+        modulo = len(COLORS)
+    idx = sum([ord(c) for c in data])
+    idx %= modulo
+    return idx
 
 
 class StandardDag(object):
@@ -281,16 +306,19 @@ class StandardDag(object):
             if visiblerev(curr_rev):
                 yield repo[curr_rev]
             curr_rev = len(repo) - 1
-        revs = revsetmod.spanset(repo, curr_rev, stop_rev - 1)
         # jump in the branch grouping graph experiment if the user subscribed
-        if repo.ui.configbool('experimental', 'graph-group-branches', False):
-            firstbranch = ()
+        if not repo.ui.configbool('experimental', 'graph-group-branches', False):
+            revs = revsetmod.spanset(repo, curr_rev, stop_rev - 1)
+        else:
+            revset = 'sort(%d:%d, "topo"'
+            args = [curr_rev, stop_rev]
             firstbranchrevset = repo.ui.config(
                 'experimental', 'graph-group-branches.firstbranch', '')
             if firstbranchrevset:
-                firstbranch = repo.revs(firstbranchrevset)
-            parentrevs = repo.changelog.parentrevs
-            revs = list(graphmod.groupbranchiter(revs, parentrevs, firstbranch))
+                revset += ', topo.firstbranch=%s'
+                args.append(firstbranchrevset)
+            revset += ')'
+            revs = repo.revs(revset, *args)
 
         for curr_rev in revs:
             if visiblerev(curr_rev):
@@ -655,11 +683,6 @@ class FileDag(object):
                 rev = heads.pop()
 
 
-def mq_patch_grapher(repo):
-    """Graphs unapplied MQ patches"""
-    for patchname in reversed(repo.thgmqunappliedpatches):
-        yield GraphNode(NODE_SHAPE_UNAPPLIEDPATCH, name=patchname)
-
 class RevColorPalette(object):
     """Assign node and line colors for each revision"""
 
@@ -732,7 +755,8 @@ class GraphEdge(tuple):
         return -self[3], -self[2]
 
 class GraphNode(object):
-    """
+    """Graph node for all actual changesets, as well as the working copy
+
     Simple class to encapsulate a hg node in the revision graph. Does
     nothing but declaring attributes.
     """
@@ -751,7 +775,7 @@ class GraphNode(object):
     def fromchangectx(cls, repo, ctx, xposition, lines):
         if ctx.thgmqappliedpatch():
             shape = NODE_SHAPE_APPLIEDPATCH
-        elif ctx.extra().get('close'):
+        elif ctx.closesbranch():
             shape = NODE_SHAPE_CLOSEDBRANCH
         elif phases.draft == ctx.phase():
             shape = NODE_SHAPE_REVISION_DRAFT
@@ -770,37 +794,57 @@ class GraphNode(object):
         obj.extra = [fctx.path()]
         return obj
 
-    def __init__(self, shape, ctx=None, name=None, xposition=0, lines=(),
+    def __init__(self, shape, ctx, xposition, lines,
                  wdparent=False, extra=None):
-        if name is not None:
-            # unapplied patch use their name as rev
-            assert ctx is None
-            self.rev = name
-            self.hidden = False
-            self.obsolete = False
-            self.troubles = ()
-        else:
-            self.rev = ctx.rev()
-            self.hidden = ctx.hidden()
-            self.obsolete = ctx.obsolete()
-            self.troubles = ctx.troubles()
+        self.rev = ctx.rev()
+        self.hidden = ctx.hidden()
+        self.obsolete = ctx.obsolete()
+        self.troubles = ctx.troubles()
         self.shape = shape
         self.x = xposition
         self.bottomlines = lines
-        self.toplines = []
+        self.toplines = []  # set from Graph.__getitem__
         self.wdparent = wdparent
         self.extra = extra
 
     @property
     def faded(self):
+        """Indicates whether the node should be faded in the UI"""
         return self.hidden or self.obsolete
 
     @property
     def cols(self):
-        xs = [self.x]
-        for p, _e in self.bottomlines:
-            xs.extend(p)
-        return max(xs) + 1
+        """Number of columns for the node"""
+        return max([self.x] + [max(p) for p, _e in self.bottomlines]) + 1
+
+
+class PatchGraphNode(object):
+    """Node for un-applied patch queue items.
+
+    This node is always displayed unfaded and only occupy one column.
+    Furthermore, the revision is the name of the patch.
+    """
+
+    def __init__(self, name):
+        self.name = name
+        self.shape = NODE_SHAPE_UNAPPLIEDPATCH
+        self.rev = name  # unapplied patch uses its name as rev
+        self.wdparent = False
+        self.toplines = []
+        self.bottomlines = []
+        self.troubles = ()
+        self.x = 0
+
+    @property
+    def faded(self):
+        """Indicates whether the node should be faded in the UI"""
+        return False
+
+    @property
+    def cols(self):
+        """Number of columns for the node"""
+        return 1
+
 
 class Graph(object):
     """
@@ -809,13 +853,9 @@ class Graph(object):
     method to build the graph progressively.
     """
 
-    def __init__(self, repo, grapher, include_mq=False):
+    def __init__(self, repo, grapher):
         self.repo = repo
-        if include_mq:
-            patch_grapher = mq_patch_grapher(self.repo)
-            self.grapher = itertools.chain(patch_grapher, grapher)
-        else:
-            self.grapher = grapher
+        self.grapher = grapher
         self.nodes = []
         self.nodesdict = {}
 
@@ -893,9 +933,10 @@ class Graph(object):
             self.build_nodes(10, len(self.repo) - 1)
         if isinstance(rev, int) and len(self) > 0 and rev < self.nodes[-1].rev:
             self.build_nodes(self.nodes[-1].rev - rev)
-        if rev in self.nodesdict:
+        try:
             return self.nodes.index(self.nodesdict[rev])
-        return -1
+        except KeyError:
+            raise ValueError('rev %r not found' % rev)
 
     #
     # File graph method
@@ -903,3 +944,35 @@ class Graph(object):
 
     def filename(self, rev):
         return self.nodesdict[rev].extra[0]
+
+
+class GraphWithMq(object):
+    """Graph layouter that also shows un-applied mq changes"""
+
+    def __init__(self, graph, patchnames):
+        object.__init__(self)
+        self.graph = graph
+        self._patchnames = list(reversed(patchnames))
+
+    def isfilled(self):
+        """Indicates whether the graph is done computing"""
+        return self.graph.isfilled()
+
+    def build_nodes(self, fillstep=None, rev=None):
+        """Ensures that the graph layout is computed"""
+        self.graph.build_nodes(fillstep, rev)
+
+    def __len__(self):
+        return len(self._patchnames) + len(self.graph)
+
+    def __getitem__(self, row):
+        if row < len(self._patchnames):
+            return PatchGraphNode(self._patchnames[row])
+        return self.graph[row - len(self._patchnames)]
+
+    def index(self, rev):
+        """Get row number for specified revision"""
+        if isinstance(rev, str):
+            return self._patchnames.index(rev)
+        i = self.graph.index(rev)
+        return len(self._patchnames) + i

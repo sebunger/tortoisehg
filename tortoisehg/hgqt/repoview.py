@@ -435,7 +435,7 @@ def _edge_color(edge, active):
     if not active or edge.linktype == graph.LINE_TYPE_FAMILY:
         return "gray"
     else:
-        colors = repomodel.COLORS
+        colors = graph.COLORS
         return colors[edge.color % len(colors)]
 
 

@@ -726,6 +726,13 @@ INFO = (
           '<b>Note</b>: Calculating family line may be slow in some cases. '
           'This option is expected to be removed if the performance issue is '
           'solved.')),
+    _fi(_('Use optimized graph layouter'), 'tortoisehg.graphopt',
+        genBoolRBGroup,
+        _('Use alternative graph layouter for large repositories. '
+          'Default: False<p>'
+          '<b>Note</b>: This layouter colors edges using branch information '
+          'and does not display graft edges, regardless of whether they are '
+          'requested or not.')),
     )),
 ({'name': 'commit', 'label': _('Commit', 'config item'), 'icon': 'hg-commit'},
  (

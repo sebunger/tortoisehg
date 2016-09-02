@@ -37,6 +37,7 @@ class RepoTabWidget(QWidget):
     makeLogVisible = pyqtSignal(bool)
     progressReceived = pyqtSignal(str, cmdcore.ProgressMessage)
     showMessageSignal = pyqtSignal(str)
+    taskTabVisibilityChanged = pyqtSignal(bool)
     toolbarVisibilityChanged = pyqtSignal(bool)
 
     # look-up of tab-index and stack-index:
@@ -75,6 +76,9 @@ class RepoTabWidget(QWidget):
         tabbar.setContextMenuPolicy(Qt.CustomContextMenu)
         tabbar.customContextMenuRequested.connect(self._onTabMenuRequested)
 
+        self._initTabSwitchActions()
+        tabbar.tabMoved.connect(self._updateTabSwitchActions)
+
         self._stack = QStackedLayout()
         vbox.addLayout(self._stack, 1)
 
@@ -86,6 +90,8 @@ class RepoTabWidget(QWidget):
         self._iconmapper.mapped[QWidget].connect(self._updateIcon)
         self._titlemapper = QSignalMapper(self)
         self._titlemapper.mapped[QWidget].connect(self._updateTitle)
+
+        self._updateTabSwitchActions()
 
     def openRepo(self, root, bundle=None):
         """Open the specified repository in new tab"""
@@ -101,6 +107,7 @@ class RepoTabWidget(QWidget):
         tabbar.setTabToolTip(index, rw.repoRootPath())
         self.setCurrentIndex(index)
         tabbar.blockSignals(False)
+        self._updateTabSwitchActions()
         self._updateTabVisibility()
         self._onCurrentTabChanged(index)
         return True
@@ -114,6 +121,7 @@ class RepoTabWidget(QWidget):
             index = tabbar.insertTab(index, os.path.basename(root))
             tabbar.setTabToolTip(index, root)
         tabbar.blockSignals(False)
+        self._updateTabSwitchActions()
         self._updateTabVisibility()
         # must call _onCurrentTabChanged() appropriately
 
@@ -166,6 +174,7 @@ class RepoTabWidget(QWidget):
                 self._repomanager.releaseRepoAgent(rw.repoRootPath())
                 rw.deleteLater()
         self._tabbar.blockSignals(False)
+        self._updateTabSwitchActions()
         self._updateTabVisibility()
         if tabchange:
             self._onCurrentTabChanged(self.currentIndex())
@@ -245,6 +254,37 @@ class RepoTabWidget(QWidget):
         if origindex != self.currentIndex():
             self._onCurrentTabChanged(self.currentIndex())
 
+    def tabSwitchActions(self):
+        """List of actions to switch current tabs; should be registered to
+        the main window or menu"""
+        return self._swactions.actions()
+
+    def _initTabSwitchActions(self):
+        self._swactions = QActionGroup(self)
+        self._swactions.triggered.connect(self._setCurrentTabByAction)
+        for i in xrange(9):
+            a = self._swactions.addAction('')
+            a.setCheckable(True)
+            a.setData(i)
+            a.setShortcut('Ctrl+%d' % (i + 1))
+
+    @pyqtSlot()
+    def _updateTabSwitchActions(self):
+        self._swactions.setVisible(self._tabbar.count() > 1)
+        if not self._swactions.isVisible():
+            return
+        for i, a in enumerate(self._swactions.actions()):
+            a.setVisible(i < self.count())
+            if not a.isVisible():
+                continue
+            a.setChecked(i == self.currentIndex())
+            a.setText(self._tabbar.tabText(i))
+
+    @pyqtSlot(QAction)
+    def _setCurrentTabByAction(self, action):
+        index, _ok = action.data().toInt()
+        self.setCurrentIndex(index)
+
     def currentRepoRootPath(self):
         return self.repoRootPath(self.currentIndex())
 
@@ -278,6 +318,7 @@ class RepoTabWidget(QWidget):
             rw = self._createRepoWidget(self.repoRootPath(index))
             if not rw:
                 tabbar.removeTab(index)  # may reenter
+                self._updateTabSwitchActions()
                 self._updateTabVisibility()
                 return
             tabbar.setTabData(index, rw)
@@ -286,6 +327,7 @@ class RepoTabWidget(QWidget):
             tabbar.setTabToolTip(index, rw.repoRootPath())
         if rw:
             self._stack.setCurrentWidget(rw)
+        self._updateTabSwitchActions()
 
         prevpath = self._curpath
         self._curpath = self.repoRootPath(index)
@@ -331,6 +373,7 @@ class RepoTabWidget(QWidget):
         rw.repoLinkClicked.connect(self._openLinkedRepo)
         rw.revisionSelected.connect(self.historyChanged)
         rw.showMessageSignal.connect(self.showMessageSignal)
+        rw.taskTabVisibilityChanged.connect(self.taskTabVisibilityChanged)
         rw.toolbarVisibilityChanged.connect(self.toolbarVisibilityChanged)
         # PyQt 4.6 cannot find compatible signal by new-style connection
         QObject.connect(rw, SIGNAL('busyIconChanged()'),
@@ -375,6 +418,7 @@ class RepoTabWidget(QWidget):
     def _updateTitle(self, rw):
         index = self._indexOf(rw)
         self._tabbar.setTabText(index, rw.title())
+        self._updateTabSwitchActions()
         if index == self.currentIndex():
             self.currentTitleChanged.emit()
 

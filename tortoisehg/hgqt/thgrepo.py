@@ -82,7 +82,7 @@ class RepoWatcher(QObject):
         self._fswatcher = None
         self._filesmap = {}  # path: (flag, watched)
         self._datamap = {}  # readmeth: (flag, dep-path)
-        self._lastmtimes = {}  # path: mtime
+        self._laststats = {}  # path: (size, ctime, mtime)
         self._lastdata = {}  # readmeth: content
         self._fixState()
         self._uimtime = time.time()
@@ -136,7 +136,7 @@ class RepoWatcher(QObject):
     def _addMissingPaths(self):
         'Add files to watcher that may have been added or replaced'
         existing = [f for f, (_flag, watched) in self._filesmap.iteritems()
-                    if watched and f in self._lastmtimes]
+                    if watched and f in self._laststats]
         files = [unicode(f) for f in self._fswatcher.files()]
         for f in existing:
             if hglib.tounicode(f) not in files:
@@ -148,7 +148,7 @@ class RepoWatcher(QObject):
                 self._fswatcher.addPath(hglib.tounicode(f))
 
     def clearStatus(self):
-        self._lastmtimes.clear()
+        self._laststats.clear()
         self._lastdata.clear()
 
     def pollStatus(self):
@@ -159,12 +159,12 @@ class RepoWatcher(QObject):
         if self._locked():
             self._ui.debug('locked, aborting\n')
             return
-        curmtimes, curdata = self._readState()
-        changeflags = self._calculateChangeFlags(curmtimes, curdata)
+        curstats, curdata = self._readState()
+        changeflags = self._calculateChangeFlags(curstats, curdata)
         if self._locked():
             self._ui.debug('lock still held - ignoring for now\n')
             return
-        self._lastmtimes = curmtimes
+        self._laststats = curstats
         self._lastdata = curdata
         if changeflags:
             self._ui.debug('change found (flags = 0x%x)\n' % changeflags)
@@ -211,18 +211,21 @@ class RepoWatcher(QObject):
             RepoWatcher._readparents: (WorkingParentChanged,
                                        repo.join('dirstate')),
             }
-        newmtimes, newdata = self._readState(newpaths)
-        self._lastmtimes.update(newmtimes)
+        newstats, newdata = self._readState(newpaths)
+        self._laststats.update(newstats)
         self._lastdata.update(newdata)
 
     def _readState(self, targetpaths=None):
         if targetpaths is None:
             targetpaths = self._filesmap
 
-        curmtimes = {}
+        curstats = {}
         for path in targetpaths:
             try:
-                curmtimes[path] = os.path.getmtime(path)
+                # see mercurial.util.filestat for details what attributes
+                # are needed an how ambiguity is resolved
+                st = os.stat(path)
+                curstats[path] = (st.st_size, st.st_ctime, st.st_mtime)
             except EnvironmentError:
                 pass
 
@@ -230,9 +233,9 @@ class RepoWatcher(QObject):
         for readmeth, (_flag, path) in self._datamap.iteritems():
             if path not in targetpaths:
                 continue
-            last = self._lastmtimes.get(path, -1)
-            cur = curmtimes.get(path, -1)
-            if last != cur:  # mtime can go back on rollback
+            last = self._laststats.get(path, -1)
+            cur = curstats.get(path, -1)
+            if last != cur:
                 try:
                     curdata[readmeth] = readmeth(self)
                 except EnvironmentError:
@@ -240,15 +243,15 @@ class RepoWatcher(QObject):
             elif cur >= 0 and readmeth in self._lastdata:
                 curdata[readmeth] = self._lastdata[readmeth]
 
-        return curmtimes, curdata
+        return curstats, curdata
 
-    def _calculateChangeFlags(self, curmtimes, curdata):
+    def _calculateChangeFlags(self, curstats, curdata):
         changeflags = 0
         for path, (flag, _watched) in self._filesmap.iteritems():
-            last = self._lastmtimes.get(path, -1)
-            cur = curmtimes.get(path, -1)
-            if last != cur:  # mtime can go back on rollback
-                self._ui.debug(' mtime: %s (%r -> %r)\n' % (path, last, cur))
+            last = self._laststats.get(path, -1)
+            cur = curstats.get(path, -1)
+            if last != cur:
+                self._ui.debug(' stat: %s (%r -> %r)\n' % (path, last, cur))
                 changeflags |= flag
         for readmeth, (flag, _path) in self._datamap.iteritems():
             last = self._lastdata.get(readmeth)
