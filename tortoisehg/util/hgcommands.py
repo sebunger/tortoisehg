@@ -5,9 +5,18 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import os, socket
+from __future__ import absolute_import
 
-from mercurial import cmdutil, extensions, sslutil, util
+import hashlib
+import os
+import socket
+
+from mercurial import (
+    cmdutil,
+    extensions,
+    sslutil,
+    util,
+)
 
 from tortoisehg.util import hgversion
 from tortoisehg.util.i18n import agettext as _
@@ -19,13 +28,15 @@ mqcommand = cmdutil.command(_mqcmdtable)
 testedwith = hgversion.testedwith
 
 @command('debuggethostfingerprint',
-    [],
-    _('[SOURCE]'),
+    [('', 'insecure', None,
+      _('do not verify server certificate (ignoring web.cacerts config)')),
+     ],
+    _('[--insecure] [SOURCE]'),
     optionalrepo=True)
-def debuggethostfingerprint(ui, repo, source='default'):
+def debuggethostfingerprint(ui, repo, source='default', **opts):
     """retrieve a fingerprint of the server certificate
 
-    The server certificate is not verified.
+    Specify --insecure to disable SSL verification.
     """
     source = ui.expandpath(source)
     u = util.url(source)
@@ -46,7 +57,7 @@ def debuggethostfingerprint(ui, repo, source='default'):
     finally:
         sock.close()
 
-    s = util.sha1(peercert).hexdigest()
+    s = hashlib.sha1(peercert).hexdigest()
     ui.write(':'.join([s[x:x + 2] for x in xrange(0, len(s), 2)]), '\n')
 
 def postinitskel(ui, repo, hooktype, result, pats, **kwargs):

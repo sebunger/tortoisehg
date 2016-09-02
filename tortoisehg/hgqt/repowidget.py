@@ -39,6 +39,7 @@ class RepoWidget(QWidget):
 
     currentTaskTabChanged = pyqtSignal()
     showMessageSignal = pyqtSignal(str)
+    taskTabVisibilityChanged = pyqtSignal(bool)
     toolbarVisibilityChanged = pyqtSignal(bool)
 
     # TODO: progress can be removed if all actions are run as hg command
@@ -71,6 +72,9 @@ class RepoWidget(QWidget):
         self.createActions()
         self.loadSettings()
         self._initModel()
+
+        self._lastTaskTabVisible = self.isTaskTabVisible()
+        self.repotabs_splitter.splitterMoved.connect(self._onSplitterMoved)
 
         if bundle:
             self.setBundle(bundle)
@@ -203,8 +207,30 @@ class RepoWidget(QWidget):
             self.taskTabsWidget.setCurrentIndex(idx)
 
             # restore default splitter position if task tab is invisible
-            if self.repotabs_splitter.sizes()[1] == 0:
-                self.repotabs_splitter.setSizes([1, 1])
+            self.setTaskTabVisible(True)
+
+    def isTaskTabVisible(self):
+        return self.repotabs_splitter.sizes()[1] > 0
+
+    def setTaskTabVisible(self, visible):
+        if visible == self.isTaskTabVisible():
+            return
+        if visible:
+            self.repotabs_splitter.setSizes([1, 1])
+        else:
+            self.repotabs_splitter.setSizes([1, 0])
+        self._updateLastTaskTabState(visible)
+
+    @pyqtSlot()
+    def _onSplitterMoved(self):
+        visible = self.isTaskTabVisible()
+        if self._lastTaskTabVisible == visible:
+            return
+        self._updateLastTaskTabState(visible)
+
+    def _updateLastTaskTabState(self, visible):
+        self._lastTaskTabVisible = visible
+        self.taskTabVisibilityChanged.emit(visible)
 
     @property
     def repo(self):
@@ -1647,7 +1673,7 @@ class RepoWidget(QWidget):
     def mergeWithOtherHead(self):
         """Open dialog to merge with the other head of the current branch"""
         cmdline = hglib.buildcmdargs('merge', preview=True,
-                                     config='ui.logtemplate={rev}\n')
+                                     config=r'ui.logtemplate={rev}\n')
         sess = self._runCommand(cmdline)
         sess.setCaptureOutput(True)
         sess.commandFinished.connect(self._onMergePreviewFinished)
@@ -2145,15 +2171,27 @@ class LightRepoWindow(QMainWindow):
         tbar.setWindowTitle(_('&Filter Toolbar'))
         self.addToolBar(tbar)
 
+        stbar = cmdui.ThgStatusBar(self)
+        repoagent.progressReceived.connect(stbar.setProgress)
+        rw.showMessageSignal.connect(stbar.showMessage)
+        rw.progress.connect(stbar.progress)
+        self.setStatusBar(stbar)
+
         s = QSettings()
         s.beginGroup('LightRepoWindow')
         self.restoreGeometry(s.value('geometry').toByteArray())
         self.restoreState(s.value('windowState').toByteArray())
+        stbar.setVisible(s.value('statusBar', True).toBool())
         s.endGroup()
 
     def createPopupMenu(self):
         menu = super(LightRepoWindow, self).createPopupMenu()
         assert menu  # should have toolbar
+        stbar = self.statusBar()
+        a = menu.addAction(_('S&tatus Bar'))
+        a.setCheckable(True)
+        a.setChecked(stbar.isVisibleTo(self))
+        a.triggered.connect(stbar.setVisible)
         menu.addSeparator()
         menu.addAction(_('&Settings'), self._editSettings)
         return menu
@@ -2167,6 +2205,7 @@ class LightRepoWindow(QMainWindow):
         s.beginGroup('LightRepoWindow')
         s.setValue('geometry', self.saveGeometry())
         s.setValue('windowState', self.saveState())
+        s.setValue('statusBar', self.statusBar().isVisibleTo(self))
         s.endGroup()
         event.accept()
 

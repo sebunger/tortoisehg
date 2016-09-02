@@ -16,7 +16,6 @@ import time
 from mercurial import ui, util, extensions
 from mercurial import encoding, templatefilters, filemerge, error, pathutil
 from mercurial import dispatch as dispatchmod
-from mercurial import match as matchmod
 from mercurial import merge as mergemod
 from mercurial import revset as revsetmod
 from mercurial.node import nullrev
@@ -204,12 +203,6 @@ def getqqueues(repo):
         qqueues = []
     return qqueues
 
-try:
-    subdirmatcher = matchmod.subdirmatcher
-except AttributeError:
-    # hg<3.8 (d3f1b7ee5e70)
-    subdirmatcher = matchmod.narrowmatcher
-
 readmergestate = mergemod.mergestate.read
 
 def readundodesc(repo):
@@ -277,10 +270,29 @@ def _loadextensionwithblacklist(orig, ui, name, path):
 
     return orig(ui, name, path)
 
-def wrapextensionsloader():
+def _wrapextensionsloader():
     """Wrap extensions.load(ui, name) for blacklist to take effect"""
     extensions.wrapfunction(extensions, 'load',
                             _loadextensionwithblacklist)
+
+def loadextensions(ui):
+    """Load and setup extensions for GUI process"""
+    _wrapextensionsloader()  # enable blacklist of extensions
+    loadedbefore = set(name for name, module in extensions.extensions())
+    extensions.loadall(ui)
+
+    # we still generate diffs and commit descriptions in GUI process, which
+    # may require template functions loaded from extensions; so run loaders
+    # of template* tables just like dispatch._dispatch(). (issue #4515)
+    for name, module in extensions.extensions():
+        if name in loadedbefore:
+            continue
+        for objname, loadermod, loadername in dispatchmod.extraloaders:
+            if not objname.startswith('template'):
+                continue
+            extraobj = getattr(module, objname, None)
+            if extraobj is not None:
+                getattr(loadermod, loadername)(ui, name, extraobj)
 
 # TODO: provide singular canonpath() wrapper instead?
 def canonpaths(list):

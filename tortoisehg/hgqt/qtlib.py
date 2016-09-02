@@ -602,14 +602,19 @@ def getcheckboxpixmap(state, bgcolor, widget):
 # To fix that we let users force tortoishg to use smaller icons by setting a
 # THG_RETINA environment variable to True (or any value that mercurial parses
 # as True.
-IS_RETINA = False
-if sys.platform == 'darwin':
-    IS_RETINA = util.parsebool(os.environ.get('THG_RETINA', '0'))
-
+# Whereas on Linux, Qt4 has no support for high dpi displays at all causing
+# icons to be rendered unusably small. The workaround for that is to render
+# the icons at double the normal size.
+# TODO: Remove this hack after upgrading to Qt5.
+IS_RETINA = util.parsebool(os.environ.get('THG_RETINA', '0'))
 
 def _fixIconSizeForRetinaDisplay(s):
-    if IS_RETINA and s > 1:
-        s /= 2
+    if IS_RETINA:
+        if sys.platform == 'darwin':
+            if s > 1:
+                s /= 2
+        elif sys.platform == 'linux2':
+            s *= 2
     return s
 
 def smallIconSize():

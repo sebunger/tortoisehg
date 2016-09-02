@@ -622,7 +622,7 @@ def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
         # if git or svn executable not found
         if (nodeop.subreporecursive and e.subkind == 'hg' and e.status != 'R'
             and os.path.isdir(repo.wjoin(path))):
-            smatch = hglib.subdirmatcher(path, match)
+            smatch = matchmod.subdirmatcher(path, match)
             try:
                 srepo = ctx.sub(path)._repo
                 e.ctx = srepo[substate[1]]

@@ -799,9 +799,9 @@ class WctxModel(QAbstractTableModel):
         if not index.isValid():
             return QVariant()
 
-        path, status, mst, upath, ext, sz = self.rows[index.row()]
         if index.column() == COL_PATH:
             if role == Qt.CheckStateRole and self.checkable:
+                path = self.rows[index.row()][0]
                 if path in self.partials:
                     changes = self.partials[path]
                     if changes.excludecount == 0:
@@ -821,11 +821,13 @@ class WctxModel(QAbstractTableModel):
         elif role == Qt.DisplayRole:
             return QVariant(self.rows[index.row()][index.column()])
         elif role == Qt.TextColorRole:
+            path, status, mst, upath, ext, sz = self.rows[index.row()]
             if mst:
                 return _colors.get(mst.lower(), QColor('black'))
             else:
                 return _colors.get(status, QColor('black'))
         elif role == Qt.ToolTipRole:
+            path, status, mst, upath, ext, sz = self.rows[index.row()]
             return QVariant(statusMessage(status, mst, upath))
         '''
         elif role == Qt.DecorationRole and index.column() == COL_STATUS:
@@ -890,6 +892,11 @@ class WctxModel(QAbstractTableModel):
                 return True
         return False
 
+    @util.propertycache
+    def workingContext(self):
+        repo = self._repoagent.rawRepo()
+        return repo[None]
+
     def fileData(self, index):
         """Returns the displayable file data at the given index"""
         repo = self._repoagent.rawRepo()
@@ -897,7 +904,7 @@ class WctxModel(QAbstractTableModel):
             return filedata.createNullData(repo)
         path, status, mst, upath, ext, sz = self.rows[index.row()]
         wfile = util.pconvert(path)
-        ctx = repo[None]
+        ctx = self.workingContext
         pctx = self._pctx and self._pctx.p1() or ctx.p1()
         if status == 'S':
             return filedata.createSubrepoData(ctx, pctx, wfile)

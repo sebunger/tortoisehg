@@ -152,7 +152,7 @@ folder of your project.
 
 	Repository Init Dialog
 
-We suggest you keep :guilabel:`Add special files (.hgignore, ...)`
+We suggest you keep :guilabel:`Create special files (.hgignore, ...)`
 checked, and do not check :guilabel:`Make repo compatible with Mercurial < 1.7`, 
 unless you have a strong reason to do so.
 

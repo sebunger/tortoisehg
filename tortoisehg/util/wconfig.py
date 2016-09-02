@@ -6,6 +6,7 @@
 # GNU General Public License version 2 or any later version.
 
 import os
+import re
 import cStringIO
 import ConfigParser
 from mercurial import error, util, config as config_mod
@@ -22,11 +23,16 @@ if _hasiniparse:
         change_comment_syntax(allow_rem=False)
     except (ImportError, TypeError):
         # TODO: yet need to care about iniparse<0.3.2 ??
-        import re
         from iniparse.ini import CommentLine
         # Monkypatch this regex to prevent iniparse from considering
         # 'rem' as a comment
         CommentLine.regex = re.compile(r'^(?P<csep>[%;#])(?P<comment>.*)$')
+
+    # allow :suboption in <name>
+    from iniparse.ini import OptionLine
+    OptionLine.regex = re.compile(r'^(?P<name>[^:=\s[][^=]*)'
+                                  r'(?P<sep>=\s*)'
+                                  r'(?P<value>.*)$')
 
 class _wsortdict(object):
     """Wrapper for config.sortdict to record set/del operations"""
