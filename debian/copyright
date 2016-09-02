@@ -48,6 +48,10 @@ Files: tortoisehg/hgqt/thgrepo.py
 Copyright: 2010, George Marrows <george.marrows@gmail.com>
 License: GPL-2+
 
+Files: tortoisehg/hgqt/graphopt.py
+Copyright: 2016 Unity Technologies.
+License: GPL-2+
+
 Files: tortoisehg/util/colormap.py
 Copyright: 2005, Dan Loda <danloda@gmail.com>
 License: GPL-2+
