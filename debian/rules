@@ -9,6 +9,8 @@ override_dh_auto_build: debian/thg.1
 
 override_dh_auto_install:
 	dh_auto_install --destdir=debian/tmp/
+	# This file is already included in mercurial-common.
+	rm debian/tmp/usr/lib/python*/dist-packages/hgext3rd/__init__.py
 	mkdir -p debian/tmp/etc/mercurial/hgrc.d/
 	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thgmergetools.rc
 
