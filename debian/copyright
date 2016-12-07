@@ -10,7 +10,8 @@ Copyright: 2007-2014, Steve Borho <steve@borho.org>
 License: GPL-2
 
 Files: tortoisehg/hgqt/*
-Copyright: 2008-2010, Steve Borho <steve@borho.org>
+Copyright: 2008-2014, Steve Borho <steve@borho.org>
+           2016, Unity Technologies
            2010, Yuki KODAMA <endflow.net@gmail.com>
            2010, David Wilhelm <dave@jumbledpile.com>
            2010, Johan Samyn <johan.samyn@gmail.com>
