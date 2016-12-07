@@ -1,8 +1,11 @@
-tortoisehg (4.0-1) UNRELEASED; urgency=medium
+tortoisehg (4.0-1) unstable; urgency=medium
 
   * Imported Upstream version 4.0 (Closes: #846234).
+  * Update copyright.
+  * Update mercurial requiemrents to version 3.9 or 4.0.
+  * Avoid overwriting hgext3rd/__init__.py from mercurial-common.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Tue, 06 Dec 2016 22:25:02 -0800
+ -- Ludovico Cavedon <cavedon@debian.org>  Tue, 06 Dec 2016 23:22:48 -0800
 
 tortoisehg (3.9-1) unstable; urgency=medium
 
