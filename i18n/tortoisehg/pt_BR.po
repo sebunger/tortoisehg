@@ -7,25 +7,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
-"PO-Revision-Date: 2016-05-01 03:21+0000\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
+"PO-Revision-Date: 2016-09-01 14:12+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2016-05-02 05:26+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:07+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servidor de Ícones Sobrepostos do TortoiseHg"
 
 msgid "Exit"
 msgstr "Sair"
-
-msgid "hg lighthg"
-msgstr "hg lighthg"
 
 msgid "About"
 msgstr "Sobre"
@@ -2366,8 +2363,8 @@ msgstr "Incapaz de escrever arquivo .hgignore"
 msgid "Copy working directory files from skeleton"
 msgstr "Copia para o diretório de trabalho arquivos do skeleton"
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Adicionar arquivos especiais (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr "Criar arquivos especiais (.hgignore, ...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Tornar o repositório compatível com Mercurial <1.7"
@@ -4583,6 +4580,13 @@ msgid "&Filter Toolbar"
 msgstr "Barra de &Filtragem"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr "TortoiseHg: %s"
+
+msgid "S&tatus Bar"
+msgstr "Barra de S&tatus"
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "Resolução de Conflitos - %s"
 
@@ -5991,6 +5995,20 @@ msgstr ""
 "alguns casos. Esta opção deve ser removida se esse problema de desempenho "
 "for resolvido."
 
+msgid "Use optimized graph layouter"
+msgstr "Usar disposição otimizada no grafo"
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
+msgstr ""
+"Usa um algoritmo alternativo para disposição do grafo para repositórios "
+"grandes. Padrão: False (desativado)<p><b>Nota</b>: Isto colore arestas "
+"usando informações de ramo e não mostra arestas de enxerto, mesmo que sejam "
+"pedidas."
+
 msgctxt "config item"
 msgid "Commit"
 msgstr "Consolidação"
@@ -6202,9 +6220,9 @@ msgid ""
 "changesets. If False, push will be performed without any confirmation "
 "dialog. Default: True"
 msgstr ""
-"Determina se o TortoiseHg deve mostrar uma caixa de diálogo de "
-"confirmaçãoantes de enviar revisões em uma operação push. Se False, o push "
-"será realizado sem qualquer diálogo de confirmação. O padrão é True"
+"Determina se o TortoiseHg deve mostrar uma caixa de diálogo de confirmação "
+"antes de enviar revisões em uma operação push. Se False, o push será "
+"realizado sem qualquer diálogo de confirmação. O padrão é True"
 
 msgid "Target Combo"
 msgstr "Combo de Alvos"
@@ -7701,6 +7719,18 @@ msgstr "### impressão digital do certificado do servidor ###"
 msgid "Query"
 msgstr "Consultar"
 
+msgid "TLS 1.0"
+msgstr "TLS 1.0"
+
+msgid "TLS 1.1"
+msgstr "TLS 1.1"
+
+msgid "TLS 1.2"
+msgstr "TLS 1.2"
+
+msgid "Minimum Protocol"
+msgstr "Protocolo Mínimo"
+
 msgid "User Authentication"
 msgstr "Autenticação de Usuário"
 
@@ -8182,6 +8212,9 @@ msgstr "&Gravar Repositórios Abertos ao Sair"
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr "Sal&var Caminhos de Sincronização Atuais ao Sair"
 
+msgid "Show Tas&k Tab"
+msgstr "Mostra Aba de Ta&refas"
+
 msgid "&Commit"
 msgstr "&Commit (consolidar)"
 
@@ -8423,8 +8456,12 @@ msgstr "Erro ao executar gatilho \"commit finished\""
 msgid "Cannot open Plugin Options dialog"
 msgstr "Não é possível abrir diálogo de Opções de Plugin"
 
-msgid "[SOURCE]"
-msgstr "[ORIGEM]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+"não verifica o certificado do servidor (ignorando a configuração web.cacerts)"
+
+msgid "[--insecure] [SOURCE]"
+msgstr "[--insecure] [ORIGEM]"
 
 #, python-format
 msgid "unsupported URL: %s"
@@ -8927,6 +8964,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 
 #~ msgid "Unknown Files"
 #~ msgstr "Arquivos desconhecidos"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Adicionar arquivos especiais (.hgignore, ...)"
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Tornar o repo compatível com o Mercurial 1.0"
@@ -11935,19 +11975,6 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ msgid "Merge "
 #~ msgstr "Mesclagem "
 
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Antes da compressão, você deve <a href=\"commit\"><b>consolidar</b></a> "
-#~ "ou <a href=\"discard\"><b>descartar</b></a> mudanças."
-
-#~ msgid "User Certificate Key File"
-#~ msgstr "Arquivo de Chaves de Certificado do Usuário"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "Arquivo de Cadeia de Certificados de Usuário"
-
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "trecho %d já aplicado na linha %d (indistinção %d)\n"
 
@@ -11956,20 +11983,6 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 
 #~ msgid "_Commit (+1 head)"
 #~ msgstr "_Commit (consolidar) (+1 cabeça)"
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Antes do rebaseamento, você deve <a href=\"commit\"><b>consolidar</b></a> "
-#~ "ou <a href=\"discard\"><b>descartar</b></a> as mudanças pendentes."
-
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr ""
-#~ "Ao executar pela linha de comando, cria um processo em segundo plano para "
-#~ "executar janelas gráficas. Valor padrão: True"
 
 #~ msgctxt "changesets"
 #~ msgid "All"
@@ -12153,31 +12166,3 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ "Nenhum link para um tíquete foi encontrado na mensagem de consolidação. A "
 #~ "mensagem deve conter um link para um tíquete. Configure isto na seção de "
 #~ "configuração 'Issue'."
-
-#~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "Incapaz de traduzir uma mensagem para a codificação local\n"
-#~ "Considere ajustar a variável de ambiente HGENCODING\n"
-#~ "Substituir caracteres não traduzíveis por \"?\"?\n"
-
-#~ msgid "Similar revisions..."
-#~ msgstr "Revisões similares..."
-
-#~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Antes de enxertar, você deve <a href=\"commit\"><b>consolidar</b></a> ou "
-#~ "<a href=\"discard\"><b>descartar</b></a> mudanças."
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "Revisões &Similares..."
-
-#~ msgid "Copyright 2008-2015 Steve Borho and others"
-#~ msgstr "Copyright 2008-2015 Steve Borho e outros"
-
-#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
-#~ msgstr "host fingerprint para %s não pode ser obtida (Python muito antigo)"

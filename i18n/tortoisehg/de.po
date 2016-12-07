@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2016-02-05 20:19+0000\n"
 "Last-Translator: Manuel Stumpf <manuelstumpf@web.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,17 +15,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:20+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:01+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHG-Symbolüberblendungsdienst"
 
 msgid "Exit"
 msgstr "Beenden"
-
-msgid "hg lighthg"
-msgstr "hg lighthg"
 
 msgid "About"
 msgstr "Über TortoiseHG"
@@ -2379,8 +2376,8 @@ msgstr "Datei .hgignore kann nicht geschrieben werden"
 msgid "Copy working directory files from skeleton"
 msgstr "Kopiere Arbeitsverzeichnis Dateien von Skelett"
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Spezialdaten (.hgignore, etc.) hinzufügen"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Projektarchiv mit Mercurial vor 1.7 kompatibel machen"
@@ -4609,6 +4606,13 @@ msgid "&Filter Toolbar"
 msgstr "&Filter-Symbolleiste"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "Konflikte auflösen - %s"
 
@@ -6044,6 +6048,16 @@ msgstr ""
 "b>Die Berechnung der Ahnentafel kann in einigen Fällen langsam sein. Diese "
 "Option wird voraussichtlich entfernt, wenn dieses Performanceproblem gelöst "
 "ist.</p>"
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
+msgstr ""
 
 msgctxt "config item"
 msgid "Commit"
@@ -7774,6 +7788,18 @@ msgstr "### Fingerabdruck des Rechnerzertifikats ###"
 msgid "Query"
 msgstr "Anfrage"
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr "Benutzerauthentisierung"
 
@@ -8266,6 +8292,9 @@ msgstr "Offene Archive beim Be&enden speichern"
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr "Speichere aktuelle Synchronisierungs Pfade beim Beenden"
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr "Ü&bernehmen"
 
@@ -8506,8 +8535,11 @@ msgstr "Fehler beim Ausführen des Triggers \"Übernahme abgeschlossen\""
 msgid "Cannot open Plugin Options dialog"
 msgstr "Kann den Plugin-Einstellungen-Dialog nicht öffnen"
 
-msgid "[SOURCE]"
-msgstr "[QUELLE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
+msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
@@ -9652,12 +9684,8 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Source path is empty"
 #~ msgstr "Das Quellverzeichnis ist leer."
 
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Vor der Komprimierung müssen Sie die Änderungen <a href=\"commit"
-#~ "\"><b>übernehmen</b></a> oder <a href=\"discard\"><b>verwerfen</b></a>"
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Spezialdaten (.hgignore, etc.) hinzufügen"
 
 #~ msgid "Please enter the directory path"
 #~ msgstr "Bitte geben Sie das Verzeichnis an"
@@ -10557,12 +10585,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "A specific revision up to which you would like to push or pull."
 #~ msgstr ""
 #~ "Eine spezifische Revision, bis zu der Sie ziehen oder verteilen möchten."
-
-#~ msgid "User Certificate Key File"
-#~ msgstr "Schlüsseldatei mit dem Benutzerzertifikat"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "Zertifikatskettendatei des Benutzers"
 
 #~ msgid "&Yes (--force)"
 #~ msgstr "&Ja (--force)"
@@ -12053,15 +12075,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Archive revision:"
 #~ msgstr "Archiv-Revision:"
 
-#~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "Nicht imstande, den Kommentar in die lokale Kodierung zu übertragen\n"
-#~ "Erwägen Sie, die Umgebungsvariable HGENCODING zu setzen\n"
-#~ "Nicht-übertragbare Zeichen als \"?\" wiedergeben?\n"
-
 #~ msgid "Message format needs to be configured"
 #~ msgstr "Das Kommentarformat muss konfiguriert werden"
 
@@ -12186,9 +12199,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Revert files to revision %s?"
 #~ msgstr "Dateien in Revision %s wiederherstellen?"
 
-#~ msgid "Similar revisions..."
-#~ msgstr "Ähnliche Revisionen..."
-
 #~ msgid "backup %r as %r\n"
 #~ msgstr "Sicherheitskopie von %r als %r\n"
 
@@ -12219,13 +12229,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 
 #~ msgid "Restart merge with"
 #~ msgstr "Zusammenführung neu beginnen mit"
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Vor der Verschiebung müssen Sie die Änderungen <a href=\"commit"
-#~ "\"><b>übernehmen</b></a> or <a href=\"discard\"><b>verwerfen</b></a>."
 
 #~ msgid "binary patch is %d bytes, not %d"
 #~ msgstr "Der binäre Patch hat %d Byte, nicht %d"
@@ -12274,23 +12277,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgstr "Fehlende Datei ansehen"
 
 #~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Vor der Transplantation müssen Sie alle Änderungen <a href=\"commit"
-#~ "\"><b>übernehmen</b></a> or <a href=\"discard\"><b>verwerfen</b></a>."
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "Ä&hnliche Revisionen..."
-
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr ""
-#~ "Bei Ausführung in der Konsole werden grafische Dialoge in einem "
-#~ "Hintergrund-Prozess ausgeführt. Standard: Wahr"
-
-#~ msgid ""
 #~ "Color changesets by author name.  If not enabled, the changes are colored "
 #~ "green for merge, red for non-trivial parents, black for normal. Default: "
 #~ "False"
@@ -12298,6 +12284,3 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ "Änderungssatz nach Autor einfärben. Im Regelfall werden Änderungen zum "
 #~ "Zusammenführen grün markiert, Änderungen mit nicht-trivialen Vorgängern "
 #~ "rot und gewöhnliche schwarz. Standard: Falsch"
-
-#~ msgid "Copyright 2008-2015 Steve Borho and others"
-#~ msgstr "Copyright 2008-2015 Steve Borho und Andere"

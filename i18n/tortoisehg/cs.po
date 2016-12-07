@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2016-04-07 05:57+0000\n"
 "Last-Translator: Tovim <Unknown>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:19+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 05:59+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 "Language: cs\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
@@ -26,9 +26,6 @@ msgstr "Server překryvných ikon TortoiseHg"
 
 msgid "Exit"
 msgstr "Ukončit"
-
-msgid "hg lighthg"
-msgstr "hg lighthg"
 
 msgid "About"
 msgstr "O programu"
@@ -2350,8 +2347,8 @@ msgstr "Nejde zapsat soubor .hgignore"
 msgid "Copy working directory files from skeleton"
 msgstr "Kopírovat soubory ze skeletu"
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Přidat specifické soubory (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Vytvořit repozitář kompatibilní s Mercurialem <1.7"
@@ -4542,6 +4539,13 @@ msgid "&Filter Toolbar"
 msgstr "Lišta filtru"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr ""
 
@@ -5923,6 +5927,16 @@ msgstr ""
 "Implicitně: True<p><b>Poznámka</b>: Počítání rodinné linky může být v "
 "některých případech pomalé. Tato možnost bude zřejmě odstraněna, podaří-li "
 "se vyřešit problém s výkonem."
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
+msgstr ""
 
 msgctxt "config item"
 msgid "Commit"
@@ -7587,6 +7601,18 @@ msgstr ""
 msgid "Query"
 msgstr "Query"
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr "User Authentication"
 
@@ -8068,6 +8094,9 @@ msgstr "Při exitu uložit otevřené repozitáře"
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr "Při exitu uložit stávající cesty pro synchronizaci"
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr "&Commit"
 
@@ -8301,7 +8330,10 @@ msgstr "Chyba při aktivaci události  \"commit finished\""
 msgid "Cannot open Plugin Options dialog"
 msgstr "Nejde otevřít dialog Plugin Options"
 
-msgid "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
 msgstr ""
 
 #, python-format
@@ -8998,6 +9030,9 @@ msgstr ""
 
 #~ msgid "Unknown Files"
 #~ msgstr "Neznámé soubory"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Přidat specifické soubory (.hgignore, ...)"
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Učinit repo kompatibilní s Mercurial 1.0"
@@ -11804,12 +11839,6 @@ msgstr ""
 #~ msgid "%s will be imported to the repository"
 #~ msgstr "%s bude importován do repozitáře"
 
-#~ msgid "User Certificate Key File"
-#~ msgstr "User Certificate Key File"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "User Certificate Chain File"
-
 #~ msgid ""
 #~ "Commit message text for new changeset that reverses the effect of the "
 #~ "change being backed out."
@@ -11951,18 +11980,8 @@ msgstr ""
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "hunk %d byl již použit na řádku %d (fuzz %d)\n"
 
-#~ msgid "Similar revisions..."
-#~ msgstr "Podobné revize..."
-
 #~ msgid "Diff to Local"
 #~ msgstr "Diff vůči lokální kopii"
-
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr ""
-#~ "Při spuštění příkazu z příkazového řádku spustí proces na pozadí pro "
-#~ "zobrazení grafických dialogů. Implicitně: True"
 
 #~ msgid "Verify"
 #~ msgstr "Ověřit repo"
@@ -11973,41 +11992,11 @@ msgstr ""
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "Konfigurace kontextové nabídky Windows"
 
-#~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "Zpráva nejde přeložit do lokálního kódování\n"
-#~ "Zkuste vytvořit proměnnou prostředí HGENCODING\n"
-#~ "Nahraďte nepřeložitelná písmena znaky \"?\"?\n"
-
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Před komprimací musíte provést<a href=\"commit\"><b>commit</b></a> nebo "
-#~ "změny <a href=\"discard\"><b>vyřadit</b></a>."
-
-#~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Před gráftem musíte změny <a href=\"commit\"><b>komitovat</b></a> nebo <a "
-#~ "href=\"discard\"><b>vyřadit</b></a>."
-
 #~ msgid "Error when creating repository"
 #~ msgstr "Chyba při vytváření repozitáře"
 
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr "Vyřadit všechny změny z cílové revize sloučení"
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Před přeskupením (rebase) musíte provést <a href=\"commit\"><b>commit</"
-#~ "b></a> nebo změny <a href=\"discard\"><b>vyřadit</b> (discard) </a>."
 
 #~ msgid "udpate all repos in current dir"
 #~ msgstr "aktualizovat všechny repozitáře ve stávajícím adresáři"
@@ -12018,6 +12007,3 @@ msgstr ""
 #~ msgstr ""
 #~ "Je-li zadáno True, jsou řádky sumární zprávy changesetu spojovány až od "
 #~ "celkové délky 80 znaků. Implicitně je False"
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "&Podobné revize..."

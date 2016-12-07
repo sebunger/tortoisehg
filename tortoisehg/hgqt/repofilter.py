@@ -123,8 +123,13 @@ class RepoFilterBar(QToolBar):
 
         self.revsetcombo = combo = QComboBox()
         combo.setEditable(True)
+        # don't calculate size hint from history contents, just use as much
+        # space as possible. this way, the branch combo can be enlarged up
+        # to its preferred width.
+        combo.setSizeAdjustPolicy(
+            QComboBox.AdjustToMinimumContentsLengthWithIcon)
         combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        combo.setMinimumContentsLength(10)
+        combo.setMinimumContentsLength(20)
         qtlib.allowCaseChangingInput(combo)
         le = combo.lineEdit()
         le.returnPressed.connect(self.runQuery)
@@ -370,6 +375,7 @@ class RepoFilterBar(QToolBar):
         self._branchCombo = QComboBox()
         self._branchCombo.setEditable(True)
         self._branchCombo.setInsertPolicy(QComboBox.NoInsert)
+        self._branchCombo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
         self._branchCombo.setLineEdit(SelectAllLineEdit())
         self._branchCombo.lineEdit().editingFinished.connect(
             self._lineBranchChanged)

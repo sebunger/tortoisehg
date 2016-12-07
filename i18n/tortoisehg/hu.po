@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2015-06-28 12:43+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
@@ -15,17 +15,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:20+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:01+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
 
 msgid "Exit"
 msgstr "Kilép"
-
-msgid "hg lighthg"
-msgstr ""
 
 msgid "About"
 msgstr "Névjegy"
@@ -2259,8 +2256,8 @@ msgstr ""
 msgid "Copy working directory files from skeleton"
 msgstr ""
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Speciális fájlok hozzáadása (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr ""
@@ -4327,6 +4324,13 @@ msgid "&Filter Toolbar"
 msgstr ""
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr ""
 
@@ -5602,6 +5606,16 @@ msgid ""
 "revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
 "some cases. This option is expected to be removed if the performance issue "
 "is solved."
+msgstr ""
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
 msgstr ""
 
 msgctxt "config item"
@@ -7087,6 +7101,18 @@ msgstr ""
 msgid "Query"
 msgstr ""
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr ""
 
@@ -7543,6 +7569,9 @@ msgstr ""
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr ""
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr ""
 
@@ -7762,7 +7791,10 @@ msgstr ""
 msgid "Cannot open Plugin Options dialog"
 msgstr ""
 
-msgid "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
 msgstr ""
 
 #, python-format
@@ -8828,6 +8860,9 @@ msgstr ""
 
 #~ msgid "TortoiseHg Init"
 #~ msgstr "TortoiseHg Init"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Speciális fájlok hozzáadása (.hgignore, ...)"
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Repsitory legyen kompatibilis a Mercurial 1.0-val"

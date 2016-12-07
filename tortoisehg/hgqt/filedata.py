@@ -383,16 +383,11 @@ class FileData(_AbstractFileData):
             m = match.exact(repo.root, repo.root, [wfile])
             fp = cStringIO.StringIO()
 
-            try:
-                copy = {}
-                if oldname != wfile:
-                    copy[wfile] = oldname
-                patches = patch.diff(repo, ctx.node(), None, match=m,
-                                     opts=diffopts, copy=copy)
-            except TypeError:
-                # hg<3.9 (40d53d4b5925)
-                patches = patch.diff(repo, ctx.node(), None, match=m,
-                                     opts=diffopts)
+            copy = {}
+            if oldname != wfile:
+                copy[wfile] = oldname
+            patches = patch.diff(repo, ctx.node(), None, match=m,
+                                 opts=diffopts, copy=copy)
 
             for c in patches:
                 fp.write(c)

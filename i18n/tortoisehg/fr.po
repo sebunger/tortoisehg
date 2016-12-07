@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
-"PO-Revision-Date: 2016-05-10 12:17+0000\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
+"PO-Revision-Date: 2016-10-26 20:07+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2016-05-11 05:23+0000\n"
-"X-Generator: Launchpad (build 18025)\n"
+"X-Launchpad-Export-Date: 2016-10-27 06:00+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -25,9 +25,6 @@ msgstr "Icône du serveur de TortoiseHg Overlay"
 
 msgid "Exit"
 msgstr "Quitter"
-
-msgid "hg lighthg"
-msgstr "hg lighthg"
 
 msgid "About"
 msgstr "À propos"
@@ -1257,12 +1254,12 @@ msgid ""
 "You can also set this value to the absolute path to\n"
 "any icon on your file system."
 msgstr ""
-"Icone d'outil.\n"
+"Icône d'outil.\n"
 "Vous pouvez utiliser n'importe quelle icone de TortoiseHg\n"
-"en indiquant un nom d'icone TortoiseHg valide\n"
+"en indiquant un nom d'icône TortoiseHg valide\n"
 "(par exemple : clone, add, remove, sync, thg-logo, hg-update, etc).\n"
 "Vous pouvez aussi indiquer le chemin absolu vers\n"
-"n'importe quelle icone dans votre système de fichiers."
+"n'importe quelle icône dans votre système de fichiers."
 
 msgid "On repowidget, show for"
 msgstr "Dans le menu contextuel, afficher pour"
@@ -2370,8 +2367,8 @@ msgstr "Impossible d'écrire le fichier .hgignore"
 msgid "Copy working directory files from skeleton"
 msgstr "Copier des fichiers du répertoire de travail depuis le squelette"
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Ajouter les fichiers spéciaux (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr "Créer les fichiers spéciaux (.hgignore, ...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Rendre le dépôt compatible avec Mercurial <1.7"
@@ -4588,6 +4585,13 @@ msgid "&Filter Toolbar"
 msgstr "Barre d'outils de &filtre"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr "TortoiseHg : %s"
+
+msgid "S&tatus Bar"
+msgstr "Barre de s&tatut"
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "Résoudre les conflits - %s"
 
@@ -5999,6 +6003,20 @@ msgstr ""
 "ensemble de révisions. Par défaut : Vrai<p><b>Note</b> : le calcul des "
 "lignes de famille peut être lent dans certains cas. Cette option sera "
 "retirée si le problème de performance est résolu."
+
+msgid "Use optimized graph layouter"
+msgstr "Utiliser l'agencement optimisé de graphe"
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
+msgstr ""
+"Utiliser l'agencement optimisé de graphe pour les gros dépôts. Par défaut : "
+"Faux<p><b>Note</b> : Cet agencement colorie les arcs en utilisant les "
+"informations de branche et n'affiche pas les arcs de greffe, indépendamment "
+"du fait qu'ils soient demandés ou non."
 
 msgctxt "config item"
 msgid "Commit"
@@ -7723,6 +7741,18 @@ msgstr "### empreinte du certificate du serveur ###"
 msgid "Query"
 msgstr "Requête"
 
+msgid "TLS 1.0"
+msgstr "TLS 1.0"
+
+msgid "TLS 1.1"
+msgstr "TLS 1.1"
+
+msgid "TLS 1.2"
+msgstr "TLS 1.2"
+
+msgid "Minimum Protocol"
+msgstr "Protocole minimum"
+
 msgid "User Authentication"
 msgstr "Authentification de l'utilisateur"
 
@@ -8209,6 +8239,9 @@ msgstr "Enregistrer les dépôts ouverts en quittant"
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr "Enregister les chemins de synchro en quittant"
 
+msgid "Show Tas&k Tab"
+msgstr "Afficher l'onglet de tâches"
+
 msgid "&Commit"
 msgstr "&Committer"
 
@@ -8447,8 +8480,12 @@ msgstr "Erreur durant le déclencheur \"commit terminé\""
 msgid "Cannot open Plugin Options dialog"
 msgstr "Ne peut pas ouvrir le dialogue des options plugin"
 
-msgid "[SOURCE]"
-msgstr "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+"ne pas vérifier le certificat du serveur (ignorant la config web.cacerts)"
+
+msgid "[--insecure] [SOURCE]"
+msgstr "[--insecure] [SOURCE]"
 
 #, python-format
 msgid "unsupported URL: %s"
@@ -8679,7 +8716,7 @@ msgid "Update Icons"
 msgstr "Mettre à jour les icônes"
 
 msgid "Update icons for this repository"
-msgstr "Mettre à jour les icones du dépôt"
+msgstr "Mettre à jour les icônes du dépôt"
 
 msgid "Global Settings"
 msgstr "Paramètres généraux"
@@ -9026,6 +9063,9 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 
 #~ msgid "Glob:"
 #~ msgstr "Glob:"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Ajouter les fichiers spéciaux (.hgignore, ...)"
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Créé un dépôt compatible avec Mercurial 1.0"
@@ -10600,13 +10640,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "File is binary.\n"
 #~ msgstr "Le fichier est binaire.\n"
 
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Avant de compresser, vous devez <a href=\"commit\"><b>committer</b></a> "
-#~ "ou <a href=\"discard\"><b>abandonner</b></a> les modifications."
-
 #~ msgid "Destination path is empty"
 #~ msgstr "Le chemin destination est vide"
 
@@ -10661,9 +10694,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Push"
 #~ msgstr "Pousser"
 
-#~ msgid "Similar revisions..."
-#~ msgstr "Révisions similaires..."
-
 #~ msgid "Restart merge with"
 #~ msgstr "Redémarrer la fusion avec"
 
@@ -10706,22 +10736,8 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Ignore changes in the amount of white space. Default: False"
 #~ msgstr "Ignorer les changements dans le nombre d'espaces. Par défaut : Faux"
 
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr ""
-#~ "Lors de l'exécution depuis la ligne de commande, crée un processus "
-#~ "d'arrière-plan pour les boîtes de dialogue. Par défaut : Vrai"
-
 #~ msgid "Character encoding name"
 #~ msgstr "Nom de l'encodage des caractères"
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Avant de \"rebaser\", vous devez <a href=\"commit\"><b>committer</b></a> "
-#~ "ou <a href=\"discard\"><b>abandonner</b></a> les changements."
 
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr ""
@@ -10783,23 +10799,8 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Remove versioned"
 #~ msgstr "Supprimer les fichiers versionnés"
 
-#~ msgid "User Certificate Key File"
-#~ msgstr "Fichier de clé de certificat de l'utilisateur"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "Fichier de chaîne de certificat de l'utilisateur"
-
 #~ msgid "Backout..."
 #~ msgstr "Backout..."
-
-#~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "Impossible de transposer le message dans l'encodage local\n"
-#~ "Envisager de configurer la variable d'environnement HGENCODING\n"
-#~ "Remplacer les caractères non-transposables par \"?\" ?\n"
 
 #~ msgid ""
 #~ "Defines the command to run when an issue number is recognized. You may "
@@ -10815,23 +10816,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ "correspond à la chaîne entière trouvée par issue.regex, {1} désigne le "
 #~ "premier groupe et ainsi de suite. Si aucun jeton {n} n'est trouvé dans "
 #~ "issue.link, la chaîne complète trouvée est ajoutée."
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "Révisions &similaires..."
-
-#~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Avant de greffer, vous devez <a href=\"commit\"><b>committer</b></a> ou "
-#~ "<a href=\"discard\"><b>abandonner</b></a> les changements."
-
-#~ msgid "Copyright 2008-2015 Steve Borho and others"
-#~ msgstr "Copyright 2008-2015 Steve Borho et d'autres"
-
-#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
-#~ msgstr ""
-#~ "empreinte du serveur pour %s ne peut pas être obtenue (Python trop vieux)"
 
 #~ msgid "udpate all repos in current dir"
 #~ msgstr "mettre à jour tous les dépôts dans le répertoire actuel"

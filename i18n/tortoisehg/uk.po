@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2016-03-13 10:18+0000\n"
 "Last-Translator: onekosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,17 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:23+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:06+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
 
 msgid "Exit"
 msgstr "Закрити"
-
-msgid "hg lighthg"
-msgstr "hg lighthg"
 
 msgid "About"
 msgstr "Про програму"
@@ -2355,8 +2352,8 @@ msgstr "Не можливо писати до файлу .hgignore"
 msgid "Copy working directory files from skeleton"
 msgstr "Копіювати робочий каталог файлів з скелетона"
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Додати спеціальні файли (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Створити сховище сумісне з Mercurial < 1.7"
@@ -4550,6 +4547,13 @@ msgid "&Filter Toolbar"
 msgstr "Фільтр пеналів"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "Розв'язати конфлікти - %s"
 
@@ -5942,6 +5946,16 @@ msgstr ""
 "Показати непряму залежність графу правки коли фільтрується набір правок. "
 "Типово: Так<p><b>Note</b>: РОзрахунок фамільних ліній може бути повільним в "
 "деяких випадках. Цю опцію очікує видалення продуктивність не покращиться."
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
+msgstr ""
 
 msgctxt "config item"
 msgid "Commit"
@@ -7626,6 +7640,18 @@ msgstr "### вузол сертифікату відбитків пальців 
 msgid "Query"
 msgstr "Запит"
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr "Аутентифікація користувача"
 
@@ -8111,6 +8137,9 @@ msgstr "Зберігати відкритими сховища на виході
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr "Зберегати поточний обмін латками на виході"
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr "Фіксувати"
 
@@ -8348,8 +8377,11 @@ msgstr "Помилка виконання \"commit finished\" перехоплю
 msgid "Cannot open Plugin Options dialog"
 msgstr "Неможливо відкрити діалог Налаштуваня Модулів"
 
-msgid "[SOURCE]"
-msgstr "[ДЖЕРЕЛО]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
+msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
@@ -8736,6 +8768,9 @@ msgstr "win32ill: переривається коли зупиняється ц�
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Створити сховище сумісне з Mercurial 1.0"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Додати спеціальні файли (.hgignore, ...)"
 
 #~ msgid "Unable to create new repository"
 #~ msgstr "Неможливо створити нове сховище"
@@ -10342,19 +10377,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "частина %d вже прийнята для рядка %d (fuzz %d)\n"
 
-#~ msgid "User Certificate Key File"
-#~ msgstr "Файл з ключами користувача"
-
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Перед стисканням Вам потрібно <a href=\"commit\"><b>зафіксувати</b></a> "
-#~ "або <a href=\"discard\"><b>відкинути</b></a> зміни."
-
-#~ msgid "Similar revisions..."
-#~ msgstr "Схожі ревізії..."
-
 #~ msgid "Invalid date specification"
 #~ msgstr "Помилковий формат дати"
 
@@ -11200,13 +11222,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ msgstr "Виберіть спільного предка ревізії"
 
 #~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Перед щепленням, ви повинні <a href=\"commit\"><b>зафіксувати</b></a> або "
-#~ "<a href=\"discard\"><b>відкинути</b></a> зміни."
-
-#~ msgid ""
 #~ "\n"
 #~ "[command interrupted]"
 #~ msgstr ""
@@ -11342,9 +11357,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ msgid "finding source of "
 #~ msgstr "пошукування джерела у "
 
-#~ msgid "&Similar Revisions..."
-#~ msgstr "Схожі ревізії..."
-
 #~ msgid "&Yes (--force)"
 #~ msgstr "Так (--force)"
 
@@ -11428,13 +11440,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ "Показувати панель різниць знизу переліка файлів для діалога стану, "
 #~ "відкладання та фіксації. Типово: ні (різниці показують праворуч від "
 #~ "переліку файлів)."
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Перед переміщенням Вам потрібно виконати <a href=\"commit\"><b>фіксацію</"
-#~ "b></a> або <a href=\"discard\"><b>відмовитись від</b></a> змін."
 
 #~ msgid "Rebase on top of selected"
 #~ msgstr "Перемістити на крок вище вибраної"
@@ -11528,9 +11533,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ "Не обрано файли для переміщення\n"
 #~ "\n"
 #~ "Нотатка: лише незмінені файли можуть бути переміщені."
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "Файл ланцюжок сертифікатів користувача"
 
 #~ msgid "name of file to write process ID to"
 #~ msgstr "ім'я файлу для запису ID процесу"
@@ -11840,33 +11842,11 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ "Ні\t- Зафіксувати без зміни гілки\n"
 #~ "Відмова - Відмовитись від фіксації"
 
-#~ msgid "Copyright 2008-2015 Steve Borho and others"
-#~ msgstr "Авторські права Стів Борхо (Steve Borho) 2008-2015 та інших"
-
-#~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "Не вдається транслювати повідомлення поточним кодуванням.\n"
-#~ "Спробуйте встановити параметр HGENCODING\n"
-#~ "Чи слід замінити неперекладені літери на \"?\"?\n"
-
 #~ msgid "Bisect"
 #~ msgstr "Половинити"
 
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr ""
-#~ "На час виконання з командного рядку, визуальні діалоги переходитимуть у "
-#~ "фоновий процес. Типово: так."
-
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr "Відкинути всі зміни із злиттям цільової (іншої) правки"
-
-#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
-#~ msgstr "вузол fingerprint для %s не може бути obtained (Python дуже старий)"
 
 #~ msgid "Display local changes that will be pushed to selected repository"
 #~ msgstr "Показати місцеві зміни, що будуть внесені до обраного сховища"

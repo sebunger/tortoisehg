@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2015-09-03 18:15+0000\n"
 "Last-Translator: yfdyh000 <yfdyh000@gmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:24+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:08+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 "Language: zh_CN\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -24,9 +24,6 @@ msgstr "TortoiseHg 层叠图标服务"
 
 msgid "Exit"
 msgstr "退出"
-
-msgid "hg lighthg"
-msgstr "hg lighthg"
 
 msgid "About"
 msgstr "关于"
@@ -2296,8 +2293,8 @@ msgstr "无法写入 .hgignore 文件"
 msgid "Copy working directory files from skeleton"
 msgstr "复制选定的工作目录文件"
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "添加特殊文件 (.hgignore,...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "创建和 Mercurial 1.7 以前的版本兼容的仓库"
@@ -4406,6 +4403,13 @@ msgid "&Filter Toolbar"
 msgstr "过滤工具栏(&F)"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "解决冲突 - %s"
 
@@ -5703,6 +5707,16 @@ msgid ""
 "revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
 "some cases. This option is expected to be removed if the performance issue "
 "is solved."
+msgstr ""
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
 msgstr ""
 
 msgctxt "config item"
@@ -7230,6 +7244,18 @@ msgstr "### 主机证书指纹 ###"
 msgid "Query"
 msgstr "查询"
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr "用户认证"
 
@@ -7691,6 +7717,9 @@ msgstr "退出时保存打开的仓库(&X)"
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr "退出时保存当前的同步路径(&V)"
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr "提交(&C)"
 
@@ -7922,8 +7951,11 @@ msgstr "执行 \"commit finished\" 触发器出错"
 msgid "Cannot open Plugin Options dialog"
 msgstr "无法打开插件选项对话框"
 
-msgid "[SOURCE]"
-msgstr "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
+msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
@@ -10630,13 +10662,6 @@ msgstr "win32ill: 停止消息循环时被中断\n"
 #~ "'%(qtip)s'?"
 #~ msgstr "确认要折叠未应用的补丁'%(target)s'到当前的补丁'%(qtip)s'吗"
 
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "在压缩之前，您必须要<a href=\"commit\"><b>提交</b></a>或<a href=\"discard"
-#~ "\"><b>放弃</b></a>更改。"
-
 #~ msgid "close branch: "
 #~ msgstr "关闭分支： "
 
@@ -10948,17 +10973,11 @@ msgstr "win32ill: 停止消息循环时被中断\n"
 #~ msgid "Allow pushing a new branch"
 #~ msgstr "允许推送新分支"
 
-#~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "无法将说明转换到本地编码\n"
-#~ "请考虑设置 HGENCODING 环境变量\n"
-#~ "使用“?”替换不能翻译的字符？\n"
-
 #~ msgid "Nothing Commited"
 #~ msgstr "未提交"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "添加特殊文件 (.hgignore,...)"
 
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr "丢弃目标修订版本所做的全部更改"
@@ -10980,11 +10999,6 @@ msgstr "win32ill: 停止消息循环时被中断\n"
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "终止: 恢复备份失败, %s\n"
-
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr "从命令行运行时单独建立一个背景进程用于显示图形界面。默认: 是"
 
 #~ msgid ""
 #~ "Color changesets by author name.  If not enabled, the changes are colored "
@@ -11011,32 +11025,3 @@ msgstr "win32ill: 停止消息循环时被中断\n"
 
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr "忽略对空行的修改. 默认: 否"
-
-#~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "在嫁接之前，您必须<a href=\"commit\"><b>提交</b></a>或者<a href=\"discard"
-#~ "\"><b>丢弃</b></a>变更。"
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "在变基之前，您必须<a href=\"commit\"><b>提交</b></a>或者<a href=\"discard"
-#~ "\"><b>丢弃</b></a>变更。"
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "类似的修订(&S)..."
-
-#~ msgid "Similar revisions..."
-#~ msgstr "类似的修订..."
-
-#~ msgid "User Certificate Key File"
-#~ msgstr "用户证书密钥文件"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "用户证书链文件"
-
-#~ msgid "Copyright 2008-2015 Steve Borho and others"
-#~ msgstr "版权所有 2008-2015 Steve Borho 等人"

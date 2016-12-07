@@ -217,7 +217,7 @@ import os
 import collections
 
 from mercurial import revset as revsetmod
-from mercurial import phases
+from mercurial import error, hg, node, phases
 
 from tortoisehg.util import obsoleteutil
 
@@ -307,11 +307,11 @@ class StandardDag(object):
                 yield repo[curr_rev]
             curr_rev = len(repo) - 1
         # jump in the branch grouping graph experiment if the user subscribed
-        if not repo.ui.configbool('experimental', 'graph-group-branches', False):
-            revs = revsetmod.spanset(repo, curr_rev, stop_rev - 1)
-        else:
+        revs = revsetmod.spanset(repo, curr_rev, stop_rev - 1)
+        if revs and repo.ui.configbool('experimental', 'graph-group-branches', False):
+            start, stop = revs.first(), revs.last()
             revset = 'sort(%d:%d, "topo"'
-            args = [curr_rev, stop_rev]
+            args = [start, stop]
             firstbranchrevset = repo.ui.config(
                 'experimental', 'graph-group-branches.firstbranch', '')
             if firstbranchrevset:
@@ -638,7 +638,13 @@ def filelog_grapher(repo, path):
     Graph the ancestry of a single file (log).  Deletions show
     up as breaks in the graph.
     '''
-    dag = FileDag(repo, path)
+
+    if hasattr(repo, 'shallowmatch') and repo.shallowmatch(path):
+        filedag = ShallowFileDag
+    else:
+        filedag = FileDag
+
+    dag = filedag(repo, path)
     return _iter_graphnodes(dag, GraphNode.fromfilectx)
 
 
@@ -647,27 +653,24 @@ class FileDag(object):
         self.repo = repo
         self.path = path
 
+    def _getflogheads(self):
+        flog = self.repo.file(self.path)
+        return flog.heads()
+
     def walk(self):
-        repo = self.repo
-        path = self.path
+        flogheads = self._getflogheads()
+        heads = sorted(self.repo.filectx(self.path, fileid=x).rev()
+                       for x in flogheads) or [-1]
 
-        filerev = len(repo.file(path)) - 1
-        fctx = repo.filectx(path, fileid=filerev)
-        rev = fctx.rev()
-
-        flog = fctx.filelog()
-        heads = [repo.filectx(path, fileid=flog.rev(x)).rev()
-                 for x in flog.heads()]
-        assert rev in heads
-        heads.remove(rev)
+        rev = heads.pop()
 
         _paths = {}
 
         while rev >= 0:
-            revpath = _paths.pop(rev, path)
+            revpath = _paths.pop(rev, self.path)
 
             # Add parents to next_revs
-            fctx = repo.filectx(revpath, changeid=rev)
+            fctx = self.repo.filectx(revpath, changeid=rev)
             for pfctx in fctx.parents():
                 _paths[pfctx.rev()] = pfctx.path()
             parents = [(pfctx, LINE_TYPE_PARENT, i == 0)
@@ -681,6 +684,47 @@ class FileDag(object):
                 rev = -1
             if heads and rev <= heads[-1]:
                 rev = heads.pop()
+
+
+class ShallowFileDag(FileDag):
+    """FileDag specialization for shallow (remotefilelog) repository"""
+
+    def _getflogheads(self):
+        repo = self.repo
+        path = self.path
+
+        try:
+            dest = repo.ui.expandpath('default')
+            peer = hg.peer(repo, {}, dest)
+        except error.RepoError:
+            peer = None
+
+        flogheads = set()
+        repoheads = set(repo.heads())
+
+        # Get filelog heads from server and filter local heads with peer heads
+        if peer is not None and peer.capable('getflogheads'):
+            repoheads -= set(peer.heads())
+            flogheads.update(set(peer.getflogheads(path)))
+
+        # Get filelog heads from local repo heads.
+        # This allows to get changes not yet pushed to the server. This is
+        # also a fallback in case the server is not available.
+        for head in repoheads:
+            try:
+                fctx = repo[head].filectx(path)
+                fnode = node.hex(fctx.filenode())
+                if fnode not in flogheads:
+                    flogheads.add(fnode)
+                    # We filter out parents of added node.
+                    # A parent could already be in flogheads if still a
+                    # head on the server, but not anymore in local repository
+                    flogheads -= set([node.hex(pfctx.filenode())
+                                      for pfctx in fctx.parents()])
+            except error.ManifestLookupError:
+                pass
+
+        return flogheads
 
 
 class RevColorPalette(object):

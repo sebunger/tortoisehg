@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
-"PO-Revision-Date: 2016-05-09 07:28+0000\n"
-"Last-Translator: Stanislav V. Kroter <krotersv@gmail.com>\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
+"PO-Revision-Date: 2016-10-25 19:47+0000\n"
+"Last-Translator: Дьяченко Александр <DyachenkoA@hotmail.ru>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2016-05-10 05:23+0000\n"
-"X-Generator: Launchpad (build 18025)\n"
+"X-Launchpad-Export-Date: 2016-10-26 05:22+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 "Language: ru\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -25,9 +25,6 @@ msgstr "Сервер накладных значков TortoiseHg"
 
 msgid "Exit"
 msgstr "В&ыход"
-
-msgid "hg lighthg"
-msgstr "hg lighthg"
 
 msgid "About"
 msgstr "О программе"
@@ -2373,8 +2370,8 @@ msgstr "Не удалось записать файл .hgignore"
 msgid "Copy working directory files from skeleton"
 msgstr "Копировать рабочие файлы каталога из скелета"
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Добавить файлы особого назначения (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr "Создать файлы особого назначения (.hgignore, ...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Сделать хранилище совместимым с Mercurial <1.7"
@@ -4590,6 +4587,13 @@ msgid "&Filter Toolbar"
 msgstr "Панель &фильтра"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr "TortoiseHg: %s"
+
+msgid "S&tatus Bar"
+msgstr "&Строка состояния"
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "Улаживание конфликтов - %s"
 
@@ -5992,6 +5996,20 @@ msgstr ""
 "наборам ревизий. По умолчанию: Да<p><b>Примечание</b>: Вычисление линий "
 "родства может быть медленным в некоторых случаях. Эта опция будет удалена, "
 "если как ожидается проблема производительности будет решена."
+
+msgid "Use optimized graph layouter"
+msgstr "Использовать оптимизированную компоновку графа"
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
+msgstr ""
+"Использовать альтернативную компоновку графа для больших хранилищ. По "
+"умолчанию: Нет<p><b>Примечание</b>: Эта компоновка устанавливает цвета линий "
+"с использованием информации о ветках и не отображает наращения, независимо "
+"от того, являются ли они запрашиваемыми или нет."
 
 msgctxt "config item"
 msgid "Commit"
@@ -7581,7 +7599,7 @@ msgid ""
 "creation of a new branch.  Do you want to create a new branch in the remote "
 "repository?"
 msgstr ""
-"Некоторые наборы изменений из тех, что вы пытаетесь протолкнуть, вызовуть "
+"Некоторые наборы изменений из тех, что вы пытаетесь протолкнуть, вызовут "
 "создание новой ветки. Вы правда хотите создать новую ветку в отдалённом "
 "хранилище?"
 
@@ -7719,6 +7737,18 @@ msgstr "### отпечаток сертификата хоста ###"
 
 msgid "Query"
 msgstr "Запрос"
+
+msgid "TLS 1.0"
+msgstr "TLS 1.0"
+
+msgid "TLS 1.1"
+msgstr "TLS 1.1"
+
+msgid "TLS 1.2"
+msgstr "TLS 1.2"
+
+msgid "Minimum Protocol"
+msgstr "Минимальный протокол"
 
 msgid "User Authentication"
 msgstr "Аутентификация пользователя"
@@ -8207,6 +8237,9 @@ msgstr "Сохранять открытые хранилища при выход
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr "Сохранять текущий путь синхронизации при выходе"
 
+msgid "Show Tas&k Tab"
+msgstr "Показать вкладку &Задачи"
+
 msgid "&Commit"
 msgstr "&Фиксация"
 
@@ -8447,8 +8480,11 @@ msgstr "Ошибка выполнения триггера \"commit finished\""
 msgid "Cannot open Plugin Options dialog"
 msgstr "Невозможно открыть диалог настройки плагина"
 
-msgid "[SOURCE]"
-msgstr "[ИСТОЧНИК]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr "не проверять сертификат сервера (игнорировать настройки web.cacerts)"
+
+msgid "[--insecure] [SOURCE]"
+msgstr "[--insecure] [ИСТОЧНИК]"
 
 #, python-format
 msgid "unsupported URL: %s"
@@ -8961,6 +8997,9 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "Unknown Files"
 #~ msgstr "Неизвестные Файлы"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Добавить файлы особого назначения (.hgignore, ...)"
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Сделать хранилище совместимым с Mercurial 1.0"
@@ -11377,13 +11416,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ msgid "Refresh required"
 #~ msgstr "Требуется обновить изображение"
 
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Перед перебазированием, вам нужно <a href=\"commit\"><b>зафиксировать</"
-#~ "b></a> или <a href=\"discard\"><b>отбросить</b></a> изменения."
-
 #~ msgid "unknown hunk type: %s"
 #~ msgstr "неизвестный тип лоскута: %s"
 
@@ -11834,13 +11866,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ msgstr "Обратить изменения..."
 
 #~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr ""
-#~ "При запуске с командой строки, запускать фоновый процесс для графического "
-#~ "интерфейса пользователя. По умолчанию: Да"
-
-#~ msgid ""
 #~ "Color changesets by author name.  If not enabled, the changes are colored "
 #~ "green for merge, red for non-trivial parents, black for normal. Default: "
 #~ "False"
@@ -11978,15 +12003,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ msgstr "прервано: восстановление резервной копии не удалось, %s\n"
 
 #~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "Не удаётся перевести сообщение в локальную кодировку.\n"
-#~ "Попробуйте установить переменную среды HGENCODING\n"
-#~ "Заменить непереводимые символы знаком \"?\"?\n"
-
-#~ msgid ""
 #~ "Defines the command to run when an issue number is recognized. You may "
 #~ "include groups in issue.regex, and corresponding {n} tokens in issue.link "
 #~ "(where n is a non-negative integer). {0} refers to the entire string "
@@ -12001,12 +12017,6 @@ msgstr "win32ill: прервано при остановке цикла обра
 #~ "{1} ссылается на первую группу и т.д. Если в ссылке на проблему не будет "
 #~ "никаких лексем {n}, то вся совпавшая строка будет добавлена в конец "
 #~ "ссылки."
-
-#~ msgid "User Certificate Key File"
-#~ msgstr "Файл ключа сертификата пользователя"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "Файл цепочки сертификатов пользователя"
 
 #~ msgid "unshelve backup aborted\n"
 #~ msgstr "восстановление отложенных изменений из резервной копии прервано\n"
@@ -12104,29 +12114,3 @@ msgstr "win32ill: прервано при остановке цикла обра
 
 #~ msgid "abandon shelved changes"
 #~ msgstr "Отказаться от отложенных изменений"
-
-#~ msgid "Similar revisions..."
-#~ msgstr "Похожие ревизии..."
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "&Похожие ревизии..."
-
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Перед сжатием вы должны <a href=\"commit\"><b>зафиксировать</b></a> или "
-#~ "<a href=\"discard\"><b>отбросить</b></a> изменения."
-
-#~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Перед наращением ветви, вы должны <a href=\"commit\"><b>фиксировать</b></"
-#~ "a> или <a href=\"discard\"><b>отбросить</b></a> изменения."
-
-#~ msgid "Copyright 2008-2015 Steve Borho and others"
-#~ msgstr "Авторское право 2008-2015 Steve Borho и другие"
-
-#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
-#~ msgstr "отпечаток хоста для %s не может быть получен (Python слишком стар)"

@@ -1314,8 +1314,6 @@ class SecureDialog(QDialog):
         hbox.addWidget(le)
         self._querybutton = qb = QPushButton(_('Query'))
         qb.clicked.connect(self._queryFingerprint)
-        self.fprintradio.toggled.connect(self._updateUi)
-        self.insecureradio.toggled.connect(self._updateUi)
         hbox.addWidget(qb)
         vbox.addWidget(self.cacertradio)
         vbox.addWidget(self.fprintradio)
@@ -1327,6 +1325,9 @@ class SecureDialog(QDialog):
             self.fprintradio.setChecked(True)
         elif repo.ui.config('insecurehosts', u.host):
             self.insecureradio.setChecked(True)
+
+        self.fprintradio.toggled.connect(self._updateUi)
+        self.insecureradio.toggled.connect(self._updateUi)
 
         self._protocolcombo = e = QComboBox(self)
         e.addItem(_('<unspecified>'), '')
