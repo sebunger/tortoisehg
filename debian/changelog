@@ -1,3 +1,9 @@
+tortoisehg (4.0-1) UNRELEASED; urgency=medium
+
+  * Imported Upstream version 4.0 (Closes: #846234).
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Tue, 06 Dec 2016 22:25:02 -0800
+
 tortoisehg (3.9-1) unstable; urgency=medium
 
   * Team upload (collab-maint).
