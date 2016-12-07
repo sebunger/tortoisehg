@@ -2184,6 +2184,8 @@ class LightRepoWindow(QMainWindow):
         stbar.setVisible(s.value('statusBar', True).toBool())
         s.endGroup()
 
+        self.setWindowTitle(_('TortoiseHg: %s') % repoagent.displayName())
+
     def createPopupMenu(self):
         menu = super(LightRepoWindow, self).createPopupMenu()
         assert menu  # should have toolbar

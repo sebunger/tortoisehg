@@ -7,25 +7,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Peer Sommerlund <peer.sommerlund@gmail.com>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
-"PO-Revision-Date: 2015-06-28 12:53+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
+"PO-Revision-Date: 2016-08-07 04:41+0000\n"
+"Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:19+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:00+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg overlay-ikon server"
 
 msgid "Exit"
 msgstr "Afslut"
-
-msgid "hg lighthg"
-msgstr ""
 
 msgid "About"
 msgstr "Om"
@@ -504,13 +501,13 @@ msgid "Manually resolve rejected chunks?"
 msgstr ""
 
 msgid "Edit patched file and rejects?"
-msgstr ""
+msgstr "Rediger lappede filer og afvisninger?"
 
 msgid "No deletable chunks"
 msgstr "Ingen sletbare blokke"
 
 msgid "Completely remove file from patch?"
-msgstr ""
+msgstr "Fjern filen helt fra lappen?"
 
 msgid "Revert all file changes?"
 msgstr ""
@@ -528,7 +525,7 @@ msgid "Unable to merge chunks"
 msgstr "Kan ikke flette blokke"
 
 msgid "Add or remove patches must be merged in the working directory"
-msgstr ""
+msgstr "Tilføjede eller fjernede lapper skal være flettet i arbejdskkataloget"
 
 msgid "Unable to remove"
 msgstr ""
@@ -611,7 +608,7 @@ msgid "Select destination repository"
 msgstr "Vælg destinationsdepot"
 
 msgid "Select patch folder"
-msgstr ""
+msgstr "Vælg lap-folder"
 
 #, python-format
 msgid "Clone - %s"
@@ -1145,10 +1142,10 @@ msgid "Fixed revisions"
 msgstr ""
 
 msgid "Applied patches"
-msgstr ""
+msgstr "Anvendte lapper"
 
 msgid "Applied patches or qparent"
-msgstr ""
+msgstr "Anvendte lapper eller qparent"
 
 msgid "<default icon>"
 msgstr ""
@@ -1328,7 +1325,7 @@ msgid "Open parent folder of current file in the system file manager"
 msgstr ""
 
 msgid "&Copy Patch"
-msgstr ""
+msgstr "&Kopier lap"
 
 msgid "Copy &Path"
 msgstr ""
@@ -1436,7 +1433,7 @@ msgid "Edit Re&jects"
 msgstr ""
 
 msgid "Manually resolve rejected patch chunks"
-msgstr ""
+msgstr "Løs afviste lap-stumper manuelt"
 
 msgid "De&tect Renames..."
 msgstr ""
@@ -1875,6 +1872,9 @@ msgid ""
 "\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
 "changes."
 msgstr ""
+"Før du kan pode skal du <a href=\"commit\"><b>integrere</b></a> ændringerne, "
+"lægge en lap på <a href=\"shelve\"><b>hylden</b></a> eller <a href=\"discard"
+"\"><b>forkaste</b></a> ændringerne."
 
 msgid "You may continue or start the graft"
 msgstr "Du må fortsætte eller starte podningen"
@@ -2169,7 +2169,7 @@ msgid "Send single binary bundle, not patches"
 msgstr "Send samlet binært bundt, ingen lapper"
 
 msgid "send patches as part of the email body"
-msgstr ""
+msgstr "send lapper som en del af mail teksten"
 
 msgid "body"
 msgstr ""
@@ -2206,7 +2206,7 @@ msgstr ""
 "i besked-emnet."
 
 msgid "Write patch series (bundle) description"
-msgstr ""
+msgstr "Skriv lap-sekvens (bundt) beskrivelse"
 
 msgid "Subject:"
 msgstr "Emne:"
@@ -2292,8 +2292,8 @@ msgstr "Kan ikke skrive .hgignore filen"
 msgid "Copy working directory files from skeleton"
 msgstr ""
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Tilføj specielle filer (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Gør depot kompatibelt med Mercurial <1.7"
@@ -2606,20 +2606,20 @@ msgid "&Purge Queue..."
 msgstr ""
 
 msgid "Create Patch Queue"
-msgstr ""
+msgstr "Opret lap-kø"
 
 msgid "New patch queue name"
-msgstr ""
+msgstr "Navn på ny lap-kø"
 
 msgid "Create"
 msgstr "Opret"
 
 msgid "Rename Patch Queue"
-msgstr ""
+msgstr "Omdøb lap-kø"
 
 #, python-format
 msgid "Rename patch queue '%s' to"
-msgstr ""
+msgstr "Omdøb lap-kø '%s' til"
 
 msgid "Rename"
 msgstr "Omdøb"
@@ -2637,13 +2637,13 @@ msgid "Purge Patch Queue"
 msgstr ""
 
 msgid "Remove patch directory of"
-msgstr ""
+msgstr "Slet lap-folder"
 
 msgid "Purge"
 msgstr "Ryd"
 
 msgid "Rename Patch"
-msgstr ""
+msgstr "Omdøb lap"
 
 #, python-format
 msgid "Rename patch <b>%s</b> to:"
@@ -2673,40 +2673,40 @@ msgid "Pop"
 msgstr ""
 
 msgid "Unapply one patch"
-msgstr ""
+msgstr "Fjern én lap"
 
 msgid "Pop all"
 msgstr ""
 
 msgid "Unapply all patches"
-msgstr "Undlad anvendelse af alle lapper/programrettelser"
+msgstr "Fjern alle lapper"
 
 msgid "Go &to Patch"
-msgstr ""
+msgstr "&Gå til lap"
 
 msgid "&Finish Patch"
-msgstr ""
+msgstr "&Afslut lap"
 
 msgid "Move applied patches into repository history"
-msgstr ""
+msgstr "Flyt anvendte lapper ind i depotet"
 
 msgid "&Delete Patches..."
-msgstr ""
+msgstr "&Slet lapper..."
 
 msgid "Delete selected patches"
 msgstr "Slet valgte lapper"
 
 msgid "Re&name Patch..."
-msgstr ""
+msgstr "&Omdøb lap..."
 
 msgid "Set &Guards..."
 msgstr ""
 
 msgid "Configure guards for selected patch"
-msgstr ""
+msgstr "Konfigurer vagter for valgte lap"
 
 msgid "Patch Queue Actions Toolbar"
-msgstr ""
+msgstr "Lap kø værktøjslinje"
 
 msgid "Configure guards"
 msgstr ""
@@ -2716,11 +2716,11 @@ msgid "Input new guards for %s:"
 msgstr ""
 
 msgid "Confirm patch queue switch"
-msgstr ""
+msgstr "Bekræft skift af lap-kø"
 
 #, python-format
 msgid "Do you really want to activate patch queue '%s' ?"
-msgstr ""
+msgstr "Ønsker du at aktivere lap-kø '%s'?"
 
 #, python-format
 msgid "Guards: %d/%d"
@@ -4057,7 +4057,7 @@ msgid "Modi&fy History"
 msgstr ""
 
 msgid "&Unapply Patch"
-msgstr ""
+msgstr "&Fjern lap"
 
 msgid "Import to &MQ"
 msgstr ""
@@ -4141,13 +4141,13 @@ msgid "Post Selected to Review Board..."
 msgstr ""
 
 msgid "Apply patch"
-msgstr ""
+msgstr "Anvend lap"
 
 msgid "Apply onto original parent"
 msgstr ""
 
 msgid "Apply only this patch"
-msgstr ""
+msgstr "Anvend denne lap"
 
 msgid "Fold patches..."
 msgstr ""
@@ -4378,6 +4378,13 @@ msgid "&Refresh"
 msgstr "&Opdater"
 
 msgid "&Filter Toolbar"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
 msgstr ""
 
 #, python-format
@@ -5679,6 +5686,16 @@ msgid ""
 "revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
 "some cases. This option is expected to be removed if the performance issue "
 "is solved."
+msgstr ""
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
 msgstr ""
 
 msgctxt "config item"
@@ -7206,6 +7223,18 @@ msgstr "### værtscertifikat fingeraftryk ###"
 msgid "Query"
 msgstr ""
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr ""
 
@@ -7662,6 +7691,9 @@ msgstr ""
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr ""
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr ""
 
@@ -7882,7 +7914,10 @@ msgstr ""
 msgid "Cannot open Plugin Options dialog"
 msgstr ""
 
-msgid "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
 msgstr ""
 
 #, python-format
@@ -8772,6 +8807,9 @@ msgstr ""
 
 #~ msgid "Remove Selected"
 #~ msgstr "Fjern valgte"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Tilføj specielle filer (.hgignore, ...)"
 
 #~ msgid "Destination path is empty"
 #~ msgstr "Mål-sti er tom"
@@ -11465,10 +11503,3 @@ msgstr ""
 #~ "Juster visningen af hovedværktøjslinjen i Depot Stifinderen. Værdier: "
 #~ "\"small\" (lille), \"large\" (stor), eller \"theme\" (følg tema). "
 #~ "Standard: theme"
-
-#~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Før podning skal du <a href=\"commit\"><b>integrere</b></a> eller <a href="
-#~ "\"discard\"><b>annulere</b></a> ændringer."

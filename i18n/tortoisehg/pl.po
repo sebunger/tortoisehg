@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2013-02-27 15:09+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Polish <pl@li.org>\n"
@@ -16,17 +16,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:22+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:04+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Serwer nakładek na ikony TortoiseHg"
 
 msgid "Exit"
 msgstr "Zakończ"
-
-msgid "hg lighthg"
-msgstr ""
 
 msgid "About"
 msgstr "O TortoiseHg"
@@ -2280,8 +2277,8 @@ msgstr "Nie można zapisać pliku .hgignore"
 msgid "Copy working directory files from skeleton"
 msgstr ""
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Dodaj specjalne pliki (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Zgodność z Mercurial <1.7"
@@ -4382,6 +4379,13 @@ msgid "&Filter Toolbar"
 msgstr ""
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr ""
 
@@ -5672,6 +5676,16 @@ msgid ""
 "revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
 "some cases. This option is expected to be removed if the performance issue "
 "is solved."
+msgstr ""
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
 msgstr ""
 
 msgctxt "config item"
@@ -7172,6 +7186,18 @@ msgstr "### odcisk certyfikatu hosta ###"
 msgid "Query"
 msgstr "Generuj"
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr "Autentyfikacja użytkownika"
 
@@ -7637,6 +7663,9 @@ msgstr ""
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr ""
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr "&Commit"
 
@@ -7860,7 +7889,10 @@ msgstr ""
 msgid "Cannot open Plugin Options dialog"
 msgstr ""
 
-msgid "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
 msgstr ""
 
 #, python-format
@@ -8387,15 +8419,11 @@ msgstr ""
 #~ msgid "Nothing Commited"
 #~ msgstr "Nic nie wcommitowano"
 
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Przed kompresją, musisz <a href=\"commit\"><b>wcommitować</b></a> lub <a "
-#~ "href=\"discard\"><b>odrzucić</b></a> zmiany."
-
 #~ msgid "File is binary.\n"
 #~ msgstr "Plik jest binarny.\n"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Dodaj specjalne pliki (.hgignore, ...)"
 
 #~ msgid "Destination path is empty"
 #~ msgstr "Ścieżka docelowa jest pusta"
@@ -9546,13 +9574,6 @@ msgstr ""
 #~ msgid "hg unshelve [OPTION]... [FILE]..."
 #~ msgstr "hg unshelve [OPTION]... [FILE]..."
 
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Przed przebazowaniem musisz <a href=\"commit\"><b>wcommitować</b></a> lub "
-#~ "<a href=\"discard\"><b>odrzucić</b></a> zmiany."
-
 #~ msgid "tag '%s' is not a local tag"
 #~ msgstr "tag '%s' nie jest tagiem lokalnym"
 
@@ -9627,15 +9648,6 @@ msgstr ""
 
 #~ msgid "Push"
 #~ msgstr "Wyślij"
-
-#~ msgid "Similar revisions..."
-#~ msgstr "Podobne rewizje..."
-
-#~ msgid "User Certificate Key File"
-#~ msgstr "Plik certyfikatu użytkownika"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "Plik łańc. cert. użytkownika"
 
 #~ msgid "No repository found here"
 #~ msgstr "Nie znaleziono tu żadnego repozytorium"

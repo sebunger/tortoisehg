@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2015-09-16 10:35+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,17 +15,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:24+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:07+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
 
 msgid "Exit"
 msgstr "離開"
-
-msgid "hg lighthg"
-msgstr ""
 
 msgid "About"
 msgstr "關於"
@@ -2264,8 +2261,8 @@ msgstr "不能寫入.hgignore檔案"
 msgid "Copy working directory files from skeleton"
 msgstr ""
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "增加特別的檔案 (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "讓儲存庫相容於1.7版之前的Mercurial"
@@ -4346,6 +4343,13 @@ msgid "&Filter Toolbar"
 msgstr "過濾器工具列(&F)"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "解決衝突 - %s"
 
@@ -5624,6 +5628,16 @@ msgid ""
 "revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
 "some cases. This option is expected to be removed if the performance issue "
 "is solved."
+msgstr ""
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
 msgstr ""
 
 msgctxt "config item"
@@ -7126,6 +7140,18 @@ msgstr ""
 msgid "Query"
 msgstr "查詢"
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr ""
 
@@ -7583,6 +7609,9 @@ msgstr "結束時儲存已開啟的儲存庫(&x)"
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr ""
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr "提交(&C)"
 
@@ -7804,7 +7833,10 @@ msgstr "正在執行\"commit finished\"觸發器時發生錯誤"
 msgid "Cannot open Plugin Options dialog"
 msgstr "不能開啟Plugin選項對話框"
 
-msgid "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
 msgstr ""
 
 #, python-format
@@ -8921,6 +8953,9 @@ msgstr ""
 #~ msgid "Destination path is empty"
 #~ msgstr "目的地路徑是空的"
 
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "增加特別的檔案 (.hgignore, ...)"
+
 #~ msgid "Error when creating repository"
 #~ msgstr "建立儲存庫時錯誤"
 
@@ -9526,11 +9561,6 @@ msgstr ""
 #~ msgid "TortoiseHg Shell Configuration"
 #~ msgstr "TortoiseHg命令列設置"
 
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr "當使用命令列執行的時候,衍生一個背景行程來執行視窗對話框. 預設:True"
-
 #~ msgid "Verify"
 #~ msgstr "驗證"
 
@@ -9740,13 +9770,6 @@ msgstr ""
 
 #~ msgid "%s will be stripped"
 #~ msgstr "%s將被剝除"
-
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "壓縮之前,你得要<a href=\"commit\"><b>提交</b></a> 或 <a href=\"discard"
-#~ "\"><b>放棄</b></a>變更"
 
 #~ msgid "Font used in command output window. Default: monospace 10"
 #~ msgstr "指令輸出視窗的字型.預設:monospace 10"
@@ -9991,19 +10014,6 @@ msgstr ""
 
 #~ msgid "Backout..."
 #~ msgstr "回退 ..."
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "在rebase之前,你必須<a href=\"commit\"><b>提交</b></a> 或 <a href=\"discard"
-#~ "\"><b>放棄</b></a>變更"
-
-#~ msgid "Similar revisions..."
-#~ msgstr "相似的修訂版..."
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "相似的修訂版(&S)..."
 
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr "合併目的(其他)修訂版時移除掉所有的變更"

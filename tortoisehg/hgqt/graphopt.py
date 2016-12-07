@@ -115,6 +115,7 @@ class Graph(object):
         self._graph = {}
         self._cache = util.lrucachedict(1000)
         self._revset_set = opts.get('revset', set())
+        self._revset_set_pure = self._revset_set
         self._revset = sorted(self._revset_set, reverse=True)
         self._all_parents = opts.get('allparents', False)
         self._show_family_line = opts.get('showfamilyline', False)
@@ -123,16 +124,31 @@ class Graph(object):
         if branch:
             revs = _branch_spec(self._repo, branch, self._all_parents)
 
+            add_none = False
             if self._revset:
                 self._revset_set = self._revset_set & frozenset(revs)
             else:
                 self._revset_set = frozenset(revs)
+                prevs = set([pctx.rev() for pctx in self._repo[None].parents()])
+                if prevs & self._revset_set:
+                    add_none = True
 
             self._revset = sorted(self._revset_set, reverse=True)
+
+            if add_none:
+                self._revset.insert(0, None)
+                self._revset_set_pure = self._revset_set
+                self._revset_set = frozenset(self._revset_set | set([None]))
         self._edge_color_cache = {}
         self._grapher = self._build_nodes()
         self._row_to_rev = dict(
             enumerate(self._get_revision_iterator()))
+
+    @property
+    def _clean_revset_set(self):
+        if self._revset_set_pure:
+            return self._revset_set_pure
+        return self._revset_set
 
     def edge_color(self, branch):
         """Color function for edges"""
@@ -163,10 +179,14 @@ class Graph(object):
 
     def _get_revision_iterator(self):
         if self._revset:
-            return revset.spanset(self._repo, max(self._revset_set),
-                                  min(self._revset_set) - 1)
-        revs = revset.spanset(self._repo, len(self._repo) - 1, -1)
-        return itertools.chain([None], revs)
+            revs = revset.spanset(self._repo, max(self._clean_revset_set),
+                                  min(self._clean_revset_set) - 1)
+            if None not in self._revset_set:
+                return revs
+            return itertools.chain([None], revs)
+        else:
+            revs = revset.spanset(self._repo, len(self._repo) - 1, -1)
+            return itertools.chain([None], revs)
 
     def _filter_parents(self, p1, p2):
         """omit parents not in revset as well as degenerate repository cases"""
@@ -427,7 +447,7 @@ class Graph(object):
         node = _create_node(self._repo, rev, idxinfo)
         if row > 0:
             prevrev = self._rev_from_row(row - 1)
-            if not self._revset or prevrev is not None:
+            if (not self._revset or None in self._revset) or prevrev is not None:
                 pidxinfo = self._get_or_load_graph_node(prevrev)
                 _pprevs, _prevs, _pactedges = pidxinfo[1:]
                 plines = _compute_lines(prevrev, _pprevs, _prevs, _pactedges)

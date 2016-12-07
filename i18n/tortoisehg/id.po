@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2015-06-28 12:42+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -15,17 +15,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:20+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:02+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Hamparan Ikon Server TortoiseHg"
 
 msgid "Exit"
 msgstr "Keluar"
-
-msgid "hg lighthg"
-msgstr ""
 
 msgid "About"
 msgstr "Informasi program"
@@ -2254,7 +2251,7 @@ msgstr ""
 msgid "Copy working directory files from skeleton"
 msgstr ""
 
-msgid "Add special files (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
 msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
@@ -4324,6 +4321,13 @@ msgid "&Filter Toolbar"
 msgstr ""
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr ""
 
@@ -5601,6 +5605,16 @@ msgid ""
 "revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
 "some cases. This option is expected to be removed if the performance issue "
 "is solved."
+msgstr ""
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
 msgstr ""
 
 msgctxt "config item"
@@ -7086,6 +7100,18 @@ msgstr ""
 msgid "Query"
 msgstr ""
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr ""
 
@@ -7542,6 +7568,9 @@ msgstr ""
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr ""
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr ""
 
@@ -7761,7 +7790,10 @@ msgstr ""
 msgid "Cannot open Plugin Options dialog"
 msgstr ""
 
-msgid "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
 msgstr ""
 
 #, python-format

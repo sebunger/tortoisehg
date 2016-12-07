@@ -7,25 +7,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: English <United Kingdom)\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
-"PO-Revision-Date: 2016-05-10 10:05+0000\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
+"PO-Revision-Date: 2016-10-20 10:43+0000\n"
 "Last-Translator: Andi Chandler <Unknown>\n"
 "Language-Team: English (United Kingdom) <en_GB@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2016-05-11 05:23+0000\n"
-"X-Generator: Launchpad (build 18025)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:07+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
 
 msgid "Exit"
 msgstr "Exit"
-
-msgid "hg lighthg"
-msgstr "hg lighthg"
 
 msgid "About"
 msgstr "About"
@@ -2347,8 +2344,8 @@ msgstr "Unable to write .hgignore file"
 msgid "Copy working directory files from skeleton"
 msgstr "Copy working directory files from skeleton"
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "Add special files (.hgignore, ...)"
+msgid "Create special files (.hgignore, ...)"
+msgstr "Create special files (.hgignore, ...)"
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Make repo compatible with Mercurial <1.7"
@@ -4542,6 +4539,13 @@ msgid "&Filter Toolbar"
 msgstr "&Filter Toolbar"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr "S&tatus Bar"
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "Resolve Conflicts - %s"
 
@@ -5928,6 +5932,20 @@ msgstr ""
 "revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
 "some cases. This option is expected to be removed if the performance issue "
 "is solved."
+
+msgid "Use optimized graph layouter"
+msgstr "Use optimised graph layouter"
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
+msgstr ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
 
 msgctxt "config item"
 msgid "Commit"
@@ -7595,6 +7613,18 @@ msgstr "### host certificate fingerprint ###"
 msgid "Query"
 msgstr "Query"
 
+msgid "TLS 1.0"
+msgstr "TLS 1.0"
+
+msgid "TLS 1.1"
+msgstr "TLS 1.1"
+
+msgid "TLS 1.2"
+msgstr "TLS 1.2"
+
+msgid "Minimum Protocol"
+msgstr "Minimum Protocol"
+
 msgid "User Authentication"
 msgstr "User Authentication"
 
@@ -8074,6 +8104,9 @@ msgstr "Save Open Repositories on E&xit"
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr "Sa&ve Current Sync Paths on Exit"
 
+msgid "Show Tas&k Tab"
+msgstr "Show Tas&k Tab"
+
 msgid "&Commit"
 msgstr "&Commit"
 
@@ -8309,8 +8342,11 @@ msgstr "Error executing \"commit finished\" trigger"
 msgid "Cannot open Plugin Options dialog"
 msgstr "Cannot open Plugin Options dialog"
 
-msgid "[SOURCE]"
-msgstr "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr "do not verify server certificate (ignoring web.cacerts config)"
+
+msgid "[--insecure] [SOURCE]"
+msgstr "[--insecure] [SOURCE]"
 
 #, python-format
 msgid "unsupported URL: %s"
@@ -9417,6 +9453,9 @@ msgstr "win32ill: interrupted while stopping message loop\n"
 
 #~ msgid "TortoiseHg Init"
 #~ msgstr "TortoiseHg Init"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "Add special files (.hgignore, ...)"
 
 #~ msgid "Make repo compatible with Mercurial 1.0"
 #~ msgstr "Make repo compatible with Mercurial 1.0"
@@ -11579,58 +11618,3 @@ msgstr "win32ill: interrupted while stopping message loop\n"
 #~ "matched by issue.regex, while {1} refers to the first group and so on. If "
 #~ "no {n} tokensare found in issue.link, the entire matched string is "
 #~ "appended instead."
-
-#~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-
-#~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "&Similar Revisions..."
-
-#~ msgid "Similar revisions..."
-#~ msgstr "Similar revisions..."
-
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-
-#~ msgid "User Certificate Key File"
-#~ msgstr "User Certificate Key File"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "User Certificate Chain File"
-
-#~ msgid "Copyright 2008-2015 Steve Borho and others"
-#~ msgstr "Copyright 2008-2015 Steve Borho and others"
-
-#~ msgid "host fingerprint for %s cannot be obtained (Python too old)"
-#~ msgstr "host fingerprint for %s cannot be obtained (Python too old)"

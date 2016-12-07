@@ -67,6 +67,10 @@ WorkingParentChanged = 0x2
 WorkingBranchChanged = 0x4
 WorkingStateChanged = 0x8  # internal flag to invalidate dirstate cache
 
+_PollDeferred = 0x1  # flag to defer polling
+_PollFsChangesPending = 0x2
+_PollStatusPending = 0x4
+
 
 class RepoWatcher(QObject):
     """Notify changes of repository by optionally monitoring filesystem"""
@@ -80,6 +84,7 @@ class RepoWatcher(QObject):
         self._repo = repo
         self._ui = repo.ui
         self._fswatcher = None
+        self._deferredpoll = 0  # _Poll* flags
         self._filesmap = {}  # path: (flag, watched)
         self._datamap = {}  # readmeth: (flag, dep-path)
         self._laststats = {}  # path: (size, ctime, mtime)
@@ -91,15 +96,19 @@ class RepoWatcher(QObject):
         """Start filesystem monitoring to notify changes automatically"""
         if not self._fswatcher:
             self._fswatcher = QFileSystemWatcher(self)
-            self._fswatcher.directoryChanged.connect(self._pollChanges)
-            self._fswatcher.fileChanged.connect(self._pollChanges)
+            self._fswatcher.directoryChanged.connect(self._onFsChanged)
+            self._fswatcher.fileChanged.connect(self._onFsChanged)
         self._fswatcher.addPath(hglib.tounicode(self._repo.path))
         self._fswatcher.addPath(hglib.tounicode(self._repo.spath))
         self._addMissingPaths()
         self._fswatcher.blockSignals(False)
 
     def stopMonitoring(self):
-        """Stop filesystem monitoring by removing all watched paths"""
+        """Stop filesystem monitoring by removing all watched paths
+
+        This will release OS resources held by filesystem watcher, so good
+        for disabling change notification for a long time.
+        """
         if not self._fswatcher:
             return
         self._fswatcher.blockSignals(True)  # ignore pending events
@@ -124,12 +133,37 @@ class RepoWatcher(QObject):
             return False
         return not self._fswatcher.signalsBlocked()
 
+    def resumeStatusPolling(self):
+        """Execute deferred status checks to emit notification signals"""
+        self._deferredpoll &= ~_PollDeferred
+        if self._deferredpoll & _PollFsChangesPending:
+            self._pollFsChanges()
+            self._deferredpoll &= ~(_PollFsChangesPending | _PollStatusPending)
+        if self._deferredpoll & _PollStatusPending:
+            self._pollStatus()
+            self._deferredpoll &= ~_PollStatusPending
+
+    def suspendStatusPolling(self):
+        """Defer status checks until resumed
+
+        Resuming from suspended state should be cheaper, but no OS resources
+        will be released. This is good for short-time suspend.
+        """
+        self._deferredpoll |= _PollDeferred
+
     @pyqtSlot()
-    def _pollChanges(self):
+    def _onFsChanged(self):
+        if self._deferredpoll:
+            self._ui.debug('filesystem change detected, but poll deferred\n')
+            self._deferredpoll |= _PollFsChangesPending
+            return
+        self._pollFsChanges()
+
+    def _pollFsChanges(self):
         '''Catch writes or deletions of files, or writes to .hg/ folder,
         most importantly lock files'''
-        self.pollStatus()
-        # filesystem monitor may be stopped inside pollStatus()
+        self._pollStatus()
+        # filesystem monitor may be stopped inside _pollStatus()
         if self.isMonitoring():
             self._addMissingPaths()
 
@@ -152,6 +186,13 @@ class RepoWatcher(QObject):
         self._lastdata.clear()
 
     def pollStatus(self):
+        if self._deferredpoll:
+            self._ui.debug('poll request deferred\n')
+            self._deferredpoll |= _PollStatusPending
+            return
+        self._pollStatus()
+
+    def _pollStatus(self):
         if not os.path.exists(self._repo.path):
             self._ui.debug('repository destroyed: %s\n' % self._repo.root)
             self.repositoryDestroyed.emit()
@@ -326,20 +367,15 @@ class RepoAgent(QObject):
         self._subrepoagents = {}  # path: agent
 
     def startMonitoringIfEnabled(self):
-        """Start filesystem monitoring on repository open by RepoManager or
-        running command finished"""
+        """Start filesystem monitoring on repository open by RepoManager"""
         repo = self._repo
         ui = repo.ui
         monitorrepo = repo.ui.config('tortoisehg', 'monitorrepo', 'localonly')
         if monitorrepo == 'never':
             ui.debug('watching of F/S events is disabled by configuration\n')
-        elif self._overlayurl:
-            ui.debug('not watching F/S events for overlay repository\n')
         elif (monitorrepo == 'localonly'
               and not paths.is_on_fixed_drive(repo.path)):
             ui.debug('not watching F/S events for network drive\n')
-        elif self.isBusy():
-            ui.debug('not watching F/S events while busy\n')
         else:
             self._watcher.startMonitoring()
 
@@ -359,9 +395,7 @@ class RepoAgent(QObject):
             self.serviceStopped.emit()
 
     def suspendMonitoring(self):
-        """Stop filesystem monitoring temporarily; may be resumed when command
-        finished or overlay repository changed"""
-        # no "suspended" status until we really need it
+        """Stop filesystem monitoring and release OS resources"""
         self._watcher.stopMonitoring()
 
     def resumeMonitoring(self):
@@ -419,7 +453,7 @@ class RepoAgent(QObject):
         repo = repo.filtered('visible')
         self._changeRepo(_filteredrepo(repo, self.hiddenRevsIncluded()))
         self._overlayurl = url
-        self.suspendMonitoring()
+        self._watcher.suspendStatusPolling()
         self._flushRepositoryChanged()
 
     def clearOverlay(self):
@@ -429,7 +463,8 @@ class RepoAgent(QObject):
         repo.thginvalidate()  # take changes during overlaid
         self._changeRepo(_filteredrepo(repo, self.hiddenRevsIncluded()))
         self._overlayurl = ''
-        self.resumeMonitoring()
+        self._watcher.resumeStatusPolling()
+        self._flushRepositoryChanged()
 
     def _changeRepo(self, repo):
         # bundle/union repo will append temporary revisions to changelog
@@ -452,9 +487,8 @@ class RepoAgent(QObject):
         self._watcher.clearStatus()
 
     def pollStatus(self):
-        """Force checking changes to emit corresponding signals"""
-        if self._cmdagent.isBusy():
-            return  # delayed until _onBusyChanged(False)
+        """Force checking changes to emit corresponding signals; this will be
+        deferred if command is running"""
         self._watcher.pollStatus()
         self._flushRepositoryChanged()
 
@@ -493,9 +527,14 @@ class RepoAgent(QObject):
     @pyqtSlot(bool)
     def _onBusyChanged(self, busy):
         if busy:
-            self.suspendMonitoring()
+            self._watcher.suspendStatusPolling()
         else:
-            self.resumeMonitoring()
+            self._watcher.resumeStatusPolling()
+            if not self._watcher.isMonitoring():
+                # detect changes made by the last command even if monitoring
+                # is disabled
+                self._watcher.pollStatus()
+            self._flushRepositoryChanged()
         self.busyChanged.emit(busy)
 
     def runCommand(self, cmdline, uihandler=None, overlay=True):

@@ -482,7 +482,7 @@ def setup_windows(version):
     # Specific definitios for Windows NT-alike installations
     _scripts = []
     _data_files = []
-    _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg']
+    _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg', 'hgext3rd']
     extra = {}
     hgextmods = []
 
@@ -601,7 +601,7 @@ def setup_osx(version):
     # mode, but the build dir is ignored for some reason.
     _scripts = ['thg']
 
-    _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg']
+    _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg', 'hgext3rd']
     _data_files = []
 
     def qt4_plugins(subdir, *libs):
@@ -658,7 +658,7 @@ def setup_posix():
     # Specific definitios for Posix installations
     _extra = {}
     _scripts = ['thg']
-    _packages = ['tortoisehg', 'tortoisehg.hgqt', 'tortoisehg.util']
+    _packages = ['tortoisehg', 'tortoisehg.hgqt', 'tortoisehg.util', 'hgext3rd']
     _data_files = []
     # .svg and .png are loaded by thg, .ico by nautilus extension
     for root, dirs, files in os.walk('icons'):

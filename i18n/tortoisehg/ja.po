@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2016-04-30 11:02-0300\n"
+"POT-Creation-Date: 2016-10-23 11:30-0200\n"
 "PO-Revision-Date: 2015-09-07 12:25+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,17 +17,14 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2016-05-01 05:21+0000\n"
-"X-Generator: Launchpad (build 17995)\n"
+"X-Launchpad-Export-Date: 2016-10-24 06:02+0000\n"
+"X-Generator: Launchpad (build 18246)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
 
 msgid "Exit"
 msgstr "終了"
-
-msgid "hg lighthg"
-msgstr ""
 
 msgid "About"
 msgstr "バージョン情報"
@@ -2309,8 +2306,8 @@ msgstr ".hgignoreファイルに書き込めません"
 msgid "Copy working directory files from skeleton"
 msgstr ""
 
-msgid "Add special files (.hgignore, ...)"
-msgstr "特殊ファイルを追加する (.hgignoreなど)"
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
 
 msgid "Make repo compatible with Mercurial <1.7"
 msgstr "Mercurial 1.7 互換のリポジトリを作成"
@@ -4441,6 +4438,13 @@ msgid "&Filter Toolbar"
 msgstr "フィルターツールバー(&F)"
 
 #, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
 msgid "Resolve Conflicts - %s"
 msgstr "マージ衝突を解消 - %s"
 
@@ -5763,6 +5767,16 @@ msgid ""
 "revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
 "some cases. This option is expected to be removed if the performance issue "
 "is solved."
+msgstr ""
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
 msgstr ""
 
 msgctxt "config item"
@@ -7329,6 +7343,18 @@ msgstr "### ホストの証明書フィンガープリント ###"
 msgid "Query"
 msgstr "クエリー"
 
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
 msgid "User Authentication"
 msgstr "ユーザー認証情報"
 
@@ -7791,6 +7817,9 @@ msgstr "終了時に開いているリポジトリを保存(&X)"
 msgid "Sa&ve Current Sync Paths on Exit"
 msgstr ""
 
+msgid "Show Tas&k Tab"
+msgstr ""
+
 msgid "&Commit"
 msgstr "コミット(&C)"
 
@@ -8024,7 +8053,10 @@ msgstr ""
 msgid "Cannot open Plugin Options dialog"
 msgstr "プラグインオプションダイアログを開けません"
 
-msgid "[SOURCE]"
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
 msgstr ""
 
 #, python-format
@@ -9117,6 +9149,9 @@ msgstr ""
 
 #~ msgid "_Undo"
 #~ msgstr "取り消し(_U)"
+
+#~ msgid "Add special files (.hgignore, ...)"
+#~ msgstr "特殊ファイルを追加する (.hgignoreなど)"
 
 #~ msgid "%d hunks, %d lines changed\n"
 #~ msgstr "%d ハンク, %d 行の変更\n"
@@ -11335,20 +11370,8 @@ msgstr ""
 #~ msgid "bad shelve backup directory name"
 #~ msgstr "バックアップファイルの保存先として利用できないディレクトリ名です"
 
-#~ msgid ""
-#~ "Unable to translate message to local encoding\n"
-#~ "Consider setting HGENCODING environment variable\n"
-#~ "Replace untranslatable characters with \"?\"?\n"
-#~ msgstr ""
-#~ "メッセージをローカルエンコーディングへ変換できませんでした。\n"
-#~ "HGENCODING 環境変数を設定してみてください。\n"
-#~ "変換できない文字を \"?\" へ置き換えますか?\n"
-
 #~ msgid "delete of shelve backup failed"
 #~ msgstr "バックアップファイルを削除できません"
-
-#~ msgid "Similar revisions..."
-#~ msgstr "類似のリビジョン..."
 
 #~ msgid " Aborted"
 #~ msgstr " が中断されました"
@@ -11365,13 +11388,6 @@ msgstr ""
 #~ msgid "bad hunk #%d %s (%d %d %d %d)"
 #~ msgstr "不正なハンク #%d %s (%d %d %d %d)"
 
-#~ msgid ""
-#~ "Before compress, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "圧縮の前に、<a href=\"commit\"><b>コミット</b></a>か変更を<a href="
-#~ "\"discard\"><b>破棄</b></a>する必要があります"
-
 #~ msgid "user quit"
 #~ msgstr "ユーザーによるキャンセル"
 
@@ -11380,26 +11396,6 @@ msgstr ""
 
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "バックアップを除去中: %r\n"
-
-#~ msgid ""
-#~ "Before rebase, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "リベースの前に、<a href=\"commit\"><b>コミット</b></a>か変更を<a href="
-#~ "\"discard\"><b>破棄</b></a>してください"
-
-#~ msgid ""
-#~ "When running from the command line, fork a background process to run "
-#~ "graphical dialogs.  Default: True"
-#~ msgstr ""
-#~ "コマンドラインで動作している時、GUIダイアログをバックグラウンドプロセスと"
-#~ "してフォークします。デフォルトは有効です。"
-
-#~ msgid "User Certificate Key File"
-#~ msgstr "ユーザー証明書のキーファイル"
-
-#~ msgid "User Certificate Chain File"
-#~ msgstr "ユーザー証明書のチェインファイル"
 
 #~ msgid "Restart merge with"
 #~ msgstr "指定ツールで再マージ"
@@ -11412,13 +11408,3 @@ msgstr ""
 
 #~ msgid "Mark unresolved"
 #~ msgstr "衝突未解消状態に設定"
-
-#~ msgid ""
-#~ "Before graft, you must <a href=\"commit\"><b>commit</b></a> or <a href="
-#~ "\"discard\"><b>discard</b></a> changes."
-#~ msgstr ""
-#~ "移植の前に変更を<a href=\"commit\"><b>コミット</b></a> するか <a href="
-#~ "\"discard\"><b>破棄</b></a>してください。"
-
-#~ msgid "&Similar Revisions..."
-#~ msgstr "類似のリビジョン(&S)..."
