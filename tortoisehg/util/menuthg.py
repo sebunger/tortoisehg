@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, ui, node, error
+from mercurial import hg, node, error
 
 from tortoisehg.util.i18n import _ as gettext
 from tortoisehg.util import cachethg, paths, hglib
@@ -187,7 +187,7 @@ def open_repo(path):
     root = paths.find_root(path)
     if root:
         try:
-            repo = hg.repository(ui.ui(), path=root)
+            repo = hg.repository(hglib.loadui(), path=root)
             return repo
         except error.RepoError:
             pass
@@ -204,7 +204,7 @@ class menuThg:
     def __init__(self, internal=False):
         self.name = "TortoiseHg"
         promoted = []
-        pl = ui.ui().config('tortoisehg', 'promoteditems', 'commit,log')
+        pl = hglib.loadui().config('tortoisehg', 'promoteditems', 'commit,log')
         for item in pl.split(','):
             item = item.strip()
             if item:
@@ -250,7 +250,7 @@ class menuThg:
         return menu
 
     def get_norepo_commands(self, cwd, files):
-        menu = thg_menu(ui.ui(), self.promoted, self.name)
+        menu = thg_menu(hglib.loadui(), self.promoted, self.name)
         menu.add_menu('clone')
         menu.add_menu('init')
         menu.add_menu('userconf')

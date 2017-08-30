@@ -285,7 +285,7 @@ class ChunksWidget(QWidget):
                 wlock = repo.wlock()
                 try:
                     # atomictemp can preserve file permission
-                    wf = repo.wopener(self.currentFile, 'wb', atomictemp=True)
+                    wf = repo.wvfs(self.currentFile, 'wb', atomictemp=True)
                     wf.write(self.diffbrowse.origcontents)
                     wf.close()
                     fp = cStringIO.StringIO()

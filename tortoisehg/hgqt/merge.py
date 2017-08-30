@@ -335,15 +335,19 @@ class MergePage(BasePage):
         discard = self.field('discard').toBool()
         rev = hglib.tounicode(self._otherrev)
         cfgs = []
+        extrakwargs = {}
         if discard:
-            tool = ':local'
+            extrakwargs['tool'] = ':local'
             # disable changed/deleted prompt because we'll revert changes
             cfgs.append('ui.interactive=False')
+        elif self.field('autoresolve').toBool():
+            cfgs.append('ui.merge=:merge')
         else:
-            tool = self.field('autoresolve').toBool() and ':merge' or ':fail'
-        cmdlines = [hglib.buildcmdargs('merge', rev, verbose=True, tool=tool,
+            extrakwargs['tool'] = ':fail'
+
+        cmdlines = [hglib.buildcmdargs('merge', rev, verbose=True,
                                        force=self.field('force').toBool(),
-                                       config=cfgs)]
+                                       config=cfgs, **extrakwargs)]
         if discard:
             # revert files added/removed at other side
             cmdlines.append(hglib.buildcmdargs('revert', rev='.', all=True))

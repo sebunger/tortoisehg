@@ -36,7 +36,7 @@
 :kbd:`F5`, :kbd:`Ctrl-R`
 	最新の状態に更新します
 
-`Mac OS X <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_ では
+`Mac OS X <https://bitbucket.org/tortoisehg/thg/wiki/developers/MacOSX>`_ では
 アップル (Command) キーを :kbd:`Ctrl` キーモディファイアの代わりに使用します。
 ただしコピー＆ペーストなど一部の機能については GTK+ 標準のキーボードショートカットが
 使用されるため、 :kbd:`Ctrl` キーを使わなければならない場合もあります。
@@ -102,7 +102,7 @@ GUI 差分ウィンドウが作業コピーの比較に使用された場合、
 使っている GUI 差分表示ツールを TortoiseHg がサポートしてないときは
 ホームディレクトリにある :file:`Mercurial.ini` ファイルにツール設定を追加することができます。
 詳しい設定方法については Mercurial の
-`ドキュメント <http://www.selenic.com/mercurial/hgrc.5.html#merge-tools>`_
+`ドキュメント <https://www.selenic.com/mercurial/hgrc.5.html#merge-tools>`_
 を参照してください。それが終わったら TortoiseHg が使用する設定項目を追加してください： ::
 
 	diffargs:  2つのファイル比較に使用される引数です
@@ -149,7 +149,7 @@ TortoiseSVN のスクリプトを同梱しています。
 
 ファイルの拡張子によって使用する差分表示ツールを変更するために、
 TortoiseHg は Mercurial の
-`merge-patterns <http://www.selenic.com/mercurial/hgrc.5.html#merge-patterns>`_
+`merge-patterns <https://www.selenic.com/mercurial/hgrc.5.html#merge-patterns>`_
 にならって **[diff-patterns]** セクションをサポートしています。
 
 

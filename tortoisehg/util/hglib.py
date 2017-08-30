@@ -5,21 +5,43 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+from __future__ import absolute_import
+
 import cStringIO
 import glob
 import os
 import re
-import sys
 import shlex
+import sys
 import time
 
-from mercurial import ui, util, extensions
-from mercurial import encoding, templatefilters, filemerge, error, pathutil
-from mercurial import dispatch as dispatchmod
-from mercurial import merge as mergemod
-from mercurial import revset as revsetmod
-from mercurial.node import nullrev
 from hgext import mq as mqmod
+from mercurial import (
+    dispatch as dispatchmod,
+    encoding,
+    error,
+    extensions,
+    filemerge,
+    fileset,
+    mdiff,
+    merge as mergemod,
+    pathutil,
+    rcutil,
+    registrar,
+    revset as revsetmod,
+    revsetlang,
+    templatefilters,
+    ui as uimod,
+    util,
+)
+from tortoisehg.util import paths
+
+from mercurial.node import nullrev
+from tortoisehg.util.hgversion import hgversion
+from tortoisehg.util.i18n import (
+    _ as _gettext,
+    ngettext as _ngettext,
+)
 
 _encoding = encoding.encoding
 _fallbackencoding = encoding.fallbackencoding
@@ -33,9 +55,15 @@ _extensions_blacklist = (
     'zeroconf',
 )
 
-from tortoisehg.util import paths
-from tortoisehg.util.hgversion import hgversion
-from tortoisehg.util.i18n import _ as _gettext, ngettext as _ngettext
+try:
+    command = registrar.command
+except AttributeError:
+    # hg<4.3 (d47d7d3bd07b)
+    from mercurial import cmdutil
+    command = cmdutil.command
+
+tokenizerevspec = revsetlang.tokenize
+userrcpath = rcutil.userrcpath
 
 # TODO: use unicode version globally
 def _(message, context=''):
@@ -209,11 +237,16 @@ def readundodesc(repo):
     """Read short description and changelog size of last transaction"""
     if os.path.exists(repo.sjoin('undo')):
         try:
-            args = repo.opener('undo.desc', 'r').read().splitlines()
+            args = repo.vfs('undo.desc', 'r').read().splitlines()
             return args[1], int(args[0])
         except (IOError, IndexError, ValueError):
             pass
     return '', len(repo)
+
+def unidifftext(a, ad, b, bd, fn1, fn2, opts=mdiff.defaultopts):
+    headers, hunks = mdiff.unidiff(a, ad, b, bd, fn1, fn2, opts)
+    text = ''.join(sum((list(hlines) for _hrange, hlines in hunks), []))
+    return '\n'.join(headers) + '\n' + text
 
 def enabledextensions():
     """Return the {name: shortdesc} dict of enabled extensions
@@ -284,10 +317,15 @@ def loadextensions(ui):
     # we still generate diffs and commit descriptions in GUI process, which
     # may require template functions loaded from extensions; so run loaders
     # of template* tables just like dispatch._dispatch(). (issue #4515)
+    try:
+        extraloaders = dispatchmod.extraloaders
+    except AttributeError:
+        return
+    # hg<4.3 (45b0e9d05ee9)
     for name, module in extensions.extensions():
         if name in loadedbefore:
             continue
-        for objname, loadermod, loadername in dispatchmod.extraloaders:
+        for objname, loadermod, loadername in extraloaders:
             if not objname.startswith('template'):
                 continue
             extraobj = getattr(module, objname, None)
@@ -400,6 +438,8 @@ def difftools(ui):
 tortoisehgtoollocations = (
     ('workbench.custom-toolbar', _('Workbench custom toolbar')),
     ('workbench.revdetails.custom-menu', _('Revision details context menu')),
+    ('workbench.pairselection.custom-menu', _('Pair selection context menu')),
+    ('workbench.multipleselection.custom-menu', _('Multiple selection context menu')),
     ('workbench.commit.custom-menu', _('Commit context menu')),
     ('workbench.filelist.custom-menu', _('File context menu (on manifest '
                                          'and revision details)')),
@@ -410,7 +450,7 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
 
     >>> from pprint import pprint
     >>> from mercurial import config
-    >>> class memui(ui.ui):
+    >>> class memui(uimod.ui):
     ...     def readconfig(self, filename, root=None, trust=False,
     ...                    sections=None, remap=None):
     ...         pass  # avoid reading settings from file-system
@@ -511,7 +551,7 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
     >>> tortoisehgtools(emptycfg, selectedlocation='workbench.custom-toolbar')
     ({}, [])
     """
-    if isinstance(uiorconfig, ui.ui):
+    if isinstance(uiorconfig, uimod.ui):
         configitems = uiorconfig.configitems
         configlist = uiorconfig.configlist
     else:
@@ -521,7 +561,7 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
 
     tools = {}
     for key, value in configitems('tortoisehg-tools'):
-        toolname, field = key.split('.')
+        toolname, field = key.split('.', 1)
         if toolname not in tools:
             tools[toolname] = {}
         bvalue = util.parsebool(value)
@@ -548,14 +588,16 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         toollist.append(name)
     return selectedtools, toollist
 
+loadui = uimod.ui.load
+
 def copydynamicconfig(srcui, destui):
     """Copy config values that come from command line or code
 
-    >>> srcui = ui.ui()
+    >>> srcui = uimod.ui()
     >>> srcui.setconfig('paths', 'default', 'http://example.org/',
     ...                 '/repo/.hg/hgrc:2')
     >>> srcui.setconfig('patch', 'eol', 'auto', 'eol')
-    >>> destui = ui.ui()
+    >>> destui = uimod.ui()
     >>> copydynamicconfig(srcui, destui)
     >>> destui.config('paths', 'default') is None
     True
@@ -638,6 +680,19 @@ def age(date):
         n = delta // s
         if n >= 2 or s == 1:
             return t(n) % n
+
+def configuredusername(ui):
+    # need to check the existence before calling ui.username(); otherwise it
+    # may fall back to the system default.
+    if (not os.environ.get('HGUSER')
+        and not ui.config('ui', 'username')
+        and not ui.config('ui', 'user')  # hg<4.3 (e714159860fd)
+        and not os.environ.get('EMAIL')):
+        return None
+    try:
+        return ui.username()
+    except error.Abort:
+        return None
 
 def username(user):
     author = templatefilters.person(user)
@@ -747,7 +802,7 @@ def getLineSeparator(line):
 def parseconfigopts(ui, args):
     """Pop the --config options from the command line and apply them
 
-    >>> u = ui.ui()
+    >>> u = uimod.ui()
     >>> args = ['log', '--config', 'extensions.mq=!']
     >>> parseconfigopts(u, args)
     [('extensions', 'mq', '!')]
@@ -762,6 +817,34 @@ def parseconfigopts(ui, args):
 
 # (unicode, QString) -> unicode, otherwise -> str
 _stringify = '%s'.__mod__
+
+# ASCII code -> escape sequence (see PyString_Repr())
+_escapecharmap = []
+_escapecharmap.extend('\\x%02x' % x for x in xrange(32))
+_escapecharmap.extend(chr(x) for x in xrange(32, 127))
+_escapecharmap.append('\\x7f')
+_escapecharmap[0x09] = '\\t'
+_escapecharmap[0x0a] = '\\n'
+_escapecharmap[0x0d] = '\\r'
+_escapecharmap[0x27] = "\\'"
+_escapecharmap[0x5c] = '\\\\'
+_escapecharre = re.compile(r'[\x00-\x1f\x7f\'\\]')
+
+def _escapecharrepl(m):
+    return _escapecharmap[ord(m.group(0))]
+
+def escapeascii(s):
+    r"""Escape string to be embedded as a literal; like Python string_escape,
+    but keeps 8bit characters and can process unicode
+
+    >>> from PyQt4.QtCore import QString
+    >>> escapeascii("\0 \x0b \x7f \t \n \r ' \\")
+    "\\x00 \\x0b \\x7f \\t \\n \\r \\' \\\\"
+    >>> escapeascii(QString(u'\xc0\n'))
+    u'\xc0\\n'
+    """
+    s = _stringify(s)
+    return _escapecharre.sub(_escapecharrepl, s)
 
 def escapepath(path):
     r"""Convert path to command-line-safe string; path must be relative to
@@ -822,6 +905,105 @@ def compactrevs(revs):
             k = m = n
     specs.append(_escaperevrange(k, m))
     return ' + '.join(specs)
+
+# subset of revsetlang.formatspec(), but can process unicode
+def _formatspec(expr, args, lparse, listfuncs):
+    def argtype(c, arg):
+        if c == 'd':
+            return '%d' % int(arg)
+        elif c == 's':
+            return "'%s'" % escapeascii(arg)
+        elif c == 'r':
+            s = _stringify(arg)
+            if isinstance(s, unicode):
+                # 8-bit characters aren't important; just avoid encoding error
+                s = s.encode('utf-8')
+            lparse(s)  # make sure syntax errors are confined
+            return '(%s)' % arg
+        raise ValueError('invalid format character %c' % c)
+
+    def listexp(c, arg):
+        l = len(arg)
+        if l == 0:
+            if 's' not in listfuncs:
+                raise ValueError('cannot process empty list')
+            return "%s('')" % listfuncs['s']
+        elif l == 1:
+            return argtype(c, arg[0])
+        elif c in listfuncs:
+            f = listfuncs[c]
+            a = '\0'.join(map(_stringify, arg))
+            # packed argument is escaped so it is command-line safe
+            return "%s('%s')" % (f, escapeascii(a))
+
+        m = l // 2
+        return '(%s or %s)' % (listexp(c, arg[:m]), listexp(c, arg[m:]))
+
+    expr = _stringify(expr)
+    argiter = iter(args)
+    ret = []
+    pos = 0
+    while pos < len(expr):
+        q = expr.find('%', pos)
+        if q < 0:
+            ret.append(expr[pos:])
+            break
+        ret.append(expr[pos:q])
+        pos = q + 1
+        c = expr[pos]
+        if c == '%':
+            ret.append(c)
+        elif c == 'l':
+            pos += 1
+            d = expr[pos]
+            ret.append(listexp(d, list(next(argiter))))
+        else:
+            ret.append(argtype(c, next(argiter)))
+        pos += 1
+
+    return ''.join(ret)
+
+def formatfilespec(expr, *args):
+    """Build fileset expression by template and positional arguments
+
+    Supported arguments:
+
+    %r = fileset expression, parenthesized
+    %d = int(arg), no quoting
+    %s = string(arg), escaped and single-quoted
+    %% = a literal '%'
+
+    Prefixing the type with 'l' specifies a parenthesized list of that type,
+    but the list must not be empty.
+    """
+    listfuncs = {}
+    return _formatspec(expr, args, fileset.parse, listfuncs)
+
+def formatrevspec(expr, *args):
+    r"""Build revset expression by template and positional arguments
+
+    Supported arguments:
+
+    %r = revset expression, parenthesized
+    %d = int(arg), no quoting
+    %s = string(arg), escaped and single-quoted
+    %% = a literal '%'
+
+    Prefixing the type with 'l' specifies a parenthesized list of that type.
+
+    >>> formatrevspec('%r:: and %lr', u'10 or "\xe9"', ("this()", "that()"))
+    u'(10 or "\xe9"):: and ((this()) or (that()))'
+    >>> formatrevspec('%d:: and not %d::', 10, 20)
+    '10:: and not 20::'
+    >>> formatrevspec('%ld or %ld', [], [1])
+    "_list('') or 1"
+    >>> formatrevspec('keyword(%s)', u'foo\xe9')
+    u"keyword('foo\xe9')"
+    >>> formatrevspec('root(%ls)', ['a', 'b', 'c', 'd'])
+    "root(_list('a\\x00b\\x00c\\x00d'))"
+    """
+    listfuncs = {'d': '_intlist', 's': '_list'}
+    return _formatspec(expr, args, revsetlang.parse, listfuncs)
 
 def buildcmdargs(name, *args, **opts):
     r"""Build list of command-line arguments

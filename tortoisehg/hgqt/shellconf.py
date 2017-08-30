@@ -176,7 +176,7 @@ class ShellConfigWindow(QDialog):
         iconslayout.addStretch()
 
         # i18n: URL of TortoiseSVN documentation
-        url = _('http://tortoisesvn.net/docs/release/TortoiseSVN_en/'
+        url = _('https://tortoisesvn.net/docs/release/TortoiseSVN_en/'
                 'tsvn-dug-settings.html#tsvn-dug-settings-icon-set')
         w = QLabel(_('You can change the icon set from <a href="%s">'
                      "TortoiseSVN's Settings</a>") % url)

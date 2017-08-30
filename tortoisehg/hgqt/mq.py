@@ -265,7 +265,8 @@ class PatchQueueActions(QObject):
         return self._runCommand('qpop', [patch], opts)
 
     def finishRevision(self, rev):
-        return self._runCommand('qfinish', ['qbase::%s' % rev], {})
+        revspec = hglib.formatrevspec('qbase::%s', rev)
+        return self._runCommand('qfinish', [revspec], {})
 
     def deletePatches(self, patches):
         dlg = qdelete.QDeleteDialog(patches, self.parent())

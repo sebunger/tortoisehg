@@ -118,7 +118,9 @@ class BisectDialog(QDialog):
         if ret != 0:
             self._stbar.showMessage(_('Error encountered.'), True)
             return
-        self.repo.dirstate.invalidate()
+
+        self.repo.invalidatedirstate()
+
         ctx = self.repo['.']
         if ctx.rev() == self.lastrev:
             self._stbar.showMessage(_('Culprit found.'))

@@ -35,7 +35,7 @@ demandimport.enable()
 import subprocess
 import urllib
 
-from mercurial import hg, ui, match, util, error
+from mercurial import hg, match, util, error
 from mercurial.node import short
 
 def _thg_path():
@@ -50,7 +50,7 @@ def _thg_path():
         sys.path.insert(0, thgpath)
 _thg_path()
 
-from tortoisehg.util import paths, debugthg, cachethg
+from tortoisehg.util import hglib, paths, debugthg, cachethg
 
 if debugthg.debug('N'):
     debugf = debugthg.debugf
@@ -124,7 +124,7 @@ class HgExtensionDefault(GObject.GObject):
         if not p:
             return None
         try:
-            return hg.repository(ui.ui(), path=p)
+            return hg.repository(hglib.loadui(), path=p)
         except error.RepoError:
             return None
         except StandardError, e:
@@ -385,7 +385,7 @@ class HgExtensionIcons(HgExtensionDefault):
             debugf(e)
         return True
 
-if ui.ui().configbool("tortoisehg", "overlayicons", default = True):
+if hglib.loadui().configbool("tortoisehg", "overlayicons", default=True):
     class HgExtension(HgExtensionIcons, Nautilus.MenuProvider, Nautilus.ColumnProvider, Nautilus.PropertyPageProvider, Nautilus.InfoProvider):
         pass
 else:

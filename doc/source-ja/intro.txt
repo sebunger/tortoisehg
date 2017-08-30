@@ -9,7 +9,7 @@
 TortoiseHg とは何か?
 ====================
 
-TortoiseHg は `Mercurial <http://mercurial.selenic.com/wiki/>`_
+TortoiseHg は `Mercurial <https://www.mercurial-scm.org/wiki/>`_
 分散構成管理のための GUI ツールと Windows
 エクスプローラに統合するためのシェル拡張のパッケージです。
 
@@ -62,7 +62,7 @@ TortoiseHg には簡単にセットアップできるようにインストーラ
 
 TortoiseHg は使いやすい MSI インストーラを採用しています。
 最新バージョンは TortoiseHg の `ウェブサイト
-<http://tortoisehg.bitbucket.org/download/windows.html>`_ から入手できます。
+<https://tortoisehg.bitbucket.io/download/windows.html>`_ から入手できます。
 ダウンロードしたらインストーラをダブルクリックして起動し、
 表示される指示に従ってインストールを進めてください。
 
@@ -148,13 +148,13 @@ Linux または Max OS の場合
 --------------------------
 
 Debian の DEB パッケージまたは Fedora 向けの RPM パッケージは
-`ダウンロード <http://tortoisehg.bitbucket.org/download/linux.html>`
+`ダウンロード <https://tortoisehg.bitbucket.io/download/linux.html>`
 ページに用意されています。
 
 Max OS X 向けのパッケージは用意されていませんが、ソースコードから
 インストールすることで hgtk スクリプトを含むすべての TortoiseHg ダイアログが
 利用可能になります。詳しくは
-`MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_
+`MacOSX <https://bitbucket.org/tortoisehg/thg/wiki/developers/MacOSX>`_
 をご覧ください。
 
 .. note::
@@ -166,7 +166,7 @@ Max OS X 向けのパッケージは用意されていませんが、ソース�
 ^^^^^^^^
 
 TortoiseHg はローカライズに
-`gettext <http://docs.python.org/library/gettext.html>`_ ライブラリの
+`gettext <https://docs.python.org/2/library/gettext.html>`_ ライブラリの
 Python バインディングを利用しています。ダイアログをローカライズするには
 環境変数 ``LANGUAGE`` を使用したい言語に設定するのが簡単です。
 

@@ -14,7 +14,7 @@
 TortoiseHg は Windows のシェル拡張として提供されるため、
 ユーザは普段使っている Windows エクスプローラから利用することができます。
 
-本書の最新版は `公式サイト <http://tortoisehg.org>`_
+本書の最新版は `公式サイト <https://tortoisehg.bitbucket.io>`_
 からダウンロード可能です。
 
 本書の読み方
@@ -49,7 +49,7 @@ TortoiseHg でよく利用するダイアログやコンポーネントについ
 ライセンス
 ==========
 
-TortoiseHg は `GPLv2 <http://www.gnu.org/licenses/gpl-2.0.html>`_
+TortoiseHg は `GPLv2 <https://www.gnu.org/licenses/gpl-2.0.html>`_
 の下でリリースされています。
 好きなコンピュータに好きなだけインストールすることができますし、
 GPLv2 ライセンスに従う限り再配布も可能です。
@@ -63,8 +63,8 @@ GPLv2 ライセンスに従う限り再配布も可能です。
 * `開発者 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - パッチ投稿、バグ報告、開発関連の議論など。
 * `バグ通知 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - バグ管理システムからの自動通知メール。
 
-Bitbucket には `公式 Wiki <http://bitbucket.org/tortoisehg/stable/wiki/Home>`_ もあります。
-日本語 Wiki は `こちら <http://bitbucket.org/kuy/thg-ja/wiki/Home>`_ になります。
+Bitbucket には `公式 Wiki <https://bitbucket.org/tortoisehg/thg/wiki/Home>`_ もあります。
+日本語 Wiki は `こちら <https://bitbucket.org/kuy/thg-ja/wiki/Home>`_ になります。
 
 謝辞
 ====
@@ -73,7 +73,7 @@ TortoiseHg プロジェクトに貢献し、本当に便利なツールを作り
 翻訳者、利用者コミュニティ、特に貴重なバグレポートおよび機能要望をしていただいた
 ユーザの方々に感謝の意を表します。
 
-TortoiseHg の Windows 向けインストーラには `TortoiseSVN <http://tortoisesvn.net>`_
+TortoiseHg の Windows 向けインストーラには `TortoiseSVN <https://tortoisesvn.net>`_
 プロジェクトによる TortoiseOverlays ハンドラが含まれています。
 
 表記規則

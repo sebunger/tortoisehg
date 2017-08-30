@@ -31,7 +31,7 @@ Workbench Main Widgets are:
 		in the Dock Toolbar. It's also a dockable widget.
 		The :menuselection:`View --> Show Paths` menu option allows to not only view
 		the names of the repositories but also their path in a second column.
-	
+
 	:guilabel:`Output Log`
 		This dockable widget, which can be shown/hidden with
 		:menuselection:`View --> Show Output Log`, gives the user information about
@@ -56,7 +56,7 @@ launching other tools.
 
 		.. figure:: figures/file-menu.png
 			:alt: File menu
-			
+
 			File Menu
 
 	:guilabel:`View`
@@ -64,7 +64,7 @@ launching other tools.
 
 		.. figure:: figures/view-menu.png
 			:alt: View menu
-			
+
 			View menu
 
 .. _workbench-repository-label:
@@ -74,7 +74,7 @@ launching other tools.
 
 		.. figure:: figures/repository-menu.png
 			:alt: Repository menu
-			
+
 			Repository menu
 
 	:guilabel:`Help`
@@ -85,7 +85,7 @@ Edit Toolbar
 
 .. figure:: figures/edit-toolbar.png
 	:alt: Edit Toolbar
-	
+
 	Edit toolbar
 
 Moving around in the revision history. All the buttons work on the current repository.
@@ -106,7 +106,7 @@ Dock Toolbar
 
 .. figure:: figures/dock-toolbar.png
 	:alt: Dock Toolbar
-	
+
 	Dock toolbar
 
 Show or hide some main widgets in the Workbench.
@@ -122,7 +122,7 @@ Sync Toolbar
 
 .. figure:: figures/sync-toolbar.png
 	:alt: Sync Toolbar
-	
+
 	Sync toolbar
 
 Synchronize your repository with other repositories.
@@ -149,7 +149,7 @@ Task Toolbar
 
 .. figure:: figures/task-toolbar.png
 	:alt: Task Toolbar
-	
+
 	Task toolbar
 
 Work with the various task tabs.
@@ -161,7 +161,7 @@ Work with the various task tabs.
 
 ..        .. figure:: figures/revdetails-tasktab.png
 			:alt: Revision Details Task Tab
-			
+
 			Revision Details Task Tab
 
 ..
@@ -172,14 +172,14 @@ Work with the various task tabs.
 
 ..		.. figure:: figures/commit-tasktab.png
 			:alt: Commit Task Tab
-			
+
 			Commit Task Tab
 
 ..
 
 	:guilabel:`Search`
 		For performing text searches through file content.
-		
+
 ..		See _`Search` for more detail.
 
 ..
@@ -191,14 +191,14 @@ Work with the various task tabs.
 
 ..		.. figure:: figures/sync-tasktab.png
 			:alt: Synchronise Task Tab
-			
+
 			Sync Task Tab
 
 ..
 
 ..		.. figure:: figures/search-tasktab.png
 			:alt: Search Task Tab
-			
+
 			Search Task Tab
 
 ..
@@ -226,7 +226,7 @@ Filter Toolbar
 
 The filter bar allows one to quickly filter the changesets panel. It is based
 on the Revision Sets feature of Mercurial.
-See `hg.1.html#revsets <http://www.selenic.com/mercurial/hg.1.html#revsets>`_ 
+See `hg.1.html#revsets <https://www.mercurial-scm.org/mercurial/hg.1.html#revsets>`_
 for details on how to specify revision sets.
 The toolbar can be toggled with :kbd:`Ctrl-S`. Parts from left to right:
 
@@ -296,7 +296,7 @@ Performance Implications
 There are some Workbench features that could have performance implications in
 large repositories.
 
-	:menuselection:`View --> Choose Log columns...` 
+	:menuselection:`View --> Choose Log columns...`
 		Enabling the :guilabel:`Changes` column can be expensive to calculate
 		on repositories with large working copies, causing both refreshes and
 		scrolling to be slow.
@@ -437,7 +437,7 @@ With more than two revisions selected:
 
 .. [#rcm1] The strip command will store the stripped revisions in a bundle file
 		that can later be reapplied.
-		See also `EditingHistory <http://mercurial.selenic.com/wiki/EditingHistory>`_.
+		See also `EditingHistory <https://www.mercurial-scm.org/wiki/EditingHistory>`_.
 
 File Context Menus
 ------------------
@@ -461,7 +461,7 @@ task tab) will bring up a context menu for the selected file:
 	:guilabel:`Compare file revisions`
 		Brings up a new dialog where you can compare any revision of the file
 		with any other revision in the history.
- 
+
 .. [#flcm1] :menuselection:`Global Settings --> TortoiseHg --> Visual Editor`
 .. [#flcm2] Does not show revisions where a file was deleted, as this is only a
             manifest change, it does not modify the file's history.
@@ -517,7 +517,7 @@ Examples::
 
 	Mercurial:
 	issue.regex = \bissue(\d+)\b
-	issue.link = http://bz.selenic.com/show_bug.cgi?id={1}
+	issue.link = https://bz.mercurial-scm.org/show_bug.cgi?id={1}
 
 Output Log Console
 ------------------

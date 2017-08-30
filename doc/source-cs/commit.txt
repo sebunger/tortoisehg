@@ -33,11 +33,11 @@ Výčet prvků nástrojové lišty úlohy komit:
 	:guilabel:`Refresh`
 		Znovu načíst seznam souborů.
 	:guilabel:`Větev`
-		Uvádí název aktuální větve pracovního adresáře. Poklepem otevřeme dialogové okno, kde lze s větví manipulovat. Nedoporučujeme používat bez dobré znalosti `pojmenovaných větví Mercurialu <http://mercurial.selenic.com/wiki/NamedBranches>`_.
+		Uvádí název aktuální větve pracovního adresáře. Poklepem otevřeme dialogové okno, kde lze s větví manipulovat. Nedoporučujeme používat bez dobré znalosti `pojmenovaných větví Mercurialu <https://www.mercurial-scm.org/wiki/NamedBranches>`_.
 	:guilabel:`Copy message`
 		Rozvinovací seznam posledních deseti souhrnných zpráv komitů.
 	:guilabel:`Možnosti`
-		Dialogové okno pro podrobné nastavení náležitostí komitu - Jméno uživatele, Datum, Push po komitu, Auto Includes, Odbočit do subrepozitářů.	
+		Dialogové okno pro podrobné nastavení náležitostí komitu - Jméno uživatele, Datum, Push po komitu, Auto Includes, Odbočit do subrepozitářů.
 
 Lištu uzavírá roletka pro výběr procedury:
 
@@ -46,13 +46,13 @@ Lištu uzavírá roletka pro výběr procedury:
 	:guilabel:`Amend`
 		Upravit aktuální revizi.
 	:guilabel:`QNew`
-		Vytvořit novou oprávku.				
+		Vytvořit novou oprávku.
 	:guilabel:`Refresh`
 		Znovu načíst aktuální oprávku (patch).
 
-		
-		
-		
+
+
+
 Pole se seznamem souborů má pět (šest)  sloupců:
 
 * Zatržítko, které označuje soubor, vybraný pro operaci. Neoznačené soubory se akce Commit nezůčastní.
@@ -61,9 +61,9 @@ Pole se seznamem souborů má pět (šest)  sloupců:
 * Sloupec :guilabel:`Název souboru` uvádí kanonickou cestu souboru relativně ke kořeni repozitáře (k repozitóriu).
 * Sloupec :guilabel:`Typ` uvádí příponu souboru (pokud existuje).
 * Sloupec :guilabel:`Velikost` uvádí velikost neodebraného souboru.
-		
 
-	
+
+
 Výběr změn
 ----------
 
@@ -87,23 +87,23 @@ Kontextové menu zvýrazněné části má tyto položky:
 		Přepínač pro přeškrtnutí vyloučených změn. Toto nastavení je primárně osobní preference ale budoucí verze TortoiseHg mohou rozšířit použití tohoto proškrtnutí pro částečné  vyloučení individuálních změn.
 	:guilabel:`Hledat v aktuálním souboru`
 		Při tomto výběru se otevře další lišta s těmito prvky:
-	
+
 		:guilabel:`Zavřít lištu`
-	
+
 		:guilabel:`Textové pole`
-	
+
 		:guilabel:`Ignorovat velikost písmen - zatržítko`
-	
+
 		:guilabel:`Wrap search - zatržítko`
-	
+
 		:guilabel:`Prev, Next`
-	
+
 	:guilabel:`Hledat v celé historii`
 		Při tomto výběru se otevře karta Hledat
-	
+
 Když uživatel vyloučí jednu nebo více změn souboru, považuje TortoiseHg tento soubor za částečně vybraný (tato možnost výběru změn je někdy označována jako **částečný komit**. Částečně vybrané soubory jsou v seznamu souborů uvedeny se speciálním označením.
 
-Tato nová možnost částečného výběru je podobná proceduře `Hunk selection <http://tortoisehg.bitbucket.org/manual/0.9/commit.html#change-selection>`_ popsaná v dokumentaci k TortoiseHg 0.9.3 a to v několika ohledech:
+Tato nová možnost částečného výběru je podobná proceduře `Hunk selection <https://tortoisehg.bitbucket.io/manual/0.9/commit.html#change-selection>`_ popsaná v dokumentaci k TortoiseHg 0.9.3 a to v několika ohledech:
 
 1) Výběr změn je integrován přímo do zobrazení diffu. Žádný přepínač režimu není potřebný.
 
@@ -145,15 +145,15 @@ Má-li váš projekt pravidla pro formátování komitových zpráv, můžete je
 Pro formát komitové zprávy jsou signifikantní tyto položky karty Commit widgetu Settings:
 
     :guilabel:`Délka souhrnného řádku`:
-		Maximální délka řádku souhrnného popisu komitu. 
+		Maximální délka řádku souhrnného popisu komitu.
     :guilabel:`Průvodní texty anglicky`:
 		Generovat anglickou zprávu komitu i pro neanglické jazykové prostředí.
-		
-		
+
+
 Slučování
 ---------
 
-Procedura komitu má speciální režim, je-li otevřena v repozitáři, který je ve slučovaném stavu (buďto slučování probíhá nebo byla provedena aktualizace, která způsobila konflikt).	
+Procedura komitu má speciální režim, je-li otevřena v repozitáři, který je ve slučovaném stavu (buďto slučování probíhá nebo byla provedena aktualizace, která způsobila konflikt).
 
 Stavový sloupec *MS* je v tomto režimu zvlášť užitečný. Soubory, označené *R* jsou ty, kde Mercurial nebo uživatel úspěšně sloučil (rozřešil / resolved) změny od obou rodičů. Soubory, označené *U* mají nerozřešené (unresolved) změny. Můžete použít nabídku kontextového menu *Restart Merge* pro opětovné spuštění slučovacího procesu nebo nabídku *Editovat* pro rozřešení konfliktu ručně. Nabídka *Restart Merge* vám dovolí vybrat slučovací nástroj nebo dokonce vybrat jednu z verzí nepodmínečně (internal:local, internal:other). Po ručním rozřešení konfliktů musíte použít kontextovou nabídku *mark resolved* abyste změnili stav sloučení souboru na *R*.
 
@@ -164,12 +164,12 @@ Pro úplnost dodejme, že *local* je revize, u níž začíná proces slučován
 Abychom zrušili neúspěšný pokus o sloučení, musíme přikázat, aby Mercurial odstranil druhého rodiče z pracovního adresáře. To obvykle znamená provést čistou aktualizaci prvního rodiče. Slučovací nástroj má tlačítko :guilabel:`Undo`, jímž lze zařídit přesně to samé.
 
 Jakmile máte svůj pracovní adresář zpět u jedné rodičovské revize, můžete zopakovat proces sloučení.
-		
+
 
 Subrepozitáře
 -------------
 
-`Subrepozitář <http://mercurial.selenic.com/wiki/subrepos>`_ je entita, zavedená v Mercurialu 1.3. Umožňuje repozitáři Mercurialu ukládat odkazy na externí repozitáře (případně jiných VCS) a zahrnout stavy těchto externích repozitářů do historie hlavního repozitáře.
+`Subrepozitář <https://www.mercurial-scm.org/wiki/Subrepository>`_ je entita, zavedená v Mercurialu 1.3. Umožňuje repozitáři Mercurialu ukládat odkazy na externí repozitáře (případně jiných VCS) a zahrnout stavy těchto externích repozitářů do historie hlavního repozitáře.
 
 TortoiseHg 1.0 zavedl rudimentární podporu pro subrepozitáře a to pouze v nástroji commit a status. Považuje-li Mercurial subrepozitář za "nečistý", objeví se v seznamu souborů nástroje Commit s označením stavu *S* a je potom komitován spolu s jinými změnami, přičemž se aktualizuje soubor .hgsubstate v kořenovém adresáři repozitáře.
 
@@ -201,7 +201,7 @@ Spuštění z příkazového řádku
 	use "thg -v help commit" to show global options
 
 Pro rychlou nápovědu o formátu datového typu::
-	
+
 	hg help dates
 
 .. vim: noet ts=4

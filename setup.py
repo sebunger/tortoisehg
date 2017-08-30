@@ -29,8 +29,8 @@ from distutils.command.clean import clean as _clean_orig
 from distutils.spawn import spawn, find_executable
 from i18n.msgfmt import Msgfmt
 
-thgcopyright = 'Copyright (C) 2010-2016 Steve Borho and others'
-hgcopyright = 'Copyright (C) 2005-2016 Matt Mackall and others'
+thgcopyright = 'Copyright (C) 2010-2017 Steve Borho and others'
+hgcopyright = 'Copyright (C) 2005-2017 Matt Mackall and others'
 
 def _walklocales():
     podir = 'i18n/tortoisehg'
@@ -516,6 +516,7 @@ def setup_windows(version):
     path = os.getenv('HGEXT_PATH')
     if path:
         modulefinder.AddPackagePath('hgext', path)
+    modulefinder.AddPackagePath('hgext3rd', 'hgext3rd')
 
     if 'py2exe' in sys.argv:
         import hgext
@@ -723,7 +724,7 @@ if __name__ == '__main__':
           version=setupversion,
           author='Steve Borho',
           author_email='steve@borho.org',
-          url='http://tortoisehg.org',
+          url='https://tortoisehg.bitbucket.io',
           description='TortoiseHg dialogs for Mercurial VCS',
           license='GNU GPL2',
           scripts=scripts,

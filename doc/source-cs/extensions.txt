@@ -10,14 +10,14 @@ Tato kapitola popisuje extenze Mercurialu, které jsou pro Windows dodávány s 
 Hgfold
 ======
 
-`hgfold <http://mercurial.selenic.com/wiki/CaseFoldExtension>`_  je rozšíření Mercurialu, které pomůže uživatelům Windows s kolizemi jmen souborů v VFAT a NTFS.
+`hgfold <https://www.mercurial-scm.org/wiki/CaseFoldExtension>`_  je rozšíření Mercurialu, které pomůže uživatelům Windows s kolizemi jmen souborů v VFAT a NTFS.
 
 Přidá možnosti k následujícím příkazům Mercurialu. Více info viz :command:`hg help <command>`::
 
 	up    - dovolí aktualizovat k revizi s kolizemi jmen souborů
 	merge - dovolí sloučení s changesetem, který by vytvořil kolizi jmen souborů
 
-Extenze v současné době neumí kolizi zabránit. Viz wiki Mercurialu.     
+Extenze v současné době neumí kolizi zabránit. Viz wiki Mercurialu.
 
 **Instalace**
 
@@ -25,7 +25,7 @@ Extenze v současné době neumí kolizi zabránit. Viz wiki Mercurialu.
 Abychom si vyzkoušeli použití tohoto pluginu, zadáme příkaz z příkazového řádku::
 
 	hg --config "extensions.fold=" status
-	
+
 Můžeme jej zaké zapsat do konfiguračního souboru Mercurial.ini nebo do souboru hgrc v repozitáři::
 
 	[extensions]
@@ -33,7 +33,7 @@ Můžeme jej zaké zapsat do konfiguračního souboru Mercurial.ini nebo do soub
 
 Učíníme-li to, můžeme vypustit opci --config.
 
- 
+
 
 **Varování**
 
@@ -42,7 +42,7 @@ Jako u všech slučovacích operací musí soubor fold.py změnit rodiče pracov
 Dostaneme-li po běhu příkazu :command:`hg recover` chybové hlášení, vyzkoušíme příkaz :command:`hg debugsetparents` <číslo revize **tip**>`. Toto číslo zjistíme příkazem :command:`hg log`.
 
 
-	
+
 Perfarce
 ========
 
@@ -50,15 +50,15 @@ Perfarce
 page.
 
 Tato extenze je dokumentována v odstavci :ref:`perfarce-perforce` kapitoly :doc:`nonhg`.
- 
+
 
 Mercurial-Keyring
 =================
 
 Extenze `keyring` slouží k bezpečnému ukládání hesel pro spojení přes HTTP a SMTP. Tato extenze používá služby knihovny `Python Keyring Lib`.
 
-* `Mercurial Keyring <http://pypi.python.org/pypi/mercurial_keyring>`_ home page
-* `Keyring Extension <http://mercurial.selenic.com/wiki/KeyringExtension>`_ wiki page
+* `Mercurial Keyring <https://pypi.python.org/pypi/mercurial_keyring>`_ home page
+* `Keyring Extension <https://www.mercurial-scm.org/wiki/KeyringExtension>`_ wiki page
 
 
 **Co se provádí**
@@ -79,13 +79,13 @@ Nejprve musí být povolena extenze v souboru Mercurial.ini::
 **Konfigurace uložiště hesla**
 
 Nejvhodnější zázemí (backend) hesla by obvykle mělo být výbráno automaticky, bez konfigurace. Lze jej ovšem konfigurovat s použitím souboru ~/keyringrc.cfg (keyringrc.cfg in the home directory of the current user).
-Podrobnosti viz `keyring docs <http://pypi.python.org/pypi/keyring>`_
+Podrobnosti viz `keyring docs <https://pypi.python.org/pypi/keyring>`_
 .
 
 .. note::
 	On Windows XP and above, your encrypted passwords are stored in the
 	credentials subsystem using
-	`CredRead <http://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ and `CredWrite <http://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
+	`CredRead <https://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ and `CredWrite <https://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
 
 .. note::
 	On Windows 2K, the encrypted passwords are stored in the system
@@ -103,15 +103,15 @@ Editujte  `.hg/hgrc` lokálního repozitáře a uložte tam cestu ke vzdáleném
 	myremote.prefix = my.server.com/hgrepo
 	myremote.username = mekk
 
-Jednodušší forma s vloženým názvem url může být také použita:: 
+Jednodušší forma s vloženým názvem url může být také použita::
 
 	[paths]
 	bitbucket = https://User@bitbucket.org/User/project_name/
 
 .. note::
 	Je-li v :file:`.hg/hgrc` zadáno jméno uživatele i heslo, potom je extenze použije bez použití heslové databáze. Není-li jméno uživatele uvedeno, extenze bude pokaždé vyžadovat osobní údaje, také bez uložení hesla. Takže se v obou případech vlastně vracíme k implicitnímu chování.
-	
-Podrobnější informace získáte v `[auth] <http://www.selenic.com/mercurial/hgrc.5.html#auth>`_.
+
+Podrobnější informace získáte v `[auth] <https://www.selenic.com/mercurial/hgrc.5.html#auth>`_.
 
 **Konfigurace repozitáře (SMTP)**
 
@@ -138,11 +138,11 @@ Konfigurujte repozitář jak výše uvedeno, pak už jen stahujte a vysílejte (
 projrc
 ======
 
-`projrc <http://mercurial.selenic.com/wiki/ProjrcExtension>`_ je extenze, která prozkoumá soubor .hg/projrc, hledaje další konfigurační možnosti. Soubor se přenese klonováním a stažením (pull) ze seznamu serverů, který  musí být nakonfigurován uživatelem. Z bezpečnostních důvodů musí  být také uvedeno, která konfigurační nastavení `projrc` mají být přenesena (implicitně se žádná nastavení ze žádného serveru nepřenášejí).
+`projrc <https://www.mercurial-scm.org/wiki/ProjrcExtension>`_ je extenze, která prozkoumá soubor .hg/projrc, hledaje další konfigurační možnosti. Soubor se přenese klonováním a stažením (pull) ze seznamu serverů, který  musí být nakonfigurován uživatelem. Z bezpečnostních důvodů musí  být také uvedeno, která konfigurační nastavení `projrc` mají být přenesena (implicitně se žádná nastavení ze žádného serveru nepřenášejí).
 Uživatel také může nastavit extenzi tak, že automaticky zahrne všechny změny do souboru .hg/projrc.
 
-To je důležité pro centralizovaná nastavení, kde chcete distribuovat konfigurační nastavení do všech repozitářů s minimálním úsilím. Zejména to lze použít pro přemapování subrepozitářových zdrojů, jak je vysvětleno v textu 
-`SubrepoRemappingPlan <http://mercurial.selenic.com/wiki/SubrepoRemappingPlan>`_.
+To je důležité pro centralizovaná nastavení, kde chcete distribuovat konfigurační nastavení do všech repozitářů s minimálním úsilím. Zejména to lze použít pro přemapování subrepozitářových zdrojů, jak je vysvětleno v textu
+`SubrepoRemappingPlan <https://www.mercurial-scm.org/wiki/SubrepoRemappingPlan>`_.
 
 **Konfigurace**
 
@@ -157,7 +157,7 @@ Je-li extenze povolena, vidíte nový vstup "Projrc" v dialogu pro nastavení. Z
 :guilabel:`Servers`
         Toto nastavení je seznam čárkami oddělených globů, které se shodují s názvy serverů, z nichž bude soubor projrc stažen (pulled).
 	Pokud není toto nastvení zadáno, žádné soubory .hg/projrc se nikdy ze žádného serveru nepřenesou.
-		
+
 :guilabel:`Include`
     Tímto klíčem určíte, které sekce a které klíče budou přijaty ze vzdálených souborů projrc.
     Je to seznam čárkami oddělených globů, které se shodují s názvy sekcí nebo klíčů, které mohou být připojeny.
@@ -167,7 +167,7 @@ Je-li extenze povolena, vidíte nový vstup "Projrc" v dialogu pro nastavení. Z
     Všechny sekce a klíče povolíte zadáním "*" (bez uvozovek).
 
 :guilabel:`Exclude`
-    Toto nastavení je podobné nastavení `Include` ale má opačný účinek. Deklaruje seznam nastavení, která nebudou přenesena ze společných soubofů projrc. 
+    Toto nastavení je podobné nastavení `Include` ale má opačný účinek. Deklaruje seznam nastavení, která nebudou přenesena ze společných soubofů projrc.
 
     Seznam "exclude" má stejnou skladbu jako seznam "include". Je-li zadán exkluzivní seznam ale inkluzivní seznam je prázdný nebo neexistuje, budou připojeny všechny nevyloučené klíče.
 
@@ -188,25 +188,25 @@ Kdykoliv extenze zjistí změnu ve vzdáleném souboru projrc (e.g. when
 you do not have a .hg/projrc file yet, or when the contents of said file
 have changed on the server), obdržíte varování pokud nemáte "Require confirmation" nastaveno na False (v kterémžto případě extenze předpokládá, že změny přijímáte). Přijmete-li změny, váš lokální soubor .hg/projrc je aktualizován a jeho nastavení jsou Mercurialem a TortoiseHg vzata v úvahu.
 
-Má-li lokální repozitář soubor .hg/projrc, uvidíte v dialogu pro nastavení další panel s názvem "project settings (.hg/projrc)". 
+Má-li lokální repozitář soubor .hg/projrc, uvidíte v dialogu pro nastavení další panel s názvem "project settings (.hg/projrc)".
 
 Tento panel je pouze pro čtení a ukazuje aktuální nastavení v souboru .hg/projrc. I když můžete aktualizovat svoji lokální verzi .hg/projrc, nemožnost měnit údaje v panelu naznačuje, že nemůžete měnit nastavení vzdáleného repozitáře a že když se nastavení vzdáleného repozitáře změní, vaše lokální kopie bude aktualizována při nejbližší akci pull (pokud to dovolíte).
 
-Panel "project settings" se zařadí mezi panely "global settings" a "repository settings", čímž je naznačováno, že jeho nastavení jsou použita po globálních nastaveních ale před nastaveními lokálního repozitáře (uvedenými v souboru .hg/hgrc) 
+Panel "project settings" se zařadí mezi panely "global settings" a "repository settings", čímž je naznačováno, že jeho nastavení jsou použita po globálních nastaveních ale před nastaveními lokálního repozitáře (uvedenými v souboru .hg/hgrc)
 
 
 **Dodatečná poznámka**
 
-Podrobnější údaje o používání a konfiguraci z přikazového řádku, jakož i nejčersvější informace o extenzi získáte na stránce 
-`Wiki <http://mercurial.selenic.com/wiki/ProjrcExtension>`_.
+Podrobnější údaje o používání a konfiguraci z přikazového řádku, jakož i nejčersvější informace o extenzi získáte na stránce
+`Wiki <https://www.mercurial-scm.org/wiki/ProjrcExtension>`_.
 
 
 pbranch
 =======
 
 Extenze `pbranch
-<http://mercurial.selenic.com/wiki/PatchBranchExtension>`_ (patch branch) sloužila ke správě oprávek coby tematických větví (alternativa k mq). Bohužel, tato extenze přestala být v roce 2012 aktualizována a je proto nekompatibilní s novějšími verzemi Mercurialu.
+<https://www.mercurial-scm.org/wiki/PatchBranchExtension>`_ (patch branch) sloužila ke správě oprávek coby tematických větví (alternativa k mq). Bohužel, tato extenze přestala být v roce 2012 aktualizována a je proto nekompatibilní s novějšími verzemi Mercurialu.
 
 
- 
+
 .. vim: noet ts=4

@@ -41,7 +41,7 @@ _common = (
     ('closed()',
      _('Changeset is closed.')),
     ('date(interval)',
-     _('Changesets within the interval, see <a href="http://www.selenic.com/'
+     _('Changesets within the interval, see <a href="https://www.mercurial-scm.org/'
        'mercurial/hg.1.html#dates">help dates</a>')),
     ('ancestor(single, single)',
      _('Greatest common ancestor of the two changesets.')),
@@ -53,7 +53,7 @@ _common = (
 _filepatterns = (
     ('file(pattern)',
      _('Changesets affecting files matched by pattern.  '
-       'See <a href="http://www.selenic.com/mercurial/hg.1.html#patterns">'
+       'See <a href="https://www.mercurial-scm.org/mercurial/hg.1.html#patterns">'
        'help patterns</a>')),
     ('modifies(pattern)',
      _('Changesets which modify files matched by pattern.')),
@@ -207,7 +207,7 @@ class RevisionSetQuery(QDialog):
         self.entry.returnPressed.connect(self.returnPressed)
         layout.addWidget(self.entry, 0)
 
-        txt = _('<a href="http://www.selenic.com/mercurial/hg.1.html#revsets">'
+        txt = _('<a href="https://www.mercurial-scm.org/mercurial/hg.1.html#revsets">'
                 'help revsets</a>')
         helpLabel = QLabel(txt)
         helpLabel.setOpenExternalLinks(True)

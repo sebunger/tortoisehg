@@ -19,7 +19,6 @@ from PyQt4.QtCore import *
 
 from mercurial import hg, error, bundlerepo, extensions, filemerge, node
 from mercurial import localrepo, subrepo
-from mercurial import ui as uimod
 from hgext import mq
 
 from tortoisehg.util import hglib, paths
@@ -37,7 +36,7 @@ def repository(_ui=None, path=''):
     is obtained using mercurial.hg.repository()'''
     if path not in _repocache:
         if _ui is None:
-            _ui = uimod.ui()
+            _ui = hglib.loadui()
         try:
             repo = hg.repository(_ui, path)
             repo = repo.unfiltered()
@@ -214,9 +213,9 @@ class RepoWatcher(QObject):
         self._checkuimtime()
 
     def _locked(self):
-        if os.path.lexists(self._repo.join('wlock')):
+        if os.path.lexists(self._repo.vfs.join('wlock')):
             return True
-        if os.path.lexists(self._repo.sjoin('lock')):
+        if os.path.lexists(self._repo.svfs.join('lock')):
             return True
         return False
 
@@ -225,22 +224,22 @@ class RepoWatcher(QObject):
         repo = self._repo
         q = getattr(repo, 'mq', None)
         newfilesmap = {
-            repo.join('bookmarks'): (LogChanged, False),
-            repo.join('bookmarks.current'): (LogChanged, False),
-            repo.join('branch'): (0, False),
-            repo.join('dirstate'): (WorkingStateChanged, False),
-            repo.join('localtags'): (LogChanged, False),
-            repo.sjoin('00changelog.i'): (LogChanged, False),
-            repo.sjoin('obsstore'): (LogChanged, False),
-            repo.sjoin('phaseroots'): (LogChanged, False),
+            repo.vfs.join('bookmarks'): (LogChanged, False),
+            repo.vfs.join('bookmarks.current'): (LogChanged, False),
+            repo.vfs.join('branch'): (0, False),
+            repo.vfs.join('dirstate'): (WorkingStateChanged, False),
+            repo.vfs.join('localtags'): (LogChanged, False),
+            repo.svfs.join('00changelog.i'): (LogChanged, False),
+            repo.svfs.join('obsstore'): (LogChanged, False),
+            repo.svfs.join('phaseroots'): (LogChanged, False),
             }
         if q:
             newfilesmap.update({
                 q.join('guards'): (LogChanged, True),
                 q.join('series'): (LogChanged, True),
                 q.join('status'): (LogChanged, True),
-                repo.join('patches.queue'): (LogChanged, True),
-                repo.join('patches.queues'): (LogChanged, True),
+                repo.vfs.join('patches.queue'): (LogChanged, True),
+                repo.vfs.join('patches.queues'): (LogChanged, True),
                 })
         newpaths = set(newfilesmap) - set(self._filesmap)
         if not newpaths:
@@ -248,9 +247,9 @@ class RepoWatcher(QObject):
         self._filesmap = newfilesmap
         self._datamap = {
             RepoWatcher._readbranch: (WorkingBranchChanged,
-                                      repo.join('branch')),
+                                      repo.vfs.join('branch')),
             RepoWatcher._readparents: (WorkingParentChanged,
-                                       repo.join('dirstate')),
+                                       repo.vfs.join('dirstate')),
             }
         newstats, newdata = self._readState(newpaths)
         self._laststats.update(newstats)
@@ -304,10 +303,10 @@ class RepoWatcher(QObject):
         return changeflags
 
     def _readparents(self):
-        return self._repo.opener('dirstate').read(40)
+        return self._repo.vfs('dirstate').read(40)
 
     def _readbranch(self):
-        return self._repo.opener('branch').read()
+        return self._repo.vfs('branch').read()
 
     def _checkuimtime(self):
         'Check for modified config files, or a new .hg/hgrc file'
@@ -801,7 +800,7 @@ def _extendrepo(repo):
             for line in cfg._source.values():
                 f = line.rsplit(':', 1)[0]
                 files.add(f)
-            files.add(self.join('hgrc'))
+            files.add(self.vfs.join('hgrc'))
             return files
 
         @localrepo.unfilteredpropertycache
@@ -883,7 +882,7 @@ def _extendrepo(repo):
             return tag in self._thgmqpatchnames
 
         def thgshelves(self):
-            self.shelfdir = sdir = self.join('shelves')
+            self.shelfdir = sdir = self.vfs.join('shelves')
             if os.path.isdir(sdir):
                 def getModificationTime(x):
                     try:
@@ -904,7 +903,8 @@ def _extendrepo(repo):
 
         def thginvalidate(self):
             'Should be called when mtime of repo store/dirstate are changed'
-            self.dirstate.invalidate()
+            self.invalidatedirstate()
+
             if not isinstance(repo, bundlerepo.bundlerepository):
                 self.invalidate()
             # mq.queue.invalidate does not handle queue changes, so force
@@ -918,8 +918,8 @@ def _extendrepo(repo):
         def invalidateui(self):
             'Should be called when mtime of ui files are changed'
             origui = self.ui
-            self.ui = uimod.ui()
-            self.ui.readconfig(self.join('hgrc'))
+            self.ui = hglib.loadui()
+            self.ui.readconfig(self.vfs.join('hgrc'))
             hglib.copydynamicconfig(origui, self.ui)
             for a in _uiprops:
                 if localrepo.hasunfilteredcache(self, a):
@@ -928,7 +928,7 @@ def _extendrepo(repo):
         def thgbackup(self, path):
             'Make a backup of the given file in the repository "trashcan"'
             # The backup name will be the same as the orginal file plus '.bak'
-            trashcan = self.join('Trashcan')
+            trashcan = self.vfs.join('Trashcan')
             if not os.path.isdir(trashcan):
                 os.mkdir(trashcan)
             if not os.path.exists(path):

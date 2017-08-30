@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import ui, util, error, extensions, scmutil, phases
+from mercurial import util, error, extensions, phases
 
 from tortoisehg.util import hglib, paths, wconfig, i18n, editor
 from tortoisehg.util import terminal, gpg
@@ -510,19 +510,19 @@ def issuePluginVisible():
         return False
 
 def findDiffTools():
-    return hglib.difftools(ui.ui())
+    return hglib.difftools(hglib.loadui())
 
 def findMergeTools():
-    return hglib.mergetools(ui.ui())
+    return hglib.mergetools(hglib.loadui())
 
 def findEditors():
-    return editor.findeditors(ui.ui())
+    return editor.findeditors(hglib.loadui())
 
 def findTerminals():
-    return terminal.findterminals(ui.ui())
+    return terminal.findterminals(hglib.loadui())
 
 def findGpg():
-    return gpg.findgpg(ui.ui())
+    return gpg.findgpg(hglib.loadui())
 
 def genCheckBox(opts):
     opts['nohist'] = True
@@ -799,14 +799,14 @@ INFO = (
         genBoolRBGroup,
         _('Determines if TortoiseHg should show a confirmation dialog '
           'before adding new files in a commit. '
-          'If True, a confirmation dialog will be showed. '
+          'If True, a confirmation dialog will be shown. '
           'If False, selected new files will be included in the '
           'commit with no confirmation dialog.  Default: True')),
     _fi(_('Confirm deleting files'), 'tortoisehg.confirmdeletefiles',
         genBoolRBGroup,
         _('Determines if TortoiseHg should show a confirmation dialog '
           'before removing files in a commit. '
-          'If True, a confirmation dialog will be showed. '
+          'If True, a confirmation dialog will be shown. '
           'If False, selected deleted files will be included in the '
           'commit with no confirmation dialog.  Default: True')),
     )),
@@ -1197,7 +1197,7 @@ class SettingsDialog(QDialog):
             qtlib.ErrorMsgBox(_('Iniparse package not found'),
                          _("Can't change settings without iniparse package - "
                            'view is readonly.'), parent=self)
-            print 'Please install http://code.google.com/p/iniparse/'
+            print 'Please install https://code.google.com/archive/p/iniparse/'
 
         if not focus:
             focus = QSettings().value('settings/lastpage', 'log').toString()
@@ -1224,7 +1224,7 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.conftabs)
         if qtlib.IS_RETINA:
             self.conftabs.setIconSize(qtlib.barRetinaIconSize())
-        utab = SettingsForm(rcpath=scmutil.userrcpath(), focus=focus)
+        utab = SettingsForm(rcpath=hglib.userrcpath(), focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('thg-userconfig'),
                              _("%s's global settings") % username())
         utab.restartRequested.connect(self._pushRestartRequest)
@@ -1233,7 +1233,7 @@ class SettingsDialog(QDialog):
             if root is None:
                 root = paths.find_root()
             if root:
-                repo = thgrepo.repository(ui.ui(), root)
+                repo = thgrepo.repository(hglib.loadui(), root)
             else:
                 repo = None
         except error.RepoError:
@@ -1562,9 +1562,9 @@ class SettingsForm(QWidget):
                 func = e.values
                 w = func(opts)
             if e.globalonly:
-                w.setEnabled(self.rcpath == scmutil.userrcpath())
+                w.setEnabled(self.rcpath == hglib.userrcpath())
             elif e.noglobal:
-                w.setEnabled(self.rcpath != scmutil.userrcpath())
+                w.setEnabled(self.rcpath != hglib.userrcpath())
             lbl = QLabel(e.label)
             lbl.setToolTip(e.tooltip)
             widgets.append(w)
@@ -1771,7 +1771,7 @@ class SettingsForm(QWidget):
                 chk.setEnabled(False)
                 cpath = chk.opts['cpath']
                 sect, key = cpath.split('.', 1)
-                if ui.ui().config(sect, key, None) is not None:
+                if hglib.loadui().config(sect, key, None) is not None:
                     chk.setValue(True)
                     chk.curvalue = True
             else:

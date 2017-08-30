@@ -1,4 +1,4 @@
-Debugging 
+Debugging
 =========
 
 .. module:: debugging
@@ -37,7 +37,7 @@ Linux/MacOSX
 
 To debug the changelog viewer, for instance, enter these commands
 into your shell window, while inside the repository::
-    
+
     export THGDEBUG=1
     thg --nofork log
 
@@ -51,7 +51,7 @@ The debugging mechanisms depend on your platform.
 Windows
 ~~~~~~~
 
-See also http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx
+See also https://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx
 for some info bits about Running and Testing Shell Extensions on Windows
 
 The :command:`DbgView` tool from the SysInternals suite will capture
@@ -75,7 +75,7 @@ Debugging is done via the environment variable DEBUG_THG
 
     DEBUG_THG=Ne TMPDIR=/tmp/anydir/ --no-desktop nautilus [path]
 
-* to test in the main instance:: 
+* to test in the main instance::
 
     nautilus -q
     DEBUG_THG=NOe nautilus

@@ -11,7 +11,7 @@ Frequently Asked Questions
 
 *What comes included in the TortoiseHg binary installer for Windows?*
 
-	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
+	`Mercurial <https://www.mercurial-scm.org/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
 	bonus extensions: hgfold, perfarce, mercurial-keyring.  fixfrozenexts,
@@ -22,7 +22,7 @@ Frequently Asked Questions
 
 *Is Mercurial on Windows compatible with the index service and virus scanners?*
 
-	No. Like TortoiseSVN, `we recommend <http://www.selenic.com/pipermail/mercurial/2010-January/029680.html>`_
+	No. Like TortoiseSVN, `we recommend <https://www.mercurial-scm.org/pipermail/mercurial/2010-January/029680.html>`_
 	to turn off the indexing service on the working copies and repositories,
 	and exclude them from virus scans.
 
@@ -56,7 +56,7 @@ Frequently Asked Questions
 *How is TortoiseHg configured?*
 
 	TortoiseHg gets configuration settings from two systems.
-    
+
 	1. The Mercurial configuration system, which is three-tiered
 		a. Site-wide :file:`Mercurial.ini` in :file:`%ProgramFiles%\\TortoiseHg`
 		b. Per-User :file:`Mercurial.ini` in :file:`%UserProfile%`
@@ -67,7 +67,7 @@ Frequently Asked Questions
 
 	These are some of the configurables that are stored in the Mercurial
 	configuration system. ::
-	
+
 		[tortoisehg]
 		vdiff = vdiff
 		editor = gvim

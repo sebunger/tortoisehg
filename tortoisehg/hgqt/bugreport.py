@@ -39,7 +39,7 @@ class BugReport(QDialog):
 
         lbl = QLabel(_('Please report this bug to our '
             '<a href="%s">bug tracker</a>') %
-            u'http://bitbucket.org/tortoisehg/thg/wiki/BugReport')
+            u'https://bitbucket.org/tortoisehg/thg/wiki/BugReport')
         lbl.setOpenExternalLinks(True)
         self.layout().addWidget(lbl)
 
@@ -73,7 +73,7 @@ class BugReport(QDialog):
         QTimer.singleShot(0, self.getUpdateInfo)
 
     def getUpdateInfo(self):
-        verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
+        verurl = 'https://tortoisehg.bitbucket.io/curversion.txt'
         # If we use QNetworkAcessManager elsewhere, it should be shared
         # through the application.
         self._netmanager = QNetworkAccessManager(self)
@@ -234,12 +234,11 @@ class ExceptionMsgBox(QDialog):
             try:
                 # A chicken-egg problem here, we need a ui to get your
                 # editor in order to repair your ui config file.
-                from mercurial import ui as uimod
                 from tortoisehg.hgqt import qtlib
                 class FakeRepo(object):
                     def __init__(self):
                         self.root = os.getcwd()
-                        self.ui = uimod.ui()
+                        self.ui = hglib.loadui()
                 fake = FakeRepo()
                 qtlib.editfiles(fake, [fname], lineno, parent=self)
             except Exception, e:

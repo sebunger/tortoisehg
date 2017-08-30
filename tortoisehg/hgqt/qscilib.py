@@ -24,7 +24,7 @@ _HIGHLIGHT_INDIC_ID = _IM_PREEDIT_INDIC_ID - 1
 class _SciImSupport(object):
     """Patch for QsciScintilla to implement improved input method support
 
-    See http://doc.trolltech.com/4.7/qinputmethodevent.html
+    See https://doc.qt.io/qt-4.8/qinputmethodevent.html
     """
 
     def __init__(self, sci):

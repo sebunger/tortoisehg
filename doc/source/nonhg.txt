@@ -7,7 +7,7 @@ Use with other VCS systems
 
 This chapter describes the three most popular Mercurial extensions for
 interoperating with *foreign* VCS systems.  See also `Repository
-Conversion <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
+Conversion <https://www.mercurial-scm.org/wiki/RepositoryConversion>`_
 
 .. _perfarce-perforce:
 
@@ -15,7 +15,7 @@ Perfarce (Perforce)
 ===================
 
 * `Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_ home page.
-* `Mercurial for Perforce users <http://mercurial.selenic.com/wiki/PerforceConcepts>`_
+* `Mercurial for Perforce users <https://www.mercurial-scm.org/wiki/PerforceConcepts>`_
 
 This extension modifies the remote repository handling so that repository
 paths that resemble::
@@ -98,13 +98,13 @@ repository's hgrc like this::
 	The perfarce extension has been known to not work together with
 	hgsubversion, so if you plan to use both extensions they should be
 	enabled locally on the repositories that require them.
- 
+
 hgsubversion (SVN)
 ==================
 
 * `hgsubversion <https://bitbucket.org/durin42/hgsubversion/wiki/Home>`_ home page
-* `hgsubversion Extension <http://mercurial.selenic.com/wiki/HgSubversion>`_ wiki page
-* `Working with Subversion Repositories <http://mercurial.selenic.com/wiki/WorkingWithSubversion>`_
+* `hgsubversion Extension <https://www.mercurial-scm.org/wiki/HgSubversion>`_ wiki page
+* `Working with Subversion Repositories <https://www.mercurial-scm.org/wiki/WorkingWithSubversion>`_
 
 hgsubversion, as it's name implies, allows you to use Mercurial as a
 client to a Subversion server.  It can also be used to do straight
@@ -153,11 +153,11 @@ number in the Changeset Info widget in the Revision Details task tab of the
 Workbench.
 
 hg-git (git)
-============ 
+============
 
-* `hg-git <http://hg-git.github.com/>`_ home page
-* `hg-git Extension <http://mercurial.selenic.com/wiki/HgGit>`_ wiki page
-* `Mercurial for Git users <http://mercurial.selenic.com/wiki/GitConcepts>`_
+* `hg-git <https://hg-git.github.io/>`_ home page
+* `hg-git Extension <https://www.mercurial-scm.org/wiki/HgGit>`_ wiki page
+* `Mercurial for Git users <https://www.mercurial-scm.org/wiki/GitConcepts>`_
 
 hg-git, as its name implies, allows you to use Mercurial as a
 client to a git server.  It can also be used to do straight conversions

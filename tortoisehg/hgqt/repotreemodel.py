@@ -121,7 +121,7 @@ class RepoTreeModel(QAbstractItemModel):
         self.allrepos = all
         self.updateCommonPaths()
 
-    # see http://doc.qt.nokia.com/4.6/model-view-model-subclassing.html
+    # see https://doc.qt.io/qt-4.8/model-view-programming.html#model-subclassing-reference
 
     # overrides from QAbstractItemModel
 

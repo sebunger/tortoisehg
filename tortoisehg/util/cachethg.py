@@ -8,7 +8,7 @@
 import os
 import sys
 
-from mercurial import hg, util, ui, node, error, scmutil
+from mercurial import hg, util, node, error, scmutil
 from tortoisehg.util import paths, debugthg, hglib
 
 debugging = False
@@ -184,7 +184,7 @@ def get_states(upath, repo=None):
         tc1 = GetTickCount()
         real = os.path.realpath #only test if necessary (symlink in path)
         if not repo or (repo.root != root and repo.root != real(root)):
-            repo = hg.repository(ui.ui(), path=root)
+            repo = hg.repository(hglib.loadui(), path=root)
             debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
     except error.RepoError:
         # We aren't in a working tree

@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/Users/sborho/repos/thg/tortoisehg/hgqt/serve.ui'
+# Form implementation generated from reading ui file '/home/sborho/repos/thg/tortoisehg/hgqt/serve.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created by: PyQt UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
 from tortoisehg.util.i18n import _
-from PyQt4 import QtCore, QtGui
+from .pyqtcompat import QtCore, QtGui
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8

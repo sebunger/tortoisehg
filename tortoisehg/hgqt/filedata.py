@@ -8,9 +8,8 @@
 import os, posixpath
 import cStringIO
 
-from mercurial import commands, error, match, patch, subrepo, util, mdiff
+from mercurial import commands, error, match, patch, subrepo, util
 from mercurial import copies
-from mercurial import ui as uimod
 from mercurial.node import nullrev
 
 from tortoisehg.util import hglib, patchctx
@@ -422,8 +421,8 @@ class FileData(_AbstractFileData):
             if isbfile:
                 olddata += '\0'
                 newdata += '\0'
-            difftext = mdiff.unidiff(olddata, olddate, newdata, newdate,
-                                     oldname, wfile, opts=diffopts)
+            difftext = hglib.unidifftext(olddata, olddate, newdata, newdate,
+                                         oldname, wfile, opts=diffopts)
             if difftext:
                 self.diff = ('diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
                              + difftext)
@@ -720,7 +719,9 @@ class SubrepoData(_AbstractFileData):
                     # Will be handled later as such below
                     pass
             out = []
-            _ui = uimod.ui()
+            # TODO: should be copied from the baseui
+            _ui = hglib.loadui()
+            _ui.setconfig('ui', 'paginate', 'off', 'subrepodata')
 
             if srepo is None or ctx.rev() is not None:
                 data = []

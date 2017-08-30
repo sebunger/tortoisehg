@@ -9,11 +9,11 @@ What is TortoiseHg?
 ===================
 
 TortoiseHg is a set of graphical tools and a shell extension for the
-`Mercurial <http://mercurial.selenic.com/wiki/>`_ distributed revision control
+`Mercurial <https://www.mercurial-scm.org/wiki/>`_ distributed revision control
 system.
 
 .. note::
-	hg is the symbol for the chemical element `Mercury <http://en.wikipedia.org/wiki/Mercury_%28element%29>`_
+	hg is the symbol for the chemical element `Mercury <https://en.wikipedia.org/wiki/Mercury_%28element%29>`_
 
 On Windows,
 	TortoiseHg consists of the Workbench graphical application, a shell
@@ -51,7 +51,7 @@ On Windows
 
 TortoiseHg comes with an easy to use MSI installer.  You can always find
 the most up to date release on our `website
-<http://tortoisehg.bitbucket.org/download/windows.html>`_.
+<https://tortoisehg.bitbucket.io/download/windows.html>`_.
 Simply double click on the installer file and follow its instructions.
 
 After a first time install, a re-login is usually required to start the
@@ -130,7 +130,7 @@ On Linux and Mac
 ----------------
 
 The most recent Linux packages can be found on our `download
-<http://tortoisehg.bitbucket.org/download/linux.html>`_ page.
+<https://tortoisehg.bitbucket.io/download/linux.html>`_ page.
 
 For Mac OS X, no packages are available but you can run thg and all the
 dialogs via the source install method. For details, see

@@ -423,7 +423,7 @@ class HistorySearchThread(QThread):
                     'rev':[], 'line_number':True, 'print0':True,
                     'ignore_case':self.icase, 'include':self.inc,
                     'exclude':self.exc}
-            u = incrui()
+            u = incrui(self.repo.ui)
             commands.grep(u, self.repo, self.pattern, **opts)
         except Exception, e:
             self.showMessage.emit(str(e))
@@ -458,7 +458,7 @@ class CtxSearchThread(QThread):
         def badfn(f, msg):
             e = hglib.tounicode("%s: %s" % (matchfn.rel(f), msg))
             self.showMessage.emit(e)
-        self.hu = htmlui.htmlui()
+        self.hu = htmlui.htmlui(self.repo.ui)
         try:
             # generate match function relative to repo root
             matchfn = match.match(self.repo.root, '', [], self.inc, self.exc)

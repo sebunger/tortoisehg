@@ -15,7 +15,7 @@ Protože extenze nautilu nemá své vlastní GUI pro správu překryvných ikon 
 	:alt: Nautilus screenshot
 
 	GNOME/Nautilus screenshot
-	
+
 Byť většinou užitečné, mohou překryvné ikony způsobit zpomalení výkonu u velkých repozitářů. Tuto funkci lze vyřadit úpravou konfiguračního souboru :file:`~/.hgrc`::
 
     [tortoisehg]

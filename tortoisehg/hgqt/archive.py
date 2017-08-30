@@ -37,24 +37,76 @@ _ARCHIVE_TYPES = [
 class ArchiveWidget(cmdui.AbstractCmdWidget):
     """Command widget to archive a particular Mercurial revision"""
 
-    def __init__(self, repoagent, rev=None, parent=None):
+    _archive_content_all_files = 0
+    _archive_content_touched_files = 1
+    _archive_content_touched_since = 2
+
+    def __init__(self, repoagent, rev, parent=None, minrev=None):
         super(ArchiveWidget, self).__init__(parent)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._repoagent = repoagent
+        if minrev is None:
+            minrev = rev
+            archive_since = False
+        else:
+            archive_since = True
+
+        possibleroots = []
+        if minrev is not None:
+            parents = self.repo[minrev].parents()
+            if parents:
+                for p in parents:
+                    text = hglib.tounicode(str(int(p)))
+                    possibleroots.append(text)
+            else:
+                possibleroots.append('null')
 
         form = QFormLayout()
         form.setContentsMargins(0, 0, 0, 0)
         self.setLayout(form)
 
-        # content selection
+        ### content selection
+        ## revision selection
         self.rev_combo = QComboBox()
         self.rev_combo.setEditable(True)
         self.rev_combo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        self.files_in_rev_chk = QCheckBox(
-                _('Only files modified/created in this revision'))
-        self.subrepos_chk = QCheckBox(_('Recurse into subrepositories'))
         form.addRow(_('Revision:'), self.rev_combo)
-        form.addRow('', self.files_in_rev_chk)
+
+        ### content type
+        ## Selection of the content mode
+        self.content_mode = QButtonGroup(self)
+        # All files
+        box = QVBoxLayout()
+        w = QRadioButton(_('All files in this revision'), self)
+        self.content_mode.addButton(w, self._archive_content_all_files)
+        box.addWidget(w)
+        # Touched in this revision
+        w = QRadioButton(_('Only files modified/created in this revision'), self)
+        self.content_mode.addButton(w, self._archive_content_touched_files)
+        box.addWidget(w)
+        # Touched since
+        sincebox = QHBoxLayout()
+        self.rootrev_combo = QComboBox(self)
+        self.rootrev_combo.setEditable(True)
+        self.rootrev_combo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
+        if minrev is not None:
+            for text in possibleroots:
+                self.rootrev_combo.addItem(text)
+            self.rootrev_combo.setCurrentIndex(0)
+        w = QRadioButton(_('Only files modified/created since:'), self)
+        self.content_mode.addButton(w, self._archive_content_touched_since)
+        sincebox.addWidget(w)
+        sincebox.addWidget(self.rootrev_combo)
+        box.addLayout(sincebox)
+        if archive_since:
+            # default to "touched since X" if the input is a range
+            self.content_mode.button(self._archive_content_touched_since).setChecked(True)
+        else:
+            self.content_mode.button(self._archive_content_all_files).setChecked(True)
+        form.addRow(_('Archive Content:'), box)
+
+        # subrepository option
+        self.subrepos_chk = QCheckBox(_('Recurse into subrepositories'))
         form.addRow('', self.subrepos_chk)
 
         # selecting a destination
@@ -108,7 +160,8 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         self.dest_edit.textEdited.connect(self.compose_command)
         self.rev_combo.editTextChanged.connect(self.rev_combo_changed)
         self.dest_btn.clicked.connect(self.browse_clicked)
-        self.files_in_rev_chk.stateChanged.connect(self.compose_command)
+        self.content_mode.buttonClicked.connect(self.compose_command)
+        self.rootrev_combo.editTextChanged.connect(self.compose_command)
         self.subrepos_chk.toggled.connect(self.compose_command)
         self._typesradios.buttonClicked.connect(self.update_path)
 
@@ -156,6 +209,10 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         else:
             rev = hglib.fromunicode(rev)
         return rev
+
+    def get_selected_rootrev(self):
+        rev = self.rootrev_combo.currentText()
+        return hglib.fromunicode(rev)
 
     def get_selected_archive_type(self):
         """Return a dictionary describing the selected archive type"""
@@ -210,12 +267,20 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
 
     @pyqtSlot()
     def compose_command(self):
-        if self.files_in_rev_chk.isChecked():
-            incl = 'set:added() or modified()'
-        else:
+        content = self.content_mode.checkedId()
+        targetrev = hglib.tounicode(self.get_selected_rev())
+        if content == self._archive_content_all_files:
             incl = None
+        elif content == self._archive_content_touched_files:
+            incl = 'set:added() or modified()'
+        elif content == self._archive_content_touched_since:
+            expr = 'set:status(%s, %s, added() or modified())'
+            rootrev = hglib.tounicode(self.get_selected_rootrev())
+            incl = hglib.formatfilespec(expr, rootrev, targetrev)
+        else:
+            assert False
         cmdline = hglib.buildcmdargs('archive', self.dest_edit.text(),
-                                     r=hglib.tounicode(self.get_selected_rev()),
+                                     r=targetrev,
                                      S=self.subrepos_chk.isChecked(), I=incl,
                                      t=self.get_selected_archive_type()['type'])
         self.hgcmd_txt.setText('hg ' + hglib.prettifycmdline(cmdline))
@@ -266,11 +331,11 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         return self._repoagent.runCommand(cmdline, self)
 
 
-def createArchiveDialog(repoagent, rev=None, parent=None):
+def createArchiveDialog(repoagent, rev=None, parent=None, minrev=None):
     dlg = cmdui.CmdControlDialog(parent)
     dlg.setWindowTitle(_('Archive - %s') % repoagent.displayName())
     dlg.setWindowIcon(qtlib.geticon('hg-archive'))
     dlg.setObjectName('archive')
     dlg.setRunButtonText(_('&Archive'))
-    dlg.setCommandWidget(ArchiveWidget(repoagent, rev, dlg))
+    dlg.setCommandWidget(ArchiveWidget(repoagent, rev, dlg, minrev))
     return dlg

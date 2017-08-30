@@ -15,7 +15,7 @@ assumed that the user is familiar with the Windows explorer and knows
 how to use it.
 
 You can find the most up to date version of this documentation at our
-`web <http://tortoisehg.org>`_ site.
+`web <https://tortoisehg.bitbucket.io>`_ site.
 
 Reading guide
 =============
@@ -44,8 +44,8 @@ non-Mercurial servers.
 TortoiseHg is free!
 ===================
 
-TortoiseHg is released under 
-`GPLv2 <http://www.gnu.org/licenses/gpl-2.0.html>`_.  You are free to
+TortoiseHg is released under
+`GPLv2 <https://www.gnu.org/licenses/gpl-2.0.html>`_.  You are free to
 install it on as many computers as you like, and to redistribute it
 according to the GPLv2 license.
 
@@ -69,12 +69,12 @@ truly useful tool (especially users who care enough to report bugs and
 file feature requests).
 
 The TortoiseHg installer for Windows includes the TortoiseOverlays handler,
-as provided by the `TortoiseSVN <http://tortoisesvn.net>`_ project.
+as provided by the `TortoiseSVN <https://tortoisesvn.net>`_ project.
 
-The history viewer of TortoiseHg is based on 
-`hgview <http://www.logilab.org/project/hgview>`_, a tool developed by
+The history viewer of TortoiseHg is based on
+`hgview <https://www.logilab.org/project/hgview>`_, a tool developed by
 `David Douard <david.douard@logilab.fr>`_ and others, with the financial
-support of `Logilab <http://www.logilab.fr>`_.
+support of `Logilab <https://www.logilab.fr>`_.
 
 
 Conventions used in this manual
@@ -104,7 +104,7 @@ The following typographical conventions are used in this manual:
 
 ``myproxy:8000``
 	Indicates a text to enter into a text input field in the GUI.
-	
+
 .. note::
 	This is a note.
 

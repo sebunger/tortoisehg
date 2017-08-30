@@ -12,7 +12,7 @@ import tempfile
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import hg, util, scmutil, httpconnection
+from mercurial import hg, util, httpconnection
 
 from tortoisehg.util import hglib, paths, wconfig
 from tortoisehg.util.i18n import _
@@ -306,7 +306,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def reload(self):
         # Refresh configured paths
         self.paths = {}
-        fn = self.repo.join('hgrc')
+        fn = self.repo.vfs.join('hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if 'paths' in cfg:
             for alias in cfg['paths']:
@@ -757,7 +757,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.pullCompleted.emit()
         # handle file conflicts during rebase
         if self.cachedpp in ('rebase', 'updateorrebase'):
-            if os.path.exists(self.repo.join('rebasestate')):
+            if os.path.exists(self.repo.vfs.join('rebasestate')):
                 dlg = rebase.RebaseDialog(self._repoagent, self)
                 dlg.exec_()
                 return
@@ -988,7 +988,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot(str)
     def removeAlias(self, alias):
         alias = hglib.fromunicode(alias)
-        fn = self.repo.join('hgrc')
+        fn = self.repo.vfs.join('hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to remove URL'),
@@ -1090,7 +1090,7 @@ class PostPullDialog(QDialog):
                     if chk.isChecked()).next()
 
     def accept(self):
-        path = self.repo.join('hgrc')
+        path = self.repo.vfs.join('hgrc')
         fn, cfg = hgrcutil.loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save post pull operation'),
@@ -1174,7 +1174,7 @@ class SaveDialog(QDialog):
         self._updateUi()
 
     def savePath(self, repo, alias, path, confirm=True):
-        fn = repo.join('hgrc')
+        fn = repo.vfs.join('hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save an URL'),
@@ -1305,7 +1305,11 @@ class SecureDialog(QDialog):
         self.insecureradio = QRadioButton(
             _('No host validation, but still encrypted (bad)'))
         hbox = QHBoxLayout()
-        fprint = repo.ui.config('hostfingerprints', u.host, '')
+        fprint = repo.ui.config('hostsecurity', u.host + ':fingerprints', '')
+        if not fprint:
+            fprint = repo.ui.config('hostfingerprints', u.host, '')
+            if fprint:
+                fprint = 'sha1:' + fprint
         self.fprintentry = le = QLineEdit(fprint)
         self.fprintradio.toggled.connect(self.fprintentry.setEnabled)
         self.fprintentry.setEnabled(False)
@@ -1441,7 +1445,7 @@ are expanded in the filename.'''))
             e.setText(n)
 
     def accept(self):
-        path = scmutil.userrcpath()
+        path = hglib.userrcpath()
         fn, cfg = hgrcutil.loadIniFile(path, self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save authentication'),
@@ -1465,7 +1469,7 @@ are expanded in the filename.'''))
         else:
             fprint = None
             insecure = '1'
-        setorclear('hostfingerprints', self.host, fprint)
+        setorclear('hostsecurity', '%s:fingerprints' % self.host, fprint)
         setorclear('insecurehosts', self.host, insecure)
 
         e = self._protocolcombo

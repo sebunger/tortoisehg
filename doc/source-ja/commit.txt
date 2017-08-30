@@ -8,7 +8,7 @@
 	win32text 拡張機能はハンク選択で問題を引き起こす可能性があります。この問題は
 	Mercurial 1.3 と TortoiseHg 0.8 において解決されましたが、適切な設定が
 	必要です。詳しくは
-	`issue #82 <http://bitbucket.org/tortoisehg/stable/issue/82/>`_
+	`issue #82 <https://bitbucket.org/tortoisehg/thg/issue/82/>`_
 	をご覧ください。
 
 コミットツールは TortoiseHg に2つある主要アプリケーションのうちの1つです。
@@ -73,7 +73,7 @@ TortoiseHg が実装しているほぼすべての機能にアクセスできま
 		作業ディレクトリの現在のブランチ名を表示します。通常はブランチ名の表示のみですが、
 		このボタンを押すとブランチ操作のためのダイアログが表示されます。
 		この機能は Mercurial の
-		`名前付きブランチ <http://mercurial.selenic.com/wiki/NamedBranches>`_
+		`名前付きブランチ <https://www.mercurial-scm.org/wiki/NamedBranches>`_
 		を理解している場合のみ使用してください。
 	:guilabel:`最近コミットしたメッセージ`
 		最近のコミットメッセージ 10 件のドロップダウンリストです。

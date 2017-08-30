@@ -10,7 +10,7 @@ import os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
-from mercurial import error, util, revset as hgrevset
+from mercurial import error, util
 from mercurial import repoview
 
 from tortoisehg.util import hglib
@@ -22,8 +22,9 @@ _permanent_queries = ('head()', 'merge()',
                       'file(".hgsubstate") or file(".hgsub")')
 
 def _firstword(query):
+    lquery = hglib.fromunicode(query)
     try:
-        for token, value, _pos in hgrevset.tokenize(hglib.fromunicode(query)):
+        for token, value, _pos in hglib.tokenizerevspec(lquery):
             if token == 'symbol' or token == 'string':
                 return value  # localstr
     except error.ParseError:
@@ -107,10 +108,10 @@ class RepoFilterBar(QToolBar):
         self._repoagent = repoagent
         self._permanent_queries = list(_permanent_queries)
         repo = repoagent.rawRepo()
-        username = repo.ui.config('ui', ['username', 'user'])
+        username = hglib.configuredusername(repo.ui)
         if username:
             self._permanent_queries.insert(0,
-                hgrevset.formatspec('author(%s)', os.path.expandvars(username)))
+                hglib.formatrevspec('author(%s)', os.path.expandvars(username)))
         self.filterEnabled = True
 
         #Check if the font contains the glyph needed by the branch combo
@@ -261,8 +262,7 @@ class RepoFilterBar(QToolBar):
     def _prepareQuery(self):
         query = unicode(self.revsetcombo.currentText()).strip()
         if _querytype(self._repo, query) == 'keyword':
-            s = hglib.fromunicode(query)
-            return hglib.tounicode(hgrevset.formatspec('keyword(%s)', s))
+            return hglib.formatrevspec('keyword(%s)', query)
         else:
             return query
 

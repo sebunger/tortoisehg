@@ -8,7 +8,7 @@
 import os, re
 
 from mercurial import node
-from mercurial import ui, hg, util, error
+from mercurial import hg, util, error
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.util.i18n import _
@@ -358,7 +358,8 @@ class RepoItem(RepoTreeItem):
                       and not os.path.exists(
                           os.path.join(self._root, '.hg', 'sharedpath'))):
                     return []  # skip repo creation, which is expensive
-                repo = hg.repository(ui.ui(), hglib.fromunicode(self._root))
+                repo = hg.repository(hglib.loadui(),
+                                     hglib.fromunicode(self._root))
             if repo.sharedpath != repo.path:
                 self._sharedpath = hglib.tounicode(repo.sharedpath)
             wctx = repo['.']

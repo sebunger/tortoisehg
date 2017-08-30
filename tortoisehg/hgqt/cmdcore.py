@@ -147,8 +147,10 @@ def _fixprocenv(proc):
     env['HGPLAINEXCEPT'] = 'alias,i18n,revsetalias'
     if not getattr(sys, 'frozen', False):
         # make sure hg process can look up our modules
-        env['PYTHONPATH'] = (paths.get_prog_root() + os.pathsep
-                             + env.get('PYTHONPATH', ''))
+        old_python_path = env.get('PYTHONPATH')
+        env['PYTHONPATH'] = paths.get_prog_root()
+        if old_python_path:
+            env['PYTHONPATH'] += os.pathsep + old_python_path
     # not using setProcessEnvironment() for compatibility with PyQt 4.6
     proc.setEnvironment([hglib.tounicode('%s=%s' % p) for p in env.iteritems()])
 
@@ -243,7 +245,7 @@ class CmdServer(CmdWorker):
         self._readchtable = self._idlechtable
         self._readq = []  # (ch, data or datasize), ...
         # deadline for arrival of hello message and immature data
-        sec = ui.configint('tortoisehg', 'cmdserver.readtimeout', 5)
+        sec = ui.configint('tortoisehg', 'cmdserver.readtimeout', 30)
         self._readtimer = QTimer(self, interval=sec * 1000, singleShot=True)
         self._readtimer.timeout.connect(self._onReadTimeout)
         self._proc = self._createProc(cwd)
