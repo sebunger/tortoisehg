@@ -382,7 +382,7 @@ class HgFileView(QFrame):
                     _('Show changes from second parent')]
         for a, pctx, tooltip in zip(self._parentToggleGroup.actions(),
                                     parents, tooltips):
-            firstline = hglib.longsummary(ctx.description())
+            firstline = hglib.longsummary(pctx.description())
             a.setToolTip('%s:\n%s [%d:%s] %s'
                          % (tooltip, hglib.tounicode(pctx.branch()),
                             pctx.rev(), pctx, firstline))
@@ -692,7 +692,12 @@ class _DiffViewControl(_AbstractViewControl):
 
     def open(self):
         self._sci.markerDefine(qsci.Background, _ChunkStartMarker)
-        self._sci.setMarkerBackgroundColor(QColor('#B0FFA0'), _ChunkStartMarker)
+        if qtlib.isDarkTheme(self._sci.palette()):
+            self._sci.setMarkerBackgroundColor(QColor('#204820'),
+                                               _ChunkStartMarker)
+        else:
+            self._sci.setMarkerBackgroundColor(QColor('#B0FFA0'),
+                                               _ChunkStartMarker)
         self._sci.setLexer(lexers.difflexer(self))
 
     def close(self):
@@ -746,10 +751,16 @@ class _FileViewControl(_AbstractViewControl):
         # define markers for colorize zones of diff
         self._sci.markerDefine(qsci.Background, _InsertedLineMarker)
         self._sci.markerDefine(qsci.Background, _ReplacedLineMarker)
-        self._sci.setMarkerBackgroundColor(QColor('#B0FFA0'),
-                                           _InsertedLineMarker)
-        self._sci.setMarkerBackgroundColor(QColor('#A0A0FF'),
-                                           _ReplacedLineMarker)
+        if qtlib.isDarkTheme(self._sci.palette()):
+            self._sci.setMarkerBackgroundColor(QColor('#204820'),
+                                               _InsertedLineMarker)
+            self._sci.setMarkerBackgroundColor(QColor('#202050'),
+                                               _ReplacedLineMarker)
+        else:
+            self._sci.setMarkerBackgroundColor(QColor('#B0FFA0'),
+                                               _InsertedLineMarker)
+            self._sci.setMarkerBackgroundColor(QColor('#A0A0FF'),
+                                               _ReplacedLineMarker)
 
         self._actionGotoLine = a = QAction(qtlib.geticon('go-jump'),
                                            _('Go to Line'), self)
@@ -932,6 +943,8 @@ class _AnnotateViewControl(_AbstractViewControl):
         self._initAnnotateOptionActions()
         self._loadAnnotateSettings()
 
+        self._isdarktheme = qtlib.isDarkTheme(self._sci.palette())
+
     def open(self):
         self._sci.viewport().installEventFilter(self)
 
@@ -1060,6 +1073,11 @@ class _AnnotateViewControl(_AbstractViewControl):
             return
         repo = self._repoAgentForFile().rawRepo()
         data = pickle.loads(str(sess.readAll()))
+        try:
+            data = data[0]['lines']
+        except (IndexError, KeyError):
+            # hg<4.3 (7a209737f01c)
+            pass
         links = []
         fctxcache = {}  # (path, rev): fctx
         for l in data:
@@ -1116,7 +1134,8 @@ class _AnnotateViewControl(_AbstractViewControl):
         palette = colormap.makeannotatepalette(filectxs, curdate,
                                                maxcolors=maxcolors, maxhues=8,
                                                maxsaturations=16,
-                                               mindate=mindate)
+                                               mindate=mindate,
+                                               isdarktheme=self._isdarktheme)
         for i, (color, fctxs) in enumerate(palette.iteritems()):
             m = _FirstAnnotateLineMarker + i
             self._sci.markerDefine(qsci.Background, m)

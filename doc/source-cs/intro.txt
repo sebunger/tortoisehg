@@ -10,17 +10,17 @@ Co je TortoiseHg?
 
 TortoiseHg je sada grafických nástrojů a extenzí uživatelského rozhraní programu `Mercurial <https://www.mercurial-scm.org/wiki/>`_  (`CzechMercurial <https://www.mercurial-scm.org/wiki/CzechMercurial>`_) pro necentralizovanou (neboli distribuovanou) správu verzí.
 
-Ve Windows 
+Ve Windows
  se TortoiseHg skládá z grafické aplikace Verpánek (Workbench), z extenze uživatelského rozhranní s překryvnými ikonami a kontextovým menu v Průzkumníku a z programu pro příkazový řádek :file:`thg.exe` který spouští nástroje TortoiseHg. Binární pakety aplikace TortoiseHg pro Windows obsahují Mercurial i slučovací nástroj a je proto možné je použít bezprostředně po instalaci.
-	
-V Linuxu 
+
+V Linuxu
  se TortoiseHg skládá ze skriptu thg pro příkazový řádek a z extenze Nautilusu, která poskytuje překryvné ikony a kontextové menu v průzkumíku souborů.
- Pro činnost TortoiseHg v Linuxu je potřebná oddělená instalace 
+ Pro činnost TortoiseHg v Linuxu je potřebná oddělená instalace
  programu Mercurial. Binární pakety TortoiseHg znají Mercurial jako
  závislou aplikaci, která je obvykle instalována automaticky.
-	
-.. note:: Ve Window obsahuje TortoiseHg jak thg.exe, tak thgw.exe. programy. Nástroj thgw.exe je zamýšlen pro použití v zástupci na ploše nebo v menu. Nástroj thg.exe je určen pro použití v konzoli a pro volání nápovědy z příkazového řádku. Dávkový soubor thg.cmd, který instalace přidá do proměnné PATH, volá thg.exe.	
-    
+
+.. note:: Ve Window obsahuje TortoiseHg jak thg.exe, tak thgw.exe. programy. Nástroj thgw.exe je zamýšlen pro použití v zástupci na ploše nebo v menu. Nástroj thg.exe je určen pro použití v konzoli a pro volání nápovědy z příkazového řádku. Dávkový soubor thg.cmd, který instalace přidá do proměnné PATH, volá thg.exe.
+
 TortoiseHg je napsán převážně v Pythonu a PyQt (extenze rozhraní Windows je významná výjimka). Skript thg a dialogy TortoiseHg lze použít na jakékoliv platformě, která podporuje PyQt, včetně Mac OS X.
 
 Instalace TortoiseHg
@@ -29,7 +29,7 @@ Instalace TortoiseHg
 Ve Windows
 ----------
 
-TortoiseHg je dodáván se snadno ovladatelným instalačním programem. Aktuální verzi lze nalézt na naši `webové stránce <http://tortoisehg.bitbucket.org/download/windows.html>`_. Dvojím poklepem na staženém souboru spustíme instalaci a sledujeme pokyny. 
+TortoiseHg je dodáván se snadno ovladatelným instalačním programem. Aktuální verzi lze nalézt na naši `webové stránce <https://tortoisehg.bitbucket.io/download/windows.html>`_. Dvojím poklepem na staženém souboru spustíme instalaci a sledujeme pokyny.
 
 Během aktualizací nás instalátor požádá, abychon zavřeli nebo restartovali všechny aplikace, které si načetly extenze rozhranní TorotiseHg. Pokud aplikace zavřeme, aktualizace nebude požadovat restart počítače. Jsou-li připojeni jiní uživatelé, nebo nelze-li některé aplikace zavřít, bude pro ukončení instalace požadován restart.
 
@@ -49,28 +49,28 @@ Nové instalátory pro THg obsahují pakety TortoiseOverlay jako "sloučené mod
 Bezpečné jsou tyto dvě možnosti:
 
 1. Ponecháme staré balíčky TortoiseOverlay nainstalovány, neboť ničemu neškodí.
-2. Staré balíčky TortoiseOverlay odinstalujeme a přeinstalujeme všechny své produkty Tortoise. 
+2. Staré balíčky TortoiseOverlay odinstalujeme a přeinstalujeme všechny své produkty Tortoise.
 
-Pokud se i potom vyskytnou problémy s extenzí rozhraní, doporučujeme znovu spustit instalátor s volbou *Repair* (Opravit).	
-  
+Pokud se i potom vyskytnou problémy s extenzí rozhraní, doporučujeme znovu spustit instalátor s volbou *Repair* (Opravit).
+
 Jazykové nastavení
 ^^^^^^^^^^^^^^^^^^
 
 Uživatelské rozhraní TorotiseHg bylo přeloženo do mnoha jazyků. Jazykové balíčky nejsou potřebné, neboť všechny přeložené jazyky jsou nainstalované. Preferovaný jazyk lze nastavit v nástroji pro globální konfiguraci (:guilabel:`Settings > TortoiseHg > Jazyk aplikace`).
 
 Kontextové nabídky rozhraní Windows jsou překládány pomocí registrů Windows. Překlady pro mnohé lokalizace byly nainstalovány do složky
-:file:`C:\\Program Files\\TortoiseHg\\i18n\\cmenu`. Na vybraném jazyku proveďte dvojpoklep a potvrďte dotazy. 
+:file:`C:\\Program Files\\TortoiseHg\\i18n\\cmenu`. Na vybraném jazyku proveďte dvojpoklep a potvrďte dotazy.
 
 
 V OS Linux a Mac
 -----------------
 
 Nejposlednější pakety ke stažení pro Linux lze nalézt na našich `stránkách
-<http://tortoisehg.bitbucket.org/download/linux.html>`_.
+<https://tortoisehg.bitbucket.io/download/linux.html>`_.
 
 Pro MacOSX nejsou žádné balíčky k disposici, ale je možné používat
 thg a všechny dialogy pomocí instalační metody. Podrobnosti viz
-`MacOSX <http://bitbucket.org/tortoisehg/stable/wiki/MacOSX>`_.
+`MacOSX <https://bitbucket.org/tortoisehg/thg/wiki/developers/MacOSX>`_.
 
 .. note::
 	Při instalaci TortoiseHg ze zdroje, je nutné nějakým způsobem přidat soubor :file:`contrib\\mergetools.rc` do cesty HGRC. Možný způsob je přidat jej ze souboru :file:`~/.hgrc`.

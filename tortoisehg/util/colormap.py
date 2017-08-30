@@ -17,9 +17,10 @@ def _rescaleceil(val, step):
     return float(step) * math.ceil(float(val) / step)
 
 class AnnotateColorSaturation(object):
-    def __init__(self, maxhues=None, maxsaturations=None):
+    def __init__(self, maxhues=None, maxsaturations=None, isdarktheme=False):
         self._maxhues = maxhues
         self._maxsaturations = maxsaturations
+        self._isdarktheme = isdarktheme
 
     def hue(self, angle):
         return tuple([self.v(angle, r) for r in (0, 120, 240)])
@@ -42,7 +43,10 @@ class AnnotateColorSaturation(object):
             return 1 - ((ang - 60) / 60)
 
     def saturate_v(self, saturation, hv):
-        return int(255 - (saturation/3*(1-hv)))
+        if self._isdarktheme:
+            return int(saturation / 4 * (1 - hv))
+        else:
+            return int(255 - (saturation / 3 * (1 - hv)))
 
     def committer_angle(self, committer):
         angle = float(abs(hash(committer))) / sys.maxint * 360.0
@@ -60,7 +64,8 @@ class AnnotateColorSaturation(object):
         return "#%x%x%x" % color
 
 def makeannotatepalette(fctxs, now, maxcolors, maxhues=None,
-                        maxsaturations=None, mindate=None):
+                        maxsaturations=None, mindate=None,
+                        isdarktheme=False):
     """Assign limited number of colors for annotation
 
     :fctxs: list of filecontexts by lines
@@ -78,12 +83,15 @@ def makeannotatepalette(fctxs, now, maxcolors, maxhues=None,
 
     sortedfctxs = list(sorted(set(fctxs), key=lambda fctx: -fctx.date()[0]))
     return _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
-                                maxsaturations, mindate)[0]
+                                maxsaturations, mindate,
+                                isdarktheme)[0]
 
 def _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
-                         maxsaturations, mindate):
+                         maxsaturations, mindate,
+                         isdarktheme):
     cm = AnnotateColorSaturation(maxhues=maxhues,
-                                 maxsaturations=maxsaturations)
+                                 maxsaturations=maxsaturations,
+                                 isdarktheme=isdarktheme)
     palette = {}
 
     def reassignifneeded(fctx):
@@ -91,7 +99,8 @@ def _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
         if mindate is None or fctx.date()[0] < mindate or maxsaturations <= 1:
             return palette, cm
         return _makeannotatepalette(sortedfctxs, now, maxcolors, maxhues,
-                                    maxsaturations - 1, mindate)
+                                    maxsaturations - 1, mindate,
+                                    isdarktheme)
 
     # assign from the latest for maximum discrimination
     for fctx in sortedfctxs:

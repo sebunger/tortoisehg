@@ -10,9 +10,9 @@ Defining a patch
 These links are recommended reading for understanding the history and nature
 of patches and how they can be used with Mercurial.
 
-* `The patch management problem <https://tortoisehg.bitbucket.org/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
-* `Understanding patches <https://tortoisehg.bitbucket.org/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
-* `More about patches <https://tortoisehg.bitbucket.org/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
+* `The patch management problem <https://tortoisehg.bitbucket.io/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+* `Understanding patches <https://tortoisehg.bitbucket.io/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
+* `More about patches <https://tortoisehg.bitbucket.io/hgbook/1.7/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
 
 Pitfalls
 ========
@@ -27,7 +27,7 @@ things, you will need to enable **git** patches via::
 Mercurial 1.5 improves its behavior in this regard.  It will warn you
 when git diffs are required, or sometimes upgrade to the git format
 automatically.  See also the
-`diff section <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_ of
+`diff section <https://www.mercurial-scm.org/mercurial/hgrc.5.html#diff>`_ of
 the hgrc documentation.
 
 Mercurial's patch routines do not deal well with mixed EOLN between
@@ -44,7 +44,7 @@ source files and patches.  The **patch.eol** setting was introduced in
 	The only downside is that you cannot make a patch that changes the
 	line endings of a source file.
 
-See also the `patch section <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_
+See also the `patch section <https://www.mercurial-scm.org/mercurial/hgrc.5.html#patch>`_
 of the hgrc documentation.
 
 Applying a patch is not a foolproof operation.  If the source file has
@@ -98,7 +98,7 @@ repository.
 
 .. note::
 	You must configure
-	`SMTP <http://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
+	`SMTP <https://www.mercurial-scm.org/mercurial/hgrc.5.html#smtp>`_
 	to send patches via email
 
 Import Patches

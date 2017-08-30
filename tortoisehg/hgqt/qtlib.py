@@ -5,24 +5,35 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import os
-import sys
+from __future__ import absolute_import
+
 import atexit
+import cgi
+import os
 import posixpath
-import shutil
+import re
 import shlex
+import shutil
+import sip
 import stat
 import subprocess
+import sys
 import tempfile
-import re
-import sip
 import weakref
 
-from mercurial import extensions, error, util
+from mercurial import (
+    color,
+    extensions,
+    util,
+)
 
-from tortoisehg.util import hglib, paths, editor, terminal
+from tortoisehg.util import (
+    editor,
+    hglib,
+    paths,
+    terminal,
+)
 from tortoisehg.util.i18n import _
-from hgext.color import _styles
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
@@ -67,7 +78,7 @@ def gettempdir():
 def openhelpcontents(url):
     'Open online help, use local CHM file if available'
     if not url.startswith('http'):
-        fullurl = 'http://tortoisehg.readthedocs.org/en/latest/' + url
+        fullurl = 'https://tortoisehg.readthedocs.org/en/latest/' + url
         # Use local CHM file if it can be found
         if os.name == 'nt' and paths.bin_path:
             chm = os.path.join(paths.bin_path, 'doc', 'TortoiseHg.chm')
@@ -90,7 +101,7 @@ def openlocalurl(path):
         path = unicode(path)
     if os.name == 'nt' and path.startswith('\\\\'):
         # network share, special handling because of qt bug 13359
-        # see http://bugreports.qt.nokia.com/browse/QTBUG-13359
+        # see https://bugreports.qt.io/browse/QTBUG-13359
         qurl = QUrl()
         qurl.setUrl(QDir.toNativeSeparators(path))
     else:
@@ -266,6 +277,9 @@ def isDarkTheme(palette=None):
 # set of _effects, since we convert color effect names to font style
 # effect programatically.
 
+# TODO: update ui._styles instead of color._defaultstyles
+_styles = color._defaultstyles
+
 _effects = {
     'bold': 'font-weight: bold',
     'italic': 'font-style: italic',
@@ -315,8 +329,8 @@ def configstyles(ui):
         cfgeffects = ui.configlist('thg-color', status)
         _styles[status] = ' '.join(cfgeffects)
 
-# See http://doc.trolltech.com/4.2/richtext-html-subset.html
-# and http://www.w3.org/TR/SVG/types.html#ColorKeywords
+# See https://doc.qt.io/qt-4.8/richtext-html-subset.html
+# and https://www.w3.org/TR/SVG/types.html#ColorKeywords
 
 def geteffect(labels):
     'map labels like "log.date" to Qt font styles'
@@ -405,6 +419,8 @@ def descriptionhtmlizer(ui):
      u'http://example.com:8000/foo?bar=baz&amp;bax#blah</a>')
     >>> htmlize('https://example/')
     u'<a href="https://example/">https://example/</a>'
+    >>> htmlize('<https://example/>')
+    u'&lt;<a href="https://example/">https://example/</a>&gt;'
 
     issue links:
     >>> u.setconfig('tortoisehg', 'issue.regex', r'#(\\d+)\\b')
@@ -439,8 +455,8 @@ def descriptionhtmlizer(ui):
     regexp = r'%s|%s' % (csmatch, httpmatch)
     bodyre = re.compile(regexp)
 
-    issuematch = ui.config('tortoisehg', 'issue.regex')
-    issuerepl = ui.config('tortoisehg', 'issue.link')
+    issuematch = hglib.tounicode(ui.config('tortoisehg', 'issue.regex'))
+    issuerepl = hglib.tounicode(ui.config('tortoisehg', 'issue.link'))
     if issuematch and issuerepl:
         regexp += '|(%s)' % issuematch
         try:
@@ -450,35 +466,36 @@ def descriptionhtmlizer(ui):
 
     def htmlize(desc):
         """Mark up ctx.description() [localstr] as an HTML [unicode]"""
-        desc = unicode(Qt.escape(hglib.tounicode(desc)))
+        desc = hglib.tounicode(desc)
 
         buf = ''
         pos = 0
         for m in bodyre.finditer(desc):
             a, b = m.span()
             if a >= pos:
-                buf += desc[pos:a]
+                buf += cgi.escape(desc[pos:a])
                 pos = b
             groups = m.groups()
             if groups[0]:
-                cslink = groups[0]
+                cslink = cgi.escape(groups[0])
                 buf += '<a href="cset:%s">%s</a>' % (cslink, cslink)
             if groups[1]:
-                urllink = groups[1]
+                urllink = cgi.escape(groups[1])
                 buf += '<a href="%s">%s</a>' % (urllink, urllink)
             if len(groups) > 4 and groups[4]:
-                issue = groups[4]
+                issue = cgi.escape(groups[4])
                 issueparams = groups[4:]
                 try:
                     link = re.sub(r'\{(\d+)\}',
                                   lambda m: issueparams[int(m.group(1))],
                                   issuerepl)
+                    link = cgi.escape(link)
                     buf += '<a href="%s">%s</a>' % (link, issue)
                 except IndexError:
                     buf += issue
 
         if pos < len(desc):
-            buf += desc[pos:]
+            buf += cgi.escape(desc[pos:])
 
         return buf
 
@@ -509,7 +526,7 @@ def _findcustomicon(name):
             return QIcon(path)
     return None
 
-# http://standards.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+# https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
 _SCALABLE_ICON_PATHS = [(QSize(), 'scalable/actions', '.svg'),
                         (QSize(), 'scalable/apps', '.svg'),
                         (QSize(), 'scalable/status', '.svg'),
@@ -1253,18 +1270,6 @@ class Spacer(QWidget):
     def sizeHint(self):
         return QSize(self.width, self.height)
 
-def _configuredusername(ui):
-    # need to check the existence before calling ui.username(); otherwise it
-    # may fall back to the system default.
-    if (not os.environ.get('HGUSER')
-        and not ui.config('ui', ['username', 'user'])
-        and not os.environ.get('EMAIL')):
-        return None
-    try:
-        return ui.username()
-    except error.Abort:
-        return None
-
 def getCurrentUsername(widget, repo, opts=None):
     if opts:
         # 1. Override has highest priority
@@ -1273,7 +1278,7 @@ def getCurrentUsername(widget, repo, opts=None):
             return user
 
     # 2. Read from repository
-    user = _configuredusername(repo.ui)
+    user = hglib.configuredusername(repo.ui)
     if user:
         return user
 
@@ -1285,7 +1290,7 @@ def getCurrentUsername(widget, repo, opts=None):
     dlg = SettingsDialog(False, focus='ui.username')
     dlg.exec_()
     repo.invalidateui()
-    return _configuredusername(repo.ui)
+    return hglib.configuredusername(repo.ui)
 
 class _EncodingSafeInputDialog(QInputDialog):
     def accept(self):

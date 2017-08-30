@@ -3,7 +3,7 @@ Serve
 
 Mercurial poskytuje  vestavěný, úsporný server, který je schopný zprostředkovat jedno spojení pro jeden repozitář. Server neprovádí ověření uživatele ale nabízí vhodnou, ad-hoc metodu pro synchronizaci repozitářů v rámci lokální sítě.
 
-Bližší informaci o publikování repozitářů lze nalézt v článku `Publishing Repositories <http://mercurial.selenic.com/wiki/PublishingRepositories>`_. 
+Bližší informaci o publikování repozitářů lze nalézt v článku `Publishing Repositories <https://www.mercurial-scm.org/wiki/PublishingRepositories>`_.
 
 Spuštění z TortoiseHg
 ---------------------

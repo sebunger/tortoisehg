@@ -11,7 +11,7 @@
 
 *Windows 向けの TortoiseHg インストーラには何が含まれていますか？*
 
-	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
+	`Mercurial <https://www.mercurial-scm.org/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_,
 	`TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_,
 	に加えて5つの拡張機能: hgfold、hgcr-gui、perfarce、hgeol、mercurial-keyring
@@ -22,7 +22,7 @@
 *Windows 上の Mercurial はインデックスサービスやアンチウイルスソフトウェアと競合しませんか？*
 
 	競合する可能性があります。
-	`TortoiseSVN <http://www.selenic.com/pipermail/mercurial/2010-January/029680.html>`_
+	`TortoiseSVN <https://www.mercurial-scm.org/pipermail/mercurial/2010-January/029680.html>`_
 	と同様、リポジトリとその作業コピーのディレクトリではインデックスサービスを無効にし、
 	アンチウイルスソフトウェアのスキャン対象外に指定してください。
 
@@ -71,7 +71,7 @@
 
 *SSH サーバに接続できない (TortoisePlink.exe - "...cannot execute specified..." というエラーメッセージ)*
 
-	`SSH 接続 <http://bitbucket.org/kuy/thg-ja/wiki/ssh>`_ ページを参照してください。
+	`SSH 接続 <https://bitbucket.org/kuy/thg-ja/wiki/ssh>`_ ページを参照してください。
 
 *～差分表示ツールを使うにはどうすればいいの？*
 

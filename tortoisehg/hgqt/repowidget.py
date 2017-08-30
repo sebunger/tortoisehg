@@ -10,7 +10,7 @@ import binascii
 import os
 import shlex, subprocess  # used by runCustomCommand
 import cStringIO
-from mercurial import error, patch, phases, util, ui
+from mercurial import error, patch, phases, util
 
 from tortoisehg.util import hglib, shlib, paths
 from tortoisehg.util.i18n import _
@@ -34,6 +34,24 @@ from tortoisehg.hgqt.docklog import ConsoleWidget
 
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+
+
+# iswd = working directory
+# isrev = the changeset has an integer revision number
+# isctx = changectx or workingctx
+# fixed = the changeset is considered permanent
+# applied = an applied patch
+# qgoto = applied patch or qparent
+_ENABLE_MENU_FUNCS = {
+    'isrev'  : lambda ap, wd, tags: not wd,
+    'iswd'   : lambda ap, wd, tags: bool(wd),
+    'isctx'  : lambda ap, wd, tags: True,
+    'fixed'  : lambda ap, wd, tags: not (ap or wd),
+    'applied': lambda ap, wd, tags: ap,
+    'qgoto'  : lambda ap, wd, tags: ('qparent' in tags) or (ap),
+    'istrue' : lambda ap, wd, tags: True,
+}
+
 
 class RepoWidget(QWidget):
 
@@ -1023,31 +1041,40 @@ class RepoWidget(QWidget):
         else:
             self.multipleSelectionMenu(point, selection)
 
-    def singleSelectionMenu(self, point, selection):
-        ctx = self.repo.changectx(self.rev)
-        applied = ctx.thgmqappliedpatch()
-        working = self.rev is None
-        tags = ctx.tags()
+    def _selectionMenuExec(self, point, selection, menu, menuitems):
+        ctxs = [self.repo.changectx(rev) for rev in selection]
+        applied = [ctx.thgmqappliedpatch() for ctx in ctxs]
+        working = [ctx.rev() is None for ctx in ctxs]
+        tags = [ctx.tags() for ctx in ctxs]
 
-        for item in self.singlecmenuitems:
-            enabled = item.enableFunc(applied, working, tags)
+        for item in menuitems:
+            enabled = all(item.enableFunc(*args)
+                          for args in zip(applied, working, tags))
             item.setEnabled(enabled)
 
-        self.singlecmenu.exec_(point)
+        menu.exec_(point)
+
+    def singleSelectionMenu(self, point, selection):
+        self._selectionMenuExec(point, selection, self.singlecmenu,
+                                self.singlecmenuitems)
 
     def doubleSelectionMenu(self, point, selection):
         for r in selection:
             # No pair menu if working directory or unapplied patch
             if type(r) is not int:
                 return
-        self.paircmenu.exec_(point)
+
+        self._selectionMenuExec(point, selection, self.paircmenu,
+                                self.paircmenuitems)
 
     def multipleSelectionMenu(self, point, selection):
         for r in selection:
             # No multi menu if working directory or unapplied patch
             if type(r) is not int:
                 return
-        self.multicmenu.exec_(point)
+
+        self._selectionMenuExec(point, selection, self.multicmenu,
+                                self.multicmenuitems)
 
     def unappliedPatchMenu(self, point, selection):
         q = self.repo.mq
@@ -1070,41 +1097,62 @@ class RepoWidget(QWidget):
         self.unappacts[5].setEnabled(len(selection) == 1)
         self.unappcmenu.exec_(point)
 
+    def _createMenuEntry(self, items, menu, ext=None, func=None, desc=None,
+                         icon=None, cb=None):
+        if ext and ext not in self.repo.extensions():
+            return
+        if desc is None:
+            return menu.addSeparator()
+        act = QAction(desc, self)
+        if cb:
+            act.triggered.connect(cb)
+        if icon:
+            act.setIcon(qtlib.geticon(icon))
+        act.enableFunc = func
+        menu.addAction(act)
+        items.append(act)
+        return act
+
+    def _setupCustomSubmenu(self, items, menu, location):
+        tools, toollist = hglib.tortoisehgtools(self.repo.ui,
+                            selectedlocation=location)
+
+        if not tools:
+            return
+
+        self._createMenuEntry(items, menu)
+        submenu = menu.addMenu(_('Custom Tools'))
+        submenu.triggered.connect(self._runCustomCommandByMenu)
+        for name in toollist:
+            if name == '|':
+                self._createMenuEntry(items, submenu)
+                continue
+            info = tools.get(name, None)
+            if info is None:
+                continue
+            command = info.get('command', None)
+            if not command:
+                continue
+            workingdir = info.get('workingdir', '')
+            showoutput = info.get('showoutput', False)
+            label = info.get('label', name)
+            icon = info.get('icon', 'tools-spanner-hammer')
+            enable = info.get('enable', 'istrue').lower()
+            if enable in _ENABLE_MENU_FUNCS:
+                enable = _ENABLE_MENU_FUNCS[enable]
+            else:
+                continue
+            a = self._createMenuEntry(items, submenu, None, enable, label, icon)
+            a.setData((command, showoutput, workingdir))
+
     def generateSingleMenu(self, mode=None):
         items = []
         # This menu will never be opened for an unapplied patch, they
         # have their own menu.
-        #
-        # iswd = working directory
-        # isrev = the changeset has an integer revision number
-        # isctx = changectx or workingctx
-        # fixed = the changeset is considered permanent
-        # applied = an applied patch
-        # qgoto = applied patch or qparent
-        isrev   = lambda ap, wd, tags: not wd
-        iswd   = lambda ap, wd, tags: bool(wd)
-        isctx   = lambda ap, wd, tags: True
-        fixed   = lambda ap, wd, tags: not (ap or wd)
-        applied = lambda ap, wd, tags: ap
-        qgoto   = lambda ap, wd, tags: ('qparent' in tags) or \
-                                       (ap)
 
-        exs = self.repo.extensions()
+        entry = self._createMenuEntry
+        enablefuncs = _ENABLE_MENU_FUNCS
 
-        def entry(menu, ext=None, func=None, desc=None, icon=None, cb=None):
-            if ext and ext not in exs:
-                return
-            if desc is None:
-                return menu.addSeparator()
-            act = QAction(desc, self)
-            if cb:
-                act.triggered.connect(cb)
-            if icon:
-                act.setIcon(qtlib.geticon(icon))
-            act.enableFunc = func
-            menu.addAction(act)
-            items.append(act)
-            return act
         menu = QMenu(self)
         if mode == 'outgoing':
             pushtypeicon = {'all': None, 'branch': None, 'revision': None}
@@ -1112,137 +1160,107 @@ class RepoWidget(QWidget):
                 'tortoisehg', 'defaultpush', 'all')
             pushtypeicon[defaultpush] = 'hg-push'
             submenu = menu.addMenu(_('Pus&h'))
-            entry(submenu, None, isrev, _('Push to &Here'),
-                  pushtypeicon['revision'], self.pushToRevision)
-            entry(submenu, None, isrev, _('Push Selected &Branch'),
-                  pushtypeicon['branch'], self.pushBranch)
-            entry(submenu, None, isrev, _('Push &All'),
+            entry(items, submenu, None, enablefuncs['isrev'],
+                  _('Push to &Here'), pushtypeicon['revision'],
+                  self.pushToRevision)
+            entry(items, submenu, None, enablefuncs['isrev'],
+                  _('Push Selected &Branch'), pushtypeicon['branch'],
+                  self.pushBranch)
+            entry(items, submenu, None, enablefuncs['isrev'], _('Push &All'),
                   pushtypeicon['all'], self.pushAll)
-            entry(menu)
-        entry(menu, None, isrev, _('&Update...'), 'hg-update',
-              self.updateToRevision)
-        entry(menu)
-        entry(menu, None, isctx, _('&Diff to Parent'), 'visualdiff',
-              self.visualDiffRevision)
-        entry(menu, None, isrev, _('Diff to &Local'), 'ldiff',
-              self.visualDiffToLocal)
-        entry(menu, None, isctx, _('Bro&wse at Revision'), 'hg-annotate',
-              self.manifestRevision)
+            entry(items, menu)
+        entry(items, menu, None, enablefuncs['isrev'], _('&Update...'),
+              'hg-update', self.updateToRevision)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['isctx'], _('&Diff to Parent'),
+              'visualdiff', self.visualDiffRevision)
+        entry(items, menu, None, enablefuncs['isrev'], _('Diff to &Local'),
+              'ldiff', self.visualDiffToLocal)
+        entry(items, menu, None, enablefuncs['isctx'], _('Bro&wse at Revision'),
+              'hg-annotate', self.manifestRevision)
         act = self._createFilterBySelectedRevisionsMenu()
-        act.enableFunc = isrev
+        act.enableFunc = enablefuncs['isrev']
         menu.addAction(act)
         items.append(act)
-        entry(menu)
-        entry(menu, None, fixed, _('&Merge with Local...'), 'hg-merge',
-              self.mergeWithRevision)
-        entry(menu)
-        entry(menu, None, fixed, _('&Tag...'), 'hg-tag',
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['fixed'],
+              _('&Merge with Local...'), 'hg-merge', self.mergeWithRevision)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['fixed'], _('&Tag...'), 'hg-tag',
               self.tagToRevision)
-        entry(menu, None, isrev, _('Boo&kmark...'), 'hg-bookmarks',
-              self.bookmarkRevision)
-        entry(menu, 'gpg', fixed, _('Sig&n...'), 'hg-sign',
-              self.signRevision)
-        entry(menu)
-        entry(menu, None, fixed, _('&Backout...'), 'hg-revert',
-              self.backoutToRevision)
-        entry(menu, None, isctx, _('Revert &All Files...'), 'hg-revert',
-              self.revertToRevision)
-        entry(menu)
-
-        entry(menu, None, isrev, _('Copy &Hash'), 'copy-hash',
-              self.copyHash)
-        entry(menu)
-
+        entry(items, menu, None, enablefuncs['isrev'], _('Boo&kmark...'),
+              'hg-bookmarks', self.bookmarkRevision)
+        entry(items, menu, 'gpg', enablefuncs['fixed'], _('Sig&n...'),
+              'hg-sign', self.signRevision)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['fixed'], _('&Backout...'),
+              'hg-revert', self.backoutToRevision)
+        entry(items, menu, None, enablefuncs['isctx'],
+              _('Revert &All Files...'), 'hg-revert', self.revertToRevision)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['isrev'], _('Copy &Hash'),
+              'copy-hash', self.copyHash)
+        entry(items, menu)
         submenu = menu.addMenu(_('E&xport'))
-        entry(submenu, None, isrev, _('E&xport Patch...'), 'hg-export',
-              self.exportRevisions)
-        entry(submenu, None, isrev, _('&Email Patch...'), 'mail-forward',
-              self.emailSelectedRevisions)
-        entry(submenu, None, isrev, _('&Archive...'), 'hg-archive',
-              self.archiveRevision)
-        entry(submenu, None, isrev, _('&Bundle Rev and Descendants...'),
-              'hg-bundle', self.bundleRevisions)
-        entry(submenu, None, isctx, _('&Copy Patch'), 'copy-patch',
-              self.copyPatch)
-        entry(menu)
+        entry(items, submenu, None, enablefuncs['isrev'], _('E&xport Patch...'),
+              'hg-export', self.exportRevisions)
+        entry(items, submenu, None, enablefuncs['isrev'], _('&Email Patch...'),
+              'mail-forward', self.emailSelectedRevisions)
+        entry(items, submenu, None, enablefuncs['isrev'], _('&Archive...'),
+              'hg-archive', self.archiveRevision)
+        entry(items, submenu, None, enablefuncs['isrev'],
+              _('&Bundle Rev and Descendants...'), 'hg-bundle',
+              self.bundleRevisions)
+        entry(items, submenu, None, enablefuncs['isctx'], _('&Copy Patch'),
+              'copy-patch', self.copyPatch)
+        entry(items, menu)
 
         submenu = menu.addMenu(_('Change &Phase to'))
         submenu.triggered.connect(self._changePhaseByMenu)
         for pnum, pname in enumerate(phases.phasenames):
-            entry(submenu, None, isrev, pname).setData(pnum)
-        entry(menu)
+            a = entry(items, submenu, None, enablefuncs['isrev'], pname)
+            a.setData(pnum)
+        entry(items, menu)
 
-        entry(menu, None, isrev, _('&Graft to Local...'), 'hg-transplant',
-              self.graftRevisions)
+        entry(items, menu, None, enablefuncs['isrev'], _('&Graft to Local...'),
+              'hg-transplant', self.graftRevisions)
+
+        exs = self.repo.extensions()
 
         if 'mq' in exs or 'rebase' in exs or 'strip' in exs or 'evolve' in exs:
             submenu = menu.addMenu(_('Modi&fy History'))
-            entry(submenu, 'mq', applied, _('&Unapply Patch'), 'hg-qgoto',
-                  self.qgotoParentRevision)
-            entry(submenu, 'mq', fixed, _('Import to &MQ'), 'qimport',
-                  self.qimportRevision)
-            entry(submenu, 'mq', applied, _('&Finish Patch'), 'qfinish',
-                  self.qfinishRevision)
-            entry(submenu, 'mq', applied, _('Re&name Patch...'), None,
-                  self.qrename)
-            entry(submenu, 'mq')
+            entry(items, submenu, 'mq', enablefuncs['applied'],
+                  _('&Unapply Patch'), 'hg-qgoto', self.qgotoParentRevision)
+            entry(items, submenu, 'mq', enablefuncs['fixed'],
+                  _('Import to &MQ'), 'qimport', self.qimportRevision)
+            entry(items, submenu, 'mq', enablefuncs['applied'],
+                  _('&Finish Patch'), 'qfinish', self.qfinishRevision)
+            entry(items, submenu, 'mq', enablefuncs['applied'],
+                  _('Re&name Patch...'), None, self.qrename)
+            entry(items, submenu, 'mq')
             if self._mqActions:
-                entry(submenu, 'mq', isctx, _('MQ &Options'), None,
+                entry(items, submenu, 'mq', enablefuncs['isctx'],
+                      _('MQ &Options'), None,
                       self._mqActions.launchOptionsDialog)
-                entry(submenu, 'mq')
-            entry(submenu, 'rebase', isrev, _('&Rebase...'), 'hg-rebase',
-                  self.rebaseRevision)
-            entry(submenu, 'rebase')
-            entry(submenu, 'evolve', fixed, _('&Prune...'), 'edit-cut',
-                  self._pruneSelected)
+                entry(items, submenu, 'mq')
+            entry(items, submenu, 'rebase', enablefuncs['isrev'],
+                  _('&Rebase...'), 'hg-rebase', self.rebaseRevision)
+            entry(items, submenu, 'rebase')
+            entry(items, submenu, 'evolve', enablefuncs['fixed'],
+                  _('&Prune...'), 'edit-cut', self._pruneSelected)
             if 'mq' in exs or 'strip' in exs:
-                entry(submenu, None, fixed, _('&Strip...'), 'hg-strip',
-                      self.stripRevision)
+                entry(items, submenu, None, enablefuncs['fixed'],
+                      _('&Strip...'), 'hg-strip', self.stripRevision)
 
-        entry(menu, 'reviewboard', isrev, _('Post to Re&view Board...'), 'reviewboard',
+        entry(items, menu, 'reviewboard', enablefuncs['isrev'],
+              _('Post to Re&view Board...'), 'reviewboard',
               self.sendToReviewBoard)
 
-        entry(menu, 'rupdate', fixed, _('&Remote Update...'), 'hg-update',
-              self.rupdate)
+        entry(items, menu, 'rupdate', enablefuncs['fixed'],
+              _('&Remote Update...'), 'hg-update', self.rupdate)
 
-        def _setupCustomSubmenu(menu):
-            tools, toollist = hglib.tortoisehgtools(self.repo.ui,
-                selectedlocation='workbench.revdetails.custom-menu')
-            if not tools:
-                return
-
-            istrue = lambda ap, wd, tags: True
-            enablefuncs = {
-                'istrue': istrue, 'iswd': iswd, 'isrev': isrev, 'isctx': isctx,
-                'fixed': fixed, 'applied': applied, 'qgoto': qgoto
-            }
-
-            entry(menu)
-            submenu = menu.addMenu(_('Custom Tools'))
-            submenu.triggered.connect(self._runCustomCommandByMenu)
-            for name in toollist:
-                if name == '|':
-                    entry(submenu)
-                    continue
-                info = tools.get(name, None)
-                if info is None:
-                    continue
-                command = info.get('command', None)
-                if not command:
-                    continue
-                workingdir = info.get('workingdir', '')
-                showoutput = info.get('showoutput', False)
-                label = info.get('label', name)
-                icon = info.get('icon', 'tools-spanner-hammer')
-                enable = info.get('enable', 'istrue').lower()
-                if enable in enablefuncs:
-                    enable = enablefuncs[enable]
-                else:
-                    continue
-                a = entry(submenu, None, enable, label, icon)
-                a.setData((command, showoutput, workingdir))
-
-        _setupCustomSubmenu(menu)
+        self._setupCustomSubmenu(items, menu,
+                                 'workbench.revdetails.custom-menu')
 
         if mode == 'outgoing':
             self.outgoingcmenu = menu
@@ -1286,6 +1304,12 @@ class RepoWidget(QWidget):
                 return
             sess = self._buildPatch('diff')
             sess.setOutputDevice(f)
+
+        def archiveDagRange():
+            l = dagrange()
+            if l:
+                self.archiveRevisions(l)
+
         def exportDagRange():
             l = dagrange()
             if l:
@@ -1332,55 +1356,63 @@ class RepoWidget(QWidget):
             dlg = rebase.RebaseDialog(self._repoagent, self, **opts)
             dlg.exec_()
 
-        exs = self.repo.extensions()
+        items = []
+        entry = self._createMenuEntry
+        enablefuncs = _ENABLE_MENU_FUNCS
 
         menu = QMenu(self)
-        for name, cb, icon, ext in (
-                (_('Visual Diff...'), diffPair, 'visualdiff', None),
-                (_('Export Diff...'), exportDiff, 'hg-export', None),
-                (None, None, None, None),
-                (_('Export Selected...'), exportPair, 'hg-export', None),
-                (_('Email Selected...'), emailPair, 'mail-forward', None),
-                (_('Copy Selected as Patch'), self.copyPatch, 'copy-patch', None),
-                (None, None, None, None),
-                (_('Export DAG Range...'), exportDagRange, 'hg-export', None),
-                (_('Email DAG Range...'), emailDagRange, 'mail-forward', None),
-                (_('Bundle DAG Range...'), bundleDagRange, 'hg-bundle', None),
-                (None, None, None, None),
-                (_('Bisect - Good, Bad...'), bisectNormal, 'hg-bisect-good-bad', None),
-                (_('Bisect - Bad, Good...'), bisectReverse, 'hg-bisect-bad-good', None),
-                (_('Compress History...'), compressDlg, 'hg-compress', None),
-                (_('Rebase...'), rebaseDlg, 'hg-rebase', 'rebase'),
-                (None, None, None, None),
-                (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge', None),
-                (self._createFilterBySelectedRevisionsMenu, None, None, None),
-                (None, None, None, None),
-                (_('Graft Selected to local...'), self.graftRevisions, 'hg-transplant', None),
-                (None, None, None, None),
-                (_('&Prune Selected...'), self._pruneSelected, 'edit-cut',
-                 'evolve'),
-                ):
-            if name is None:
-                menu.addSeparator()
-                continue
-            if ext and ext not in exs:
-                continue
-            if callable(name):
-                a = name()
-            else:
-                a = QAction(name, self)
-            if icon:
-                a.setIcon(qtlib.geticon(icon))
-            if cb:
-                a.triggered.connect(cb)
-            menu.addAction(a)
+        entry(items, menu, None, enablefuncs['istrue'], _('Visual Diff...'),
+              'visualdiff', diffPair)
+        entry(items, menu, None, enablefuncs['istrue'], _('Export Diff...'),
+              'hg-export', exportDiff)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['istrue'], _('Export Selected...'),
+              'hg-export', exportPair)
+        entry(items, menu, None, enablefuncs['istrue'], _('Email Selected...'),
+              'mail-forward', emailPair)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Copy Selected as Patch'), 'copy-patch', self.copyPatch)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Archive DAG Range...'), 'hg-archive', archiveDagRange)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Export DAG Range...'), 'hg-export', exportDagRange)
+        entry(items, menu, None, enablefuncs['istrue'], _('Email DAG Range...'),
+              'mail-forward', emailDagRange)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Bundle DAG Range...'), 'hg-bundle', bundleDagRange)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Bisect - Good, Bad...'), 'hg-bisect-good-bad', bisectNormal)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Bisect - Bad, Good...'), 'hg-bisect-bad-good', bisectReverse)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Compress History...'), 'hg-compress', compressDlg)
+        entry(items, menu, 'rebase', enablefuncs['istrue'], _('Rebase...'),
+              'hg-rebase', rebaseDlg)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Goto common ancestor'), 'hg-merge', self._gotoAncestor)
+        menu.addAction(self._createFilterBySelectedRevisionsMenu())
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Graft Selected to local...'), 'hg-transplant',
+              self.graftRevisions)
+        entry(items, menu)
+        entry(items, menu, 'evolve', enablefuncs['istrue'],
+              _('&Prune Selected...'), 'edit-cut', self._pruneSelected)
 
         if 'reviewboard' in self.repo.extensions():
             menu.addSeparator()
             a = QAction(_('Post Selected to Review Board...'), self)
             a.triggered.connect(self.sendToReviewBoard)
             menu.addAction(a)
+
+        self._setupCustomSubmenu(items, menu,
+                                 'workbench.pairselection.custom-menu')
+
         self.paircmenu = menu
+        self.paircmenuitems = items
 
     def generateUnappliedPatchMenu(self):
         def qdeleteact():
@@ -1417,42 +1449,41 @@ class RepoWidget(QWidget):
             self.exportRevisions(self.menuselection)
         def emailSel():
             self._emailRevisions(self.menuselection)
+
+        entry = self._createMenuEntry
+        enablefuncs = _ENABLE_MENU_FUNCS
+
+        items = []
         menu = QMenu(self)
-        for name, cb, icon in (
-                (_('Export Selected...'), exportSel, 'hg-export'),
-                (_('Email Selected...'), emailSel, 'mail-forward'),
-                (_('Copy Selected as Patch'), self.copyPatch, 'copy-patch'),
-                (None, None, None),
-                (_('Goto common ancestor'), self._gotoAncestor, 'hg-merge'),
-                (self._createFilterBySelectedRevisionsMenu, None, None),
-                (None, None, None),
-                (_('Graft Selected to local...'), self.graftRevisions, 'hg-transplant'),
-                ):
-            if name is None:
-                menu.addSeparator()
-                continue
-            if callable(name):
-                a = name()
-            else:
-                a = QAction(name, self)
-            if icon:
-                a.setIcon(qtlib.geticon(icon))
-            if cb:
-                a.triggered.connect(cb)
-            menu.addAction(a)
+        entry(items, menu, None, enablefuncs['istrue'], _('Export Selected...'),
+              'hg-export', exportSel)
+        entry(items, menu, None, enablefuncs['istrue'], _('Email Selected...'),
+              'mail-forward', emailSel)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Copy Selected as Patch'), 'copy-patch', self.copyPatch)
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Goto common ancestor'), 'hg-merge', self._gotoAncestor)
+        menu.addAction(self._createFilterBySelectedRevisionsMenu())
+        entry(items, menu)
+        entry(items, menu, None, enablefuncs['istrue'],
+              _('Graft Selected to local...'), 'hg-transplant',
+              self.graftRevisions)
 
         if 'evolve' in self.repo.extensions():
             menu.addSeparator()
-            a = QAction(_('&Prune Selected...'), self)
-            a.setIcon(qtlib.geticon('edit-cut'))
-            a.triggered.connect(self._pruneSelected)
-            menu.addAction(a)
+            entry(items, menu, None, enablefuncs['istrue'],
+                  _('&Prune Selected...'), 'edit-cut', self._pruneSelected)
 
-        if 'reviewboard' in self.repo.extensions():
-            a = QAction(_('Post Selected to Review Board...'), self)
-            a.triggered.connect(self.sendToReviewBoard)
-            menu.addAction(a)
+        entry(items, menu, 'reviewboard', enablefuncs['istrue'],
+              _('Post Selected to Review Board...'), None,
+              self.sendToReviewBoard)
+
+        self._setupCustomSubmenu(items, menu,
+                                 'workbench.multipleselection.custom-menu')
+
         self.multicmenu = menu
+        self.multicmenuitems = items
 
     def generateBundleMenu(self):
         menu = QMenu(self)
@@ -1783,6 +1814,13 @@ class RepoWidget(QWidget):
         dlg = archive.createArchiveDialog(self._repoagent, rev, self)
         dlg.exec_()
 
+    def archiveRevisions(self, revs):
+        rev = max(revs)
+        minrev = min(revs)
+        dlg = archive.createArchiveDialog(self._repoagent, rev=rev, minrev=minrev,
+                                          parent=self)
+        dlg.exec_()
+
     def bundleRevisions(self, base=None, tip=None):
         root = self.repoRootPath()
         if base is None or base is False:
@@ -1925,7 +1963,7 @@ class RepoWidget(QWidget):
                 % (self.rev, self.repo['qparent'].rev()))
             return
 
-        patchdir = self.repo.join('patches')
+        patchdir = self.repo.vfs.join('patches')
         def patchExists(p):
             return os.path.exists(os.path.join(patchdir, p))
 
@@ -2035,18 +2073,39 @@ class RepoWidget(QWidget):
                             for filename in filelist)
         if files is None:
             files = []
+
+        selection = self.repoview.selectedRevisions()
+
+        def selectionfiles2str(source):
+            files = set()
+            for rev in selection:
+                files.update(f for f in getattr(self.repo[rev], source)())
+            return filelist2str(sorted(files))
+
         vars = {
-            'ROOT': self.repo.root,
-            'REVID': str(self.repo[self.rev]),
-            'REV': self.rev,
-            'FILES': filelist2str(self.repo[self.rev].files()),
-            'ALLFILES': filelist2str(self.repo[self.rev]),
-            'SELECTEDFILES': filelist2str(files),
+            'ROOT': lambda: self.repo.root,
+            'REVID': lambda: '+'.join(str(self.repo[rev]) for rev in selection),
+            'REV': lambda: '+'.join(str(rev) for rev in selection),
+            'FILES': lambda: selectionfiles2str('files'),
+            'ALLFILES': lambda: selectionfiles2str('manifest'),
+            'SELECTEDFILES': lambda: filelist2str(files),
         }
+
+        if len(selection) == 2:
+            pairvars = {
+                'REV_A': lambda: selection[0],
+                'REV_B': lambda: selection[1],
+                'REVID_A': lambda: str(self.repo[selection[0]]),
+                'REVID_B': lambda: str(self.repo[selection[1]]),
+            }
+            vars.update(pairvars)
+
         for var in vars:
-            command = command.replace('{%s}' % var, str(vars[var]))
-            if workingdir:
-                workingdir = workingdir.replace('{%s}' % var, str(vars[var]))
+            bracedvar = '{%s}' % var
+            if bracedvar in command:
+                command = command.replace(bracedvar, str(vars[var]()))
+            if workingdir and bracedvar in workingdir:
+                workingdir = workingdir.replace(bracedvar, str(vars[var]()))
         if not workingdir:
             workingdir = self.repo.root
 
@@ -2065,7 +2124,7 @@ class RepoWidget(QWidget):
         elif cmdtype == 'thg':
             cmd = cmd[1:]
             if '--repository' in cmd:
-                _ui = ui.ui()
+                _ui = hglib.loadui()
             else:
                 cmd += ['--repository', self.repo.root]
                 _ui = self.repo.ui.copy()

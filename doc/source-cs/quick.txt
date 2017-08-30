@@ -7,29 +7,29 @@ Rychlá cesta pro netrpělivé
 
 Jak už bylo řečeno, TortoiseHg je sada grafických aplikací, které spolu s Průzkumníkem Windows slouží jako uživatelsky přívětivé rozhranní pro DVCS Mercurialu (distributed version control system - necentralizovaný systém správy verzí).
 
-Všechny nástroje TortoiseHg jsou přístupné ze třech míst: 
+Všechny nástroje TortoiseHg jsou přístupné ze třech míst:
 
 1. Z aplikace **Verpánek**
- 
-   Verpánek (Workbench) spustíme z menu Start nebo z kontextového menu aktivovaného poklepem pravé klávesy myši s kurzorem kdekoli v ploše monitoru. 
-	
+
+   Verpánek (Workbench) spustíme z menu Start nebo z kontextového menu aktivovaného poklepem pravé klávesy myši s kurzorem kdekoli v ploše monitoru.
+
    .. figure:: figures/desktop-workbench.png
     :alt: Desktop Context Menu
-	   
+
     Spuštění Verpánku z plochy monitoru
 
 
 2. Z kontextového menu **Explorer**
- 
-   Na vybrané složce či souboru v Průzkumníku provedeme pravý poklep a vybereme položku z kontextového menu.
-	
-3. Příkazem **thg** z příkazového řádku
- 
-   V konzoli cmd.exe či v jiném terminálu zadáme příkaz  :command:`thg <command> [opce]`.
-     
-Příkazy Mercurialu jsou dostupné také z příkazového řádku příkazem :command:`hg <command>`. 
 
-.. note:: Při zadávání příkazu z příkazového řádku se předpokládá, že repozitórium je aktuálním adresářem příkazové konzoly.  
+   Na vybrané složce či souboru v Průzkumníku provedeme pravý poklep a vybereme položku z kontextového menu.
+
+3. Příkazem **thg** z příkazového řádku
+
+   V konzoli cmd.exe či v jiném terminálu zadáme příkaz  :command:`thg <command> [opce]`.
+
+Příkazy Mercurialu jsou dostupné také z příkazového řádku příkazem :command:`hg <command>`.
+
+.. note:: Při zadávání příkazu z příkazového řádku se předpokládá, že repozitórium je aktuálním adresářem příkazové konzoly.
 
 
 Nastavení programu
@@ -52,36 +52,36 @@ Tím si otevřeme dialogové okno Nastavení TortoiseHg pro úpravu globální k
 
 Nejprve vybereme kartu :guilabel:`Commit` a zadáme jméno v poli :guilabel:`Jméno uživatele`.
 
-.. note:: 
+.. note::
     Pokud nezadáme uživatelské jméno nyní, budeme na něj tázáni   později, až poprvé použijeme příkaz ``commit``.
 
 .. note::
 	Pro formátování uživatelského jména není pevné pravidlo ale obvykle se používá následující forma::
-	
+
 		Celé Jméno <email>
-		
+
 	například ::
-	
+
 		Donald Duck <donaldduck@example.net>
-	
+
 	Emailová adresa je při prohlížení změn odtržena a vestavěný webový server emailovou adresu zakryje v rámci prevence proti spamu.
-	
+
 Dále vybereme katru :guilabel:`TortoiseHg` a v ní :guilabel:`Nástroj pro sloučení`. V rozvinovacím seznamu nalezneme všechny slučovací nástroje nalezené v programovém vybavení počítače (kdiff3 je poskytnut instalátorem pro Windows) a řadu interních způsobů sloučení. Vybereme si oblíbený nástroj pro slučování.
 
-Pokud chceme, aby TortoiseHg používal námi vybraný slučovací nástroj také pro zobrazení diffů, necháme položku :guilabel:`Nástroj pro sloučení` neurčenu. Jinak si v rozvinovacím seznamu vybereme z nabízených nástrojů. 
+Pokud chceme, aby TortoiseHg používal námi vybraný slučovací nástroj také pro zobrazení diffů, necháme položku :guilabel:`Nástroj pro sloučení` neurčenu. Jinak si v rozvinovacím seznamu vybereme z nabízených nástrojů.
 
 Pokud nám v uvedených položkách není nabídnuta žádná volba, musíme instalovat nástroj, který je podporován v mergetools.rc nebo si nakonfigurovat nástroj vlastní.
 
 .. note::
 	Při instalaci TortoiseHg ze zdroje, je nutné nějakým způsobem přidat soubor :kbd:`contrib/mergetools.ini` do cesty HGRC. Možný způsob je připojit jej ze souboru :kbd:`~/.hgrc`.
-	
+
 Neostýchejte se konfigurovat i další položky globálního nastavení. Budeme je moci později přepsat v lokální konfiguraci repozitáře.
 
 Nastavené změny potvrdíme a okno zavřeme tlačítkem :command:`OK`.
 
 .. note::
 	Většina změn nastavení TortoiseHg se projeví okamžitě ale povolení nebo zakázání extenzí obvykle vyžadují restart.
-	
+
 Status souboru
 ==============
 
@@ -100,8 +100,8 @@ Soubory, obsluhované Mercurialem, mají různý vztah k zapisované historii. T
 Vytvoření repozitória a repozitáře
 ==================================
 
-Jak bylo již uvedeno v Předmluvě (odst. 1.7), budeme z didaktických důvodů rozlišovat mezi repozitářem a repozitóriem. Za repozitář budeme považovat 
-složku .hg, za repozitórium její kořenový adresář. 
+Jak bylo již uvedeno v Předmluvě (odst. 1.7), budeme z didaktických důvodů rozlišovat mezi repozitářem a repozitóriem. Za repozitář budeme považovat
+složku .hg, za repozitórium její kořenový adresář.
 
 Repozitórium můžeme vytvořit z existující složky, kde umístíme repozitář, nebo vytvoříme složku repozitória i repozitáře současně.
 
@@ -120,22 +120,20 @@ Příkaz: :command:`thg init`
 
 Dialogové okno pro vytvoření repozitáře či repozitória
 
-Je dobré ponechat volbu :guilabel:`Přidat specifické soubory (.hgignore, ...)`
+Je dobré ponechat volbu :guilabel:`Vytvořit specifické soubory (.hgignore, ...)`
 zatrženou a nezatrhávat :guilabel:`Vytvořit repozitář kompatibilní s Mercurialem < 1.7` pokud k tomu nemáme pádný důvod.
 
-Po stisku tlačítka :guilabel:`Vytvořit`, vytvoří Mercurial v našem repozitóriu složku repozitáře :file:`.hg`. Zde si program ukládá všechna  verzovaná data. 
+Po stisku tlačítka :guilabel:`Vytvořit`, vytvoří Mercurial v našem repozitóriu složku repozitáře :file:`.hg`. Zde si program ukládá všechna  verzovaná data.
 Se složkou :file:`.hg` nikdy přímo nepracujeme. Při zadávání příkazů se odkazujeme na repozitórium.
 
 Nové repozitórium se také přidá do Seznamu repozitářů , pokud tuto operaci provedeme z Verpánku.
 Nezařazená repozitória můžete přidat do Seznamu repozitářů výběrem :menuselection:`File > Otevřít repozitář...` nebo je můžete přetáhnout z Průzkumníka.
 
-.. note:: 
+.. note::
     Mezi právě aktuálními revizemi a repozitóriem existuje tajemná symbióza. Jak později poznáme, mění se obsah repozitória podle aktuálně nastavené revize. Ponecháme-li aktuální starší revizi, můžeme případné nověji přidané soubory v Průzkumníku Windows (tedy v repozitóriu) nevidět!
 
 .. warning::
-	Ručně editovat soubory ve složce :file:`.hg` je nebezpečné, může dojít k poškození repozitáře. Jedinou výjimkou je konfigurační soubor :file:`.hg/hgrc`. 
-
-
+	Ručně editovat soubory ve složce :file:`.hg` je nebezpečné, může dojít k poškození repozitáře. Jedinou výjimkou je konfigurační soubor :file:`.hg/hgrc`.
 
 Přidávání souborů
 =================
@@ -143,11 +141,11 @@ Přidávání souborů
 Nyní je třeba aplikaci Mercurial sdělit, které soubory mají být sledovány. Lze to provést více způsoby:
 
 1. Verpánek: ikonou :menuselection:`Commit` otevřeme úkonovou kartu, pravým poklepem zvýrazníme vybraný soubor a z kontextového menu vybereme :menuselection:`Add` . To změní status souboru na 'A' a po zatržení nabídky barva názvu zezelená.
-  
+
 2. Explorer: vybereme :menuselection:`TortoiseHg > Přidat soubory...` v kontextovém menu vybraného souboru. Otevře se okno pro zadání výběru a potvrzení operace :menuselection:`add`. Stejným způsobem lze vybrat nabídku :menuselection:`TortoiseHg > Status souboru`. V otevřeném dialogovém okně můžeme vybrat zamýšlené soubory.
 
 3. Příkazem: :command:`thg status`
-   
+
 4. Přidávání souborů v samostatném kroku můžeme přeskočit a přidat je implicitně v rámci příkazu :menuselection:`TortoiseHg > Commit...`. Otevře se podobné dialogové okno jako u volby :menuselection:`Status souboru`. Vybereme zařazovaný, dosud nesledovaný soubor a volbu potvrdíme tlačítkem :guilabel:`Commit`.
 
 
@@ -165,7 +163,7 @@ Ve svých repozitóriích můžeme mít z různých důvodů soubory, jež nechc
 
 Pro vybraný soubor určíte druh filtru (`Glob` nebo `Regexp`) a zadáte :command:`Přidat`. Změny filtru :guilabel:`ignore` se projeví okamžitě.
 
-.. note:: 
+.. note::
     Soubor :file:`.hgignore`, obsažený repozitóriu, je normálně sledován (checked in).
 
 .. note::
@@ -179,7 +177,7 @@ Předání změn do repozitáře provedete následujícím způsobem:
 
 Verpánek: Poklepem na pracovní adresář se otevře panel pro předání změn (commit), případně tento panel můžete aktivovat výběrem ikony s `fajfkou`.
 
-Explorer: Pravým poklepem kdekoliv ve složce otevřete kontextové menu a vyberete dialogové okno :menuselection:`TortoiseHg > Commit...`. 
+Explorer: Pravým poklepem kdekoliv ve složce otevřete kontextové menu a vyberete dialogové okno :menuselection:`TortoiseHg > Commit...`.
 
 Příkaz:  :command:`thg commit`
 
@@ -191,11 +189,11 @@ Napíšete předávací zprávu, vyberete soubory, které chcete předat a přik
 
 	Zadávací okno TortoiseHg > Commit
 
-	
+
 Sdílení repozitářů
 ==================
 
-Mercurial podporuje mnoho různých `modelů spolupráce <http://tortoisehg.bitbucket.org/hgbook/1.7/collaborating-with-other-people.html>`_. Tento odstavec popisuje pouze jeden z nich: model s centrálním repozitářem. 
+Mercurial podporuje mnoho různých `modelů spolupráce <https://tortoisehg.bitbucket.io/hgbook/1.7/collaborating-with-other-people.html>`_. Tento odstavec popisuje pouze jeden z nich: model s centrálním repozitářem.
 
 Na místě, kam mají přístup všichni členové skupiny se vytvoří centrální repozitář, kam všichni posílají své změny, přičemž jeden člen kolektivu má za úkol na tento repozitář dohlížet.
 
@@ -220,7 +218,7 @@ celý obsah repozitória. Zatržením volby :guilabel:`Neaktualizovat nový prac
 Další členové skupiny si tento centrální repozitář naklonují již s nezatrženou volbou :guilabel:`Neaktualizovat nový pracovní adresář`.
 Tím si do svého lokálního repozitoria přenesou i pracovní soubory.
 
-Klonováním vzniká příbuzenský vztah mezi repozitáři. Akce *pull* a *commit* lze provádět pouze mezi příbuznými repozitáři. Příbuzný repozitář na jiném počítači je repozitář vzdálený (remote). 
+Klonováním vzniká příbuzenský vztah mezi repozitáři. Akce *pull* a *commit* lze provádět pouze mezi příbuznými repozitáři. Příbuzný repozitář na jiném počítači je repozitář vzdálený (remote).
 
 
 Práce s repozitářem
@@ -237,7 +235,7 @@ Spodní pole vpravo karty Commit vám zobrazí i změny v jednotlivých souborec
 **Explorer**: Složky a soubory vašeho repozitória jsou označeny jednou z  překryvných ikon. Ty vám napoví, v jakém stavu se ten či onen soubor nebo složka nachází.
 
 .. figure:: figures/overlayicons.png
-	:alt: Overlay Icons 
+	:alt: Overlay Icons
 
 	Překryvné ikony
 
@@ -248,14 +246,14 @@ Jste-li připraven zveřejnit své změny, provedete následující:
 1. Předáte změny do svého lokálního repozitáře (provedete komit).
 2. Aktivujete kartu pro synchronizaci, vyberete cestu k centrálnímu repozitáři a stisknete tlačítko :guilabel:`Pull`, čímž vydáte příkaz ke stažení možných změn z tohoto repozitáře.
 3. Byly-li nějaké changesety staženy, provedete jejich případné sloučení s vašimi lokálními změnami a provedete jejich komit do repozitáře.
- 
+
 V přehledu changesetů zviditelníte ten, se kterým chcete sloučení provést, aktivujete kontextové menu a vyberete :guilabel:`Merge with local...`. V dialogovém okně pro sloučení stisknete :command:`Sloučit` (merge) a posléze :command:`Commit`.
 4. Sloučenou práci prověříte svým testovacím postupem.
 5. V kartě pro synchronizaci vyberete cestu k centrálnímu repozitáři a pošlete do něho své změny tlačítkem :command:`Push`.
 
-.. note:: Sloučení lze bezpečně v případě potřeby opakovat. 
+.. note:: Sloučení lze bezpečně v případě potřeby opakovat.
 
-Spolupráce prostřednictvím Mercurialu je snadná, rychlá a produktivní. Více o Mercurialu na jeho stránkách `wiki <http://mercurial.selenic.com/wiki/CzechMercurial>`_.
+Spolupráce prostřednictvím Mercurialu je snadná, rychlá a produktivní. Více o Mercurialu na jeho stránkách `wiki <https://www.mercurial-scm.org/wiki/CzechMercurial>`_.
 
 
 .. vim: noet ts=4

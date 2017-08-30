@@ -17,8 +17,8 @@ Once 'latex' is built, you have to cd into that output directory and run
 Once 'htmlhelp' is built, you have to run the actual HTML Help Compiler on a
 Windows machine.
 
-On Windows, if you have no make tool you can use build.bat. If the HTML Help 
-Compiler and MiKTeX are installed you can directly generate the CHM file 
+On Windows, if you have no make tool you can use build.bat. If the HTML Help
+Compiler and MiKTeX are installed you can directly generate the CHM file
 ('build chm') and PDF file ('build pdf').
 
 Hacking the source
@@ -26,7 +26,7 @@ Hacking the source
 
 Please follow this rules when hacking the doc source files.
 
-- As suggested by Sphinx (see http://sphinx.pocoo.org/rest.html#sections)
+- As suggested by Sphinx (see http://www.sphinx-doc.org/en/stable/rest.html#sections)
   use:
 
   *************

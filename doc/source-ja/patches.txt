@@ -11,9 +11,9 @@
 以下のリンクはパッチの本質と歴史を理解し、Mercurial
 ではどのように使われているのかを理解するのによい資料です。
 
-* `パッチ管理問題 <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
-* `パッチを理解する <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
-* `さらにパッチについて <http://tortoisehg.bitbucket.org/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
+* `パッチ管理問題 <https://tortoisehg.bitbucket.io/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch-mgmt>`_
+* `パッチを理解する <https://tortoisehg.bitbucket.io/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:patch>`_
+* `さらにパッチについて <https://tortoisehg.bitbucket.io/hgbook/1.4/managing-change-with-mercurial-queues.html#sec:mq:adv-patch>`_
 
 落とし穴
 ========
@@ -26,7 +26,7 @@
 
 Mercurial 1.5 ではこの振る舞いが改善され、GIT 形式の差分が必要な場合は
 ユーザに警告を出すか、自動的に GIT 形式に変更します。詳しくは hgrc
-マニュアルの `差分 <http://www.selenic.com/mercurial/hgrc.5.html#diff>`_
+マニュアルの `差分 <https://www.selenic.com/mercurial/hgrc.5.html#diff>`_
 のセクションを参照してください。
 
 Mercurial のパッチ処理は改行文字に一貫性のないソースファイルとパッチを
@@ -38,7 +38,7 @@ Mercurial のパッチ処理は改行文字に一貫性のないソースファ�
 
 hgeol 拡張機能もこの領域の問題の改善に取り組んでいます。
 おそらく Mercurial 1.5 で解決します。詳しくは 詳しくは hgrc
-マニュアルの `パッチ <http://www.selenic.com/mercurial/hgrc.5.html#patch>`_
+マニュアルの `パッチ <https://www.selenic.com/mercurial/hgrc.5.html#patch>`_
 のセクションを参照してください。
 
 実のところパッチの適用というのはそれほど簡単な作業ではありません。
@@ -46,7 +46,7 @@ hgeol 拡張機能もこの領域の問題の改善に取り組んでいます�
 パッチ適用時に衝突が起こり、.rej という拡張子のファイルが生成されます。
 TortoiseHg 1.0 からこれらの除外されたハンクをうまく適用してくれる実験的な
 :command:`hgtk mpatch` コマンドが導入されました。このコマンドは Chris Mason
-による `mpatch <http://oss.oracle.com/~mason/mpatch/>`_
+による `mpatch <https://oss.oracle.com/~mason/mpatch/>`_
 ツールが元になっています。この mpatch
 でも適用できなかったハンクは手動で適用するしかありません。
 
@@ -82,7 +82,7 @@ TortoiseHg 1.0 からこれらの除外されたハンクをうまく適用し�
 	メール送信ダイアログ
 
 単独のチェンジセットを送るにはチェンジログビューアで
-チェンジセットの右クリックメニューを使用してください: 
+チェンジセットの右クリックメニューを使用してください:
 :menuselection:`エクスポート --> メールで送信...` 。
 選択するとメール送信ダイアログが開きます。
 
@@ -95,7 +95,7 @@ TortoiseHg 1.0 からこれらの除外されたハンクをうまく適用し�
 
 .. note::
 	パッチをメールで送信するには事前に
-	`SMTP <http://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
+	`SMTP <https://www.selenic.com/mercurial/hgrc.5.html#smtp>`_
 	の設定が必要です。
 
 チェンジセットのつまみ食い

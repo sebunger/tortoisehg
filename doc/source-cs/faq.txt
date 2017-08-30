@@ -5,11 +5,11 @@ Frequently Asked Questions
 
 *Co je TortoiseHg?*
 
-	Extenze konzoly Windows pro Mercurial podobná extenzím Tortoise pro Subversion a CVS. Obsahuje také aplikaci hgtk, použitelnou na mnoha platformách. 
-	
+	Extenze konzoly Windows pro Mercurial podobná extenzím Tortoise pro Subversion a CVS. Obsahuje také aplikaci hgtk, použitelnou na mnoha platformách.
+
 *Co je součástí binární instalace TortioseHg pro Windows?*
 
-	`Mercurial <http://mercurial.selenic.com/wiki/>`_,
+	`Mercurial <https://www.mercurial-scm.org/wiki/>`_,
 	`kdiff3 <http://kdiff3.sourceforge.net/>`_, `TortoisePlink <http://www.chiark.greenend.org.uk/%7Esgtatham/putty/>`_
 	five bonus extensions: hgfold, hgcr-gui, perfarce, mercurial-keyring.
 	python-svn for hgsubversion and convert extensions, and dulwich for
@@ -18,17 +18,17 @@ Frequently Asked Questions
 
 *Je Mercurial ve Windows kompatibilní s indexovací službou a se skenery virů?*
 
-	Ne. Stejně jako v TortoiseSVN, `doporučujeme <http://www.selenic.com/pipermail/mercurial/2010-January/029680.html>`_  v pracovní kopii repozitáře vypnout indexování a vyloučit skenování proti virům.
+	Ne. Stejně jako v TortoiseSVN, `doporučujeme <https://www.mercurial-scm.org/pipermail/mercurial/2010-January/029680.html>`_  v pracovní kopii repozitáře vypnout indexování a vyloučit skenování proti virům.
 
 *Jak lze získat překlady kontextového menu Exploreru?*
 
 	Dostupné překlady jsou při instalaci uloženy ve složce
 	:file:`C:\\Program Files\\TortoiseHg\\cmenu_i18n`.  Poklepem na zvýrazněném souboru :file:`thg-cmenu-cs.reg` aktivujte dva dotazy, které potvrďte.
-	
+
 *Jak provádět sloučení a výběr libovolných revizí?*
 
 	Pro sloučení a aktualizace je vhodný Verpánek s kontextovou nabídkou vybrané revize.
-	
+
 
 *Proč se nemohu připojit ke serveru SSH (remote: bash: <server name>: command not found)?*
 
@@ -39,25 +39,25 @@ Frequently Asked Questions
 *Jak mohu použít nástroj X jako svůj "visual diff"?*
 
 	Od verze 1.0, by měl TortoiseHg umět detekovat nejpopulárnější diffové nástroje a nabídnout je k výběru v konfiguračním nástroji
-	:guilabel:`Visual Diff Tool`. 
+	:guilabel:`Visual Diff Tool`.
 
 *Jak je TortoiseHg konfigurován?*
 
- Konfigurační sestavení získává Torotisehg ze dvou systémů. 
-	
+ Konfigurační sestavení získává Torotisehg ze dvou systémů.
+
 1. Z konfiguačního systému Mercurialu, který má tři úrovně:
-	
- 1. pro počítač - :file:`\\Documents and Settings\\admin\\Mercurial.ini` 
+
+ 1. pro počítač - :file:`\\Documents and Settings\\admin\\Mercurial.ini`
  2. pro uživatele - :file:`\\Document and Settings\\user\\Mercurial.ini`
  3. pro repozitórium - :file:`{repo-root}\\.hg\\hgrc`
 
 2. Ze složky :file:`%APPDATA%\\Tortoisehg`:
-	
+
  1. Soubor :file:`thg-reporegistry.xml` obsahuje Seznam repozitářů Verpánku.
  2. Soubor :file:`TortoiseHgQt.ini` obsahuje nastavení pro stav aplikace (pozice oken, atp).
 
  Toto jsou některé položky, které jsou uloženy v konfiguračním systému Mercurialu. ::
-	
+
 	[tortoisehg]
 	vdiff = vdiff
 	editor = gvim
@@ -70,21 +70,21 @@ Frequently Asked Questions
 
 *Kde hledají extenze TortoiseHg externí moduly Pythonu ve Windows?*
 
-  TortoiseHg obsahuje úplnou distribuci Pythonu sbalenou do souborů DLL. Moduly standardní knihovny jsou v souboru :file:`library.zip` složky :file:`C:\\Program Files\\TortoiseHg`. 
-	
+  TortoiseHg obsahuje úplnou distribuci Pythonu sbalenou do souborů DLL. Moduly standardní knihovny jsou v souboru :file:`library.zip` složky :file:`C:\\Program Files\\TortoiseHg`.
+
   Pokusíte-li se použít extenzi, která importuje nestandardní modul Pythonu, zjistíte, že se extenze nenačte, protože nemůže modul najít. Například extenze ReviewBoard importuje modul simplejson, který není součástí standardní distribuce Pythonu.
-	
+
   Aby vám extenze chodila, musíte přidat několik řádků na začátek souboru ~.py a to před řádek, který importuje cizí modul::
-	
+
 	import sys
 	sys.path.append(r'C:\path\to\module')
 
-  Nepomůže to u modulů, distribuovaných jako soubory ~.egg; 
+  Nepomůže to u modulů, distribuovaných jako soubory ~.egg;
   doplněná cesta musí obsahovat soubory modulu ~.py nebo ~.pyc.
-	
+
   Máte-li více extenzí a/nebo hooků, sdílejících tentýž paket (package) Pythonu, můžete vytvořit extenzi, která explicitně modifikuje sys.path pro všechny ostatní. Jednoduše uveďte extenzi tak aby byla načtena jako první (abecedně).
   Nějak takto::
-	
+
    	[extensions]
 	00setSysPath = C:\path\to\setsyspath.py
 

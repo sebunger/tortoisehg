@@ -10,7 +10,7 @@ import re
 import tempfile
 import time
 
-from mercurial import util, error, scmutil, phases
+from mercurial import util, error, phases
 from mercurial import obsolete  # delete if obsolete becomes enabled by default
 
 from tortoisehg.util import hglib, i18n, shlib, wconfig
@@ -816,12 +816,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.userhist = map(unicode, s.value(gpref+'userhist').toStringList())
         self.userhist = [u for u in self.userhist if u]
         try:
-            curmsg = self.repo.opener('cur-message.txt').read()
+            curmsg = self.repo.vfs('cur-message.txt').read()
             self.setMessage(hglib.tounicode(curmsg))
         except EnvironmentError:
             pass
         try:
-            curmsg = self.repo.opener('last-message.txt').read()
+            curmsg = self.repo.vfs('last-message.txt').read()
             if curmsg:
                 self.addMessageToHistory(hglib.tounicode(curmsg))
         except EnvironmentError:
@@ -839,7 +839,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             s.setValue(gpref+'history-'+repoid, self.msghistory)
             s.setValue(gpref+'userhist', self.userhist)
             msg = self.getMessage(True)
-            self.repo.opener('cur-message.txt', 'w').write(msg)
+            self.repo.vfs('cur-message.txt', 'w').write(msg)
         except (EnvironmentError, IOError):
             pass
 
@@ -1244,7 +1244,7 @@ class DetailsDialog(QDialog):
         self.saveToPath([fn])
 
     def saveGlobal(self):
-        self.saveToPath(scmutil.userrcpath())
+        self.saveToPath(hglib.userrcpath())
 
     def saveToPath(self, path):
         fn, cfg = hgrcutil.loadIniFile(path, self)

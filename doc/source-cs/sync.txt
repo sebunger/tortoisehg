@@ -5,13 +5,13 @@ Synchronizace
 .. module:: synchronize.dialog
 	:synopsis: Dialog used to perform synchronization operations
 
-Nástroj `TortoiseHg > Synchronizovat`	
-	
+Nástroj `TortoiseHg > Synchronizovat`
+
 .. figure:: figures/synchronize.png
 	:alt: Synchronize dialog
 
 
-Synchronizační nástroj se používá pro přesouvání changesetů mezi repozitáři nebo pro odesílání změn přes e-mail. 	
+Synchronizační nástroj se používá pro přesouvání changesetů mezi repozitáři nebo pro odesílání změn přes e-mail.
 
 :guilabel:`Incoming`
   Ukázat (příchozí) changesety, které mohou být staženy (pulled) z cílového repozitáře, neboli změny v cílovém repozitáři, které nejsou v lokálním repozitáři
@@ -32,18 +32,18 @@ Synchronizační nástroj se používá pro přesouvání changesetů mezi repoz
 
   :guilabel:`None`
      Po akci pull se neprovedou žádné operace. Můžete si prohlédnout stažené changesety v záznamovém panelu a můžete se pokusit o aktualizaci k novému tipu.
-		
+
   :guilabel:`Update`
      Automaticky aktualizovat k tipu aktuální větve tehdy a jen tehdy, jestliže byly nové revize staženy do lokálního repozitáře. Může to spustit slučování, jestliže stažené změny kolidují s lokálními nekomitovanými změnami.
-		
+
   :guilabel:`Fetch`
      Ekvivalentní k hg fetch. Viz dokumentaci k extenzi fetch. Tato  procedura je přístupná, pokud byla povolena uživatelem.
-  
+
   :guilabel:`Konflikty při slučování`
      Konflikty při sloučování řešit pokud možno automaticky. Je-li tato volba zatržena, pokusí se Mercurial řešit triviální konflikty bez spoluúčasti uživatele. Není-li, jsou všechna slučování interaktivní.
 
 
-:guilabel:`Možnosti` 
+:guilabel:`Možnosti`
   Tlačítko obsahuje zatržítka pro výběr méně používaných příkazových opcí.
 
   :guilabel:`Povolit push nové větve`
@@ -57,34 +57,34 @@ Synchronizační nástroj se používá pro přesouvání changesetů mezi repoz
   :guilabel:`Emitovat výstup ladění`
 	 ...
   :guilabel:`Pracovat s frontou oprávek (-mq)`
-	 ...	
+	 ...
   :guilabel:`Vzdálený příkaz`
      Textové pole pro zadání vzdáleného příkazu
   :guilabel:`Větev`
-	 Textové pole pro zadání názvu větve	
+	 Textové pole pro zadání názvu větve
 
 Je-li synchronizační nástroj otevřen ve Verpánku, má nástrojová lišta ještě zatržítko
 
-:guilabel:`Cíl`. 
+:guilabel:`Cíl`.
   Zatržením se aktivuje roletkový seznam, ve kterém lze vybrat cílovou revizi, bookmark nebo větev. Tyto výběry se přidají ke každému synchronizačnímu příkazu. Je-li synchronizační nástroj otevřen mimo Verpánek, je toto zatržítko skryté.
-	
+
 Než bude zatržítko "Cíl" doplněno i do widgetu `TortoiseHg > Synchronizovat`, bude zřejmě vhodnější používat synchronizační nástroj z Verpánku.
 
 
 Pod nástrojovou lištou je uvedena aktuálně vybraná adresa URL. Tuto adresu použijí všechny synchronizační nástroje.
 
 Celkový účinek nástroje `Synchronizovat` je ten, že může být čten jako příkaz Mercuriálu z příkazového řádku. Tlačítky nástroje se vybere příkaz, v dialozích `Po akci pull` a `Možnosti` se zadají parametry, v roletkovém seznamu `Cíl` se určí revize či větve a textovém poli lze zkontrolovat adresu vzdáleného repozitáře.
- 
-Před textovým polem pro URL jsou dvě ikony pro nastavení bezpečného spojení a uložení aktuálního URL jako alias. 
+
+Před textovým polem pro URL jsou dvě ikony pro nastavení bezpečného spojení a uložení aktuálního URL jako alias.
 
 
 
 Přidání URL
 -----------
 
-Nejsnadněji přidáte nové URL do svého repozitáře jeho přetažením (drag @ drop) z jiné aplikace, uložíte  a zadáte alias. 
+Nejsnadněji přidáte nové URL do svého repozitáře jeho přetažením (drag @ drop) z jiné aplikace, uložíte  a zadáte alias.
 
-V textových polích spodní části karty Synchronizovat lze vidět adresy, uložené v konfiguračním souboru aktuálního repozitáře (:guilabel:`Cesty v nastavení repozitáře`) a adresy, které jsou uložené v jiných příbuzných repozitářích, uvedených v Seznamu repozitářů (:guilabel:`Příbuzné cesty`). 
+V textových polích spodní části karty Synchronizovat lze vidět adresy, uložené v konfiguračním souboru aktuálního repozitáře (:guilabel:`Cesty v nastavení repozitáře`) a adresy, které jsou uložené v jiných příbuzných repozitářích, uvedených v Seznamu repozitářů (:guilabel:`Příbuzné cesty`).
 
 .. note::
 	"Příbuzný" znamená, že dva repozitáře mají alespoň jeden společný kořenový changeset. Klonované repozitáře jsou zcela zřejmě příbuzné. Operace push a pull vyžadují příbuznost repozitářů; tento požadavek lze potlačit opcí --force.
@@ -109,99 +109,50 @@ Bezpečné spojení HTTPS se skládá ze dvou asymetrických částí. První č
 
 Druhou částí bezpečného spojení je ověření uživatele zadáním jména, hesla, případně certifikačního klíče či řetězce (chain).
 
-Host Authentication
+Prověření hostitele
 +++++++++++++++++++
 
-Prior to version 1.7, Mercurial ignored this half of HTTPS connection
-security.  In version 1.7 it began warning that the server's certificate
-was not being verified. 
+Před verzí 1.7 ignoroval Mercurial tuto část bezpečnosti HTTPS spojení. Ve verzi 1.7 již začal varovat, že certifikát serveru není ověřován.
 
-Mercurial version 1.7.5 introduced the ability to validate an HTTPS
-server's certificate against a stored fingerprint.  TortoiseHg 2.0's
-synchronize tool has an HTTPS security dialog that allows you to select
-between using a host fingerprint or using the CA certificates.
+Mercurial 1.7.5 zavedl schopnost ověřit certifikát serveru HTTPS porovnáním s uloženým fingerprintem. Synchronizační nástroj TortoiseHg 2.0 obsahuje dialog, umožňující zvolit mezi fingerprintem hostitele nebo použitím certifikátu CA.
 
-In theory, a host fingerprint is more secure than the CA certificates
-if you do not necessarily trust all of the signing authorities listed in
-the default store.  However you must be sure that the fingerprint you
-store is the correct fingerprint for the server to which you believe you
-are communicating.
+Teoreticky je fingerprint hostitele bezpečnější než certifikáty CA, pokud zcela nevěříte všem autoritám, uvedeným v implicitním uložišti. Musíte si ovšem být jist, že váš uložený fingerprint je skutečně ten správný.
 
-TortoiseHg 2.0 also allows you to select an insecure connection for a
-given host.  This disables validation of the host's certificate but
-still uses an encrypted data stream (which was essentially the behavior
-of Mercurial pre-1.7 except for the warning messages).
+TortoiseHg 2.0 také umožňuje použití nezajištěného spojení s daným hostitelem. Přitom se nepoužije ověření certifikátu hostitele ale použije se zašifrovaný datový proud (stream) - což je vlastně chování Mercurialu před verzí 1.7. messages).
 
-User Authentication
+Prověření uživatele
 +++++++++++++++++++
 
-There are several mechanisms available for authenticating yourself to an
-HTTPS server.  The simplest is to allow Mercurial to prompt you for the
-username and passphrase.  However this quickly grows old as the two
-prompts are always made separately and each push operation can require
-multiple connections to be established.
+Pro prověření vlastní osoby vzhledem k serveru HTTPS je k disposici několik mechanizmů.
 
-The next option is to encode the username in the URL so that Mercurial
-only prompts for a passphrase.  This cuts the number of prompts in half,
-but is still annoying.  If you do not wish to be prompted for the
-passphrase, it must be stored somewhere.  Your choices, in increasing
-security, are:
+Nejjednodušším je oprávnění Mercurialu požádat uživatele o zadání uživatelského jména a hesla. To má tu nevýhodu, že separátní výzvy vyžadují vytvoření dvou separátních spojení.
 
-1) encode the clear-text passphrase in each HTTPS URL in your repository configuration files
-2) store the clear-text passphrase in your user configuration file
-3) use the mercurial_keyring extension to store the passphrase cryptographically
+Další možností je připojení uživatelského jména k URL, takže Mercurial žádá pouze o zadání hesla (passphrase). To zkracuje proces prověřování na polovinu ale je stále poněkud únavné. Nechcete-li být obtěžování se zadáváním fráze hesla, musí být někde uloženo. Máte tyto možnosti:
 
-Until recently, TortoiseHg only supported the first option in the
-graphical interface even though the second and third options were
-supported internally. In TortoiseHg 2.0, we only support the latter two
-options in the graphical interface, and we do not allow the user
-configure the first option anymore.  By default we strip the username
-and password off of URLs when they are saved.
+1) připojit passphrase k URL HTTPS v konfiguračním souboru každého repozitáře
+2) uložit passphrase do konfiguračního souboru uživatele
+3) použít extenzi mercurial_keyring k uložení passphrase v kryptografické formě.
 
-To migrate from the first option to the later options, select an HTTPS
-URL in the sync tool, open the security dialog and enter a username and
-passphrase for the host if none are configured, and save.  Next save the
-URL itself and allow the save dialog to strip the user authentication
-data from the URL.
+Až donedávna podporoval TortoiseHg ve svém grafickém rozhranní pouze první možnost i když interně byly podporovány i druhá a třetí varianta.
+V grafickém rozhranní TortoiseHg 2.0 jsou podporovány pouze dvě poslední varianty. Uživatelské jméno a heslo jsou při ukládání odtrženy od URL.
+
+Při přechodu od první možnosti k některé další vyberte v synchronizačním nástroji HTTPS URL, otevřte bezpečnostní dialog a zadejte uživatelské jméno a passphrase pro hostitele (není-li žádný nakonfigurován) a uložte. Poté uložte samotné URL a povolte odtržení ověřovacích dat uživatele od URL.
 
 .. note::
-	If the mercurial_keyring extension is enabled, the security dialog
-	will not allow you to enter a passphrase since you do not want to
-	store the passphrase in clear text in your configuration file if you
-	are going to later store it cryptographically.
+	Je-li  povolena extenze mercurial_keyring, bezpečnostní dialog vám nedovolí zadat passphrase ve formě prostého textu, neboť se předpokládá, že chcete uložit passphrase kryptograficky.
 
-Options 2 and 3 use the [auth] section of your user configuration file
-to configure a single username and passphrase (or certificate key files)
-to authenticate to a given HTTPS hostname.  The [auth] section supports
-many more configurations than this, see the man page for details.
+Druhá a třetí možnost používá  sekci [auth] konfiguračního souboru uživatele k nastavení jména uživatele a passphrase (nebo soubory s certifikačními klíči) k autentifikaci u  daného jména HTTPS hostitele. Sekce [auth] podporuje mnohem víc konfigurací, než je tato - viz stránky man.
 
-Once the mercurial_keyring extension has been enabled (and all
-applications are restarted), you can remove the HTTPS passphrases from
-all of your configuration files.  Mercurial will prompt for the
-passphrase once, then store it cryptographically using the best back-end
-it can find for your platform.
+Jakmile je povolena extenze mercurial_keyring (a všechny aplikace jsou restartovány), můžete odebrat HTTPS passphrases ze všech svých konfiguračních souborů. Mercurial požádá o passphrase jednou, potom jej kryptograficky uloží s použitím nejlepšího back-endu, který na vaší platformě nalezne.
 
-The mercurial_keyring extension requires the [auth] section to be
-configured for the host to which you are connecting, to provide the
-username.  If your URL has an encoded username or passphrase, the
-[auth] section is ignored.
+Extenze mercurial_keyring vyžaduje aby byla sekce [auth] nastavena pro hostitele, ke kterému se připojujete aby mohla poskytnout jméno uživatele. Má-li vaše URL vkódované (encoded) jméno uživatele nebo passphrase, je sekce [auth] ignorována.
 
 SSH
 ~~~
 
-SSH is a symmetrical peer-to-peer secure tunnel.  SSH clients and
-servers have their own key management systems, so Mercurial does not get
-involved with password prompts when SSH is used.  This is problematic on
-Windows and thus TortoiseHg bundles the TortoisePlink SSH client with its
-Windows installers.  TortoisePlink is a port of the Plink SSH client
-that uses dialog prompts for host-key authorizations and passphrase
-prompts.  TortoisePlink (developed by the TortoiseSVN project) can use
-the other SSH tools that are part of the Plink toolchain, including the
-Pageant key agent.
+SSH je symetrický peer-to-peer bezpečný tunel. Klienti SSH a servery mají své vlastní systémy správy, takže Mercurial se na výzvách po hesle při použití SSH nepodílí. To je problematické  ve Windovs, pročež TortoisHg připojuje do svých instalačních programů klienta SSH TortoiseHgPlink. TortoisePlink je port klienta Plink SSH, který používá dialogové prompty pro prověření hostitelského klíče a hesla uživatele. TortoisePlink (vyvinutý v rámci projektu TortoiseSVN) může použít také ostatní nástroje SSH, které jsou součástí Plink toolchainu, včetně prostředku Pageant key.
 
-It is a known issue that TortoisePlink does not use compression in many
-scenarios, and thus is up to four times slower than openssh and other
-clients.  TortoiseHg recommends the use of HTTPS for Windows clients.
+Je známým problémem, že TortoisePlink v mnoha situacích nepoužívá kompresi, v důsledku čehož je až čtyřikrát pomalejší než openssh a jiní klienti. Pro Windows doporučuje TortoiseHg použití HTTPs.
 
 See the :doc:`faq` for help if you have trouble connecting to ssh servers.
 
@@ -214,9 +165,9 @@ E-mail
 Dialogové okno **Email** lze spustit ze dvou nástrojů TortoiseHg.
 
 * Z Verpánku jako kontextové menu pro jednu nebo více vybraných revizi.
-   
+
 * Tlačítkem :guilabel:`Email out..` v synchronizačním panelu odešlete všechny odchozí změny do zadaného cílového repozitáře.
- 
+
 Parametry poštovního klienta lze přednastavit v otevřeném okně 'Email out' výběrem :guilabel:Settings`.
 
 V dokumentaci pro Mercurial se seznámíte s rozdíly mezi plain patches, Hg patches, Git patches a svazky (bundles).

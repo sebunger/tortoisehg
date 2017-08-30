@@ -5,11 +5,10 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os, cgi, time
+import cgi, time
 
 from mercurial import ui
 from tortoisehg.hgqt import qtlib
-from tortoisehg.util import hglib
 
 BEGINTAG = '\033' + str(time.time())
 ENDTAG = '\032' + str(time.time())
@@ -89,7 +88,7 @@ class htmlui(ui.ui):
 
 if __name__ == "__main__":
     from mercurial import hg
-    u = htmlui()
+    u = htmlui.load()
     repo = hg.repository(u)
     repo.status()
     print u.getdata()[0]

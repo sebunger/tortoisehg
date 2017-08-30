@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import hg, ui, mdiff, similar, patch
+from mercurial import hg, similar, patch
 
 from tortoisehg.util import hglib, thread2
 from tortoisehg.util.i18n import _
@@ -265,13 +265,13 @@ class DetectRenameDialog(QDialog):
             return
         index = indexes[0]
         ctx = self.repo['.']
-        hu = htmlui.htmlui()
+        hu = htmlui.htmlui(self.repo.ui)
         row = self.matchtv.model().getRow(index)
         src, dest, percent = self.matchtv.model().getRow(index)
         aa = self.repo.wread(dest)
         rr = ctx.filectx(src).data()
         date = hglib.displaytime(ctx.date())
-        difftext = mdiff.unidiff(rr, date, aa, date, src, dest)
+        difftext = hglib.unidifftext(rr, date, aa, date, src, dest)
         if not difftext:
             t = _('%s and %s have identical contents\n\n') % \
                     (hglib.tounicode(src), hglib.tounicode(dest))
@@ -399,7 +399,7 @@ class RenameSearchThread(QThread):
 
     def __init__(self, repo, ufiles, minpct, copies):
         super(RenameSearchThread, self).__init__()
-        self.repo = hg.repository(ui.ui(), repo.root)
+        self.repo = hg.repository(hglib.loadui(), repo.root)
         self.ufiles = ufiles
         self.minpct = minpct
         self.copies = copies

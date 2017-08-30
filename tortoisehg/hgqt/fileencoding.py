@@ -14,7 +14,7 @@ from tortoisehg.util.i18n import _
 
 # List of encoding names which are likely used, based on the Chromium
 # source <chrome/browser/character_encoding.cc> and the Python documentation
-# <http://docs.python.org/2.7/library/codecs.html>.
+# <https://docs.python.org/2.7/library/codecs.html>.
 #
 # - no UTF-16 or -32, which is binary in Mercurial
 # - no ASCII because it can be represented in other encodings

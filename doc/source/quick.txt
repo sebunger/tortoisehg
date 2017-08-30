@@ -71,13 +71,13 @@ First select the :guilabel:`Commit` page and enter a name in the
 .. note::
 	There are no hard fast rules on how to format your username, the
 	field is free form, but the following convention is commonly used::
-	
+
 		FullName <email>
-		
+
 	for example ::
-	
+
 		Donald Duck <donaldduck@example.net>
-	
+
 	The email address is stripped when viewing history in the revision history
 	viewer, and the built-in web server obfuscates email addresses to
 	prevent SPAM.
@@ -120,14 +120,14 @@ Getting Acquainted
 ==================
 
 Mercurial supports many different
-`collaboration models <https://tortoisehg.bitbucket.org/hgbook/1.7/collaborating-with-other-people.html>`_.
+`collaboration models <https://tortoisehg.bitbucket.io/hgbook/1.7/collaborating-with-other-people.html>`_.
 This chapter describes just one of those models: a single central repository.
 The central repository model does not scale as well as other models, but
 it is the most familiar to those coming from other revision tools and
 thus is the most common approach people start with.
 
 To get started, suppose you volunteer to create the central repository.
-There are ways to `convert <http://mercurial.selenic.com/wiki/RepositoryConversion>`_
+There are ways to `convert <https://www.mercurial-scm.org/wiki/RepositoryConversion>`_
 non-Mercurial repositories into Mercurial repositories, but this example
 assumes you are starting from scratch.
 
@@ -153,7 +153,7 @@ folder of your project.
 	Repository Init Dialog
 
 We suggest you keep :guilabel:`Create special files (.hgignore, ...)`
-checked, and do not check :guilabel:`Make repo compatible with Mercurial < 1.7`, 
+checked, and do not check :guilabel:`Make repo compatible with Mercurial < 1.7`,
 unless you have a strong reason to do so.
 
 After pressing :guilabel:`Create`, Mercurial creates a subdirectory in
@@ -217,7 +217,7 @@ mark these files as ignored in some different ways too.
    dialog.
 
 2. Explorer: select :menuselection:`TortoiseHg --> Edit Ignore Filter`.
-	
+
 3. Command line: type :command:`thg hgignore` to bring up the ignore filter dialog.
 
 4. You can also launch the ignore filter from the status tool (the menu option
@@ -240,7 +240,7 @@ immediately.
 
 Commit
 ======
-   
+
 Commit your local repository now:
 
 Workbench: click on the Working Directory revision which also selects the Commit
@@ -326,7 +326,7 @@ Working with your repository
 ============================
 
 Suppose you've introduced some changes.  It is easy to discover what pending
-changes there are in the repository.  
+changes there are in the repository.
 
 Workbench: go to the Commit task tab and inspect the filelist at the left
 
@@ -347,7 +347,7 @@ changes and commit them from Explorer. Though it might be quicker to do that
 from the Commit task tab in the Workbench.
 
 .. figure:: figures/overlayicons.png
-	:alt: Overlay Icons 
+	:alt: Overlay Icons
 
 	Overlay Icons on Vista
 
@@ -379,6 +379,6 @@ Which may sound complicated, but is easier than it sounds.
 	Merges can be safely restarted if necessary.
 
 Mercurial makes collaboration easy, fast, and productive.
-Learn more at Mercurial's `wiki <http://mercurial.selenic.com/wiki/>`_.
+Learn more at Mercurial's `wiki <https://www.mercurial-scm.org/wiki/>`_.
 
 .. vim: noet ts=4

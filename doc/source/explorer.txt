@@ -108,7 +108,7 @@ Windows).
 	handlers registered on a computer.
 	Unchecking handlers that are not used by TortoiseHg (that is: Locked,
 	Readonly, Ignored, Deleted) is highly recommended, if you know that no
-	other Tortoises (e.g. TortoiseSVN) uses them. 
+	other Tortoises (e.g. TortoiseSVN) uses them.
 	Make sure the "Added" and "Unversioned" handlers are enabled, as these
 	are used by TortoiseHg.
 	(Default: all checked)

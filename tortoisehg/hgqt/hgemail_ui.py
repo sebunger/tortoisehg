@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/Users/sborho/repos/thg/tortoisehg/hgqt/hgemail.ui'
+# Form implementation generated from reading ui file '/home/sborho/repos/thg/tortoisehg/hgqt/hgemail.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created by: PyQt UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
 from tortoisehg.util.i18n import _
-from PyQt4 import QtCore, QtGui
+from .pyqtcompat import *
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -312,5 +312,3 @@ class Ui_EmailDialog(object):
         self.settings_button.setText(_('&Settings'))
         self.send_button.setText(_('Send &Email'))
         self.close_button.setText(_('&Close'))
-
-from PyQt4 import Qsci

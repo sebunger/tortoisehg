@@ -11,7 +11,7 @@ TortoiseHg マニュアルにようこそ!
 .. toctree::
 	:maxdepth: 3
 	:numbered:
-   
+
 	preface
 	intro
 	quick
@@ -23,7 +23,7 @@ TortoiseHg マニュアルにようこそ!
 	nonhg
 	faq
 	debugging
-   
+
 索引
 ====
 

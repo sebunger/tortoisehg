@@ -169,7 +169,7 @@ class RebaseDialog(QDialog):
 
         itool = self.autoresolvechk.isChecked() and 'merge' or 'fail'
         opts = {'config': 'ui.merge=internal:%s' % itool}
-        if os.path.exists(self.repo.join('rebasestate')):
+        if os.path.exists(self.repo.vfs.join('rebasestate')):
             opts['continue'] = True
         else:
             opts.update({
@@ -249,7 +249,7 @@ class RebaseDialog(QDialog):
             txt = _('You may continue the rebase')
         self._stbar.showMessage(txt)
 
-        if os.path.exists(self.repo.join('rebasestate')):
+        if os.path.exists(self.repo.vfs.join('rebasestate')):
             self.swaplabel.setVisible(False)
             self.abortbtn.setEnabled(True)
             self.rebasebtn.setText('Continue')
@@ -267,7 +267,7 @@ class RebaseDialog(QDialog):
             self._wctxcleaner.runCleaner(cmd)
 
     def reject(self):
-        if os.path.exists(self.repo.join('rebasestate')):
+        if os.path.exists(self.repo.vfs.join('rebasestate')):
             main = _('Exiting with an unfinished rebase is not recommended.')
             text = _('Consider aborting the rebase first.')
             labels = ((QMessageBox.Yes, _('&Exit')),

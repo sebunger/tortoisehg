@@ -96,7 +96,7 @@
 :guilabel:`中止` ボタンの右側には閲覧中のリポジトリに設定されたすべてのリモートリポジトリ
 を含むコンボボックスがあります。デフォルトのリポジトリパスが設定されている場合は
 起動時にそれが自動的に選択されます。リポジトリパス設定の詳細については
-`hg.1.html#urls <http://www.selenic.com/mercurial/hg.1.html#urls>`_
+`hg.1.html#urls <https://www.selenic.com/mercurial/hg.1.html#urls>`_
 をご覧ください。
 
 さらにその右側には :guilabel:`プル後の操作` コンボボックスがあり、
@@ -162,19 +162,19 @@ fetch 拡張機能を有効化しない限りリストには表示されませ�
 
 	:guilabel:`リビジョンの範囲`
 		入力されたテキストをリビジョンの範囲として解釈します。詳細は
-		`hg.1.html#revisions <http://www.selenic.com/mercurial/hg.1.html#revisions>`_
+		`hg.1.html#revisions <https://www.selenic.com/mercurial/hg.1.html#revisions>`_
 		をご覧ください。
 	:guilabel:`ファイル名パターン`
 		入力されたテキストを glob パターンとして解釈します。
 		*regexp:* を先頭に付加することで正規表現パターンとして解釈されます。詳細は
-		`hg.1.html#patterns <http://www.selenic.com/mercurial/hg.1.html#patterns>`_
+		`hg.1.html#patterns <https://www.selenic.com/mercurial/hg.1.html#patterns>`_
 		をご覧ください。
 	:guilabel:`キーワード`
 		入力されたテキストをチェンジセットのメタデータ (ユーザ名、コミットメッセージなど)
 		にマッチするキーワードとして解釈します。
 	:guilabel:`日付`
 		入力されたテキストを日付の範囲として解釈します。詳細は
-		`hg.1.html#dates <http://www.selenic.com/mercurial/hg.1.html#dates>`_
+		`hg.1.html#dates <https://www.selenic.com/mercurial/hg.1.html#dates>`_
 		をご覧ください。
 	:guilabel:`ユーザ名`
 		入力されたテキストをユーザ名 (コミッタ) として解釈します。
@@ -312,7 +312,7 @@ avoided in large repositories.
 .. [#rcm2]	選択したリビジョンが指定された状態で TortoiseHg のマージダイアログが開きます。
 .. [#rcm3]	選択したリビジョンが指定された状態で TortoiseHg のメール送信ダイアログが開きます。
 .. [#rcm4]	strip コマンドは削除したリビジョンを後で再適用できるようにバンドルファイルとして
-			保存します。詳細は `こちら <http://mercurial.selenic.com/wiki/EditingHistory>`_
+			保存します。詳細は `こちら <https://www.mercurial-scm.org/wiki/EditingHistory>`_
 			を参照してください。
 .. [#rcm5]	:menuselection:`ユーザ設定 --> TortoiseHg --> GUI 差分表示コマンド`
 .. [#rcm6]	選択中のリビジョンが現在の作業ディレクトリの親リビジョンであるときのみ有効になります。
@@ -403,11 +403,11 @@ issue.regex では正規表現のグループ機能を使うことができ、�
 
 	BitBucket:
 	issue.regex = #(\d+)\b
-	issue.link = http://bitbucket.org/<your project and repo>/issue/{1}/
+	issue.link = https://bitbucket.org/<your project and repo>/issue/{1}/
 
 	Mercurial:
 	issue.regex = \bissue(\d+)\b
-	issue.link = http://bz.selenic.com/show_bug.cgi?id={1}
+	issue.link = https://bz.mercurial-scm.org/show_bug.cgi?id={1}
 
 
 Bisect

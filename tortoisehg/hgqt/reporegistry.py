@@ -7,7 +7,7 @@
 
 import os
 
-from mercurial import commands, hg, ui, util
+from mercurial import commands, hg, util
 
 from tortoisehg.util import hglib, paths
 from tortoisehg.util.i18n import _
@@ -40,7 +40,8 @@ class RepoTreeView(QTreeView):
         self.setMouseTracking(True)
 
         # enable drag and drop
-        # (see http://doc.qt.nokia.com/4.6/model-view-dnd.html)
+        # see
+        # https://doc.qt.io/qt-4.8/model-view-programming.html#using-drag-and-drop-with-item-views
         self.setDragEnabled(True)
         self.setAcceptDrops(True)
         self.setAutoScroll(True)
@@ -160,7 +161,7 @@ class RepoTreeView(QTreeView):
 
         if event.buttons() == Qt.NoButton:
             # Bail out early to avoid tripping over this bug:
-            # http://bugreports.qt.nokia.com/browse/QTBUG-10180
+            # https://bugreports.qt.io/browse/QTBUG-10180
             return
         super(RepoTreeView, self).mouseMoveEvent(event)
 
@@ -572,7 +573,8 @@ class RepoRegistryView(QDockWidget):
 
                 # Is is already on the selected repository substate list?
                 try:
-                    repo = hg.repository(ui.ui(), hglib.fromunicode(root))
+                    repo = hg.repository(hglib.loadui(),
+                                         hglib.fromunicode(root))
                 except:
                     qtlib.WarningMsgBox(_('Cannot open repository'),
                         _('The selected repository:<br><br>%s<br><br>'
@@ -591,7 +593,7 @@ class RepoRegistryView(QDockWidget):
                     hasHgsub = os.path.exists(repo.wjoin('.hgsub'))
                     if hasHgsub:
                         try:
-                            fsub = repo.wopener('.hgsub', 'r')
+                            fsub = repo.wvfs('.hgsub', 'r')
                             lines = fsub.readlines()
                             fsub.close()
                         except:
@@ -630,11 +632,12 @@ class RepoRegistryView(QDockWidget):
 
                     # and update the .hgsub file
                     try:
-                        fsub = repo.wopener('.hgsub', 'w')
+                        fsub = repo.wvfs('.hgsub', 'w')
                         fsub.write(linesep.join(lines) + linesep)
                         fsub.close()
                         if not hasHgsub:
-                            commands.add(ui.ui(), repo, repo.wjoin('.hgsub'))
+                            commands.add(hglib.loadui(),
+                                         repo, repo.wjoin('.hgsub'))
                         qtlib.InfoMsgBox(
                             _('Subrepo added to .hgsub file'),
                             _('The selected subrepo:<br><br><i>%s</i><br><br>'
@@ -808,7 +811,8 @@ class RepoRegistryView(QDockWidget):
         model = self.tview.model()
         index = self.tview.currentIndex()
         ip = index.internalPointer()
-        repo = hg.repository(ui.ui(), hglib.fromunicode(model.repoRoot(index)))
+        repo = hg.repository(hglib.loadui(),
+                             hglib.fromunicode(model.repoRoot(index)))
         ctx = repo['.']
         wfile = '.hgsub'
         if wfile not in ctx:

@@ -406,7 +406,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         # TODO: Parameters should include rev, as one patch may have several heads
         # rev should be appended to filename and used by pdiff
         assert(len(patchname)>0)
-        cachepath = self.repo.join(PATCHCACHEPATH)
+        cachepath = self.repo.vfs.join(PATCHCACHEPATH)
         # TODO: Fix this - it looks ugly
         try:
             os.mkdir(cachepath)
@@ -415,7 +415,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
                 raise
         # TODO: Convert filename if any funny characters are present
         patchfile = os.path.join(cachepath, patchname)
-        dirstate = self.repo.join('dirstate')
+        dirstate = self.repo.vfs.join('dirstate')
         try:
             patch_age = os.path.getmtime(patchfile) - os.path.getmtime(dirstate)
         except:

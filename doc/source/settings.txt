@@ -334,13 +334,13 @@ Commit
 :guilabel:`Confirm adding unknown files:`
 	Determines if TortoiseHg should show a confirmation dialog before
 	adding new files in a commit. If True, a confirmation dialog will be
-	showed. If False, selected new files will be included in the commit
+	shown. If False, selected new files will be included in the commit
 	with no confirmation dialog.  Default: True
 
 :guilabel:`Confirm deleting files:`
 	Determines if TortoiseHg should show a confirmation dialog before
 	removing files in a commit. If True, a confirmation dialog will be
-	showed. If False, selected deleted files will be included in the
+	shown. If False, selected deleted files will be included in the
 	commit with no confirmation dialog.  Default: True
 
 

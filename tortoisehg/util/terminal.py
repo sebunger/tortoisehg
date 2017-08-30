@@ -1,5 +1,6 @@
 import os, sys
-from mercurial import util, ui
+from mercurial import util
+from tortoisehg.util import hglib
 
 def defaultshell():
     if sys.platform == 'darwin':
@@ -100,7 +101,7 @@ def _findterminal(ui):
 def detectterminal(ui_):
     'returns tuple of terminal tool path and arguments'
     if ui_ is None:
-        ui_ = ui.ui()
+        ui_ = hglib.loadui()
     name, pathorconfig = _findterminal(ui_)
     if name is None:
         return (pathorconfig, None)

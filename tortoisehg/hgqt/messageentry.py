@@ -32,7 +32,7 @@ class MessageEntry(qscilib.Scintilla):
         self.setMatchedBraceBackgroundColor(Qt.yellow)
         self.setIndentationsUseTabs(False)
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        # http://www.riverbankcomputing.com/pipermail/qscintilla/2009-February/000461.html
+        # https://www.riverbankcomputing.com/pipermail/qscintilla/2009-February/000461.html
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         # default message entry widgets to word wrap, user may override

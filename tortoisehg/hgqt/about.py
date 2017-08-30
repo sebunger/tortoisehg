@@ -52,7 +52,7 @@ class AboutDialog(QDialog):
         self.copyright_lbl = QLabel()
         self.copyright_lbl.setAlignment(Qt.AlignCenter)
         self.copyright_lbl.setText('\n'
-                + _('Copyright 2008-2016 Steve Borho and others'))
+                + _('Copyright 2008-2017 Steve Borho and others'))
         self.vbox.addWidget(self.copyright_lbl)
         self.courtesy_lbl = QLabel()
         self.courtesy_lbl.setAlignment(Qt.AlignCenter)
@@ -66,7 +66,8 @@ class AboutDialog(QDialog):
         self.download_url_lbl.setTextInteractionFlags(Qt.LinksAccessibleByMouse)
         self.download_url_lbl.setOpenExternalLinks(True)
         self.download_url_lbl.setText('<a href=%s>%s</a>' %
-                ('http://tortoisehg.org', _('You can visit our site here')))
+                                      ('https://tortoisehg.bitbucket.io',
+                                       _('You can visit our site here')))
         self.vbox.addWidget(self.download_url_lbl)
 
         # Let's have some space between the url and the buttons.
@@ -109,7 +110,7 @@ class AboutDialog(QDialog):
 
     @pyqtSlot()
     def getUpdateInfo(self):
-        verurl = 'http://tortoisehg.bitbucket.org/curversion.txt'
+        verurl = 'https://tortoisehg.bitbucket.io/curversion.txt'
         # If we use QNetworkAcessManager elsewhere, it should be shared
         # through the application.
         self._netmanager = QNetworkAccessManager(self)

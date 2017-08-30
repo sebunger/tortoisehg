@@ -9,7 +9,7 @@ import os
 import stat
 import shutil
 
-from mercurial import hg, scmutil, ui
+from mercurial import hg, scmutil
 
 from tortoisehg.util import hglib
 from tortoisehg.util.i18n import _, ngettext
@@ -108,7 +108,7 @@ class PurgeDialog(QDialog):
                     repo.lfstatus = True
                     stat = repo.status(ignored=True, unknown=True)
                     repo.lfstatus = False
-                    trashcan = repo.join('Trashcan')
+                    trashcan = repo.vfs.join('Trashcan')
                     if os.path.isdir(trashcan):
                         trash = os.listdir(trashcan)
                     else:
@@ -212,14 +212,14 @@ class PurgeThread(QThread):
             self.showMessage.emit(hglib.tounicode(str(e)))
 
     def purge(self, root, opts):
-        repo = hg.repository(ui.ui(), self.root)
+        repo = hg.repository(hglib.loadui(), self.root)
         keephg = opts['keephg']
         directories = []
         failures = []
 
         if opts['trash']:
             self.showMessage.emit(_('Deleting trash folder...'))
-            trashcan = repo.join('Trashcan')
+            trashcan = repo.vfs.join('Trashcan')
             try:
                 shutil.rmtree(trashcan)
             except EnvironmentError:

@@ -11,9 +11,9 @@ V kontextové nabídce průzkumníka Windows vybereme :menuselection:`TortoiseHg
 	:alt: Clone dialog
 
 	Dialogové okno Klonovat
-	
+
 :guilabel:`Zdroj`
-	Cesta k repozitáři (nebo URL), který má být klonován. Pro výběr lokálního adresáře použijeme tlačítko :guilabel:`Vyhledat...`. 
+	Cesta k repozitáři (nebo URL), který má být klonován. Pro výběr lokálního adresáře použijeme tlačítko :guilabel:`Vyhledat...`.
 :guilabel:`Destinace`
 	Cesta k cílovému adresáři, v němž bude vytvořena složka se stejným názvem jako zdrojový repozitář.
 
@@ -28,7 +28,7 @@ Pod rozšířenou nabídkou expandéru :guilabel:`Možnosti` nalezneme:
 :guilabel:`Použít nekomprimovaný přenos`
 	Pro použití nekomprimovaného transferu (rychlé v LAN).
 :guilabel:`Zahrnout frontu oprávek`
-	Pro klonování repozitáře oprávek MQ spolu s hlavním repozitářem.	
+	Pro klonování repozitáře oprávek MQ spolu s hlavním repozitářem.
 :guilabel:`Použít proxy server`
 	Pro použití proxy serveru, nastaveného v :menuselection:`TortoiseHg... > Globální nastavení > Proxy`.
 	Volba je použitelná jen je-li proxy server nastaven.
@@ -42,7 +42,7 @@ Spuštění z příkazového řádku
 ::
 
 	thg clone
-	
+
 	alias: cl
 
 Skladba příkazu je ::

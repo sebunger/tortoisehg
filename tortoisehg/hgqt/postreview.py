@@ -7,7 +7,7 @@
 
 """A dialog to allow users to post a review to reviewboard
 
-http:///www.reviewboard.org
+https://www.reviewboard.org
 
 This dialog requires a fork of the review board mercurial plugin, maintained
 by mdelagra, that can be downloaded from:
@@ -58,7 +58,7 @@ class LoadReviewDataThread(QThread):
                 msg = _("Invalid reviewboard plugin. Please download the "
                         "Mercurial reviewboard plugin version 3.5 or higher "
                         "from the website below.\n\n %s") % \
-                        u'http://bitbucket.org/mdelagra/mercurial-reviewboard/'
+                        u'https://bitbucket.org/mdelagra/mercurial-reviewboard/'
 
         self.dialog.error_message = msg
 

@@ -23,7 +23,7 @@ Dialogové okno pro archiv repozitáře
 :guilabel:`Pouze soubory upravené či vytvořené v této revizi`
 	Omezíte si počet souborů v archivu.
 :guilabel:`Zabočit do subrepozitářů`
-	Umožňuje přístup do subrepozitářů.	
+	Umožňuje přístup do subrepozitářů.
 :guilabel:`Destinace`
 	Jméno souboru nebo složky, kde bude archiv vytvořen. Jméno se skládá z názvu aktuálního repozitáře s připojeným číslem vybrané revize, případně s příponou vybraného formátu archivního souboru.
 :guilabel:`Typy archivů`
@@ -32,7 +32,7 @@ Dialogové okno pro archiv repozitáře
 	Toto pole zobrazuje příkaz, který bude proveden.
 :guilabel:`Vždy zobrazit výstup`
 	Pro zobrazení záznamového panelu s výsledky prováděného příkazu.
-	
+
 Archivovat repozitář znamená vytvořit archivní soubor nebo podadresář s obsahem vybrané revize.
 
 
@@ -49,6 +49,6 @@ Spuštění z příkazového řádku
 
 kde [REV] je archivovaná revize, [TYPE] je typ vytvářeného archivu, a [DEST] je název souboru nebo složky, která se má vytvořit.
 
-Podrobněji viz `hg.1.html#archive <http://www.selenic.com/mercurial/hg.1.html#archive>`_, nebo zadejte :command:`hg help archive` z příkazového řádku systémové konzoly nebo v panelu Output Log ve Verpánku.
+Podrobněji viz `hg.1.html#archive <https://www.selenic.com/mercurial/hg.1.html#archive>`_, nebo zadejte :command:`hg help archive` z příkazového řádku systémové konzoly nebo v panelu Output Log ve Verpánku.
 
 .. vim: noet ts=4

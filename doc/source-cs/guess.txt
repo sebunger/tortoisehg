@@ -8,7 +8,7 @@ Vypátrat změnu jména
 	:alt: Rename guessing dialog
 
 	Dialog pro hledání změněného názvu
-	
+
 
 Tento dialog se používá pro vyhledání přejmenovaných, přemístěných anebo kopírovaných souborů u nichž k těmto změnám došlo bez vědomí aplikace Mercurial. Dialog lze spustit z kontextové nabídky TortoiseHg (Status souboru, Uhodnout změny názvu)  nebo v kartě Commit.
 

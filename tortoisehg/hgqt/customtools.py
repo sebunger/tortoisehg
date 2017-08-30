@@ -647,7 +647,7 @@ class CustomConfigDialog(QDialog):
     def value(self):
         return None
 
-    def _genCombo(self, items, selecteditem=None):
+    def _genCombo(self, items, selecteditem=None, tooltips=None):
         index = 0
         if selecteditem:
             try:
@@ -658,6 +658,9 @@ class CustomConfigDialog(QDialog):
         combo.addItems(items)
         if index:
             combo.setCurrentIndex(index)
+        if tooltips:
+            for idx, tooltip in enumerate(tooltips):
+                combo.setItemData(idx, tooltip, Qt.ToolTipRole)
         return combo
 
     def _addConfigItem(self, parent, label, configwidget, tooltip=None):
@@ -728,15 +731,22 @@ class CustomToolConfigDialog(CustomConfigDialog):
             QLineEdit(command), _('The command that will be executed.\n'
             'To execute a Mercurial command use "hg" (rather than "hg.exe") '
             'as the executable command.\n'
-            'You can use several {VARIABLES} to compose your command:\n'
+            'You can use several {VARIABLES} to compose your command.\n'
+            'Common variables:\n'
             '- {ROOT}: The path to the current repository root.\n'
-            '- {REV} / {REVID}: the selected revision number / '
-            'hexadecimal revision id hash respectively.\n'
+            '- {REV} / {REVID}: Selected revisions numbers / hexadecimal'
+            ' revision id hashes respectively formatted as a revset'
+            ' expression.\n'
             '- {SELECTEDFILES}: The list of files selected by the user on the '
             'revision details file list.\n'
-            '- {FILES}: The list of files touched by the selected revision.\n'
+            '- {FILES}: The list of files touched by the selected revisions.\n'
             '- {ALLFILES}: All the files tracked by Mercurial on the selected'
-            ' revision.'))
+            ' revisions.\n'
+            'Pair selection variables:\n'
+            '- {REV_A} / {REVID_A}: the first selected revision number / '
+            'hexadecimal revision id hash respectively.\n'
+            '- {REV_B} / {REVID_B}: the second selected revision number / '
+            'hexadecimal revision id hash respectively.\n'))
         self.workingdir = self._addConfigItem(vbox, _('Working Directory'),
             QLineEdit(workingdir),
             _('The directory where the command will be executed.\n'
@@ -843,6 +853,90 @@ class HookConfigDialog(CustomConfigDialog):
         'tag',
         'update',
     )
+
+    _hooktooltips = (
+        _('Run after a changegroup has been added via push, pull or unbundle. '
+            'ID of the first new changeset is in <tt>$HG_NODE</tt> and last in '
+            '<tt>$HG_NODE_LAST</tt>. URL from which changes came is in '
+            '<tt>$HG_URL</tt>.'),
+        _('Run after a changeset has been created in the local repository. ID '
+            'of the newly created changeset is in <tt>$HG_NODE</tt>. Parent '
+            'changeset IDs are in <tt>$HG_PARENT1</tt> and '
+            '<tt>$HG_PARENT2</tt>.'),
+        _('Run after a changeset has been pulled, pushed, or unbundled into '
+            'the local repository. The ID of the newly arrived changeset is in '
+            '<tt>$HG_NODE</tt>. URL that was source of changes came is in '
+            '<tt>$HG_URL</tt>.'),
+        _('Run after sending changes from local repository to another. ID of '
+            'first changeset sent is in <tt>$HG_NODE</tt>. Source of operation '
+            'is in <tt>$HG_SOURCE</tt>.'),
+        _('Run before a changegroup is added via push, pull or unbundle. Exit '
+            'status 0 allows the changegroup to proceed. Non-zero status will '
+            'cause the push, pull or unbundle to fail. URL from which changes '
+            'will come is in <tt>$HG_URL</tt>.'),
+        _('Run before starting a local commit. Exit status 0 allows the commit '
+            'to proceed. Non-zero status will cause the commit to fail. Parent '
+            'changeset IDs are in <tt>$HG_PARENT1</tt> and '
+            '<tt>$HG_PARENT2</tt>.'),
+        _('Run before listing pushkeys (like bookmarks) in the repository. '
+            'Non-zero status will cause failure. The key namespace is in '
+            '<tt>$HG_NAMESPACE</tt>.'),
+        _('Run before collecting changes to send from the local repository to '
+            'another. Non-zero status will cause failure. This lets you '
+            'prevent pull over HTTP or SSH. Also prevents against local pull, '
+            'push (outbound) or bundle commands, but not effective, since you '
+            'can just copy files instead then. Source of operation is in '
+            '<tt>$HG_SOURCE</tt>. If "serve", operation is happening on behalf '
+            'of remote SSH or HTTP repository. If "push", "pull" or "bundle", '
+            'operation is happening on behalf of repository on same system.'),
+        _('Run before a pushkey (like a bookmark) is added to the repository. '
+            'Non-zero status will cause the key to be rejected. The key '
+            'namespace is in <tt>$HG_NAMESPACE</tt>, the key is in '
+            '<tt>$HG_KEY</tt>, the old value (if any) is in <tt>$HG_OLD</tt>, '
+            'and the new value is in <tt>$HG_NEW</tt>.'),
+        _('Run before creating a tag. Exit status 0 allows the tag to be '
+            'created. Non-zero status will cause the tag to fail. ID of '
+            'changeset to tag is in <tt>$HG_NODE</tt>. Name of tag is in '
+            '<tt>$HG_TAG</tt>. Tag is local if <tt>$HG_LOCAL=1</tt>, in '
+            'repository if <tt>$HG_LOCAL=0</tt>.'),
+        _('Run after a changegroup has been added via push, pull or unbundle, '
+            'but before the transaction has been committed. Changegroup is '
+            'visible to hook program. This lets you validate incoming changes '
+            'before accepting them. Passed the ID of the first new changeset '
+            'in <tt>$HG_NODE</tt> and last in <tt>$HG_NODE_LAST</tt>. Exit '
+            'status 0 allows the transaction to commit. Non-zero status will '
+            'cause the transaction to be rolled back and the push, pull or '
+            'unbundle will fail. URL that was source of changes is in '
+            '<tt>$HG_URL</tt>.'),
+        _('Run after a changeset has been created but the transaction not yet '
+            'committed. Changeset is visible to hook program. This lets you '
+            'validate commit message and changes. Exit status 0 allows the '
+            'commit to proceed. Non-zero status will cause the transaction to '
+            'be rolled back. ID of changeset is in <tt>$HG_NODE</tt>. Parent '
+            'changeset IDs are in <tt>$HG_PARENT1</tt> and '
+            '<tt>$HG_PARENT2</tt>.'),
+        _('Run before updating the working directory. Exit status 0 allows the '
+            'update to proceed. Non-zero status will prevent the update. '
+            'Changeset ID of first new parent is in <tt>$HG_PARENT1</tt>. '
+            'If merge, ID of second new parent is in <tt>$HG_PARENT2</tt>.'),
+        _('Run after listing pushkeys (like bookmarks) in the repository. The '
+            'key namespace is in <tt>$HG_NAMESPACE</tt>. <tt>$HG_VALUES</tt> '
+            'is a dictionary containing the keys and values.'),
+        _('Run after a pushkey (like a bookmark) is added to the repository. '
+            'The key namespace is in <tt>$HG_NAMESPACE</tt>, the key is in '
+            '<tt>$HG_KEY</tt>, the old value (if any) is in <tt>$HG_OLD</tt>, '
+            'and the new value is in <tt>$HG_NEW</tt>.'),
+        _('Run after a tag is created. ID of tagged changeset is in '
+            '<tt>$HG_NODE</tt>. Name of tag is in <tt>$HG_TAG</tt>. Tag is '
+            'local if <tt>$HG_LOCAL=1</tt>, in repository if '
+            '<tt>$HG_LOCAL=0</tt>.'),
+        _('Run after updating the working directory. Changeset ID of first new '
+            'parent is in <tt>$HG_PARENT1</tt>. If merge, ID of second new '
+            'parent is in <tt>$HG_PARENT2</tt>. If the update succeeded, '
+            '<tt>$HG_ERROR=0</tt>. If the update failed (e.g. because '
+            'conflicts not resolved), <tt>$HG_ERROR=1</tt>.'),
+    )
+
     _rehookname = re.compile('^[^=\s]*$')
 
     def __init__(self, parent=None, hooktype=None, command='', hookname=''):
@@ -852,7 +946,7 @@ class HookConfigDialog(CustomConfigDialog):
             windowIcon=qtlib.geticon('tools-hooks'))
 
         vbox = self.formvbox
-        combo = self._genCombo(self._hooktypes, hooktype)
+        combo = self._genCombo(self._hooktypes, hooktype, self._hooktooltips)
         self.hooktype = self._addConfigItem(vbox, _('Hook type'),
             combo, _('Select when your command will be run'))
         self.name = self._addConfigItem(vbox, _('Tool name'),

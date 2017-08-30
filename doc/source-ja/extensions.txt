@@ -12,7 +12,7 @@ Mercurial の拡張機能について述べます。これらの拡張機能は 
 Hgfold
 ======
 
-`hgfold <http://mercurial.selenic.com/wiki/CaseFoldExtension>`_
+`hgfold <https://www.mercurial-scm.org/wiki/CaseFoldExtension>`_
 は VFAT および NTFS 上におけるファイル名の大文字小文字の違いによる名前衝突を回避したい
 Windows ユーザ向けの Mercurial 拡張機能です。
 
@@ -48,7 +48,7 @@ Windows ユーザ向けの Mercurial 拡張機能です。
 Hgcr-gui
 ========
 
-`コードレビュー <http://bitbucket.org/glimchb/hgcr-gui/wiki/Home>`_ 管理ツール
+`コードレビュー <https://bitbucket.org/glimchb/hgcr-gui/wiki/Home>`_ 管理ツール
 
 * この拡張機能はプロジェクトのコードレビューを管理します。
 * レビュー管理を Mercurial 内で完結させます。
@@ -119,14 +119,13 @@ hgeol は将来 win32text 拡張機能に取って代わる拡張機能で、
 まだ未確定な部分も多く、頻繁に内容が書き変わることが予想されるため、
 ここに詳細な説明を書くかわりにリンクを張っておきます。
 
-* `EOLTranslationPlan <http://mercurial.selenic.com/wiki/EOLTranslationPlan>`_
-* `ソースコード <http://bitbucket.org/mg/hg-eol/>`_
+* `EolExtension <https://www.mercurial-scm.org/wiki/EolExtension>`_
 
 Mercurial-Keyring
 =================
 
-* `Mercurial Keyring <http://pypi.python.org/pypi/mercurial_keyring>`_ ウェブサイト
-* `Keyring 拡張機能 <http://mercurial.selenic.com/wiki/KeyringExtension>`_ Wiki
+* `Mercurial Keyring <https://pypi.python.org/pypi/mercurial_keyring>`_ ウェブサイト
+* `Keyring 拡張機能 <https://www.mercurial-scm.org/wiki/KeyringExtension>`_ Wiki
 
 keyring 拡張機能は安全に認証パスワード (HTTP/HTTPS and SMTP) をシステム固有の
 パスワードデータベース (Gnome Keyring, KDE KWallet, OSXKeyChain, Win32,
@@ -157,13 +156,13 @@ HTTP パスワードの入力を促し、それをパスワードデータベー
 使用しているシステムに最適なバックエンドは自動的に選択されますが、
 必要に応じて ~/keyringrc.cfg ファイル (ユーザのホームディレクトリの
 keyringrc.cfg ファイル) を設定することで指定可能です。
-設定に関する詳細は `keyring ドキュメント <http://pypi.python.org/pypi/keyring>`_
+設定に関する詳細は `keyring ドキュメント <https://pypi.python.org/pypi/keyring>`_
 を参照してください。
 
 .. note::
 	Windows XP 以降の Windows では、暗号化されたパスワードは
-	`CredRead <http://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ と
-	`CredWrite <http://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
+	`CredRead <https://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ と
+	`CredWrite <https://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
 	を用いて、Credentials Subsystem に保管されます。
 
 .. note::
@@ -200,7 +199,7 @@ keyringrc.cfg ファイル) を設定することで指定可能です。
 	Mercurial 標準の動作になるということです。
 
 Mercurial の認証に関するより詳しい説明はマニュアルの
-`[auth] <http://www.selenic.com/mercurial/hgrc.5.html#auth>`_
+`[auth] <https://www.selenic.com/mercurial/hgrc.5.html#auth>`_
 セクションにあります。
 
 **リポジトリの設定 (SMTP)**

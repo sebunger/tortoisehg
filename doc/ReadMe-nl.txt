@@ -28,7 +28,7 @@ Hacking in de broncode
 Volg aub onderstaande regels als u de bronbestanden van de documentatie gaat
 aanpassen.
 
-- Zoals voorgesteld door Sphinx (zie http://sphinx.pocoo.org/rest.html#sections) gebruik:
+- Zoals voorgesteld door Sphinx (zie http://www.sphinx-doc.org/en/stable/rest.html#sections) gebruik:
 
   ***************
   Hoofdstuk titel

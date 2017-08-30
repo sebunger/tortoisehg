@@ -12,19 +12,21 @@ import os
 import socket
 
 from mercurial import (
-    cmdutil,
     extensions,
     sslutil,
     util,
 )
 
-from tortoisehg.util import hgversion
+from tortoisehg.util import (
+    hglib,
+    hgversion,
+)
 from tortoisehg.util.i18n import agettext as _
 
 cmdtable = {}
 _mqcmdtable = {}
-command = cmdutil.command(cmdtable)
-mqcommand = cmdutil.command(_mqcmdtable)
+command = hglib.command(cmdtable)
+mqcommand = hglib.command(_mqcmdtable)
 testedwith = hgversion.testedwith
 
 @command('debuggethostfingerprint',
@@ -57,8 +59,9 @@ def debuggethostfingerprint(ui, repo, source='default', **opts):
     finally:
         sock.close()
 
-    s = hashlib.sha1(peercert).hexdigest()
-    ui.write(':'.join([s[x:x + 2] for x in xrange(0, len(s), 2)]), '\n')
+    s = hashlib.sha256(peercert).hexdigest()
+    ui.write('sha256:', ':'.join([s[x:x + 2] for x in xrange(0, len(s), 2)]),
+             '\n')
 
 def postinitskel(ui, repo, hooktype, result, pats, **kwargs):
     """create common files in new repository"""

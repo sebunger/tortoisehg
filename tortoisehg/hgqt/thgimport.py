@@ -137,7 +137,8 @@ class ImportDialog(QDialog):
         self.checkStatus()
 
     def checkStatus(self):
-        self.repo.dirstate.invalidate()
+        self.repo.invalidatedirstate()
+
         wctx = self.repo[None]
         M, A, R = wctx.status()[:3]
         if M or A or R:

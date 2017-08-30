@@ -25,7 +25,7 @@ Každá repozitářová karta je propojena s úkonovými kartami (Podrobnosti re
 K disposici jsou také tři parkovatelné panely - *Seznam repozitářů*, *Fronta oprávek* a Výstupní konzola* (Output Log). První zobrazuje stromovou strukturu lokálních repozitářů v počítači, druhý panel se použije při manipulaci s oprávkami (patches) a třetí panel zobrazuje aktuálně prováděné příkazy a lze jej použít i pro zadávání příkazů.
 
 Zobrazení příkazového řádku Mercuriálu
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Ve snaze poučit uživatele o použitých příkazech Mercuriálu, jsou téměř všechny příkazy souběžně zobrazovány ve výstupní konzole, včetně následného výstupu z Mercuriálu.
 
@@ -36,9 +36,9 @@ Nástroj Resolve, uvážlivá sloučení
 
 TortoiseHg 2.0 zavádí dialog 'resolve' pro řešení konfliktů při slučování souborů. Ukazuje uživateli všechny soubory, které potřebují řešení i soubory již rozřešené, umožňujíce kontrolu sloučení.
 
-Za podpory procedury 'resolve' mohou být jednotlivá sloučení restartována tak často, jak je pro správné sloučení souborů zapotřebí. 
+Za podpory procedury 'resolve' mohou být jednotlivá sloučení restartována tak často, jak je pro správné sloučení souborů zapotřebí.
 
-Proceduru 'resolve' použije TortoiseHg implicitně k řešení všech konfliktů. Pokud je úspěšné, dojde k automatickéhu sloučení, pokud ne, musí konflikt vyřešit uživatel. 
+Proceduru 'resolve' použije TortoiseHg implicitně k řešení všech konfliktů. Pokud je úspěšné, dojde k automatickéhu sloučení, pokud ne, musí konflikt vyřešit uživatel.
 
 
 Zlepšené odkládání souborů
@@ -48,7 +48,7 @@ Tortoise 2.0 obsahuje nový odkládací nástroj zvaný 'shelve' který umí př
 
 Sady revizí
 ^^^^^^^^^^^
-Lištu pro nastavení filtru v Repozitory Explorer jsme ve Verpánku nahradili Pracovní lištou filtru pro výběr sad revizí (implicitně není zobrazena). Sady revizí byly zavedeny v Mercurialu 1.6 a byly v každém dalším vydání integrovány se stoupajícím počtem příkazů. Je to mocný dotazovací nástroj pro vyhledávání revizí v repozitáři. 
+Lištu pro nastavení filtru v Repozitory Explorer jsme ve Verpánku nahradili Pracovní lištou filtru pro výběr sad revizí (implicitně není zobrazena). Sady revizí byly zavedeny v Mercurialu 1.6 a byly v každém dalším vydání integrovány se stoupajícím počtem příkazů. Je to mocný dotazovací nástroj pro vyhledávání revizí v repozitáři.
 
 Verpánek obsahuje také editor sady revizí, který je zdrojem poučení o dostupných klíčových slovech a jejich argumentech, a má schopnost doplňovat otevřené závorky, počatá slova a další.
 
@@ -60,15 +60,15 @@ Technologie
 Qt a PyQt
 ^^^^^^^^^
 
-Téměř všechny nástroje a dialogy v TortoiseHg 2.0 byly přepsány pro využití vynikajících aplikací `Qt <http://qt.nokia.com/products>`_  a  `PyQt <http://www.riverbankcomputing.co.uk/software/pyqt/intro>`_. 
+Téměř všechny nástroje a dialogy v TortoiseHg 2.0 byly přepsány pro využití vynikajících aplikací `Qt <https://www.qt.io/>`_  a  `PyQt <https://www.riverbankcomputing.com/software/pyqt/intro>`_.
 
 QScintilla2
 ^^^^^^^^^^^
 
-TortoiseHg používá značnou měrou editovací komponenty aplikace `QScintilla2 <http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/index.html>`_ pro:
+TortoiseHg používá značnou měrou editovací komponenty aplikace `QScintilla2 <http://pyqt.sourceforge.net/Docs/QScintilla2/>`_ pro:
 * zobrazení souborů a diffů se zvýrazněním syntaxe
 * zobrazení anotací se zvýrazněním syntaxe
-* editaci komitových zpráv s automatickým dokončováním jmen souborů a zdrojových symbolů 
+* editaci komitových zpráv s automatickým dokončováním jmen souborů a zdrojových symbolů
 * editaci řetězců sad revizí (revision set strings) s doplňováním závorek a s automatickým dokončováním.
 
 Délku tabulátoru lze nastavit v konfiguračním nástroji, zatímco délky řádků a viditelnost "white space" jsou ovládány z kontextových menu.

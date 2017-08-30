@@ -632,7 +632,6 @@ class StatusThread(QThread):
         self.patchecked = {}
 
     def run(self):
-        self.repo.dirstate.invalidate()
         extract = lambda x, y: dict(zip(x, map(y.get, x)))
         stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
         patchecked = {}

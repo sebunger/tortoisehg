@@ -4,7 +4,7 @@ TortoiseHg in daily use
 
 .. toctree::
 	:maxdepth: 3
-	
+
 	common
 	explorer
 	nautilus

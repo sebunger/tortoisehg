@@ -296,7 +296,7 @@ class ShelveDialog(QDialog):
                 return
         try:
             fn = os.path.join('shelves', shelve)
-            shelfpath = self.repo.join(fn)
+            shelfpath = self.repo.vfs.join(fn)
             if os.path.exists(shelfpath):
                 qtlib.ErrorMsgBox(_('File already exists'),
                                   _('A shelf file of that name already exists'))

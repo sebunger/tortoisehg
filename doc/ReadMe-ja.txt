@@ -28,8 +28,8 @@ CHM 形式と PDF 形式で出力することができます。
 マニュアルのソースファイルを変更する場合は以下のガイドラインに従ってください。
 
 - このガイドラインは Sphinx 推奨のものです:
-  http://sphinx.pocoo.org/rest.html#sections
-  
+  http://www.sphinx-doc.org/en/stable/rest.html#sections
+
   *********
   章タイトル
   *********

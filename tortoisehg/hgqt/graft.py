@@ -27,7 +27,7 @@ class GraftDialog(QDialog):
 
         self._repoagent = repoagent
         self._cmdsession = cmdcore.nullCmdSession()
-        self._graftstatefile = self.repo.join('graftstate')
+        self._graftstatefile = self.repo.vfs.join('graftstate')
         self.valid = True
 
         def cleanrevlist(revlist):
@@ -198,7 +198,7 @@ class GraftDialog(QDialog):
         sess.commandFinished.connect(self._abortFinished)
 
     def graftstate(self):
-        graftstatefile = self.repo.join('graftstate')
+        graftstatefile = self.repo.vfs.join('graftstate')
         if os.path.exists(graftstatefile):
             f = open(graftstatefile, 'r')
             info = f.readlines()

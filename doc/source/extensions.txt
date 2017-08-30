@@ -13,7 +13,7 @@ soon as they are needed.
 Hgfold
 ======
 
-`hgfold <http://mercurial.selenic.com/wiki/CaseFoldExtension>`_ is a
+`hgfold <https://www.mercurial-scm.org/wiki/CaseFoldExtension>`_ is a
 Mercurial extension that helps Windows users deal with filename case
 collisions on VFAT and NTFS.
 
@@ -22,7 +22,7 @@ It adds options to the following Mercurial commands. Type
 
 	up    - allows you to update to a revision with filename collisions
 	merge - allows you to merge with a changeset that would create filename collisions
-    
+
 The extension does not currently do anything to prevent filename
 collisions. See discussion on the Mercurial Wiki
 
@@ -37,7 +37,7 @@ You may want to add it to your Mercurial.ini or a repository's hgrc like this::
 
 	[extensions]
 	fold=
- 
+
 If you do this, you can omit the --config command-line option.
 
 **Warnings**
@@ -58,12 +58,12 @@ page.
 
 This extension is documented in :ref:`perfarce-perforce` section of
 :doc:`nonhg` chapter.
- 
+
 Mercurial-Keyring
 =================
 
-* `Mercurial Keyring <http://pypi.python.org/pypi/mercurial_keyring>`_ home page
-* `Keyring Extension <http://mercurial.selenic.com/wiki/KeyringExtension>`_ wiki page
+* `Mercurial Keyring <https://pypi.python.org/pypi/mercurial_keyring>`_ home page
+* `Keyring Extension <https://www.mercurial-scm.org/wiki/KeyringExtension>`_ wiki page
 
 Keyring extension uses services of the keyring library to securely save
 authentication passwords (HTTP/HTTPS and SMTP) using system specific
@@ -99,13 +99,13 @@ The most appropriate password backend should usually be picked automatically,
 without configuration. Still, if necessary, it can be configured using
 :file:`~/keyringrc.cfg` file (:file:`keyringrc.cfg` in the home directory of
 the current user).
-Refer to `keyring docs <http://pypi.python.org/pypi/keyring>`_
+Refer to `keyring docs <https://pypi.python.org/pypi/keyring>`_
 for more details.
 
 .. note::
 	On Windows XP and above, your encrypted passwords are stored in the
 	credentials subsystem using
-	`CredRead <http://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ and `CredWrite <http://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
+	`CredRead <https://msdn.microsoft.com/en-us/library/aa374804%28VS.85%29.aspx>`_ and `CredWrite <https://msdn.microsoft.com/en-us/library/aa375187%28VS.85%29.aspx>`_
 
 .. note::
 	On Windows 2K, the encrypted passwords are stored in the system
@@ -136,7 +136,7 @@ Simpler form with url-embedded name can also be used::
 	without saving the password. So, in both cases, it is effectively
 	reverting to the default behaviour.
 
-Consult `[auth] <http://www.selenic.com/mercurial/hgrc.5.html#auth>`_
+Consult `[auth] <https://www.mercurial-scm.org/mercurial/hgrc.5.html#auth>`_
 section documentation for more details.
 
 **Repository configuration (SMTP)**
@@ -162,14 +162,14 @@ to use the extension, in other cases it will revert to the default behaviour.
 
 Configure the repository as above, then just pull and push (or email) You
 should be asked for the password only once (per every username +
-remote_repository_url combination). 
+remote_repository_url combination).
 
 .. vim: noet ts=4
 
 projrc
 ======
 
-`projrc <http://mercurial.selenic.com/wiki/ProjrcExtension>`_ is an extension
+`projrc <https://www.mercurial-scm.org/wiki/ProjrcExtension>`_ is an extension
 that makes Mercurial look for and parse .hg/projrc for additional
 configuration settings.The file is transferred on clone and on pull
 (but never on push), after confirmation by the user, from a list of servers
@@ -183,7 +183,7 @@ This is useful for centralized setups where you want to distribute
 configuration settings to all repositories with a minimum amount of setup.
 In particular, it can be used to remap subrepository sources, as explained
 on Mercurial's
-`SubrepoRemappingPlan <http://mercurial.selenic.com/wiki/SubrepoRemappingPlan>`_.
+`SubrepoRemappingPlan <https://www.mercurial-scm.org/wiki/SubrepoRemappingPlan>`_.
 
 **Configuration**
 
@@ -253,7 +253,7 @@ key match, in the following order:
 
     * full key, exact matches are considered the most explicit (e.g.
       "''`ui.merge`''");
-    * pattern (glob) matches are considered next (e.g. 
+    * pattern (glob) matches are considered next (e.g.
       "''`auth.bitbucket.com.*`''"), with the longest matching pattern being the
       most explicit;
     * section level matches (e.g. "''`ui`''");
@@ -298,20 +298,20 @@ the settings specified in the repository .hg/hgrc file).
 For the most up to date information regarding this extension, to see several
 detailed usage examples and to learn how to use it and configure it from the
 command line, please go to the extension's
-`Wiki <http://mercurial.selenic.com/wiki/ProjrcExtension>`_.
+`Wiki <https://www.mercurial-scm.org/wiki/ProjrcExtension>`_.
 
 pbranch
 =======
 
-Patch Branches (`pbranch <http://mercurial.selenic.com/wiki/PatchBranchExtension>`_) 
-is a way to develop a series of patches for submission into a main 
-repo. It is based on topic branches, one per patch, and is thus highly 
-suitable for collaborative and/or long-term patch development and 
+Patch Branches (`pbranch <https://www.mercurial-scm.org/wiki/PatchBranchExtension>`_)
+is a way to develop a series of patches for submission into a main
+repo. It is based on topic branches, one per patch, and is thus highly
+suitable for collaborative and/or long-term patch development and
 maintenance.
 
 `A detailed manual <http://arrenbrecht.ch/mercurial/pbranch/>`_ can be found online.
 
-It adds a number of commands which can be listed with 
+It adds a number of commands which can be listed with
 :command:`hg help pbranch`::
 
  pbackout       - backs out the current patch branch (undoes all its changes)
@@ -333,12 +333,12 @@ TortoiseHg will provide a new task tab that shows the patch dependency graph.
 	:alt: Pbranch task tab
 
 	Pbranch task tab
- 
+
 
 **Installation**
 
-As this extension is not installed with TortoiseHg, you have to download 
-it from `<http://bitbucket.org/parren/hg-pbranch>`_. Be sure to dowload the
+As this extension is not installed with TortoiseHg, you have to download
+it from `<https://bitbucket.org/parren/hg-pbranch>`_. Be sure to dowload the
 right one according to the Mercurial version included with TortoiseHg (see the
 wiki page on the download site).
 To test the use of this plugin, you can specify it on the Mercurial
@@ -350,5 +350,5 @@ You may want to add it to your Mercurial.ini or a repository's hgrc like this::
 
 	[extensions]
 	pbranch = C:\path\to\pbranch.py
- 
+
 If you do this, you can omit the --config command-line option.

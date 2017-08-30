@@ -1,4 +1,4 @@
-Debugging 
+Debugging
 ==========
 
 .. module:: debugging
@@ -28,7 +28,7 @@ Linux/MacOSX
 ~~~~~~~~~~~~
 
 Podobně jako ve Windows::
-    
+
     export THGDEBUG=1
     thg --nofork log
 
@@ -42,10 +42,10 @@ Způsob odladění závisí na platformě.
 Windows
 ~~~~~~~
 
-Viz také `Debugging with the shell <http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx>`_ kde jsou informace o spuštění a testování extenzí shellu ve Windows.
+Viz také `Debugging with the shell <https://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx>`_ kde jsou informace o spuštění a testování extenzí shellu ve Windows.
 
 Nástroj :command:`DbgView` ze sady SysInternals odchytí chybovou zprávu
- z extenze shellu.  Shell ovšem ladící informace neemituje implicitně. Je nutné to povolit editací klíče registru, definovaného v 
+ z extenze shellu.  Shell ovšem ladící informace neemituje implicitně. Je nutné to povolit editací klíče registru, definovaného v
 :file:`win32/shellext/DebugShellExt.reg`
     v repozitáři TortoiseHg. Dvojklikem na souboru můžete načíst klíč do svého registru.
 
@@ -60,7 +60,7 @@ Ladění se provádí prostřednictvím proměnné DEBUG_THG
 
     DEBUG_THG=Ne TMPDIR=/tmp/anydir/ --no-desktop nautilus [path]
 
-* pro testování v hlavní instanci:: 
+* pro testování v hlavní instanci::
 
     nautilus -q
     DEBUG_THG=NOe nautilus

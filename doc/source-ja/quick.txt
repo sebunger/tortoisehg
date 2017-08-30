@@ -276,7 +276,7 @@ TortoiseHg には専用のダイアログが用意されています。
 	マージ作業に失敗したとしても安全に最初からマージ作業を始めることが可能です。
 
 Mercurial は共同作業を簡単に、素早く、効率的にします。
-詳しくは Mercurial の `wiki <http://mercurial.selenic.com/wiki/>`_
+詳しくは Mercurial の `wiki <https://www.mercurial-scm.org/wiki/>`_
 をご覧ください。
 
 .. vim: noet ts=4

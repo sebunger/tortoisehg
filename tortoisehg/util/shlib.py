@@ -111,7 +111,7 @@ if os.name == 'nt':
         update = False
         f = None
         try:
-            f = repo.opener('thgstatus', 'rb')
+            f = repo.vfs('thgstatus', 'rb')
             for dn in sorted(dirstatus):
                 s = dirstatus[dn]
                 e = f.readline()
@@ -130,7 +130,7 @@ if os.name == 'nt':
                 f.close()
 
         if update:
-            f = repo.opener('thgstatus', 'wb', atomictemp=True)
+            f = repo.vfs('thgstatus', 'wb', atomictemp=True)
             for dn in sorted(dirstatus):
                 s = dirstatus[dn]
                 f.write(s + dn + '\n')

@@ -7,14 +7,14 @@
 
 この章では他のバージョン管理システムと相互運用するために使用される3つの
 Mercurial 拡張機能について述べます。 `リポジトリの変換
-<http://mercurial.selenic.com/wiki/RepositoryConversion>`_
+<https://www.mercurial-scm.org/wiki/RepositoryConversion>`_
 も参照してください。
 
 Perfarce (Perforce)
 ===================
 
 * `Perfarce <http://www.kingswood-consulting.co.uk/hg/perfarce/>`_ ウェブサイト
-* `Perforce ユーザのための Mercurial <http://mercurial.selenic.com/wiki/PerforceConcepts>`_
+* `Perforce ユーザのための Mercurial <https://www.mercurial-scm.org/wiki/PerforceConcepts>`_
 
 この拡張機能は Perforce サーバ上の名前付き Perforce
 クライアント仕様に基いて ::
@@ -99,9 +99,9 @@ pending::
 hgsubversion (SVN)
 ==================
 
-* `hgsubversion <http://bitbucket.org/durin42/hgsubversion/wiki/Home>`_ ウェブサイト
-* `hgsubversion 拡張機能 <http://mercurial.selenic.com/wiki/HgSubversion>`_ Wiki
-* `Subversion リポジトリを使う <http://mercurial.selenic.com/wiki/WorkingWithSubversion>`_
+* `hgsubversion <https://bitbucket.org/durin42/hgsubversion/wiki/Home>`_ ウェブサイト
+* `hgsubversion 拡張機能 <https://www.mercurial-scm.org/wiki/HgSubversion>`_ Wiki
+* `Subversion リポジトリを使う <https://www.mercurial-scm.org/wiki/WorkingWithSubversion>`_
 
 hgsubversion はその名前の通り、Mercurial を Subversion
 サーバのクライアントとして使用するための拡張機能です。また Subversion
@@ -113,7 +113,7 @@ TortoiseHg の Windows インストーラは hgsubversion が必要とする Pyt
 SVN ライブラリを同梱しているため、以下の hgsubversion
 リポジトリをローカルにクローンするだけで使えます： ::
 
-	hg clone http://bitbucket.org/durin42/hgsubversion/ C:\hgsvn
+	hg clone https://bitbucket.org/durin42/hgsubversion/ C:\hgsvn
 
 そして次のようにしてクローンしたリポジトリの中を指すようにして hgsubversion
 拡張機能を Mercurial.ini で有効にします： ::
@@ -138,11 +138,11 @@ Subversion リポジトリからインポートしたチェンジセットには
 におけるバージョン番号がログビューアに表示されます。
 
 hg-git (git)
-============ 
+============
 
-* `hg-git <http://hg-git.github.com/>`_ ウェブサイト
-* `hg-git 拡張機能 <http://mercurial.selenic.com/wiki/HgGit>`_ Wiki
-* `Git ユーザのための Mercurial <http://mercurial.selenic.com/wiki/GitConcepts>`_
+* `hg-git <https://hg-git.github.io/>`_ ウェブサイト
+* `hg-git 拡張機能 <https://www.mercurial-scm.org/wiki/HgGit>`_ Wiki
+* `Git ユーザのための Mercurial <https://www.mercurial-scm.org/wiki/GitConcepts>`_
 
 hg-git はその名前の通り、Mercurial を git サーバのクライアントとして使用するための拡張機能です。
 また git リポジトリを Mercurial のリポジトリに変換するのにも使えます。
@@ -153,7 +153,7 @@ TortoiseHg の Windows インストーラは hg-git が必要とする Python �
 git ライブラリ (dulwich) を同梱しているため、以下の hg-git
 リポジトリをローカルにクローンするだけで使えます： ::
 
-	hg clone http://bitbucket.org/durin42/hg-git/ C:\hg-git
+	hg clone https://bitbucket.org/durin42/hg-git/ C:\hg-git
 
 Mercurial.ini ファイルで hggit と bookmarks 拡張機能を有効にしてください： ::
 

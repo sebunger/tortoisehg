@@ -31,7 +31,7 @@ class CheckThread(QThread):
 
     def run(self):
         self.repo.invalidate()
-        self.repo.dirstate.invalidate()
+        self.repo.invalidatedirstate()
         unresolved = False
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
             if self.canceled:

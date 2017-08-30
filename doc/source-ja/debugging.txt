@@ -53,7 +53,7 @@ Linux または MacOSX
 Windows エクスプローラ
 ~~~~~~~~~~~~~~~~~~~~~~
 
-http://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx に
+https://msdn.microsoft.com/en-us/library/cc144064(VS.85).aspx に
 Windows シェル拡張を実行・デバッグするための情報が掲載されています。
 
 SysInternals による :command:`DbgView` ツールはシェル拡張からのデバッッグ情報を

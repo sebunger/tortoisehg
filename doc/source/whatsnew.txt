@@ -91,16 +91,16 @@ Qt and PyQt
 ~~~~~~~~~~~
 
 TortoiseHg 2.0 has been a near rewrite of all of the tools and dialogs
-taking advantage of Digia's excellent `Qt <https://qt-project.org/>`_
+taking advantage of Digia's excellent `Qt <https://www.qt.io/>`_
 UI framework and Riverbank Computing's fine
-`PyQt <http://www.riverbankcomputing.co.uk/software/pyqt/intro>`_ Python
+`PyQt <https://www.riverbankcomputing.com/software/pyqt/intro>`_ Python
 bindings.
 
 QScintilla2
 ~~~~~~~~~~~
 
 TortoiseHg uses the `QScintilla2
-<http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/index.html>`_
+<http://pyqt.sourceforge.net/Docs/QScintilla2/>`_
 editing component extensively to:
 
 * display file contents and diffs with syntax highlighting

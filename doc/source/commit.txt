@@ -25,7 +25,7 @@ Enumerating the toolbar buttons:
 		this is informational only, but pressing this button opens up a
 		branch maintenance dialog.  Do not use this feature unless you
 		understand Mercurial's
-		`named branches <http://mercurial.selenic.com/wiki/NamedBranches>`_.
+		`named branches <https://www.mercurial-scm.org/wiki/NamedBranches>`_.
 	:guilabel:`Recent Commit Messages`
 		A drop-down list of the 10 most recent commit messages. The
 		the drop-down list is filled the first time it is opened.
@@ -115,7 +115,7 @@ selection feature is sometimes referred to as **partial commit**).
 Partially selected files are displayed in the file list with a special
 partial check state.
 
-The diff view pane has a context menu option for configuring the 
+The diff view pane has a context menu option for configuring the
 marking of excluded changes.  :menuselection:`Mark excluded changes`
 toggles a strike-through indicator on excluded changes.  This setting is
 primarily a personal preference, but future versions of TortoiseHg may
@@ -123,7 +123,7 @@ extend the use of the strike-through indicator for partial exclusion of
 individual changes.
 
 This new partial selection feature is similar to hgtk's
-`chunk selection <http://tortoisehg.bitbucket.org/manual/0.9/commit.html#change-selection>`_,
+`chunk selection <https://tortoisehg.bitbucket.io/manual/0.9/commit.html#change-selection>`_,
 but is superior in several ways:
 
 1) Change selection is integrated directly into the diff view. No mode
@@ -236,7 +236,7 @@ has these two configurables for commit message policy:
 Subrepositories
 ---------------
 
-A `subrepository <http://mercurial.selenic.com/wiki/subrepos>`_
+A `subrepository <https://www.mercurial-scm.org/wiki/Subrepository>`_
 is a feature introduced in Mercurial 1.3.  It allows one Mercurial
 repository to store references to external Mercurial (or potentially
 other VCS) repositories, and to include the state of those external
@@ -291,7 +291,7 @@ The commit tool can be started from command line::
 	use "thg -v help commit" to show global options
 
 For a quick help on the format of date type::
-	
+
 	hg help dates
 
 .. vim: noet ts=4

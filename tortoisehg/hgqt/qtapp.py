@@ -170,7 +170,7 @@ class ExceptionCatcher(QObject):
 
     if os.name == 'posix':
         # Wake up Python interpreter via pipe so that SIGINT can be handled
-        # immediately.  (http://qt-project.org/doc/qt-4.8/unix-signals.html)
+        # immediately.  (https://doc.qt.io/qt-4.8/unix-signals.html)
 
         def _initWakeup(self):
             import fcntl
@@ -344,7 +344,7 @@ class QtRunner(QObject):
 
     NOTE: This object will be instantiated before QApplication, it means
     there's a limitation on Qt's event handling. See
-    http://doc.qt.nokia.com/4.6/threads-qobject.html#per-thread-event-loop
+    https://doc.qt.io/qt-4.8/threads-qobject.html#per-thread-event-loop
     """
 
     def __init__(self):
@@ -445,7 +445,7 @@ class QtRunner(QObject):
 
     def _fixlibrarypaths(self):
         # make sure to use the bundled Qt plugins to avoid ABI incompatibility
-        # http://qt-project.org/doc/qt-4.8/deployment-windows.html#qt-plugins
+        # https://doc.qt.io/qt-4.8/deployment-windows.html#qt-plugins
         if os.name == 'nt' and getattr(sys, 'frozen', False):
             self._mainapp.setLibraryPaths([self._mainapp.applicationDirPath()])
 

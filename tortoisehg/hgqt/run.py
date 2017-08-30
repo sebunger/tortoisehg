@@ -7,20 +7,19 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 shortlicense = '''
-Copyright (C) 2008-2016 Steve Borho <steve@borho.org> and others.
+Copyright (C) 2008-2017 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
 
+import getopt
 import os
 import pdb
 import sys
 import subprocess
 
-import mercurial.ui as uimod
 from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
 from mercurial import pathutil
-from mercurial import revset as revsetmod
 
 from tortoisehg.util.i18n import agettext as _
 from tortoisehg.util import hglib, paths, i18n
@@ -41,7 +40,7 @@ def dispatch(args, u=None):
     """run the command specified in args"""
     try:
         if u is None:
-            u = uimod.ui()
+            u = hglib.loadui()
         if '--traceback' in args:
             u.setconfig('ui', 'traceback', 'on')
         if '--debugger' in args:
@@ -98,10 +97,15 @@ else:
         cmdline = list(paths.get_thg_command())
         cmdline.extend(sys.argv[1:])
         os.chdir(_origwdir)
-        # "nul" device is tty on Windows! creates pipe instead
+        # redirect stdout/stderr to "nul" device; otherwise EBADF could occur
+        # on cmd.exe (#4837). for stdin, create a pipe since "nul" is a tty
+        # on Windows! (#4469)
+        nullfd = os.open(os.devnull, os.O_RDWR)
         p = subprocess.Popen(cmdline, stdin=subprocess.PIPE,
+                             stdout=nullfd, stderr=nullfd,
                              creationflags=qtlib.openflags)
         p.stdin.close()
+        os.close(nullfd)
         sys.exit(0)
 
 # Windows and Nautilus shellext execute
@@ -191,7 +195,7 @@ def _parse(ui, args):
 
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
-    except fancyopts.getopt.GetoptError, inst:
+    except getopt.GetoptError, inst:
         raise error.CommandError(None, inst)
 
     if args:
@@ -215,7 +219,7 @@ def _parse(ui, args):
 
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions, True)
-    except fancyopts.getopt.GetoptError, inst:
+    except getopt.GetoptError, inst:
         raise error.CommandError(cmd, inst)
 
     # separate global options back out
@@ -326,6 +330,9 @@ def runcommand(ui, args):
     else:
         # disables interaction with tty as it would block GUI events
         ui.setconfig('ui', 'interactive', 'off', 'qtrun')
+        ui.setconfig('ui', 'paginate', 'off', 'qtrun')
+        # ANSI color output is useless in GUI
+        ui.setconfig('ui', 'color', 'off', 'qtrun')
         portable_fork(ui, options)
         d = lambda: qtrun(checkedfunc, ui, *args, **cmdoptions)
     return _runcommand(lui, options, cmd, d)
@@ -384,7 +391,7 @@ def _runcommand(ui, options, cmd, cmdfunc):
 qtrun = qtapp.QtRunner()
 
 table = {}
-command = cmdutil.command(table)
+command = hglib.command(table)
 
 # common command options
 
@@ -646,7 +653,7 @@ def graft(ui, repoagent, *revs, **opts):
     repo = repoagent.rawRepo()
     revs = list(revs)
     revs.extend(opts['rev'])
-    if not os.path.exists(repo.join('graftstate')) and not revs:
+    if not os.path.exists(repo.vfs.join('graftstate')) and not revs:
         raise util.Abort(_('You must provide revisions to graft'))
     return graftmod.GraftDialog(repoagent, None, source=revs)
 
@@ -993,7 +1000,7 @@ def prune(ui, repoagent, *revs, **opts):
     if len(revs) < 2:
         revspec = ''.join(revs)
     else:
-        revspec = revsetmod.formatspec('%lr', revs)
+        revspec = hglib.formatrevspec('%lr', revs)
     return prunemod.createPruneDialog(repoagent, hglib.tounicode(revspec))
 
 @command('^purge', [], _('thg purge'))
@@ -1013,7 +1020,7 @@ def rebase(ui, repoagent, *pats, **opts):
     """rebase dialog"""
     from tortoisehg.hgqt import rebase as rebasemod
     repo = repoagent.rawRepo()
-    if os.path.exists(repo.join('rebasestate')):
+    if os.path.exists(repo.vfs.join('rebasestate')):
         # TODO: move info dialog into RebaseDialog if possible
         qtlib.InfoMsgBox(hglib.tounicode(_('Rebase already in progress')),
                          hglib.tounicode(_('Resuming rebase already in '
