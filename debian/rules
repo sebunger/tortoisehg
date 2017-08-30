@@ -5,7 +5,9 @@
 
 override_dh_auto_build: debian/thg.1
 	dh_auto_build
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
 	$(MAKE) -C doc html
+endif
 
 override_dh_auto_install:
 	dh_auto_install --destdir=debian/tmp/
@@ -25,11 +27,13 @@ override_dh_auto_clean:
 
 override_dh_installdocs:
 	dh_installdocs --exclude=nautilus-thg.py --exclude=mergetools.rc
+ifeq (,$(filter nodoc,$(DEB_BUILD_OPTIONS)))
 	ln -sf ../../../../javascript/jquery/jquery.js \
 	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/jquery.js
 	ln -sf ../../../../javascript/underscore/underscore.js \
 	    debian/tortoisehg/usr/share/doc/tortoisehg/html/_static/underscore.js
 	ln -sf email.png debian/tortoisehg/usr/share/doc/tortoisehg/html/_images/email1.png
+endif
 
 override_dh_compress:
 	dh_compress -X.js -X_static/* -X "_sources/*"
