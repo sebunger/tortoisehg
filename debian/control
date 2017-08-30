@@ -6,7 +6,7 @@ Uploaders: Max Bowsher <maxb@f2s.com>
 Build-Depends: debhelper (>= 9), python (>= 2.6.6-3~)
 Build-Depends-Indep: docbook-xsl, docbook-xml,
  xsltproc, python-sphinx, pyqt4-dev-tools
-Standards-Version: 3.9.8
+Standards-Version: 4.1.0
 Homepage: https://tortoisehg.bitbucket.io
 Vcs-Git: https://anonscm.debian.org/git/collab-maint/tortoisehg.git
 Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/tortoisehg.git
