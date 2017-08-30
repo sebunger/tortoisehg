@@ -1,8 +1,14 @@
-tortoisehg (4.3.1-1) UNRELEASED; urgency=medium
+tortoisehg (4.3.1-1) unstable; urgency=medium
 
   * Imported Upstream version 4.3.1 (Closes: #873583).
+  * Update upstream homepage URL.
+  * Update copyright dates.
+  * Update dependency on Mercurial.
+  * Add tortoisehg-caja (LP: #1371956).
+  * Bump Standards-Version to 4.1.0.
+  * Support nodoc in DEB_BUILD_OPTIONS.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Wed, 30 Aug 2017 11:00:13 +0200
+ -- Ludovico Cavedon <cavedon@debian.org>  Wed, 30 Aug 2017 12:25:56 +0200
 
 tortoisehg (4.0-1) unstable; urgency=medium
 
@@ -63,7 +69,7 @@ tortoisehg (3.4.1-1) unstable; urgency=low
 
   * Imported Upstream version 3.4.1
   * Update Standards-Version to 3.9.6.
-  * Update dependecy on mercurial to match hgversion.py.
+  * Update dependency on mercurial to match hgversion.py.
 
  -- Ludovico Cavedon <cavedon@debian.org>  Sun, 12 Jul 2015 12:45:11 -0700
 
@@ -251,7 +257,7 @@ tortoisehg (1.1.7-1) experimental; urgency=low
   * New upstream release.
 
   [ Ludovico Cavedon ]
-  * Update dependecy on mercurial to 1.7.
+  * Update dependency on mercurial to 1.7.
 
  -- Ludovico Cavedon <cavedon@debian.org>  Fri, 17 Dec 2010 12:50:22 +0100
 
@@ -268,7 +274,7 @@ tortoisehg (1.1.4-1) experimental; urgency=low
 tortoisehg (1.1.3-1) experimental; urgency=low
 
   * New upstream release.
-  * Add dependecy on python-gnome2 for nautilus plugin (LP: #617235).
+  * Add dependency on python-gnome2 for nautilus plugin (LP: #617235).
   * Bump Standards-Version to 3.9.1.
 
  -- Ludovico Cavedon <cavedon@debian.org>  Tue, 31 Aug 2010 21:40:49 -0700
@@ -282,7 +288,7 @@ tortoisehg (1.1.2-1) experimental; urgency=low
 tortoisehg (1.1.1-1) unstable; urgency=low
 
   * New upstream release.
-  * Set minimum mercurial dependecy to version 1.6 (Closes: #589503).
+  * Set minimum mercurial dependency to version 1.6 (Closes: #589503).
 
  -- Ludovico Cavedon <cavedon@debian.org>  Sun, 18 Jul 2010 16:41:12 +0200
 
