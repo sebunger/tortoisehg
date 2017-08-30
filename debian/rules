@@ -13,6 +13,8 @@ override_dh_auto_install:
 	rm debian/tmp/usr/lib/python*/dist-packages/hgext3rd/__init__.py
 	mkdir -p debian/tmp/etc/mercurial/hgrc.d/
 	install -o 0 -g 0 -m 644 contrib/mergetools.rc debian/tmp/etc/mercurial/hgrc.d/thgmergetools.rc
+	mkdir -p debian/tmp/usr/share/caja-python/extensions/
+	install -o 0 -g 0 -m 644 contrib/nautilus-thg.py debian/tmp/usr/share/caja-python/extensions/caja-thg.py
 
 ## drop automatically created file
 override_dh_auto_clean:

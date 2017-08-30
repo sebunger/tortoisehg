@@ -50,3 +50,23 @@ Description: Graphical tool for working with Mercurial (Nautilus extension)
  .
  This package contains the Nautilus extension for TortoiseHg.
 
+Package: tortoisehg-caja
+Architecture: all
+Depends: mate-icon-theme | gnome-icon-theme-full | gnome-icon-theme,
+         python-gi,
+         python-caja (>= 1.1-2),
+         tortoisehg (>= ${source:Version}),
+         ${misc:Depends},
+         ${python:Depends}
+Recommends: ssh-askpass-gnome | ssh-askpass
+Description: Graphical tool for working with Mercurial (Caja extension)
+ TortoiseHg provides a graphical tool for interacting with the distributed
+ revision control system Mercurial.  GUI support is provided for over a dozen
+ operations, including add files, commit changes, manage ignore filter, view
+ change log, merge, recover/rollback, edit configuration, synchronize
+ repository, and many others.   The highlight is the interactive commit tool
+ which allows easy selection of diffs from multiple files and packaging into
+ changesets, and which is more powerful and easier to use than available
+ alternatives such as qct and hgct (commit-tool).
+ .
+ This package contains the Caja extension for TortoiseHg.
