@@ -17,15 +17,11 @@ Copyright: 2008-2017, Steve Borho <steve@borho.org>
            2010, Johan Samyn <johan.samyn@gmail.com>
            2010, Michal De Wildt <michael.dewildt@gmail.com>
            2010, Peer Sommerlund <peso@users.sourceforge.net>
-           2010, Yuya Nishihara <yuya@tcha.org>
+           2010-2015, Yuya Nishihara <yuya@tcha.org>
            2010, Adrian Buehlmann <adrian@cadifra.com>
            2009, Emmanuel Rosa <goaway1000@gmail.com>
            2007-2008, TK Soh <teekaysoh@gmail.com>
            2007, Brad Schick <brad at gmail dot com>
-License: GPL-2
-
-Files: tortoisehg/hgqt/modeltest.py
-Copyright: 2007, Trolltech ASA
 License: GPL-2
 
 Files: tortoisehg/hgqt/blockmatcher.py
