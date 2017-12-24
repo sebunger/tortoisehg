@@ -8,7 +8,7 @@ Build-Depends-Indep: docbook-xml,
                      docbook-xsl,
                      pyqt5-dev-tools,
                      python-pyqt5,
-                     python-sphinx,
+                     python3-sphinx,
                      xsltproc,
 Standards-Version: 4.1.0
 Homepage: https://tortoisehg.bitbucket.io
