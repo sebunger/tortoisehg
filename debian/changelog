@@ -395,7 +395,7 @@ tortoisehg (0.9.1.1-1) unstable; urgency=low
   [ Ludovico Cavedon ]
   * Lower depends on python to 2.4, according to upstream.
   * Install _hgtk (zhs completions) into proper location for zsh.
-  * Use newer source format 3.0 (quilt). 
+  * Use newer source format 3.0 (quilt).
   * Update Maintainer and remove DM-Upload-Allowed.
   * Update Upstream Homepage.
 
