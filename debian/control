@@ -10,7 +10,7 @@ Build-Depends-Indep: docbook-xml,
                      python-pyqt5,
                      python3-sphinx,
                      xsltproc,
-Standards-Version: 4.1.0
+Standards-Version: 4.1.2
 Homepage: https://tortoisehg.bitbucket.io
 Vcs-Git: https://anonscm.debian.org/git/collab-maint/tortoisehg.git
 Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/tortoisehg.git
