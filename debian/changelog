@@ -1,3 +1,10 @@
+tortoisehg (4.5.2-0.1) UNRELEASED; urgency=medium
+
+  * Non-maintainer upload.
+  * New upstream release (Closes: #390807)
+
+ -- Thomas Liebetraut <thomas@tommie-lie.de>  Tue, 27 Mar 2018 22:02:32 +0200
+
 tortoisehg (4.4.1-1) unstable; urgency=medium
 
   * New upstream version (Closes: #881707).
