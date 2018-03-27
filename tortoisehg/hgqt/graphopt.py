@@ -298,6 +298,9 @@ class Graph(object):
         avoids using context lookups, except to determine filtering state.
         """
 
+        if self._revset and rev not in self._revset_set:
+            return
+
         revs = list(obsoleteutil.first_known_precursors_rev(self._repo, rev))
 
         if self._revset:

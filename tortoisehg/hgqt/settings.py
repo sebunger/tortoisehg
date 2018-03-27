@@ -18,7 +18,6 @@ from .qtcore import (
     pyqtSlot,
 )
 from .qtgui import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QCompleter,
@@ -1087,9 +1086,6 @@ INFO = (
     _fi(_('Diff Font'), 'tortoisehg.fontdiff', genFontEdit,
         _('Font used to display text differences. Default: monospace 10'),
         globalonly=True),
-    _fi(_('List Font'), 'tortoisehg.fontlist', genFontEdit,
-        _('Font used to display file lists. Default: sans 9'),
-        globalonly=True),
     _fi(_('ChangeLog Font'), 'tortoisehg.fontlog', genFontEdit,
         _('Font used to display changelog data. Default: monospace 10'),
         globalonly=True),
@@ -1485,9 +1481,7 @@ class SettingsForm(QWidget):
             if isinstance(meta['icon'], str):
                 icon = qtlib.geticon(meta['icon'])
             else:
-                style = QApplication.style()
-                icon = QIcon()
-                icon.addPixmap(style.standardPixmap(meta['icon']))
+                icon = self.style().standardIcon(meta['icon'])
             item = QListWidgetItem(icon, meta['label'])
             pageList.addItem(item)
 

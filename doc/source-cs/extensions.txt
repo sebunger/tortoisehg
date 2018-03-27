@@ -111,7 +111,7 @@ Jednodušší forma s vloženým názvem url může být také použita::
 .. note::
 	Je-li v :file:`.hg/hgrc` zadáno jméno uživatele i heslo, potom je extenze použije bez použití heslové databáze. Není-li jméno uživatele uvedeno, extenze bude pokaždé vyžadovat osobní údaje, také bez uložení hesla. Takže se v obou případech vlastně vracíme k implicitnímu chování.
 
-Podrobnější informace získáte v `[auth] <https://www.selenic.com/mercurial/hgrc.5.html#auth>`_.
+Podrobnější informace získáte v `[auth] <https://www.mercurial-scm.org/doc/hgrc.5.html#auth>`_.
 
 **Konfigurace repozitáře (SMTP)**
 

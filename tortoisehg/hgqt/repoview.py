@@ -26,6 +26,7 @@ from .qtcore import (
     QRectF,
     QSettings,
     QSize,
+    QT_API,
     QT_VERSION,
     Qt,
     pyqtSignal,
@@ -51,6 +52,7 @@ from .qtgui import (
     QPainterPath,
     QPen,
     QPolygonF,
+    QProxyStyle,
     QStyle,
     QStyleOptionViewItemV2,
     QStyleOptionViewItemV4,
@@ -118,7 +120,10 @@ class HgRepoView(QTreeView):
         self.setRootIsDecorated(False)
         self.setUniformRowHeights(True)
 
-        self.setStyle(HgRepoViewStyle(self.style()))
+        # do not pass self.style() to HgRepoViewStyle() because it would steal
+        # the ownership from QApplication and cause SEGV after the deletion of
+        # this widget.
+        self.setStyle(HgRepoViewStyle())
         self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
@@ -409,11 +414,10 @@ class HgRepoView(QTreeView):
     def enablefilterpalette(self, enable):
         self._paletteswitcher.enablefilterpalette(enable)
 
-class HgRepoViewStyle(QStyle):
+
+class HgRepoViewStyle(QProxyStyle):
     "Override a style's drawPrimitive method to customize the drop indicator"
-    def __init__(self, style):
-        style.__class__.__init__(self)
-        self._style = style
+
     def drawPrimitive(self, element, option, painter, widget=None):
         if element == QStyle.PE_IndicatorItemViewItemDrop:
             # Drop indicators should be painted using the full viewport width
@@ -422,48 +426,8 @@ class HgRepoViewStyle(QStyle):
                 painter.drawRect(vp.x(), option.rect.y(),
                                  vp.width() - 1, 0.5)
         else:
-            self._style.drawPrimitive(element, option, painter, widget)
-    # Delegate all other methods overridden by QProxyStyle to the base class
-    def drawComplexControl(self, *args):
-        return self._style.drawComplexControl(*args)
-    def drawControl(self, *args):
-        return self._style.drawControl(*args)
-    def drawItemPixmap(self, *args):
-        return self._style.drawItemPixmap(*args)
-    def drawItemText(self, *args):
-        return self._style.drawItemText(*args)
-    def generatedIconPixmap(self, *args):
-        return self._style.generatedIconPixmap(*args)
-    def hitTestComplexControl(self, *args):
-        return self._style.hitTestComplexControl(*args)
-    def itemPixmapRect(self, *args):
-        return self._style.itemPixmapRect(*args)
-    def itemTextRect(self, *args):
-        return self._style.itemTextRect(*args)
-    def pixelMetric(self, *args):
-        return self._style.pixelMetric(*args)
-    def polish(self, *args):
-        return self._style.polish(*args)
-    def sizeFromContents(self, *args):
-        return self._style.sizeFromContents(*args)
-    def standardPalette(self):
-        return self._style.standardPalette()
-    def standardPixmap(self, *args):
-        return self._style.standardPixmap(*args)
-    def styleHint(self, *args):
-        return self._style.styleHint(*args)
-    def subControlRect(self, *args):
-        return self._style.subControlRect(*args)
-    def subElementRect(self, *args):
-        return self._style.subElementRect(*args)
-    def unpolish(self, *args):
-        return self._style.unpolish(*args)
-    def event(self, *args):
-        return self._style.event(*args)
-    def layoutSpacingImplementation(self, *args):
-        return self._style.layoutSpacingImplementation(*args)
-    def standardIconImplementation(self, *args):
-        return self._style.standardIconImplementation(*args)
+            super(HgRepoViewStyle, self).drawPrimitive(element, option, painter,
+                                                       widget)
 
 
 def get_style(line_type, active):

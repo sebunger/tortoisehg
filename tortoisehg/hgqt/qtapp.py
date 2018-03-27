@@ -83,6 +83,9 @@ try:
 except ImportError:
     thginithook = None
 
+def _ugetuser():
+    return hglib.tounicode(util.getuser())
+
 # {exception class: message}
 # It doesn't check the hierarchy of exception classes for simplicity.
 _recoverableexc = {
@@ -334,7 +337,7 @@ def connectToExistingWorkbench(root, revset=None):
         data = '\0'.join([root, revset])
     else:
         data = root
-    servername = QApplication.applicationName() + '-' + util.getuser()
+    servername = QApplication.applicationName() + '-' + _ugetuser()
     socket = QLocalSocket()
     socket.connectToServer(servername, QIODevice.ReadWrite)
     if socket.waitForConnected(10000):
@@ -420,6 +423,12 @@ class QtRunner(QObject):
 
         self._ui = ui
         self._mainapp = QApplication(sys.argv)
+
+        if QT_VERSION >= 0x50000:
+            self._mainapp.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+            if sys.platform == 'darwin':
+                self._mainapp.setAttribute(Qt.AA_DontShowIconsInMenus, True)
+
         self._exccatcher = ExceptionCatcher(ui, self._mainapp, self)
         self._gc = GarbageCollector(ui, self)
 
@@ -528,7 +537,7 @@ class QtRunner(QObject):
 
         dlg.setAttribute(Qt.WA_DeleteOnClose)
         if reporoot:
-            dlg.destroyed[()].connect(self._reporeleaser.map)
+            dlg.destroyed.connect(self._reporeleaser.map)
             self._reporeleaser.setMapping(dlg, reporoot)
         if dlg is not self._workbench and not dlg.parent():
             # keep reference to avoid garbage collection.  workbench should
@@ -576,7 +585,7 @@ class QtRunner(QObject):
         assert not self._server
         self._server = QLocalServer(self)
         self._server.newConnection.connect(self._handleNewConnection)
-        self._server.listen(self._mainapp.applicationName() + '-' + util.getuser())
+        self._server.listen(self._mainapp.applicationName() + '-' + _ugetuser())
 
     @pyqtSlot()
     def _handleNewConnection(self):

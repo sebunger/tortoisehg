@@ -420,11 +420,12 @@ class MatchModel(QAbstractTableModel):
         self.layoutChanged.emit()
 
     def sort(self, col, order):
+        self.beginResetModel()
         self.layoutAboutToBeChanged.emit()
         self.rows.sort(key=lambda x: x[col],
                        reverse=(order == Qt.DescendingOrder))
         self.layoutChanged.emit()
-        self.reset()
+        self.endResetModel()
 
     def isEmpty(self):
         return not bool(self.rows)

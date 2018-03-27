@@ -15,7 +15,7 @@ V základní minimalistické konfiguraci (s vypnutými lištami) má okno Verpá
 Mezi pruh hlavního menu (Soubor, Zobrazit, Repozitář, Help) a Přehled revizí lze vložit nástrojové lišty - Editovací (Edit Toolbar), Parkovací (Dock Toolbar), Úkonovou (Task Toolbar), Synchronizační (Sync Toolbar) a Uživatelskou (Custom Toolbar). Složení jednotlivých lišt bude uvedeno níže.
 Lišty lze  aktivovat/deaktivovat výběrem z kontextové nabídky, vytvořené poklepem "pravé" myši v pruhu hlavního menu nebo výběrem ze sekvence :menuselection:`Zobrazit > Nástrojové lišty`.
 
-Parkovací lišta obsahuje ikony tří procedur - :menuselection:`Otevřít seznam repozitářů, Otevřít frontu oprávek, Otevřít konzolu`. První dvě procedury se zobrazují v samostatném přemistitelném okně. Okno poslední procedury je nově nepřemistitelné.
+Parkovací lišta obsahuje ikony tří procedur - :menuselection:`Otevřít seznam repozitářů, Otevřít frontu oprávek, Otevřít konzolu`. První dvě procedury se zobrazují v samostatném přemistitelném okně. Okno poslední procedury je nepřemistitelné.
 
 Výběr ze sekvence :menuselection:`Zobrazit > Zobrazit úkonovou plochu` otevře strukturovanou pracovní plochu, jejíž konfigurace se mění podle právě zvoleného úkonu v Úkonové liště (Podrobnosti revizí, Commit, Synchronizovat a Hledat ).
 
@@ -136,7 +136,7 @@ Tato lišta zobrazí nebo skryje původně přemistitelné panely Verpánku. Pan
        :alt: Task Toolbar
 
 
-Lišta (vpravo nahoře) je sestavena z ikon, které aktivují úkonové karty v úkonové ploše: **Podrobnosti revize, Commit, Synchronizovat** a **Hledat**.
+Lišta je sestavena z ikon, které aktivují úkonové karty v úkonové ploše: **Podrobnosti revize, Commit, Hledat** a **Synchronizovat**.
 
 Rozdělení úkonové plochy se mění v závislosti na volbě úkonové karty. Tuto volbu lze realizovat i výběrem ouška karty na okraji úkonové plochy, pokud je viditelnost oušek aktivována.
 
@@ -192,11 +192,13 @@ Slouží k synchronizaci lokálního repozitáře s jinými repozitáři. Obsahu
 Pracovní lišta filtru
 ---------------------
 
-Tato lišta (Filter toolbar) slouží pro zadávání vyhledávacích vzorů při vyhledávání specifikovaných revizí.
-
 .. figure:: figures/filter-toolbar.png
     :alt: Filter Toolbar
 
+	Filtrovací možnosti ve Verpánku
+
+Tato lišta umožňuje rychlé filtrování vybraných changesetů. Je založena na proceduře Revision Sets Mercuriálu.
+Určení skladby revizí viz `hg.1.html#revsets <https://www.mercurial-scm.org/doc/hg.1.html#revsets>`_.
 Zobrazení této lišty aktivujeme buď tlačítkem s ikonou v editovací liště nebo přepínačem :kbd:`Ctrl+S`. Lišta obsahuje následující sadu procedur (zleva doprava):
 
 :guilabel:`Clear`
@@ -207,7 +209,7 @@ Zobrazení této lišty aktivujeme buď tlačítkem s ikonou v editovací lišt�
 	 Aplikuje dotaz na zadanou sadu revizí.
 :guilabel:`Otevřít editor průzkumu`
 	 Otvírá dialogové okno "Revision Set Query". Zde můžete upřesnit svůj dotaz.
-:guilabel:`Delete`
+:guilabel:`Smazat vybraný dotaz`
 	 Smaže zadaný vyhledávací dotaz (query).
 :guilabel:`Filtr`
 	 Přepínač pro aktivaci filtru. Aktivní filtr prosévá changesety a
@@ -232,6 +234,12 @@ V situaci, kdy je zobrazován seznam příchozích changesetů, vynoří se na p
 Verpánek se pokusí nalézt zadanou vyhledávací frázi v repozitáři, porovnávaje ji s tagem, záložkou, názvem větve, hešem changesetu nebo s číslem revize. Není-li žádná shoda nalezena, zjistí Verpánek, zda fráze obsahuje závorky. Pokud ne, předpokládá Verpánek, že fráze je klíčovým slovem a provede hledání :command:`keyword ()`. Jsou-li závorky zjištěny, předpokládá Verpánek, že fráze je specifikací sady revizí a pokusí se sadu řešit.
 
 Potřebujete-li provést hledání s klíčovým slovem, které obsahuje závorky, použijte příkaz :command:`keyword` ("fráze(foo)").
+
+
+Graf revizí
+----------------------
+
+Sloupec s grafem zobrazuje vztah dítě-rodič mezi revizemi. Tento sloupec se automaticky zvětšuje podle počtu čar.
 
 
 Výkonové implikace
@@ -387,7 +395,7 @@ Pravý poklep na revizi v Přehledu revizí vyvolá různá kontextová menu v z
 .. [#rcm1] Tento příkaz uloží odtržené revize do svazku souborů, které mohou  být později znovu použity. Viz také `Editing History <https://www.mercurial-scm.org/wiki/EditingHistory>`_
 
 
-Kontextové menu souboru
+Kontextová menu souboru
 ------------------------
 
 Pravým poklepem na soubor v seznamu souborů aktuální revize vyvoláme kontextové menu pro vybraný soubor:
@@ -529,9 +537,10 @@ Nastavitelné možnosti
 ---------------------
 
 Nastavitelné parametry Verpánku  lze zadat v dialogu  :menuselection:`Soubor > Settings > Verpánek` viz odstavec 6.1.2 kapitoly 6. Nastavení parametrů.
-Konkretní barvu u parametru "Zabarvení podle autora" lze zadat v souboru :file:`Mercurial.ini`
-zápisem authorcolor.USERNAME = color v sekci [tortoisehg].
+Konkretní barvu u parametru "Zabarvení podle autora" lze zadat v souboru :file:`Mercurial.ini`: ::
 
+        [tortoisehg].
+        authorcolor.USERNAME = color
 
 
 

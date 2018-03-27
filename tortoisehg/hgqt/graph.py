@@ -811,7 +811,7 @@ class GraphNode(object):
                  "rev",
                  "shape",
                  "toplines",
-                 "troubles",
+                 "instabilities",
                  "wdparent",
                  "x"]
 
@@ -843,7 +843,7 @@ class GraphNode(object):
         self.rev = ctx.rev()
         self.hidden = ctx.hidden()
         self.obsolete = ctx.obsolete()
-        self.troubles = ctx.troubles()
+        self.instabilities = ctx.instabilities()
         self.shape = shape
         self.x = xposition
         self.bottomlines = lines
@@ -876,7 +876,7 @@ class PatchGraphNode(object):
         self.wdparent = False
         self.toplines = []
         self.bottomlines = []
-        self.troubles = ()
+        self.instabilities = ()
         self.x = 0
 
     @property

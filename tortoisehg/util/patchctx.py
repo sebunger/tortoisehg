@@ -116,7 +116,7 @@ class patchctx(object):
     def bumped(self):       return False
     def divergent(self):    return False
     def troubled(self):     return False
-    def troubles(self):     return []
+    def instabilities(self): return []
 
     def flags(self, wfile):
         if wfile == self._parseErrorFileName:

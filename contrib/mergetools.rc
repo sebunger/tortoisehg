@@ -38,11 +38,23 @@ meld.regkeyalt=SOFTWARE\Wow6432Node\Meld
 meld.regname=Executable
 meld.gui=True
 meld.priority=-2
-meld.args=--label='local' $local --label='merged' $base --label='other' $other -o $output
+meld.args=--label='local' $local --label='merged' $base --label='other' $other --auto-merge -o $output
 meld.checkchanged=True
 meld.diffargs=-a --label='$plabel1' $parent --label='$clabel' $child
 meld.diff3args=-a --label='$plabel1' $parent1 --label='$clabel' $child --label='$plabel2' $parent2
 meld.dirdiff=True
+
+; copy of meld above, dropping --auto-merge
+meld-noauto.regkey=SOFTWARE\Meld
+meld-noauto.regkeyalt=SOFTWARE\Wow6432Node\Meld
+meld-noauto.regname=Executable
+meld-noauto.gui=True
+meld-noauto.priority=-3
+meld-noauto.args=--label='local' $local --label='merged' $base --label='other' $other -o $output
+meld-noauto.checkchanged=True
+meld-noauto.diffargs=-a --label='$plabel1' $parent --label='$clabel' $child
+meld-noauto.diff3args=-a --label='$plabel1' $parent1 --label='$clabel' $child --label='$plabel2' $parent2
+meld-noauto.dirdiff=True
 
 tkdiff.args=-L local -L other $local $other -a $base -o $output
 tkdiff.gui=True

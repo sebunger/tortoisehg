@@ -1,6 +1,6 @@
 TortoiseHg Documentation
 
-Pro vytvoření dokumentace ve formátu HTML je potřebná instalace Sphinx. V Ubuntu je to balíček Sphinx-Python. Ve Windows je zřejmě nejlepší easy_install. Sphinx musí být novější než 0.6.
+Pro vytvoření dokumentace ve formátu HTML je potřebná instalace Sphinx. V Ubuntu je to balíček python-sphinx. Ve Windows je zřejmě nejlepší easy_install. Sphinx musí být novější než 0.6.
 
 Pro vytvoření souborů PDF jsou potřebné balíčky LaTeX. V Ubuntu to jsou texlive-latex-extra, texlive-fonts-recomended a všechny jejich dependence. Ve Windows je nejlepší MikTeX.
 

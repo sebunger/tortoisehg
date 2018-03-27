@@ -163,10 +163,10 @@ class CloneWidget(cmdui.AbstractCmdWidget):
 
         self.noupdate_chk = QCheckBox(_('Do not update the new working directory'))
         self.pproto_chk = QCheckBox(_('Use pull protocol to copy metadata'))
-        self.uncomp_chk = QCheckBox(_('Use uncompressed transfer'))
+        self.stream_chk = QCheckBox(_('Clone with minimal processing'))
         optbox.addWidget(self.noupdate_chk)
         optbox.addWidget(self.pproto_chk)
-        optbox.addWidget(self.uncomp_chk)
+        optbox.addWidget(self.stream_chk)
 
         self.qclone_chk, self.qclone_txt, self.qclone_btn = \
                 chktext(_('Include patch queue'), btnlabel=_('Browse...'),
@@ -208,7 +208,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         self.rev_text.textChanged.connect(self._composeCommand)
         self.noupdate_chk.toggled.connect(self._composeCommand)
         self.pproto_chk.toggled.connect(self._composeCommand)
-        self.uncomp_chk.toggled.connect(self._composeCommand)
+        self.stream_chk.toggled.connect(self._composeCommand)
         self.qclone_chk.toggled.connect(self._composeCommand)
         self.qclone_txt.textChanged.connect(self._composeCommand)
         self.proxy_chk.toggled.connect(self._composeCommand)
@@ -227,7 +227,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             self.rev_text.setText(hglib.tounicode(rev))
         self.noupdate_chk.setChecked(bool(opts.get('noupdate')))
         self.pproto_chk.setChecked(bool(opts.get('pull')))
-        self.uncomp_chk.setChecked(bool(opts.get('uncompressed')))
+        self.stream_chk.setChecked(bool(opts.get('stream')))
         self.startrev_chk.setVisible(_startrev_available())
         self.startrev_text.setVisible(_startrev_available())
 
@@ -276,7 +276,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
     def _composeCommand(self):
         opts = {
             'noupdate': self.noupdate_chk.isChecked(),
-            'uncompressed': self.uncomp_chk.isChecked(),
+            'stream': self.stream_chk.isChecked(),
             'pull': self.pproto_chk.isChecked(),
             'verbose': True,
             'config': [],
