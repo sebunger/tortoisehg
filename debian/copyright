@@ -4,13 +4,13 @@ Upstream-Contact: Maintainer: Steve Borho <steve@borho.org>, TK Soh <teekaysoh@g
 Source: https://tortoisehg.bitbucket.io/download/source.html
 
 Files: *
-Copyright: 2007-2017, Steve Borho <steve@borho.org>
+Copyright: 2007-2018, Steve Borho <steve@borho.org>
            2005-2014, Matt Mackall
            2007-2008, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
 Files: tortoisehg/hgqt/*
-Copyright: 2008-2017, Steve Borho <steve@borho.org>
+Copyright: 2008-2018, Steve Borho <steve@borho.org>
            2016, Unity Technologies
            2010, Yuki KODAMA <endflow.net@gmail.com>
            2010, David Wilhelm <dave@jumbledpile.com>
