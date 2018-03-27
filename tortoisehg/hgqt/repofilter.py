@@ -18,7 +18,6 @@ from .qtcore import (
     pyqtSlot,
 )
 from .qtgui import (
-    QApplication,
     QCheckBox,
     QComboBox,
     QCompleter,
@@ -198,8 +197,7 @@ class RepoFilterBar(QToolBar):
         self.editorBtn.clicked.connect(self.openEditor)
         self.addWidget(self.editorBtn)
 
-        icon = QIcon()
-        icon.addPixmap(QApplication.style().standardPixmap(QStyle.SP_TrashIcon))
+        icon = self.style().standardIcon(QStyle.SP_TrashIcon)
         self.deleteBtn = QToolButton()
         self.deleteBtn.setIcon(icon)
         self.deleteBtn.setToolTip(_('Delete selected query from history'))

@@ -29,8 +29,8 @@ from distutils.command.clean import clean as _clean_orig
 from distutils.spawn import spawn, find_executable
 from i18n.msgfmt import Msgfmt
 
-thgcopyright = 'Copyright (C) 2010-2017 Steve Borho and others'
-hgcopyright = 'Copyright (C) 2005-2017 Matt Mackall and others'
+thgcopyright = 'Copyright (C) 2010-2018 Steve Borho and others'
+hgcopyright = 'Copyright (C) 2005-2018 Matt Mackall and others'
 
 def _walklocales():
     podir = 'i18n/tortoisehg'

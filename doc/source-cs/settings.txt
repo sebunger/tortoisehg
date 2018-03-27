@@ -292,10 +292,10 @@ Commit
 	  "osvěžení" na lokální repozitáře.
 
 :guilabel:`Potvrdit přidání neznámých souborů:`
-    Určuje, zda má TortoiseHg zobrazit konfirmační dialog 	před přidáním nových souborů při komitu.  Implictně: True
+    Určuje, zda má TortoiseHg zobrazit konfirmační dialog před přidáním nových souborů při komitu. Zadáno-li False, vybrané nové soubory budou přidány do komitu bez potvrzovacího dialogu. Implictně: True
 
 :guilabel:`Potvrdit mazání souborů:`
-    Určuje, zda má TortoiseHg zobrazit konfirmační dialog před odebrání souborů při komitu. Implicitně: True
+    Určuje, zda má TortoiseHg zobrazit konfirmační dialog před odebráním souborů při komitu. Implicitně: True
 
 
 .. module:: sync.settings

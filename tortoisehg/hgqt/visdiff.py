@@ -548,15 +548,16 @@ class FileSelectionDialog(QDialog):
         self.launch(item.text()[2:])
 
     def updateDiffButtons(self, tool):
+        # hg>=4.4: configbool() may return None as the default is set to None
         if hasattr(self, 'p1button'):
             d2 = self.repo.ui.configbool('merge-tools', tool + '.dirdiff')
             d3 = self.repo.ui.configbool('merge-tools', tool + '.dir3diff')
-            self.p1button.setEnabled(d2)
-            self.p2button.setEnabled(d2)
-            self.p3button.setEnabled(d3)
+            self.p1button.setEnabled(bool(d2))
+            self.p2button.setEnabled(bool(d2))
+            self.p3button.setEnabled(bool(d3))
         elif hasattr(self, 'dbutton'):
             d2 = self.repo.ui.configbool('merge-tools', tool + '.dirdiff')
-            self.dbutton.setEnabled(d2)
+            self.dbutton.setEnabled(bool(d2))
 
     def launch(self, fname):
         fname = hglib.fromunicode(fname)

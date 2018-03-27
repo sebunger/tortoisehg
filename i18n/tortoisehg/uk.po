@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-07-26 09:07-0300\n"
+"POT-Creation-Date: 2017-11-28 15:25-0200\n"
 "PO-Revision-Date: 2016-03-13 10:18+0000\n"
 "Last-Translator: onekosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2017-07-27 05:38+0000\n"
-"X-Generator: Launchpad (build 18439)\n"
+"X-Launchpad-Export-Date: 2017-11-29 05:20+0000\n"
+"X-Generator: Launchpad (build 18511)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
@@ -3093,6 +3093,9 @@ msgstr "Надіслати відгук"
 msgid "Target:"
 msgstr "Ціль:"
 
+msgid "Do not modify working copy (-k/--keep)"
+msgstr ""
+
 #, python-format
 msgid "Prune - %s"
 msgstr "Спростити - %s"
@@ -3652,6 +3655,9 @@ msgstr "Пошук слова"
 
 msgid "Revision Set"
 msgstr "Набір правок"
+
+msgid "(unsaved)"
+msgstr ""
 
 msgid "Display graph the named branch only"
 msgstr "Відобразити графік лише зазначеної гілки"
@@ -4916,7 +4922,7 @@ msgstr "Набір змін закритий."
 
 msgid ""
 "Changesets within the interval, see <a href=\"https://www.mercurial-scm.org/"
-"mercurial/hg.1.html#dates\">help dates</a>"
+"doc/hg.1.html#dates\">help dates</a>"
 msgstr ""
 
 msgid "Greatest common ancestor of the two changesets."
@@ -4930,7 +4936,7 @@ msgstr ""
 
 msgid ""
 "Changesets affecting files matched by pattern.  See <a href=\"https://www."
-"mercurial-scm.org/mercurial/hg.1.html#patterns\">help patterns</a>"
+"mercurial-scm.org/doc/hg.1.html#patterns\">help patterns</a>"
 msgstr ""
 
 msgid "Changesets which modify files matched by pattern."
@@ -5023,7 +5029,7 @@ msgid "Set Logic"
 msgstr "Встановити логіку"
 
 msgid ""
-"<a href=\"https://www.mercurial-scm.org/mercurial/hg.1.html#revsets\">help "
+"<a href=\"https://www.mercurial-scm.org/doc/hg.1.html#revsets\">help "
 "revsets</a>"
 msgstr ""
 
@@ -6299,6 +6305,37 @@ msgid ""
 msgstr ""
 "Використовуватиметься SSH для з'єднання.<p>Типово: \"ssh\" або "
 "\"TortoisePlink.exe -ssh -2\" (Windows)"
+
+msgid "<b>Subrepository Features:</b>"
+msgstr ""
+
+msgid "Allow Hg Subrepos"
+msgstr ""
+
+msgid ""
+"Whether Mercurial subrepositories are allowed in the working directory. "
+"Default: True"
+msgstr ""
+
+msgid "Allow Git Subrepos"
+msgstr ""
+
+#, python-format
+msgid ""
+"Whether Git subrepositories are allowed in the working directory. Default: "
+"False<p><a href=\"%s\">See the security note</a> before enabling Git "
+"subrepos."
+msgstr ""
+
+msgid "Allow SVN Subrepos"
+msgstr ""
+
+#, python-format
+msgid ""
+"Whether Subversion subrepositories are allowed in the working directory. "
+"Default: False<p><a href=\"%s\">See the security note</a> before enabling "
+"Subversion subrepos."
+msgstr ""
 
 msgid "Server"
 msgstr "Сервер"

@@ -217,7 +217,7 @@ class SummaryInfo(object):
                     obsoletestate.append('obsolete')
                 if ctx.extinct():
                     obsoletestate.append('extinct')
-                obsoletestate += ctx.troubles()
+                obsoletestate += ctx.instabilities()
                 if obsoletestate:
                     return obsoletestate
                 return None

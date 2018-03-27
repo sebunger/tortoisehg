@@ -161,6 +161,7 @@ class HgRepoListModel(QAbstractTableModel):
         self._filterbyrevset = True
         self.unicodestar = True
         self.unicodexinabox = True
+        self._branchheads = {}  # branch: {node, ...}
         self._latesttags = {-1: (0, 0, 'null')}  # date, dist, tag
         self._fullauthorname = False
         self._filterbranch = ''  # unicode
@@ -235,6 +236,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     @pyqtSlot()
     def _reloadGraph(self):
+        self._branchheads.clear()
         self._latesttags = {-1: self._latesttags[-1]}  # clear
         if self._revspec:
             self._runQuery()
@@ -541,7 +543,7 @@ class HgRepoListModel(QAbstractTableModel):
             return text
         elif role == Qt.ForegroundRole:
             color = None
-            if gnode.troubles:
+            if gnode.instabilities:
                 color = TROUBLED_COLOR
             elif column == AuthorColumn and self._authorcolor:
                 color = QColor(self._user_color(ctx.user()))
@@ -744,7 +746,16 @@ class HgRepoListModel(QAbstractTableModel):
 
     def _getrevlabels(self, ctx):
         labels = []
-        branchheads = self.repo.branchheads(ctx.branch())
+
+        # as of hg 4.4.2, repo.branchheads() can be slow because of
+        # branchmap.updatecache() -> scmutil.filteredhash() calls
+        branch = ctx.branch()
+        try:
+            branchheads = self._branchheads[branch]
+        except KeyError:
+            branchheads = set(self.repo.branchheads(branch))
+            self._branchheads[branch] = branchheads
+
         if ctx.rev() is None:
             for pctx in ctx.parents():
                 if branchheads and pctx.node() not in branchheads:
@@ -752,7 +763,7 @@ class HgRepoListModel(QAbstractTableModel):
             return labels
 
         if ctx.node() in branchheads:
-            labels.append((hglib.tounicode(ctx.branch()), 'log.branch'))
+            labels.append((hglib.tounicode(branch), 'log.branch'))
 
         if ctx.thgmqunappliedpatch():
             style = 'log.unapplied_patch'

@@ -374,10 +374,13 @@ class ManifestModel(QAbstractItemModel):
         assert len(self._rootentry) == 0
         newroote = self._rootentry.copyskel()
         self._populateNodes(newroote)
-        self.beginInsertRows(parent, 0, len(newroote) - 1)
+        last = len(newroote) - 1
+        if last >= 0:
+            self.beginInsertRows(parent, 0, last)
         self._rootentry = newroote
         self._rootpopulated = True
-        self.endInsertRows()
+        if last >= 0:
+            self.endInsertRows()
         self.revLoaded.emit(self.rev())
 
     def _repopulateNodes(self, newnodeop=None, newroote=None):

@@ -111,7 +111,6 @@ class ChunksWidget(QWidget):
         self.fileListFrame.setLayout(vbox)
 
         self.diffbrowse = DiffBrowser(self.splitter)
-        self.diffbrowse.setFont(qtlib.getfont('fontdiff').font())
         self.diffbrowse.showMessage.connect(self.showMessage)
         self.diffbrowse.linkActivated.connect(self.linkActivated)
         self.diffbrowse.chunksSelected.connect(self.chunksSelected)
@@ -575,16 +574,12 @@ class DiffBrowser(QFrame):
         self.searchbar.conditionChanged.connect(self.highlightText)
         self.addActions(self.searchbar.editorActions())
 
-        guifont = qtlib.getfont('fontlist').font()
         self.sumlabel = QLabel()
-        self.sumlabel.setFont(guifont)
         self.allbutton = QToolButton()
-        self.allbutton.setFont(guifont)
         self.allbutton.setText(_('All', 'files'))
         self.allbutton.setShortcut(QKeySequence.SelectAll)
         self.allbutton.clicked.connect(self.selectAll)
         self.nonebutton = QToolButton()
-        self.nonebutton.setFont(guifont)
         self.nonebutton.setText(_('None', 'files'))
         self.nonebutton.setShortcut(QKeySequence.New)
         self.nonebutton.clicked.connect(self.selectNone)
@@ -615,6 +610,7 @@ class DiffBrowser(QFrame):
         self.sci.setUtf8(True)
         self.sci.installEventFilter(qscilib.KeyPressInterceptor(self))
         self.sci.setCaretLineVisible(False)
+        self.sci.setFont(qtlib.getfont('fontdiff').font())
 
         self.sci.setMarginType(1, qsci.SymbolMargin)
         self.sci.setMarginLineNumbers(1, False)

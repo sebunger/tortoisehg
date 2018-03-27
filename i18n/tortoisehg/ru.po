@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Andrei Polushin <polushin@gmail.com>\n"
-"POT-Creation-Date: 2017-07-26 09:07-0300\n"
-"PO-Revision-Date: 2017-07-22 10:28+0000\n"
-"Last-Translator: Stanislav V. Kroter <krotersv@gmail.com>\n"
+"POT-Creation-Date: 2017-11-28 15:25-0200\n"
+"PO-Revision-Date: 2017-11-21 01:37+0000\n"
+"Last-Translator: Dmitry Listopad <Unknown>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2017-07-27 05:37+0000\n"
-"X-Generator: Launchpad (build 18439)\n"
+"X-Launchpad-Export-Date: 2017-11-29 05:20+0000\n"
+"X-Generator: Launchpad (build 18511)\n"
 "Language: ru\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -795,10 +795,10 @@ msgid "Commit"
 msgstr "Фиксировать"
 
 msgid "Amend current revision"
-msgstr "Отменить текущую ревизию"
+msgstr "Исправить текущую ревизию"
 
 msgid "Amend"
-msgstr "Отмена"
+msgstr "Исправить"
 
 msgid "Create a new patch"
 msgstr "Создать новую заплатку"
@@ -3197,6 +3197,9 @@ msgstr "Отправить &рецензию"
 msgid "Target:"
 msgstr "Приемник:"
 
+msgid "Do not modify working copy (-k/--keep)"
+msgstr ""
+
 #, python-format
 msgid "Prune - %s"
 msgstr "Отсечение - %s"
@@ -3755,6 +3758,9 @@ msgstr "Поиск по ключевым словам"
 
 msgid "Revision Set"
 msgstr "Пакет ревизий"
+
+msgid "(unsaved)"
+msgstr ""
 
 msgid "Display graph the named branch only"
 msgstr "Показать граф только именованной ветки"
@@ -5034,10 +5040,8 @@ msgstr "Набор изменений, который закрыт."
 
 msgid ""
 "Changesets within the interval, see <a href=\"https://www.mercurial-scm.org/"
-"mercurial/hg.1.html#dates\">help dates</a>"
+"doc/hg.1.html#dates\">help dates</a>"
 msgstr ""
-"Наборы изменений в интервале дат, смотри <a href=\"https://www.mercurial-scm."
-"org/mercurial/hg.1.html#dates\">справку по датам</a>"
 
 msgid "Greatest common ancestor of the two changesets."
 msgstr "Наибольший общий предок двух наборов изменений."
@@ -5051,11 +5055,8 @@ msgstr ""
 
 msgid ""
 "Changesets affecting files matched by pattern.  See <a href=\"https://www."
-"mercurial-scm.org/mercurial/hg.1.html#patterns\">help patterns</a>"
+"mercurial-scm.org/doc/hg.1.html#patterns\">help patterns</a>"
 msgstr ""
-"Наборы изменений, затрагивающие файлы, совпадающие с шаблоном. Смотри <a "
-"href=\"https://www.mercurial-scm.org/mercurial/hg.1.html#patterns\">справку "
-"по шаблонам имён файлов</a>"
 
 msgid "Changesets which modify files matched by pattern."
 msgstr "Наборы изменений, изменяющие файлы, совпадающие с шаблоном."
@@ -5148,11 +5149,9 @@ msgid "Set Logic"
 msgstr "Логика множеств"
 
 msgid ""
-"<a href=\"https://www.mercurial-scm.org/mercurial/hg.1.html#revsets\">help "
+"<a href=\"https://www.mercurial-scm.org/doc/hg.1.html#revsets\">help "
 "revsets</a>"
 msgstr ""
-"<a href=\"https://www.mercurial-scm.org/mercurial/hg.1.html#revsets"
-"\">справка по наборам ревизий</a>"
 
 msgid ""
 "\n"
@@ -6443,6 +6442,37 @@ msgstr ""
 "Команда используемая для SSH подключения.<p>По умолчанию: \"ssh\" или "
 "\"TortoisePlink.exe -ssh -2\" (Windows)"
 
+msgid "<b>Subrepository Features:</b>"
+msgstr ""
+
+msgid "Allow Hg Subrepos"
+msgstr ""
+
+msgid ""
+"Whether Mercurial subrepositories are allowed in the working directory. "
+"Default: True"
+msgstr ""
+
+msgid "Allow Git Subrepos"
+msgstr ""
+
+#, python-format
+msgid ""
+"Whether Git subrepositories are allowed in the working directory. Default: "
+"False<p><a href=\"%s\">See the security note</a> before enabling Git "
+"subrepos."
+msgstr ""
+
+msgid "Allow SVN Subrepos"
+msgstr ""
+
+#, python-format
+msgid ""
+"Whether Subversion subrepositories are allowed in the working directory. "
+"Default: False<p><a href=\"%s\">See the security note</a> before enabling "
+"Subversion subrepos."
+msgstr ""
+
 msgid "Server"
 msgstr "Сервер"
 
@@ -6759,9 +6789,7 @@ msgstr ""
 "умолчанию: Нет"
 
 msgid "Ignore WS Amount"
-msgstr ""
-"Игнорировать изменение\r\n"
-"количества пробелов"
+msgstr "Игнорировать изменение<br>количества пробелов"
 
 msgid ""
 "Ignore changes in the amount of white space in diff views. Default: False"
@@ -8570,7 +8598,7 @@ msgid "Check for incoming changes"
 msgstr "Проверка входящих изменений"
 
 msgid "Pull incoming changes"
-msgstr "Вытянуть входящие изменения"
+msgstr "Затянуть входящие изменения"
 
 msgid "Detect outgoing changes"
 msgstr "Обнаружить выходящие изменения"
@@ -8591,7 +8619,7 @@ msgid ""
 "Pull incoming changes from\n"
 "%s"
 msgstr ""
-"Вытянуть входящие изменения из\n"
+"Затянуть входящие изменения из\n"
 "%s"
 
 #, python-format

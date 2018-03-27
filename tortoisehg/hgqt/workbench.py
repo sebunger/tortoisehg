@@ -119,8 +119,6 @@ class Workbench(QMainWindow):
                 qt_mac_set_menubar_icons(False)
             else:
                 self.dockMenu.setAsDockMenu()
-                qapp = QApplication.instance()
-                qapp.setAttribute(Qt.AA_DontShowIconsInMenus, True)
 
         self._dialogs = qtlib.DialogKeeper(
             lambda self, dlgmeth: dlgmeth(self), parent=self)
@@ -268,8 +266,7 @@ class Workbench(QMainWindow):
             'sync': ('thg-sync', _('S&ynchronize')),
             # 'console' is toggled by "Show Console" action
         }
-        tasklist = self.ui.configlist(
-            'tortoisehg', 'workbench.task-toolbar', [])
+        tasklist = self.ui.configlist('tortoisehg', 'workbench.task-toolbar')
         if tasklist == []:
             tasklist = ['log', 'commit', 'grep', 'pbranch', '|', 'sync']
 

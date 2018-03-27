@@ -149,11 +149,7 @@ class _wconfig(object):
                 # an inner dict may be replaced later on preparewrite(). our
                 # wrapper expects non-empty config[section] instance persists.
                 data = self._config._data
-                try:
-                    data[section] = data[section].preparewrite()
-                except AttributeError:
-                    # hg<4.4 (c41444a39de2)
-                    pass
+                data[section] = data[section].preparewrite()
                 self._sections[section] = _wsortdict(self._config[section])
                 return self._sections[section]
             else:

@@ -421,15 +421,30 @@ class PatchQueueModel(QAbstractListModel):
 
     def _updateCacheAndLayout(self):
         self.layoutAboutToBeChanged.emit()
+        oldcount = len(self._series)
         oldindexes = [(oi, self._series[oi.row()])
                       for oi in self.persistentIndexList()]
         self._buildCache()
+
+        mappedindexes = []  # old -> new
+        missngindexes = []  # old
         for oi, patch in oldindexes:
             try:
                 ni = self.index(self._series.index(patch), oi.column())
+                mappedindexes.append((oi, ni))
             except ValueError:
-                ni = QModelIndex()
+                missngindexes.append(oi)
+        # if no indexes are moved, assume missing ones were renamed
+        if (missngindexes and oldcount == len(self._series)
+            and all(oi.row() == ni.row() for oi, ni in mappedindexes)):
+            mappedindexes.extend((oi, self.index(oi.row(), oi.column()))
+                                 for oi in missngindexes)
+            del missngindexes[:]
+
+        for oi, ni in mappedindexes:
             self.changePersistentIndex(oi, ni)
+        for oi in missngindexes:
+            self.changePersistentIndex(oi, QModelIndex())
         self.layoutChanged.emit()
 
     def _buildCache(self):
@@ -613,11 +628,18 @@ class MQPatchesWidget(QDockWidget):
         a.setToolTip(_('Unapply all patches'))
         self._qgotoAct = QAction(
             qtlib.geticon('hg-qgoto'), _('Go &to Patch'), self)
+        self._qpushMoveAct = a = QAction(
+            qtlib.geticon('hg-qpush-move'), _('&Apply Only This Patch'), self)
+        a.setToolTip(_('Apply only the selected patch'))
+        a.setShortcut('Ctrl+Return')
+        a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         self._qfinishAct = a = QAction(
             qtlib.geticon('qfinish'), _('&Finish Patch'), self)
         a.setToolTip(_('Move applied patches into repository history'))
         self._qdeleteAct = a = QAction(
             qtlib.geticon('hg-qdelete'), _('&Delete Patches...'), self)
+        a.setShortcut('Del')
+        a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         a.setToolTip(_('Delete selected patches'))
         self._qrenameAct = a = QAction(_('Re&name Patch...'), self)
         a.setShortcut('F2')
@@ -634,8 +656,12 @@ class MQPatchesWidget(QDockWidget):
         tbar.addAction(self._qpopAct)
         tbar.addAction(self._qpopAllAct)
         tbar.addSeparator()
+        tbar.addAction(self._qpushMoveAct)
+        self.addAction(self._qpushMoveAct)
+        tbar.addSeparator()
         tbar.addAction(self._qfinishAct)
         tbar.addAction(self._qdeleteAct)
+        self.addAction(self._qdeleteAct)
         tbar.addSeparator()
         self.addAction(self._qrenameAct)
         tbar.addAction(self._setGuardsAct)
@@ -691,6 +717,7 @@ class MQPatchesWidget(QDockWidget):
         self._qpopAct.triggered.connect(self._patchActions.popPatch)
         self._qpopAllAct.triggered.connect(self._patchActions.popAllPatches)
         self._qgotoAct.triggered.connect(self._onGotoPatch)
+        self._qpushMoveAct.triggered.connect(self._onPushMovePatch)
         self._qfinishAct.triggered.connect(self._onFinishRevision)
         self._qdeleteAct.triggered.connect(self._onDelete)
         self._qrenameAct.triggered.connect(self._onRenamePatch)
@@ -745,6 +772,7 @@ class MQPatchesWidget(QDockWidget):
     def _onMenuRequested(self, pos):
         menu = QMenu(self)
         menu.addAction(self._qgotoAct)
+        menu.addAction(self._qpushMoveAct)
         menu.addAction(self._qfinishAct)
         menu.addAction(self._qdeleteAct)
         menu.addAction(self._qrenameAct)
@@ -784,6 +812,11 @@ class MQPatchesWidget(QDockWidget):
         self._patchActions.gotoPatch(patch)
 
     @pyqtSlot()
+    def _onPushMovePatch(self):
+        patch = self._currentPatchName()
+        self._patchActions.pushPatch(patch, move=True)
+
+    @pyqtSlot()
     def _onFinishRevision(self):
         patch = self._currentPatchName()
         self._patchActions.finishRevision(patch)
@@ -815,6 +848,7 @@ class MQPatchesWidget(QDockWidget):
         anyapplied = any(model.isApplied(i) for i in indexes)
         self._qgotoAct.setEnabled(len(indexes) == 1
                                   and indexes[0] != model.topAppliedIndex())
+        self._qpushMoveAct.setEnabled(len(indexes) == 1 and not anyapplied)
         self._qfinishAct.setEnabled(len(indexes) == 1 and anyapplied)
         self._qdeleteAct.setEnabled(len(indexes) > 0 and not anyapplied)
         self._setGuardsAct.setEnabled(len(indexes) == 1)

@@ -40,7 +40,7 @@ Je-li dialogové okno pro vizuální diff použito k porovnání souborů pracov
 Přidávání nástrojů
 ~~~~~~~~~~~~~~~~~~
 
-Máte-li nainstalovaný diffový nástroj, který není podporován aplikací TortoiseHg, můžete pro něj vytvořit konfiguraci v souboru :file:`Merurial.ini`. Viz `dokumentace Hg <https://www.selenic.com/mercurial/hgrc.5.html#merge-tools>`_. Poté přidáte extra klíče, které pro vizuální diff TortoiseHg používá::
+Máte-li nainstalovaný diffový nástroj, který není podporován aplikací TortoiseHg, můžete pro něj vytvořit konfiguraci v souboru :file:`Merurial.ini`. Viz `dokumentace Hg <https://www.mercurial-scm.org/doc/hgrc.5.html#merge-tools>`_. Poté přidáte extra klíče, které pro vizuální diff TortoiseHg používá::
 
 	diffargs:  argumenty pro dvojné komparace
 	diff3args: argumenty pro trojné komparace
@@ -72,6 +72,6 @@ Diffy slov
 
 Instalační program TortoiseHg pro Windows nyní obsahuje skripty aplikace TortoiseSVN pro porovnávání (a někdy sloučení) dokumentů v mnoha binárních formátech. Tyto jsou nastaveny v souboru :file:`mergepatterns.rc` jako ovladače pro obvyklé extenze souborů každého binárního formátu, takže není zapotřebí zásahu uživatele.
 
-Pro podporu výběru nástrojů, vycházejícího z přípony souboru, přidal TortoiseHg podporu pro sekci **[diff-patterns]**, která je ekvivalentní k sekci Mercurialu `merge-patterns <https://www.selenic.com/mercurial/hgrc.5.html#merge-patterns>`_.
+Pro podporu výběru nástrojů, vycházejícího z přípony souboru, přidal TortoiseHg podporu pro sekci **[diff-patterns]**, která je ekvivalentní k sekci Mercurialu `merge-patterns <https://www.mercurial-scm.org/doc/hgrc.5.html#merge-patterns>`_.
 
 .. vim: noet ts=4

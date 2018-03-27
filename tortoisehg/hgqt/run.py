@@ -7,7 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 shortlicense = '''
-Copyright (C) 2008-2017 Steve Borho <steve@borho.org> and others.
+Copyright (C) 2008-2018 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
@@ -243,6 +243,8 @@ def _runcatch(ui, args):
     try:
         # read --config before doing anything else like Mercurial
         hglib.parseconfigopts(ui, args)
+        # register config items specific to TortoiseHg GUI
+        ui.setconfig('extensions', 'tortoisehg.util.configitems', '', 'run')
         try:
             return runcommand(ui, args)
         finally:

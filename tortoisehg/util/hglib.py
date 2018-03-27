@@ -21,13 +21,13 @@ from mercurial import (
     encoding,
     error,
     extensions,
+    fancyopts,
     filemerge,
     fileset,
     mdiff,
     merge as mergemod,
     pathutil,
     rcutil,
-    registrar,
     revset as revsetmod,
     revsetlang,
     templatefilters,
@@ -589,7 +589,7 @@ def copydynamicconfig(srcui, destui):
         destui.setconfig(section, name, value, source)
 
 def shortreponame(ui):
-    name = ui.config('web', 'name')
+    name = ui.config('web', 'name', None)
     if not name:
         return
     src = ui.configsource('web', 'name')  # path:line
@@ -784,7 +784,14 @@ def parseconfigopts(ui, args):
     >>> u.config('extensions', 'mq')
     '!'
     """
-    config = dispatchmod._earlygetopt(['--config'], args)
+    try:
+        config = dispatchmod._earlyparseopts(ui, args)['config']
+        # drop --config from args
+        args[:] = fancyopts.earlygetopt(args, '', ['config='],
+                                        gnu=True, keepsep=True)[1]
+    except (AttributeError, TypeError):
+        # hg<4.5 (6e6d0a5b88e6)
+        config = dispatchmod._earlygetopt(['--config'], args)
     return dispatchmod._parseconfig(ui, config)
 
 
@@ -980,22 +987,22 @@ def buildcmdargs(name, *args, **opts):
     r"""Build list of command-line arguments
 
     >>> buildcmdargs('push', branch='foo')
-    ['push', '--branch', 'foo']
+    ['push', '--branch=foo']
     >>> buildcmdargs('graft', r=['0', '1'])
-    ['graft', '-r', '0', '-r', '1']
+    ['graft', '-r0', '-r1']
     >>> buildcmdargs('diff', r=[0, None])
-    ['diff', '-r', '0']
+    ['diff', '-r0']
     >>> buildcmdargs('log', no_merges=True, quiet=False, limit=None)
     ['log', '--no-merges']
     >>> buildcmdargs('commit', user='')
-    ['commit', '--user', '']
+    ['commit', '--user=']
 
     positional arguments:
 
     >>> buildcmdargs('add', 'foo', 'bar')
     ['add', 'foo', 'bar']
     >>> buildcmdargs('cat', '-foo', rev='0')
-    ['cat', '--rev', '0', '--', '-foo']
+    ['cat', '--rev=0', '--', '-foo']
     >>> buildcmdargs('qpush', None)
     ['qpush']
     >>> buildcmdargs('update', '')
@@ -1004,11 +1011,11 @@ def buildcmdargs(name, *args, **opts):
     type conversion to string:
 
     >>> buildcmdargs('email', r=[0, 1])
-    ['email', '-r', '0', '-r', '1']
+    ['email', '-r0', '-r1']
     >>> buildcmdargs('grep', 'foo', rev=2)
-    ['grep', '--rev', '2', 'foo']
+    ['grep', '--rev=2', 'foo']
     >>> buildcmdargs('tag', u'\xc0', message=u'\xc1')
-    ['tag', '--message', u'\xc1', u'\xc0']
+    ['tag', u'--message=\xc1', u'\xc0']
     """
     fullargs = [_stringify(name)]
     for k, v in opts.iteritems():
@@ -1017,8 +1024,10 @@ def buildcmdargs(name, *args, **opts):
 
         if len(k) == 1:
             aname = '-%s' % k
+            apref = aname
         else:
             aname = '--%s' % k.replace('_', '-')
+            apref = aname + '='
         if isinstance(v, bool):
             if v:
                 fullargs.append(aname)
@@ -1026,11 +1035,9 @@ def buildcmdargs(name, *args, **opts):
             for e in v:
                 if e is None:
                     continue
-                fullargs.append(aname)
-                fullargs.append(_stringify(e))
+                fullargs.append(apref + _stringify(e))
         else:
-            fullargs.append(aname)
-            fullargs.append(_stringify(v))
+            fullargs.append(apref + _stringify(v))
 
     args = [_stringify(v) for v in args if v is not None]
     if any(e.startswith('-') for e in args):

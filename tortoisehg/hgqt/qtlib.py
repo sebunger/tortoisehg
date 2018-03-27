@@ -691,7 +691,7 @@ def getcheckboxpixmap(state, bgcolor, widget):
     option = QStyleOptionButton()
     style = QApplication.style()
     option.initFrom(widget)
-    option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option)
+    option.rect = style.subElementRect(style.SE_CheckBoxIndicator, option, None)
     option.rect.moveTo(1, 1)
     option.state |= state
     style.drawPrimitive(style.PE_IndicatorCheckBox, option, painter)
@@ -759,7 +759,6 @@ class ThgFont(QObject):
 _fontdefaults = {
     'fontcomment': 'monospace,10',
     'fontdiff': 'monospace,10',
-    'fontlist': 'sans,9',
     'fontlog': 'monospace,10',
     'fontoutputlog': 'sans,8'
 }

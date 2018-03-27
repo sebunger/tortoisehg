@@ -49,6 +49,6 @@ Spuštění z příkazového řádku
 
 kde [REV] je archivovaná revize, [TYPE] je typ vytvářeného archivu, a [DEST] je název souboru nebo složky, která se má vytvořit.
 
-Podrobněji viz `hg.1.html#archive <https://www.selenic.com/mercurial/hg.1.html#archive>`_, nebo zadejte :command:`hg help archive` z příkazového řádku systémové konzoly nebo v panelu Output Log ve Verpánku.
+Podrobněji viz `hg.1.html#archive <https://www.mercurial-scm.org/doc/hg.1.html#archive>`_, nebo zadejte :command:`hg help archive` z příkazového řádku systémové konzoly nebo v panelu Output Log ve Verpánku.
 
 .. vim: noet ts=4

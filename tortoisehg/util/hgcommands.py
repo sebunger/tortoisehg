@@ -27,7 +27,13 @@ cmdtable = {}
 _mqcmdtable = {}
 command = registrar.command(cmdtable)
 mqcommand = registrar.command(_mqcmdtable)
+
+configtable = {}
+configitem = registrar.configitem(configtable)
+
 testedwith = hgversion.testedwith
+
+configitem('tortoisehg', 'initskel')
 
 @command('debuggethostfingerprint',
     [('', 'insecure', None,
