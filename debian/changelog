@@ -1,8 +1,13 @@
-tortoisehg (4.4.1-1) UNRELEASED; urgency=medium
+tortoisehg (4.4.1-1) unstable; urgency=medium
 
-  * New upstream version 4.4.1
+  * New upstream version (Closes: #881707).
+  * Update copyright file.
+  * Update dependenceies to python-pyqt5 and python-pyqt5.qsci.
+  * Build-depend on python3-sphinx instead of python-sphinx.
+  * Bump Standards-Version to 4.1.2.
+  * Use HTTPS URL in watch file.
 
- -- Ludovico Cavedon <cavedon@debian.org>  Sun, 24 Dec 2017 14:49:56 +0100
+ -- Ludovico Cavedon <cavedon@debian.org>  Sun, 24 Dec 2017 16:40:05 +0100
 
 tortoisehg (4.3.1-1) unstable; urgency=medium
 
