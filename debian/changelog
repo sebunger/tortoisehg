@@ -2,8 +2,12 @@ tortoisehg (4.5.2-0.1) UNRELEASED; urgency=medium
 
   * Non-maintainer upload.
   * New upstream release (Closes: #390807)
+  * Fix spelling error in patch file (lintian clean)
+  * Update dependency on mercurial
+  * Update copyright notices
+  * Remove dependency on python-gobject (Closes: #890175)
 
- -- Thomas Liebetraut <thomas@tommie-lie.de>  Tue, 27 Mar 2018 22:02:32 +0200
+ -- Thomas Liebetraut <thomas@tommie-lie>  Wed, 28 Mar 2018 19:53:04 +0200
 
 tortoisehg (4.4.1-1) unstable; urgency=medium
 
