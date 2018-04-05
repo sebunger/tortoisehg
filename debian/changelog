@@ -6,6 +6,7 @@ tortoisehg (4.5.2-0.1) UNRELEASED; urgency=medium
   * Update dependency on mercurial
   * Update copyright notices
   * Remove dependency on python-gobject (Closes: #890175)
+  * Build-depend on dh-python
 
  -- Thomas Liebetraut <thomas@tommie-lie>  Wed, 28 Mar 2018 19:53:04 +0200
 
