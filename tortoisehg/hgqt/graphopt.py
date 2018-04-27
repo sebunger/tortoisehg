@@ -459,6 +459,10 @@ class Graph(object):
 
         return node
 
+    def getrevstate(self, row):
+        """Return (rev, isunapplied) of the node at the specified row"""
+        return self._rev_from_row(row), False
+
     def index(self, rev):
         """Get row number for specified revision"""
 

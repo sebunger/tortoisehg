@@ -570,12 +570,12 @@ class HgRepoListModel(QAbstractTableModel):
         if row >= len(self.graph) and not self.repo.ui.debugflag:
             # TODO: should not happen; internal data went wrong (issue #754)
             return Qt.NoItemFlags
-        gnode = self.graph[row]
-        if not self.isActiveRev(gnode.rev):
+        rev, isunapplied = self.graph.getrevstate(row)
+        if not self.isActiveRev(rev):
             return Qt.NoItemFlags
-        if gnode.shape == graph.NODE_SHAPE_UNAPPLIEDPATCH:
+        if isunapplied:
             flags |= Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
-        if gnode.rev is None:
+        if rev is None:
             flags |= Qt.ItemIsDropEnabled
         return flags
 
