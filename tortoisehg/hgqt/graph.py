@@ -915,6 +915,11 @@ class Graph(object):
             return self.nodes[-1]
         return self.nodes[idx]
 
+    def getrevstate(self, idx):
+        """Return (rev, isunapplied) of the node at the specified row"""
+        n = self[idx]
+        return n.rev, False
+
     def __len__(self):
         # len(graph) is the number of actually built graph nodes
         return len(self.nodes)
@@ -1013,6 +1018,12 @@ class GraphWithMq(object):
         if row < len(self._patchnames):
             return PatchGraphNode(self._patchnames[row])
         return self.graph[row - len(self._patchnames)]
+
+    def getrevstate(self, row):
+        """Return (rev, isunapplied) of the node at the specified row"""
+        if row < len(self._patchnames):
+            return self._patchnames[row], True
+        return self.graph.getrevstate(row - len(self._patchnames))
 
     def index(self, rev):
         """Get row number for specified revision"""

@@ -1733,7 +1733,7 @@ class RepoWidget(QWidget):
     @pyqtSlot(QAction)
     def _filterBySelectedRevisions(self, action):
         revs = hglib.compactrevs(sorted(self.repoview.selectedRevisions()))
-        expr = str(action.data())
+        expr = action.data()
         if not expr:
             self._filterByMatchDialog(revs)
             return
