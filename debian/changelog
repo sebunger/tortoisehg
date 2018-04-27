@@ -1,14 +1,16 @@
-tortoisehg (4.5.2-0.1) UNRELEASED; urgency=medium
+tortoisehg (4.5.3-1) unstable; urgency=medium
 
-  * Non-maintainer upload.
-  * New upstream release (Closes: #390807)
-  * Fix spelling error in patch file (lintian clean)
-  * Update dependency on mercurial
-  * Update copyright notices
-  * Remove dependency on python-gobject (Closes: #890175)
-  * Build-depend on dh-python
+  [ Thomas Liebetraut ]
+  * Fix spelling error in patch file (lintian clean).
+  * Update dependency on mercurial.
+  * Update copyright notices.
+  * Remove dependency on python-gobject (Closes: #890175).
+  * Build-depend on dh-python.
 
- -- Thomas Liebetraut <thomas@tommie-lie>  Wed, 28 Mar 2018 19:53:04 +0200
+  [ Ludovico Cavedon ]
+  * New upstream release (Closes: #390807).
+
+ -- Ludovico Cavedon <cavedon@debian.org>  Fri, 27 Apr 2018 01:07:54 -0700
 
 tortoisehg (4.4.1-1) unstable; urgency=medium
 
