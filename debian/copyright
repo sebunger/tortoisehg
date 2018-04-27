@@ -9,7 +9,7 @@ Copyright: 2007-2018, Steve Borho <steve@borho.org>
            2007-2008, TK Soh <teekaysoh@gmail.com>
 License: GPL-2
 
-Files: tortoisehg/hgqt/*
+Files: tortoisehg/*
 Copyright: 2008-2018, Steve Borho <steve@borho.org>
            2016, Unity Technologies
            2010, Yuki KODAMA <endflow.net@gmail.com>
