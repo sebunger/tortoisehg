@@ -8,7 +8,7 @@
 
 import urllib2, urllib
 
-from mercurial import error, extensions, subrepo, util
+from mercurial import error, extensions, subrepo
 from mercurial import dispatch as dispatchmod
 
 from tortoisehg.util import hgversion
@@ -29,7 +29,7 @@ def _dispatch(orig, req):
         ui.write_err(_('abort: ') + errormsg + '\n', label=label)
         if e.hint:
             ui.write_err(_('hint: ') + str(e.hint) + '\n', label=label)
-    except util.Abort, e:
+    except error.Abort, e:
         ui.write_err(_('abort: ') + str(e) + '\n', label='ui.error')
         if e.hint:
             ui.write_err(_('hint: ') + str(e.hint) + '\n', label='ui.error')

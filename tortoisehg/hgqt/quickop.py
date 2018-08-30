@@ -27,7 +27,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import util
+from mercurial import (
+    error,
+    util,
+)
 
 from ..util import (
     hglib,
@@ -216,7 +219,7 @@ class QuickOpDialog(QDialog):
             self.repo.lfstatus = True
             try:
                 repostate = self.repo.status()
-            except (EnvironmentError, util.Abort), e:
+            except (EnvironmentError, error.Abort), e:
                 qtlib.WarningMsgBox(_('Unable to read repository status'),
                                     hglib.tounicode(str(e)), parent=self)
                 return

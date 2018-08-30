@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Croatian <hg@li.org>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
 "PO-Revision-Date: 2013-08-10 15:26+0000\n"
 "Last-Translator: Mario Šarić <mario.saric@helix.hr>\n"
 "Language-Team: Croatian <hr@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:20+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:28+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg poslužitelj prekrivnih ikona"
@@ -28,7 +28,7 @@ msgstr "Izlazak"
 msgid "About"
 msgstr "O programu"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
+msgid "Copyright 2008-2018 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -585,8 +585,8 @@ msgstr "Ne osvježavaj novu radnu mapu"
 msgid "Use pull protocol to copy metadata"
 msgstr "Koristi protokol pull za kopiranje metapodataka"
 
-msgid "Use uncompressed transfer"
-msgstr "Koristi prijenos bez sažimanja"
+msgid "Clone with minimal processing"
+msgstr ""
 
 msgid "Include patch queue"
 msgstr ""
@@ -1007,6 +1007,9 @@ msgid "must be specified repository"
 msgstr ""
 
 msgid "must be specified 'type' in style"
+msgstr ""
+
+msgid "Git Commit:"
 msgstr ""
 
 msgid "Summary:"
@@ -2766,6 +2769,12 @@ msgstr ""
 msgid "Go &to Patch"
 msgstr ""
 
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
 msgid "&Finish Patch"
 msgstr ""
 
@@ -3554,6 +3563,10 @@ msgid "Node"
 msgstr ""
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
 msgid "Age"
 msgstr ""
 
@@ -4101,6 +4114,9 @@ msgid "&Tag..."
 msgstr ""
 
 msgid "Boo&kmark..."
+msgstr ""
+
+msgid "Top&ic..."
 msgstr ""
 
 msgid "Sig&n..."
@@ -4652,7 +4668,7 @@ msgstr ""
 msgid "Child:"
 msgstr ""
 
-msgid "Precursors:"
+msgid "Predecessors:"
 msgstr ""
 
 msgid "Successors:"
@@ -5324,6 +5340,15 @@ msgid "update all repos in current dir"
 msgstr ""
 
 msgid "thg thgstatus [OPTION]"
+msgstr ""
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
 msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
@@ -6246,12 +6271,6 @@ msgid "Diff Font"
 msgstr ""
 
 msgid "Font used to display text differences. Default: monospace 10"
-msgstr ""
-
-msgid "List Font"
-msgstr ""
-
-msgid "Font used to display file lists. Default: sans 9"
 msgstr ""
 
 msgid "ChangeLog Font"
@@ -7481,6 +7500,36 @@ msgstr ""
 msgid "&Strip"
 msgstr ""
 
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr ""
+
 msgid "Parent 1:"
 msgstr ""
 
@@ -8337,6 +8386,9 @@ msgstr ""
 
 #~ msgid "Clone"
 #~ msgstr "Kloniraj"
+
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "Koristi prijenos bez sažimanja"
 
 #~ msgid "Advanced options"
 #~ msgstr "Napredne mogućnosti"

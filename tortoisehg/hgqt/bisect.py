@@ -26,7 +26,6 @@ from .qtgui import (
 
 from mercurial import (
     error,
-    util,
 )
 
 from ..util import hglib
@@ -162,7 +161,7 @@ class BisectDialog(QDialog):
             return ctx.rev()
         except (error.LookupError, error.RepoLookupError), e:
             self._stbar.showMessage(hglib.tounicode(str(e)))
-        except util.Abort, e:
+        except error.Abort, e:
             if e.hint:
                 err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                             hglib.tounicode(e.hint))

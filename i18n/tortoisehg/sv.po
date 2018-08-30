@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: Swedish <sv@li.org>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
-"PO-Revision-Date: 2017-07-19 20:08+0000\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"PO-Revision-Date: 2018-03-07 04:45+0000\n"
 "Last-Translator: ojn <Unknown>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:20+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:29+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -27,8 +27,8 @@ msgstr "Stäng"
 msgid "About"
 msgstr "Om programmet"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
-msgstr "Copyright 2008-2017 Steve Borho med flera"
+msgid "Copyright 2008-2018 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Flera ikoner är tillhandahållna av  TortoiseSVN och Tango projekt"
@@ -317,82 +317,83 @@ msgid "Culprit found."
 msgstr ""
 
 msgid "Revision"
-msgstr ""
+msgstr "Revidering"
 
 msgid "Test this revision and report findings. (good/bad/skip)"
 msgstr ""
+"Testa revideringen och rapportera slutsatser (bra/dåligt/eller hoppa över)"
 
 #, python-format
 msgid "%s (hint: %s)"
-msgstr ""
+msgstr "%s (antydan: %s)"
 
 msgid "Bookmark:"
-msgstr ""
+msgstr "Bokmärke"
 
 msgid "New Name:"
 msgstr "Nytt namn:"
 
 msgid "Activate:"
-msgstr ""
+msgstr "Aktivera:"
 
 msgid "&Add"
-msgstr ""
+msgstr "&Lägg till"
 
 msgid "Re&name"
-msgstr ""
+msgstr "Byt&namn"
 
 msgid "&Remove"
-msgstr ""
+msgstr "&Ta bort"
 
 msgid "&Move"
-msgstr ""
+msgstr "&Flytta"
 
 #, python-format
 msgid "Bookmark - %s"
-msgstr ""
+msgstr "Bokmärk - %s"
 
 #, python-format
 msgid "A bookmark named \"%s\" already exists"
-msgstr ""
+msgstr "Bokmärken med namnet \"%s\" finns redan"
 
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr ""
+msgstr "Bokmärke '%s' har lagts till"
 
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr ""
+msgstr "Bokmärke med namnet \"%s\" finns inte"
 
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr ""
+msgstr "Bokmärke '%s' har flyttats"
 
 #, python-format
 msgid "Bookmark '%s' does not exist"
-msgstr ""
+msgstr "Bokmärke '%s' existerar inte"
 
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr ""
+msgstr "Bokmärke '%s' har raderats"
 
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr ""
+msgstr "Bokmärke '%s' har ändrat namn till '%s'"
 
 msgid "TortoiseHg Bookmark Sync"
-msgstr ""
+msgstr "TortoiseHg Synkronisera bokmärken"
 
 msgid "Outgoing Bookmarks"
-msgstr ""
+msgstr "Utgående bokmärken"
 
 msgid "&Push Bookmark"
 msgstr ""
 
 msgid "&Remove Bookmark"
-msgstr ""
+msgstr "&Radera Bokmärke"
 
 msgid "Incoming Bookmarks"
-msgstr ""
+msgstr "Inkommande Bokmärken"
 
 msgid "P&ull Bookmark"
 msgstr ""
@@ -576,7 +577,7 @@ msgstr ""
 msgid "Use pull protocol to copy metadata"
 msgstr ""
 
-msgid "Use uncompressed transfer"
+msgid "Clone with minimal processing"
 msgstr ""
 
 msgid "Include patch queue"
@@ -998,6 +999,9 @@ msgid "must be specified repository"
 msgstr ""
 
 msgid "must be specified 'type' in style"
+msgstr ""
+
+msgid "Git Commit:"
 msgstr ""
 
 msgid "Summary:"
@@ -2757,6 +2761,12 @@ msgstr ""
 msgid "Go &to Patch"
 msgstr ""
 
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
 msgid "&Finish Patch"
 msgstr ""
 
@@ -3545,6 +3555,10 @@ msgid "Node"
 msgstr ""
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
 msgid "Age"
 msgstr ""
 
@@ -4092,6 +4106,9 @@ msgid "&Tag..."
 msgstr ""
 
 msgid "Boo&kmark..."
+msgstr ""
+
+msgid "Top&ic..."
 msgstr ""
 
 msgid "Sig&n..."
@@ -4643,7 +4660,7 @@ msgstr ""
 msgid "Child:"
 msgstr ""
 
-msgid "Precursors:"
+msgid "Predecessors:"
 msgstr ""
 
 msgid "Successors:"
@@ -5315,6 +5332,15 @@ msgid "update all repos in current dir"
 msgstr ""
 
 msgid "thg thgstatus [OPTION]"
+msgstr ""
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
 msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
@@ -6237,12 +6263,6 @@ msgid "Diff Font"
 msgstr ""
 
 msgid "Font used to display text differences. Default: monospace 10"
-msgstr ""
-
-msgid "List Font"
-msgstr ""
-
-msgid "Font used to display file lists. Default: sans 9"
 msgstr ""
 
 msgid "ChangeLog Font"
@@ -7470,6 +7490,36 @@ msgid "Strip - %s"
 msgstr ""
 
 msgid "&Strip"
+msgstr ""
+
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
 msgstr ""
 
 msgid "Parent 1:"

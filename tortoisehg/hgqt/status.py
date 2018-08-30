@@ -727,7 +727,7 @@ class StatusThread(QThread):
             self.showMessage.emit(hglib.tounicode(str(e)))
         except (error.LookupError, error.RepoError, error.ConfigError), e:
             self.showMessage.emit(hglib.tounicode(str(e)))
-        except util.Abort, e:
+        except error.Abort, e:
             if e.hint:
                 err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                             hglib.tounicode(e.hint))

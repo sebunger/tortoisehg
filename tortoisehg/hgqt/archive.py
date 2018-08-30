@@ -27,7 +27,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -73,11 +76,10 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
 
         possibleroots = []
         if minrev is not None:
-            parents = self.repo[minrev].parents()
+            parents = scmutil.revsymbol(self.repo, str(minrev)).parents()
             if parents:
                 for p in parents:
-                    text = hglib.tounicode(str(int(p)))
-                    possibleroots.append(text)
+                    possibleroots.append(u'%d' % p.rev())
             else:
                 possibleroots.append('null')
 
@@ -217,7 +219,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
     def get_subrepos_present(self):
         rev = self.get_selected_rev()
         try:
-            ctx = self.repo[rev]
+            ctx = scmutil.revsymbol(self.repo, rev)
         except (error.LookupError, error.RepoLookupError):
             return False
         return '.hgsubstate' in ctx
@@ -272,7 +274,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
             text = wdrev
         else:
             try:
-                self.repo[hglib.fromunicode(text)]
+                scmutil.revsymbol(self.repo, hglib.fromunicode(text))
             except (error.RepoError, error.LookupError):
                 self.commandChanged.emit()
                 return
@@ -312,7 +314,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         if not rev or not self.dest_edit.text():
             return False
         try:
-            return rev in self.repo
+            return scmutil.isrevsymbol(self.repo, rev)
         except error.LookupError:
             # ambiguous changeid
             return False

@@ -24,6 +24,7 @@ from .qtcore import (
 from .qtgui import (
     QAction,
     QActionGroup,
+    QDesktopServices,
     QDialog,
     QFrame,
     QKeySequence,
@@ -294,7 +295,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 
     def onRevisionSelected(self, rev):
         'called by repowidget when repoview changes revisions'
-        self.ctx = ctx = self.repo.changectx(rev)
+        self.ctx = ctx = self.repo[rev]
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
         msg = ctx.description()
@@ -591,27 +592,29 @@ class RevDetailsDialog(QDialog):
     def setFileStatusFilter(self, statustext):
         self.revdetails.setFileStatusFilter(statustext)
 
+    @pyqtSlot(str)
     def linkActivated(self, link):
-        link = hglib.fromunicode(link)
-        link = link.split(':', 1)
-        if len(link) == 1:
-            linktype = 'cset:'
-            linktarget = link[0]
+        handlers = {'cset': self.setRev,
+                    'repo': self._showRepoInWorkbench}
+        if ':' in link:
+            scheme, param = link.split(':', 1)
+            hdr = handlers.get(scheme)
+            if hdr:
+                return hdr(param)
+        if os.path.isabs(link):
+            qtlib.openlocalurl(link)
         else:
-            linktype = link[0]
-            linktarget = link[1]
+            QDesktopServices.openUrl(QUrl(link))
 
-        if linktype == 'cset':
-            self.setRev(linktarget)
-        elif linktype == 'repo':
-            try:
-                linkpath, rev = linktarget.split('?', 1)
-            except ValueError:
-                linkpath = linktarget
-                rev = None
-            # TODO: implement by using signal-slot if possible
-            from tortoisehg.hgqt import run
-            run.qtrun.showRepoInWorkbench(hglib.tounicode(linkpath), rev)
+    def _showRepoInWorkbench(self, linktarget):
+        try:
+            linkpath, rev = linktarget.split('?', 1)
+        except ValueError:
+            linkpath = linktarget
+            rev = None
+        # TODO: implement by using signal-slot if possible
+        from tortoisehg.hgqt import run
+        run.qtrun.showRepoInWorkbench(linkpath, rev)
 
     @pyqtSlot()
     def refresh(self):

@@ -332,7 +332,7 @@ class StandardDag(object):
             if self.stop_rev <= src_rev < ctx.rev() and \
                     self.visiblerev(src_rev) and self.visiblectx(src):
                 parents.append((src, LINE_TYPE_GRAFT, False))
-        for octx in obsoleteutil.first_known_precursors(ctx):
+        for octx in obsoleteutil.first_known_predecessors(ctx):
             src_rev = octx.rev()
             if self.stop_rev <= src_rev < ctx.rev() and \
                     self.visiblerev(src_rev) and self.visiblectx(octx):

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
 "PO-Revision-Date: 2015-06-28 12:43+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:18+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:27+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Server icone di overlay di TortoiseHg"
@@ -27,7 +27,7 @@ msgstr "Esci"
 msgid "About"
 msgstr "Informazioni su..."
 
-msgid "Copyright 2008-2017 Steve Borho and others"
+msgid "Copyright 2008-2018 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -581,8 +581,8 @@ msgstr "Non aggiornare la nuova directory di lavoro"
 msgid "Use pull protocol to copy metadata"
 msgstr "Usa protocollo di pull per copiare i metadati"
 
-msgid "Use uncompressed transfer"
-msgstr "Usa trasferimento non compresso"
+msgid "Clone with minimal processing"
+msgstr ""
 
 msgid "Include patch queue"
 msgstr ""
@@ -1006,6 +1006,9 @@ msgstr "deve essere specificato un repository"
 
 msgid "must be specified 'type' in style"
 msgstr "deve essere specificato 'type' nello stile"
+
+msgid "Git Commit:"
+msgstr ""
 
 msgid "Summary:"
 msgstr "Sommario:"
@@ -2792,6 +2795,12 @@ msgstr "Annulla tutte le patch"
 msgid "Go &to Patch"
 msgstr ""
 
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
 msgid "&Finish Patch"
 msgstr ""
 
@@ -3580,6 +3589,10 @@ msgid "Node"
 msgstr ""
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
 msgid "Age"
 msgstr ""
 
@@ -4127,6 +4140,9 @@ msgid "&Tag..."
 msgstr ""
 
 msgid "Boo&kmark..."
+msgstr ""
+
+msgid "Top&ic..."
 msgstr ""
 
 msgid "Sig&n..."
@@ -4678,7 +4694,7 @@ msgstr "Changeset:"
 msgid "Child:"
 msgstr "Figlio:"
 
-msgid "Precursors:"
+msgid "Predecessors:"
 msgstr ""
 
 msgid "Successors:"
@@ -5360,6 +5376,15 @@ msgid "update all repos in current dir"
 msgstr "aggiorna tutti i repository nella directory corrente"
 
 msgid "thg thgstatus [OPTION]"
+msgstr ""
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
 msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
@@ -6336,12 +6361,6 @@ msgid "Diff Font"
 msgstr ""
 
 msgid "Font used to display text differences. Default: monospace 10"
-msgstr ""
-
-msgid "List Font"
-msgstr ""
-
-msgid "Font used to display file lists. Default: sans 9"
 msgstr ""
 
 msgid "ChangeLog Font"
@@ -7576,6 +7595,36 @@ msgid "Strip - %s"
 msgstr "Elimina - %s"
 
 msgid "&Strip"
+msgstr ""
+
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
 msgstr ""
 
 msgid "Parent 1:"
@@ -9545,6 +9594,9 @@ msgstr ""
 
 #~ msgid "Source path:"
 #~ msgstr "Percorso sorgente:"
+
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "Usa trasferimento non compresso"
 
 #~ msgid "Merge "
 #~ msgstr "Merge "

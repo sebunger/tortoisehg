@@ -22,7 +22,6 @@ from .qtgui import (
     QComboBox,
     QCompleter,
     QFontMetrics,
-    QIcon,
     QLabel,
     QLineEdit,
     QMainWindow,
@@ -420,6 +419,8 @@ class RepoFilterBar(QToolBar):
         self._branchCombo.setMaxVisibleItems(30)
         self._branchCombo.currentIndexChanged.connect(self._emitBranchChanged)
         completer = QCompleter(self._branchCombo.model(), self._branchCombo)
+        if hasattr(completer, 'setFilterMode'):  # Qt>=5.2
+            completer.setFilterMode(Qt.MatchContains)
         self._branchCombo.setCompleter(completer)
 
         self.addWidget(self._branchLabel)

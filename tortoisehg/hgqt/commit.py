@@ -56,7 +56,9 @@ from mercurial import (
     error,
     obsolete,  # delete if obsolete becomes enabled by default
     phases,
-    util,
+)
+from mercurial.utils import (
+    dateutil,
 )
 
 from ..util import (
@@ -384,7 +386,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if not self.hasmqbutton:
             return 'commit'
         else:
-            pctx = self.repo.changectx('.')
+            pctx = self.repo['.']
             ispatch = 'qtip' in pctx.tags()
             if not ispatch:
                 # Set the button to Commit
@@ -397,14 +399,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 return 'qref'
 
     def commitSetupButton(self):
-        ispatch = lambda r: 'qtip' in r.changectx('.').tags()
-        notpatch = lambda r: 'qtip' not in r.changectx('.').tags()
+        ispatch = lambda r: 'qtip' in r['.'].tags()
+        notpatch = lambda r: 'qtip' not in r['.'].tags()
         def canamend(r):
             if ispatch(r):
                 return False
-            ctx = r.changectx('.')
+            ctx = r['.']
             return (ctx.phase() != phases.public) \
-                and len(r.changectx(None).parents()) < 2 \
+                and len(r[None].parents()) < 2 \
                 and (obsolete._enabled or not ctx.children())
 
         acts = [
@@ -486,7 +488,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             selectedAction.setChecked(True)
         curraction = self.mqgroup.checkedAction()
         oldpctx = self.stwidget.pctx
-        pctx = self.repo.changectx('.')
+        pctx = self.repo['.']
         if curraction._name == 'qnew':
             self.pnlabel.setVisible(True)
             self.pnedit.setVisible(True)
@@ -735,7 +737,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot()
     def refresh(self):
-        ispatch = self.repo.changectx('.').thgmqappliedpatch()
+        ispatch = self.repo['.'].thgmqappliedpatch()
         if not self.hasmqbutton:
             self.commitButtonEnable.emit(not ispatch)
         self.msgte.refresh(self.repo)
@@ -1169,7 +1171,7 @@ class DetailsDialog(QDialog):
         try:
             val = hglib.tounicode(self.repo.ui.username())
             l.append(val)
-        except util.Abort:
+        except error.Abort:
             pass
         for name in userhistory:
             if name not in l:
@@ -1204,7 +1206,7 @@ class DetailsDialog(QDialog):
         self.datecb.toggled.connect(curdate.setEnabled)
         self.datecb.toggled.connect(lambda s: s and curdate.setFocus())
         curdate.clicked.connect( lambda: self.datele.setText(
-                hglib.tounicode(hglib.displaytime(util.makedate()))))
+                hglib.tounicode(hglib.displaytime(dateutil.makedate()))))
         if opts.get('date'):
             self.datele.setText(opts['date'])
             self.datecb.setChecked(True)
@@ -1395,8 +1397,8 @@ class DetailsDialog(QDialog):
         if self.datecb.isChecked():
             date = hglib.fromunicode(self.datele.text())
             try:
-                util.parsedate(date)
-            except error.Abort, e:
+                dateutil.parsedate(date)
+            except error.ParseError as e:
                 if e.hint:
                     err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                                 hglib.tounicode(e.hint))
@@ -1416,7 +1418,7 @@ class DetailsDialog(QDialog):
         if not user:
             try:
                 self.repo.ui.username()
-            except util.Abort, e:
+            except error.Abort, e:
                 if e.hint:
                     err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                                 hglib.tounicode(e.hint))

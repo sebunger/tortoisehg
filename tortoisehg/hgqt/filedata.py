@@ -10,6 +10,9 @@ import cStringIO
 
 from mercurial import commands, error, match, patch, subrepo, util
 from mercurial import copies
+from mercurial.utils import (
+    dateutil,
+)
 from mercurial.node import nullrev
 
 from tortoisehg.util import hglib, patchctx
@@ -217,7 +220,7 @@ class FileData(_AbstractFileData):
             self._readStatus(ctx, ctx2, wfile, status, changeselect, force)
         except _BadContent, e:
             self.error = errorprefix + e.args[0] + '\n\n' + forcedisplaymsg
-        except (EnvironmentError, error.LookupError, util.Abort), e:
+        except (EnvironmentError, error.LookupError, error.Abort), e:
             self.error = errorprefix + hglib.tounicode(str(e))
 
     def _checkMaxDiff(self, ctx, wfile, maxdiff, force):
@@ -416,8 +419,8 @@ class FileData(_AbstractFileData):
         else:
             diffopts = patch.diffopts(repo.ui, {})
             diffopts.git = False
-            newdate = util.datestr(ctx.date())
-            olddate = util.datestr(ctx2.date())
+            newdate = dateutil.datestr(ctx.date())
+            olddate = dateutil.datestr(ctx2.date())
             if isbfile:
                 olddata += '\0'
                 newdata += '\0'
@@ -462,7 +465,7 @@ class DirData(_AbstractFileData):
         try:
             m = ctx.match(['path:%s' % self._wfile])
             self.diff = ''.join(ctx.diff(pctx, m))
-        except (EnvironmentError, util.Abort), e:
+        except (EnvironmentError, error.Abort), e:
             self.error = hglib.tounicode(str(e))
             return
 
@@ -693,7 +696,7 @@ class SubrepoData(_AbstractFileData):
 
                 return out, sstatedesc
 
-            srev = ctx.substate.get(wfile, subrepo.nullstate)[1]
+            srev = ctx.substate.get(wfile, hglib.nullsubrepostate)[1]
             srepo = None
             subabspath = os.path.join(ctx._repo.root, wfile)
             sactual = ''
@@ -708,7 +711,7 @@ class SubrepoData(_AbstractFileData):
                         self.error = _('Not a Mercurial subrepo, not '
                                        'previewable')
                         return
-                except util.Abort, e:
+                except error.Abort, e:
                     self.error = (_('Error previewing subrepo: %s')
                                   % hglib.tounicode(str(e))) + u'\n\n'
                     self.error += _('Subrepo may be damaged or '
@@ -738,7 +741,7 @@ class SubrepoData(_AbstractFileData):
 
             sstatedesc = 'changed'
             if ctx.rev() is not None:
-                sparent = ctx2.substate.get(wfile, subrepo.nullstate)[1]
+                sparent = ctx2.substate.get(wfile, hglib.nullsubrepostate)[1]
                 subrepochange, sstatedesc = \
                     genSubrepoRevChangedDescription(wfile,
                         sparent, srev, ctx._repo)
@@ -771,7 +774,7 @@ class SubrepoData(_AbstractFileData):
             if sactual:
                 lbl = ' <a href="repo:%%s">%s</a>' % _('open...')
                 self.flabel += lbl % hglib.tounicode(srepo.root)
-        except (EnvironmentError, error.RepoError, util.Abort), e:
+        except (EnvironmentError, error.RepoError, error.Abort), e:
             self.error = _('Error previewing subrepo: %s') % \
                     hglib.tounicode(str(e))
 
@@ -796,7 +799,7 @@ def createDirData(ctx, pctx, path, rpath=None):
 
 def createSubrepoData(ctx, pctx, path, status=None, rpath=None, subkind=None):
     if not subkind:
-        subkind = ctx.substate.get(path, subrepo.nullstate)[2]
+        subkind = ctx.substate.get(path, hglib.nullsubrepostate)[2]
     # TODO: replace 'S' by subrepo's status
     return SubrepoData(ctx, pctx, path, 'S', rpath, subkind)
 

@@ -1,5 +1,6 @@
 import os, sys
 from mercurial import util
+from mercurial.utils import procutil
 from tortoisehg.util import hglib
 
 def defaultshell():
@@ -38,7 +39,7 @@ def _findtool(ui, tool):
             continue
         p = util.lookupreg(k, _toolstr(ui, tool, "regname"))
         if p:
-            p = util.findexe(p + _toolstr(ui, tool, "regappend"))
+            p = procutil.findexe(p + _toolstr(ui, tool, "regappend"))
             if p:
                 toolcache[tool] = p
                 return p
@@ -46,12 +47,12 @@ def _findtool(ui, tool):
     exe = _toolstr(ui, tool, _platformexecutablekey)
     if not exe:
         exe = _toolstr(ui, tool, 'executable', tool)
-    path = util.findexe(util.expandpath(exe))
+    path = procutil.findexe(util.expandpath(exe))
     if path:
         toolcache[tool] = path
         return path
     elif tool != exe:
-        path = util.findexe(tool)
+        path = procutil.findexe(tool)
         toolcache[tool] = path
         return path
     toolcache[tool] = None
@@ -92,7 +93,7 @@ def _findterminal(ui):
     for p, t in tools:
         toolpath = _findtool(ui, t)
         if toolpath:
-            return (t, util.shellquote(toolpath))
+            return (t, procutil.shellquote(toolpath))
 
     # fallback to the default shell
     global _defaultshell

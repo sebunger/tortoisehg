@@ -116,7 +116,7 @@ class AboutDialog(QDialog):
         self._readsettings()
 
         # Spawn it later, so that the dialog gets visible quickly.
-        QTimer.singleShot(0, self.getUpdateInfo)
+        QTimer.singleShot(1000, self.getUpdateInfo)
         self._newverreply = None
 
     def getVersionInfo(self):

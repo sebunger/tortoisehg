@@ -12,6 +12,7 @@ import os
 import socket
 
 from mercurial import (
+    error,
     extensions,
     registrar,
     sslutil,
@@ -52,7 +53,7 @@ def debuggethostfingerprint(ui, repo, source='default', **opts):
     host = u.host
     port = util.getport(u.port or scheme or '-1')
     if scheme != 'https' or not host or not (0 <= port <= 65535):
-        raise util.Abort(_('unsupported URL: %s') % source)
+        raise error.Abort(_('unsupported URL: %s') % source)
 
     sock = socket.socket()
     try:
@@ -60,8 +61,8 @@ def debuggethostfingerprint(ui, repo, source='default', **opts):
         sock = sslutil.wrapsocket(sock, None, None, ui, serverhostname=host)
         peercert = sock.getpeercert(True)
         if not peercert:
-            raise util.Abort(_('%s certificate error: no certificate received')
-                             % host)
+            raise error.Abort(_('%s certificate error: no certificate received')
+                              % host)
     finally:
         sock.close()
 
@@ -119,11 +120,11 @@ def qreorder(ui, repo, *patches, **opts):
     after = opts['after'] or None
     q = repo.mq
     if any(n not in q.series for n in patches):
-        raise util.Abort(_('unknown patch to move specified'))
+        raise error.Abort(_('unknown patch to move specified'))
     if after in patches:
-        raise util.Abort(_('invalid patch position specified'))
+        raise error.Abort(_('invalid patch position specified'))
     if any(q.isapplied(n) for n in patches):
-        raise util.Abort(_('cannot move applied patches'))
+        raise error.Abort(_('cannot move applied patches'))
 
     if after is None:
         at = 0
@@ -131,9 +132,9 @@ def qreorder(ui, repo, *patches, **opts):
         try:
             at = q.series.index(after) + 1
         except ValueError:
-            raise util.Abort(_('patch %s not in series') % after)
+            raise error.Abort(_('patch %s not in series') % after)
     if at < q.seriesend(True):
-        raise util.Abort(_('cannot move into applied patches'))
+        raise error.Abort(_('cannot move into applied patches'))
 
     wlock = repo.wlock()
     try:

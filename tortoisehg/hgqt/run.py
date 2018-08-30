@@ -6,11 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-shortlicense = '''
-Copyright (C) 2008-2018 Steve Borho <steve@borho.org> and others.
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-'''
+from __future__ import absolute_import
 
 import getopt
 import os
@@ -18,19 +14,45 @@ import pdb
 import sys
 import subprocess
 
-from mercurial import util, fancyopts, cmdutil, extensions, error, scmutil
-from mercurial import pathutil, registrar
+from mercurial import (
+    cmdutil,
+    error,
+    extensions,
+    fancyopts,
+    pathutil,
+    registrar,
+    scmutil,
+    util,
+)
+from mercurial.utils import (
+    stringutil,
+)
 
-from tortoisehg.util.i18n import agettext as _
-from tortoisehg.util import hglib, paths, i18n
-from tortoisehg.util import version as thgversion
-from tortoisehg.hgqt import qtapp, qtlib, thgrepo
-from tortoisehg.hgqt import cmdui, quickop
+from ..util import (
+    hglib,
+    i18n,
+    paths,
+    version as thgversion,
+)
+from ..util.i18n import agettext as _
+from . import (
+    cmdui,
+    qtapp,
+    qtlib,
+    quickop,
+    thgrepo,
+)
 
 try:
     from tortoisehg.util.config import nofork as config_nofork
 except ImportError:
     config_nofork = None
+
+shortlicense = '''
+Copyright (C) 2008-2018 Steve Borho <steve@borho.org> and others.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+'''
 
 console_commands = 'help thgstatus version'
 nonrepo_commands = '''userconfig shellconfig clone init debugblockmatcher
@@ -180,7 +202,7 @@ def get_files_from_listfile():
         try:
             cpath = pathutil.canonpath(root, cwd, f)
             # canonpath will abort on .hg/ paths
-        except util.Abort:
+        except error.Abort:
             continue
         if cpath.startswith(cwd_rel):
             cpath = cpath[len(cwd_rel):]
@@ -264,7 +286,7 @@ def _runcatch(ui, args):
             help_(ui, 'shortlist')
     except error.RepoError, inst:
         ui.warn(_("abort: %s!\n") % inst)
-    except util.Abort, inst:
+    except error.Abort, inst:
         ui.warn(_("abort: %s\n") % inst)
         if inst.hint:
             ui.warn(_("(%s)\n") % inst.hint)
@@ -275,7 +297,7 @@ def runcommand(ui, args):
     cmd, func, args, options, cmdoptions, alias = _parse(ui, args)
 
     if options['config']:
-        raise util.Abort(_('option --config may not be abbreviated!'))
+        raise error.Abort(_('option --config may not be abbreviated!'))
 
     cmdoptions['alias'] = alias
     ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
@@ -365,7 +387,7 @@ def _runcommand(ui, options, cmd, cmdfunc):
         try:
             from mercurial import lsprof
         except ImportError:
-            raise util.Abort(_(
+            raise error.Abort(_(
                 'lsprof not available - install from '
                 'http://codespeak.net/svn/user/arigo/hack/misc/lsprof/'))
         p = lsprof.Profiler()
@@ -471,7 +493,7 @@ def annotate(ui, repoagent, *pats, **opts):
         try:
             lineno = int(opts['line'])
         except ValueError:
-            raise util.Abort(_('invalid line number: %s') % opts['line'])
+            raise error.Abort(_('invalid line number: %s') % opts['line'])
         dlg.showLine(lineno)
     if opts.get('pattern'):
         dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
@@ -504,7 +526,7 @@ def backout(ui, repoagent, *pats, **opts):
     rev = scmutil.revsingle(repo, rev).rev()
     msg = backoutmod.checkrev(repo, rev)
     if msg:
-        raise util.Abort(hglib.fromunicode(msg))
+        raise error.Abort(hglib.fromunicode(msg))
     return backoutmod.BackoutDialog(repoagent, rev)
 
 @command('^bisect', [], _('thg bisect'))
@@ -522,7 +544,7 @@ def bookmark(ui, repoagent, *names, **opts):
     repo = repoagent.rawRepo()
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
     if len(names) > 1:
-        raise util.Abort(_('only one new bookmark name allowed'))
+        raise error.Abort(_('only one new bookmark name allowed'))
     dlg = bookmarkmod.BookmarkDialog(repoagent, rev)
     if names:
         dlg.setBookmarkName(hglib.tounicode(names[0]))
@@ -587,7 +609,7 @@ def debuglighthg(ui, repoagent, *pats, **opts):
 def debugruncommand(ui, repoagent, *cmdline, **opts):
     """run hg command in dialog"""
     if not cmdline:
-        raise util.Abort(_('no command specified'))
+        raise error.Abort(_('no command specified'))
     dlg = cmdui.CmdSessionDialog()
     dlg.setLogVisible(ui.verbose)
     sess = repoagent.runCommand(map(hglib.tounicode, cmdline), dlg)
@@ -615,7 +637,7 @@ def email(ui, repoagent, *revs, **opts):
     # TODO: same options as patchbomb
     if opts.get('rev'):
         if revs:
-            raise util.Abort(_('use only one form to specify the revision'))
+            raise error.Abort(_('use only one form to specify the revision'))
         revs = opts.get('rev')
 
     repo = repoagent.rawRepo()
@@ -630,7 +652,7 @@ def filelog(ui, repoagent, *pats, **opts):
     """show history of the specified file"""
     from tortoisehg.hgqt import filedialogs
     if len(pats) != 1:
-        raise util.Abort(_('requires a single filename'))
+        raise error.Abort(_('requires a single filename'))
     repo = repoagent.rawRepo()
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
     filename = hglib.canonpaths(pats)[0]
@@ -656,7 +678,7 @@ def graft(ui, repoagent, *revs, **opts):
     revs = list(revs)
     revs.extend(opts['rev'])
     if not os.path.exists(repo.vfs.join('graftstate')) and not revs:
-        raise util.Abort(_('You must provide revisions to graft'))
+        raise error.Abort(_('You must provide revisions to graft'))
     return graftmod.GraftDialog(repoagent, None, source=revs)
 
 @command('^grep|search',
@@ -775,9 +797,10 @@ def help_(ui, name=None, with_version=False, **opts):
                 commands = cmds[f].replace("|",", ")
                 ui.write(" %s:\n      %s\n"%(commands, h[f]))
             else:
-                ui.write('%s\n' % (util.wrap(h[f], textwidth,
-                                             initindent=' %-*s   ' % (m, f),
-                                             hangindent=' ' * (m + 4))))
+                ui.write('%s\n'
+                         % (stringutil.wrap(h[f], textwidth,
+                                            initindent=' %-*s   ' % (m, f),
+                                            hangindent=' ' * (m + 4))))
 
         if not ui.quiet:
             addglobalopts(True)
@@ -846,9 +869,9 @@ def help_(ui, name=None, with_version=False, **opts):
             if second:
                 initindent = ' %-*s  ' % (opts_len, first)
                 hangindent = ' ' * (opts_len + 3)
-                ui.write('%s\n' % (util.wrap(second, textwidth,
-                                             initindent=initindent,
-                                             hangindent=hangindent)))
+                ui.write('%s\n' % (stringutil.wrap(second, textwidth,
+                                                   initindent=initindent,
+                                                   hangindent=hangindent)))
             else:
                 ui.write("%s\n" % first)
 
@@ -895,7 +918,7 @@ def log(ui, *pats, **opts):
     if opts.get('query') and pats:
         # 'filelog' does not support -k, and multiple filenames are packed
         # into revset query that may conflict with user-supplied one.
-        raise util.Abort(_('cannot specify both -k/--query and filenames'))
+        raise error.Abort(_('cannot specify both -k/--query and filenames'))
 
     root = opts.get('root') or paths.find_root()
     if root and len(pats) == 1 and os.path.isfile(pats[0]):
@@ -951,7 +974,7 @@ def manifest(ui, repoagent, *pats, **opts):
             try:
                 lineno = int(opts['line'])
             except ValueError:
-                raise util.Abort(_('invalid line number: %s') % opts['line'])
+                raise error.Abort(_('invalid line number: %s') % opts['line'])
             dlg.showLine(lineno)
     if opts.get('pattern'):
         dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
@@ -967,7 +990,7 @@ def merge(ui, repoagent, *pats, **opts):
     if not rev and len(pats):
         rev = pats[0]
     if not rev:
-        raise util.Abort(_('Merge revision not specified or not found'))
+        raise error.Abort(_('Merge revision not specified or not found'))
     repo = repoagent.rawRepo()
     rev = scmutil.revsingle(repo, rev).rev()
     return mergemod.MergeDialog(repoagent, rev)
@@ -981,14 +1004,14 @@ def postreview(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     if 'reviewboard' not in repo.extensions():
         url = 'https://www.mercurial-scm.org/wiki/ReviewboardExtension'
-        raise util.Abort(_('reviewboard extension not enabled'),
-                         hint=(_('see <a href="%(url)s">%(url)s</a>')
-                               % {'url': url}))
+        raise error.Abort(_('reviewboard extension not enabled'),
+                          hint=(_('see <a href="%(url)s">%(url)s</a>')
+                                % {'url': url}))
     revs = opts.get('rev') or None
     if not revs and len(pats):
         revs = pats[0]
     if not revs:
-        raise util.Abort(_('no revisions specified'))
+        raise error.Abort(_('no revisions specified'))
     return postreviewmod.PostReviewDialog(repo.ui, repoagent, revs)
 
 @command('^prune|obsolete|kill',
@@ -1028,7 +1051,7 @@ def rebase(ui, repoagent, *pats, **opts):
                          hglib.tounicode(_('Resuming rebase already in '
                                            'progress')))
     elif not opts['source'] or not opts['dest']:
-        raise util.Abort(_('You must provide source and dest arguments'))
+        raise error.Abort(_('You must provide source and dest arguments'))
     return rebasemod.RebaseDialog(repoagent, None, **opts)
 
 @command('rejects', [], _('thg rejects [FILE]'))
@@ -1036,7 +1059,7 @@ def rejects(ui, *pats, **opts):
     """manually resolve rejected patch chunks"""
     from tortoisehg.hgqt import rejects as rejectsmod
     if len(pats) != 1:
-        raise util.Abort(_('You must provide the path to a file'))
+        raise error.Abort(_('You must provide the path to a file'))
     path = pats[0]
     if path.endswith('.rej'):
         path = path[:-4]
@@ -1139,7 +1162,7 @@ def sign(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import sign as signmod
     repo = repoagent.rawRepo()
     if 'gpg' not in repo.extensions():
-        raise util.Abort(_('Please enable the Gpg extension first.'))
+        raise error.Abort(_('Please enable the Gpg extension first.'))
     kargs = {}
     rev = len(pats) > 0 and pats[0] or None
     if rev:
@@ -1222,6 +1245,23 @@ def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
     from tortoisehg.util import thgstatus as thgstatusmod
     thgstatusmod.run(ui, *pats, **opts)
+
+@command('topics',
+    [('r', 'rev', '', _('revision'))],
+    _('thg topics [-r REV] [NAME]'))
+def topics(ui, repoagent, *names, **opts):
+    """add, remove or change a topic"""
+    repo = repoagent.rawRepo()
+    if 'topic' not in repo.extensions():
+        raise error.Abort(_('Please enable the Topic extension first.'))
+    from tortoisehg.hgqt import topics as topicsmod
+    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    if len(names) > 1:
+        raise error.Abort(_('only one new topic name allowed'))
+    dlg = topicsmod.TopicsDialog(repoagent, rev)
+    if names:
+        dlg.setTopicName(hglib.tounicode(names[0]))
+    return dlg
 
 @command('^update|checkout|co',
     [('C', 'clean', None, _('discard uncommitted changes (no backup)')),

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
 "PO-Revision-Date: 2015-09-03 18:15+0000\n"
 "Last-Translator: yfdyh000 <yfdyh000@gmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:21+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:30+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 "Language: zh_CN\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -28,7 +28,7 @@ msgstr "退出"
 msgid "About"
 msgstr "关于"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
+msgid "Copyright 2008-2018 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -581,8 +581,8 @@ msgstr "不更新当前新的工作目录"
 msgid "Use pull protocol to copy metadata"
 msgstr "使用 pull 协议复制元数据"
 
-msgid "Use uncompressed transfer"
-msgstr "使用非压缩传输"
+msgid "Clone with minimal processing"
+msgstr ""
 
 msgid "Include patch queue"
 msgstr "导入补丁队列"
@@ -1008,6 +1008,9 @@ msgstr "必须是指定的仓库"
 
 msgid "must be specified 'type' in style"
 msgstr "必须是样式(style)中指定的'type'"
+
+msgid "Git Commit:"
+msgstr ""
 
 msgid "Summary:"
 msgstr "摘要:"
@@ -2815,6 +2818,12 @@ msgstr "取消应用所有补丁"
 msgid "Go &to Patch"
 msgstr ""
 
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
 msgid "&Finish Patch"
 msgstr "完成补丁(&F)"
 
@@ -3607,6 +3616,10 @@ msgid "Node"
 msgstr "节点"
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
 msgid "Age"
 msgstr "时间"
 
@@ -4165,6 +4178,9 @@ msgstr "标签(&T)..."
 
 msgid "Boo&kmark..."
 msgstr "书签(&K)..."
+
+msgid "Top&ic..."
+msgstr ""
 
 msgid "Sig&n..."
 msgstr "签(&N)..."
@@ -4731,8 +4747,8 @@ msgstr "修订集:"
 msgid "Child:"
 msgstr "子版本:"
 
-msgid "Precursors:"
-msgstr "先驱:"
+msgid "Predecessors:"
+msgstr ""
 
 msgid "Successors:"
 msgstr "继任者:"
@@ -5415,6 +5431,15 @@ msgstr "更新当前目录下的所有仓库"
 
 msgid "thg thgstatus [OPTION]"
 msgstr "thg thgstatus [OPTION]"
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
+msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
 msgstr "thg update [-C] [[-r] REV]"
@@ -6386,12 +6411,6 @@ msgstr "差异字体"
 
 msgid "Font used to display text differences. Default: monospace 10"
 msgstr "显示差异文本的字体。默认：monospace 10"
-
-msgid "List Font"
-msgstr "列表字体"
-
-msgid "Font used to display file lists. Default: sans 9"
-msgstr "显示文件列表的字体。默认：sans 9"
 
 msgid "ChangeLog Font"
 msgstr "变更日志字体"
@@ -7631,6 +7650,36 @@ msgstr "截去 - %s"
 msgid "&Strip"
 msgstr "剥离(&S)"
 
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr ""
+
 msgid "Parent 1:"
 msgstr "父版本 1:"
 
@@ -8760,6 +8809,9 @@ msgstr "win32ill: 停止消息循环时被中断\n"
 
 #~ msgid "Clone"
 #~ msgstr "克隆"
+
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "使用非压缩传输"
 
 #~ msgid "Advanced options"
 #~ msgstr "高级选项"
@@ -11190,6 +11242,12 @@ msgstr "win32ill: 停止消息循环时被中断\n"
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr "忽略对空行的修改. 默认: 否"
 
+#~ msgid "Precursors:"
+#~ msgstr "先驱:"
+
+#~ msgid "List Font"
+#~ msgstr "列表字体"
+
 #~ msgid ""
 #~ "The command that will be executed.\n"
 #~ "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
@@ -11225,6 +11283,9 @@ msgstr "win32ill: 停止消息循环时被中断\n"
 #~ msgstr ""
 #~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">revsets 帮"
 #~ "助</a>"
+
+#~ msgid "Font used to display file lists. Default: sans 9"
+#~ msgstr "显示文件列表的字体。默认：sans 9"
 
 #~ msgid ""
 #~ "http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."

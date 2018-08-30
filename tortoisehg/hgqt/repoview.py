@@ -26,7 +26,6 @@ from .qtcore import (
     QRectF,
     QSettings,
     QSize,
-    QT_API,
     QT_VERSION,
     Qt,
     pyqtSignal,
@@ -43,6 +42,7 @@ from .qtgui import (
     QDialogButtonBox,
     QFont,
     QFontMetrics,
+    QHeaderView,
     QLabel,
     QListView,
     QListWidget,
@@ -57,11 +57,11 @@ from .qtgui import (
     QStyleOptionViewItemV2,
     QStyleOptionViewItemV4,
     QStyledItemDelegate,
-    QTreeView,
+    QTableView,
     QVBoxLayout,
 )
 
-from mercurial import error
+from mercurial import error, scmutil
 
 from ..util import hglib
 from ..util.i18n import _
@@ -71,7 +71,7 @@ from . import (
     repomodel,
 )
 
-class HgRepoView(QTreeView):
+class HgRepoView(QTableView):
 
     revisionSelected = pyqtSignal(object)
     revisionActivated = pyqtSignal(object)
@@ -80,18 +80,23 @@ class HgRepoView(QTreeView):
     columnsVisibilityChanged = pyqtSignal()
 
     def __init__(self, repoagent, cfgname, colselect, parent=None):
-        QTreeView.__init__(self, parent)
+        QTableView.__init__(self, parent)
         self._repoagent = repoagent
         self.current_rev = -1
         self.resized = False
         self.cfgname = cfgname
         self.colselect = colselect
+        self.setShowGrid(False)
 
-        header = self.header()
+        vh = self.verticalHeader()
+        vh.hide()
+        header = self.horizontalHeader()
         if QT_VERSION < 0x50000:
+            vh.setResizeMode(QHeaderView.Fixed)
             header.setClickable(False)
             header.setMovable(True)
         else:
+            vh.setSectionResizeMode(QHeaderView.Fixed)
             header.setSectionsClickable(False)
             header.setSectionsMovable(True)
         header.setDefaultAlignment(Qt.AlignLeft)
@@ -115,11 +120,6 @@ class HgRepoView(QTreeView):
         self.setDropIndicatorShown(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
 
-        self.setAllColumnsShowFocus(True)
-        self.setItemsExpandable(False)
-        self.setRootIsDecorated(False)
-        self.setUniformRowHeights(True)
-
         # do not pass self.style() to HgRepoViewStyle() because it would steal
         # the ownership from QApplication and cause SEGV after the deletion of
         # this widget.
@@ -127,6 +127,7 @@ class HgRepoView(QTreeView):
         self._paletteswitcher = qtlib.PaletteSwitcher(self)
 
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.doubleClicked.connect(self.revActivated)
         self.clicked.connect(self.revClicked)
@@ -142,7 +143,7 @@ class HgRepoView(QTreeView):
         if event.button() == Qt.MidButton:
             self.gotoAncestor(index)
             return
-        QTreeView.mousePressEvent(self, event)
+        QTableView.mousePressEvent(self, event)
 
     def contextMenuEvent(self, event):
         self.menuRequested.emit(event.globalPos(), self.selectedRevisions())
@@ -159,7 +160,7 @@ class HgRepoView(QTreeView):
 
     @pyqtSlot(QPoint)
     def headerMenuRequest(self, point):
-        self.headermenu.exec_(self.header().mapToGlobal(point))
+        self.headermenu.exec_(self.horizontalHeader().mapToGlobal(point))
 
     def setHistoryColumns(self):
         dlg = ColumnSelectDialog(self.colselect[1],
@@ -197,14 +198,14 @@ class HgRepoView(QTreeView):
         s.endGroup()
 
     def visibleColumns(self):
-        hh = self.header()
+        hh = self.horizontalHeader()
         return [self.model().allColumns()[hh.logicalIndex(visualindex)]
                 for visualindex in xrange(hh.count() - hh.hiddenSectionCount())]
 
     def setVisibleColumns(self, visiblecols):
         if not self.model() or visiblecols == self.visibleColumns():
             return
-        hh = self.header()
+        hh = self.horizontalHeader()
         hh.sectionMoved.disconnect(self.columnsVisibilityChanged)
         allcolumns = self.model().allColumns()
         for logicalindex, colname in enumerate(allcolumns):
@@ -217,7 +218,7 @@ class HgRepoView(QTreeView):
 
     def setModel(self, model):
         oldmodel = self.model()
-        QTreeView.setModel(self, model)
+        QTableView.setModel(self, model)
         if type(oldmodel) is not type(model):
             # logical columns are vary by model class
             self._loadColumnSettings()
@@ -230,6 +231,12 @@ class HgRepoView(QTreeView):
         self._rev_history = []
         self._rev_pos = -1
         self._in_history = False
+
+    def _adjustRowHeight(self):
+        """Resize rows to fit to LabeledDelegate item"""
+        fm = QFontMetrics(self.font())
+        h = fm.height() + 2 + 2  # see _LabelsLayout and LabeledDelegate
+        self.verticalHeader().setDefaultSectionSize(h)
 
     @pyqtSlot()
     def _resizeIgnoreSettings(self):
@@ -250,7 +257,7 @@ class HgRepoView(QTreeView):
             except ValueError:
                 pass
 
-        hh = self.header()
+        hh = self.horizontalHeader()
         hh.setStretchLastSection(False)
         self._resizeColumns(col_widths)
         hh.setStretchLastSection(True)
@@ -258,7 +265,7 @@ class HgRepoView(QTreeView):
 
     def _resizeColumns(self, col_widths):
         # _resizeColumns misbehaves if called with last section streched
-        hh = self.header()
+        hh = self.horizontalHeader()
         model = self.model()
         fontm = QFontMetrics(self.font())
 
@@ -288,7 +295,7 @@ class HgRepoView(QTreeView):
             return gnode.rev
 
     def context(self, rev):
-        return self.repo.changectx(rev)
+        return self.repo[rev]
 
     def revClicked(self, index):
         rev = self.revFromindex(index)
@@ -355,16 +362,16 @@ class HgRepoView(QTreeView):
 
     def goto(self, rev):
         """
-        Select revision 'rev' (can be anything understood by repo.changectx())
+        Select revision 'rev' (can be anything understood by repo[])
         """
         if isinstance(rev, unicode):
             rev = hglib.fromunicode(rev)
         try:
-            rev = self.repo.changectx(rev).rev()
+            rev = scmutil.revsymbol(self.repo, rev).rev()
         except error.RepoError:
             self.showMessage.emit(_("Can't find revision '%s'")
                                   % hglib.tounicode(str(rev)))
-        except LookupError, e:
+        except LookupError as e:
             self.showMessage.emit(hglib.tounicode(str(e)))
         else:
             idx = self.model().indexFromRev(rev)
@@ -390,6 +397,10 @@ class HgRepoView(QTreeView):
             pass
 
         self._saveColumnSettings()
+
+    def showEvent(self, event):
+        self._adjustRowHeight()
+        super(HgRepoView, self).showEvent(event)
 
     def resizeEvent(self, e):
         # re-size columns the smart way: the column holding Description
@@ -738,7 +749,7 @@ class LabeledDelegate(QStyledItemDelegate):
     def sizeHint(self, option, index):
         size = super(LabeledDelegate, self).sizeHint(option, index)
         # give additional margins for each row (even if it has no labels
-        # because uniformRowHeights is enabled)
+        # because all rows must have the same height)
         option = QStyleOptionViewItemV4(option)
         self.initStyleOption(option, index)
         lay = self._makeLabelsLayout([], option)

@@ -26,14 +26,21 @@ from mercurial import (
     fileset,
     mdiff,
     merge as mergemod,
+    patch as patchmod,
     pathutil,
     rcutil,
     revset as revsetmod,
     revsetlang,
-    templatefilters,
+    scmutil,
+    subrepoutil,
     ui as uimod,
     util,
 )
+from mercurial.utils import (
+    dateutil,
+    stringutil,
+)
+
 from tortoisehg.util import paths
 
 from mercurial.node import nullrev
@@ -43,6 +50,7 @@ from tortoisehg.util.i18n import (
     ngettext as _ngettext,
 )
 
+nullsubrepostate = subrepoutil.nullstate
 _encoding = encoding.encoding
 _fallbackencoding = encoding.fallbackencoding
 
@@ -55,6 +63,7 @@ _extensions_blacklist = (
     'zeroconf',
 )
 
+extractpatch = patchmod.extract
 tokenizerevspec = revsetlang.tokenize
 userrcpath = rcutil.userrcpath
 
@@ -190,7 +199,7 @@ def getrevisionlabel(repo, rev):
 
     ctx = repo[rev]
     label = _getfirstrevisionlabel(repo, ctx)
-    if label and ctx == repo[label]:
+    if label and ctx == scmutil.revsymbol(repo, label):
         return label
 
     return str(rev)
@@ -212,6 +221,23 @@ def getcurrentqqueue(repo):
         cur = cur[8:]
     return cur
 
+def gitcommit(ctx):
+    """
+    If the hggit extension is loaded, and the repository is a git clone,
+    returns the git commit hash of the current revision
+    """
+
+    repo = ctx._repo
+
+    if 'hggit' not in repo.extensions():
+        return None
+
+    fullgitnode = repo.githandler.map_git_get(ctx.hex())
+    if fullgitnode is None:
+        return None
+
+    return fullgitnode[:12]
+
 def getqqueues(repo):
     ui = repo.ui.copy()
     ui.quiet = True  # don't append "(active)"
@@ -220,7 +246,7 @@ def getqqueues(repo):
         opts = {'list': True}
         mqmod.qqueue(ui, repo, None, **opts)
         qqueues = tounicode(ui.popbuffer()).splitlines()
-    except (util.Abort, EnvironmentError):
+    except (error.Abort, EnvironmentError):
         qqueues = []
     return qqueues
 
@@ -237,7 +263,11 @@ def readundodesc(repo):
     return '', len(repo)
 
 def unidifftext(a, ad, b, bd, fn1, fn2, opts=mdiff.defaultopts):
-    headers, hunks = mdiff.unidiff(a, ad, b, bd, fn1, fn2, opts)
+    binary = stringutil.binary(a) or stringutil.binary(b)
+    headers, hunks = mdiff.unidiff(a, ad, b, bd, fn1, fn2,
+                                   binary=binary, opts=opts)
+    if not hunks:
+        return ''
     text = ''.join(sum((list(hlines) for _hrange, hlines in hunks), []))
     return '\n'.join(headers) + '\n' + text
 
@@ -317,7 +347,7 @@ def canonpaths(list):
     for f in list:
         try:
             canonpats.append(pathutil.canonpath(root, cwd, f))
-        except util.Abort:
+        except error.Abort:
             # Attempt to resolve case folding conflicts.
             fu = f.upper()
             cwdu = cwd.upper()
@@ -538,7 +568,7 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         toolname, field = key.split('.', 1)
         if toolname not in tools:
             tools[toolname] = {}
-        bvalue = util.parsebool(value)
+        bvalue = stringutil.parsebool(value)
         if bvalue is not None:
             value = bvalue
         tools[toolname][field] = value
@@ -620,7 +650,7 @@ def extractchoices(prompttext):
     return msg, zip(resps, choices)
 
 def displaytime(date):
-    return util.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
+    return dateutil.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
 
 def utctime(date):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(date[0]))
@@ -648,7 +678,7 @@ def age(date):
     if delta == 0:
         return _('now')
     if delta > agescales[0][1] * 2:
-        return util.shortdate(date)
+        return dateutil.shortdate(date)
 
     for t, s in agescales:
         n = delta // s
@@ -668,9 +698,9 @@ def configuredusername(ui):
         return None
 
 def username(user):
-    author = templatefilters.person(user)
+    author = stringutil.person(user)
     if not author:
-        author = util.shortuser(user)
+        author = stringutil.shortuser(user)
     return author
 
 def user(ctx):
@@ -784,14 +814,10 @@ def parseconfigopts(ui, args):
     >>> u.config('extensions', 'mq')
     '!'
     """
-    try:
-        config = dispatchmod._earlyparseopts(ui, args)['config']
-        # drop --config from args
-        args[:] = fancyopts.earlygetopt(args, '', ['config='],
-                                        gnu=True, keepsep=True)[1]
-    except (AttributeError, TypeError):
-        # hg<4.5 (6e6d0a5b88e6)
-        config = dispatchmod._earlygetopt(['--config'], args)
+    config = dispatchmod._earlyparseopts(ui, args)['config']
+    # drop --config from args
+    args[:] = fancyopts.earlygetopt(args, '', ['config='],
+                                    gnu=True, keepsep=True)[1]
     return dispatchmod._parseconfig(ui, config)
 
 
@@ -996,6 +1022,12 @@ def buildcmdargs(name, *args, **opts):
     ['log', '--no-merges']
     >>> buildcmdargs('commit', user='')
     ['commit', '--user=']
+    >>> buildcmdargs('log', keyword=['', 'foo'])
+    ['log', '--keyword=', '--keyword=foo']
+    >>> buildcmdargs('log', k='')
+    ['log', '-k', '']
+    >>> buildcmdargs('log', k=['', 'foo'])
+    ['log', '-k', '', '-kfoo']
 
     positional arguments:
 
@@ -1022,7 +1054,8 @@ def buildcmdargs(name, *args, **opts):
         if v is None:
             continue
 
-        if len(k) == 1:
+        ashort = (len(k) == 1)
+        if ashort:
             aname = '-%s' % k
             apref = aname
         else:
@@ -1035,9 +1068,17 @@ def buildcmdargs(name, *args, **opts):
             for e in v:
                 if e is None:
                     continue
-                fullargs.append(apref + _stringify(e))
+                s = _stringify(e)
+                if s or not ashort:
+                    fullargs.append(apref + s)
+                else:
+                    fullargs.extend([aname, s])
         else:
-            fullargs.append(apref + _stringify(v))
+            s = _stringify(v)
+            if s or not ashort:
+                fullargs.append(apref + s)
+            else:
+                fullargs.extend([aname, s])
 
     args = [_stringify(v) for v in args if v is not None]
     if any(e.startswith('-') for e in args):

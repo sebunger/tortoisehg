@@ -31,7 +31,6 @@ from .qtgui import (
 from mercurial import (
     error,
     match as matchmod,
-    subrepo,
 )
 
 from ..util import hglib
@@ -621,9 +620,9 @@ def _populaterepo(roote, repo, nodeop, statusfilter, match):
 def _comparesubstate(state1, state2):
     if state1 == state2:
         return 'C'
-    elif state1 == subrepo.nullstate:
+    elif state1 == hglib.nullsubrepostate:
         return 'A'
-    elif state2 == subrepo.nullstate:
+    elif state2 == hglib.nullsubrepostate:
         return 'R'
     else:
         return 'M'
@@ -634,8 +633,8 @@ def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
     subpaths = set(pctx.substate)
     subpaths.update(ctx.substate)
     for path in subpaths:
-        substate = ctx.substate.get(path, subrepo.nullstate)
-        psubstate = pctx.substate.get(path, subrepo.nullstate)
+        substate = ctx.substate.get(path, hglib.nullsubrepostate)
+        psubstate = pctx.substate.get(path, hglib.nullsubrepostate)
         e = _Entry()
         e.status = _comparesubstate(psubstate, substate)
         if e.status == 'R':

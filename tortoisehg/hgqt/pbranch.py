@@ -45,7 +45,9 @@ from .qtgui import (
 from mercurial import (
     error,
     extensions,
-    util,
+)
+from mercurial.utils import (
+    dateutil,
 )
 
 from ..util import hglib
@@ -137,7 +139,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
 
         def PatchList():
             self.patchlistmodel = PatchBranchModel(self.compute_model(),
-                                                   self.repo.changectx('.').branch(),
+                                                   self.repo['.'].branch(),
                                                    self)
             self.patchlist = QTableView(self)
             self.patchlist.setModel(self.patchlistmodel)
@@ -198,7 +200,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         # compute model data
         self.patchlistmodel.setModel(
             self.compute_model(),
-            self.repo.changectx('.').branch() )
+            self.repo['.'].branch())
 
         # restore patch selection
         if selname:
@@ -466,7 +468,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
             pf = open(patchfile, 'wb')
             try:
                 pf.writelines(self.pdiff(patchname))
-            #  except (util.Abort, error.RepoError), e:
+            #  except (error.Abort, error.RepoError), e:
             #      # Do something with str(e)
             finally:
                 pf.close()
@@ -708,7 +710,7 @@ class PatchBranchModel(QAbstractTableModel):
         column = self._columns[index.column()]
         gnode = self.model[row]
         ctx = None
-        #ctx = self.repo.changectx(gnode.rev)
+        #ctx = self.repo[gnode.rev]
 
         if role == Qt.DisplayRole:
             text = self._columnmap[column](ctx, gnode)
@@ -902,7 +904,7 @@ class PNewDialog(QDialog):
         layout.addWidget(DialogButtons())
 
         self.patchdatele.setText(
-                hglib.tounicode(hglib.displaytime(util.makedate())))
+                hglib.tounicode(hglib.displaytime(dateutil.makedate())))
 
     def patchname(self):
         return self.patchnamele.text()

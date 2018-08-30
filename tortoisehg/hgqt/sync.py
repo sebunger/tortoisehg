@@ -331,7 +331,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if rev >= len(self.repo):
             return
 
-        ctx = self.repo.changectx(rev)
+        ctx = self.repo[rev]
         if self.targetcombo.count() <= 0:
             self._loadTargets()
         self.targetcombo.setItemText(0, _('rev: %d (%s)') % (ctx.rev(), ctx))

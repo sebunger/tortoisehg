@@ -36,7 +36,7 @@ Caveats:
 
 import atexit, ctypes, os, threading
 
-from mercurial import util
+from mercurial import error
 
 from tortoisehg.util import hgversion
 from tortoisehg.util.i18n import agettext as _
@@ -174,7 +174,7 @@ class messageserver(object):
         self._thread.start()
         self._wndcreated.wait()
         if not self._hwnd:
-            raise util.Abort(_('win32ill: cannot create window for messages'))
+            raise error.Abort(_('win32ill: cannot create window for messages'))
 
     def stop(self):
         hwnd = self._hwnd

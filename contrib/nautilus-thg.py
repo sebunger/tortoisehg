@@ -36,6 +36,9 @@ import subprocess
 import urllib
 
 from mercurial import hg, match, util, error
+from mercurial.utils import (
+    dateutil,
+)
 from mercurial.node import short
 
 def _thg_path():
@@ -324,9 +327,9 @@ class HgExtensionDefault(GObject.GObject):
             rev = fctx.filelog().linkrev(fctx.filerev())
         except:
             rev = ctx.rev()
-        ctx = repo.changectx(rev)
+        ctx = repo[rev]
         node = short(ctx.node())
-        date = util.datestr(ctx.date(), '%Y-%m-%d %H:%M:%S %1%2')
+        date = dateutil.datestr(ctx.date(), '%Y-%m-%d %H:%M:%S %1%2')
         parents = '\n'.join([short(p.node()) for p in ctx.parents()])
         description = ctx.description()
         user = ctx.user()

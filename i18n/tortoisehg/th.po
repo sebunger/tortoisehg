@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
 "PO-Revision-Date: 2015-10-21 17:04+0000\n"
 "Last-Translator: Yanyong Kunok <Unknown>\n"
 "Language-Team: Thai <th@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:20+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:29+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -27,7 +27,7 @@ msgstr "ออก"
 msgid "About"
 msgstr "เกี่ยวกับ"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
+msgid "Copyright 2008-2018 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -582,8 +582,8 @@ msgstr "Do not update the new working directory"
 msgid "Use pull protocol to copy metadata"
 msgstr "Use pull protocol to copy metadata"
 
-msgid "Use uncompressed transfer"
-msgstr "ใช้การส่งที่ไม่ต้องย่อข้อมูล"
+msgid "Clone with minimal processing"
+msgstr ""
 
 msgid "Include patch queue"
 msgstr "Include patch queue"
@@ -1010,6 +1010,9 @@ msgstr "ระบุ repository"
 
 msgid "must be specified 'type' in style"
 msgstr "ระบุ  'type' in style"
+
+msgid "Git Commit:"
+msgstr ""
 
 msgid "Summary:"
 msgstr "สรุป:"
@@ -2854,6 +2857,12 @@ msgstr "Unapply all patches"
 msgid "Go &to Patch"
 msgstr ""
 
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
 msgid "&Finish Patch"
 msgstr "&Finish Patch"
 
@@ -3664,6 +3673,10 @@ msgid "Node"
 msgstr "Node"
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
 msgid "Age"
 msgstr "อายุ"
 
@@ -4236,6 +4249,9 @@ msgstr "&Tag..."
 
 msgid "Boo&kmark..."
 msgstr "Boo&kmark..."
+
+msgid "Top&ic..."
+msgstr ""
 
 msgid "Sig&n..."
 msgstr "Sig&n..."
@@ -4837,8 +4853,8 @@ msgstr "Changeset:"
 msgid "Child:"
 msgstr "Child:"
 
-msgid "Precursors:"
-msgstr "Precursors:"
+msgid "Predecessors:"
+msgstr ""
 
 msgid "Successors:"
 msgstr "Successors:"
@@ -5532,6 +5548,15 @@ msgstr "ปรับปรุง repos ทั้งหมดใน dir ปัจ
 
 msgid "thg thgstatus [OPTION]"
 msgstr "thg thgstatus [OPTION]"
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
+msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
 msgstr "thg update [-C] [[-r] REV]"
@@ -6631,12 +6656,6 @@ msgstr "Diff Font"
 
 msgid "Font used to display text differences. Default: monospace 10"
 msgstr "Font used to display text differences. Default: monospace 10"
-
-msgid "List Font"
-msgstr "รายชื่อ Font"
-
-msgid "Font used to display file lists. Default: sans 9"
-msgstr "Font used to display file lists. Default: sans 9"
 
 msgid "ChangeLog Font"
 msgstr "ChangeLog Font"
@@ -7956,6 +7975,36 @@ msgstr "Strip - %s"
 msgid "&Strip"
 msgstr "&Strip"
 
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr ""
+
 msgid "Parent 1:"
 msgstr "Parent 1:"
 
@@ -8757,6 +8806,9 @@ msgstr "win32ill: unsupported platform: %s\n"
 msgid "win32ill: interrupted while stopping message loop\n"
 msgstr "win32ill: interrupted while stopping message loop\n"
 
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "ใช้การส่งที่ไม่ต้องย่อข้อมูล"
+
 #~ msgid "Add special files (.hgignore, ...)"
 #~ msgstr "เพิ่ม พิเศษ(.hgignore, ...)"
 
@@ -8791,6 +8843,9 @@ msgstr "win32ill: interrupted while stopping message loop\n"
 #~ "- {FILES}: The list of files touched by the selected revision.\n"
 #~ "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
 
+#~ msgid "Precursors:"
+#~ msgstr "Precursors:"
+
 #~ msgid ""
 #~ "Changesets affecting files matched by pattern.  See <a href=\"http://www."
 #~ "selenic.com/mercurial/hg.1.html#patterns\">help patterns</a>"
@@ -8833,6 +8888,12 @@ msgstr "win32ill: interrupted while stopping message loop\n"
 #~ "new files in a commit. If True, a confirmation dialog will be showed. If "
 #~ "False, selected new files will be included in the commit with no "
 #~ "confirmation dialog.  Default: True"
+
+#~ msgid "List Font"
+#~ msgstr "รายชื่อ Font"
+
+#~ msgid "Font used to display file lists. Default: sans 9"
+#~ msgstr "Font used to display file lists. Default: sans 9"
 
 #~ msgid ""
 #~ "http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."

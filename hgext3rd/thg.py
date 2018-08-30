@@ -54,7 +54,12 @@ else:
 import threading
 
 from mercurial import demandimport
-demandimport.ignore.extend([
+try:
+    _updateignores = demandimport.IGNORES.update
+except AttributeError:
+    # hg<4.7 (670eb4fa1b86)
+    _updateignores = demandimport.ignore.extend
+_updateignores([
     'win32com.shell',
     'numpy',  # comtypes.npsupport does try-import
     'tortoisehg.util.config',
