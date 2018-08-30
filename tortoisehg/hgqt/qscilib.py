@@ -24,6 +24,7 @@ from .qtcore import (
     QIODevice,
     QRect,
     QSettings,
+    QT_VERSION,
     Qt,
     pyqtSignal,
     pyqtSlot,
@@ -591,10 +592,14 @@ class SearchToolBar(QToolBar):
         super(SearchToolBar, self).keyPressEvent(event)
 
     def wheelEvent(self, event):
-        if event.delta() > 0:
+        if QT_VERSION >= 0x50000:
+            d = event.angleDelta().y()
+        else:
+            d = event.delta()
+        if d > 0:
             self._prevact.trigger()
             return
-        if event.delta() < 0:
+        if d < 0:
             self._nextact.trigger()
             return
         super(SearchToolBar, self).wheelEvent(event)

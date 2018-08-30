@@ -27,6 +27,10 @@ from .qtgui import (
     QWidget,
 )
 
+from mercurial import (
+    scmutil,
+)
+
 from ..util import (
     hglib,
     i18n,
@@ -65,7 +69,7 @@ class TagDialog(QDialog):
         base.addWidget(formwidget)
 
         repo = repoagent.rawRepo()
-        ctx = repo[rev]
+        ctx = scmutil.revsymbol(repo, rev)
         form.addRow(_('Revision:'), QLabel('%d (%s)' % (ctx.rev(), ctx)))
         self.rev = ctx.rev()
 

@@ -28,7 +28,9 @@ from .qtgui import (
 
 from mercurial import (
     error,
-    util,
+)
+from mercurial.utils import (
+    dateutil,
 )
 
 from ..util import hglib
@@ -379,7 +381,7 @@ class EmailDialog(QDialog):
 class _ChangesetsModel(QAbstractTableModel):
     _COLUMNS = [('rev', lambda ctx: '%d:%s' % (ctx.rev(), ctx)),
                 ('author', lambda ctx: hglib.username(ctx.user())),
-                ('date', lambda ctx: util.shortdate(ctx.date())),
+                ('date', lambda ctx: dateutil.shortdate(ctx.date())),
                 ('description', lambda ctx: ctx.longsummary())]
 
     def __init__(self, repo, revs, selectedrevs, parent=None):
@@ -410,7 +412,7 @@ class _ChangesetsModel(QAbstractTableModel):
             return rev in self._selectedrevs and Qt.Checked or Qt.Unchecked
         if role == Qt.DisplayRole:
             coldata = self._COLUMNS[index.column()][1]
-            return hglib.tounicode(coldata(self._repo.changectx(rev)))
+            return hglib.tounicode(coldata(self._repo[rev]))
 
         return None
 

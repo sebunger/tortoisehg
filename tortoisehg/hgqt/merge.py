@@ -51,6 +51,7 @@ class MergeDialog(QWizard):
 
     def __init__(self, repoagent, otherrev, parent=None):
         super(MergeDialog, self).__init__(parent)
+        assert isinstance(otherrev, int)
         self._repoagent = repoagent
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
@@ -61,9 +62,9 @@ class MergeDialog(QWizard):
         self.setOption(QWizard.IndependentPages, True)
 
         # set pages
-        summarypage = SummaryPage(repoagent, str(otherrev), self)
+        summarypage = SummaryPage(repoagent, otherrev, self)
         self.addPage(summarypage)
-        self.addPage(MergePage(repoagent, str(otherrev), self))
+        self.addPage(MergePage(repoagent, otherrev, self))
         self.addPage(CommitPage(repoagent, self))
         self.addPage(ResultPage(repoagent, self))
         self.currentIdChanged.connect(self.pageChanged)
@@ -197,7 +198,7 @@ class SummaryPage(BasePage):
         ## current revision
         local_sep = qtlib.LabeledSeparator(_('Merge to (working directory)'))
         self.layout().addWidget(local_sep)
-        localCsInfo = create(str(repo['.'].rev()))
+        localCsInfo = create(repo['.'].rev())
         self.layout().addWidget(localCsInfo)
         self.localCsInfo = localCsInfo
 
@@ -364,7 +365,7 @@ class MergePage(BasePage):
             return
 
         discard = self.field('discard')
-        rev = hglib.tounicode(self._otherrev)
+        rev = hglib.tounicode('%d' % self._otherrev)
         cfgs = []
         extrakwargs = {}
         if discard:

@@ -43,6 +43,9 @@ from .qtgui import (
 )
 
 from mercurial import util
+from mercurial.utils import (
+    dateutil,
+)
 
 from ..util import (
     colormap,
@@ -1043,7 +1046,7 @@ class _AnnotateViewControl(_AbstractViewControl):
         def getauthor(fctx):
             return hglib.tounicode(hglib.username(fctx.user()))
         def getdate(fctx):
-            return util.shortdate(fctx.date())
+            return dateutil.shortdate(fctx.date())
         if self._fd.rev() is None:
             p1rev = self._fd.parentRevs()[0]
             revfmt = '%%%dd%%c' % len(str(p1rev))
@@ -1142,7 +1145,7 @@ class _AnnotateViewControl(_AbstractViewControl):
                                 s.style(), s.paper())
         self._sci.SendScintilla(qsci.SCI_STYLESETFONT,
                                 s.style(),
-                                unicode(s.font().family()).encode('latin-1'))
+                                unicode(s.font().family()).encode('utf-8'))
         self._sci.SendScintilla(qsci.SCI_STYLESETSIZE,
                                 s.style(), s.font().pointSize())
         for i, (fctx, _origline) in enumerate(self._links):

@@ -26,7 +26,7 @@ from .qtgui import (
     QPushButton,
     QSizePolicy,
     QStyle,
-    QTreeView,
+    QTableView,
     QVBoxLayout,
     QWidget,
 )
@@ -261,7 +261,7 @@ class InfoBarPlaceholder(QWidget):
         repoagent.busyChanged.connect(self._clearStaleInfo)
 
     def setView(self, view):
-        assert isinstance(view, QTreeView)
+        assert isinstance(view, QTableView)
         lay = self.layout()
         if self._view:
             lay.removeWidget(self._view)
@@ -348,7 +348,7 @@ class InfoBarPlaceholder(QWidget):
         #   _:__________   ---- h.y        ____ h.height
         #                  ____ h.height
         #
-        h = self._view.header()
+        h = self._view.horizontalHeader()
         if w.infobartype >= CONFIRM:
             cmy = w.height() - h.y()
         elif w.infobartype >= ERROR:

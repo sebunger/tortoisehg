@@ -648,7 +648,7 @@ class FileDiffDialog(_AbstractFileDialog):
         else:
             side = 'left'
         path = self.filerevmodel.graph.nodesdict[rev].extra[0]
-        fc = self.repo.changectx(rev).filectx(path)
+        fc = self.repo[rev].filectx(path)
         data = hglib.tounicode(fc.data())
         self.filedata[side] = data.splitlines()
         self.update_diff(keeppos=otherside[side])

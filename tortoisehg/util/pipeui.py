@@ -36,7 +36,9 @@ ui.promptchoice (with ui.prompt)
 
 import time
 
-from mercurial import util
+from mercurial import (
+    error,
+)
 
 from tortoisehg.util import hgversion
 from tortoisehg.util.i18n import agettext as _
@@ -198,13 +200,9 @@ def _extenduiclass(parcls):
         _lastprogresstopic = None
         _lastprogresstime = 0
 
-        def write(self, *args, **opts):
-            if self._buffers:
-                # do not label buffered data because it can be written later
-                super(pipeui, self).write(*args, **opts)
-                return
+        def _writenobuf(self, *args, **opts):
             label = opts.get('label', '')
-            super(pipeui, self).write(*_packmsgs(args, label), **opts)
+            super(pipeui, self)._writenobuf(*_packmsgs(args, label), **opts)
 
         def write_err(self, *args, **opts):
             label = opts.get('label', '')
@@ -223,7 +221,7 @@ def _extenduiclass(parcls):
             try:
                 return resps.index(r.lower())
             except ValueError:
-                raise util.Abort(_('unrecognized response: %s') % r)
+                raise error.Abort(_('unrecognized response: %s') % r)
 
         def getpass(self, prompt=None, default=None):
             prompt = self.label(prompt or _('password: '), 'ui.getpass')

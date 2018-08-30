@@ -89,7 +89,7 @@ class ResolveDialog(QDialog):
             localrevtitle = qtlib.LabeledSeparator(_('Local revision '
                                                      'information'))
             localrevinfo = csinfo.create(repo)
-            localrevinfo.update(repo[None].p1())
+            localrevinfo.update(repo[repo[None].p1().rev()])
             vbox.addWidget(localrevtitle)
             vbox.addWidget(localrevinfo)
             vbox.addStretch()
@@ -100,7 +100,7 @@ class ResolveDialog(QDialog):
             otherrevtitle = qtlib.LabeledSeparator(_('Other revision '
                                                      'information'))
             otherrevinfo = csinfo.create(repo)
-            otherrevinfo.update(repo[None].p2())
+            otherrevinfo.update(repo[repo[None].p2().rev()])
 
             vbox.addWidget(otherrevtitle)
             vbox.addWidget(otherrevinfo)

@@ -10,13 +10,13 @@
 
 from mercurial import error
 
-def precursorsmarkers(obsstore, node):
-    return obsstore.precursors.get(node, ())
+def predecessorsmarkers(obsstore, node):
+    return obsstore.predecessors.get(node, ())
 
 def successorsmarkers(obsstore, node):
     return obsstore.successors.get(node, ())
 
-def first_known_precursors_rev(repo, rev):
+def first_known_predecessors_rev(repo, rev):
     if rev is None or not isinstance(rev, int):
         return
 
@@ -27,7 +27,7 @@ def first_known_precursors_rev(repo, rev):
     clog = repo.changelog
     nm = clog.nodemap
     start = clog.node(rev)
-    markers = precursorsmarkers(obsstore, start)
+    markers = predecessorsmarkers(obsstore, start)
     candidates = set(mark[0] for mark in markers)
     seen = set(candidates)
     if start in candidates:
@@ -44,13 +44,13 @@ def first_known_precursors_rev(repo, rev):
                 continue
             except error.RepoLookupError:
                 pass
-        for mark in precursorsmarkers(obsstore, current):
+        for mark in predecessorsmarkers(obsstore, current):
             if mark[0] not in seen:
                 candidates.add(mark[0])
                 seen.add(mark[0])
 
-def first_known_precursors(ctx):
-    for rev in first_known_precursors_rev(ctx._repo, ctx.rev()):
+def first_known_predecessors(ctx):
+    for rev in first_known_predecessors_rev(ctx._repo, ctx.rev()):
         yield ctx._repo[rev]
 
 def first_known_successors(ctx):
@@ -59,7 +59,7 @@ def first_known_successors(ctx):
     nm = ctx._repo.changelog.nodemap
     if obsstore is not None:
         markers = successorsmarkers(obsstore, startnode)
-        # consider all precursors
+        # consider all predecessors
         candidates = set()
         for mark in markers:
             candidates.update(mark[1])

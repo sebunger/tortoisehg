@@ -44,9 +44,10 @@ from .qtgui import (
 
 from mercurial import (
     error,
-    patch,
     phases,
-    util,
+)
+from mercurial.utils import (
+    procutil,
 )
 
 from ..util import (
@@ -83,6 +84,7 @@ from . import (
     tag,
     thgimport,
     thgstrip,
+    topics,
     update,
     visdiff,
 )
@@ -106,14 +108,17 @@ from .sync import SyncWidget
 # fixed = the changeset is considered permanent
 # applied = an applied patch
 # qgoto = applied patch or qparent
+# isdraftorwd = working directory or changset is draft
+
 _ENABLE_MENU_FUNCS = {
-    'isrev'  : lambda ap, wd, tags: not wd,
-    'iswd'   : lambda ap, wd, tags: bool(wd),
-    'isctx'  : lambda ap, wd, tags: True,
-    'fixed'  : lambda ap, wd, tags: not (ap or wd),
-    'applied': lambda ap, wd, tags: ap,
-    'qgoto'  : lambda ap, wd, tags: ('qparent' in tags) or (ap),
-    'istrue' : lambda ap, wd, tags: True,
+    'isrev'  : lambda ap, wd, tags, ph: not wd,
+    'iswd'   : lambda ap, wd, tags, ph: bool(wd),
+    'isctx'  : lambda ap, wd, tags, ph: True,
+    'fixed'  : lambda ap, wd, tags, ph: not (ap or wd),
+    'applied': lambda ap, wd, tags, ph: ap,
+    'qgoto'  : lambda ap, wd, tags, ph: ('qparent' in tags) or (ap),
+    'istrue' : lambda ap, wd, tags, ph: True,
+    'isdraftorwd': lambda ap, wd, tags, ph: bool(ph > 0 or wd),
 }
 
 
@@ -704,11 +709,9 @@ class RepoWidget(QWidget):
                 if '\0' in earlybytes:
                     continue
                 pf.seek(0)
-                data = patch.extract(self.repo.ui, pf)
-                filename = data.get('filename')
-                if filename:
-                    filepaths.append(p)
-                    os.unlink(filename)
+                with hglib.extractpatch(self.repo.ui, pf) as data:
+                    if data.get('filename'):
+                        filepaths.append(p)
             except EnvironmentError:
                 pass
         return filepaths
@@ -871,7 +874,7 @@ class RepoWidget(QWidget):
     def switchToPreferredTaskTab(self):
         tw = self.taskTabsWidget
         rev = self.rev
-        ctx = self.repo.changectx(rev)
+        ctx = self.repo[rev]
         if rev is None or ('mq' in self.repo.extensions() and 'qtip' in ctx.tags()
                            and self.repo['.'].rev() == rev):
             # Clicking on working copy or on the topmost applied patch
@@ -915,7 +918,7 @@ class RepoWidget(QWidget):
         if isinstance(rev, basestring):
             qgoto = True
         else:
-            ctx = self.repo.changectx(rev)
+            ctx = self.repo[rev]
             if 'qparent' in ctx.tags() or ctx.thgmqappliedpatch():
                 qgoto = True
             if 'qtip' in ctx.tags():
@@ -1092,7 +1095,7 @@ class RepoWidget(QWidget):
         allunapp = False
         if 'mq' in self.repo.extensions():
             for rev in selection:
-                if not self.repo.changectx(rev).thgmqunappliedpatch():
+                if not self.repo[rev].thgmqunappliedpatch():
                     break
             else:
                 allunapp = True
@@ -1106,14 +1109,15 @@ class RepoWidget(QWidget):
             self.multipleSelectionMenu(point, selection)
 
     def _selectionMenuExec(self, point, selection, menu, menuitems):
-        ctxs = [self.repo.changectx(rev) for rev in selection]
+        ctxs = [self.repo[rev] for rev in selection]
         applied = [ctx.thgmqappliedpatch() for ctx in ctxs]
         working = [ctx.rev() is None for ctx in ctxs]
         tags = [ctx.tags() for ctx in ctxs]
+        phases = [ctx.phase() for ctx in ctxs]
 
         for item in menuitems:
             enabled = all(item.enableFunc(*args)
-                          for args in zip(applied, working, tags))
+                          for args in zip(applied, working, tags, phases))
             item.setEnabled(enabled)
 
         menu.exec_(point)
@@ -1254,6 +1258,8 @@ class RepoWidget(QWidget):
               self.tagToRevision)
         entry(items, menu, None, enablefuncs['isrev'], _('Boo&kmark...'),
               'hg-bookmarks', self.bookmarkRevision)
+        entry(items, menu, 'topic', enablefuncs['isdraftorwd'], _('Top&ic...'),
+              'topic', self.topicsRevision)
         entry(items, menu, 'gpg', enablefuncs['fixed'], _('Sig&n...'),
               'hg-sign', self.signRevision)
         entry(items, menu)
@@ -1816,6 +1822,10 @@ class RepoWidget(QWidget):
         dlg = bookmark.BookmarkDialog(self._repoagent, self.rev, self)
         dlg.exec_()
 
+    def topicsRevision(self):
+        dlg = topics.TopicsDialog(self._repoagent, self.rev, self)
+        dlg.exec_()
+
     def signRevision(self):
         dlg = sign.SignDialog(self._repoagent, self.rev, self)
         dlg.exec_()
@@ -2087,7 +2097,7 @@ class RepoWidget(QWidget):
     def qgotoRevision(self, rev):
         """Make REV the top applied patch"""
         mqw = self._mqActions
-        ctx = self.repo.changectx(rev)
+        ctx = self.repo[rev]
         if 'qparent'in ctx.tags():
             mqw.popAllPatches()
         else:
@@ -2096,12 +2106,12 @@ class RepoWidget(QWidget):
     def qrename(self):
         sel = self.menuselection[0]
         if not isinstance(sel, str):
-            sel = self.repo.changectx(sel).thgmqpatchname()
+            sel = self.repo[sel].thgmqpatchname()
         self._mqActions.renamePatch(hglib.tounicode(sel))
 
     def _qpushRevision(self, move=False, exact=False):
         """QPush REV with the selected options"""
-        ctx = self.repo.changectx(self.rev)
+        ctx = self.repo[self.rev]
         patchname = hglib.tounicode(ctx.thgmqpatchname())
         self._mqActions.pushPatch(patchname, move=move, exact=exact)
 
@@ -2133,7 +2143,7 @@ class RepoWidget(QWidget):
 
         # 2. Expand internal workbench variables
         def filelist2str(filelist):
-            return ' '.join(util.shellquote(
+            return ' '.join(procutil.shellquote(
                             os.path.normpath(self.repo.wjoin(filename)))
                             for filename in filelist)
         if files is None:

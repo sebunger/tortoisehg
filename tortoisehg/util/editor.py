@@ -1,5 +1,6 @@
 import os, sys
 from mercurial import util, match
+from mercurial.utils import procutil
 
 def _getplatformexecutablekey():
     if sys.platform == 'darwin':
@@ -26,7 +27,7 @@ def _findtool(ui, tool):
             continue
         p = util.lookupreg(k, _toolstr(ui, tool, "regname"))
         if p:
-            p = util.findexe(p + _toolstr(ui, tool, "regappend"))
+            p = procutil.findexe(p + _toolstr(ui, tool, "regappend"))
             if p:
                 toolcache[tool] = p
                 return p
@@ -34,12 +35,12 @@ def _findtool(ui, tool):
     exe = _toolstr(ui, tool, _platformexecutablekey)
     if not exe:
         exe = _toolstr(ui, tool, 'executable', tool)
-    path = util.findexe(util.expandpath(exe))
+    path = procutil.findexe(util.expandpath(exe))
     if path:
         toolcache[tool] = path
         return path
     elif tool != exe:
-        path = util.findexe(tool)
+        path = procutil.findexe(tool)
         toolcache[tool] = path
         return path
     toolcache[tool] = None
@@ -64,7 +65,7 @@ def _findeditor(repo, files):
         mf = match.match(repo.root, '', [pat])
         toolpath = _findtool(ui, tool)
         if mf(files[0]) and toolpath:
-            return (tool, util.shellquote(toolpath))
+            return (tool, procutil.shellquote(toolpath))
 
     # then editor-tools
     tools = {}
@@ -90,7 +91,7 @@ def _findeditor(repo, files):
     for p, t in tools:
         toolpath = _findtool(ui, t)
         if toolpath:
-            return (t, util.shellquote(toolpath))
+            return (t, procutil.shellquote(toolpath))
 
     # fallback to potential CLI editor
     editor = ui.geteditor()

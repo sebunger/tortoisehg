@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
-"PO-Revision-Date: 2017-11-28 18:55+0000\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"PO-Revision-Date: 2018-05-04 12:57+0000\n"
 "Last-Translator: Wagner Bruna <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:21+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-05 05:23+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servidor de Ícones Sobrepostos do TortoiseHg"
@@ -27,8 +27,8 @@ msgstr "Sair"
 msgid "About"
 msgstr "Sobre"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
-msgstr "Copyright 2008-2017 Steve Borho e outros"
+msgid "Copyright 2008-2018 Steve Borho and others"
+msgstr "Copyright 2008-2018 Steve Borho e outros"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Vários ícones são cortesia dos projetos TortoiseSVN e Tango"
@@ -591,8 +591,8 @@ msgstr "Não atualizar o novo diretório de trabalho"
 msgid "Use pull protocol to copy metadata"
 msgstr "Usar o protocolo pull para copiar metadados"
 
-msgid "Use uncompressed transfer"
-msgstr "Usar transferência não comprimida"
+msgid "Clone with minimal processing"
+msgstr "Clona com processamento mínimo"
 
 msgid "Include patch queue"
 msgstr "Incluir fila de patches"
@@ -1027,6 +1027,9 @@ msgstr "o repositório deve ser especificado"
 
 msgid "must be specified 'type' in style"
 msgstr "'type' deve ser especificado no estilo"
+
+msgid "Git Commit:"
+msgstr "Commit Git:"
 
 msgid "Summary:"
 msgstr "Sumário:"
@@ -2993,6 +2996,12 @@ msgstr "Desaplica todos os patches"
 msgid "Go &to Patch"
 msgstr "Ir para o Pa&tch"
 
+msgid "&Apply Only This Patch"
+msgstr "&Aplica Apenas Este Patch"
+
+msgid "Apply only the selected patch"
+msgstr "Aplica apenas o patch selecionado"
+
 msgid "&Finish Patch"
 msgstr "&Finalizar Patch (qfinish)"
 
@@ -3819,6 +3828,10 @@ msgid "Node"
 msgstr "Nó"
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr "Commit Git"
+
+msgctxt "column header"
 msgid "Age"
 msgstr "Idade"
 
@@ -4402,6 +4415,9 @@ msgstr "&Tag... (Etiqueta)"
 
 msgid "Boo&kmark..."
 msgstr "Boo&kmark... (Marcador)"
+
+msgid "Top&ic..."
+msgstr "Tóp&ico..."
 
 msgid "Sig&n..."
 msgstr "Assi&nar..."
@@ -5002,8 +5018,8 @@ msgstr "Revisão:"
 msgid "Child:"
 msgstr "Filha:"
 
-msgid "Precursors:"
-msgstr "Precursores:"
+msgid "Predecessors:"
+msgstr "Predecessores:"
 
 msgid "Successors:"
 msgstr "Sucessores:"
@@ -5710,6 +5726,15 @@ msgstr "atualizar todos os repos no dir atual"
 
 msgid "thg thgstatus [OPTION]"
 msgstr "thg thgstatus [OPÇÃO]"
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr "thg topics [-r REV] [NOME]"
+
+msgid "Please enable the Topic extension first."
+msgstr "Por favor primeiro habilite a extensão Topic."
+
+msgid "only one new topic name allowed"
+msgstr "só é permitido um novo nome de tópico"
 
 msgid "thg update [-C] [[-r] REV]"
 msgstr "thg update [-C] [[-r] REV]"
@@ -6872,12 +6897,6 @@ msgstr "Fonte do Diff"
 
 msgid "Font used to display text differences. Default: monospace 10"
 msgstr "Fonte usada para mostrar diferenças de texto. Padrão: monospace 10"
-
-msgid "List Font"
-msgstr "Fonte de Listas"
-
-msgid "Font used to display file lists. Default: sans 9"
-msgstr "Fonte usada para mostrar listas de arquivos. Padrão: sans 9"
 
 msgid "ChangeLog Font"
 msgstr "Fonte do ChangeLog"
@@ -8224,6 +8243,36 @@ msgstr "Strip - %s"
 
 msgid "&Strip"
 msgstr "&Strip"
+
+msgid "Topic:"
+msgstr "Tópico:"
+
+msgid "&Rename"
+msgstr "&Renomeia"
+
+#, python-format
+msgid "Topic - %s"
+msgstr "Tópico - %s"
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr "Já existe um tópico de nome \"%s\""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr "O tópico '%s' foi adicionado"
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr "O tópico '%s' não existe"
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr "O tópico '%s' foi removido"
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr "O tópico '%s' foi renomeado para '%s'"
 
 msgid "Parent 1:"
 msgstr "Pai 1:"
@@ -10198,6 +10247,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 
 #~ msgid "Source path:"
 #~ msgstr "Caminho de origem:"
+
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "Usar transferência não comprimida"
 
 #~ msgid "Recent commit messages..."
 #~ msgstr "Mensagens de consolidação recentes..."
@@ -12245,6 +12297,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ msgid "Merge "
 #~ msgstr "Mesclagem "
 
+#~ msgid "Font used to display file lists. Default: sans 9"
+#~ msgstr "Fonte usada para mostrar listas de arquivos. Padrão: sans 9"
+
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "trecho %d já aplicado na linha %d (indistinção %d)\n"
 
@@ -12255,6 +12310,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ "Revisões afetando arquivos correspondentes ao padrão. Veja <a href="
 #~ "\"http://www.selenic.com/mercurial/hg.1.html#patterns\">hg help patterns</"
 #~ "a>"
+
+#~ msgid "List Font"
+#~ msgstr "Fonte de Listas"
 
 #~ msgid "_Commit (-1 head)"
 #~ msgstr "_Commit (consolidar) (-1 cabeça)"
@@ -12482,6 +12540,9 @@ msgstr "win32ill: interrompido enquanto parava loop de mensagens\n"
 #~ "True, a janela de confirmação será exibida. Se False, arquivos novos "
 #~ "selecionados serão incluídos na consolidação sem confirmação. O padrão é "
 #~ "True."
+
+#~ msgid "Precursors:"
+#~ msgstr "Precursores:"
 
 #~ msgid ""
 #~ "The command that will be executed.\n"

@@ -113,6 +113,7 @@ class UnknownItem(Exception):
 class SummaryInfo(object):
 
     LABELS = {'rev': _('Revision:'), 'revnum': _('Revision:'),
+              'gitcommit': _('Git Commit:'),
               'revid': _('Revision:'), 'summary': _('Summary:'),
               'user': _('User:'), 'date': _('Date:'),'age': _('Age:'),
               'dateage': _('Date:'), 'branch': _('Branch:'),
@@ -144,6 +145,8 @@ class SummaryInfo(object):
                 return ctx.rev()
             elif item == 'revid':
                 return str(ctx)
+            elif item == 'gitcommit':
+                return hglib.gitcommit(ctx)
             elif item == 'desc':
                 return hglib.tounicode(ctx.description().replace('\0', ''))
             elif item == 'summary':
@@ -298,7 +301,8 @@ class SummaryInfo(object):
                 if revnum is not None and revid is not None:
                     return '%s (%s)' % (revnum, revid)
                 return '%s' % revid
-            elif item in ('revid', 'graft', 'transplant', 'mqoriginalparent'):
+            elif item in ('revid', 'gitcommit', 'graft', 'transplant',
+                          'mqoriginalparent'):
                 return qtlib.markup(value, **mono)
             elif item in ('revnum', 'p4', 'close', 'converted'):
                 return str(value)
@@ -361,14 +365,11 @@ class SummaryInfo(object):
 class SummaryBase(object):
 
     def __init__(self, target, custom, repo, info):
-        if target is None:
-            self.target = None
-        else:
-            self.target = str(target)
+        self.target = target
         self.custom = custom
         self.repo = repo
         self.info = info
-        self.ctx = repo.changectx(self.target)
+        self.ctx = repo[self.target]
 
     def get_data(self, item, **kargs):
         return self.info.get_data(item, self, self.ctx, self.custom, **kargs)
@@ -387,10 +388,7 @@ class SummaryBase(object):
 
     def update(self, target=None, custom=None, repo=None):
         self.ctx = None
-        if target is None:
-            target = self.target
         if target is not None:
-            target = str(target)
             self.target = target
         if custom is not None:
             self.custom = custom
@@ -399,7 +397,7 @@ class SummaryBase(object):
         if repo is not None:
             self.repo = repo
         if self.ctx is None:
-            self.ctx = repo.changectx(target)
+            self.ctx = repo[self.target]
 
 PANEL_TMPL = '<tr><td style="padding-right:6px">%s</td><td>%s</td></tr>'
 

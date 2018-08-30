@@ -148,7 +148,7 @@ class FilectxActions(QObject):
             if icon:
                 act.setIcon(qtlib.geticon(icon))
             if key:
-                act.setShortcut(key)
+                qtlib.setContextMenuShortcut(act, key)
                 act.setShortcutContext(Qt.WidgetWithChildrenShortcut)
             if tip:
                 act.setStatusTip(tip)
@@ -488,7 +488,7 @@ class WctxActions(FilectxActions):
         repo = self._repoagent.rawRepo()
         # the same shortcut as editFile that is disabled for working rev
         a = self.action('editLocalFile')
-        a.setShortcut('Ctrl+Shift+E')
+        qtlib.setContextMenuShortcut(a, 'Ctrl+Shift+E')
         a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         a = self.action('addLargefile')
         a.setVisible('largefiles' in repo.extensions())

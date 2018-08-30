@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
 "PO-Revision-Date: 2015-09-16 10:35+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:21+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:30+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -27,7 +27,7 @@ msgstr "離開"
 msgid "About"
 msgstr "關於"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
+msgid "Copyright 2008-2018 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -580,8 +580,8 @@ msgstr "不要對新的工作目錄進行更新"
 msgid "Use pull protocol to copy metadata"
 msgstr "使用 pull 協定複製 metadata"
 
-msgid "Use uncompressed transfer"
-msgstr "使用非壓縮傳輸"
+msgid "Clone with minimal processing"
+msgstr ""
 
 msgid "Include patch queue"
 msgstr "引入補丁佇列"
@@ -1006,6 +1006,9 @@ msgstr "必須指定儲存庫"
 
 msgid "must be specified 'type' in style"
 msgstr "必須在style裡指定type"
+
+msgid "Git Commit:"
+msgstr ""
 
 msgid "Summary:"
 msgstr "摘要："
@@ -2789,6 +2792,12 @@ msgstr "反套用所有的補丁"
 msgid "Go &to Patch"
 msgstr ""
 
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
 msgid "&Finish Patch"
 msgstr "完成補丁(&F)"
 
@@ -3575,6 +3584,10 @@ msgid "Node"
 msgstr "節點"
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
 msgid "Age"
 msgstr "經歷時間"
 
@@ -4124,6 +4137,9 @@ msgstr "標籤(&T)..."
 
 msgid "Boo&kmark..."
 msgstr "書籤(&k)..."
+
+msgid "Top&ic..."
+msgstr ""
 
 msgid "Sig&n..."
 msgstr "簽名(&n)..."
@@ -4679,7 +4695,7 @@ msgstr "變更:"
 msgid "Child:"
 msgstr "下層:"
 
-msgid "Precursors:"
+msgid "Predecessors:"
 msgstr ""
 
 msgid "Successors:"
@@ -5359,6 +5375,15 @@ msgid "update all repos in current dir"
 msgstr ""
 
 msgid "thg thgstatus [OPTION]"
+msgstr ""
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
 msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
@@ -6295,12 +6320,6 @@ msgstr "差異比對字型"
 
 msgid "Font used to display text differences. Default: monospace 10"
 msgstr "顯示文字差異用的字型, 預設: monospace 10"
-
-msgid "List Font"
-msgstr "列表字型"
-
-msgid "Font used to display file lists. Default: sans 9"
-msgstr "顯示檔案列表所使用的字型.預設: sans 9"
 
 msgid "ChangeLog Font"
 msgstr "變更紀錄字型"
@@ -7533,6 +7552,36 @@ msgstr "剝除 - %s"
 msgid "&Strip"
 msgstr "剝除(&S)"
 
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr ""
+
 msgid "Parent 1:"
 msgstr "母系 1:"
 
@@ -8392,6 +8441,9 @@ msgstr ""
 
 #~ msgid "Source path is empty"
 #~ msgstr "來源路徑是空的"
+
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "使用非壓縮傳輸"
 
 #~ msgid "_Commit"
 #~ msgstr "提交(_C)"
@@ -9682,6 +9734,9 @@ msgstr ""
 #~ msgid "Overwrite existing '%s' path?"
 #~ msgstr "覆寫已存在的'%s'路徑?"
 
+#~ msgid "Font used to display file lists. Default: sans 9"
+#~ msgstr "顯示檔案列表所使用的字型.預設: sans 9"
+
 #~ msgid "file patterns \"%s\""
 #~ msgstr "檔案樣式\"%s\""
 
@@ -9693,6 +9748,9 @@ msgstr ""
 
 #~ msgid "Move files to directory..."
 #~ msgstr "移動檔案到目錄..."
+
+#~ msgid "List Font"
+#~ msgstr "列表字型"
 
 #~ msgid "Preset fonts:"
 #~ msgstr "預設字型;"

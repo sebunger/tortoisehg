@@ -37,6 +37,9 @@ from mercurial import (
     scmutil,
     util,
 )
+from mercurial.utils import (
+    procutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -142,7 +145,7 @@ def snapshot(repo, files, ctx):
 def launchtool(cmd, opts, replace, block):
     def quote(match):
         key = match.group()[1:]
-        return util.shellquote(replace[key])
+        return procutil.shellquote(replace[key])
     if isinstance(cmd, unicode):
         cmd = hglib.fromunicode(cmd)
     lopts = []
@@ -153,8 +156,8 @@ def launchtool(cmd, opts, replace, block):
             lopts.append(opt)
     args = ' '.join(lopts)
     args = re.sub(_regex, quote, args)
-    cmdline = util.shellquote(cmd) + ' ' + args
-    cmdline = util.quotecommand(cmdline)
+    cmdline = procutil.shellquote(cmd) + ' ' + args
+    cmdline = procutil.quotecommand(cmdline)
     try:
         proc = subprocess.Popen(cmdline, shell=True,
                                 creationflags=qtlib.openflags,

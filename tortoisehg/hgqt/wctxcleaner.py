@@ -20,8 +20,8 @@ from .qtgui import (
 
 from mercurial import (
     cmdutil,
+    error,
     hg,
-    util,
 )
 
 from ..util.i18n import _
@@ -36,7 +36,7 @@ def _checkchanged(repo):
     try:
         cmdutil.bailifchanged(repo)
         return False
-    except util.Abort:
+    except error.Abort:
         return True
 
 

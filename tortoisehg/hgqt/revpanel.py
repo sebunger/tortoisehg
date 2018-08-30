@@ -26,8 +26,8 @@ def label_func(widget, item, ctx):
         return _('Parent:')
     elif item == 'children':
         return _('Child:')
-    elif item == 'precursors':
-        return _('Precursors:')
+    elif item == 'predecessors':
+        return _('Predecessors:')
     elif item == 'successors':
         return _('Successors:')
     raise csinfo.UnknownItem(item)
@@ -94,8 +94,8 @@ def data_func(widget, item, ctx):
         if ctx.rev() is None:
             ctx = ctx.p1()
         return ctx.extra().get('close') is not None
-    elif item == 'precursors':
-        ctxlist = obsoleteutil.first_known_precursors(ctx)
+    elif item == 'predecessors':
+        ctxlist = obsoleteutil.first_known_predecessors(ctx)
         return format_ctxlist(ctxlist)
     elif item == 'successors':
         ctxlist = obsoleteutil.first_known_successors(ctx)
@@ -138,7 +138,7 @@ def create_markup_func(ui):
             if isinstance(value, basestring):
                 return revid_markup(value)
             return revline_markup(linkpattern=linkpattern, *value)
-        elif item in ('parents', 'children', 'precursors', 'successors'):
+        elif item in ('parents', 'children', 'predecessors', 'successors'):
             csets = []
             for cset in value:
                 if isinstance(cset, basestring):
@@ -153,10 +153,11 @@ def RevPanelWidget(repo):
     '''creates a rev panel widget and returns it'''
     custom = csinfo.custom(data=data_func, label=label_func,
                            markup=create_markup_func(repo.ui))
-    style = csinfo.panelstyle(contents=('cset', 'branch', 'obsolete', 'close', 'user',
+    style = csinfo.panelstyle(contents=(
+                   'cset', 'gitcommit', 'branch', 'obsolete', 'close', 'user',
                    'dateage', 'parents', 'children', 'tags', 'graft', 'transplant',
                    'mqoriginalparent',
-                   'precursors', 'successors',
+                   'predecessors', 'successors',
                    'p4', 'svn', 'converted'), selectable=True,
                    expandable=True)
     return csinfo.create(repo, style=style, custom=custom)

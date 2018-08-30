@@ -11,6 +11,9 @@ import cStringIO
 
 from mercurial import patch, util, error
 from mercurial import node
+from mercurial.utils import (
+    dateutil,
+)
 from mercurial.util import propertycache
 from hgext import mq
 
@@ -51,7 +54,7 @@ class patchctx(object):
             ph = mq.patchheader(self._path)
             self._ph = ph
         except EnvironmentError:
-            self._date = util.makedate()
+            self._date = dateutil.makedate()
             return
 
         try:
@@ -72,10 +75,13 @@ class patchctx(object):
 
         self._user = ph.user or ''
         self._desc = ph.message and '\n'.join(ph.message).strip() or ''
-        try:
-            self._date = ph.date and util.parsedate(ph.date) or util.makedate()
-        except error.Abort:
-            self._date = util.makedate()
+        date = None
+        if ph.date:
+            try:
+                date = dateutil.parsedate(ph.date)
+            except error.ParseError:
+                pass
+        self._date = date or dateutil.makedate()
 
     def invalidate(self):
         # ensure the patch contents are re-read

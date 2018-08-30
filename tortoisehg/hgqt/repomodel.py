@@ -25,6 +25,7 @@ from .qtcore import (
     QByteArray,
     QMimeData,
     QModelIndex,
+    QT_VERSION,
     Qt,
     pyqtSignal,
     pyqtSlot,
@@ -37,7 +38,9 @@ from .qtgui import (
 
 from mercurial import (
     error,
-    util,
+)
+from mercurial.utils import (
+    dateutil,
 )
 
 from ..util import hglib
@@ -60,13 +63,14 @@ AuthorColumn = 4
 TagsColumn = 5
 LatestTagColumn = 6
 NodeColumn = 7
-AgeColumn = 8
-LocalDateColumn = 9
-UtcDateColumn = 10
-ChangesColumn = 11
-ConvertedColumn = 12
-PhaseColumn = 13
-FileColumn = 14
+GitNodeColumn = 8
+AgeColumn = 9
+LocalDateColumn = 10
+UtcDateColumn = 11
+ChangesColumn = 12
+ConvertedColumn = 13
+PhaseColumn = 14
+FileColumn = 15
 
 COLUMNHEADERS = (
     ('Graph', _('Graph', 'column header')),
@@ -77,6 +81,7 @@ COLUMNHEADERS = (
     ('Tags', _('Tags', 'column header')),
     ('Latest tags', _('Latest tags', 'column header')),
     ('Node', _('Node', 'column header')),
+    ('GitNode', _('Git Commit', 'column header')),
     ('Age', _('Age', 'column header')),
     ('LocalTime', _('Local Time', 'column header')),
     ('UTCTime', _('UTC Time', 'column header')),
@@ -252,6 +257,21 @@ class HgRepoListModel(QAbstractTableModel):
             self.graph = self._createGraph()
             return
 
+        # QTBUG-66444: Do not emit layoutChanged if we're sure the model
+        # was/is about to be empty. Otherwise all columns would get visible
+        # due to a bug existing in Qt 5.9.5-5.10.x.
+        newgraph = self._createGraph()
+        if not newgraph:
+            newgraph.build_nodes(self._fill_step)
+        if self._rowcount <= 0 or not newgraph:
+            self._cache = []
+            self.graph = newgraph
+            self._expandRowCount()
+            self._shrinkRowCount()
+            self._pendingrebuild = False
+            self.revsUpdated.emit()
+            return
+
         self.layoutAboutToBeChanged.emit()
         try:
             oldindexmap = {}  # rev: [index, ...]
@@ -267,7 +287,7 @@ class HgRepoListModel(QAbstractTableModel):
 
             self._cache = []
             try:
-                self.graph = self._createGraph()
+                self.graph = newgraph
                 self._ensureBuilt(brev)
             except (error.RevlogError, error.RepoError):
                 self._shrinkRowCount()  # avoid further exceptions at data()
@@ -277,6 +297,13 @@ class HgRepoListModel(QAbstractTableModel):
                 try:
                     row = self.graph.index(rev)
                 except ValueError:
+                    # QTBUG-66444: Work around QHeaderView bug which makes all
+                    # columns visible if the first row gets invalidated. This
+                    # is technically wrong because invalid rows should be
+                    # removed from the persistent indexes, but less bad than
+                    # losing user configuration.
+                    if QT_VERSION < 0x50b00 and ois[0].row() == 0:
+                        continue
                     # rev stripped or patch (un-)applied, map to invalid index
                     row = -1
                 nis = [self.index(row, i.column(), i.parent()) for i in ois]
@@ -430,10 +457,10 @@ class HgRepoListModel(QAbstractTableModel):
     def maxWidthValueForColumn(self, column):
         if column == RevColumn:
             return '8' * len(str(len(self.repo))) + '+'
-        if column == NodeColumn:
+        if column in (NodeColumn, GitNodeColumn):
             return '8' * 12 + '+'
         if column in (LocalDateColumn, UtcDateColumn):
-            return hglib.displaytime(util.makedate())
+            return hglib.displaytime(dateutil.makedate())
         if column in (TagsColumn, LatestTagColumn):
             try:
                 return sorted(self.repo.tags().keys(), key=lambda x: len(x))[-1][:10]
@@ -483,7 +510,7 @@ class HgRepoListModel(QAbstractTableModel):
             if self._hasFileColumn() and index.column() == FileColumn:
                 return hglib.tounicode(gnode.extra[0])
         if role == Qt.FontRole:
-            if index.column() in (NodeColumn, ConvertedColumn):
+            if index.column() in (NodeColumn, GitNodeColumn, ConvertedColumn):
                 return QFont("Monospace")
             if index.column() == DescColumn and gnode.wdparent:
                 font = QApplication.font('QAbstractItemView')
@@ -522,7 +549,7 @@ class HgRepoListModel(QAbstractTableModel):
                 # happens if repository pruned/stripped or bundle unapplied
                 # but model is not reloaded yet because repository is busy
                 return None
-            except util.Abort:
+            except error.Abort:
                 return None
             data[idx] = result
         return data[idx]
@@ -531,7 +558,7 @@ class HgRepoListModel(QAbstractTableModel):
         row = index.row()
         column = index.column()
         gnode = self.graph[row]
-        ctx = self.repo.changectx(gnode.rev)
+        ctx = self.repo[gnode.rev]
 
         if role == Qt.DisplayRole:
             textfunc = self._columnmap.get(column)
@@ -856,6 +883,7 @@ class HgRepoListModel(QAbstractTableModel):
         TagsColumn: _gettags,
         LatestTagColumn: _getlatesttags,
         NodeColumn: lambda self, ctx: str(ctx),
+        GitNodeColumn: lambda self, ctx: hglib.gitcommit(ctx),
         AgeColumn: lambda self, ctx: hglib.age(ctx.date()).decode('utf-8'),
         LocalDateColumn: lambda self, ctx: hglib.displaytime(ctx.date()),
         UtcDateColumn: lambda self, ctx: hglib.utctime(ctx.date()),
@@ -906,10 +934,10 @@ class FileRevModel(HgRepoListModel):
         if not index.isValid() or row < 0 or row >= len(self.graph):
             return filedata.createNullData(self.repo)
         rev = self.graph[row].rev
-        ctx = self.repo.changectx(rev)
+        ctx = self.repo[rev]
         if baseindex.isValid():
             prev = self.graph[baseindex.row()].rev
-            pctx = self.repo.changectx(prev)
+            pctx = self.repo[prev]
         else:
             pctx = ctx.p1()
         filename = self.graph.filename(rev)

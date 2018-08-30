@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
-"PO-Revision-Date: 2017-08-25 00:34+0000\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"PO-Revision-Date: 2018-02-25 16:52+0000\n"
 "Last-Translator: Tovim <Unknown>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:17+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:25+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 "Language: cs\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
@@ -30,7 +30,7 @@ msgstr "Ukončit"
 msgid "About"
 msgstr "O programu"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
+msgid "Copyright 2008-2018 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -209,9 +209,9 @@ msgid ""
 "\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
 "b></a> changes."
 msgstr ""
-"Před zrušením revize (backout) musíte změny komitovat <a href=\"commit"
-"\"><b>commit</b></a>, odložit do oprávky <a href=\"shelve\"><b>shelve</b></"
-"a> nebo je <a href=\"discard\"><b>vyřadit</b></a> (discard)."
+"Před zrušením revize (backout) musíte provést<a href=\"commit\"><b>commit</"
+"b></a>, <a href=\"shelve\"><b>shelve</b></a>  do oprávky nebo změny <a href="
+"\"discard\"><b>vyřadit</b></a> (discard)."
 
 msgid "Automatically resolve merge conflicts where possible"
 msgstr "Konflikty při slučování řešit pokud možno automaticky"
@@ -395,27 +395,27 @@ msgid "Outgoing Bookmarks"
 msgstr "Odchozí záložky"
 
 msgid "&Push Bookmark"
-msgstr "Vyslat (push) záložku"
+msgstr "Postrčit (push) záložku"
 
 msgid "&Remove Bookmark"
-msgstr "Odebrat záložku"
+msgstr "&Odebrat záložku"
 
 msgid "Incoming Bookmarks"
 msgstr "Příchozí záložky"
 
 msgid "P&ull Bookmark"
-msgstr "Přijmout (pull) záložku"
+msgstr "Přetáhnout (pull) záložku"
 
 msgid "R&emove Bookmark"
-msgstr "Odebrat záložku"
+msgstr "O&debrat záložku"
 
 #, python-format
 msgid "Pushed local bookmark: %s"
-msgstr "Vyslaná lokální záložka: %s"
+msgstr "Postrčená lokální záložka: %s"
 
 #, python-format
 msgid "Pulled remote bookmark: %s"
-msgstr "Přijmutá vzdálená záložka: %s"
+msgstr "Přetažená vzdálená záložka: %s"
 
 #, python-format
 msgid "Removed remote bookmark: %s"
@@ -498,10 +498,10 @@ msgid "Edit current file in working copy"
 msgstr "Editovat aktuální soubor v pracovní kopii"
 
 msgid "Revert to Revision"
-msgstr "Návrat k revizi"
+msgstr "Navrátit k revizi"
 
 msgid "Revert file(s) to contents at this revision"
-msgstr "Vrátit obsahy souboru(ů) ke stavu při této revizi"
+msgstr "Navrátit obsahy souboru(ů) ke stavu při této revizi"
 
 msgid "Patch failed to apply"
 msgstr "Oprávku se nezdařilo aplikovat"
@@ -519,7 +519,7 @@ msgid "Completely remove file from patch?"
 msgstr "Kompletně odebrat soubor z oprávky?"
 
 msgid "Revert all file changes?"
-msgstr "Vrátit zpět všechny změny souboru?"
+msgstr "Navrátit všechny změny souboru?"
 
 msgid "No chunks remain"
 msgstr "No chunks remain"
@@ -589,11 +589,11 @@ msgstr "Neaktualizovat nový pracovní adresář"
 msgid "Use pull protocol to copy metadata"
 msgstr "Použít protokol přejímky (pull) ke kopírování metadat"
 
-msgid "Use uncompressed transfer"
-msgstr "Použít nekomprimovaný přenos"
+msgid "Clone with minimal processing"
+msgstr ""
 
 msgid "Include patch queue"
-msgstr "Připojit frontu oprávek"
+msgstr "Zahrnout frontu oprávek"
 
 msgid "Use proxy server"
 msgstr "Použít server proxy"
@@ -701,7 +701,7 @@ msgid "Show Detail"
 msgstr ""
 
 msgid "Hide Detail"
-msgstr ""
+msgstr "Skrýt podrobnosti"
 
 msgid "Confirm Exit"
 msgstr "Potvrďte ukončení programu"
@@ -804,7 +804,7 @@ msgid "QNew"
 msgstr "QNew"
 
 msgid "Refresh current patch"
-msgstr "Refresh aktuální oprávku"
+msgstr "Reaktivovat aktuální oprávku"
 
 msgid "QRefresh"
 msgstr "QRefresh"
@@ -940,7 +940,7 @@ msgid "Set Date:"
 msgstr "Zadejte datum:"
 
 msgid "Update"
-msgstr "Aktualizovat"
+msgstr "Aktualizovat (update)"
 
 msgid "Push After Commit:"
 msgstr "Push After Commit:"
@@ -996,7 +996,7 @@ msgstr "Komprimovat"
 
 #, python-format
 msgid "Compress - %s"
-msgstr "Compress - %s"
+msgstr "Komprimovat - %s"
 
 msgid ""
 "Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
@@ -1004,8 +1004,8 @@ msgid ""
 "b></a> changes."
 msgstr ""
 "Před komprimací nutno provést <a href=\"commit\"><b>commit</b></a>, <a href="
-"\"shelve\"><b>shelve</b></a> za účelem oprávky nebo <a href=\"discard"
-"\"><b>odvržení </b></a> změn."
+"\"shelve\"><b>shelve</b></a> do oprávky (patch) nebo <a href=\"discard"
+"\"><b>discard </b></a> změny."
 
 msgid "You may continue the compress"
 msgstr "Můžete pokračovat v komprimaci"
@@ -1025,6 +1025,9 @@ msgstr "musí to být určitý repositář"
 
 msgid "must be specified 'type' in style"
 msgstr "musí být určen 'type' ve stylu"
+
+msgid "Git Commit:"
+msgstr ""
 
 msgid "Summary:"
 msgstr "Shrnutí:"
@@ -1085,7 +1088,7 @@ msgid "Select a GUI location to edit:"
 msgstr "Vybrat umístění GUI k editaci:"
 
 msgid "Select the toolbar or menu to change"
-msgstr "Vybrat nástrojovou lištu nebo menu, které má být měněno"
+msgstr "Vyberte nástrojovou lištu nebo menu, které má být měněno"
 
 msgid "Tools shown on selected location"
 msgstr "Nástroje, zobrazené ve vybraném místě"
@@ -1121,7 +1124,7 @@ msgid "Command"
 msgstr "Příkaz"
 
 msgid "New hook"
-msgstr ""
+msgstr "Nový hook"
 
 msgid "Edit hook"
 msgstr ""
@@ -1548,13 +1551,13 @@ msgstr ""
 "Zobrazit změny oproti stávající (revizi) v externím diffovém prohlížeči"
 
 msgid "&View at Revision"
-msgstr "&Zobrazit verzi souboru"
+msgstr "&Otevřít verzi souboru"
 
 msgid "View file as it appeared at this revision"
 msgstr "Zobrazit stav souboru při této revizi"
 
 msgid "&Save at Revision..."
-msgstr "&Uložit ve verzi souboru..."
+msgstr "&Uložit verzi souboru..."
 
 msgid "Save file as it appeared at this revision"
 msgstr "Uložit soubor ve stavu, odpovídajícím této revizi"
@@ -1585,10 +1588,10 @@ msgid "Copy full path of file(s) to the clipboard"
 msgstr "Kopírovat úplnou cestu k souboru do schránky"
 
 msgid "&Revert to Revision..."
-msgstr "&Vrátit k revizi..."
+msgstr "&Navrátit k revizi..."
 
 msgid "Open S&ubrepository"
-msgstr ""
+msgstr "Otevřít s&ubrepozitář"
 
 msgid "Open the selected subrepository"
 msgstr "Otevřít vybraný subrepozitář"
@@ -1612,10 +1615,10 @@ msgid "Diff &Local"
 msgstr ""
 
 msgid "&View Missing"
-msgstr ""
+msgstr "&Zobrazit chybějící"
 
 msgid "View O&ther"
-msgstr ""
+msgstr "Zobrazit o&statní"
 
 msgid "Add &Largefiles..."
 msgstr ""
@@ -1639,13 +1642,13 @@ msgid "Re&move Versioned"
 msgstr "Odebrat verzovaný soubor"
 
 msgid "&Revert..."
-msgstr "&Vrátit (revert)..."
+msgstr "&Navrátit (revert)..."
 
 msgid "Uncommited merge - please select a parent revision"
 msgstr "Nekomitované sloučení - vyberte prosím rodičovskou revizi"
 
 msgid "Revert files to local or other parent?"
-msgstr "Vrátit soubory ke stavu lokálního či jihého rodiče?"
+msgstr "Navrátit soubory ke stavu lokálního či jihého rodiče?"
 
 msgid "&Local"
 msgstr "&Lokální"
@@ -1657,16 +1660,16 @@ msgid "Confirm Revert"
 msgstr "Potvrdit navrácení"
 
 msgid "Revert local file changes?"
-msgstr "Vrátit změny lokálních souborů?"
+msgstr "Navrátit změny lokálních souborů?"
 
 msgid "&Revert with backup"
-msgstr "&Návrat do předchozího stavu se zálohou"
+msgstr "&Navrátit se zálohou"
 
 msgid "&Discard changes"
 msgstr "&Vyřadit změny"
 
 msgid "Revert the following files?"
-msgstr "Vrátit (revert) změny následujících suborů?"
+msgstr "Navrátit následující soubory?"
 
 msgid "&Revert"
 msgstr ""
@@ -1690,10 +1693,10 @@ msgid "De&tect Renames..."
 msgstr "Změna názvu..."
 
 msgid "&Mark Resolved"
-msgstr ""
+msgstr "&Vyřešené"
 
 msgid "&Mark Unresolved"
-msgstr ""
+msgstr "&Nevyřešené"
 
 msgid "Restart Mer&ge"
 msgstr ""
@@ -1708,7 +1711,7 @@ msgid "Display the file anyway"
 msgstr "Přesto ten soubor zobrazit"
 
 msgid "Diff not displayed: "
-msgstr "Rozdíl (diff) nezobrazen: "
+msgstr "Diff nezobrazen: "
 
 #, python-format
 msgid ""
@@ -1732,14 +1735,14 @@ msgstr " <i>(přidáno)</i>"
 
 #, python-format
 msgid " <i>(copied from %s)</i>"
-msgstr ""
+msgstr " <i>(kopírováno z %s)</i>"
 
 #, python-format
 msgid " <i>(renamed from %s)</i>"
 msgstr " <i>(přejmenováno z %s)</i>"
 
 msgid " <i>(is a symlink)</i>"
-msgstr ""
+msgstr " <i>(je symlink)</i>"
 
 #, python-format
 msgid ""
@@ -2017,7 +2020,7 @@ msgid "Show changes from second parent"
 msgstr "Ukázat změny vůči druhému rodiči"
 
 msgid "E&ncoding"
-msgstr ""
+msgstr "Kó&dování"
 
 msgid "&Search in Current File"
 msgstr "&Hledat v aktuálním souboru"
@@ -2033,7 +2036,7 @@ msgid "Enter line number (1 - %d)"
 msgstr "Zadejte číslo řádku (1 - %d)"
 
 msgid "Show &Author"
-msgstr ""
+msgstr "Ukázat &autora"
 
 msgid "Show &Date"
 msgstr ""
@@ -2048,22 +2051,22 @@ msgid "Search Selected Text"
 msgstr "Hledat vybraný text"
 
 msgid "In Current &File"
-msgstr ""
+msgstr "V aktuálním &souboru"
 
 msgid "In &Current Revision"
-msgstr ""
+msgstr "V &aktuální revizi"
 
 msgid "In &Original Revision"
-msgstr ""
+msgstr "V &původní revizi"
 
 msgid "In All &History"
-msgstr ""
+msgstr "V celé &historii"
 
 msgid "Go to"
-msgstr ""
+msgstr "Přejít k"
 
 msgid "View File at"
-msgstr ""
+msgstr "Zobrazit soubor v"
 
 msgid "Diff File to"
 msgstr ""
@@ -2134,9 +2137,9 @@ msgid ""
 "\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
 "changes."
 msgstr ""
-"Před gráftem nutno provést oprávku <a href=\"commit\"><b>commit</b></a>, <a "
-"href=\"shelve\"><b>shelve</b></a> nebo změny <a href=\"discard\"><b>discard</"
-"b></a>."
+"Před gráftem musíte provést <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> do oprávky nebo <a href=\"discard\"><b>discard</"
+"b>  změny</a>."
 
 msgid "You may continue or start the graft"
 msgstr "Můžete pokračovat nebo začít vytvářet gráft"
@@ -2287,7 +2290,7 @@ msgid "<b>Unrevisioned Files</b>"
 msgstr "<b>Neverzované soubory</b>"
 
 msgid "Refresh file list"
-msgstr "Refresh' seznam souborů"
+msgstr "Reaktivovat seznam souborů"
 
 #, python-format
 msgid "Min Similarity: %d%%"
@@ -2553,7 +2556,7 @@ msgid "Unable to write .hgignore file"
 msgstr "Nejde zapsat soubor .hgignore"
 
 msgid "Copy working directory files from skeleton"
-msgstr "Kopírovat soubory ze skeletu"
+msgstr "Kopírovat soubory pracovního adresáře ze skeletu"
 
 msgid "Create special files (.hgignore, ...)"
 msgstr "Vytvořit specielní soubory (.hgignore, ...)"
@@ -2565,7 +2568,7 @@ msgid "New Repository"
 msgstr "Nový repozitář"
 
 msgid "&Create"
-msgstr ""
+msgstr "&Vytvořit"
 
 msgid "Unable to create a config file"
 msgstr "Nejde vytvořit konfigurační soubor"
@@ -2590,13 +2593,13 @@ msgstr ""
 "(largefiles)?"
 
 msgid "Add as &Largefiles"
-msgstr ""
+msgstr "Přidat jako &Largefiles"
 
 msgid "Add as &Normal Files"
-msgstr ""
+msgstr "Přidat jako &Normal Files"
 
 msgid "Invalid Patterns"
-msgstr ""
+msgstr "Neplatné vzory"
 
 msgid "Failed to process largefiles.patterns."
 msgstr ""
@@ -2615,16 +2618,16 @@ msgid "TortoiseHg Lock Tool - %s"
 msgstr ""
 
 msgid "Refresh lock information"
-msgstr ""
+msgstr "Reaktivovat informaci o zámku"
 
 msgid "Lock a file not described in .hglocks"
-msgstr ""
+msgstr "Uzamčení souboru není popsáno v .hglocks"
 
 msgid "Stop current operation"
 msgstr "Zastavit probíhající operaci"
 
 msgid "Locked And Lockable Files:"
-msgstr ""
+msgstr "Zamknuté a zamknutelné soubory:"
 
 msgid "Path"
 msgstr "Cesta"
@@ -2633,16 +2636,16 @@ msgid "Locking User"
 msgstr ""
 
 msgid "Purpose"
-msgstr ""
+msgstr "Účel"
 
 msgid "Simplelock extension not enabled"
-msgstr ""
+msgstr "Extenze simplelock není povolena"
 
 msgid "Please enable and configure simplelock"
-msgstr ""
+msgstr "Povolte prosím a nastavte simplelock"
 
 msgid "Open a (nonmergable) file you wish to be locked"
-msgstr ""
+msgstr "Otevřít (neslučitelný) soubor, který si přejete zamknout"
 
 msgid "File was not within current repository"
 msgstr "Soubor nebyl v aktuálním repozitáři"
@@ -2653,35 +2656,35 @@ msgstr ""
 
 #, python-format
 msgid "Unlocking %s"
-msgstr ""
+msgstr "Odemčení %s"
 
 msgid "Refreshing locks..."
-msgstr ""
+msgstr "Reaktivuje zámky..."
 
 #, python-format
 msgid "Lock of %s successful"
-msgstr ""
+msgstr "Uzamčení %s bylo úspěšné"
 
 #, python-format
 msgid "Lock of %s failed, retry"
-msgstr ""
+msgstr "Uzamčení %s selhalo, zkuste znovu"
 
 #, python-format
 msgid "Unlock of %s failed, retry"
-msgstr ""
+msgstr "Odemčení %s selhalo, zkuste znova"
 
 #, python-format
 msgid "Unlock of %s successful"
-msgstr ""
+msgstr "Odemčení %s bylo úspěšné"
 
 msgid "Ready, double click to lock or unlock"
-msgstr ""
+msgstr "Připraveno, dvojím klikem zamknout nebo odemknout"
 
 msgid "Ready"
 msgstr ""
 
 msgid "You can only release your own locks"
-msgstr ""
+msgstr "Můžete uvolnit pouze své vlastní zámky"
 
 msgid "Find revisions matching fields of:"
 msgstr "Nalézt shodná pole revizí:"
@@ -2840,13 +2843,13 @@ msgid "Commit merge results"
 msgstr "Komitovat výsledek sloučení"
 
 msgid "Commit Options"
-msgstr ""
+msgstr "Možnosti komitu"
 
 msgid "Commit Now"
-msgstr ""
+msgstr "Komitovat nyní"
 
 msgid "Commit Later"
-msgstr ""
+msgstr "Komitovat později"
 
 msgid "Merge changeset"
 msgstr "Changeset sloučení"
@@ -2870,7 +2873,7 @@ msgstr ""
 "společně s odmíntutými?"
 
 msgid "&Commit to Queue..."
-msgstr ""
+msgstr "&Komitovat do fronty..."
 
 msgid "Create &New Queue..."
 msgstr ""
@@ -2907,7 +2910,7 @@ msgid "Delete Patch Queue"
 msgstr ""
 
 msgid "Delete reference to"
-msgstr ""
+msgstr "Smazat odkaz na"
 
 msgid "Delete"
 msgstr "Smazat"
@@ -2961,6 +2964,12 @@ msgid "Unapply all patches"
 msgstr "Zrušit aplikaci všech oprávek"
 
 msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
 msgstr ""
 
 msgid "&Finish Patch"
@@ -3180,7 +3189,7 @@ msgid "Target:"
 msgstr "Cíl:"
 
 msgid "Do not modify working copy (-k/--keep)"
-msgstr ""
+msgstr "Neupravovat pracovní kopii (-k/--keep)"
 
 #, python-format
 msgid "Prune - %s"
@@ -3206,13 +3215,13 @@ msgstr "Zachovat soubory začínající s .hg"
 
 #, python-format
 msgid "%s - purge"
-msgstr "%s - purge"
+msgstr "%s - čistit"
 
 msgid "Checking"
 msgstr "Ověřování"
 
 msgid "Ready to purge."
-msgstr "Ready to purge."
+msgstr "Připraveno k čištění (purge)"
 
 #, python-format
 msgid "Delete %d unknown file"
@@ -3266,7 +3275,7 @@ msgid "Delete Patches"
 msgstr ""
 
 msgid "Remove patches from queue?"
-msgstr "Odstranit oprávky z fronty?"
+msgstr "Odebrat oprávky z fronty?"
 
 msgid "Keep patch files"
 msgstr "Zachovat oprávkové soubory"
@@ -3316,10 +3325,10 @@ msgid "Cu&t"
 msgstr ""
 
 msgid "&Copy"
-msgstr ""
+msgstr "&Kopírovat"
 
 msgid "&Paste"
-msgstr ""
+msgstr "&Vložit"
 
 msgid "&Editor Options"
 msgstr "&Možnosti editoru"
@@ -3359,7 +3368,7 @@ msgid "&TAB"
 msgstr ""
 
 msgid "&Spaces"
-msgstr ""
+msgstr "&Mezery"
 
 msgid "EOL &Visibility"
 msgstr ""
@@ -3386,7 +3395,7 @@ msgid "Regular expression search pattern"
 msgstr "Vyhledávací vzor regulárního výrazu"
 
 msgid "Wrap search"
-msgstr "Wrap search"
+msgstr "Na konci znovu od začátku"
 
 msgid "Prev"
 msgstr ""
@@ -3457,7 +3466,7 @@ msgid "hint:"
 msgstr "návod:"
 
 msgid "Repository Error"
-msgstr "Repository Error"
+msgstr "Chyba repozitáře"
 
 msgid "No visual editor configured"
 msgstr "Žádný textový editor není nastaven"
@@ -3557,7 +3566,7 @@ msgid "To rebase destination"
 msgstr "K destinaci přeskupení"
 
 msgid "Swap source and destination"
-msgstr ""
+msgstr "Prohodit zdroj a destinaci"
 
 msgid "Keep original changesets (--keep)"
 msgstr "Zachovat původní changesety (--keep)"
@@ -3566,10 +3575,10 @@ msgid "Keep original branch names (--keepbranches)"
 msgstr "Zachovat původní názvy větví (--keepbranches)"
 
 msgid "Collapse the rebased changesets (--collapse)"
-msgstr ""
+msgstr "Soustředit přeskupené (rebased) changesety (--collapse)"
 
 msgid "Rebase entire source branch (-b/--base)"
-msgstr ""
+msgstr "Přeskupit celou výchozí větev (-b/--base)"
 
 msgid "Rebase unpublished onto Subversion head (override source, destination)"
 msgstr ""
@@ -3577,7 +3586,7 @@ msgstr ""
 "destination)"
 
 msgid "Rebase"
-msgstr "Přeskupit"
+msgstr "Přeskupit (rebase)"
 
 #, python-format
 msgid "Rebase - %s"
@@ -3628,7 +3637,7 @@ msgid "Mark this chunk as unresolved"
 msgstr "Označit tento chunk jako neřešený"
 
 msgid "Reload File"
-msgstr ""
+msgstr "Opětovně načíst soubor"
 
 msgid "Are you sure you want to reload this file?"
 msgstr "Jste si jist, že tento soubor chcete opětovně načíst?"
@@ -3677,13 +3686,13 @@ msgid "Copy Error"
 msgstr "Copy Error"
 
 msgid "Select Source File"
-msgstr "Vybrat zdrojový soubor"
+msgstr "Vyberte zdrojový soubor"
 
 msgid "Select Source Folder"
 msgstr "Vyberte zdrojovou složku"
 
 msgid "Source does not exist."
-msgstr ""
+msgstr "Zdroj neexistuje..."
 
 msgid "The source must be within the repository tree."
 msgstr "Zdroj musí být uvnitř kořenového adresáře repozitáře."
@@ -3742,7 +3751,7 @@ msgid "Revision Set"
 msgstr "Sada revizí"
 
 msgid "(unsaved)"
-msgstr ""
+msgstr "(neuloženo)"
 
 msgid "Display graph the named branch only"
 msgstr "Zobrazit graf pouze pojmenované větve"
@@ -3787,6 +3796,10 @@ msgstr "Poslední tagy"
 msgctxt "column header"
 msgid "Node"
 msgstr "Node"
+
+msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
 
 msgctxt "column header"
 msgid "Age"
@@ -3836,16 +3849,16 @@ msgid "Show S&hort Paths"
 msgstr ""
 
 msgid "&Scan Repositories at Startup"
-msgstr ""
+msgstr "&Skenovat repozitáře při spuštění"
 
 msgid "Scan &Remote Repositories"
-msgstr ""
+msgstr "Skenovat &vzdálené repozitáře"
 
 msgid "&Refresh Repository List"
-msgstr ""
+msgstr "&Reaktivovat seznam repozitářů"
 
 msgid "Refresh the Repository Registry list"
-msgstr "Refresh seznam repozitářů"
+msgstr "Reaktivovat seznam repozitářů"
 
 msgid "&Open"
 msgstr "Aktivovat repozitář"
@@ -3860,7 +3873,7 @@ msgid "Open all repositories in new tabs"
 msgstr "Otevřít všechny repozitáře v nových kartách"
 
 msgid "New &Group"
-msgstr ""
+msgstr "Nová &skupina"
 
 msgid "Create a new group"
 msgstr "Vytvořit novou skupinu"
@@ -3883,7 +3896,7 @@ msgstr ""
 "Odstranit node a všechny jeho sub-nody. Repozitáře se z disku nesmažou."
 
 msgid "Clon&e..."
-msgstr "Klonovat..."
+msgstr "Klon&ovat..."
 
 msgid "Clone Repository"
 msgstr "Klonovat repozitář"
@@ -3901,7 +3914,7 @@ msgid "Open a shell terminal in the repository root"
 msgstr "Otevřít terminál v kořeni repozitáře"
 
 msgid "&Add Repository..."
-msgstr ""
+msgstr "&Přidat repozitář..."
 
 msgid "Add a repository to this group"
 msgstr "Přidat repozitář do této skupiny"
@@ -3913,7 +3926,7 @@ msgid "Convert an existing repository into a subrepository"
 msgstr "Přeměnit existující repozitář na subrepozitář"
 
 msgid "Remo&ve Subrepository..."
-msgstr ""
+msgstr "Odeb&rat subrepozitář..."
 
 msgid "Remove this subrepository from the current revision"
 msgstr "Odebrat tento subrepozitář z aktuální revize"
@@ -3922,28 +3935,28 @@ msgid "Copy the root path of the repository to the clipboard"
 msgstr "Kopírovat cestu ke kořeni repozitáře do schránky"
 
 msgid "Sort by &Name"
-msgstr ""
+msgstr "Třídit podle &jména"
 
 msgid "Sort the group by short name"
 msgstr "Třídit skupinu podle zkráceného jména"
 
 msgid "Sort by &Path"
-msgstr ""
+msgstr "Třídit podle &cesty"
 
 msgid "Sort the group by full path"
 msgstr "Třídit skupinu podle úplné cesty"
 
 msgid "&Sort by .hgsub"
-msgstr ""
+msgstr "&Třídit podle .hgsub"
 
 msgid "Order the subrepos as in .hgsub"
 msgstr "Řadit subrepozitáře jako v .hgsub"
 
 msgid "Select repository directory to add"
-msgstr "Vybrat adresář přidávaného repozitáře"
+msgstr "Vyberte adresář přidávaného repozitáře"
 
 msgid "Select an existing repository to add as a subrepo"
-msgstr "Vybrat existující repozitář a přidat jej jako subrepozitář"
+msgstr "Vyberte existující repozitář a přidat jej jako subrepozitář"
 
 msgid "Cannot add subrepository"
 msgstr "Subrepozitář nejde přidat"
@@ -4142,7 +4155,7 @@ msgid "Failed to open repository"
 msgstr "Nepodařilo se otevřít repozitář"
 
 msgid "&Sort"
-msgstr ""
+msgstr "&Sort (třídit)"
 
 #, python-format
 msgid "Local Repository %s"
@@ -4215,7 +4228,7 @@ msgstr "Synchronizovat"
 
 msgctxt "tab tooltip"
 msgid "Patch Branch"
-msgstr "Patch Branch"
+msgstr "Větev oprávky"
 
 #, python-format
 msgid "%s <incoming>"
@@ -4229,22 +4242,22 @@ msgid "Pull"
 msgstr "Pull"
 
 msgid "Pull incoming changesets into your repository"
-msgstr "Převzít (pull) příchozí changesty do svého repozitáře"
+msgstr "Přetáhnoutt (pull) příchozí changesty do svého repozitáře"
 
 msgid "Reject incoming changesets"
 msgstr "Odmítnout příchozí changesety"
 
 #, python-format
 msgid "Push current branch (%s)"
-msgstr "Předat aktuální větev (%s)"
+msgstr "Postrčit aktuální větev (%s)"
 
 #, python-format
 msgid "Push up to current revision (#%d)"
-msgstr "Předat až k aktuální revizi(#%d)"
+msgstr "Push až k aktuální revizi(#%d)"
 
 #, python-format
 msgid "Push up to revision #%d"
-msgstr "Předat až k revizi #%d"
+msgstr "Push až k revizi #%d"
 
 msgid "Push all"
 msgstr "Poslat (push) vše"
@@ -4284,7 +4297,7 @@ msgid "Nothing to push"
 msgstr "Nic k předání (push)"
 
 msgid "No revision found"
-msgstr ""
+msgstr "Žádná revize nebyla nalezena"
 
 #, python-format
 msgid "%s - verify repository"
@@ -4340,7 +4353,7 @@ msgid "Push to &Here"
 msgstr ""
 
 msgid "Push Selected &Branch"
-msgstr "Předat (push) vybranou větev"
+msgstr "Push vybranou větev"
 
 msgid "Push &All"
 msgstr ""
@@ -4352,12 +4365,15 @@ msgid "Bro&wse at Revision"
 msgstr "Podrobnosti revize"
 
 msgid "&Merge with Local..."
-msgstr ""
+msgstr "&Sloučit s lokálním..."
 
 msgid "&Tag..."
 msgstr ""
 
 msgid "Boo&kmark..."
+msgstr ""
+
+msgid "Top&ic..."
 msgstr ""
 
 msgid "Sig&n..."
@@ -4367,7 +4383,7 @@ msgid "&Backout..."
 msgstr ""
 
 msgid "Revert &All Files..."
-msgstr ""
+msgstr "Navrátit &všechny soubory..."
 
 msgid "Copy &Hash"
 msgstr ""
@@ -4394,7 +4410,7 @@ msgid "&Graft to Local..."
 msgstr ""
 
 msgid "Modi&fy History"
-msgstr ""
+msgstr "Upra&vit historii"
 
 msgid "&Unapply Patch"
 msgstr ""
@@ -4415,13 +4431,13 @@ msgid "&Strip..."
 msgstr ""
 
 msgid "Post to Re&view Board..."
-msgstr ""
+msgstr "Poslat do Re&view Board..."
 
 msgid "&Remote Update..."
 msgstr ""
 
 msgid "Write diff file"
-msgstr "Psát diffový soubor"
+msgstr "Zapsat diffový soubor"
 
 msgid "Unable to write diff file"
 msgstr "Nejde psát diffový soubor"
@@ -4451,7 +4467,7 @@ msgid "Archive DAG Range..."
 msgstr ""
 
 msgid "Export DAG Range..."
-msgstr "Export DAG Range..."
+msgstr "Exportovat DAG Range..."
 
 msgid "Email DAG Range..."
 msgstr "Email DAG Range..."
@@ -4484,7 +4500,7 @@ msgid "Post Selected to Review Board..."
 msgstr "Poslat vybrané do Review Board..."
 
 msgid "Apply patch"
-msgstr ""
+msgstr "Aplikovat oprávku (patch)"
 
 msgid "Apply onto original parent"
 msgstr "Aplikovat k původnímu rodiči"
@@ -4502,7 +4518,7 @@ msgid "Rename patch..."
 msgstr "Přejmenovat oprávku..."
 
 msgid "Pull to here..."
-msgstr "Pull to here..."
+msgstr "Přetáhnout (pull) sem..."
 
 msgid "Visual diff..."
 msgstr "Zobrazit diff k rodiči..."
@@ -4599,7 +4615,7 @@ msgid "&Branch"
 msgstr "&Větev"
 
 msgid "&More Options..."
-msgstr ""
+msgstr "&Další možnosti..."
 
 msgid "Unable to merge"
 msgstr "Nelze sloučit"
@@ -4611,7 +4627,7 @@ msgid "Unable to backout"
 msgstr "Nelze provést backout"
 
 msgid "Write bundle"
-msgstr ""
+msgstr "Zapsat svazek (bundle)"
 
 msgid "Backwards phase change requested"
 msgstr "Je požadována zpětná změna fáze"
@@ -4753,7 +4769,7 @@ msgid "&Edit Toolbar"
 msgstr ""
 
 msgid "&Refresh"
-msgstr "&Refresh repozitář"
+msgstr "&Refresh (reaktivovat)"
 
 msgid "&Filter Toolbar"
 msgstr "Lišta filtru"
@@ -4779,7 +4795,7 @@ msgid "Unresolved conflicts"
 msgstr "Neřešené konflikty"
 
 msgid "Mercurial Re&solve"
-msgstr ""
+msgstr "Resolve Mercurialu"
 
 msgid "Attempt automatic (trivial) merge"
 msgstr "Zkusit automatické (triviální) sloučení"
@@ -4803,7 +4819,7 @@ msgid "Accept the other file version (theirs)"
 msgstr "Přijmout jinou (jejich) verzi souboru"
 
 msgid "&Mark as Resolved"
-msgstr ""
+msgstr "&Označit jako vyřešené"
 
 msgid "Mark this file as resolved"
 msgstr "Označit tento soubor jako vyřešený"
@@ -4839,7 +4855,7 @@ msgid "Visual diff between resolved file and second parent"
 msgstr "Diff mezi řešeným souborem a druhým rodičem"
 
 msgid "Mark as &Unresolved"
-msgstr ""
+msgstr "Označit jako &nevyřešené"
 
 msgid "Mark this file as unresolved"
 msgstr "Označit tento soubor jako nevyřešený"
@@ -4903,7 +4919,7 @@ msgid "### filter text ###"
 msgstr "### text filtru ###"
 
 msgid "Changed by &This Commit"
-msgstr ""
+msgstr "Změněno &tímto komitem"
 
 msgid "Show files changed by this commit"
 msgstr "Zobrazit soubory změněné tímto komitem"
@@ -4918,7 +4934,7 @@ msgid "Toggle parent to be used as the base revision"
 msgstr "Přepnout na rodiče, který má být použit jako bázová revize"
 
 msgid "List Optio&ns"
-msgstr "Seznam stavů"
+msgstr "Seznam možnos&tí"
 
 #, python-format
 msgid "%s - Revision Details (%s)"
@@ -4938,7 +4954,7 @@ msgstr ""
 "<b>Vrátit (revert) %d souborů k jejich obsahům v následující revizi?</b>"
 
 msgid "Revert all files to this revision"
-msgstr "Nastavit všechny soubory k této revizi"
+msgstr "Navrátit všechny soubory k této revizi"
 
 #, python-format
 msgid "revision %d's first parent (i.e. revision %d)"
@@ -4957,8 +4973,8 @@ msgstr "Changeset:"
 msgid "Child:"
 msgstr "Dítě:"
 
-msgid "Precursors:"
-msgstr "Předchůdci:"
+msgid "Predecessors:"
+msgstr ""
 
 msgid "Successors:"
 msgstr "Následovníci:"
@@ -5007,6 +5023,8 @@ msgid ""
 "Changesets within the interval, see <a href=\"https://www.mercurial-scm.org/"
 "doc/hg.1.html#dates\">help dates</a>"
 msgstr ""
+"Changesety uvnitř intervalu, viz <a href=\"https://www.mercurial-scm.org/doc/"
+"hg.1.html#dates\">help dates</a>"
 
 msgid "Greatest common ancestor of the two changesets."
 msgstr "Největší společný předek dvou changesetů."
@@ -5020,6 +5038,8 @@ msgid ""
 "Changesets affecting files matched by pattern.  See <a href=\"https://www."
 "mercurial-scm.org/doc/hg.1.html#patterns\">help patterns</a>"
 msgstr ""
+"Changesety, působící na soubory shodné se vzorem. Viz  <a href=\"https://www."
+"mercurial-scm.org/doc/hg.1.html#patterns\">help patterns</a>"
 
 msgid "Changesets which modify files matched by pattern."
 msgstr "Changesety, které upravují soubory shodné se vzorem."
@@ -5195,7 +5215,7 @@ msgid "set/override config option (use 'section.name=value')"
 msgstr "zadat/přepsat konfigurační nastavení (use 'section.name=value')"
 
 msgid "enable debugging output"
-msgstr ""
+msgstr "umožnit ladící výstup"
 
 msgid "start debugger"
 msgstr "spustit debugger"
@@ -5204,7 +5224,7 @@ msgid "print command execution profile"
 msgstr "prováděcí profil příkazu print"
 
 msgid "do not fork GUI process"
-msgstr "nedělit proces GUI"
+msgstr "nedělit (fork) proces GUI"
 
 msgid "always fork GUI process"
 msgstr "vždy dělit proces GUI"
@@ -5276,7 +5296,7 @@ msgid "revision, tag or branch to check out"
 msgstr "vybíraná revize, tag nebo větev"
 
 msgid "include the specified changeset"
-msgstr "připojit určený changeset"
+msgstr "zahrnout určený changeset"
 
 msgid "clone only the specified branch"
 msgstr "klonovat jenom určenou větev"
@@ -5315,7 +5335,7 @@ msgid "thg debugruncommand -- COMMAND [ARGUMENT]..."
 msgstr ""
 
 msgid "no command specified"
-msgstr ""
+msgstr "žádný příkaz nebyl určen"
 
 msgid "thg drag_copy SOURCE... DEST"
 msgstr "thg drag_copy SOURCE... DEST"
@@ -5333,7 +5353,7 @@ msgid "use only one form to specify the revision"
 msgstr "pro označení revize použijte jen jeden způsob"
 
 msgid "select the specified revision"
-msgstr "vyber určenou revizi"
+msgstr "vyberte určenou revizi"
 
 msgid "side-by-side comparison of revisions"
 msgstr "porovnání revize vedle revize"
@@ -5342,13 +5362,13 @@ msgid "thg filelog [OPTION]... FILE"
 msgstr ""
 
 msgid "requires a single filename"
-msgstr ""
+msgstr "vyžaduje jediné jméno souboru"
 
 msgid "thg forget [FILE]..."
 msgstr "thg forget [FILE]..."
 
 msgid "revisions to graft"
-msgstr "gráftované revize"
+msgstr "revize pro gráftování"
 
 msgid "thg graft [-r] REV..."
 msgstr ""
@@ -5409,7 +5429,7 @@ msgid "options:\n"
 msgstr "možnosti:\n"
 
 msgid "no commands defined\n"
-msgstr "žádné příkazy nebyly definovány\n"
+msgstr "žádné příkazy nebyly určeny\n"
 
 msgid "Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
 msgstr "Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
@@ -5441,7 +5461,7 @@ msgid "thg lock"
 msgstr ""
 
 msgid "search for a given text or revset"
-msgstr ""
+msgstr "hledání daného textu nebo revsetu"
 
 msgid "(DEPRECATED)"
 msgstr ""
@@ -5477,17 +5497,17 @@ msgid "thg postreview [-r] REV..."
 msgstr ""
 
 msgid "reviewboard extension not enabled"
-msgstr ""
+msgstr "extenze reviewboard není povolena"
 
 #, python-format
 msgid "see <a href=\"%(url)s\">%(url)s</a>"
 msgstr ""
 
 msgid "no revisions specified"
-msgstr ""
+msgstr "žádná revize nebyla určena"
 
 msgid "revisions to prune"
-msgstr ""
+msgstr "revize, které mají být redukovány (pruned)"
 
 msgid "thg prune [-r] REV..."
 msgstr ""
@@ -5572,13 +5592,13 @@ msgid "thg shelve"
 msgstr "thg shelve"
 
 msgid "sign even if the sigfile is modified"
-msgstr ""
+msgstr "podepsat, i když je sigfile modifikován"
 
 msgid "make the signature local"
-msgstr ""
+msgstr "učinit signaturu lokální"
 
 msgid "the key id to sign with"
-msgstr ""
+msgstr "id podpisového klíče"
 
 msgid "do not commit the sigfile after signing"
 msgstr ""
@@ -5617,7 +5637,7 @@ msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
 msgstr ""
 
 msgid "open the bookmark sync window"
-msgstr ""
+msgstr "otevřít okno pro synchronizaci bookmarků"
 
 msgid "thg sync [OPTION]... [PEER]"
 msgstr ""
@@ -5632,7 +5652,7 @@ msgid "revision to tag"
 msgstr "tagem označovaná revize"
 
 msgid "remove a tag"
-msgstr "odejmout tag"
+msgstr "odebrat tag"
 
 msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
 msgstr "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
@@ -5644,7 +5664,7 @@ msgid "notify the shell for paths given"
 msgstr "oznámit shell pro dané cesty"
 
 msgid "remove the status cache"
-msgstr "odstranit status cache"
+msgstr "odebrat status cache"
 
 msgid "show the contents of the status cache (no update)"
 msgstr "zobrazit obsah status cache (neaktualizovat)"
@@ -5653,6 +5673,15 @@ msgid "update all repos in current dir"
 msgstr "aktualizovat všechny repozitáře ve stávajícím adresáři"
 
 msgid "thg thgstatus [OPTION]"
+msgstr ""
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
 msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
@@ -5665,7 +5694,7 @@ msgid "changeset to view in diff tool"
 msgstr "changeset který má být zobrazen v diff nástroji"
 
 msgid "revisions to view in diff tool"
-msgstr "revize které mají být zobrazeny v diff nástroji"
+msgstr "revize, které mají být zobrazeny v diff nástroji"
 
 msgid "bundle file to preview"
 msgstr "soubor svazku pro náhled"
@@ -5771,10 +5800,10 @@ msgid "Italic"
 msgstr ""
 
 msgid "Strike"
-msgstr ""
+msgstr "Přeškrtnout"
 
 msgid "Underline"
-msgstr ""
+msgstr "Podtrhnout"
 
 msgid "&Set..."
 msgstr ""
@@ -6121,13 +6150,13 @@ msgid ""
 "that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
 "activate any bookmarks.</ul><p>Default: prompt"
 msgstr ""
-"Zvolte poté, co TortoiseHg zobrazí výzvu k aktivaci záložky  při aktualizaci "
-"k revizi, která má jednu nebo více záložek.<ul><li><b>auto</b>: Pokusit se "
-"záložky aktivovat automaticky při aktualizaci k revizi, která má jedinou "
-"záložku. Zobrazit výzvu při aktualizaci k revizi, která má více záložek."
-"<li><b>prompt</b>: Implicitní nastavení. Zobrazit výzvu při aktualizaci k "
-"revizi, která má jednu či více záložek.<li><b>never</b>: Nikdy nezobrazovat "
-"žádnou výzvu pro aktivaci záložek.</ul><p>Implicitně: prompt"
+"Vyberte poté, co TortoiseHg zobrazí výzvu k aktivaci záložky  při "
+"aktualizaci k revizi, která má jednu nebo více záložek.<ul><li><b>auto</b>: "
+"Pokusit se záložky aktivovat automaticky při aktualizaci k revizi, která má "
+"jedinou záložku. Zobrazit výzvu při aktualizaci k revizi, která má více "
+"záložek.<li><b>prompt</b>: Implicitní nastavení. Zobrazit výzvu při "
+"aktualizaci k revizi, která má jednu či více záložek.<li><b>never</b>: Nikdy "
+"nezobrazovat žádnou výzvu pro aktivaci záložek.</ul><p>Implicitně: prompt"
 
 msgid "Show Family Line"
 msgstr "Zobrazit rodinnou linii"
@@ -6388,18 +6417,19 @@ msgstr ""
 "\"TortoisePlink.exe -ssh -2\" (Windows)"
 
 msgid "<b>Subrepository Features:</b>"
-msgstr ""
+msgstr "<b>Vlastnosti subrepozitáře:</b>"
 
 msgid "Allow Hg Subrepos"
-msgstr ""
+msgstr "Povolit subrepa Mercurialu"
 
 msgid ""
 "Whether Mercurial subrepositories are allowed in the working directory. "
 "Default: True"
 msgstr ""
+"Zda jsou v pracovním adresáři povolena subrepa Mercuriálu. Implicitně: True"
 
 msgid "Allow Git Subrepos"
-msgstr ""
+msgstr "Povolit subrepa Gitu"
 
 #, python-format
 msgid ""
@@ -6407,9 +6437,11 @@ msgid ""
 "False<p><a href=\"%s\">See the security note</a> before enabling Git "
 "subrepos."
 msgstr ""
+"Zda jsou v pracovním adresáři povolena subrepa Gitu. Implicitně: False<p><a "
+"href=\"%s\">Viz bezpečností poznámka</a> před povolením subrepozitářů Git."
 
 msgid "Allow SVN Subrepos"
-msgstr ""
+msgstr "Povolit subrepa SVN"
 
 #, python-format
 msgid ""
@@ -6417,6 +6449,9 @@ msgid ""
 "Default: False<p><a href=\"%s\">See the security note</a> before enabling "
 "Subversion subrepos."
 msgstr ""
+"Zda jsou v pracovním adresáři povolena subrepa Subversion. Implicitně: "
+"False<p><a href=\"%s\">Viz bezpečností poznámka</a> před povolením "
+"subrepozitářů Subversion."
 
 msgid "Server"
 msgstr "Server"
@@ -6767,12 +6802,6 @@ msgstr "Font diffu"
 msgid "Font used to display text differences. Default: monospace 10"
 msgstr "Font použitý pro zobrazení rozdílů v textu. Implicitně: monospace 10"
 
-msgid "List Font"
-msgstr "Font seznamu"
-
-msgid "Font used to display file lists. Default: sans 9"
-msgstr "Font použitý v seznamu souborů. Implicitně: sans 9"
-
 msgid "ChangeLog Font"
 msgstr "Font přehledu revizí"
 
@@ -6839,7 +6868,7 @@ msgstr ""
 "povoleno, musí nastavený regex v 'Issue Regex' nalézt shodu ve zprávě komitu."
 
 msgid "Issue Tracker Plugin"
-msgstr ""
+msgstr "Plugin pro Issue Tracker"
 
 msgid ""
 "Configures a COM IBugTraqProvider or IBugTrackProvider2 issue tracking "
@@ -6869,7 +6898,7 @@ msgstr ""
 "</ul><p>Implicitně: never"
 
 msgid "Changeset Link"
-msgstr ""
+msgstr "Odkaz na changeset"
 
 msgid ""
 "A \"template string\" that, when set, turns the revision number and short "
@@ -6930,7 +6959,7 @@ msgstr ""
 "jako 'bfiles"
 
 msgid "Size"
-msgstr ""
+msgstr "Velikost"
 
 msgid ""
 "Files of at least the specified size (in megabytes) will be added as bfiles"
@@ -6967,7 +6996,7 @@ msgstr ""
 "jako 'largefiles"
 
 msgid "Minimum Size"
-msgstr ""
+msgstr "Minimální velkost"
 
 msgid ""
 "Files of at least the specified size (in megabytes) will be added as "
@@ -7018,7 +7047,7 @@ msgstr ""
 "nastaveno stahování ze žádného serveru."
 
 msgid "Include"
-msgstr ""
+msgstr "Zahrnout"
 
 msgid ""
 "List of settings that will be pulled from the project configuration file. "
@@ -7225,7 +7254,7 @@ msgid ""
 msgstr "Můžete změnit sadu ikon z <a href=\"%s\">TortoiseSVN's Settings</a>"
 
 msgid "Explorer Extension Settings - TortoiseHg"
-msgstr ""
+msgstr "Nastavení kontext. nabídek - TortoiseHg"
 
 msgid "Clear"
 msgstr "Smazat"
@@ -7258,7 +7287,7 @@ msgid "Refresh Toolbar"
 msgstr "Refresh Toolbar"
 
 msgid "Refresh"
-msgstr "Refresh"
+msgstr "Reaktivovat (refresh)"
 
 msgid "New Shelf"
 msgstr "New Shelf"
@@ -7322,7 +7351,7 @@ msgid "Shelf deleted"
 msgstr "Šelf smazán"
 
 msgid "Revert all working copy changes?"
-msgstr "Vrátit všechny změny pracovní kopie?"
+msgstr "Navrátit všechny změny pracovní kopie?"
 
 #, python-format
 msgid "Clear contents of shelf file %s?"
@@ -7343,10 +7372,10 @@ msgid "Key:"
 msgstr ""
 
 msgid "Local sign"
-msgstr ""
+msgstr "Lokální označení"
 
 msgid "Sign even if the sigfile is modified (-f/--force)"
-msgstr ""
+msgstr "Podepsat, i když je sigfile modifikován (-f/--force)"
 
 msgid "No commit"
 msgstr ""
@@ -7362,7 +7391,7 @@ msgid "Sign - %s"
 msgstr ""
 
 msgid "Signature has been added"
-msgstr ""
+msgstr "Signatura byla připojena"
 
 msgid "Repository command still running"
 msgstr "Příkaz pro repozitář stále běží"
@@ -7380,7 +7409,7 @@ msgid "Status File List Toolbar"
 msgstr "Status File List Toolbar"
 
 msgid "Remove filter, show root"
-msgstr "Odstranit filtr, ukázat root"
+msgstr "Odebrat filtr, ukázat root"
 
 #, python-format
 msgid "%s - status (selection filtered)"
@@ -7391,7 +7420,7 @@ msgid "%s - status"
 msgstr "%s - status"
 
 msgid "Check"
-msgstr "Označit"
+msgstr "Ověřit"
 
 msgid "Uncheck"
 msgstr "Odznačit"
@@ -7490,13 +7519,13 @@ msgid "Check for incoming changes from selected URL"
 msgstr "Zjistit příchozí změny z vybraného URL"
 
 msgid "Pull incoming changes from selected URL"
-msgstr "Převzít (pull) příchozí změny z vybraného URL"
+msgstr "Přetáhnout (pull) příchozí změny z vybraného URL"
 
 msgid "Detect outgoing changes to selected URL"
 msgstr "Odchozí změny do vybraného URL"
 
 msgid "Push outgoing changes to selected URL"
-msgstr "Předat (push) odchozí změny do vybraného URL"
+msgstr "Postrčit (push) odchozí změny do vybraného URL"
 
 msgid "Sync Bookmarks"
 msgstr ""
@@ -7567,10 +7596,10 @@ msgid "Delete %s from your repo configuration file?"
 msgstr "Smazat %s z konfiguračního souboru vašeho repozitáře?"
 
 msgid "Select repository"
-msgstr ""
+msgstr "Vyberte repozitář"
 
 msgid "No host specified"
-msgstr ""
+msgstr "Žádný hostitel nebyl určen"
 
 msgid "Please set a valid URL to continue."
 msgstr "Zadejte prosím platné URL."
@@ -7617,7 +7646,7 @@ msgstr "Příjem příchozích changesetů z %s zrušen, ret %d"
 
 #, python-format
 msgid "Pulling from %s..."
-msgstr "Stahování (pulling) %s..."
+msgstr "Přetahování (pulling) %s..."
 
 #, python-format
 msgid "Pull from %s completed"
@@ -7625,7 +7654,7 @@ msgstr "Přejímka (pull) z %s je dokončena"
 
 #, python-format
 msgid "Pull from %s aborted, ret %d"
-msgstr "Přejímka (pull) z %s je zrušena, ret %d"
+msgstr "Přetažení (pull) z %s je zrušeno, ret %d"
 
 msgid "Merge caused file conflicts"
 msgstr "Sloučení způsobilo konflikty"
@@ -7732,7 +7761,7 @@ msgid "Outgoing aborted, ret %d"
 msgstr "Sestavení odchozích changesetů zrušeno, ret %d"
 
 msgid "Select bundle file"
-msgstr ""
+msgstr "Vyberte soubor svazku"
 
 msgid "Bundle files (*.hg)"
 msgstr ""
@@ -7860,7 +7889,7 @@ msgid "TLS 1.2"
 msgstr ""
 
 msgid "Minimum Protocol"
-msgstr ""
+msgstr "Minimální protokol"
 
 msgid "User Authentication"
 msgstr "Ověření uživatele"
@@ -8035,7 +8064,7 @@ msgid "Select patches"
 msgstr "Vyberte oprávky"
 
 msgid "Select Directory containing patches"
-msgstr "Vybrat adresář, obsahující oprávky"
+msgstr "Vyberte adresář, obsahující oprávky"
 
 #, python-format
 msgid "%s patches"
@@ -8092,6 +8121,36 @@ msgstr "Odtrhnout -%s"
 msgid "&Strip"
 msgstr "&Strip"
 
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr ""
+
 msgid "Parent 1:"
 msgstr "Rodič 1:"
 
@@ -8099,7 +8158,7 @@ msgid "Parent 2:"
 msgstr "Rodič 2:"
 
 msgid "Pull subrepos from:"
-msgstr ""
+msgstr "Přetáhnout (pull) subrepa z:"
 
 msgid "List updated files (--verbose)"
 msgstr "Seznam aktualizovaných souborů (--verbose)"
@@ -8248,7 +8307,7 @@ msgid "Discard outstanding changes to working directory?"
 msgstr "Vyřadit nevyřízené změny pracovního adresáře?"
 
 msgid "Config files (*.conf *.config *.ini)"
-msgstr ""
+msgstr "Konfigurační soubory (*.conf *.config *.ini)"
 
 msgid "Open hgweb config"
 msgstr "Otevřít konfig. soubor hgweb"
@@ -8263,7 +8322,7 @@ msgid "Local Path:"
 msgstr "Lokální cesta:"
 
 msgid "Select Repository"
-msgstr "Vyberte repozitář"
+msgstr "Vybrat repozitář"
 
 msgid "Add Path to Serve"
 msgstr "Add Path to Serve"
@@ -8362,13 +8421,13 @@ msgid "S&ynchronize"
 msgstr "S&ynchronizovat"
 
 msgid "Refresh current repository"
-msgstr "Refresh aktuální repozitář"
+msgstr "Reaktivovat aktuální repozitář"
 
 msgid "Refresh &Task Tab"
-msgstr "Refresh úkonovou plochu"
+msgstr "Reaktivovat úkonovou plochu"
 
 msgid "Refresh only the current task tab"
-msgstr "Obnovit (refresh) pouze aktuální úkonovou kartu"
+msgstr "Reaktivovat pouze aktuální úkonovou kartu"
 
 msgid "Load &All Revisions"
 msgstr "Načíst všechny revize"
@@ -8395,7 +8454,7 @@ msgid "&Lock File..."
 msgstr ""
 
 msgid "Lock or unlock files"
-msgstr ""
+msgstr "Zamknout nebo nezamknout soubory"
 
 msgid "Update working directory or switch revisions"
 msgstr "Aktualizovat pracovní adresář k označené revizi"
@@ -8449,13 +8508,13 @@ msgid "&About TortoiseHg"
 msgstr ""
 
 msgid "&Incoming"
-msgstr ""
+msgstr "&Příchozí"
 
 msgid "&Pull"
 msgstr ""
 
 msgid "&Outgoing"
-msgstr ""
+msgstr "&Odchozí (outgoing)"
 
 msgid "P&ush"
 msgstr ""
@@ -8480,13 +8539,13 @@ msgid "Check for incoming changes"
 msgstr "Zjistit příchozí změny"
 
 msgid "Pull incoming changes"
-msgstr "Převzít (pull) příchozí změny"
+msgstr "Přetáhnout (pull) příchozí změny"
 
 msgid "Detect outgoing changes"
 msgstr "Zjistit odchozí změny"
 
 msgid "Push outgoing changes"
-msgstr "Předat (push) odchozí změny"
+msgstr "Postrčit (push) odchozí změny"
 
 #, python-format
 msgid ""
@@ -8501,7 +8560,7 @@ msgid ""
 "Pull incoming changes from\n"
 "%s"
 msgstr ""
-"Převzít (pull) změny z\n"
+"Přetáhnout  (pull) příchozí změny změny z\n"
 "%s"
 
 #, python-format
@@ -8517,7 +8576,7 @@ msgid ""
 "Push outgoing changes to\n"
 "%s"
 msgstr ""
-"Předat (push) odchozí změny do\n"
+"Postrčit (push) odchozí změny do\n"
 "%s"
 
 #, python-format
@@ -8545,7 +8604,7 @@ msgid "Enter revision identifier"
 msgstr "Zadat označení revize"
 
 msgid "Select repository directory to open"
-msgstr "Vybrat adresář otevíraného repozitáře"
+msgstr "Vyberte adresář otevíraného repozitáře"
 
 msgid "README not configured"
 msgstr "README není nastaveno"
@@ -8580,18 +8639,18 @@ msgid "Cannot open Plugin Options dialog"
 msgstr "Nejde otevřít dialog Plugin Options"
 
 msgid "do not verify server certificate (ignoring web.cacerts config)"
-msgstr ""
+msgstr "neověřovat certifikát serveru (ignoring web.cacerts config)"
 
 msgid "[--insecure] [SOURCE]"
 msgstr ""
 
 #, python-format
 msgid "unsupported URL: %s"
-msgstr ""
+msgstr "nepodporované URL: %s"
 
 #, python-format
 msgid "%s certificate error: no certificate received"
-msgstr ""
+msgstr "%s chyba certifikace: žádný certifikát nebyl přijat"
 
 msgid "move after the specified patch"
 msgstr ""
@@ -8600,20 +8659,20 @@ msgid "[--after PATCH] PATCH..."
 msgstr ""
 
 msgid "unknown patch to move specified"
-msgstr ""
+msgstr "pro přemístění uveden neznámý soupis změn (patch)"
 
 msgid "invalid patch position specified"
-msgstr ""
+msgstr "neplatné určení pozice oprávky (patch)"
 
 msgid "cannot move applied patches"
-msgstr ""
+msgstr "aplikované oprávky nelze přemístit"
 
 #, python-format
 msgid "patch %s not in series"
 msgstr ""
 
 msgid "cannot move into applied patches"
-msgstr ""
+msgstr "nelze přemístit do aplikovaných oprávek"
 
 msgid "abort: "
 msgstr "zrušit: "
@@ -8641,10 +8700,10 @@ msgid "SSL error: %s"
 msgstr "Chyba SSL: %s"
 
 msgid "hgsubversion packaged with thg"
-msgstr ""
+msgstr "hgsubversion v paketu s thg"
 
 msgid "hggit packaged with thg"
-msgstr ""
+msgstr "hggit v paketu s thg"
 
 msgid "inotify is not supported on this platform"
 msgstr "inotify není v této platformě podporováno"
@@ -8668,10 +8727,10 @@ msgid "Revision details context menu"
 msgstr "Kontextové menu detailů revize"
 
 msgid "Pair selection context menu"
-msgstr ""
+msgstr "Kontextové menu párového výběru"
 
 msgid "Multiple selection context menu"
-msgstr ""
+msgstr "Vícevýběrové kontextové menu"
 
 msgid "Commit context menu"
 msgstr "Kontextové menu komitu"
@@ -8766,10 +8825,10 @@ msgid "Add files to version control"
 msgstr "Přidat soubory do správy verzí"
 
 msgid "Revert Files..."
-msgstr "Vrátit změny souborů..."
+msgstr "Navrátit soubory..."
 
 msgid "Revert file changes"
-msgstr "Vrátit změny souboru"
+msgstr "Navrátit změny souboru"
 
 msgid "Forget Files..."
 msgstr "Zapomenout soubory..."
@@ -8778,7 +8837,7 @@ msgid "Remove files from version control"
 msgstr "Odebrat soubory ze správy verzí"
 
 msgid "Remove Files..."
-msgstr "Odstranit soubory..."
+msgstr "Odebrat soubory..."
 
 msgid "Rename File"
 msgstr "Přejmenovat soubor"
@@ -8895,7 +8954,7 @@ msgid "win32ill: unsupported platform: %s\n"
 msgstr "win32ill: nepodporovaná platforma: %s\n"
 
 msgid "win32ill: interrupted while stopping message loop\n"
-msgstr ""
+msgstr "win32ill: přerušeno se zastavením \"message loop\"\n"
 
 #~ msgid "limit number of changes displayed"
 #~ msgstr "omezit počet zobrazených změn"
@@ -9019,6 +9078,9 @@ msgstr ""
 
 #~ msgid "Source path:"
 #~ msgstr "Cesta ke zdroji:"
+
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "Použít nekomprimovaný přenos"
 
 #~ msgid "Source path is empty"
 #~ msgstr "Cesta ke zdroji je prázdná"
@@ -12115,6 +12177,9 @@ msgstr ""
 #~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
 #~ "revsets</a>"
 
+#~ msgid "Font used to display file lists. Default: sans 9"
+#~ msgstr "Font použitý v seznamu souborů. Implicitně: sans 9"
+
 #~ msgid ""
 #~ "Commit message text for new changeset that reverses the effect of the "
 #~ "change being backed out."
@@ -12248,6 +12313,9 @@ msgstr ""
 #~ "Jestliže 'False', nové soubory budou zařazeny do komitu bez stvrzovacího "
 #~ "dialogu. Implicitně: True"
 
+#~ msgid "List Font"
+#~ msgstr "Font seznamu"
+
 #~ msgid "View missing"
 #~ msgstr "Zobrazit chybějící soubor"
 
@@ -12305,6 +12373,9 @@ msgstr ""
 #~ msgstr ""
 #~ "Je-li zadáno True, jsou řádky sumární zprávy changesetu spojovány až od "
 #~ "celkové délky 80 znaků. Implicitně je False"
+
+#~ msgid "Precursors:"
+#~ msgstr "Předchůdci:"
 
 #~ msgid ""
 #~ "The command that will be executed.\n"

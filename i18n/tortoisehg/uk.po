@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
-"PO-Revision-Date: 2016-03-13 10:18+0000\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"PO-Revision-Date: 2018-02-05 16:48+0000\n"
 "Last-Translator: onekosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:20+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:29+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
@@ -28,7 +28,7 @@ msgstr "Закрити"
 msgid "About"
 msgstr "Про програму"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
+msgid "Copyright 2008-2018 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -590,8 +590,8 @@ msgstr "Не поновлювати новий робочий каталог"
 msgid "Use pull protocol to copy metadata"
 msgstr "Використовувати протокол витягування аби копіювати метадані"
 
-msgid "Use uncompressed transfer"
-msgstr "При передаванні не стискати"
+msgid "Clone with minimal processing"
+msgstr ""
 
 msgid "Include patch queue"
 msgstr "Разом з чергою латок"
@@ -1021,6 +1021,9 @@ msgstr "потрібно вказати сховище"
 
 msgid "must be specified 'type' in style"
 msgstr "потрібно вказати 'type' в стилі"
+
+msgid "Git Commit:"
+msgstr ""
 
 msgid "Summary:"
 msgstr "Підсумок:"
@@ -2878,6 +2881,12 @@ msgstr "Відхилити всі латки"
 msgid "Go &to Patch"
 msgstr "Перейти до латки"
 
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
 msgid "&Finish Patch"
 msgstr "Остаточна латка"
 
@@ -3704,6 +3713,10 @@ msgid "Node"
 msgstr "Вузлова точка"
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
 msgid "Age"
 msgstr "Створено"
 
@@ -4274,6 +4287,9 @@ msgstr "Зріз..."
 
 msgid "Boo&kmark..."
 msgstr "Закладка..."
+
+msgid "Top&ic..."
+msgstr ""
 
 msgid "Sig&n..."
 msgstr "Підпис..."
@@ -4874,8 +4890,8 @@ msgstr "Набір змін:"
 msgid "Child:"
 msgstr "Нащадок:"
 
-msgid "Precursors:"
-msgstr "Попередники:"
+msgid "Predecessors:"
+msgstr ""
 
 msgid "Successors:"
 msgstr "Наступники:"
@@ -5572,6 +5588,15 @@ msgstr "поновити всі сховища у поточному катал�
 
 msgid "thg thgstatus [OPTION]"
 msgstr "thg thgstatus [OPTION]"
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
+msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
 msgstr "thg update [-C] [[-r] РЕВ.]"
@@ -6684,12 +6709,6 @@ msgstr "Шрифт відмінностей"
 msgid "Font used to display text differences. Default: monospace 10"
 msgstr ""
 "Шрифт використовуваний для показу різниці текстів. Типово: monospace 10."
-
-msgid "List Font"
-msgstr "Шрифт списків"
-
-msgid "Font used to display file lists. Default: sans 9"
-msgstr "Шрифт використовуваний для відображення списку файлів. Типово: sans 9."
 
 msgid "ChangeLog Font"
 msgstr "Шрифт журналу змін"
@@ -8031,6 +8050,36 @@ msgstr "Розрізати - %s"
 msgid "&Strip"
 msgstr "Розрізати"
 
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr ""
+
 msgid "Parent 1:"
 msgstr "Попередник 1:"
 
@@ -8640,8 +8689,8 @@ msgstr[2] "%d місяців"
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d тиждень"
-msgstr[1] "%d тиждні"
-msgstr[2] "%d тижднів"
+msgstr[1] "%d тижні"
+msgstr[2] "%d тижнів"
 
 #, python-format
 msgid "%d day"
@@ -10535,6 +10584,9 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ "Набір змін в інтервалі, дивись <a href=\"http://www.selenic.com/mercurial/"
 #~ "hg.1.html#dates\">довідку дат</a>"
 
+#~ msgid "List Font"
+#~ msgstr "Шрифт списків"
+
 #~ msgid "Invalid date specification"
 #~ msgstr "Помилковий формат дати"
 
@@ -11455,6 +11507,10 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ msgid "Character encoding name"
 #~ msgstr "Система кодування символів."
 
+#~ msgid "Font used to display file lists. Default: sans 9"
+#~ msgstr ""
+#~ "Шрифт використовуваний для відображення списку файлів. Типово: sans 9."
+
 #~ msgid ""
 #~ "Defines the command to run when an issue number is recognized. You may "
 #~ "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -11627,6 +11683,9 @@ msgstr "win32ill: переривається коли зупиняється ц�
 
 #~ msgid "Clean checkout, undo all changes"
 #~ msgstr "Очистити налагоджене, відмовившись від всіх змін"
+
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "При передаванні не стискати"
 
 #~ msgid ""
 #~ "Comma separated list of exclusion patterns.  Exclusion patterns are "
@@ -12042,6 +12101,9 @@ msgstr "win32ill: переривається коли зупиняється ц�
 
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr "Відкинути всі зміни із злиттям цільової (іншої) правки"
+
+#~ msgid "Precursors:"
+#~ msgstr "Попередники:"
 
 #~ msgid ""
 #~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "

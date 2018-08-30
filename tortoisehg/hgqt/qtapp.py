@@ -45,7 +45,9 @@ from .qtnetwork import (
 
 from mercurial import (
     error,
-    util,
+)
+from mercurial.utils import (
+    procutil,
 )
 
 from ..util import (
@@ -84,7 +86,7 @@ except ImportError:
     thginithook = None
 
 def _ugetuser():
-    return hglib.tounicode(util.getuser())
+    return hglib.tounicode(procutil.getuser())
 
 # {exception class: message}
 # It doesn't check the hierarchy of exception classes for simplicity.

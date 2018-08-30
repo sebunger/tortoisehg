@@ -7,27 +7,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
-"PO-Revision-Date: 2015-06-28 12:43+0000\n"
-"Last-Translator: Wagner Bruna <Unknown>\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"PO-Revision-Date: 2018-03-10 15:19+0000\n"
+"Last-Translator: HuBa <Unknown>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2017-11-29 05:18+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-04 05:26+0000\n"
+"X-Generator: Launchpad (build 18623)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
 
 msgid "Exit"
-msgstr "Kilép"
+msgstr "Kilépés"
 
 msgid "About"
 msgstr "Névjegy"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
+msgid "Copyright 2008-2018 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -49,7 +49,7 @@ msgstr ""
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr ""
+msgstr "TortoiseHg új verziója (%s) letölthető!"
 
 msgid "License"
 msgstr ""
@@ -61,31 +61,31 @@ msgid "Directory of files"
 msgstr "Könyvtár fájljai"
 
 msgid "Tar archives"
-msgstr "Tar archívum"
+msgstr "Tar archívumok"
 
 msgid "Uncompressed tar archive"
 msgstr "Tömörítettlen tar archívum"
 
 msgid "Bzip2 tar archives"
-msgstr "Bzip2 tar archívum"
+msgstr "Bzip2 tar archívumok"
 
 msgid "Tar archive compressed using bzip2"
 msgstr "Tar acrhívum bzip2-vel tömörítve"
 
 msgid "Gzip tar archives"
-msgstr "Gzip tar archívum"
+msgstr "Gzip tar archívumok"
 
 msgid "Tar archive compressed using gzip"
-msgstr "Tar archívum gzip-el tömörítve"
+msgstr "Tar archívum gzip-pel tömörítve"
 
 msgid "Zip archives"
-msgstr "Zip archívum"
+msgstr "Zip archívumok"
 
 msgid "Uncompressed zip archive"
 msgstr "Tömörítettlen zip fájl"
 
 msgid "Zip archive compressed using deflate"
-msgstr "Zip archívum deflate-el"
+msgstr "Zip archívum deflate tömörítéssel"
 
 msgid "Revision:"
 msgstr "Revízió:"
@@ -97,16 +97,16 @@ msgid "Only files modified/created in this revision"
 msgstr "Csak létrehozott és/vagy módosított fájlok vannak a revizióban."
 
 msgid "Only files modified/created since:"
-msgstr ""
+msgstr "Csak a megadott idő óta szerkesztett/létrehozott fájlok:"
 
 msgid "Archive Content:"
-msgstr ""
+msgstr "Archívum tartalom:"
 
 msgid "Recurse into subrepositories"
 msgstr ""
 
 msgid "Browse..."
-msgstr "Böngészés..."
+msgstr "Tallózás…"
 
 msgid "Destination path:"
 msgstr "Cél útvonal:"
@@ -121,17 +121,17 @@ msgid "Select Destination Folder"
 msgstr "Célkönyvtár kiválasztása"
 
 msgid "Select Destination File"
-msgstr "Célgájl kiválasztása"
+msgstr "Célfájl kiválasztása"
 
 msgid "All files (*)"
-msgstr ""
+msgstr "Minden fájl (*)"
 
 msgid "Duplicate Name"
-msgstr ""
+msgstr "Duplikált név"
 
 #, python-format
 msgid "The destination \"%s\" already exists as a file!"
-msgstr "A cél \"%s\" már létezik fájlként!"
+msgstr "A célfájl \"%s\" már létezik!"
 
 msgid "Confirm Overwrite"
 msgstr "Felülírás megerősítése"
@@ -199,7 +199,7 @@ msgid "Working directory status"
 msgstr ""
 
 msgid "Checking..."
-msgstr ""
+msgstr "Ellenőrzés…"
 
 msgid ""
 "Before backout, you must <a href=\"commit\"><b>commit</b></a>, <a href="
@@ -214,7 +214,7 @@ msgid "<b>Uncommitted local changes are detected</b>"
 msgstr ""
 
 msgid "Clean"
-msgstr ""
+msgstr "Tisztítás"
 
 msgid "Backing out, then merging..."
 msgstr ""
@@ -277,7 +277,7 @@ msgid "Please wait while committing merged files."
 msgstr ""
 
 msgid "Finished"
-msgstr ""
+msgstr "Kész"
 
 msgid "Backout changeset"
 msgstr ""
@@ -333,10 +333,10 @@ msgid "New Name:"
 msgstr "Új név:"
 
 msgid "Activate:"
-msgstr ""
+msgstr "Aktiválás:"
 
 msgid "&Add"
-msgstr "&Hozzáad"
+msgstr "&Hozzáadás"
 
 msgid "Re&name"
 msgstr "Át&nevezés"
@@ -345,7 +345,7 @@ msgid "&Remove"
 msgstr "&Törlés"
 
 msgid "&Move"
-msgstr "&Mozgatás"
+msgstr "Át&helyezés"
 
 #, python-format
 msgid "Bookmark - %s"
@@ -581,8 +581,8 @@ msgstr "Ne frissítse az új munkakönyvtárat"
 msgid "Use pull protocol to copy metadata"
 msgstr "Pull protokol alkalmazása a metaadatok másolásához"
 
-msgid "Use uncompressed transfer"
-msgstr "Tömörítettlen adatátvitel használata"
+msgid "Clone with minimal processing"
+msgstr ""
 
 msgid "Include patch queue"
 msgstr ""
@@ -1004,6 +1004,9 @@ msgstr "repository megadása kötelező"
 
 msgid "must be specified 'type' in style"
 msgstr "'típus' megadása kötelező a stílusban"
+
+msgid "Git Commit:"
+msgstr ""
 
 msgid "Summary:"
 msgstr "Összegzés:"
@@ -2774,6 +2777,12 @@ msgstr ""
 msgid "Go &to Patch"
 msgstr ""
 
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
 msgid "&Finish Patch"
 msgstr ""
 
@@ -3562,6 +3571,10 @@ msgid "Node"
 msgstr ""
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
 msgid "Age"
 msgstr ""
 
@@ -4109,6 +4122,9 @@ msgid "&Tag..."
 msgstr ""
 
 msgid "Boo&kmark..."
+msgstr ""
+
+msgid "Top&ic..."
 msgstr ""
 
 msgid "Sig&n..."
@@ -4660,7 +4676,7 @@ msgstr "Változás:"
 msgid "Child:"
 msgstr "Gyerek:"
 
-msgid "Precursors:"
+msgid "Predecessors:"
 msgstr ""
 
 msgid "Successors:"
@@ -5342,6 +5358,15 @@ msgid "update all repos in current dir"
 msgstr "Összes repo frissítése az aktuális könyvtárban"
 
 msgid "thg thgstatus [OPTION]"
+msgstr ""
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
 msgstr ""
 
 msgid "thg update [-C] [[-r] REV]"
@@ -6264,12 +6289,6 @@ msgid "Diff Font"
 msgstr ""
 
 msgid "Font used to display text differences. Default: monospace 10"
-msgstr ""
-
-msgid "List Font"
-msgstr ""
-
-msgid "Font used to display file lists. Default: sans 9"
 msgstr ""
 
 msgid "ChangeLog Font"
@@ -7499,6 +7518,36 @@ msgstr ""
 msgid "&Strip"
 msgstr ""
 
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr ""
+
 msgid "Parent 1:"
 msgstr ""
 
@@ -8445,6 +8494,9 @@ msgstr ""
 
 #~ msgid "Confirm revert file to old revision"
 #~ msgstr "Visszaállított fájl jóváhagyása a régi verzióhoz"
+
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "Tömörítettlen adatátvitel használata"
 
 #~ msgid "Advanced options"
 #~ msgstr "Speciális beállítások"

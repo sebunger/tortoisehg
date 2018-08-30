@@ -489,7 +489,7 @@ class ShelveDialog(QDialog):
             rev = self._patchnames.get(rev, rev)
             self.delShelfButtonA.setEnabled(index <= len(self.shelves))
             self.clearShelfButtonA.setEnabled(index <= len(self.shelves))
-        self.browsea.setContext(self.repo.changectx(rev))
+        self.browsea.setContext(self.repo[rev])
         self._deselectSamePatch(self.combob)
 
     @pyqtSlot(int)
@@ -500,7 +500,7 @@ class ShelveDialog(QDialog):
         rev = self._patchnames.get(rev, rev)
         self.delShelfButtonB.setEnabled(0 <= index < len(self.shelves))
         self.clearShelfButtonB.setEnabled(0 <= index < len(self.shelves))
-        self.browseb.setContext(self.repo.changectx(rev))
+        self.browseb.setContext(self.repo[rev])
         self._deselectSamePatch(self.comboa)
 
     def _deselectSamePatch(self, combo):

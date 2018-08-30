@@ -30,6 +30,7 @@ from .qtcore import (
     QProcess,
     QSize,
     QUrl,
+    QT_VERSION,
     Qt,
     pyqtSignal,
     pyqtSlot,
@@ -66,6 +67,10 @@ from mercurial import (
     color,
     extensions,
     util,
+)
+from mercurial.utils import (
+    procutil,
+    stringutil,
 )
 
 from ..util import (
@@ -164,7 +169,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         dlg.exec_()
         return
 
-    files = [util.shellquote(util.localpath(f)) for f in files]
+    files = [procutil.shellquote(util.localpath(f)) for f in files]
     assert len(files) == 1 or lineno == None
 
     cmdline = None
@@ -228,18 +233,18 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
     try:
         if '$FILES' in cmdline:
             cmdline = cmdline.replace('$FILES', ' '.join(files))
-            cmdline = util.quotecommand(cmdline)
+            cmdline = procutil.quotecommand(cmdline)
             subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
                              stderr=None, stdout=None, stdin=None, cwd=cwd)
         elif '$FILE' in cmdline:
             for file in files:
                 cmd = cmdline.replace('$FILE', file)
-                cmd = util.quotecommand(cmd)
+                cmd = procutil.quotecommand(cmd)
                 subprocess.Popen(cmd, shell=shell, creationflags=openflags,
                                  stderr=None, stdout=None, stdin=None, cwd=cwd)
         else:
             # assume filenames were expanded already
-            cmdline = util.quotecommand(cmdline)
+            cmdline = procutil.quotecommand(cmdline)
             subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
                              stderr=None, stdout=None, stdin=None, cwd=cwd)
     except (OSError, EnvironmentError), e:
@@ -273,7 +278,7 @@ def openshell(root, reponame, ui=None):
         cwd = os.getcwd()
         try:
             # Unix: QProcess.startDetached(program) cannot parse single-quoted
-            # parameters built using util.shellquote().
+            # parameters built using procutil.shellquote().
             # Windows: subprocess.Popen(program, shell=True) cannot spawn
             # cmd.exe in new window, probably because the initial cmd.exe is
             # invoked with SW_HIDE.
@@ -707,7 +712,7 @@ def getcheckboxpixmap(state, bgcolor, widget):
 # icons to be rendered unusably small. The workaround for that is to render
 # the icons at double the normal size.
 # TODO: Remove this hack after upgrading to Qt5.
-IS_RETINA = util.parsebool(os.environ.get('THG_RETINA', '0'))
+IS_RETINA = stringutil.parsebool(os.environ.get('THG_RETINA', '0'))
 
 def _fixIconSizeForRetinaDisplay(s):
     if IS_RETINA:
@@ -1461,3 +1466,9 @@ class PaletteSwitcher(object):
         else:
             pl = self._defaultpalette
         targetwidget.setPalette(pl)
+
+def setContextMenuShortcut(action, shortcut):
+    """Set shortcut for a context menu action, making sure it's visible"""
+    action.setShortcut(shortcut)
+    if QT_VERSION >= 0x50a00:
+        action.setShortcutVisibleInContextMenu(True)

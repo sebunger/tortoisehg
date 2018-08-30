@@ -294,14 +294,14 @@ class Graph(object):
     def _add_obsolete(self, rev, parents_to_add, actedge):
         """Resolves obsolete edges.
 
-        This is a mangled copy from obsoleteutil.first_known_precursors that
+        This is a mangled copy from obsoleteutil.first_known_predecessors that
         avoids using context lookups, except to determine filtering state.
         """
 
         if self._revset and rev not in self._revset_set:
             return
 
-        revs = list(obsoleteutil.first_known_precursors_rev(self._repo, rev))
+        revs = list(obsoleteutil.first_known_predecessors_rev(self._repo, rev))
 
         if self._revset:
             revs = [r for r in revs if r in self._revset_set]

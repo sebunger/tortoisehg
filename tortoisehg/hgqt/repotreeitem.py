@@ -407,7 +407,7 @@ class RepoItem(RepoTreeItem):
                         self._valid = False
                         invalidRepoList += invalidSubrepoList
 
-        except (EnvironmentError, error.RepoError, util.Abort), e:
+        except (EnvironmentError, error.RepoError, error.Abort), e:
             # Add the repo to the list of repos/subrepos
             # that could not be open
             self._valid = False

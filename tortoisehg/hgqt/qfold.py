@@ -136,7 +136,7 @@ class QFoldDialog(QDialog):
 
     def composeMsg(self, patches):
         return u'\n* * *\n'.join(
-              [hglib.tounicode(self.repo.changectx(p).description())
+              [hglib.tounicode(self.repo[p].description())
                for p in ['qtip'] + patches])
 
     @pyqtSlot()

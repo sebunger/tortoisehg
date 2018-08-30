@@ -136,7 +136,7 @@ class ChunksWidget(QWidget):
             if icon:
                 act.setIcon(qtlib.geticon(icon))
             if key:
-                act.setShortcut(key)
+                qtlib.setContextMenuShortcut(act, key)
             if tip:
                 act.setStatusTip(tip)
             if cb:
@@ -503,10 +503,10 @@ class ChunksWidget(QWidget):
         ctx = self.ctx
         if isinstance(ctx, patchctx):
             # if patch mtime has not changed, it could return the same ctx
-            ctx = self.repo.changectx(ctx._path)
+            ctx = self.repo[ctx._path]
         else:
             self.repo.thginvalidate()
-            ctx = self.repo.changectx(ctx.node())
+            ctx = self.repo[ctx.node()]
         self.setContext(ctx)
 
     def loadSettings(self, qs, prefix):

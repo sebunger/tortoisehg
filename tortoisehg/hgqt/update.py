@@ -22,7 +22,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -56,13 +59,14 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         form.addRow(_('Update to:'), combo)
 
         # always include integer revision
-        try:
+        if rev:
             assert not isinstance(rev, unicode)
-            ctx = self.repo[rev]
-            if isinstance(ctx.rev(), int):  # could be None or patch name
-                combo.addItem(str(ctx.rev()))
-        except error.RepoLookupError:
-            pass
+            try:
+                ctx = scmutil.revsymbol(self.repo, rev)
+                if isinstance(ctx.rev(), int):  # could be patch name
+                    combo.addItem(str(ctx.rev()))
+            except error.RepoLookupError:
+                pass
 
         combo.addItems(map(hglib.tounicode, hglib.namedbranches(repo)))
         tags = list(self.repo.tags()) + repo._bookmarks.keys()
@@ -183,12 +187,12 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
             self.commandChanged.emit()
             return
         try:
-            new_ctx = self.repo[new_rev]
+            new_ctx = scmutil.revsymbol(self.repo, new_rev)
             if not merge and new_ctx.rev() == self.ctxs[0].rev() \
                     and not new_ctx.bookmarks():
                 self.target_info.setText(_('(same as parent)'))
             else:
-                self.target_info.update(self.repo[new_rev])
+                self.target_info.update(new_ctx)
             # only show the path combo when there are multiple paths
             # and the target revision has subrepos
             showpathcombo = self.path_combo.count() > 1 and \
@@ -202,7 +206,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
     def canRunCommand(self):
         new_rev = hglib.fromunicode(self.rev_combo.currentText())
         try:
-            new_ctx = self.repo[new_rev]
+            new_ctx = scmutil.revsymbol(self.repo, new_rev)
         except (error.LookupError, error.RepoError, EnvironmentError):
             return False
         return (self.discard_chk.isChecked()
@@ -221,7 +225,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         activatebookmarkmode = self.repo.ui.config(
             'tortoisehg', 'activatebookmarks', 'prompt')
         if activatebookmarkmode != 'never':
-            bookmarks = self.repo[rev].bookmarks()
+            bookmarks = scmutil.revsymbol(self.repo, rev).bookmarks()
             if bookmarks and rev not in bookmarks:
                 # The revision that we are updating into has bookmarks,
                 # but the user did not refer to the revision by one of them
@@ -260,7 +264,9 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                         self, bookmarks, hglib.activebookmark(self.repo)).run()
                 if selectedbookmark:
                     rev = selectedbookmark
-                elif self.repo[rev] == self.repo[hglib.activebookmark(self.repo)]:
+                elif (scmutil.revsymbol(self.repo, rev)
+                      == scmutil.revsymbol(self.repo,
+                                           hglib.activebookmark(self.repo))):
                     deactivatebookmark = qtlib.QuestionMsgBox(
                         _('Deactivate current bookmark?'),
                         _('Do you really want to deactivate the <i>%s</i> '
@@ -294,7 +300,8 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         else:
             cur = self.repo.hgchangectx('.')
             try:
-                node = self.repo.hgchangectx(rev)
+                node = self.repo.hgchangectx(
+                    scmutil.revsymbol(self.repo, rev).rev())
             except (error.LookupError, error.RepoError, EnvironmentError):
                 return cmdcore.nullCmdSession()
             def isclean():

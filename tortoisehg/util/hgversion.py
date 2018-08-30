@@ -16,7 +16,7 @@ except AttributeError:
     from mercurial import version
     hgversion = version.get_version()
 
-testedwith = '4.4 4.5'
+testedwith = '4.6 4.7'
 
 def checkhgversion(v):
     """range check the Mercurial version"""
@@ -25,7 +25,7 @@ def checkhgversion(v):
     if not v or v == 'unknown' or len(v) >= 12:
         # can't make any intelligent decisions about unknown or hashes
         return
-    vers = re.split(r'\.|-', v)[:2]
+    vers = re.split(r'\.|-|rc', v)[:2]
     if len(vers) < 2:
         return
     if '.'.join(vers) in reqvers:

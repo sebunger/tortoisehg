@@ -257,7 +257,7 @@ class HgignoreDialog(QDialog):
             try:
                 match.match(self.repo.root, '', [], [test])
                 self.insertFilters([newfilter], False)
-            except util.Abort, inst:
+            except error.Abort, inst:
                 qtlib.WarningMsgBox(_('Invalid glob expression'), str(inst),
                                     parent=self)
                 return
@@ -267,7 +267,7 @@ class HgignoreDialog(QDialog):
                 match.match(self.repo.root, '', [], [test])
                 re.compile(test)
                 self.insertFilters([newfilter], True)
-            except (util.Abort, re.error), inst:
+            except (error.Abort, re.error), inst:
                 qtlib.WarningMsgBox(_('Invalid regexp expression'), str(inst),
                                     parent=self)
                 return
@@ -294,7 +294,7 @@ class HgignoreDialog(QDialog):
         except (EnvironmentError, error.RepoError), e:
             qtlib.WarningMsgBox(_('Unable to read repository status'),
                                 uni(str(e)), parent=self)
-        except util.Abort, e:
+        except error.Abort, e:
             if e.hint:
                 err = _('%s (hint: %s)') % (uni(str(e)), uni(e.hint))
             else:

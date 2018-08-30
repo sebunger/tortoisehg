@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2017-11-28 15:25-0200\n"
-"PO-Revision-Date: 2017-12-04 19:47+0000\n"
+"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"PO-Revision-Date: 2018-05-10 09:49+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2017-12-04 19:56+0000\n"
-"X-Generator: Launchpad (build 18511)\n"
+"X-Launchpad-Export-Date: 2018-05-10 13:52+0000\n"
+"X-Generator: Launchpad (build 18640)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -29,8 +29,8 @@ msgstr "Quitter"
 msgid "About"
 msgstr "À propos"
 
-msgid "Copyright 2008-2017 Steve Borho and others"
-msgstr "Copyright 2008-2017 Steve Borho et d'autres"
+msgid "Copyright 2008-2018 Steve Borho and others"
+msgstr "Copyright 2008-2018 Steve Borho et d'autres"
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Plusieurs icônes sont offertes par les projets TortoiseSVN et Tango"
@@ -597,8 +597,8 @@ msgstr "Ne pas mettre à jour le nouveau répertoire de travail"
 msgid "Use pull protocol to copy metadata"
 msgstr "Utiliser le protocole 'pull' pour copier les métadonnées"
 
-msgid "Use uncompressed transfer"
-msgstr "Utiliser le transfert non compressé"
+msgid "Clone with minimal processing"
+msgstr "Cloner avec traitement minimum"
 
 msgid "Include patch queue"
 msgstr "Inclure la queue de patch"
@@ -1033,6 +1033,9 @@ msgstr "doit être le dépôt spécifié"
 
 msgid "must be specified 'type' in style"
 msgstr "doit être du 'type' spécifié dans le style"
+
+msgid "Git Commit:"
+msgstr "Commit Git :"
 
 msgid "Summary:"
 msgstr "Résumé :"
@@ -2997,6 +3000,12 @@ msgstr "Dé-appliquer tous les patches"
 msgid "Go &to Patch"
 msgstr "Aller au patch"
 
+msgid "&Apply Only This Patch"
+msgstr "Appliquer uniquement ce patch"
+
+msgid "Apply only the selected patch"
+msgstr "Appliquer uniquement le patch sélectionné"
+
 msgid "&Finish Patch"
 msgstr "&Finir le patch"
 
@@ -3818,6 +3827,10 @@ msgid "Node"
 msgstr "Nœud"
 
 msgctxt "column header"
+msgid "Git Commit"
+msgstr "Commit Git"
+
+msgctxt "column header"
 msgid "Age"
 msgstr "Âge"
 
@@ -4404,6 +4417,9 @@ msgstr "É&tiquette..."
 
 msgid "Boo&kmark..."
 msgstr "Signet..."
+
+msgid "Top&ic..."
+msgstr "Top&ic..."
 
 msgid "Sig&n..."
 msgstr "Sig&ner..."
@@ -5008,8 +5024,8 @@ msgstr "Révision :"
 msgid "Child:"
 msgstr "Enfant :"
 
-msgid "Precursors:"
-msgstr "Précurseurs :"
+msgid "Predecessors:"
+msgstr "Prédécesseurs :"
 
 msgid "Successors:"
 msgstr "Successeurs :"
@@ -5721,6 +5737,15 @@ msgstr "mettre à jour tous les dépôts dans le répertoire courant"
 
 msgid "thg thgstatus [OPTION]"
 msgstr "thg thgstatus [OPTION]"
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr "thg topics [-r REV] [NAME]"
+
+msgid "Please enable the Topic extension first."
+msgstr "Activez d'abord l'extension Topic."
+
+msgid "only one new topic name allowed"
+msgstr "un seul nouveau nom de topic autorisé"
 
 msgid "thg update [-C] [[-r] REV]"
 msgstr "thg update [-C] [[-r] REV]"
@@ -6895,13 +6920,6 @@ msgid "Font used to display text differences. Default: monospace 10"
 msgstr ""
 "Police utilisée pour afficher les différences de texte. Par défaut : "
 "monospace 10"
-
-msgid "List Font"
-msgstr "Police de liste"
-
-msgid "Font used to display file lists. Default: sans 9"
-msgstr ""
-"Police utilisée pour afficher les listes de fichiers. Par défaut : sans 9"
 
 msgid "ChangeLog Font"
 msgstr "Police de changelog"
@@ -8249,6 +8267,36 @@ msgstr "Strip - %s"
 
 msgid "&Strip"
 msgstr "&Strip"
+
+msgid "Topic:"
+msgstr "Topic :"
+
+msgid "&Rename"
+msgstr "&Renommer"
+
+#, python-format
+msgid "Topic - %s"
+msgstr "Topic - %s"
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr "Un topic nommé \"%s\" existe déjà"
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr "Topic '%s' a été ajouté"
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr "Topic '%s' n'existe pas"
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr "Topic '%s' a été enlevé"
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr "Topic '%s' a été renommé en %s"
 
 msgid "Parent 1:"
 msgstr "Parent 1 :"
@@ -9791,6 +9839,9 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "_Operations"
 #~ msgstr "_Opérations"
 
+#~ msgid "Use uncompressed transfer"
+#~ msgstr "Utiliser le transfert non compressé"
+
 #~ msgid "Error: %s"
 #~ msgstr "Erreur : %s"
 
@@ -11055,6 +11106,13 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Character encoding name"
 #~ msgstr "Nom de l'encodage des caractères"
 
+#~ msgid "List Font"
+#~ msgstr "Police de liste"
+
+#~ msgid "Font used to display file lists. Default: sans 9"
+#~ msgstr ""
+#~ "Police utilisée pour afficher les listes de fichiers. Par défaut : sans 9"
+
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr ""
 #~ "Abandonner tous les changements de la révision (autre) cible de la fusion"
@@ -11132,6 +11190,9 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ "correspond à la chaîne entière trouvée par issue.regex, {1} désigne le "
 #~ "premier groupe et ainsi de suite. Si aucun jeton {n} n'est trouvé dans "
 #~ "issue.link, la chaîne complète trouvée est ajoutée."
+
+#~ msgid "Precursors:"
+#~ msgstr "Précurseurs :"
 
 #~ msgid ""
 #~ "The command that will be executed.\n"

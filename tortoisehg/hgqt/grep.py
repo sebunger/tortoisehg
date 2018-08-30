@@ -51,7 +51,9 @@ from mercurial import (
     match,
     subrepo,
     ui,
-    util,
+)
+from mercurial.utils import (
+    stringutil,
 )
 
 from ..util import (
@@ -119,6 +121,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         revision = QRadioButton(_('Revision'))
         history = QRadioButton(_('All History'))
         singlematch = QCheckBox(_('Report only the first match per file'))
+        wholeword = QCheckBox(_('Match whole words only'))
         follow = QCheckBox(_('Follow copies and renames'))
         recurse = QCheckBox(_('Recurse into subrepositories'))
         revle = QLineEdit()
@@ -126,10 +129,11 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         grid.addWidget(working, 0, 0)
         grid.addWidget(recurse, 0, 1)
         grid.addWidget(history, 1, 0)
+        grid.addWidget(follow, 1, 1)
         grid.addWidget(revision, 2, 0)
         grid.addWidget(revle, 2, 1)
         grid.addWidget(singlematch, 0, 3)
-        grid.addWidget(follow, 0, 4)
+        grid.addWidget(wholeword, 0, 4)
         ilabel = QLabel(_('Includes:'))
         ilabel.setBuddy(incle)
         elabel = QLabel(_('Excludes:'))
@@ -185,6 +189,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.tv, self.regexple, self.chk, self.recurse = tv, le, chk, recurse
         self.incle, self.excle, self.revle = incle, excle, revle
         self.wctxradio, self.ctxradio, self.aradio = working, revision, history
+        self.wholeword = wholeword
         self.singlematch, self.follow, self.eframe = singlematch, follow, frame
         self.searchbutton, self.cancelbutton = bt, cbt
         self.regexple.setFocus()
@@ -278,7 +283,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             else:
                 self.recurse.setEnabled(False)
                 self.recurse.setChecked(False)
-        except util.Abort:
+        except error.Abort:
             self.recurse.setEnabled(False)
             self.recurse.setChecked(False)
 
@@ -334,6 +339,10 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         try:
             icase = self.chk.isChecked()
             regexp = re.compile(pattern, icase and re.I or 0)
+            if self.wholeword.isChecked():
+                # re-compile with whole-word wrapping, we know pattern is safe
+                pattern = r'\b(?:%s)\b' % pattern
+                regexp = re.compile(pattern, icase and re.I or 0)
         except Exception, inst:
             msg = _('grep: invalid match pattern: %s\n') % \
                     hglib.tounicode(str(inst))
@@ -546,7 +555,7 @@ class CtxSearchThread(QThread):
                 self.showMessage.emit(_('Skipping %s, unable to read') %
                                       hglib.tounicode(wfile))
                 continue
-            if util.binary(data):
+            if stringutil.binary(data):
                 continue
             for i, line in enumerate(data.splitlines()):
                 pos = 0
@@ -619,7 +628,7 @@ class MatchTree(QTableView):
             ('ann',   _('Annotate &File'),  self.onAnnotateFile,  'CTRL+F')):
             action = QAction(name, self)
             action.triggered.connect(func)
-            action.setShortcut(QKeySequence(shortcut))
+            qtlib.setContextMenuShortcut(action, QKeySequence(shortcut))
             self.actions[key] = action
             self.addAction(action)
             self.contextmenu.addAction(action)

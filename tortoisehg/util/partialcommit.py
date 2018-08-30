@@ -6,7 +6,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-from mercurial import patch, commands, extensions, context, util, node
+from mercurial import error, patch, commands, extensions, context, node
 from tortoisehg.util import hgversion
 
 testedwith = hgversion.testedwith
@@ -26,7 +26,7 @@ def partialcommit(orig, ui, repo, *pats, **opts):
             store.keys = set(store.files.keys() + store.data.keys())
             repo._filestore = store
         except patch.PatchError, e:
-            raise util.Abort(str(e))
+            raise error.Abort(str(e))
         finally:
             fp.close()
 

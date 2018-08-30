@@ -56,7 +56,6 @@ from . import (
     qtlib,
     qdelete,
     qfold,
-    qrename,
     rejects,
 )
 
@@ -326,19 +325,11 @@ class PatchQueueActions(QObject):
         return self._runCommand('qfold', dlg.patches(), dlg.options())
 
     def renamePatch(self, patch):
-        newname = patch
-        while True:
-            newname = self._getNewName(_('Rename Patch'),
-                                       _('Rename patch <b>%s</b> to:') % patch,
-                                       newname, _('Rename'))
-            if not newname or patch == newname:
-                return cmdcore.nullCmdSession()
-            repo = self._repoagent.rawRepo()
-            newfilename = hglib.tounicode(
-                repo.mq.join(hglib.fromunicode(newname)))
-            ok = qrename.checkPatchname(newfilename, self.parent())
-            if ok:
-                break
+        newname = self._getNewName(_('Rename Patch'),
+                                   _('Rename patch <b>%s</b> to:') % patch,
+                                   patch, _('Rename'))
+        if not newname or patch == newname:
+            return cmdcore.nullCmdSession()
         return self._runCommand('qrename', [patch, newname], {})
 
     def guardPatch(self, patch, guards):
@@ -531,7 +522,7 @@ class PatchQueueModel(QAbstractListModel):
         repo = self._repoagent.rawRepo()
         patch = self._series[index.row()]
         try:
-            ctx = repo.changectx(patch)
+            ctx = repo[patch]
         except error.RepoLookupError:
             # cache not updated after qdelete or qfinish
             return
@@ -631,18 +622,18 @@ class MQPatchesWidget(QDockWidget):
         self._qpushMoveAct = a = QAction(
             qtlib.geticon('hg-qpush-move'), _('&Apply Only This Patch'), self)
         a.setToolTip(_('Apply only the selected patch'))
-        a.setShortcut('Ctrl+Return')
+        qtlib.setContextMenuShortcut(a, 'Ctrl+Return')
         a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         self._qfinishAct = a = QAction(
             qtlib.geticon('qfinish'), _('&Finish Patch'), self)
         a.setToolTip(_('Move applied patches into repository history'))
         self._qdeleteAct = a = QAction(
             qtlib.geticon('hg-qdelete'), _('&Delete Patches...'), self)
-        a.setShortcut('Del')
+        qtlib.setContextMenuShortcut(a, 'Del')
         a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         a.setToolTip(_('Delete selected patches'))
         self._qrenameAct = a = QAction(_('Re&name Patch...'), self)
-        a.setShortcut('F2')
+        qtlib.setContextMenuShortcut(a, 'F2')
         a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         self._setGuardsAct = a = QAction(
             qtlib.geticon('hg-qguard'), _('Set &Guards...'), self)
