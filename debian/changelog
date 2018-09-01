@@ -1,8 +1,11 @@
-tortoisehg (4.7-0.1) UNRELEASED; urgency=medium
+tortoisehg (4.7-0.1) unstable; urgency=medium
 
-  *
+  * Non-maintainer upload.
+  * New upstream version. (Closes: #890307)
+  * d/control: bump mercurial dependency to 4.7.
+  * d/control: migrate vcs repositories to salsa.d.o.
 
- -- James Cowgill <jcowgill@debian.org>  Thu, 30 Aug 2018 18:22:59 +0100
+ -- James Cowgill <jcowgill@debian.org>  Sat, 01 Sep 2018 16:37:37 +0100
 
 tortoisehg (4.5.3-1) unstable; urgency=medium
 
