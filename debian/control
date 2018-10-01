@@ -14,7 +14,6 @@ Standards-Version: 4.1.2
 Homepage: https://tortoisehg.bitbucket.io
 Vcs-Git: https://salsa.debian.org/debian/tortoisehg.git
 Vcs-Browser: https://salsa.debian.org/debian/tortoisehg
-X-Python-Version: >= 2.4
 
 Package: tortoisehg
 Architecture: all
