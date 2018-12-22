@@ -24,6 +24,8 @@ from .qtgui import (
     QVBoxLayout,
 )
 
+from mercurial import scmutil
+
 from ..util import hglib
 from ..util.i18n import _
 from . import (
@@ -53,7 +55,7 @@ class GraftDialog(QDialog):
         self.valid = True
 
         def cleanrevlist(revlist):
-            return [self.repo[rev].rev() for rev in revlist]
+            return [scmutil.revsymbol(self.repo, rev).rev() for rev in revlist]
         self.sourcelist = cleanrevlist(opts.get('source', ['.']))
         currgraftrevs = self.graftstate()
         if currgraftrevs:
@@ -220,17 +222,7 @@ class GraftDialog(QDialog):
         sess.commandFinished.connect(self._abortFinished)
 
     def graftstate(self):
-        graftstatefile = self.repo.vfs.join('graftstate')
-        if os.path.exists(graftstatefile):
-            f = open(graftstatefile, 'r')
-            info = f.readlines()
-            f.close()
-            if len(info):
-                revlist = [rev.strip() for rev in info]
-                revlist = [rev for rev in revlist if rev != '']
-                if revlist:
-                    return revlist
-        return None
+        return hglib.readgraftstate(self.repo)
 
     def _runCommand(self, cmdline):
         assert self._cmdsession.isFinished()

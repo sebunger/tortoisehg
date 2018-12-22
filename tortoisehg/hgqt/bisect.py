@@ -26,6 +26,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    scmutil,
 )
 
 from ..util import hglib
@@ -157,7 +158,7 @@ class BisectDialog(QDialog):
 
     def _lookupRevision(self, changeid):
         try:
-            ctx = self.repo[hglib.fromunicode(changeid)]
+            ctx = scmutil.revsymbol(self.repo, hglib.fromunicode(changeid))
             return ctx.rev()
         except (error.LookupError, error.RepoLookupError), e:
             self._stbar.showMessage(hglib.tounicode(str(e)))

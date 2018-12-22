@@ -21,7 +21,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _, ngettext
@@ -114,7 +117,7 @@ class StripWidget(cmdui.AbstractCmdWidget):
         if not revstr:
             return None
         try:
-            rev = self.repo[revstr].rev()
+            rev = scmutil.revsymbol(self.repo, revstr).rev()
         except (error.RepoError, error.LookupError):
             return None
         return rev

@@ -76,7 +76,8 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         self._cmdagent = cmdagent
         self.ui = ui
 
-        dest = src = os.getcwd()
+        dest = src = (self.ui.config('tortoisehg', 'defaultclonedest')
+                      or os.getcwd())
         if args:
             if len(args) > 1:
                 src = args[0]

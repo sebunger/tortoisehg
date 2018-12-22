@@ -227,7 +227,9 @@ def _parse(ui, args):
         sys.exit()
     else:
         alias, args = 'workbench', []
-    aliases, i = cmdutil.findcmd(alias, table, ui.config("ui", "strict"))
+    # copies hg<4.8 (fa88170c10bb) behavior
+    stable = {k.lstrip('^'): e for k, e in table.items()}
+    aliases, i = cmdutil.findcmd(alias, stable, ui.config("ui", "strict"))
     for a in aliases:
         if a.startswith(alias):
             alias = a
@@ -732,8 +734,10 @@ def help_(ui, name=None, with_version=False, **opts):
             version(ui)
             ui.write('\n')
 
+        # copies hg<4.8 (fa88170c10bb) behavior
+        stable = {k.lstrip('^'): e for k, e in table.items()}
         try:
-            aliases, i = cmdutil.findcmd(name, table, False)
+            aliases, i = cmdutil.findcmd(name, stable, False)
         except error.AmbiguousCommand, inst:
             select = lambda c: c.lstrip('^').startswith(inst.args[0])
             helplist(_('list of commands:\n\n'), select)
@@ -771,6 +775,7 @@ def help_(ui, name=None, with_version=False, **opts):
             if (not select and name != 'shortlist' and
                 e[0].__module__ != __name__):
                 continue
+            # TODO: switch to hg>=4.8 (fa88170c10bb) syntax
             if name == "shortlist" and not f.startswith("^"):
                 continue
             f = f.lstrip("^")

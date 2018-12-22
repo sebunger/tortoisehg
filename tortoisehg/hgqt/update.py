@@ -180,7 +180,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         self.p1_info.update(self.ctxs[0].node())
         merge = len(self.ctxs) == 2
         if merge:
-            self.p2_info.update(self.ctxs[1])
+            self.p2_info.update(self.ctxs[1].node())
         new_rev = hglib.fromunicode(self.rev_combo.currentText())
         if new_rev == 'null':
             self.target_info.setText(_('remove working directory'))
@@ -324,7 +324,8 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                 if clean is None:
                     clean = isclean()
                 pa = p1.ancestor(p2)
-                return not clean and (p1 == pa or p2 == pa)
+                return not clean \
+                    and (p1.rev() == pa.rev() or p2.rev() == pa.rev())
             def confirmupdate(clean=None):
                 if clean is None:
                     clean = isclean()

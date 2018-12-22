@@ -34,7 +34,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -145,7 +148,7 @@ class RemoteUpdateWidget(cmdui.AbstractCmdWidget):
             self.commandChanged.emit()
             return
         try:
-            self.target_info.update(self.repo[new_rev])
+            self.target_info.update(scmutil.revsymbol(self.repo, new_rev))
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             self.target_info.setText(_('unknown revision!'))
         self.commandChanged.emit()
@@ -153,8 +156,8 @@ class RemoteUpdateWidget(cmdui.AbstractCmdWidget):
     def canRunCommand(self):
         rev = hglib.fromunicode(self.rev_combo.currentText())
         try:
-            return rev in self.repo
-        except error.LookupError:
+            return scmutil.isrevsymbol(self.repo, rev)
+        except error.AmbiguousPrefixLookupError:
             # ambiguous changeid
             return False
 

@@ -8,7 +8,10 @@
 
 from __future__ import absolute_import
 
-from mercurial import error
+from mercurial import (
+    error,
+    scmutil,
+)
 
 from ..util import hglib, obsoleteutil
 from ..util.i18n import _
@@ -81,7 +84,7 @@ def data_func(widget, item, ctx):
         if not ts:
             return None
         try:
-            tctx = ctx._repo[ts]
+            tctx = scmutil.revsymbol(ctx.repo(), ts)
             return revline_data(tctx)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             return ts

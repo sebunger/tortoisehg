@@ -28,6 +28,9 @@ from .qtgui import (
 )
 
 from hgext import mq
+from mercurial import (
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -135,9 +138,10 @@ class QFoldDialog(QDialog):
         self.summ.setText(hglib.tounicode(txt))
 
     def composeMsg(self, patches):
-        return u'\n* * *\n'.join(
-              [hglib.tounicode(self.repo[p].description())
-               for p in ['qtip'] + patches])
+        descs = [scmutil.revsymbol(self.repo, 'qtip').description()]
+        # lookup of unapplied patches is handled by thgrepo hack
+        descs.extend(self.repo[p].description() for p in patches)
+        return u'\n* * *\n'.join(map(hglib.tounicode, descs))
 
     @pyqtSlot()
     def configChanged(self):

@@ -34,6 +34,7 @@ from .qtgui import (
     QCheckBox,
     QDialog,
     QDialogButtonBox,
+    QFont,
     QInputMethodEvent,
     QKeyEvent,
     QKeySequence,
@@ -820,7 +821,12 @@ def fileEditor(filename, **opts):
     editor.installEventFilter(KeyPressInterceptor(dialog))
     editor.setMarginLineNumbers(1, True)
     editor.setMarginWidth(1, '000')
-    editor.setLexer(QsciLexerProperties())
+
+    lexer = QsciLexerProperties()
+    lexer.setFont(QFont('Monospace', 10), -1)
+
+    editor.setLexer(lexer)
+
     if opts.get('foldable'):
         editor.setFolding(QsciScintilla.BoxedTreeFoldStyle)
     dialog.layout().addWidget(editor)

@@ -35,6 +35,7 @@ from .qtgui import (
 from mercurial import (
     error,
     repoview,
+    scmutil,
     util,
 )
 
@@ -60,6 +61,9 @@ def _firstword(query):
 
 def _querytype(repo, query):
     r"""
+    >>> # TODO: maybe replace with real repo
+    >>> origisrevsymbol = scmutil.isrevsymbol
+    >>> scmutil.isrevsymbol = lambda repo, changeid: changeid in repo
     >>> repo = set('0 1 2 3 . stable'.split())
     >>> _querytype(repo, u'') is None
     True
@@ -79,6 +83,7 @@ def _querytype(repo, query):
     'revset'
     >>> _querytype(repo, u'\u3000')  # UnicodeEncodeError
     'revset'
+    >>> scmutil.isrevsymbol = origisrevsymbol
     """
     if not query:
         return
@@ -91,7 +96,7 @@ def _querytype(repo, query):
     if not changeid:
         return 'keyword'
     try:
-        if changeid in repo:
+        if scmutil.isrevsymbol(repo, changeid):
             return 'revset'
     except error.LookupError:  # ambiguous changeid
         pass

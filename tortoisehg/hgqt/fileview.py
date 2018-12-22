@@ -1118,12 +1118,16 @@ class _AnnotateViewControl(_AbstractViewControl):
         links = []
         fctxcache = {}  # (path, rev): fctx
         for l in data[0]['lines']:
-            path, rev = l['file'], l['rev']
+            try:
+                path, rev, lineno = l['path'], l['rev'], l['lineno']
+            except KeyError:
+                # hg<4.8 (34ba47117164, 47cb6750dea3)
+                path, rev, lineno = l['file'], l['rev'], l['line_number']
             try:
                 fctx = fctxcache[path, rev]
             except KeyError:
                 fctx = fctxcache[path, rev] = repo[rev][path]
-            links.append((fctx, l['line_number']))
+            links.append((fctx, lineno))
         self._links = links
         self._updateView()
 

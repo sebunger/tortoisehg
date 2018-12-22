@@ -45,7 +45,10 @@ from .qtgui import (
     QWidget,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -522,7 +525,10 @@ class PatchQueueModel(QAbstractListModel):
         repo = self._repoagent.rawRepo()
         patch = self._series[index.row()]
         try:
-            ctx = repo[patch]
+            if patch in repo.thgmqunappliedpatches:
+                ctx = repo[patch]
+            else:
+                ctx = scmutil.revsymbol(repo, patch)
         except error.RepoLookupError:
             # cache not updated after qdelete or qfinish
             return

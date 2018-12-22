@@ -110,6 +110,7 @@ class patchctx(object):
     def description(self):  return self._desc
     def branch(self):       return self._branch
     def parents(self):      return ()
+    def repo(self):         return self._repo
     def tags(self):         return ()
     def bookmarks(self):    return ()
     def children(self):     return ()

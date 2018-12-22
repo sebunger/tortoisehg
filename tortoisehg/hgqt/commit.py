@@ -56,6 +56,7 @@ from mercurial import (
     error,
     obsolete,  # delete if obsolete becomes enabled by default
     phases,
+    scmutil,
 )
 from mercurial.utils import (
     dateutil,
@@ -569,7 +570,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             if branch in [p.branch() for p in repo[None].parents()]:
                 resp = 0
             else:
-                rev = repo[branch].rev()
+                # TODO: should look up only in branch namespace
+                rev = scmutil.revsymbol(repo, branch).rev()
                 resp = qtlib.CustomPrompt(_('Confirm Branch Change'),
                     _('Named branch "%s" already exists, '
                       'last used in revision %d\n'

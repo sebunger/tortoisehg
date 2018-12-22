@@ -26,7 +26,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -230,7 +233,7 @@ class MatchDialog(QDialog):
             self.match_btn.setEnabled(True)
             return
         try:
-            csinfo_update(self.repo[new_rev])
+            csinfo_update(scmutil.revsymbol(self.repo, new_rev))
             return
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             pass

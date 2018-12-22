@@ -169,9 +169,7 @@ class AboutDialog(QDialog):
         except (IndexError, ImportError, ValueError):
             pass
         try:
-            thgv = version.version()
-            if '+' in thgv:
-                thgv = thgv[:thgv.index('+')]
+            thgv = version.package_version()
             curver = tuple([int(p) for p in thgv.split('.')])
         except ValueError:
             curver = (0,0,0)

@@ -694,6 +694,12 @@ INFO = (
         _('If specified, files in the directory, e.g. .hgignore, are copied '
           'to the newly-created repository.'),
         globalonly=True),
+    _fi(_('Default Clone Destination'), 'tortoisehg.defaultclonedest',
+        genPathBrowser,
+        _('If specified, the destination field in the clone widget will be '
+          'pre-filled with this path. Otherwise, it will be pre-filled with '
+          'the current working directory.'),
+        globalonly=True),
     )),
 
 ({'name': 'log', 'label': _('Workbench'), 'icon': 'hg-log'}, (
@@ -826,7 +832,7 @@ INFO = (
           'This setting is used by the Merge, Tag and Backout dialogs. '
           'Default: False')),
     _fi(_('New Commit Phase'), 'phases.new-commit',
-        (genDefaultCombo, phases.phasenames),
+        (genDefaultCombo, phases.phasenames[:3]),
         _('The phase of new commits. Default: draft')),
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
         _('Make MQ patches secret (instead of draft). '
@@ -1155,7 +1161,8 @@ INFO = (
         )),
     )),
 
-({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard'}, (
+({'name': 'reviewboard', 'label': _('Review Board'), 'icon': 'reviewboard',
+  'extension': 'reviewboard'}, (
     _fi(_('Server'), 'reviewboard.server', genEditCombo,
         _('Path to review board '
           'example "http://demo.reviewboard.org"')),
