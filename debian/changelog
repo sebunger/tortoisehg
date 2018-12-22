@@ -1,13 +1,20 @@
-tortoisehg (4.8.1-0.1) UNRELEASED; urgency=medium
+tortoisehg (4.8.1-0.1) unstable; urgency=medium
 
-  [ Ondřej Nový ]
-  * d/control: Remove ancient X-Python-Version field
-  * d/copyright: Use https protocol in Format field
+  * Non-maintainer upload.
 
   [ James Cowgill ]
-  *
+  * New upstream version. (Closes: #909583)
+  * d/control:
+    - Update mercurial dependency to allow 4.7 and 4.8. (Closes: #914200)
 
- -- James Cowgill <jcowgill@debian.org>  Sat, 22 Dec 2018 10:43:58 +0000
+  [ Ondřej Nový ]
+  * d/control: Remove ancient X-Python-Version field.
+  * d/copyright: Use https protocol in Format field.
+
+  [ Stéphane Blondon ]
+  * d/thg.1.xml: Uudate link to upstream BTS in the manpage. (Closes: #915858)
+
+ -- James Cowgill <jcowgill@debian.org>  Sat, 22 Dec 2018 11:21:56 +0000
 
 tortoisehg (4.7-0.1) unstable; urgency=medium
 
