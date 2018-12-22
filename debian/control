@@ -17,7 +17,7 @@ Vcs-Browser: https://salsa.debian.org/debian/tortoisehg
 
 Package: tortoisehg
 Architecture: all
-Depends: mercurial (>= 4.7~), mercurial (<< 4.8~), python-pyqt5,
+Depends: mercurial (>= 4.7~), mercurial (<< 4.9~), python-pyqt5,
  python-pyqt5.qsci, ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
 Recommends: libjs-jquery, libjs-underscore, python-iniparse, python-pygments
 Suggests: tortoisehg-nautilus
