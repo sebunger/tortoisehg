@@ -1,9 +1,13 @@
-tortoisehg (4.7-1) UNRELEASED; urgency=medium
+tortoisehg (4.8.1-0.1) UNRELEASED; urgency=medium
 
+  [ Ondřej Nový ]
   * d/control: Remove ancient X-Python-Version field
   * d/copyright: Use https protocol in Format field
 
- -- Ondřej Nový <onovy@debian.org>  Mon, 01 Oct 2018 09:35:53 +0200
+  [ James Cowgill ]
+  *
+
+ -- James Cowgill <jcowgill@debian.org>  Sat, 22 Dec 2018 10:43:58 +0000
 
 tortoisehg (4.7-0.1) unstable; urgency=medium
 
