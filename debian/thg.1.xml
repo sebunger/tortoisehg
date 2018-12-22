@@ -453,7 +453,7 @@
     <!-- Or use this section to tell about upstream BTS. -->
     <title>BUGS</title>
     <para>The upstreams <acronym>BTS</acronym> can be found
-      at <ulink url="http://bitbucket.org/tortoisehg/stable/issues/"/>.</para>
+      at <ulink url="https://bitbucket.org/tortoisehg/thg/issues"/>.</para>
   </refsect1>
   <refsect1 id="see_also">
     <title>SEE ALSO</title>
