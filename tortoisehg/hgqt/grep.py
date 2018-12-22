@@ -51,6 +51,7 @@ from mercurial import (
     match,
     subrepo,
     ui,
+    scmutil,
 )
 from mercurial.utils import (
     stringutil,
@@ -357,7 +358,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         if inc: inc = map(str.strip, inc.split(','))
         exc = hglib.fromunicode(self.excle.text())
         if exc: exc = map(str.strip, exc.split(','))
-        rev = hglib.fromunicode(self.revle.text()).strip()
+        revstr = hglib.fromunicode(self.revle.text()).strip()
 
         self.addHistory(pattern, inc or [], exc or [])
         if self.wctxradio.isChecked():
@@ -371,7 +372,8 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             self.tv.setColumnHidden(COL_REVISION, True)
             self.tv.setColumnHidden(COL_USER, True)
             try:
-                ctx = self.repo[rev or '.']
+                rev = scmutil.revsymbol(self.repo, revstr or '.').rev()
+                ctx = self.repo[rev]
             except error.RepoError, e:
                 msg = _('grep: %s\n') % hglib.tounicode(str(e))
                 self.showMessage.emit(msg)

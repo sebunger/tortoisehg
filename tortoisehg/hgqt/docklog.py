@@ -336,6 +336,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
             matchinfo = {}
             for cmdspec in cmdtable:
                 for cmdname in cmdspec.split('|'):
+                    # TODO: switch to hg>=4.8 (fa88170c10bb) syntax
                     if cmdname[0] == '^':
                         cmdname = cmdname[1:]
                     if cmdname.startswith(cmdstart):

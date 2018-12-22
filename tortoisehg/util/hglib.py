@@ -32,6 +32,7 @@ from mercurial import (
     revset as revsetmod,
     revsetlang,
     scmutil,
+    state as statemod,
     subrepoutil,
     ui as uimod,
     util,
@@ -250,6 +251,22 @@ def getqqueues(repo):
         qqueues = []
     return qqueues
 
+def readgraftstate(repo):
+    """Read a list of nodes from graftstate; or None if nothing in progress"""
+    graftstatefile = repo.vfs.join('graftstate')
+    if not os.path.exists(graftstatefile):
+        return
+    with open(graftstatefile, 'r') as f:
+        info = f.readlines()
+    if info and info[0] == '1\n':
+        # doesn't look like a list of nodes
+        return statemod.cmdstate(repo, 'graftstate').read()['nodes']
+    if len(info):
+        revlist = [rev.strip() for rev in info]
+        revlist = [rev for rev in revlist if rev != '']
+        if revlist:
+            return revlist
+
 readmergestate = mergemod.mergestate.read
 
 def readundodesc(repo):
@@ -290,11 +307,13 @@ def allextensions():
     disabledexts = disabledextensions()
     exts = (disabledexts or {}).copy()
     exts.update(enabledexts)
+    exts.pop('configitems')   # tortoisehg.util.configitems
     if hasattr(sys, "frozen"):
         if 'hgsubversion' not in exts:
             exts['hgsubversion'] = _('hgsubversion packaged with thg')
         if 'hggit' not in exts:
             exts['hggit'] = _('hggit packaged with thg')
+        exts.pop('mercurial_extension_utils', None)  # Part of keyring extension
     return exts
 
 def validateextensions(enabledexts):
@@ -316,7 +335,7 @@ def validateextensions(enabledexts):
         exts['perfarce'] = _('perfarce is incompatible with hgsubversion')
     return exts
 
-def _loadextensionwithblacklist(orig, ui, name, path):
+def _loadextensionwithblacklist(orig, ui, name, path, *args, **kwargs):
     if name.startswith('hgext.') or name.startswith('hgext/'):
         shortname = name[6:]
     else:
@@ -324,7 +343,7 @@ def _loadextensionwithblacklist(orig, ui, name, path):
     if shortname in _extensions_blacklist and not path:  # only bundled ext
         return
 
-    return orig(ui, name, path)
+    return orig(ui, name, path, *args, **kwargs)
 
 def _wrapextensionsloader():
     """Wrap extensions.load(ui, name) for blacklist to take effect"""
@@ -718,6 +737,16 @@ def user(ctx):
         # been configured in mercurial's config
         user = ''
     return user
+
+def getestimatedsize(fctx):
+    """Return the size of the given fctx without loading the revision text"""
+    if fctx.rev() is None:
+        return fctx.size()
+    else:
+        # fctx.size() can read all data into memory in rename cases so
+        # we read the size directly from the filelog, this is deeper
+        # under the API than I prefer to go, but seems necessary
+        return fctx._filelog._revlog.rawsize(fctx.filerev())
 
 def get_revision_desc(fctx, curpath=None):
     """return the revision description as a string"""

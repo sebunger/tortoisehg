@@ -52,6 +52,10 @@ from .qtgui import (
     QWidget,
 )
 
+from mercurial import (
+    scmutil,
+)
+
 from ..util import hglib
 from ..util.i18n import _
 from . import (
@@ -366,7 +370,8 @@ class FileLogDialog(_AbstractFileDialog):
         if ':' in link:
             scheme, param = link.split(':', 1)
             if scheme == 'cset':
-                rev = self.repo[hglib.fromunicode(param)].rev()
+                rev = scmutil.revsymbol(self.repo,
+                                        hglib.fromunicode(param)).rev()
                 return self.goto(rev)
         QDesktopServices.openUrl(QUrl(link))
 

@@ -52,11 +52,9 @@ according to the GPLv2 license.
 Community
 =========
 
-Mailing Lists:
+Mailing List::
 
-* `Users <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - Announcements, user Q&A, and feature discussions.
-* `Developers <thg-dev@googlegroups.com>`_ - Patches, bug reports, development discussions.
-* `Issues <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Notifications from the issue tracker.
+	`Developers <thg-dev@googlegroups.com>`_ - Patches, bug reports, development discussions.
 
 And our `wiki <https://bitbucket.org/tortoisehg/thg/wiki/Home>`_ on Bitbucket.
 

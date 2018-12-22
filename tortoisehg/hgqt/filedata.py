@@ -226,13 +226,7 @@ class FileData(_AbstractFileData):
     def _checkMaxDiff(self, ctx, wfile, maxdiff, force):
         self.error = None
         fctx = ctx.filectx(wfile)
-        if ctx.rev() is None:
-            size = fctx.size()
-        else:
-            # fctx.size() can read all data into memory in rename cases so
-            # we read the size directly from the filelog, this is deeper
-            # under the API than I prefer to go, but seems necessary
-            size = fctx._filelog.rawsize(fctx.filerev())
+        size = hglib.getestimatedsize(fctx)
         if not force and size > maxdiff:
             raise _BadContent(_('File is larger than the specified max size.\n'
                                 'maxdiff = %s KB') % (maxdiff // 1024))
@@ -312,7 +306,7 @@ class FileData(_AbstractFileData):
         if status in ('R', '!'):
             if wfile in ctx.p1():
                 fctx = ctx.p1()[wfile]
-                if fctx._filelog.rawsize(fctx.filerev()) > maxdiff:
+                if hglib.getestimatedsize(fctx) > maxdiff:
                     self.error = mde
                 else:
                     olddata = fctx.data()
@@ -380,7 +374,7 @@ class FileData(_AbstractFileData):
 
         self.olddata = olddata
         if changeselect:
-            diffopts = patch.diffopts(repo.ui, {})
+            diffopts = patch.difffeatureopts(repo.ui)
             diffopts.git = True
             m = match.exact(repo.root, repo.root, [wfile])
             fp = cStringIO.StringIO()

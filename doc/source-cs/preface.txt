@@ -45,12 +45,6 @@ na neomezené množství počítačů a šířit ve shodě s licencí GPLv2.
 Komunita
 ========
 
-Adresy:
-
-* `Uživatelé <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - Oznámení, otázky-odpovědi a diskuze o vlastnostech
-* `Vývojáři <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - Oprávky, zprávy o chybách a diskuze o vývoji programu.
-* `Problémy <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - Přehled zaznamenávaných problémů.
-
 Naše Wiki na stránkách Bitbucket je `zde <https://bitbucket.org/tortoisehg/thg/wiki/Home>`_ .
 
 Poděkování

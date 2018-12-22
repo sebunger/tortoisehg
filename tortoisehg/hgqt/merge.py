@@ -599,10 +599,13 @@ class CommitPage(BasePage):
                 self.wizard().close()
             return True
 
-        user = hglib.tounicode(qtlib.getCurrentUsername(self, self.repo,
-                                                        self.opts))
-        if not user:
-            return False
+        # username will be prompted as necessary by hg if ui.askusername
+        user = self.opts.get('user')
+        if not self.repo.ui.configbool('ui', 'askusername'):
+            user = hglib.tounicode(qtlib.getCurrentUsername(self, self.repo,
+                                                            self.opts))
+            if not user:
+                return False
 
         self.setTitle(_('Committing...'))
         self.setSubTitle(_('Please wait while committing merged files.'))

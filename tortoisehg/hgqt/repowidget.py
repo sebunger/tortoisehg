@@ -45,6 +45,7 @@ from .qtgui import (
 from mercurial import (
     error,
     phases,
+    scmutil,
 )
 from mercurial.utils import (
     procutil,
@@ -637,7 +638,7 @@ class RepoWidget(QWidget):
         """Select and scroll to the specified revision"""
         try:
             # try instant look up
-            if hglib.fromunicode(revspec) in self.repo:
+            if scmutil.isrevsymbol(self.repo, hglib.fromunicode(revspec)):
                 self.repoview.goto(revspec)
                 return
         except error.LookupError:
@@ -1287,7 +1288,8 @@ class RepoWidget(QWidget):
 
         submenu = menu.addMenu(_('Change &Phase to'))
         submenu.triggered.connect(self._changePhaseByMenu)
-        for pnum, pname in enumerate(phases.phasenames):
+        # TODO: filter out hidden names better
+        for pnum, pname in enumerate(phases.phasenames[:3]):
             a = entry(items, submenu, None, enablefuncs['isrev'], pname)
             a.setData(pnum)
         entry(items, menu)
@@ -1411,9 +1413,9 @@ class RepoWidget(QWidget):
             dlg.restart(str(revB), str(revA))
         def compressDlg():
             ctxa, ctxb = map(self.repo.hgchangectx, self.menuselection)
-            if ctxa.ancestor(ctxb) == ctxb:
+            if ctxa.ancestor(ctxb).rev() == ctxb.rev():
                 revs = self.menuselection[:]
-            elif ctxa.ancestor(ctxb) == ctxa:
+            elif ctxa.ancestor(ctxb).rev() == ctxa.rev():
                 revs = [self.menuselection[1], self.menuselection[0]]
             else:
                 InfoMsgBox(_('Unable to compress history'),
@@ -1803,13 +1805,27 @@ class RepoWidget(QWidget):
 
     @pyqtSlot()
     def mergeWithRevision(self):
+        # Don't use self.rev (i.e. the current revision.) This is a context
+        # menu handler, and the menu is open for the selected rows, not for
+        # the current row.
+        revisions = self.repoview.selectedRevisions()
+        if len(revisions) != 1:
+            QMessageBox.warning(self, _('Unable to merge'),
+                                _('Please select a revision to merge.'))
+            return
+        rev = revisions[0]
+        if not isinstance(rev, int):
+            QMessageBox.warning(self, _('Unable to merge'),
+                                _('Cannot merge with a pseudo revision %r.')
+                                % rev)
+            return
         pctx = self.repo['.']
-        octx = self.repo[self.rev]
+        octx = self.repo[rev]
         if pctx == octx:
             QMessageBox.warning(self, _('Unable to merge'),
                 _('You cannot merge a revision with itself'))
             return
-        self._dialogs.open(RepoWidget._createMergeDialog, self.rev)
+        self._dialogs.open(RepoWidget._createMergeDialog, rev)
 
     def _createMergeDialog(self, rev):
         return merge.MergeDialog(self._repoagent, rev, self)
@@ -2035,7 +2051,7 @@ class RepoWidget(QWidget):
             QMessageBox.warning(self, _('Cannot import selected revision'),
                 _('The selected revision (rev #%d) cannot be imported '
                 'because it is not a descendant of ''qparent'' (rev #%d)') \
-                % (self.rev, self.repo['qparent'].rev()))
+                % (self.rev, scmutil.revsymbol(self.repo, 'qparent').rev()))
             return
 
         patchdir = self.repo.vfs.join('patches')

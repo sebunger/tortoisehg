@@ -213,7 +213,11 @@ def visualdiff(ui, repo, pats, opts):
     try:
         ctx1b = None
         if change:
-            ctx2 = repo[change]
+            # TODO: figure out what's the expect type
+            if isinstance(change,  str):
+                ctx2 = scmutil.revsymbol(repo, change)
+            else:
+                ctx2 = repo[change]
             p = ctx2.parents()
             if len(p) > 1:
                 ctx1a, ctx1b = p

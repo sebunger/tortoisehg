@@ -57,12 +57,6 @@ GPLv2 ライセンスに従う限り再配布も可能です。
 コミュニティ
 ============
 
-メーリングリスト:
-
-* `利用者 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-discuss>`_ - アナウンス、使い方などの質問、機能の議論など。
-* `開発者 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-develop>`_ - パッチ投稿、バグ報告、開発関連の議論など。
-* `バグ通知 ML <https://lists.sourceforge.net/lists/listinfo/tortoisehg-issues>`_ - バグ管理システムからの自動通知メール。
-
 Bitbucket には `公式 Wiki <https://bitbucket.org/tortoisehg/thg/wiki/Home>`_ もあります。
 日本語 Wiki は `こちら <https://bitbucket.org/kuy/thg-ja/wiki/Home>`_ になります。
 
