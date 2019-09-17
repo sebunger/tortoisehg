@@ -221,7 +221,7 @@ class TopicsDialog(QDialog):
 
     @pyqtSlot()
     def add_topic(self):
-        topic = unicode(self.topicsCombo.currentText())
+        topic = pycompat.unicode(self.topicsCombo.currentText())
         if topic in self._allTopics():
             self.set_status(_('A topic named "%s" already exists') %
                             topic, False)
@@ -235,7 +235,7 @@ class TopicsDialog(QDialog):
 
     @pyqtSlot()
     def remove_topic(self):
-        topic = unicode(self.topicsCombo.currentText())
+        topic = pycompat.unicode(self.topicsCombo.currentText())
         if topic not in self._allTopics():
             self.set_status(_("Topic '%s' does not exist") % topic, False)
             return
@@ -248,7 +248,7 @@ class TopicsDialog(QDialog):
 
     @pyqtSlot()
     def rename_topic(self):
-        topic = unicode(self.topicsCombo.currentText())
+        topic = pycompat.unicode(self.topicsCombo.currentText())
         finishmsg = (_("Topic '%s' has been renamed to %s")
                      % (self._current_topic, topic))
         rev = None

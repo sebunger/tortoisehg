@@ -146,11 +146,11 @@ def launchtool(cmd, opts, replace, block):
     def quote(match):
         key = match.group()[1:]
         return procutil.shellquote(replace[key])
-    if isinstance(cmd, unicode):
+    if isinstance(cmd, pycompat.unicode):
         cmd = hglib.fromunicode(cmd)
     lopts = []
     for opt in opts:
-        if isinstance(opt, unicode):
+        if isinstance(opt, pycompat.unicode):
             lopts.append(hglib.fromunicode(opt))
         else:
             lopts.append(opt)

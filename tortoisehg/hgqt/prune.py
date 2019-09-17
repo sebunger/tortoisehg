@@ -72,10 +72,10 @@ class PruneWidget(cmdui.AbstractCmdWidget):
         self._revedit.setFocus()
 
     def revset(self):
-        return unicode(self._revedit.currentText())
+        return pycompat.unicode(self._revedit.currentText())
 
     def setRevset(self, revspec):
-        if self.revset() == unicode(revspec):
+        if self.revset() == pycompat.unicode(revspec):
             return
         w = self._revedit
         i = w.findText(revspec)

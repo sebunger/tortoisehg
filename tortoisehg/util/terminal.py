@@ -86,18 +86,18 @@ def _findterminal(ui):
         if terminal not in names:
             # if tortoisehg.terminal does not match an terminal-tools entry, take
             # the value directly
-            return (None, terminal)
+            return None, terminal
         # else select this terminal as highest priority (may still use another if
         # it is not found on this machine)
         tools.insert(0, (None, terminal))
     for p, t in tools:
         toolpath = _findtool(ui, t)
         if toolpath:
-            return (t, procutil.shellquote(toolpath))
+            return t, procutil.shellquote(toolpath)
 
     # fallback to the default shell
     global _defaultshell
-    return (None, _defaultshell)
+    return None, _defaultshell
 
 def detectterminal(ui_):
     'returns tuple of terminal tool path and arguments'
@@ -105,10 +105,10 @@ def detectterminal(ui_):
         ui_ = hglib.loadui()
     name, pathorconfig = _findterminal(ui_)
     if name is None:
-        return (pathorconfig, None)
+        return pathorconfig, None
     else:
         args = _toolstr(ui_, name, "args")
-        return (pathorconfig, args)
+        return pathorconfig, args
 
 def findterminals(ui):
     seen = set()

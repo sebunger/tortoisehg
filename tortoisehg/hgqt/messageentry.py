@@ -140,7 +140,7 @@ class MessageEntry(qscilib.Scintilla):
         self.summarylen = repo.summarylen
 
     def reflowBlock(self, line):
-        lines = unicode(self.text()).splitlines()
+        lines = pycompat.unicode(self.text()).splitlines()
         if line >= len(lines):
             return None
         if not len(lines[line]) > 1:
@@ -152,7 +152,7 @@ class MessageEntry(qscilib.Scintilla):
             # or are empty
             if not linetext:
                 return True
-            if (linetext[0] in '#-*+'):
+            if linetext[0] in '#-*+':
                 return True
             if len(linetext) >= 2:
                 if linetext[:2] in ('> ', '| '):

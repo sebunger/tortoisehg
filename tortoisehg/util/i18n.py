@@ -27,6 +27,8 @@ def _defaultlanguage():
     except (ImportError, AttributeError, KeyError):
         pass
 
+_ugettext = None
+
 def setlanguage(lang=None):
     """Change translation catalog to the specified language"""
     global t, language
@@ -37,6 +39,12 @@ def setlanguage(lang=None):
         opts['languages'] = (lang,)
     t = gettext.translation('tortoisehg', paths.get_locale_path(),
                             fallback=True, **opts)
+    global _ugettext
+    try:
+        _ugettext = t.ugettext
+    except AttributeError:
+        _ugettext = t.gettext
+
     language = lang or locale.getdefaultlocale(_localeenvs)[0]
 setlanguage()
 
@@ -55,10 +63,10 @@ def availablelanguages():
 def _(message, context=''):
     if context:
         sep = '\004'
-        tmsg = t.ugettext(context + sep + message)
+        tmsg = _ugettext(context + sep + message)
         if sep not in tmsg:
             return tmsg
-    return t.ugettext(message)
+    return _ugettext(message)
 
 def ngettext(singular, plural, n):
     return t.ungettext(singular, plural, n)

@@ -1,0 +1,9 @@
+recursive-include icons *.png *.ico *.svg *.txt
+include contrib/nautilus-thg.py
+include contrib/mergetools.rc
+include contrib/thg.desktop
+include COPYING.txt
+include tortoisehg/hgqt/*.ui
+recursive-include i18n *.po *.py
+recursive-include doc *
+recursive-exclude doc/build *

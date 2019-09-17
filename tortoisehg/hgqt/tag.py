@@ -45,8 +45,10 @@ keep = i18n.keepgettext()
 
 class TagDialog(QDialog):
 
-    def __init__(self, repoagent, tag='', rev='tip', parent=None, opts={}):
+    def __init__(self, repoagent, tag='', rev='tip', parent=None, opts=None):
         super(TagDialog, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 

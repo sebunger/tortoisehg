@@ -277,7 +277,7 @@ class PostReviewDialog(QDialog):
             opts['repoid'] = self.getRepoId()
             opts['summary'] = hglib.fromunicode(self.qui.summary_edit.currentText())
 
-        if (len(self.selectedRevs) > 1):
+        if len(self.selectedRevs) > 1:
             #Set the parent to the revision below the last one on the list
             #so all checked revisions are included in the request
             ctx = self.repo[self.selectedRevs[0]]
@@ -354,7 +354,7 @@ class PostReviewDialog(QDialog):
                     if v:
                         args.append('--%s' % k.replace('_', '-'))
                 else:
-                    for e in isinstance(v, basestring) and [v] or v:
+                    for e in hglib.isbasestring(v) and [v] or v:
                         args += ['--%s' % k.replace('_', '-'), e]
 
             return args
@@ -382,7 +382,7 @@ class PostReviewDialog(QDialog):
 
         saved = 'saved:' in output
         published = 'published:' in output
-        if (saved or published):
+        if saved or published:
             if saved:
                 url = output.split('saved: ').pop().strip()
                 msg = _('Review draft posted to %s\n') % url
@@ -413,7 +413,7 @@ class PostReviewDialog(QDialog):
     @pyqtSlot(str, str)
     def _captureOutput(self, msg, label):
         if label != 'control':
-            self._cmdoutputs.append(unicode(msg))
+            self._cmdoutputs.append(pycompat.unicode(msg))
 
     @pyqtSlot()
     def onSettingsButtonClicked(self):

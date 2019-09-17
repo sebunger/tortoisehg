@@ -562,7 +562,7 @@ class HgFileView(QFrame):
 
         fm = QFontMetrics(font)
         self.maxWidth = fm.maxWidth()
-        lines = unicode(self.sci.text()).splitlines()
+        lines = pycompat.unicode(self.sci.text()).splitlines()
         if lines:
             # assume that the longest line has the largest width;
             # fm.width() is too slow to apply to each line.
@@ -755,7 +755,7 @@ class _DiffViewControl(_AbstractViewControl):
         self._startBuildMarker()
 
     def _startBuildMarker(self):
-        self._linestoprocess = unicode(self._sci.text()).splitlines()
+        self._linestoprocess = pycompat.unicode(self._sci.text()).splitlines()
         self._firstlinetoprocess = 0
         self._buildtimer.start()
 
@@ -1148,7 +1148,7 @@ class _AnnotateViewControl(_AbstractViewControl):
                                 s.style(), s.paper())
         self._sci.SendScintilla(qsci.SCI_STYLESETFONT,
                                 s.style(),
-                                unicode(s.font().family()).encode('utf-8'))
+                                pycompat.unicode(s.font().family()).encode('utf-8'))
         self._sci.SendScintilla(qsci.SCI_STYLESETSIZE,
                                 s.style(), s.font().pointSize())
         for i, (fctx, _origline) in enumerate(self._links):

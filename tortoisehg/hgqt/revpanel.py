@@ -47,10 +47,10 @@ def data_func(widget, item, ctx):
     def summary_line(desc):
         return hglib.longsummary(desc.replace('\0', ''))
     def revline_data(ctx, hl=False, branch=None):
-        if isinstance(ctx, basestring):
+        if hglib.isbasestring(ctx):
             return ctx
         desc = ctx.description()
-        return (str(ctx.rev()), str(ctx), summary_line(desc), hl, branch)
+        return str(ctx.rev()), str(ctx), summary_line(desc), hl, branch
     def format_ctxlist(ctxlist):
         if not ctxlist:
             return None
@@ -157,13 +157,13 @@ def create_markup_func(ui):
                 linkpattern = ui.config('tortoisehg', 'changeset.link', None)
             else:
                 linkpattern = 'cset:{node|short}'
-            if isinstance(value, basestring):
+            if hglib.isbasestring(value):
                 return revid_markup(value)
             return revline_markup(linkpattern=linkpattern, *value, ctx=widget.ctx)
         elif item in ('parents', 'children', 'predecessors', 'successors'):
             csets = []
             for cset in value:
-                if isinstance(cset, basestring):
+                if hglib.isbasestring(cset):
                     csets.append(revid_markup(cset))
                 else:
                     csets.append(revline_markup(*cset))
@@ -207,7 +207,7 @@ def nomarkup(widget, item, value):
             return qtlib.markup(text, fg='red', weight='bold')
         raise csinfo.UnknownItem(item)
     for cset in value:
-        if isinstance(cset, basestring):
+        if hglib.isbasestring(cset):
             csets.append(revid_markup(cset))
         else:
             csets.append(revline_markup(*cset))

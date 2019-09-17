@@ -7,6 +7,10 @@
 
 from __future__ import absolute_import
 
+from mercurial import (
+    pycompat,
+)
+
 from .qtcore import (
     QSettings,
     QSize,
@@ -513,14 +517,14 @@ class CommitPage(BasePage):
         if self._parentbackout:
             self.setTitle(_('Backing out and committing...'))
             self.setSubTitle(_('Please wait while making backout.'))
-            message = unicode(self.msgEntry.text())
+            message = pycompat.unicode(self.msgEntry.text())
             cmdline = hglib.buildcmdargs('backout', self._backoutrev,
                                          verbose=True,
                                          message=message, user=user)
         else:
             self.setTitle(_('Committing...'))
             self.setSubTitle(_('Please wait while committing merged files.'))
-            message = unicode(self.msgEntry.text())
+            message = pycompat.unicode(self.msgEntry.text())
             cmdline = hglib.buildcmdargs('commit', verbose=True,
                                          message=message, user=user)
         commandlines = [cmdline]

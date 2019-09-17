@@ -45,6 +45,7 @@ from .qtnetwork import (
 
 from mercurial import (
     error,
+    pycompat,
 )
 from mercurial.utils import (
     procutil,
@@ -103,11 +104,10 @@ _recoverableexc = {
 
 def earlyExceptionMsgBox(e):
     """Show message for recoverable error before the QApplication is started"""
-    opts = {}
-    opts['cmd'] = ' '.join(sys.argv[1:])
-    opts['values'] = e
-    opts['error'] = traceback.format_exc()
-    opts['nofork'] = True
+    opts = {'cmd': ' '.join(sys.argv[1:]),
+            'values': e,
+            'error': traceback.format_exc(),
+            'nofork': True}
     errstring = _recoverableexc[e.__class__]
     if not QApplication.instance():
         main = QApplication(sys.argv)
@@ -116,9 +116,8 @@ def earlyExceptionMsgBox(e):
 
 def earlyBugReport(e):
     """Show generic errors before the QApplication is started"""
-    opts = {}
-    opts['cmd'] = ' '.join(sys.argv[1:])
-    opts['error'] = traceback.format_exc()
+    opts = {'cmd': ' '.join(sys.argv[1:]),
+            'error': traceback.format_exc()}
     if not QApplication.instance():
         main = QApplication(sys.argv)
     dlg = bugreport.BugReport(opts)
@@ -185,10 +184,9 @@ class ExceptionCatcher(QObject):
             self.errors = []
 
     def _showexceptiondialog(self):
-        opts = {}
-        opts['cmd'] = ' '.join(sys.argv[1:])
-        opts['error'] = ''.join(''.join(traceback.format_exception(*args))
-                                for args in self.errors)
+        opts = {'cmd': ' '.join(sys.argv[1:]),
+                'error': ''.join(''.join(traceback.format_exception(*args))
+                                 for args in self.errors)}
         etype, evalue = self.errors[0][:2]
         parent = self._mainapp.activeWindow()
         if (len(set(e[0] for e in self.errors)) == 1
@@ -449,7 +447,7 @@ class QtRunner(QObject):
 
         self._repomanager = thgrepo.RepoManager(ui, self)
         self._reporeleaser = releaser = QSignalMapper(self)
-        releaser.mapped[unicode].connect(self._repomanager.releaseRepoAgent)
+        releaser.mapped[pycompat.unicode].connect(self._repomanager.releaseRepoAgent)
 
         # stop services after control returns to the main event loop
         self._mainapp.setQuitOnLastWindowClosed(False)

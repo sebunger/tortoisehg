@@ -40,8 +40,10 @@ from . import (
 
 class UpdateWidget(cmdui.AbstractCmdWidget):
 
-    def __init__(self, repoagent, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts=None):
         super(UpdateWidget, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._repoagent = repoagent
         repo = repoagent.rawRepo()
@@ -61,7 +63,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
 
         # always include integer revision
         if rev:
-            assert not isinstance(rev, unicode)
+            assert not isinstance(rev, pycompat.unicode)
             try:
                 ctx = scmutil.revsymbol(self.repo, rev)
                 if isinstance(ctx.rev(), int):  # could be patch name
@@ -401,8 +403,10 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
 
 class UpdateDialog(cmdui.CmdControlDialog):
 
-    def __init__(self, repoagent, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts=None):
         super(UpdateDialog, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self._repoagent = repoagent
 
         self.setWindowTitle(_('Update - %s') % repoagent.displayName())

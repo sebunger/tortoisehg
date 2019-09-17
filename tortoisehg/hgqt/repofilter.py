@@ -294,18 +294,18 @@ class RepoFilterBar(QToolBar):
         self.runQuery()
 
     def _prepareQuery(self):
-        query = unicode(self.revsetcombo.currentText()).strip()
+        query = pycompat.unicode(self.revsetcombo.currentText()).strip()
         if _querytype(self._repo, query) == 'keyword':
             return hglib.formatrevspec('keyword(%s)', query)
         else:
             return query
 
     def _isUnsavedQuery(self):
-        return unicode(self.revsetcombo.currentText()).startswith(' ')
+        return pycompat.unicode(self.revsetcombo.currentText()).startswith(' ')
 
     @pyqtSlot()
     def _updateQueryType(self):
-        query = unicode(self.revsetcombo.currentText()).strip()
+        query = pycompat.unicode(self.revsetcombo.currentText()).strip()
         qtype = _querytype(self._repo, query)
         if not qtype:
             self._revsettypelabel.hide()
@@ -498,7 +498,7 @@ class RepoFilterBar(QToolBar):
         """Return the current branch name [unicode]"""
         index = self._branchCombo.currentIndex()
         branch = self._branchCombo.itemData(index)
-        return unicode(branch)
+        return pycompat.unicode(branch)
 
     def branchAncestorsIncluded(self):
         return self._allparAction.isChecked()

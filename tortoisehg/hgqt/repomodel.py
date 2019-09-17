@@ -320,7 +320,7 @@ class HgRepoListModel(QAbstractTableModel):
         return self._revspec
 
     def setRevset(self, revspec):
-        revspec = unicode(revspec)
+        revspec = pycompat.unicode(revspec)
         if revspec == self._revspec:
             return
         self._revspec = revspec
@@ -567,7 +567,7 @@ class HgRepoListModel(QAbstractTableModel):
             if textfunc is None:
                 return None
             text = textfunc(self, ctx)
-            if not isinstance(text, unicode):
+            if not isinstance(text, pycompat.unicode):
                 text = hglib.tounicode(text)
             return text
         elif role == Qt.ForegroundRole:
@@ -723,7 +723,7 @@ class HgRepoListModel(QAbstractTableModel):
             try:
                 # The tuples are laid out so the right one can be found by
                 # comparison.
-                if (ctx.parents()):
+                if ctx.parents():
                     pdate, pdist, ptag = max(
                         self._latesttags[p.rev()] for p in ctx.parents())
                 else:

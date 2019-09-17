@@ -71,8 +71,10 @@ def _suggesteddest(src, basedest):
 
 class CloneWidget(cmdui.AbstractCmdWidget):
 
-    def __init__(self, ui, cmdagent, args=None, opts={}, parent=None):
+    def __init__(self, ui, cmdagent, args=None, opts=None, parent=None):
         super(CloneWidget, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._cmdagent = cmdagent
         self.ui = ui
@@ -257,14 +259,14 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             qs.setValue(key, l[:10])
 
     def source(self):
-        return unicode(self.src_combo.currentText()).strip()
+        return pycompat.unicode(self.src_combo.currentText()).strip()
 
     def setSource(self, url):
         self.src_combo.setCurrentIndex(self.src_combo.findText(url))
         self.src_combo.setEditText(url)
 
     def destination(self):
-        return unicode(self.dest_combo.currentText()).strip()
+        return pycompat.unicode(self.dest_combo.currentText()).strip()
 
     def setDestination(self, url):
         self.dest_combo.setCurrentIndex(self.dest_combo.findText(url))
@@ -287,11 +289,14 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             and not self.proxy_chk.isChecked()):
             opts['config'].append('http_proxy.host=')
         if self.remote_chk.isChecked():
-            opts['remotecmd'] = unicode(self.remote_text.text()).strip() or None
+            opts['remotecmd'] = pycompat.unicode(
+                                    self.remote_text.text()).strip() or None
         if self.rev_chk.isChecked():
-            opts['rev'] = unicode(self.rev_text.text()).strip() or None
+            opts['rev'] = pycompat.unicode(
+                              self.rev_text.text()).strip() or None
         if self.startrev_chk.isChecked():
-            opts['startrev'] = (unicode(self.startrev_text.text()).strip()
+            opts['startrev'] = (pycompat.unicode(
+                                    self.startrev_text.text()).strip()
                                 or None)
         if self.largefiles_chk.isChecked():
             opts['config'].append('extensions.largefiles=')
@@ -303,7 +308,8 @@ class CloneWidget(cmdui.AbstractCmdWidget):
 
         if self.qclone_chk.isChecked():
             name = 'qclone'
-            opts['patches'] = unicode(self.qclone_txt.text()).strip() or None
+            opts['patches'] = (pycompat.unicode(self.qclone_txt.text()).strip()
+                                  or None)
         else:
             name = 'clone'
 
@@ -324,7 +330,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
     def _browseSource(self):
         FD = QFileDialog
         caption = _("Select source repository")
-        path = FD.getExistingDirectory(self, caption, \
+        path = FD.getExistingDirectory(self, caption,
             self.src_combo.currentText(), QFileDialog.ShowDirsOnly)
         if path:
             self.src_combo.setEditText(QDir.toNativeSeparators(path))
@@ -335,7 +341,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
     def _browseDestination(self):
         FD = QFileDialog
         caption = _("Select destination repository")
-        path = FD.getExistingDirectory(self, caption, \
+        path = FD.getExistingDirectory(self, caption,
             self.dest_combo.currentText(), QFileDialog.ShowDirsOnly)
         if path:
             self.dest_combo.setEditText(QDir.toNativeSeparators(path))
@@ -346,7 +352,8 @@ class CloneWidget(cmdui.AbstractCmdWidget):
     def _browsePatchQueue(self):
         FD = QFileDialog
         caption = _("Select patch folder")
-        upatchroot = os.path.join(unicode(self.src_combo.currentText()), '.hg')
+        upatchroot = os.path.join(pycompat.unicode(
+                          self.src_combo.currentText()), '.hg')
         upath = FD.getExistingDirectory(self, caption, upatchroot,
                                         QFileDialog.ShowDirsOnly)
         if upath:

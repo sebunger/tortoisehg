@@ -142,7 +142,7 @@ class Graph(object):
             if add_none:
                 self._revset.insert(0, None)
                 self._revset_set_pure = self._revset_set
-                self._revset_set = frozenset(self._revset_set | set([None]))
+                self._revset_set = frozenset(self._revset_set | {None})
         self._edge_color_cache = {}
         self._grapher = self._build_nodes()
         self._row_to_rev = dict(

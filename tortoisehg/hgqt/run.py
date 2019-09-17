@@ -228,9 +228,8 @@ def _parse(ui, args):
         sys.exit()
     else:
         alias, args = 'workbench', []
-    # copies hg<4.8 (fa88170c10bb) behavior
-    stable = {k.lstrip('^'): e for k, e in table.items()}
-    aliases, i = cmdutil.findcmd(alias, stable, ui.config("ui", "strict"))
+
+    aliases, i = cmdutil.findcmd(alias, table, ui.config("ui", "strict"))
     for a in aliases:
         if a.startswith(alias):
             alias = a
@@ -262,7 +261,7 @@ def _parse(ui, args):
         del options['listfileutf8']
         get_lines_from_listfile(listfileutf8, True)
 
-    return (cmd, cmd and i[0] or None, args, options, cmdoptions, alias)
+    return cmd, cmd and i[0] or None, args, options, cmdoptions, alias
 
 def _runcatch(ui, args):
     try:
@@ -483,11 +482,12 @@ def add(ui, repoagent, *pats, **opts):
     """add files"""
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('^annotate|blame',
+@command('annotate|blame',
     [('r', 'rev', '', _('revision to annotate')),
      ('n', 'line', '', _('open to line')),
      ('p', 'pattern', '', _('initial search pattern'))],
-    _('thg annotate'))
+    _('thg annotate'),
+    helpbasic=True)
 def annotate(ui, repoagent, *pats, **opts):
     """annotate dialog"""
     from tortoisehg.hgqt import fileview
@@ -512,11 +512,12 @@ def archive(ui, repoagent, *pats, **opts):
     rev = opts.get('rev')
     return archivemod.createArchiveDialog(repoagent, rev)
 
-@command('^backout',
+@command('backout',
     [('', 'merge', None, _('merge with old dirstate parent after backout')),
      ('', 'parent', '', _('parent to choose when backing out merge')),
      ('r', 'rev', '', _('revision to backout'))],
-    _('thg backout [OPTION]... [[-r] REV]'))
+    _('thg backout [OPTION]... [[-r] REV]'),
+    helpbasic=True)
 def backout(ui, repoagent, *pats, **opts):
     """backout tool"""
     from tortoisehg.hgqt import backout as backoutmod
@@ -533,7 +534,8 @@ def backout(ui, repoagent, *pats, **opts):
         raise error.Abort(hglib.fromunicode(msg))
     return backoutmod.BackoutDialog(repoagent, rev)
 
-@command('^bisect', [], _('thg bisect'))
+@command('bisect', [], _('thg bisect'),
+         helpbasic=True)
 def bisect(ui, repoagent, *pats, **opts):
     """bisect dialog"""
     from tortoisehg.hgqt import bisect as bisectmod
@@ -554,7 +556,7 @@ def bookmark(ui, repoagent, *names, **opts):
         dlg.setBookmarkName(hglib.tounicode(names[0]))
     return dlg
 
-@command('^clone',
+@command('clone',
     [('U', 'noupdate', None, _('the clone will include an empty working copy '
                                '(only a repository)')),
      ('u', 'updaterev', '', _('revision, tag or branch to check out')),
@@ -563,7 +565,8 @@ def bookmark(ui, repoagent, *names, **opts):
      ('', 'pull', None, _('use pull protocol to copy metadata')),
      ('', 'uncompressed', None, _('use uncompressed transfer '
                                   '(fast over LAN)'))],
-    _('thg clone [OPTION]... [SOURCE] [DEST]'))
+    _('thg clone [OPTION]... [SOURCE] [DEST]'),
+    helpbasic=True)
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt import clone as clonemod
@@ -571,10 +574,11 @@ def clone(ui, *pats, **opts):
     dlg.clonedRepository.connect(qtrun.openRepoInWorkbench)
     return dlg
 
-@command('^commit|ci',
+@command('commit|ci',
     [('u', 'user', '', _('record user as committer')),
      ('d', 'date', '', _('record datecode as commit date'))],
-    _('thg commit [OPTIONS] [FILE]...'))
+    _('thg commit [OPTIONS] [FILE]...'),
+    helpbasic=True)
 def commit(ui, repoagent, *pats, **opts):
     """commit tool"""
     from tortoisehg.hgqt import commit as commitmod
@@ -633,9 +637,10 @@ def drag_move(ui, repoagent, *pats, **opts):
     opts.update(alias='move', headless=True)
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('^email',
+@command('email',
     [('r', 'rev', [], _('a revision to send'))],
-    _('thg email [REVS]'))
+    _('thg email [REVS]'),
+    helpbasic=True)
 def email(ui, repoagent, *revs, **opts):
     """send changesets by email"""
     from tortoisehg.hgqt import hgemail
@@ -649,10 +654,11 @@ def email(ui, repoagent, *revs, **opts):
     revs = scmutil.revrange(repo, revs)
     return hgemail.EmailDialog(repoagent, revs)
 
-@command('^filelog',
+@command('filelog',
     [('r', 'rev', '', _('select the specified revision')),
      ('', 'compare', False, _('side-by-side comparison of revisions'))],
-    _('thg filelog [OPTION]... FILE'))
+    _('thg filelog [OPTION]... FILE'),
+    helpbasic=True)
 def filelog(ui, repoagent, *pats, **opts):
     """show history of the specified file"""
     from tortoisehg.hgqt import filedialogs
@@ -686,16 +692,18 @@ def graft(ui, repoagent, *revs, **opts):
         raise error.Abort(_('You must provide revisions to graft'))
     return graftmod.GraftDialog(repoagent, None, source=revs)
 
-@command('^grep|search',
+@command('grep|search',
     [('i', 'ignorecase', False, _('ignore case during search'))],
-    _('thg grep'))
+    _('thg grep'),
+    helpbasic=True)
 def grep(ui, repoagent, *pats, **opts):
     """grep/search dialog"""
     from tortoisehg.hgqt import grep as grepmod
     upats = [hglib.tounicode(p) for p in pats]
     return grepmod.SearchDialog(repoagent, upats, **opts)
 
-@command('^guess', [], _('thg guess'))
+@command('guess', [], _('thg guess'),
+         helpbasic=True)
 def guess(ui, repoagent, *pats, **opts):
     """guess previous renames or copies"""
     from tortoisehg.hgqt import guess as guessmod
@@ -737,12 +745,10 @@ def help_(ui, name=None, with_version=False, **opts):
             version(ui)
             ui.write('\n')
 
-        # copies hg<4.8 (fa88170c10bb) behavior
-        stable = {k.lstrip('^'): e for k, e in table.items()}
         try:
-            aliases, i = cmdutil.findcmd(name, stable, False)
+            aliases, i = cmdutil.findcmd(name, table, False)
         except error.AmbiguousCommand as inst:
-            select = lambda c: c.lstrip('^').startswith(inst.args[0])
+            select = lambda c: c.startswith(inst.args[0])
             helplist(_('list of commands:\n\n'), select)
             return
 
@@ -778,10 +784,8 @@ def help_(ui, name=None, with_version=False, **opts):
             if (not select and name != 'shortlist' and
                 e[0].__module__ != __name__):
                 continue
-            # TODO: switch to hg>=4.8 (fa88170c10bb) syntax
-            if name == "shortlist" and not f.startswith("^"):
+            if name == "shortlist":
                 continue
-            f = f.lstrip("^")
             if not ui.debugflag and f.startswith("debug"):
                 continue
             doc = e[0].__doc__
@@ -791,7 +795,7 @@ def help_(ui, name=None, with_version=False, **opts):
             if not doc:
                 doc = _("(no help text available)")
             h[f] = doc.splitlines()[0].rstrip()
-            cmds[f] = c.lstrip("^")
+            cmds[f] = c
 
         if not h:
             ui.status(_('no commands defined\n'))
@@ -883,7 +887,8 @@ def help_(ui, name=None, with_version=False, **opts):
             else:
                 ui.write("%s\n" % first)
 
-@command('^hgignore|ignore|filter', [], _('thg hgignore [FILE]'))
+@command('hgignore|ignore|filter', [], _('thg hgignore [FILE]'),
+         helpbasic=True)
 def hgignore(ui, repoagent, *pats, **opts):
     """ignore filter editor"""
     from tortoisehg.hgqt import hgignore as hgignoremod
@@ -901,7 +906,8 @@ def import_(ui, repoagent, *pats, **opts):
     dlg.setfilepaths(pats)
     return dlg
 
-@command('^init', [], _('thg init [DEST]'))
+@command('init', [], _('thg init [DEST]'),
+         helpbasic=True)
 def init(ui, dest='.', **opts):
     """init dialog"""
     from tortoisehg.hgqt import hginit
@@ -909,18 +915,20 @@ def init(ui, dest='.', **opts):
     dlg.newRepository.connect(qtrun.openRepoInWorkbench)
     return dlg
 
-@command('^lock|unlock', [], _('thg lock'))
+@command('lock|unlock', [], _('thg lock'),
+         helpbasic=True)
 def lock(ui, repoagent, **opts):
     """lock dialog"""
     from tortoisehg.hgqt import locktool
     return locktool.LockDialog(repoagent)
 
-@command('^log|history|explorer|workbench',
+@command('log|history|explorer|workbench',
     [('k', 'query', '', _('search for a given text or revset')),
      ('r', 'rev', '', _('select the specified revision')),
      ('l', 'limit', '', _('(DEPRECATED)')),
      ('', 'newworkbench', None, _('open a new workbench window'))],
-    _('thg log [OPTIONS] [FILE]'))
+    _('thg log [OPTIONS] [FILE]'),
+    helpbasic=True)
 def log(ui, *pats, **opts):
     """workbench application"""
     if opts.get('query') and pats:
@@ -988,9 +996,10 @@ def manifest(ui, repoagent, *pats, **opts):
         dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
     return dlg
 
-@command('^merge',
+@command('merge',
     [('r', 'rev', '', _('revision to merge'))],
-    _('thg merge [[-r] REV]'))
+    _('thg merge [[-r] REV]'),
+    helpbasic=True)
 def merge(ui, repoagent, *pats, **opts):
     """merge wizard"""
     from tortoisehg.hgqt import merge as mergemod
@@ -1022,9 +1031,10 @@ def postreview(ui, repoagent, *pats, **opts):
         raise error.Abort(_('no revisions specified'))
     return postreviewmod.PostReviewDialog(repo.ui, repoagent, revs)
 
-@command('^prune|obsolete|kill',
+@command('prune|obsolete',
     [('r', 'rev', [], _('revisions to prune'))],
-    _('thg prune [-r] REV...'))
+    _('thg prune [-r] REV...'),
+    helpbasic=True)
 def prune(ui, repoagent, *revs, **opts):
     """hide changesets by marking them obsolete"""
     from tortoisehg.hgqt import prune as prunemod
@@ -1036,19 +1046,21 @@ def prune(ui, repoagent, *revs, **opts):
         revspec = hglib.formatrevspec('%lr', revs)
     return prunemod.createPruneDialog(repoagent, hglib.tounicode(revspec))
 
-@command('^purge', [], _('thg purge'))
+@command('purge', [], _('thg purge'),
+         helpbasic=True)
 def purge(ui, repoagent, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
     from tortoisehg.hgqt import purge as purgemod
     return purgemod.PurgeDialog(repoagent)
 
-@command('^rebase',
+@command('rebase',
     [('', 'keep', False, _('keep original changesets')),
      ('', 'keepbranches', False, _('keep original branch names')),
      ('', 'detach', False, _('(DEPRECATED)')),
      ('s', 'source', '', _('rebase from the specified changeset')),
      ('d', 'dest', '', _('rebase onto the specified changeset'))],
-    _('thg rebase -s REV -d REV [--keep]'))
+    _('thg rebase -s REV -d REV [--keep]'),
+    helpbasic=True)
 def rebase(ui, repoagent, *pats, **opts):
     """rebase dialog"""
     from tortoisehg.hgqt import rebase as rebasemod
@@ -1091,9 +1103,10 @@ def rename(ui, repoagent, source=None, dest=None, **opts):
     iscopy = (opts.get('alias') == 'copy')
     return renamemod.RenameDialog(repoagent, None, source, dest, iscopy)
 
-@command('^repoconfig',
+@command('repoconfig',
     [('', 'focus', '', _('field to give initial focus'))],
-    _('thg repoconfig'))
+    _('thg repoconfig'),
+    helpbasic=True)
 def repoconfig(ui, repoagent, *pats, **opts):
     """repository configuration editor"""
     from tortoisehg.hgqt import settings
@@ -1105,9 +1118,10 @@ def resolve(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import resolve as resolvemod
     return resolvemod.ResolveDialog(repoagent)
 
-@command('^revdetails',
+@command('revdetails',
     [('r', 'rev', '', _('the revision to show'))],
-    _('thg revdetails [-r REV]'))
+    _('thg revdetails [-r REV]'),
+    helpbasic=True)
 def revdetails(ui, repoagent, *pats, **opts):
     """revision details tool"""
     from tortoisehg.hgqt import revdetails as revdetailsmod
@@ -1134,11 +1148,12 @@ def rupdate(ui, repoagent, *pats, **opts):
         rev = pats[0]
     return rupdatemod.createRemoteUpdateDialog(repoagent, rev)
 
-@command('^serve',
+@command('serve',
     [('', 'web-conf', '', _('name of the hgweb config file (serve more than '
                             'one repository)')),
      ('', 'webdir-conf', '', _('name of the hgweb config file (DEPRECATED)'))],
-    _('thg serve [--web-conf FILE]'))
+    _('thg serve [--web-conf FILE]'),
+    helpbasic=True)
 def serve(ui, *pats, **opts):
     """start stand-alone webserver"""
     from tortoisehg.hgqt import serve as servemod
@@ -1158,13 +1173,14 @@ def shelve(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import shelve as shelvemod
     return shelvemod.ShelveDialog(repoagent)
 
-@command('^sign',
+@command('sign',
     [('f', 'force', None, _('sign even if the sigfile is modified')),
      ('l', 'local', None, _('make the signature local')),
      ('k', 'key', '', _('the key id to sign with')),
      ('', 'no-commit', None, _('do not commit the sigfile after signing')),
      ('m', 'message', '', _('use <text> as commit message'))],
-    _('thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]'))
+    _('thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]'),
+    helpbasic=True)
 def sign(ui, repoagent, *pats, **opts):
     """sign tool"""
     from tortoisehg.hgqt import sign as signmod
@@ -1177,10 +1193,11 @@ def sign(ui, repoagent, *pats, **opts):
         kargs['rev'] = rev
     return signmod.SignDialog(repoagent, opts=opts, **kargs)
 
-@command('^status|st',
+@command('status|st',
     [('c', 'clean', False, _('show files without changes')),
      ('i', 'ignored', False, _('show ignored files'))],
-    _('thg status [OPTIONS] [FILE]'))
+    _('thg status [OPTIONS] [FILE]'),
+    helpbasic=True)
 def status(ui, repoagent, *pats, **opts):
     """browse working copy status"""
     from tortoisehg.hgqt import status as statusmod
@@ -1189,12 +1206,13 @@ def status(ui, repoagent, *pats, **opts):
     os.chdir(repo.root)
     return statusmod.StatusDialog(repoagent, pats, opts)
 
-@command('^strip',
+@command('strip',
     [('f', 'force', None, _('discard uncommitted changes (no backup)')),
      ('n', 'nobackup', None, _('do not back up stripped revisions')),
      ('k', 'keep', None, _('do not modify working copy during strip')),
      ('r', 'rev', '', _('revision to strip'))],
-    _('thg strip [-k] [-f] [-n] [[-r] REV]'))
+    _('thg strip [-k] [-f] [-n] [[-r] REV]'),
+    helpbasic=True)
 def strip(ui, repoagent, *pats, **opts):
     """strip dialog"""
     from tortoisehg.hgqt import thgstrip
@@ -1205,9 +1223,10 @@ def strip(ui, repoagent, *pats, **opts):
         rev = pats[0]
     return thgstrip.createStripDialog(repoagent, rev=rev, opts=opts)
 
-@command('^sync|synchronize',
+@command('sync|synchronize',
     [('B', 'bookmarks', False, _('open the bookmark sync window'))],
-    _('thg sync [OPTION]... [PEER]'))
+    _('thg sync [OPTION]... [PEER]'),
+    helpbasic=True)
 def sync(ui, repoagent, url=None, **opts):
     """synchronize with other repositories"""
     from tortoisehg.hgqt import bookmark as bookmarkmod, repowidget
@@ -1222,13 +1241,14 @@ def sync(ui, repoagent, url=None, **opts):
         w.setSyncUrl(url)
     return w
 
-@command('^tag',
+@command('tag',
     [('f', 'force', None, _('replace existing tag')),
      ('l', 'local', None, _('make the tag local')),
      ('r', 'rev', '', _('revision to tag')),
      ('', 'remove', None, _('remove a tag')),
      ('m', 'message', '', _('use <text> as commit message'))],
-    _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]'))
+    _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]'),
+    helpbasic=True)
 def tag(ui, repoagent, *pats, **opts):
     """tag tool"""
     from tortoisehg.hgqt import tag as tagmod
@@ -1271,10 +1291,11 @@ def topics(ui, repoagent, *names, **opts):
         dlg.setTopicName(hglib.tounicode(names[0]))
     return dlg
 
-@command('^update|checkout|co',
+@command('update|checkout|co',
     [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
      ('r', 'rev', '', _('revision to update')),],
-    _('thg update [-C] [[-r] REV]'))
+    _('thg update [-C] [[-r] REV]'),
+    helpbasic=True)
 def update(ui, repoagent, *pats, **opts):
     """update/checkout tool"""
     from tortoisehg.hgqt import update as updatemod
@@ -1285,19 +1306,21 @@ def update(ui, repoagent, *pats, **opts):
         rev = pats[0]
     return updatemod.UpdateDialog(repoagent, rev, None, opts)
 
-@command('^userconfig',
+@command('userconfig',
     [('', 'focus', '', _('field to give initial focus'))],
-    _('thg userconfig'))
+    _('thg userconfig'),
+    helpbasic=True)
 def userconfig(ui, *pats, **opts):
     """user configuration editor"""
     from tortoisehg.hgqt import settings
     return settings.SettingsDialog(False, focus=opts.get('focus'))
 
-@command('^vdiff',
+@command('vdiff',
     [('c', 'change', '', _('changeset to view in diff tool')),
      ('r', 'rev', [], _('revisions to view in diff tool')),
      ('b', 'bundle', '', _('bundle file to preview'))],
-    _('launch visual diff tool'))
+    _('launch visual diff tool'),
+    helpbasic=True)
 def vdiff(ui, repoagent, *pats, **opts):
     """launch configured visual diff tool"""
     from tortoisehg.hgqt import visdiff
@@ -1307,9 +1330,10 @@ def vdiff(ui, repoagent, *pats, **opts):
     pats = hglib.canonpaths(pats)
     return visdiff.visualdiff(ui, repo, pats, opts)
 
-@command('^version',
+@command('version',
     [('v', 'verbose', None, _('print license'))],
-    _('thg version [OPTION]'))
+    _('thg version [OPTION]'),
+    helpbasic=True)
 def version(ui, **opts):
     """output version and copyright information"""
     ui.write(_('TortoiseHg Dialogs (version %s), '

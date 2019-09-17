@@ -9065,8 +9065,8 @@ msgstr "Правка пути на веб-сервер"
 msgid "Local Path"
 msgstr "Локальный путь"
 
-msgid "hg view`"
-msgstr "hg view`"
+msgid "hg view"
+msgstr "hg view"
 
 #~ msgid "TortoiseHg Overlay Icon Server"
 #~ msgstr "Сервер накладных значков TortoiseHg"

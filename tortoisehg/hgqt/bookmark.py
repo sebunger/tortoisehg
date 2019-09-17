@@ -210,7 +210,7 @@ class BookmarkDialog(QDialog):
 
     @pyqtSlot()
     def add_bookmark(self):
-        bookmark = unicode(self.bookmarkCombo.currentText())
+        bookmark = pycompat.unicode(self.bookmarkCombo.currentText())
         if bookmark in self._allBookmarks():
             self.set_status(_('A bookmark named "%s" already exists') %
                             bookmark, False)
@@ -224,7 +224,7 @@ class BookmarkDialog(QDialog):
 
     @pyqtSlot()
     def move_bookmark(self):
-        bookmark = unicode(self.bookmarkCombo.currentText())
+        bookmark = pycompat.unicode(self.bookmarkCombo.currentText())
         if bookmark not in self._allBookmarks():
             self.set_status(_('Bookmark named "%s" does not exist') %
                             bookmark, False)
@@ -238,7 +238,7 @@ class BookmarkDialog(QDialog):
 
     @pyqtSlot()
     def remove_bookmark(self):
-        bookmark = unicode(self.bookmarkCombo.currentText())
+        bookmark = pycompat.unicode(self.bookmarkCombo.currentText())
         if bookmark not in self._allBookmarks():
             self.set_status(_("Bookmark '%s' does not exist") % bookmark, False)
             return
@@ -248,12 +248,12 @@ class BookmarkDialog(QDialog):
 
     @pyqtSlot()
     def rename_bookmark(self):
-        name = unicode(self.bookmarkCombo.currentText())
+        name = pycompat.unicode(self.bookmarkCombo.currentText())
         if name not in self._allBookmarks():
             self.set_status(_("Bookmark '%s' does not exist") % name, False)
             return
 
-        newname = unicode(self.newNameEdit.text())
+        newname = pycompat.unicode(self.newNameEdit.text())
         if newname in self._allBookmarks():
             self.set_status(_('A bookmark named "%s" already exists') %
                             newname, False)
@@ -398,10 +398,12 @@ class SyncBookmarkDialog(QDialog):
         self._updateActions()
 
     def selectedOutgoingBookmarks(self):
-        return [unicode(x.text()) for x in self.outgoingList.selectedItems()]
+        return [pycompat.unicode(x.text())
+                for x in self.outgoingList.selectedItems()]
 
     def selectedIncomingBookmarks(self):
-        return [unicode(x.text()) for x in self.incomingList.selectedItems()]
+        return [pycompat.unicode(x.text())
+                for x in self.incomingList.selectedItems()]
 
     @pyqtSlot()
     def push_bookmark(self):

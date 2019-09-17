@@ -6,9 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-import urllib2, urllib
-
-from mercurial import error, extensions, subrepo
+from mercurial import error, extensions, subrepo, util
 from mercurial import dispatch as dispatchmod
 
 from tortoisehg.util import hgversion
@@ -25,7 +23,7 @@ def _dispatch(orig, req):
         errormsg = str(e)
         label = 'ui.error'
         if e.subrepo:
-            label += ' subrepo=%s' % urllib.quote(e.subrepo)
+            label += ' subrepo=%s' % util.urlreq.quote(e.subrepo)
         ui.write_err(_('abort: ') + errormsg + '\n', label=label)
         if e.hint:
             ui.write_err(_('hint: ') + str(e.hint) + '\n', label=label)
@@ -35,10 +33,10 @@ def _dispatch(orig, req):
             ui.write_err(_('hint: ') + str(e.hint) + '\n', label='ui.error')
     except error.RepoError as e:
         ui.write_err(str(e) + '\n', label='ui.error')
-    except urllib2.HTTPError as e:
+    except util.urlerr.httperror as e:
         err = _('HTTP Error: %d (%s)') % (e.code, e.msg)
         ui.write_err(err + '\n', label='ui.error')
-    except urllib2.URLError as e:
+    except util.urlerr.urlerror as e:
         err = _('URLError: %s') % str(e.reason)
         try:
             import ssl  # Python 2.6 or backport for 2.5

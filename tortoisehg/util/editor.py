@@ -65,7 +65,7 @@ def _findeditor(repo, files):
         mf = match.match(repo.root, '', [pat])
         toolpath = _findtool(ui, tool)
         if mf(files[0]) and toolpath:
-            return (tool, procutil.shellquote(toolpath))
+            return tool, procutil.shellquote(toolpath)
 
     # then editor-tools
     tools = {}
@@ -84,29 +84,29 @@ def _findeditor(repo, files):
         if editor not in names:
             # if tortoisehg.editor does not match an editor-tools entry, take
             # the value directly
-            return (None, editor)
+            return None, editor
         # else select this editor as highest priority (may still use another if
         # it is not found on this machine)
         tools.insert(0, (None, editor))
     for p, t in tools:
         toolpath = _findtool(ui, t)
         if toolpath:
-            return (t, procutil.shellquote(toolpath))
+            return t, procutil.shellquote(toolpath)
 
     # fallback to potential CLI editor
     editor = ui.geteditor()
-    return (None, editor)
+    return None, editor
 
 def detecteditor(repo, files):
     'returns tuple of editor tool path and arguments'
     name, pathorconfig = _findeditor(repo, files)
     if name is None:
-        return (pathorconfig, None, None, None)
+        return pathorconfig, None, None, None
     else:
         args = _toolstr(repo.ui, name, "args")
         argsln = _toolstr(repo.ui, name, "argsln")
         argssearch = _toolstr(repo.ui, name, "argssearch")
-        return (pathorconfig, args, argsln, argssearch)
+        return pathorconfig, args, argsln, argssearch
 
 def findeditors(ui):
     seen = set()

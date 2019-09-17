@@ -10,6 +10,10 @@ from __future__ import absolute_import
 
 import os
 
+from mercurial import (
+    pycompat,
+)
+
 from .qtcore import (
     pyqtSignal,
     pyqtSlot,
@@ -95,7 +99,7 @@ class InitWidget(cmdui.AbstractCmdWidget):
             self._dest_edit.setText(path)
 
     def destination(self):
-        return unicode(self._dest_edit.text()).strip()
+        return pycompat.unicode(self._dest_edit.text()).strip()
 
     def _buildCommand(self):
         cfgs = []

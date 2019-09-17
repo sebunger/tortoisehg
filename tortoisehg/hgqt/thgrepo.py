@@ -36,6 +36,7 @@ from mercurial import (
     hg,
     localrepo,
     node,
+    pycompat,
     subrepo,
 )
 
@@ -191,7 +192,7 @@ class RepoWatcher(QObject):
         'Add files to watcher that may have been added or replaced'
         existing = [f for f, (_flag, watched) in self._filesmap.items()
                     if watched and f in self._laststats]
-        files = [unicode(f) for f in self._fswatcher.files()]
+        files = [pycompat.unicode(f) for f in self._fswatcher.files()]
         for f in existing:
             if hglib.tounicode(f) not in files:
                 self._ui.debug('add file to watcher: %s\n' % f)
@@ -461,7 +462,7 @@ class RepoAgent(QObject):
 
     def setOverlay(self, url):
         """Switch to bundle or union repository overlaying this"""
-        url = unicode(url)
+        url = pycompat.unicode(url)
         if self._overlayurl == url:
             return
         repo = hg.repository(self._baserepo.ui, hglib.fromunicode(url))
@@ -694,7 +695,7 @@ class RepoManager(QObject):
 
     @pyqtSlot(str)
     def _tryCloseRepoAgent(self, path):
-        path = unicode(path)
+        path = pycompat.unicode(path)
         agent, refcount = self._openagents[path]
         if refcount > 0:
             # repo may be reopen before its services stopped
@@ -728,7 +729,7 @@ class RepoManager(QObject):
 
     @pyqtSlot(str)
     def _mapBusyChanged(self, path):
-        agent, _refcount = self._openagents[unicode(path)]
+        agent, _refcount = self._openagents[pycompat.unicode(path)]
         self.busyChanged.emit(path, agent.isBusy())
 
     @pyqtSlot(cmdcore.ProgressMessage)

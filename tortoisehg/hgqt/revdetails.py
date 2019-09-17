@@ -358,11 +358,14 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
         rev = self.ctx.rev()
-        if (isinstance(self.ctx.rev(), int) and len(self.repo) <= self.ctx.rev()
-            or (rev is not None  # wctxrev in repo raises TypeError
-                and rev not in self.repo
-                and rev not in self.repo.thgmqunappliedpatches)):
-            rev = 'tip'
+        if isinstance(self.ctx.rev(), int):
+            if len(self.repo) <= self.ctx.rev():
+                rev = 'tip'
+        elif rev is not None:  # None in isrevsymbol() raises ProgrammingError
+            if scmutil.isrevsymbol(self.repo, rev):
+                rev = scmutil.revsymbol(self.repo, rev).rev()
+            elif rev not in self.repo.thgmqunappliedpatches:
+                rev = 'tip'
         self.onRevisionSelected(rev)
 
     @pyqtSlot(QUrl)

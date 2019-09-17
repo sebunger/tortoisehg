@@ -124,8 +124,8 @@ class AboutDialog(QDialog):
             vers = ".".join([str(x) for x in tuple])
             return vers
         thgv = (_('version %s') % version.version())
-        libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') % \
-              (hglib.hgversion, make_version(sys.version_info[0:3]),
+        libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') %
+                (hglib.hgversion, make_version(sys.version_info[0:3]),
               PYQT_VERSION_STR, QT_VERSION_STR))
         par = ('<p style=\" margin-top:0px; margin-bottom:6px;\">'
                 '<span style=\"font-size:%spt; font-weight:600;\">'
@@ -216,7 +216,7 @@ class LicenseDialog(QDialog):
             with open(paths.get_license_path(), 'rb') as fp:
                 lic = fp.read()
             self.lic_txt.setPlainText(lic)
-        except (IOError):
+        except IOError:
             pass
 
         bbox = QDialogButtonBox(self)

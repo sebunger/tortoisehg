@@ -23,6 +23,7 @@ from mercurial import (
     error,
     hg,
     node,
+    pycompat,
     util,
 )
 
@@ -291,7 +292,7 @@ class RepoItem(RepoTreeItem):
         self._basenode = basenode
 
     def setShortName(self, uname):
-        uname = unicode(uname)
+        uname = pycompat.unicode(uname)
         if uname != self._shortname:
             self._shortname = uname
 
@@ -354,10 +355,10 @@ class RepoItem(RepoTreeItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(unicode(a.value('', 'root')),
-                  unicode(a.value('', 'shortname')),
+        obj = cls(pycompat.unicode(a.value('', 'root')),
+                  pycompat.unicode(a.value('', 'shortname')),
                   node.bin(str(a.value('', 'basenode'))),
-                  unicode(a.value('', 'sharedpath')))
+                  pycompat.unicode(a.value('', 'sharedpath')))
         _undumpChild(xr, parent=obj, undump=_undumpSubrepoItem)
         return obj
 
@@ -433,9 +434,9 @@ class RepoItem(RepoTreeItem):
                 rootpath = hglib.tounicode(repo.root)
             else:
                 rootpath = self._root
-            warningMessage = (_('An exception happened while loading the ' \
-                'subrepos of:<br><br>"%s"<br><br>') + \
-                _('The exception error message was:<br><br>%s<br><br>') +\
+            warningMessage = (_('An exception happened while loading the '
+                'subrepos of:<br><br>"%s"<br><br>') +
+                _('The exception error message was:<br><br>%s<br><br>') +
                 _('Click OK to continue or Abort to exit.')) \
                 % (rootpath, hglib.tounicode(e.message))
             res = qtlib.WarningMsgBox(_('Error loading subrepos'),
@@ -543,7 +544,7 @@ class AlienSubrepoItem(RepoItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(unicode(a.value('', 'root')),
+        obj = cls(pycompat.unicode(a.value('', 'root')),
                   str(a.value('', 'repotype')))
         xr.skipCurrentElement()  # no child
         return obj
@@ -588,7 +589,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def setData(self, column, value):
         if column == 0:
-            self.name = unicode(value)
+            self.name = pycompat.unicode(value)
             return True
         return False
 
@@ -617,7 +618,7 @@ class RepoGroupItem(RepoTreeItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(unicode(a.value('', 'name')))
+        obj = cls(pycompat.unicode(a.value('', 'name')))
         _undumpChild(xr, parent=obj)
         return obj
 

@@ -12,6 +12,10 @@ import os
 import re
 import weakref
 
+from mercurial import (
+    pycompat,
+)
+
 from .qsci import (
     QSCINTILLA_VERSION,
     QsciLexerProperties,
@@ -428,7 +432,7 @@ class Scintilla(ScintillaCompat):
             flags = 0
             if icase:
                 flags |= re.IGNORECASE
-            pat = re.compile(unicode(match).encode('utf-8'), flags)
+            pat = re.compile(pycompat.unicode(match).encode('utf-8'), flags)
         except re.error:
             return  # it could be partial pattern while user typing
 
@@ -449,7 +453,7 @@ class Scintilla(ScintillaCompat):
         #             p, len(m.group(0).encode('utf-8')))
         #
         # but it doesn't to avoid possible performance issue.
-        for m in pat.finditer(unicode(self.text()).encode('utf-8')):
+        for m in pat.finditer(pycompat.unicode(self.text()).encode('utf-8')):
             self.SendScintilla(self.SCI_INDICATORFILLRANGE,
                                m.start(), m.end() - m.start())
             line = self.lineIndexFromPosition(m.start())[0]
@@ -474,7 +478,7 @@ class Scintilla(ScintillaCompat):
 
     def setDefaultEolMode(self):
         if self.lines():
-            mode = qsciEolModeFromLine(unicode(self.text(0)))
+            mode = qsciEolModeFromLine(pycompat.unicode(self.text(0)))
         else:
             mode = qsciEolModeFromOs()
         self.setEolMode(mode)
@@ -679,8 +683,8 @@ class KeyPressInterceptor(QObject):
 
     def __init__(self, parent=None, keys=None, keyseqs=None):
         super(KeyPressInterceptor, self).__init__(parent)
-        self._keys = set((Qt.Key_Escape,))
-        self._keyseqs = set((QKeySequence.Refresh,))
+        self._keys = {Qt.Key_Escape}
+        self._keyseqs = {QKeySequence.Refresh}
         if keys:
             self._keys.update(keys)
         if keyseqs:
@@ -782,7 +786,7 @@ def writeFile(editor, filename, encoding=None):
     text = editor.text()
     try:
         if encoding:
-            data = unicode(text).encode(encoding)
+            data = pycompat.unicode(text).encode(encoding)
         else:
             data = hglib.fromunicode(text)
     except UnicodeEncodeError as inst:

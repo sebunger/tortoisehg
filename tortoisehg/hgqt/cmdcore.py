@@ -196,7 +196,7 @@ def _fixprocenv(proc):
         # make sure hg process can look up our modules
         pypath = hglib.tounicode(thgroot)
         if env.contains('PYTHONPATH'):
-            pypath += os.pathsep + unicode(env.value('PYTHONPATH'))
+            pypath += os.pathsep + pycompat.unicode(env.value('PYTHONPATH'))
         env.insert('PYTHONPATH', pypath)
     proc.setProcessEnvironment(env)
 
@@ -753,12 +753,12 @@ class CmdSession(QObject):
     def _captureOutput(self, msg, label):
         if not label:
             return  # fast path
-        labelset = unicode(label).split()
+        labelset = pycompat.unicode(label).split()
         # typically ui.error is sent only once at end
         if 'ui.error' in labelset:
-            self._erroroutputs.append(unicode(msg))
+            self._erroroutputs.append(pycompat.unicode(msg))
         elif 'ui.warning' in labelset:
-            self._warningoutputs.append(unicode(msg))
+            self._warningoutputs.append(pycompat.unicode(msg))
 
 
 def nullCmdSession():

@@ -32,6 +32,9 @@ from i18n.msgfmt import Msgfmt
 thgcopyright = 'Copyright (C) 2010-2019 Steve Borho and others'
 hgcopyright = 'Copyright (C) 2005-2019 Matt Mackall and others'
 
+if sys.version_info[0] >= 3:
+    unicode = str  # pycompat.unicode
+
 def _walklocales():
     podir = 'i18n/tortoisehg'
     for po in os.listdir(podir):
@@ -555,12 +558,12 @@ def setup_windows(version):
     def qt4_plugins(subdir, *dlls):
         import PyQt4
         pluginsdir = os.path.join(os.path.dirname(PyQt4.__file__), 'plugins')
-        return (subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls])
+        return subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls]
 
     def qt5_plugins(subdir, *dlls):
         import PyQt5
         pluginsdir = os.path.join(os.path.dirname(PyQt5.__file__), 'plugins')
-        return (subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls])
+        return subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls]
 
     from tortoisehg.hgqt.qtcore import QT_API
     if QT_API == 'PyQt4':
@@ -648,7 +651,7 @@ def setup_osx(version):
     def qt5_plugins(subdir, *dlls):
         import PyQt5
         pluginsdir = os.path.join(os.path.dirname(PyQt5.__file__), 'plugins')
-        return (subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls])
+        return subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls]
 
     from tortoisehg.hgqt.qtcore import QT_API
     if QT_API == 'PyQt4':

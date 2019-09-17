@@ -26,6 +26,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     scmutil,
 )
 
@@ -172,7 +173,8 @@ class BisectDialog(QDialog):
 
     @pyqtSlot()
     def _verifyGood(self):
-        self.goodrev = self._lookupRevision(unicode(self._gle.text()).strip())
+        self.goodrev = self._lookupRevision(
+                           pycompat.unicode(self._gle.text()).strip())
         if self.goodrev is None:
             return
         self._gb.setEnabled(False)
@@ -183,7 +185,8 @@ class BisectDialog(QDialog):
 
     @pyqtSlot()
     def _verifyBad(self):
-        self.badrev = self._lookupRevision(unicode(self._ble.text()).strip())
+        self.badrev = self._lookupRevision(
+                          pycompat.unicode(self._ble.text()).strip())
         if self.badrev is None:
             return
         self._ble.setEnabled(False)

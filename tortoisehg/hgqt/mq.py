@@ -353,7 +353,7 @@ class PatchQueueActions(QObject):
         dlg.setTextValue(curvalue)
         dlg.setOkButtonText(oktext)
         if dlg.exec_():
-            return unicode(dlg.textValue())
+            return pycompat.unicode(dlg.textValue())
 
     def abort(self):
         self._cmdsession.abort()
@@ -796,7 +796,7 @@ class MQPatchesWidget(QDockWidget):
                       text=uguards)
         if not ok or new == uguards:
             return
-        self._patchActions.guardPatch(patch, unicode(new).split())
+        self._patchActions.guardPatch(patch, pycompat.unicode(new).split())
 
     @pyqtSlot()
     def _onDelete(self):
@@ -969,8 +969,7 @@ class OptionsDialog(QDialog):
                 cb.setChecked(False)
 
     def accept(self):
-        outopts = {}
-        outopts['force'] = self.forcecb.isChecked()
-        outopts['keep_changes'] = self.keepcb.isChecked()
+        outopts = {'force': self.forcecb.isChecked(),
+                   'keep_changes': self.keepcb.isChecked()}
         self.outopts = outopts
         QDialog.accept(self)

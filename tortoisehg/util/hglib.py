@@ -83,7 +83,7 @@ def tounicode(s):
     """
     if s is None:
         return None
-    if isinstance(s, unicode):
+    if isinstance(s, pycompat.unicode):
         return s
     if isinstance(s, encoding.localstr):
         return s._utf8.decode('utf-8')
@@ -104,7 +104,7 @@ def fromunicode(s, errors='strict'):
     """
     if s is None:
         return None
-    s = unicode(s)  # s can be QtCore.QString
+    s = pycompat.unicode(s)  # s can be QtCore.QString
     for enc in (_encoding, _fallbackencoding):
         try:
             l = s.encode(enc)
@@ -143,6 +143,15 @@ def fromutf(s):
         # can't round-trip
         return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
+
+if pycompat.ispy3:
+    def isbasestring(x):
+        return isinstance(x, str)
+    getcwdu = os.getcwd
+else:
+    def isbasestring(x):
+        return isinstance(x, basestring)
+    getcwdu = os.getcwdu
 
 def activebookmark(repo):
     return repo._activebookmark
@@ -948,7 +957,7 @@ def _formatspec(expr, args, lparse, listfuncs):
             return "'%s'" % escapeascii(arg)
         elif c == 'r':
             s = _stringify(arg)
-            if isinstance(s, unicode):
+            if isinstance(s, pycompat.unicode):
                 # 8-bit characters aren't important; just avoid encoding error
                 s = s.encode('utf-8')
             lparse(s)  # make sure syntax errors are confined

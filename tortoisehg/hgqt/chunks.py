@@ -466,7 +466,7 @@ class ChunksWidget(QWidget):
 
     @pyqtSlot(str, str)
     def displayFile(self, file, status):
-        if isinstance(file, unicode):
+        if isinstance(file, pycompat.unicode):
             file = hglib.fromunicode(file)
             status = hglib.fromunicode(status)
         if file:

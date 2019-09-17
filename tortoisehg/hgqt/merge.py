@@ -8,6 +8,10 @@
 
 from __future__ import absolute_import
 
+from mercurial import (
+    pycompat,
+)
+
 from .qtcore import (
     QSettings,
     QSize,
@@ -87,7 +91,8 @@ class MergeDialog(QWizard):
             self.setField(n, qs.value(n, False))
         repo = self._repoagent.rawRepo()
         n = 'autoresolve'
-        self.setField(n, repo.ui.configbool('tortoisehg', n,
+
+        self.setField(n, repo.ui.configbool(b'tortoisehg', pycompat.sysbytes(n),
                                             qtlib.readBool(qs, n, True)))
         qs.endGroup()
 
@@ -287,7 +292,7 @@ class SummaryPage(BasePage):
 
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
-        pctx = self.repo['.']
+        pctx = self.repo[b'.']
         self.localCsInfo.update(pctx)
 
     def canExit(self):
@@ -601,7 +606,7 @@ class CommitPage(BasePage):
 
         # username will be prompted as necessary by hg if ui.askusername
         user = self.opts.get('user')
-        if not self.repo.ui.configbool('ui', 'askusername'):
+        if not self.repo.ui.configbool(b'ui', b'askusername'):
             user = hglib.tounicode(qtlib.getCurrentUsername(self, self.repo,
                                                             self.opts))
             if not user:
@@ -617,7 +622,7 @@ class CommitPage(BasePage):
                 'date': hglib.tounicode(self.opts.get('date')),
                 }
         commandlines = [hglib.buildcmdargs('commit', **opts)]
-        pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
+        pushafter = self.repo.ui.config(b'tortoisehg', b'cipushafter')
         if pushafter:
             cmd = ['push', hglib.tounicode(pushafter)]
             commandlines.append(cmd)

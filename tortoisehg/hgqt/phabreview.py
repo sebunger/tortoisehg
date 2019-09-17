@@ -199,7 +199,7 @@ class PhabReviewDialog(QDialog):
 
         history = {r.username: r for r in self._getreviewerhistory()}
         for reviewer in history.values():
-            item = QStandardItem(unicode(reviewer))
+            item = QStandardItem(pycompat.unicode(reviewer))
             item.setData(reviewer)
 
             # Must add to source model since setDynamicSortFilter() is True.
@@ -217,7 +217,7 @@ class PhabReviewDialog(QDialog):
                 username = qtlib.readString(s, "username")
                 reviewer = history.get(username)
                 if reviewer:
-                    witem = QListWidgetItem(unicode(reviewer))
+                    witem = QListWidgetItem(pycompat.unicode(reviewer))
                     witem.setData(Qt.UserRole + 1, reviewer)
                     reviewers.addItem(witem)
             s.endArray()
@@ -436,7 +436,7 @@ class PhabReviewDialog(QDialog):
                 continue
 
             u = user(username, realname, roles)
-            item = QStandardItem(unicode(u))
+            item = QStandardItem(pycompat.unicode(u))
             item.setData(u)
 
             # Must add to source model since setDynamicSortFilter() is True.

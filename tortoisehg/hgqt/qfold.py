@@ -151,7 +151,7 @@ class QFoldDialog(QDialog):
 
     def options(self):
         return {'keep': self.keepchk.isChecked(),
-                'message': unicode(self.msgte.text())}
+                'message': pycompat.unicode(self.msgte.text())}
 
     def patches(self):
         return pycompat.maplist(hglib.tounicode, self.ulw.getPatchList())

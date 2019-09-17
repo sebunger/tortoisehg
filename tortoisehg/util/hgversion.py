@@ -16,7 +16,7 @@ except AttributeError:
     from mercurial import version
     hgversion = version.get_version()
 
-testedwith = '4.9 5.0'
+testedwith = '5.0 5.1'
 
 def checkhgversion(v):
     """range check the Mercurial version"""

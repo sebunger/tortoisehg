@@ -89,7 +89,7 @@ if os.name == 'nt':
         if wait:
             tref = time.time()
             tdelta = float(int(tref)) + 1.0 - tref
-            if (tdelta > 0.0):
+            if tdelta > 0.0:
                 time.sleep(tdelta)
 
         repo = hg.repository(ui, root) # a fresh repo object is needed
