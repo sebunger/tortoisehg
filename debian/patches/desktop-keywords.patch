@@ -1,12 +1,11 @@
 Description: add keywords to desktop file
 Author: Ludovico Cavedon <cavedon@deboan.org>
 
-Index: tortoisehg/contrib/thg.desktop
-===================================================================
---- tortoisehg.orig/contrib/thg.desktop	2013-10-13 15:59:56.508272408 -0700
-+++ tortoisehg/contrib/thg.desktop	2013-10-13 15:59:56.504272408 -0700
-@@ -6,3 +6,4 @@
+--- a/contrib/thg.desktop
++++ b/contrib/thg.desktop
+@@ -8,4 +8,5 @@
  Icon=thg_logo
  Exec=thg --nofork
  Categories=Development;RevisionControl;
 +Keywords=thg;hgtk;mercurial;vcs
+ X-Desktop-File-Install-Version=0.23
