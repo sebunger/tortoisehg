@@ -6,10 +6,18 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os, posixpath
-import cStringIO
 
-from mercurial import commands, error, match, patch, subrepo, util
-from mercurial import copies
+from mercurial import (
+    commands,
+    copies,
+    error,
+    patch,
+    pycompat,
+    scmutil,
+    subrepo,
+    util,
+)
+
 from mercurial.utils import (
     dateutil,
 )
@@ -218,9 +226,9 @@ class FileData(_AbstractFileData):
         errorprefix = _('File or diffs not displayed: ')
         try:
             self._readStatus(ctx, ctx2, wfile, status, changeselect, force)
-        except _BadContent, e:
+        except _BadContent as e:
             self.error = errorprefix + e.args[0] + '\n\n' + forcedisplaymsg
-        except (EnvironmentError, error.LookupError, error.Abort), e:
+        except (EnvironmentError, error.LookupError, error.Abort) as e:
             self.error = errorprefix + hglib.tounicode(str(e))
 
     def _checkMaxDiff(self, ctx, wfile, maxdiff, force):
@@ -242,7 +250,7 @@ class FileData(_AbstractFileData):
         return fctx, data
 
     def _checkRenamed(self, repo, ctx, pctx, wfile):
-        m = match.exact(repo, '', [wfile])
+        m = scmutil.matchfiles(repo, [wfile])
         copy = copies.pathcopies(pctx, ctx, match=m)
         oldname = copy.get(wfile)
         if not oldname:
@@ -257,7 +265,7 @@ class FileData(_AbstractFileData):
 
     def _readStatus(self, ctx, ctx2, wfile, status, changeselect, force):
         def getstatus(repo, n1, n2, wfile):
-            m = match.exact(repo.root, repo.getcwd(), [wfile])
+            m = scmutil.matchfiles(repo, [wfile])
             modified, added, removed = repo.status(n1, n2, match=m)[:3]
             if wfile in modified:
                 return 'M'
@@ -376,8 +384,8 @@ class FileData(_AbstractFileData):
         if changeselect:
             diffopts = patch.difffeatureopts(repo.ui)
             diffopts.git = True
-            m = match.exact(repo.root, repo.root, [wfile])
-            fp = cStringIO.StringIO()
+            m = scmutil.matchfiles(repo, [wfile])
+            fp = pycompat.bytesio()
 
             copy = {}
             if oldname != wfile:
@@ -401,7 +409,7 @@ class FileData(_AbstractFileData):
             values = []
             lines = 0
             for chunk in self.changes.hunks:
-                buf = cStringIO.StringIO()
+                buf = pycompat.bytesio()
                 chunk.write(buf)
                 chunk.excluded = False
                 val = buf.getvalue()
@@ -459,7 +467,7 @@ class DirData(_AbstractFileData):
         try:
             m = ctx.match(['path:%s' % self._wfile])
             self.diff = ''.join(ctx.diff(pctx, m))
-        except (EnvironmentError, error.Abort), e:
+        except (EnvironmentError, error.Abort) as e:
             self.error = hglib.tounicode(str(e))
             return
 
@@ -485,7 +493,7 @@ class PatchFileData(_AbstractFileData):
         try:
             self.diff = ctx.thgmqpatchdata(wfile)
             flags = ctx.flags(wfile)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.error = hglib.tounicode(str(e))
             return
 
@@ -526,7 +534,7 @@ class PatchDirData(_AbstractFileData):
         try:
             self.diff = ''.join([ctx.thgmqpatchdata(f) for f in ctx.files()
                                  if f.startswith(self._wfile + '/')])
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.error = hglib.tounicode(str(e))
             return
 
@@ -584,7 +592,7 @@ class SubrepoData(_AbstractFileData):
                         logOutput = _ui.popbuffer()
                         if not logOutput:
                             return _('Initial revision') + u'\n'
-                    except error.ParseError, e:
+                    except error.ParseError as e:
                         # Some mercurial versions have a bug that results in
                         # saving a subrepo node id in the .hgsubstate file
                         # which ends with a "+" character. If that is the
@@ -705,13 +713,13 @@ class SubrepoData(_AbstractFileData):
                         self.error = _('Not a Mercurial subrepo, not '
                                        'previewable')
                         return
-                except error.Abort, e:
+                except error.Abort as e:
                     self.error = (_('Error previewing subrepo: %s')
                                   % hglib.tounicode(str(e))) + u'\n\n'
                     self.error += _('Subrepo may be damaged or '
                                     'inaccessible.')
                     return
-                except KeyError, e:
+                except KeyError as e:
                     # Missing, incomplete or removed subrepo.
                     # Will be handled later as such below
                     pass
@@ -768,7 +776,7 @@ class SubrepoData(_AbstractFileData):
             if sactual:
                 lbl = ' <a href="repo:%%s">%s</a>' % _('open...')
                 self.flabel += lbl % hglib.tounicode(srepo.root)
-        except (EnvironmentError, error.RepoError, error.Abort), e:
+        except (EnvironmentError, error.RepoError, error.Abort) as e:
             self.error = _('Error previewing subrepo: %s') % \
                     hglib.tounicode(str(e))
 

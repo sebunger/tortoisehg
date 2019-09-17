@@ -10,6 +10,10 @@ from __future__ import absolute_import
 
 import os
 
+from mercurial import (
+    scmutil,
+)
+
 from .qtcore import (
     QEvent,
     QPoint,
@@ -40,6 +44,10 @@ from .qtgui import (
     QToolButton,
     QVBoxLayout,
     QWidget,
+)
+
+from mercurial import (
+    pycompat,
 )
 
 from ..util import hglib
@@ -350,7 +358,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
         rev = self.ctx.rev()
-        if (type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev()
+        if (isinstance(self.ctx.rev(), int) and len(self.repo) <= self.ctx.rev()
             or (rev is not None  # wctxrev in repo raises TypeError
                 and rev not in self.repo
                 and rev not in self.repo.thgmqunappliedpatches)):
@@ -433,7 +441,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def updateItemFileActions(self):
         model = self.filelist.model()
         selmodel = self.filelist.selectionModel()
-        selfds = map(model.fileData, selmodel.selectedIndexes())
+        selfds = pycompat.maplist(model.fileData, selmodel.selectedIndexes())
         self._fileactions.setFileDataList(selfds)
 
     @pyqtSlot()
@@ -594,7 +602,11 @@ class RevDetailsDialog(QDialog):
 
     @pyqtSlot(str)
     def linkActivated(self, link):
-        handlers = {'cset': self.setRev,
+        def _torev(cset):
+            return scmutil.revsymbol(self._repoagent.rawRepo(),
+                                     hglib.fromunicode(cset))
+
+        handlers = {'cset': lambda cset: self.setRev(_torev(cset)),
                     'repo': self._showRepoInWorkbench}
         if ':' in link:
             scheme, param = link.split(':', 1)

@@ -189,7 +189,7 @@ class RepoWatcher(QObject):
 
     def _addMissingPaths(self):
         'Add files to watcher that may have been added or replaced'
-        existing = [f for f, (_flag, watched) in self._filesmap.iteritems()
+        existing = [f for f, (_flag, watched) in self._filesmap.items()
                     if watched and f in self._laststats]
         files = [unicode(f) for f in self._fswatcher.files()]
         for f in existing:
@@ -291,7 +291,7 @@ class RepoWatcher(QObject):
                 pass
 
         curdata = {}
-        for readmeth, (_flag, path) in self._datamap.iteritems():
+        for readmeth, (_flag, path) in self._datamap.items():
             if path not in targetpaths:
                 continue
             last = self._laststats.get(path, -1)
@@ -308,13 +308,13 @@ class RepoWatcher(QObject):
 
     def _calculateChangeFlags(self, curstats, curdata):
         changeflags = 0
-        for path, (flag, _watched) in self._filesmap.iteritems():
+        for path, (flag, _watched) in self._filesmap.items():
             last = self._laststats.get(path, -1)
             cur = curstats.get(path, -1)
             if last != cur:
                 self._ui.debug(' stat: %s (%r -> %r)\n' % (path, last, cur))
                 changeflags |= flag
-        for readmeth, (flag, _path) in self._datamap.iteritems():
+        for readmeth, (flag, _path) in self._datamap.items():
             last = self._lastdata.get(readmeth)
             cur = curdata.get(readmeth)
             if last != cur:
@@ -718,7 +718,7 @@ class RepoManager(QObject):
 
     def repoRootPaths(self):
         """Return list of root paths of open repositories"""
-        return self._openagents.keys()
+        return list(self._openagents.keys())
 
     @pyqtSlot(int)
     def _mapRepositoryChanged(self, flags):
@@ -762,7 +762,7 @@ def _extendrepo(repo):
             if changeid in self.thgmqunappliedpatches:
                 q = self.mq # must have mq to pass the previous if
                 return genPatchContext(self, q.join(changeid), rev=changeid)
-            elif type(changeid) is str and '\0' not in changeid and \
+            elif isinstance(changeid, str) and '\0' not in changeid and \
                     os.path.isabs(changeid) and os.path.isfile(changeid):
                 return genPatchContext(repo, changeid)
 

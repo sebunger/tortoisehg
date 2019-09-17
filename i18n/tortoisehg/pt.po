@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
 "PO-Revision-Date: 2015-06-28 13:04+0000\n"
 "Last-Translator: lloco73 <Unknown>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:28+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:44+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Servisor de ícones de sobreposição do TortoiseHg"
@@ -27,7 +27,7 @@ msgstr "Saír"
 msgid "About"
 msgstr "Sobre"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -651,6 +651,12 @@ msgstr ""
 
 #, python-format
 msgid "corrupted command result: %r"
+msgstr ""
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
 msgstr ""
 
 #, python-format
@@ -2046,6 +2052,9 @@ msgstr "Todo o histórico"
 msgid "Report only the first match per file"
 msgstr "Reportar apenas a primeira correspondência por ficheiro"
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "Seguir cópias e renomeações"
 
@@ -2945,6 +2954,54 @@ msgstr ""
 msgid "Patch user:"
 msgstr ""
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr "Publicar &revisão"
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr ""
 "Definições inválidas. O servidor do quadro de revisão não está configurado"
@@ -3011,9 +3068,6 @@ msgstr "%p%"
 
 msgid "Connecting to Review Board..."
 msgstr "A ligar ao quadro de revisões..."
-
-msgid "Post &Review"
-msgstr "Publicar &revisão"
 
 msgid "Target:"
 msgstr "Destino:"
@@ -3115,31 +3169,6 @@ msgstr "Nova mensagem de patch:"
 
 msgid "Patches to fold"
 msgstr "Patches para arquivar"
-
-msgid "Rename Error"
-msgstr "Erro ao renomear"
-
-msgid "Could not rename existing patchfile"
-msgstr "Não foi possível renomear o ficheiro de patch existente"
-
-msgid "Could not delete existing patchfile"
-msgstr ""
-
-msgid "QRename - Check patchname"
-msgstr "QRename - Verificar nome do patch"
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr "O nome do patch <b>%s</b> já existe"
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr "Adicionar a extensão .OLD ao ficheiro de patch existente"
-
-msgid "Overwrite existing patchfile"
-msgstr "Sobrescrever o ficheiro de patch existente"
-
-msgid "Go back and change new patchname"
-msgstr ""
 
 msgid "&Undo"
 msgstr "An&ular"
@@ -3483,6 +3512,9 @@ msgstr ""
 
 msgid "Copy Error"
 msgstr "Erro ao copiar"
+
+msgid "Rename Error"
+msgstr "Erro ao renomear"
 
 msgid "Select Source File"
 msgstr ""
@@ -4211,6 +4243,9 @@ msgstr ""
 msgid "Post to Re&view Board..."
 msgstr ""
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr "Atualização &remota..."
 
@@ -4275,6 +4310,9 @@ msgid "&Prune Selected..."
 msgstr ""
 
 msgid "Post Selected to Review Board..."
+msgstr ""
+
+msgid "Post Selected to Phabricator..."
 msgstr ""
 
 msgid "Apply patch"
@@ -4387,6 +4425,13 @@ msgstr ""
 
 msgid "Unable to merge"
 msgstr "Não é possível fundir"
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
 
 msgid "You cannot merge a revision with itself"
 msgstr ""
@@ -5673,6 +5718,15 @@ msgid ""
 "newly-created repository."
 msgstr ""
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr "Workbench"
 
@@ -6428,14 +6482,18 @@ msgid "Changeset Link"
 msgstr ""
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -11532,13 +11590,6 @@ msgstr ""
 
 #~ msgid "A new version of TortoiseHg is ready for download!"
 #~ msgstr "Nova versão do tortoiseHg pronta a transferir!"
-
-#~ msgid ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
-#~ msgstr ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">ajuda "
-#~ "revsets</a>"
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "abortar: restauro do backup falhou, %s\n"

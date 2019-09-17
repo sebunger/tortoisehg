@@ -47,10 +47,9 @@ def run(_ui, *pats, **opts):
 
     if opts.get('show'):
         try:
-            f = open(cachefilepath(repo), 'rb')
-            for e in f:
-                _ui.status("%s %s\n" % (e[0], e[1:-1]))
-            f.close()
+            with open(cachefilepath(repo), 'rb') as f:
+                for e in f:
+                    _ui.status("%s %s\n" % (e[0], e[1:-1]))
         except IOError:
             _ui.status("*no status*\n")
         return

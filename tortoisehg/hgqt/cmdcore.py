@@ -13,6 +13,10 @@ import struct
 import sys
 import time
 
+from mercurial import (
+    pycompat,
+)
+
 from .qtcore import (
     QBuffer,
     QIODevice,
@@ -22,6 +26,10 @@ from .qtcore import (
     QTimer,
     pyqtSignal,
     pyqtSlot,
+)
+
+from mercurial import (
+    pycompat,
 )
 
 from ..util import (
@@ -68,6 +76,7 @@ class UiHandler(object):
     ChoiceInput = 3
 
     def __init__(self):
+        self._datain = None
         self._dataout = None
 
     def setPrompt(self, text, mode, default=None):
@@ -77,9 +86,24 @@ class UiHandler(object):
         # '' to use default; None to abort
         return ''
 
+    def setDataInputDevice(self, device):
+        # QIODevice to read data from; None to disable data input
+        self._datain = device
+
     def setDataOutputDevice(self, device):
         # QIODevice to write data output; None to disable capturing
         self._dataout = device
+
+    def inputAtEnd(self):
+        if not self._datain:
+            return True
+        return self._datain.atEnd()
+
+    def readInput(self, size):
+        # b'' for EOF; None for error (per PyQt's QIODevice.read() convention)
+        if not self._datain:
+            return b''
+        return self._datain.read(size)
 
     def writeOutput(self, data, label):
         if not self._dataout or label.startswith('ui.') or ' ui.' in label:
@@ -184,7 +208,7 @@ def _proccmdline(ui, exts):
     cmdline = list(paths.get_hg_command())
     for section, name, value in configs:
         cmdline.extend(('--config', '%s.%s=%s' % (section, name, value)))
-    return map(hglib.tounicode, cmdline)
+    return pycompat.maplist(hglib.tounicode, cmdline)
 
 
 class CmdProc(CmdWorker):
@@ -359,7 +383,7 @@ class CmdServer(CmdWorker):
         assert not self.isCommandRunning()
         try:
             data = hglib.fromunicode('\0'.join(cmdline))
-        except UnicodeEncodeError, inst:
+        except UnicodeEncodeError as inst:
             self._emitError(_('failed to encode command: %s') % inst)
             self._finishCommand(-1)
             return
@@ -437,7 +461,7 @@ class CmdServer(CmdWorker):
                     raise _ProtocolError(_('unexpected response on required '
                                            'channel %r') % ch)
                 chfunc(self, ch, dataorsize)
-        except _ProtocolError, inst:
+        except _ProtocolError as inst:
             self._emitError(inst.args[0])
             self.stopService()
         except Exception:
@@ -493,18 +517,31 @@ class CmdServer(CmdWorker):
             raise _ProtocolError(_('corrupted command result: %r') % data)
         self._finishCommand(ret)
 
+    def _processInputRequest(self, _ch, size):
+        data = self._uihandler.readInput(size)
+        if data is None:
+            self._emitError(_('error while reading from data input'))
+            self._writeBlock(b'')
+            return
+        if not data and not self._uihandler.inputAtEnd():
+            # TODO: should stop processing until readyRead()
+            self._emitError(_('asynchronous read is not implement yet'))
+        self._writeBlock(data)
+
     def _processLineRequest(self, _ch, size):
+        # TODO: if no prompt observed, this should be redirected to
+        # self._uihandler.readLineInput(size + 1)
         text = self._uihandler.getLineInput()
         if text is None:
             self._writeBlock('')
             return
         try:
             data = hglib.fromunicode(text) + '\n'
-        except UnicodeEncodeError, inst:
+        except UnicodeEncodeError as inst:
             self._emitError(_('failed to encode input: %s') % inst)
             self.abortCommand()
             return
-        for start in xrange(0, len(data), size):
+        for start in pycompat.xrange(0, len(data), size):
             self._writeBlock(data[start:start + size])
 
     _idlechtable = {
@@ -521,7 +558,7 @@ class CmdServer(CmdWorker):
         'o': _processOutput,
         'e': _processOutput,
         'r': _processCommandResult,
-        # implement 'I' (data input) channel if necessary
+        'I': _processInputRequest,
         'L': _processLineRequest,
         }
 
@@ -620,6 +657,13 @@ class CmdSession(QObject):
             self._dataoutrbuf.close()
             dataoutwbuf = None
         self.setOutputDevice(dataoutwbuf)
+
+    def setInputDevice(self, device):
+        """If set, data will be read from the specified device on data input
+        request"""
+        if self.isRunning():
+            raise RuntimeError('command already running')
+        self._uihandler.setDataInputDevice(device)
 
     def setOutputDevice(self, device):
         """If set, data outputs will be sent to the specified device"""
@@ -800,7 +844,7 @@ class CmdAgent(QObject):
             self.busyChanged.emit(self.isBusy())
 
     def _cleanupWaitingSession(self):
-        for i in reversed(xrange(1, len(self._sessqueue))):
+        for i in reversed(pycompat.xrange(1, len(self._sessqueue))):
             sess = self._sessqueue[i]
             if sess.isFinished():
                 del self._sessqueue[i]

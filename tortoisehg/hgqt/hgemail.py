@@ -28,6 +28,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
 )
 from mercurial.utils import (
     dateutil,
@@ -111,7 +112,7 @@ class EmailDialog(QDialog):
         def itercombo(w):
             if w.currentText():
                 yield w.currentText()
-            for i in xrange(w.count()):
+            for i in pycompat.xrange(w.count()):
                 if w.itemText(i) != w.currentText():
                     yield w.itemText(i)
 

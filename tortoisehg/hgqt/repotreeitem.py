@@ -407,7 +407,7 @@ class RepoItem(RepoTreeItem):
                         self._valid = False
                         invalidRepoList += invalidSubrepoList
 
-        except (EnvironmentError, error.RepoError, error.Abort), e:
+        except (EnvironmentError, error.RepoError, error.Abort) as e:
             # Add the repo to the list of repos/subrepos
             # that could not be open
             self._valid = False
@@ -415,7 +415,7 @@ class RepoItem(RepoTreeItem):
                 sri._valid = False
                 invalidRepoList.append(abssubpath)
             invalidRepoList.append(hglib.fromunicode(self._root))
-        except Exception, e:
+        except Exception as e:
             # If any other sort of exception happens, show the corresponding
             # error message, but do not crash!
             # Note that we _also_ will mark the offending repos as invalid

@@ -9,6 +9,10 @@ from __future__ import absolute_import
 
 import weakref
 
+from mercurial import (
+    pycompat,
+)
+
 from .qsci import (
     QsciScintilla,
 )
@@ -246,7 +250,8 @@ class LogWidget(qscilib.ScintillaCompat):
     def appendLog(self, msg, label):
         """Append log text to the last line; scrolls down to there"""
         self.append(msg)
-        self._setmarker(xrange(self.lines() - unicode(msg).count('\n') - 1,
+        self._setmarker(pycompat.xrange(self.lines() - unicode(msg).count('\n')
+                                        - 1,
                                self.lines() - 1), unicode(label))
         self.setCursorPosition(self.lines() - 1, 0)
 

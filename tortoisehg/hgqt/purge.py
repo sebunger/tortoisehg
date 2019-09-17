@@ -135,7 +135,7 @@ class PurgeDialog(QDialog):
                     else:
                         trash = []
                     self.files = stat[4], stat[5], trash
-                except Exception, e:
+                except Exception as e:
                     self.error = str(e)
 
         self.th = CheckThread(self)
@@ -228,7 +228,7 @@ class PurgeThread(QThread):
     def run(self):
         try:
             self.failures = self.purge(self.root, self.opts)
-        except Exception, e:
+        except Exception as e:
             self.failures = None
             self.showMessage.emit(hglib.tounicode(str(e)))
 

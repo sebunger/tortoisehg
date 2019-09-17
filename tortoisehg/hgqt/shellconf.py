@@ -8,15 +8,15 @@
 
 from __future__ import absolute_import
 
-from _winreg import (
-    CreateKey,
-    HKEY_CURRENT_USER,
-    OpenKey,
-    QueryValueEx,
-    REG_DWORD,
-    REG_SZ,
-    SetValueEx,
-)
+from mercurial.windows import winreg
+
+CreateKey = winreg.CreateKey
+HKEY_CURRENT_USER = winreg.HKEY_CURRENT_USER
+OpenKey = winreg.OpenKey
+QueryValueEx = winreg.QueryValueEx
+REG_DWORD = winreg.REG_DWORD
+REG_SZ = winreg.REG_SZ
+SetValueEx = winreg.SetValueEx
 
 from .qtgui import (
     QApplication,
@@ -224,7 +224,7 @@ class ShellConfigWindow(QDialog):
         self.load_shell_configs()
 
     def load_shell_configs(self):
-        for name, info in vars.iteritems():
+        for name, info in vars.items():
             default, regkey, regtype, evalfunc, wrfunc, cbattr = info
             try:
                 hkey = OpenKey(HKEY_CURRENT_USER, 'Software\\' + regkey)
@@ -270,7 +270,7 @@ class ShellConfigWindow(QDialog):
         hkey = CreateKey(HKEY_CURRENT_USER, "Software\\" + THGKEY)
         SetValueEx(hkey, PROMOTEDITEMS, 0, REG_SZ, ','.join(promoted))
 
-        for name, info in vars.iteritems():
+        for name, info in vars.items():
             default, regkey, regtype, evalfunc, wrfunc, cbattr = info
             if cbattr == None:
                 continue

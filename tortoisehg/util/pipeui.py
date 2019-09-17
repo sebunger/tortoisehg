@@ -38,6 +38,8 @@ import time
 
 from mercurial import (
     error,
+    scmutil,
+    util,
 )
 
 from tortoisehg.util import hgversion
@@ -200,13 +202,10 @@ def _extenduiclass(parcls):
         _lastprogresstopic = None
         _lastprogresstime = 0
 
-        def _writenobuf(self, *args, **opts):
+        def _writenobuf(self, dest, *args, **opts):
             label = opts.get('label', '')
-            super(pipeui, self)._writenobuf(*_packmsgs(args, label), **opts)
-
-        def write_err(self, *args, **opts):
-            label = opts.get('label', '')
-            super(pipeui, self).write_err(*_packmsgs(args, label), **opts)
+            super(pipeui, self)._writenobuf(dest, *_packmsgs(args, label),
+                                            **opts)
 
         def prompt(self, msg, default='y'):
             fullmsg = _packprompt(msg, default)
@@ -227,6 +226,8 @@ def _extenduiclass(parcls):
             prompt = self.label(prompt or _('password: '), 'ui.getpass')
             return super(pipeui, self).getpass(prompt, default)
 
+        # TODO: progress handler can be extracted to new class, and pass its
+        # instance to scmutil.progress() per makeprogress() call.
         def progress(self, topic, pos, item='', unit='', total=None):
             now = time.time()
             if (topic == self._lastprogresstopic and pos is not None
@@ -241,6 +242,9 @@ def _extenduiclass(parcls):
             self._lastprogresstime = now
             msg = _packprogress(topic, pos, item, unit, total)
             self.write_err(msg, label='ui.progress')
+
+        def makeprogress(self, topic, unit='', total=None):
+            return scmutil.progress(self, self.progress, topic, unit, total)
 
         def label(self, msg, label):
             return _labeledstr(msg, label)

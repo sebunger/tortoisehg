@@ -1,16 +1,16 @@
-# Hungarian translation for tortoisehg
-# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# Finnish translation for tortoisehg
+# Copyright (c) 2018 Rosetta Contributors and Canonical Ltd 2018
 # This file is distributed under the same license as the tortoisehg package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
 "POT-Creation-Date: 2019-07-16 12:01-0300\n"
-"PO-Revision-Date: 2018-09-22 13:55+0000\n"
-"Last-Translator: Zsolt Bölöny <bolony.zsolt@gmail.com>\n"
-"Language-Team: Hungarian <hu@li.org>\n"
+"PO-Revision-Date: 2018-07-23 21:54+0000\n"
+"Last-Translator: Nikolay Korotkiy <sikmir@gmail.com>\n"
+"Language-Team: Finnish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,13 +19,13 @@ msgstr ""
 "X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
-msgstr "TortoiseHg Overlay Icon Server"
+msgstr ""
 
 msgid "Exit"
-msgstr "Kilépés"
+msgstr "Lopeta"
 
 msgid "About"
-msgstr "Névjegy"
+msgstr "Tietoja"
 
 msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
@@ -34,14 +34,14 @@ msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr ""
 
 msgid "You can visit our site here"
-msgstr "Itt látogathatja meg honlapunkat"
+msgstr ""
 
 msgid "&License"
-msgstr "&Licensz"
+msgstr "&Lisenssi"
 
 #, python-format
 msgid "version %s"
-msgstr "Verzió: %s"
+msgstr "versio %s"
 
 #, python-format
 msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
@@ -49,92 +49,92 @@ msgstr ""
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr "TortoiseHg új verziója (%s) letölthető!"
+msgstr ""
 
 msgid "License"
-msgstr "Licensz"
+msgstr "Lisenssi"
 
 msgid "= Working Directory Parent ="
-msgstr "= Munkakönyvtár szülője ="
+msgstr ""
 
 msgid "Directory of files"
-msgstr "Fájlok könyvtára"
+msgstr ""
 
 msgid "Tar archives"
-msgstr "Tar archívumok"
+msgstr ""
 
 msgid "Uncompressed tar archive"
-msgstr "Tömörítetlen tar archívum"
+msgstr ""
 
 msgid "Bzip2 tar archives"
-msgstr "Bzip2 tar archívumok"
+msgstr ""
 
 msgid "Tar archive compressed using bzip2"
-msgstr "Tar archívum bzip2-vel tömörítve"
+msgstr ""
 
 msgid "Gzip tar archives"
-msgstr "Gzip tar archívumok"
+msgstr ""
 
 msgid "Tar archive compressed using gzip"
-msgstr "Tar archívum gzip-pel tömörítve"
+msgstr ""
 
 msgid "Zip archives"
-msgstr "Zip archívumok"
+msgstr ""
 
 msgid "Uncompressed zip archive"
-msgstr "Tömörítetlen zip archívum"
+msgstr ""
 
 msgid "Zip archive compressed using deflate"
-msgstr "Zip archívum deflate tömörítéssel"
+msgstr ""
 
 msgid "Revision:"
-msgstr "Revízió:"
+msgstr ""
 
 msgid "All files in this revision"
-msgstr "Minden fájl ebben a revízióban"
+msgstr ""
 
 msgid "Only files modified/created in this revision"
-msgstr "Csak az ezen revízióban módosított/létrehozott fájlok"
+msgstr ""
 
 msgid "Only files modified/created since:"
-msgstr "Csak az ekkortól módosított/létrehozott fájlok:"
+msgstr ""
 
 msgid "Archive Content:"
-msgstr "Archívum tartalma:"
+msgstr ""
 
 msgid "Recurse into subrepositories"
 msgstr ""
 
 msgid "Browse..."
-msgstr "Tallózás…"
+msgstr ""
 
 msgid "Destination path:"
-msgstr "Cél útvonal:"
+msgstr ""
 
 msgid "Archive types:"
-msgstr "Archívum típusok:"
+msgstr ""
 
 msgid "Hg command:"
-msgstr "Hg parancs:"
+msgstr ""
 
 msgid "Select Destination Folder"
-msgstr "Célkönyvtár kiválasztása"
+msgstr ""
 
 msgid "Select Destination File"
-msgstr "Célfájl kiválasztása"
+msgstr ""
 
 msgid "All files (*)"
-msgstr "Minden fájl (*)"
+msgstr "Kaikki tiedostot (*)"
 
 msgid "Duplicate Name"
-msgstr "Duplikált név"
+msgstr ""
 
 #, python-format
 msgid "The destination \"%s\" already exists as a file!"
-msgstr "A cél \"%s\" már létezik fájlként!"
+msgstr ""
 
 msgid "Confirm Overwrite"
-msgstr "Felülírás megerősítése"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -142,9 +142,6 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
-"A(z) \"%s\" könyvtár nem üres!\n"
-"\n"
-"Szeretné felülírni?"
 
 #, python-format
 msgid ""
@@ -152,56 +149,51 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
-"A(z) \"%s\" fájl már létezik!\n"
-"\n"
-"Szeretné felülírni?"
 
 #, python-format
 msgid "The destination \"%s\" already exists as a folder!"
-msgstr "A cél \"%s\" már létezik könyvtárként!"
+msgstr ""
 
 #, python-format
 msgid "Archive - %s"
-msgstr "Archiválás - %s"
+msgstr ""
 
 msgid "&Archive"
-msgstr "&Archiválás"
+msgstr ""
 
 msgid "Backout requires a parent revision"
-msgstr "A visszavonáshoz szükség van egy szülő revízióra"
+msgstr ""
 
 msgid "Cannot backout change on a different branch"
-msgstr "Más ágon levő változtatást nem lehet visszavonni"
+msgstr ""
 
 #, python-format
 msgid "Backout - %s"
-msgstr "Visszavonás - %s"
+msgstr ""
 
 msgid "Prepare to backout"
-msgstr "Felkészülés visszavonásra"
+msgstr ""
 
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
-"Ellenőrizze a visszavonás revízióját és győződjön meg a munkakönyvtár "
-"tisztaságáról."
 
 msgid "Backing out a parent revision is a single step operation"
-msgstr "Egy szülő revízió visszavonása egy lépéses művelet"
+msgstr ""
 
 msgid "Backout revision"
-msgstr "Visszavonás revíziója"
+msgstr ""
 
 msgid "Not a head, backout will create a new head!"
 msgstr ""
 
 msgid "Current local revision"
-msgstr "Jelenlegi helyi revízió"
+msgstr ""
 
 msgid "Working directory status"
-msgstr "Munkakönyvtár állapota"
+msgstr ""
 
 msgid "Checking..."
-msgstr "Ellenőrzés…"
+msgstr ""
 
 msgid ""
 "Before backout, you must <a href=\"commit\"><b>commit</b></a>, <a href="
@@ -210,24 +202,22 @@ msgid ""
 msgstr ""
 
 msgid "Automatically resolve merge conflicts where possible"
-msgstr "Automatikus összefűzés-ütközés feloldás"
+msgstr ""
 
 msgid "<b>Uncommitted local changes are detected</b>"
 msgstr ""
 
 msgid "Clean"
-msgstr "Tiszta"
+msgstr ""
 
 msgid "Backing out, then merging..."
-msgstr "Visszavonás, majd összefűzés..."
+msgstr ""
 
 msgid "All conflicting files will be marked unresolved."
-msgstr "Minden ütköző fájl feloldatlanként lesz megjelölve."
+msgstr ""
 
 msgid "Automatically advance to next page when backout and merge are complete."
 msgstr ""
-"Automatikus továbblépés a következő lapra amikor a visszavonás és összefűzés "
-"elkészül."
 
 #, python-format
 msgid ""
@@ -242,13 +232,13 @@ msgid "Commit backout and merge results"
 msgstr ""
 
 msgid "Parents"
-msgstr "Szülők"
+msgstr ""
 
 msgid "Working Directory"
-msgstr "Munkakönyvtár"
+msgstr ""
 
 msgid "Working Directory (merged)"
-msgstr "Munkakönyvtár (összefűzött)"
+msgstr ""
 
 msgid "Commit message"
 msgstr ""
@@ -260,19 +250,19 @@ msgid "Backed out changeset: "
 msgstr ""
 
 msgid "Confirm Discard Message"
-msgstr "Elvetési üzenet megerősítése"
+msgstr ""
 
 msgid "Discard current backout message?"
-msgstr "Elveti a jelenlegi visszavonási üzenetet?"
+msgstr ""
 
 msgid "Use English backout message"
-msgstr "Angol visszavonási üzenet használata"
+msgstr ""
 
 msgid "Backing out and committing..."
 msgstr ""
 
 msgid "Please wait while making backout."
-msgstr "Kérjük, várjon a visszavonás elkészültéig."
+msgstr ""
 
 msgid "Committing..."
 msgstr ""
@@ -281,128 +271,128 @@ msgid "Please wait while committing merged files."
 msgstr ""
 
 msgid "Finished"
-msgstr "Kész"
+msgstr ""
 
 msgid "Backout changeset"
 msgstr ""
 
 #, python-format
 msgid "Bisect - %s"
-msgstr "Felezés - %s"
+msgstr ""
 
 msgid "Accept"
-msgstr "Elfogadás"
+msgstr "Hyväksy"
 
 msgid "Known good revision:"
-msgstr "Ismert jó revízió:"
+msgstr ""
 
 msgid "Known bad revision:"
-msgstr "Ismert rossz revízió:"
+msgstr ""
 
 msgid "Discard local changes (revert --all)"
-msgstr "Helyi változtatások elvetése (revert --all)"
+msgstr ""
 
 msgid "Revision is &Good"
-msgstr "A revízió &jó"
+msgstr ""
 
 msgid "Revision is &Bad"
-msgstr "A revízió &rossz"
+msgstr ""
 
 msgid "&Skip this Revision"
-msgstr "&Ezen revízió kihagyása"
+msgstr ""
 
 msgid "Close"
-msgstr "Bezárás"
+msgstr "Sulje"
 
 msgid "Error encountered."
-msgstr "Hiba történt."
+msgstr ""
 
 msgid "Culprit found."
-msgstr "Megvan a bűnös."
+msgstr ""
 
 msgid "Revision"
-msgstr "Revízió"
+msgstr ""
 
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr "Revízió tesztelése és találatok jelentése. (jó/rossz/kihagyás)"
+msgstr ""
 
 #, python-format
 msgid "%s (hint: %s)"
-msgstr "%s (tipp: %s)"
+msgstr "%s (vihje: %s)"
 
 msgid "Bookmark:"
-msgstr "Könyvjelző:"
+msgstr ""
 
 msgid "New Name:"
-msgstr "Új név:"
+msgstr "Uusi nimi:"
 
 msgid "Activate:"
-msgstr "Aktiválás:"
+msgstr ""
 
 msgid "&Add"
-msgstr "&Hozzáadás"
+msgstr "&Lisää"
 
 msgid "Re&name"
-msgstr "Át&nevezés"
+msgstr ""
 
 msgid "&Remove"
-msgstr "&Törlés"
+msgstr "&Poista"
 
 msgid "&Move"
-msgstr "&Áthelyezés"
+msgstr "&Siirrä"
 
 #, python-format
 msgid "Bookmark - %s"
-msgstr "Könyvjelző - %s"
+msgstr ""
 
 #, python-format
 msgid "A bookmark named \"%s\" already exists"
-msgstr "A(z) \"%s\" könyvjelző már létezik"
+msgstr ""
 
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr "'%s' könyvjelző hozzáadva"
+msgstr ""
 
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr "A(z) \"%s\" könyvjelző nem létezik"
+msgstr ""
 
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr "'%s' könyvjelző áthelyezve"
+msgstr ""
 
 #, python-format
 msgid "Bookmark '%s' does not exist"
-msgstr "'%s' könyvjelző nem létezik"
+msgstr ""
 
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr "'%s' könyvjelző eltávolítva"
+msgstr ""
 
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr "'%s' könyvjelző átnevezve erre: '%s'"
+msgstr ""
 
 msgid "TortoiseHg Bookmark Sync"
 msgstr ""
 
 msgid "Outgoing Bookmarks"
-msgstr "Kimenő könyvjelzők"
+msgstr ""
 
 msgid "&Push Bookmark"
 msgstr ""
 
 msgid "&Remove Bookmark"
-msgstr "Könyvjelző &eltávolítása"
+msgstr ""
 
 msgid "Incoming Bookmarks"
-msgstr "Bejövő könyvjelzők"
+msgstr ""
 
 msgid "P&ull Bookmark"
 msgstr ""
 
 msgid "R&emove Bookmark"
-msgstr "Könyvjelző &eltávolítása"
+msgstr ""
 
 #, python-format
 msgid "Pushed local bookmark: %s"
@@ -414,125 +404,120 @@ msgstr ""
 
 #, python-format
 msgid "Removed remote bookmark: %s"
-msgstr "Távoli könyvjelző eltávolítva: %s"
+msgstr ""
 
 #, python-format
 msgid "Removed local bookmark: %s"
-msgstr "Helyi könyvjelző eltávolítva: %s"
+msgstr ""
 
 #, python-format
 msgid "%s - branch operation"
-msgstr "%s - ág művelet"
+msgstr ""
 
 msgid "Select branch of merge commit"
-msgstr "Összeolvasztási ág kiválasztása"
+msgstr ""
 
 msgid "Changes take effect on next commit"
-msgstr "Változások hatása a következő kommitkor"
+msgstr ""
 
 msgid "No branch changes"
-msgstr "Nincsenek változtatások az ágon"
+msgstr ""
 
 msgid "Open a new named branch"
-msgstr "Nyisson meg egy új elnevezett ágat"
+msgstr ""
 
 msgid "Close current branch"
-msgstr "Jelenlegi ág lezárása"
+msgstr ""
 
 #, python-format
 msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 msgstr ""
-"Kérjük, jelentse ezt a hibát a <a href=\"%s\">hibakövető rendszerünkben</a>"
 
 msgid "Checking for updates..."
-msgstr "Frissítések keresése..."
+msgstr ""
 
 msgid "Copy"
-msgstr "Másolás"
+msgstr "Kopioi"
 
 msgid "Quit"
-msgstr "Kilépés"
+msgstr ""
 
 msgid "TortoiseHg Bug Report"
-msgstr "TortoiseHg Hibajelentés"
+msgstr ""
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr "Ajánlott egy újabb TortoiseHg verzióra frissíteni."
+msgstr ""
 
 msgid "Your TortoiseHg is up to date."
-msgstr "A TortoiseHg naprakész."
+msgstr ""
 
 msgid "Save error report to"
-msgstr "Hibajelentés mentése ide:"
+msgstr ""
 
 msgid "Text files (*.txt)"
-msgstr "Szövegfájlok (*.txt)"
+msgstr "Tekstitiedostot (*.txt)"
 
 msgid "Error writing file"
-msgstr "Hiba a fájl íráskor"
+msgstr ""
 
 msgid "TortoiseHg Error"
-msgstr "TortoiseHg Hiba"
+msgstr ""
 
 msgid ""
 "If you still have trouble, <a href=\"#bugreport\">please file a bug report</"
 "a>."
 msgstr ""
-"Ha továbbra is gond van, <a href=\"#bugreport\">kérjük küldjön egy "
-"hibajelentést</a>."
 
 msgid "Visual Diff"
-msgstr "Vizuális összehasonlítás"
+msgstr ""
 
 msgid "View file changes in external diff tool"
-msgstr "Fájlváltozások megtekintése külső összehasonlító eszközzel"
+msgstr ""
 
 msgid "Edit Local"
-msgstr "Helyi szerkesztése"
+msgstr ""
 
 msgid "Edit current file in working copy"
 msgstr ""
 
 msgid "Revert to Revision"
-msgstr "Visszaállítás revízióra"
+msgstr ""
 
 msgid "Revert file(s) to contents at this revision"
-msgstr "Fájl(ok) tartalmának visszaállítása erre a revízióra"
+msgstr ""
 
 msgid "Patch failed to apply"
-msgstr "Nem sikerült alkalmazni a foltot"
+msgstr ""
 
 msgid "Manually resolve rejected chunks?"
-msgstr "Szeretné manuálisan feloldani a visszautasított darabokat?"
+msgstr ""
 
 msgid "Edit patched file and rejects?"
 msgstr ""
 
 msgid "No deletable chunks"
-msgstr "Nincsenek törölhető darabok"
+msgstr ""
 
 msgid "Completely remove file from patch?"
 msgstr ""
 
 msgid "Revert all file changes?"
-msgstr "Visszavonja az összes fájlváltoztatást?"
+msgstr ""
 
 msgid "No chunks remain"
-msgstr "Nem maradt több darab"
+msgstr ""
 
 msgid "file has been deleted, refresh"
-msgstr "fájl törölve, frissítés"
+msgstr ""
 
 msgid "file has been modified, refresh"
-msgstr "fájl módosítva, frissítés"
+msgstr ""
 
 msgid "Unable to merge chunks"
-msgstr "Nem lehet összeolvasztani a darabokat"
+msgstr ""
 
 msgid "Add or remove patches must be merged in the working directory"
 msgstr ""
-"Foltok hozzáadása vagy törlése előtt, be kell olvasztani őket a "
-"munkakönyvtárba"
 
 msgid "Unable to remove"
 msgstr ""
@@ -542,16 +527,14 @@ msgid ""
 "Unable to remove file %s,\n"
 "permission denied"
 msgstr ""
-"Nem lehet törölni a(z) %s fájlt,\n"
-"hozzáférés megtagadva"
 
 msgctxt "files"
 msgid "All"
-msgstr "Összes"
+msgstr "Kaikki"
 
 msgctxt "files"
 msgid "None"
-msgstr "Egyik sem"
+msgstr ""
 
 msgid "Toggle display of text search bar"
 msgstr ""
@@ -561,89 +544,89 @@ msgstr ""
 
 #, python-format
 msgid "Chunks selected: %d / %d"
-msgstr "Kiválasztott darabok: %d / %d"
+msgstr ""
 
 msgid "Please wait while the file is opened ..."
-msgstr "Kérjük várjon, amíg megnyílik a fájl..."
+msgstr ""
 
 msgid "Source:"
-msgstr "Forrás:"
+msgstr ""
 
 msgid "Destination:"
-msgstr "Cél:"
+msgstr ""
 
 msgid "Options"
-msgstr "Opciók"
+msgstr ""
 
 msgid "Clone to revision:"
-msgstr "Klón a verzióhoz:"
+msgstr ""
 
 msgid "A revision identifier, bookmark, tag or branch name"
 msgstr ""
 
 msgid "Do not update the new working directory"
-msgstr "Ne frissítse az új munkakönyvtárat"
+msgstr ""
 
 msgid "Use pull protocol to copy metadata"
-msgstr "Pull protokol alkalmazása a metaadatok másolásához"
+msgstr ""
 
 msgid "Clone with minimal processing"
-msgstr "Klónozás minimális feldolgozással"
+msgstr ""
 
 msgid "Include patch queue"
 msgstr ""
 
 msgid "Use proxy server"
-msgstr "Proxy kiszolgáló használata"
+msgstr ""
 
 msgid "Do not verify host certificate"
 msgstr ""
 
 msgid "Remote command:"
-msgstr "Távoli parancs:"
+msgstr ""
 
 msgid "Use largefiles"
 msgstr ""
 
 msgid "Start revision:"
-msgstr "Kezdő revízió:"
+msgstr ""
 
 msgid "Select source repository"
-msgstr "Forrás tároló kiválasztása"
+msgstr ""
 
 msgid "Select destination repository"
-msgstr "Cél tároló kiválasztása"
+msgstr ""
 
 msgid "Select patch folder"
-msgstr "Folt könyvtár kiválasztása"
+msgstr ""
 
 #, python-format
 msgid "Clone - %s"
-msgstr "Klónozás - %s"
+msgstr ""
 
 msgid "&Clone"
-msgstr "&Klónozás"
+msgstr ""
 
 msgid "failed to start command\n"
-msgstr "nem sikerült elindítani a parancsot\n"
+msgstr ""
 
 msgid "error while running command\n"
-msgstr "hiba a parancs futtatása során\n"
+msgstr ""
 
 #, python-format
 msgid "process exited unexpectedly with code %d"
-msgstr "folyamat váratlanul kilépett a(z) %d kóddal"
+msgstr ""
 
 #, python-format
 msgid "failed to encode command: %s"
-msgstr "nem sikerült kódolni a parancsot: %s"
+msgstr ""
 
 #, python-format
 msgid "timed out while reading: %r..."
-msgstr "időtúllépés olvasáskor: %r..."
+msgstr ""
 
 msgid "timed out waiting for message"
-msgstr "időtúllépés üzenetre várakozás közben"
+msgstr ""
 
 #, python-format
 msgid "unexpected response on required channel %r"
@@ -651,7 +634,7 @@ msgstr ""
 
 #, python-format
 msgid "invalid \"hello\" message: %r"
-msgstr "érvénytelen \"hello\" üzenet: %r"
+msgstr ""
 
 msgid "no \"runcommand\" capability"
 msgstr ""
@@ -671,11 +654,11 @@ msgid "failed to encode input: %s"
 msgstr ""
 
 msgid "Terminated by user"
-msgstr "Felhasználó által megszakítva"
+msgstr ""
 
 #, python-format
 msgid "[command terminated by user %s]"
-msgstr "[parancs %s felhasználó által megszakítva]"
+msgstr ""
 
 #, python-format
 msgid "[command interrupted %s]"
@@ -683,55 +666,53 @@ msgstr ""
 
 #, python-format
 msgid "[command returned code %d %%s]"
-msgstr "[a parancs a(z) %d %%s kóddal tért vissza]"
+msgstr ""
 
 #, python-format
 msgid "[command completed successfully %s]"
-msgstr "[parancs sikeresen végrehajtva %s]"
+msgstr ""
 
 msgid "Running..."
-msgstr "Fut..."
+msgstr ""
 
 msgid "Failed!"
-msgstr "Sikertelen!"
+msgstr ""
 
 msgid "Clea&r Log"
-msgstr "Napló &törlése"
+msgstr ""
 
 msgid "TortoiseHg Prompt"
-msgstr "TortoiseHG Parancssor"
+msgstr ""
 
 msgid "Show Detail"
-msgstr "Részletek megjelenítése"
+msgstr ""
 
 msgid "Hide Detail"
-msgstr "Részletek elrejtése"
+msgstr ""
 
 msgid "Confirm Exit"
-msgstr "Kilépés megerősítése"
+msgstr ""
 
 msgid ""
 "Mercurial command is still running.\n"
 "Are you sure you want to terminate?"
 msgstr ""
-"Egy Mercurial parancs még fut.\n"
-"Biztosan meg akarja szakítani?"
 
 msgid "&Run"
-msgstr "&Futtatás"
+msgstr ""
 
 msgid "TortoiseHg Command Dialog"
 msgstr ""
 
 msgid "Command Error"
-msgstr "Parancshiba"
+msgstr ""
 
 #, python-format
 msgid "[Code: %d]"
-msgstr "[Kód: %d]"
+msgstr ""
 
 msgid "Merge"
-msgstr "Összefésülés"
+msgstr ""
 
 #, python-format
 msgid "Merge with %s"
@@ -759,10 +740,10 @@ msgid "Commit Dialog Toolbar"
 msgstr ""
 
 msgid "Branch: "
-msgstr "Ág: "
+msgstr ""
 
 msgid "Copy message"
-msgstr "Üzenet másolása"
+msgstr ""
 
 msgid "Copy one of the recent commit messages"
 msgstr ""
@@ -771,7 +752,7 @@ msgid "Show Issues"
 msgstr ""
 
 msgid "Please wait..."
-msgstr "Kis türelmet…"
+msgstr ""
 
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
@@ -784,7 +765,7 @@ msgid "Show Issues..."
 msgstr ""
 
 msgid "Stop"
-msgstr "Leállítás"
+msgstr ""
 
 msgid "### patch name ###"
 msgstr ""
@@ -793,25 +774,25 @@ msgid "Commit changes"
 msgstr ""
 
 msgid "Commit"
-msgstr "Eltárolás (commit)"
+msgstr ""
 
 msgid "Amend current revision"
-msgstr "Jelenlegi revízió módosítása"
+msgstr ""
 
 msgid "Amend"
-msgstr "Módosítás"
+msgstr ""
 
 msgid "Create a new patch"
-msgstr "Új folt létrehozása"
+msgstr ""
 
 msgid "QNew"
-msgstr "QNew"
+msgstr ""
 
 msgid "Refresh current patch"
-msgstr "Jelenlegi folt frissítése"
+msgstr ""
 
 msgid "QRefresh"
-msgstr "QRefresh"
+msgstr ""
 
 msgid "Confirm Branch Change"
 msgstr ""
@@ -821,43 +802,43 @@ msgid "Named branch \"%s\" already exists, last used in revision %d\n"
 msgstr ""
 
 msgid "Restart &Branch"
-msgstr "&Ág újraindítása"
+msgstr ""
 
 msgid "&Commit to current branch"
 msgstr ""
 
 msgid "Cancel"
-msgstr "Mégse"
+msgstr "Peru"
 
 msgid "Confirm New Branch"
-msgstr "Új Ág Jóváhagyása"
+msgstr ""
 
 #, python-format
 msgid "Create new named branch \"%s\" with this commit?\n"
 msgstr ""
 
 msgid "Create &Branch"
-msgstr "&Ág létrehozása"
+msgstr ""
 
 msgid "Close Branch: "
-msgstr "Ág lezárása: "
+msgstr ""
 
 msgid "New Branch: "
-msgstr "Új ág: "
+msgstr ""
 
 #, python-format
 msgid "<b>Selected Options:</b> %s"
 msgstr ""
 
 msgid "Parent:"
-msgstr "Szülő:"
+msgstr ""
 
 msgid "Patch name:"
-msgstr "Folt neve:"
+msgstr ""
 
 #, python-format
 msgid "Close %s branch"
-msgstr "%s ág lezárása"
+msgstr ""
 
 #, python-format
 msgid "Rollback commit to revision %d"
@@ -867,7 +848,7 @@ msgid "Confirm Undo"
 msgstr ""
 
 msgid "Discard current commit message?"
-msgstr "Elveti az aktuális kommit üzenetet?"
+msgstr ""
 
 msgid "Message Translation Failure"
 msgstr ""
@@ -886,7 +867,7 @@ msgid "Nothing Committed"
 msgstr ""
 
 msgid "Please enter commit message"
-msgstr "Kérjük adjun meg kommit üzenetet."
+msgstr ""
 
 msgid ""
 "No issue link was found in the commit message.  The commit message should "
@@ -1008,55 +989,55 @@ msgstr ""
 
 msgctxt "action button"
 msgid "Commit"
-msgstr "Commit"
+msgstr ""
 
 msgid "Compress is complete, old history untouched"
 msgstr ""
 
 msgid "must be specified repository"
-msgstr "repository megadása kötelező"
+msgstr ""
 
 msgid "must be specified 'type' in style"
-msgstr "'típus' megadása kötelező a stílusban"
+msgstr ""
 
 msgid "Git Commit:"
 msgstr ""
 
 msgid "Summary:"
-msgstr "Összegzés:"
+msgstr ""
 
 msgid "User:"
-msgstr "Felhasználó:"
+msgstr ""
 
 msgid "Date:"
-msgstr "Dátum:"
+msgstr ""
 
 msgid "Age:"
-msgstr "Kor:"
+msgstr ""
 
 msgid "Branch:"
-msgstr "Ág:"
+msgstr ""
 
 msgid "Close:"
 msgstr ""
 
 msgid "Tags:"
-msgstr "Címkék:"
+msgstr "Tagit:"
 
 msgid "Graft:"
 msgstr ""
 
 msgid "Transplant:"
-msgstr "Átültet:"
+msgstr ""
 
 msgid "Obsolete state:"
 msgstr ""
 
 msgid "Perforce:"
-msgstr "Szükségképpen:"
+msgstr ""
 
 msgid "Subversion:"
-msgstr "Subversion:"
+msgstr ""
 
 msgid "Converted From:"
 msgstr ""
@@ -1065,17 +1046,17 @@ msgid "Original Parent:"
 msgstr ""
 
 msgid "No items to display"
-msgstr "Nincs megjeleníthető elem"
+msgstr ""
 
 msgid "Use compact view"
-msgstr "Kompakt nézet használata"
+msgstr ""
 
 msgid "Patch:"
-msgstr "Javítás:"
+msgstr ""
 
 #, python-format
 msgid "Displaying %(count)d of %(total)d items"
-msgstr "Megjelenítve %(count)d a %(total)d-ból"
+msgstr ""
 
 msgid "Select a GUI location to edit:"
 msgstr ""
@@ -1108,10 +1089,10 @@ msgid "Delete Tool"
 msgstr ""
 
 msgid "Type"
-msgstr ""
+msgstr "Tyyppi"
 
 msgid "Name"
-msgstr ""
+msgstr "Nimi"
 
 msgid "Command"
 msgstr ""
@@ -1448,7 +1429,7 @@ msgid "Save file as it appeared at this revision"
 msgstr ""
 
 msgid "Save file to"
-msgstr "Fájlba mentés"
+msgstr ""
 
 msgid "&Edit Local"
 msgstr ""
@@ -1693,7 +1674,7 @@ msgid "changeset: %s (not found on subrepository)"
 msgstr ""
 
 msgid "From:"
-msgstr "Feladó:"
+msgstr ""
 
 msgid ""
 "[WARNING] Missing changed subrepository. Update to this revision to clone it."
@@ -1794,13 +1775,13 @@ msgid "Traditional Chinese"
 msgstr ""
 
 msgid "Korean"
-msgstr ""
+msgstr "korea"
 
 msgid "Japanese"
-msgstr ""
+msgstr "japani"
 
 msgid "Thai"
-msgstr ""
+msgstr "thai"
 
 msgid "Central and Eastern Europe"
 msgstr ""
@@ -1809,25 +1790,25 @@ msgid "Cyrillic"
 msgstr ""
 
 msgid "Russian"
-msgstr ""
+msgstr "venäjä"
 
 msgid "Ukrainian"
-msgstr ""
+msgstr "ukraina"
 
 msgid "Greek"
-msgstr ""
+msgstr "kreikka"
 
 msgid "Turkish"
-msgstr ""
+msgstr "turkki"
 
 msgid "Arabic"
-msgstr ""
+msgstr "arabia"
 
 msgid "Hebrew"
-msgstr ""
+msgstr "heprea"
 
 msgid "Vietnamese"
-msgstr ""
+msgstr "vietnam"
 
 msgid "Baltic"
 msgstr ""
@@ -1984,7 +1965,7 @@ msgid "Graft"
 msgstr ""
 
 msgid "Abort"
-msgstr "Megszakít"
+msgstr ""
 
 #, python-format
 msgid "Graft - %s"
@@ -2036,13 +2017,13 @@ msgid "### regular expression search pattern ###"
 msgstr ""
 
 msgid "Regexp:"
-msgstr "REg. kif.:"
+msgstr ""
 
 msgid "Ignore case"
-msgstr "Nem nagybetűérzékeny"
+msgstr ""
 
 msgid "Search"
-msgstr "Keresés"
+msgstr ""
 
 msgid "Working Copy"
 msgstr ""
@@ -2057,13 +2038,13 @@ msgid "Match whole words only"
 msgstr ""
 
 msgid "Follow copies and renames"
-msgstr "Alábbiak másolása és átnevezése"
+msgstr ""
 
 msgid "Includes:"
-msgstr "Tartalma:"
+msgstr ""
 
 msgid "Excludes:"
-msgstr "Kizártak:"
+msgstr ""
 
 msgid ""
 "Comma separated list of exclusion file patterns. Exclusion patterns are "
@@ -2124,16 +2105,16 @@ msgid "Annotate &File"
 msgstr ""
 
 msgid "File"
-msgstr "Fájl"
+msgstr "Tiedosto"
 
 msgid "Line"
-msgstr "Sor"
+msgstr ""
 
 msgid "Rev"
-msgstr "Rev"
+msgstr ""
 
 msgid "User"
-msgstr "Felhasználó"
+msgstr ""
 
 msgid "Match Text"
 msgstr ""
@@ -2143,7 +2124,7 @@ msgstr ""
 
 #, python-format
 msgid "Detect Copies/Renames in %s"
-msgstr "Másolatok/Átnevezések keresése itt: %s"
+msgstr ""
 
 msgid "<b>Unrevisioned Files</b>"
 msgstr ""
@@ -2162,7 +2143,7 @@ msgid "Uncheck to consider all revisioned files for copy sources"
 msgstr ""
 
 msgid "Find Renames"
-msgstr "Átnevezések Keresése"
+msgstr ""
 
 msgid "Find copy and/or rename sources"
 msgstr ""
@@ -2212,10 +2193,10 @@ msgid "%d%%"
 msgstr ""
 
 msgid "Source"
-msgstr "Forrás"
+msgstr ""
 
 msgid "Dest"
-msgstr "Cél"
+msgstr ""
 
 msgid "% Match"
 msgstr ""
@@ -2227,16 +2208,16 @@ msgid "Email"
 msgstr ""
 
 msgid "To:"
-msgstr "Címzett:"
+msgstr ""
 
 msgid "Cc:"
-msgstr "Másolat:"
+msgstr ""
 
 msgid "In-Reply-To:"
-msgstr "Eredeti üzenet a válasz üzenetben"
+msgstr ""
 
 msgid "Message identifier to reply to, for threading"
-msgstr "Üzenet azonosító a válaszban a szálkövetés megtartása miatt"
+msgstr ""
 
 msgid "Flag:"
 msgstr ""
@@ -2246,48 +2227,36 @@ msgid ""
 "programs.  They include a header which contains the most important changeset "
 "metadata."
 msgstr ""
-"Hg javítások (export parancsal generálva) kompatibilisek a legtöbb javító "
-"programmal. Tartalmaza a fejlécet, ami magábafoglalja a legfontosabb "
-"változások metaadatait."
 
 msgid "Send changesets as Hg patches"
-msgstr "Válzotások küldése mint HG javítása"
+msgstr ""
 
 msgid ""
 "Git patches can describe binary files, copies, and permission changes, but "
 "recipients may not be able to use them if they are not using git or "
 "Mercurial."
 msgstr ""
-"Git javítások bináris fájlokat tartalmazhatnak, teljes másolatokat és "
-"jogosultság változásokat, előfordulhat, hogy a fogadó nem képes feldolgoznia "
-"a fájlokat ha nem git-et vagy Mercurial-t használ"
 
 msgid "Use extended (git) patch format"
-msgstr "Kiterjestett (git) javító formátum használata"
+msgstr ""
 
 msgid ""
 "Stripping Mercurial header removes username and parent information.  Only "
 "useful if recipient is not using Mercurial (and does not like to see the "
 "headers)."
 msgstr ""
-"Egyszerűsített Mercurial header nem tartalmazza a felhasználóinevet és a "
-"szülő információka. Csak akkor hasznos, ha a fogadó nem használ Mercurial-t "
-"és nem szereti ha a fejlécinformációk megjelenítődnek."
 
 msgid "Plain, do not prepend Hg header"
-msgstr "Hh fejléc nélkül"
+msgstr ""
 
 msgid ""
 "Bundles store complete changesets in binary form. Upstream users can pull "
 "from them. This is the safest way to send changes to recipient Mercurial "
 "users."
 msgstr ""
-"A csomag tartalmazza a teljes változás listát bináris formátumban. A "
-"csővégén lévő felhasználók letudják tölteni azokat. Ez a legbiztonságosabb "
-"módja a változások küldésének másik Mercurial felhasználónak."
 
 msgid "Send single binary bundle, not patches"
-msgstr "Egy bináris csomag küldése, nem javítás"
+msgstr ""
 
 msgid "send patches as part of the email body"
 msgstr ""
@@ -2296,22 +2265,22 @@ msgid "body"
 msgstr ""
 
 msgid "send patches as attachments"
-msgstr "javítás küldése mellékletként"
+msgstr ""
 
 msgid "attach"
-msgstr "csatolás"
+msgstr ""
 
 msgid "send patches as inline attachments"
-msgstr "javítás küldése beágyazott levélelemként"
+msgstr ""
 
 msgid "inline"
-msgstr "beágyazott"
+msgstr ""
 
 msgid "add diffstat output to messages"
-msgstr "különbözeti statistika hozzáadása az üzenetekhez"
+msgstr ""
 
 msgid "diffstat"
-msgstr "diffstat"
+msgstr ""
 
 msgid ""
 "Patch series description is sent in initial summary email with [PATCH 0 of "
@@ -2325,7 +2294,7 @@ msgid "Write patch series (bundle) description"
 msgstr ""
 
 msgid "Subject:"
-msgstr "Tárgy:"
+msgstr ""
 
 msgid "Changesets"
 msgstr ""
@@ -2343,17 +2312,17 @@ msgid "Preview"
 msgstr ""
 
 msgid "&Settings"
-msgstr ""
+msgstr "A&setukset"
 
 msgid "Send &Email"
 msgstr ""
 
 msgid "&Close"
-msgstr "&Bezár"
+msgstr ""
 
 #, python-format
 msgid "Ignore filter - %s"
-msgstr "Figyelmen kívülhagyott szűrő - %s"
+msgstr ""
 
 msgid "Glob"
 msgstr ""
@@ -2362,10 +2331,10 @@ msgid "Regexp"
 msgstr ""
 
 msgid "Add"
-msgstr "Hozzáadás"
+msgstr ""
 
 msgid "Edit File"
-msgstr "Fájl szerkesztése"
+msgstr ""
 
 msgid "<b>Ignore Filter</b>"
 msgstr ""
@@ -2386,10 +2355,10 @@ msgid "Ignore "
 msgstr ""
 
 msgid "Invalid glob expression"
-msgstr "Hibás glob kifejezés"
+msgstr ""
 
 msgid "Invalid regexp expression"
-msgstr "Hibás reguláris kifejezés"
+msgstr ""
 
 msgid "Unable to read repository status"
 msgstr ""
@@ -2544,16 +2513,16 @@ msgid "Summary (first description line)"
 msgstr ""
 
 msgid "Description"
-msgstr ""
+msgstr "Kuvaus"
 
 msgid "Author"
 msgstr ""
 
 msgid "Date"
-msgstr "Dátum"
+msgstr ""
 
 msgid "Files"
-msgstr "Fájlok"
+msgstr "Tiedostot"
 
 msgid "Diff contents"
 msgstr ""
@@ -2722,7 +2691,7 @@ msgid "New patch queue name"
 msgstr ""
 
 msgid "Create"
-msgstr "Létrehozás"
+msgstr ""
 
 msgid "Rename Patch Queue"
 msgstr ""
@@ -2732,7 +2701,7 @@ msgid "Rename patch queue '%s' to"
 msgstr ""
 
 msgid "Rename"
-msgstr "Átnevezés"
+msgstr ""
 
 msgid "Delete Patch Queue"
 msgstr ""
@@ -2763,7 +2732,7 @@ msgid "no guards"
 msgstr ""
 
 msgid "Patch Queue"
-msgstr "Javítási sor"
+msgstr ""
 
 msgctxt "MQ QPush"
 msgid "Push"
@@ -3005,10 +2974,10 @@ msgid "Review Board"
 msgstr ""
 
 msgid "Password:"
-msgstr ""
+msgstr "Salasana:"
 
 msgid "Error"
-msgstr "Hiba"
+msgstr "Virhe"
 
 #, python-format
 msgid "Review draft posted to %s\n"
@@ -3214,13 +3183,13 @@ msgid "EOL &Mode"
 msgstr ""
 
 msgid "&Windows"
-msgstr ""
+msgstr "&Windows"
 
 msgid "&Unix"
-msgstr ""
+msgstr "&Unix"
 
 msgid "&Mac"
-msgstr ""
+msgstr "&Mac"
 
 msgid "&Auto-Complete"
 msgstr ""
@@ -3229,7 +3198,7 @@ msgid "### regular expression ###"
 msgstr ""
 
 msgid "Regular expression search pattern"
-msgstr "Reguláris kif. kereső mintája"
+msgstr ""
 
 msgid "Wrap search"
 msgstr ""
@@ -3302,10 +3271,10 @@ msgid "Repository Error"
 msgstr ""
 
 msgid "No visual editor configured"
-msgstr "Visuális szerkesztő nincs konfigurálva"
+msgstr ""
 
 msgid "Please configure a visual editor."
-msgstr "Kérjük konfigurálja a vizuális szerkesztőt"
+msgstr ""
 
 msgid "Editor launch failure"
 msgstr ""
@@ -3358,11 +3327,11 @@ msgid "Checkmark files to remove"
 msgstr ""
 
 msgid "Remove"
-msgstr "Eltávolítás"
+msgstr "Poista"
 
 #, python-format
 msgid "%s - hg %s"
-msgstr ""
+msgstr "%s - hg %s"
 
 msgid "Do not save backup files (*.orig)"
 msgstr ""
@@ -3470,7 +3439,7 @@ msgid "All unsaved changes will be lost."
 msgstr ""
 
 msgid "Warning"
-msgstr "Figyelem"
+msgstr ""
 
 msgid ""
 "You have marked all rejected patch chunks as resolved yet you have not "
@@ -3502,7 +3471,7 @@ msgid "Select Source File"
 msgstr ""
 
 msgid "Select Source Folder"
-msgstr "Válasszon forrás könyvtárt"
+msgstr ""
 
 msgid "Source does not exist."
 msgstr ""
@@ -3528,7 +3497,7 @@ msgid "Rename - %s"
 msgstr ""
 
 msgid "Show all"
-msgstr "Összes megjelenítése"
+msgstr ""
 
 msgid "### revision set query ###"
 msgstr ""
@@ -3592,7 +3561,7 @@ msgstr ""
 
 msgctxt "column header"
 msgid "Description"
-msgstr ""
+msgstr "Kuvaus"
 
 msgctxt "column header"
 msgid "Author"
@@ -3600,7 +3569,7 @@ msgstr ""
 
 msgctxt "column header"
 msgid "Tags"
-msgstr ""
+msgstr "Tagit"
 
 msgctxt "column header"
 msgid "Latest tags"
@@ -3852,10 +3821,10 @@ msgid ""
 msgstr ""
 
 msgid "&Yes"
-msgstr "&Igen"
+msgstr ""
 
 msgid "&No"
-msgstr "&Nem"
+msgstr ""
 
 msgid "Remove the selected repository?"
 msgstr ""
@@ -4033,7 +4002,7 @@ msgid "Found %d incoming changesets"
 msgstr ""
 
 msgid "Pull"
-msgstr "Lehúz"
+msgstr ""
 
 msgid "Pull incoming changesets into your repository"
 msgstr ""
@@ -4449,7 +4418,7 @@ msgid "&Make secret"
 msgstr ""
 
 msgid "&Cancel"
-msgstr "&Mégsem"
+msgstr ""
 
 msgid "Do you really want to <i>force</i> a backwards phase transition?"
 msgstr ""
@@ -4649,7 +4618,7 @@ msgid "Unresolved conflicts remain. Are you sure?"
 msgstr ""
 
 msgid "E&xit"
-msgstr ""
+msgstr "Lo&peta"
 
 msgid "Ext"
 msgstr ""
@@ -4724,10 +4693,10 @@ msgid "null revision (i.e. remove file(s))"
 msgstr ""
 
 msgid "Changeset:"
-msgstr "Változás:"
+msgstr ""
 
 msgid "Child:"
-msgstr "Gyerek:"
+msgstr ""
 
 msgid "Predecessors:"
 msgstr ""
@@ -4883,8 +4852,6 @@ msgid ""
 "\n"
 "Caught keyboard interrupt, aborting.\n"
 msgstr ""
-"\n"
-"Billentyűzet bevitel megszakít, leállít.\n"
 
 #, python-format
 msgid "failed to fork GUI process: %s\n"
@@ -4892,7 +4859,7 @@ msgstr ""
 
 #, python-format
 msgid "can not read file \"%s\". Ignored.\n"
-msgstr "fájl nem olvasható \"%s\". Figyelmen kívül hagyva.\n"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -4914,7 +4881,7 @@ msgstr ""
 
 #, python-format
 msgid "abort: %s!\n"
-msgstr "megszakít: %s!\n"
+msgstr ""
 
 #, python-format
 msgid "abort: %s\n"
@@ -4928,30 +4895,28 @@ msgid "option --config may not be abbreviated!"
 msgstr ""
 
 msgid "invalid arguments"
-msgstr "hibás argomentum"
+msgstr ""
 
 #, python-format
 msgid "unrecognized profiling format '%s' - Ignored\n"
-msgstr "nem felismerhető nyomkövetési formátúm '%s' - Figyelmen kívül hagyva\n"
+msgstr ""
 
 msgid ""
 "lsprof not available - install from http://codespeak.net/svn/user/arigo/hack/"
 "misc/lsprof/"
 msgstr ""
-"lsprof nem elérhető - telepíthető a http://codespeak.net/svn/user/arigo/hack/"
-"misc/lsprof/ címről"
 
 msgid "repository root directory or symbolic path name"
-msgstr "a repository gyökér könyvtára vagy a szimbolikus elérési útvonal neve"
+msgstr ""
 
 msgid "enable additional output"
-msgstr "kiegészítő kimenet engedélyezése"
+msgstr ""
 
 msgid "suppress output"
-msgstr "kimenet elrejtése"
+msgstr ""
 
 msgid "display help and exit"
-msgstr "súgó mutatása és kilépés"
+msgstr ""
 
 msgid "set/override config option (use 'section.name=value')"
 msgstr ""
@@ -4960,10 +4925,10 @@ msgid "enable debugging output"
 msgstr ""
 
 msgid "start debugger"
-msgstr "debugger indítása"
+msgstr ""
 
 msgid "print command execution profile"
-msgstr "nyomtatási parancs végrehajtási profílja"
+msgstr ""
 
 msgid "do not fork GUI process"
 msgstr ""
@@ -4972,7 +4937,7 @@ msgid "always fork GUI process"
 msgstr ""
 
 msgid "read file list from file"
-msgstr "fájl lista olvasása fájlból"
+msgstr ""
 
 msgid "read file list from file encoding utf-8"
 msgstr ""
@@ -5051,10 +5016,10 @@ msgid "thg clone [OPTION]... [SOURCE] [DEST]"
 msgstr ""
 
 msgid "record user as committer"
-msgstr "felhasználó felvétele mint kommitáló"
+msgstr ""
 
 msgid "record datecode as commit date"
-msgstr "dátum kd használata mint jóváhagyási dátum"
+msgstr ""
 
 msgid "thg commit [OPTIONS] [FILE]..."
 msgstr ""
@@ -5129,7 +5094,7 @@ msgid "thg help [COMMAND]"
 msgstr ""
 
 msgid "global options:"
-msgstr "globális beállítás"
+msgstr ""
 
 msgid "use \"thg help\" for the full list of commands"
 msgstr ""
@@ -5150,25 +5115,21 @@ msgid ""
 "list of commands:\n"
 "\n"
 msgstr ""
-"parancsok listája:\n"
-"\n"
 
 #, python-format
 msgid ""
 "\n"
 "aliases: %s\n"
 msgstr ""
-"\n"
-"aliasok: %s\n"
 
 msgid "(no help text available)"
-msgstr "(súgó nem található)"
+msgstr ""
 
 msgid "options:\n"
-msgstr "opciók:\n"
+msgstr ""
 
 msgid "no commands defined\n"
-msgstr "nincs definiált parancs\n"
+msgstr ""
 
 msgid "Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
 msgstr ""
@@ -5177,18 +5138,16 @@ msgid ""
 "basic commands:\n"
 "\n"
 msgstr ""
-"alap parancsok:\n"
-"\n"
 
 #, python-format
 msgid " (default: %s)"
-msgstr " (alapértelmezett: %s)"
+msgstr ""
 
 msgid "thg hgignore [FILE]"
 msgstr ""
 
 msgid "import to the patch queue (MQ)"
-msgstr "importálás a patch queue-ba (MQ)"
+msgstr ""
 
 msgid "thg import [OPTION] [SOURCE]..."
 msgstr ""
@@ -5291,7 +5250,7 @@ msgid "thg rename [SOURCE] [DEST]"
 msgstr ""
 
 msgid "field to give initial focus"
-msgstr "mező, amelyik megkapja a kezdő fókuszt"
+msgstr ""
 
 msgid "thg repoconfig"
 msgstr ""
@@ -5309,7 +5268,7 @@ msgid "thg revert [FILE]..."
 msgstr ""
 
 msgid "revision to update"
-msgstr "revízió frissítése"
+msgstr ""
 
 msgid "thg rupdate [[-r] REV]"
 msgstr ""
@@ -5402,13 +5361,13 @@ msgid "notify the shell for paths given"
 msgstr ""
 
 msgid "remove the status cache"
-msgstr "állapot cache eltávolítása"
+msgstr ""
 
 msgid "show the contents of the status cache (no update)"
-msgstr "mutassa az állapot cache tartalmát (nics update)"
+msgstr ""
 
 msgid "update all repos in current dir"
-msgstr "Összes repo frissítése az aktuális könyvtárban"
+msgstr ""
 
 msgid "thg thgstatus [OPTION]"
 msgstr ""
@@ -5435,20 +5394,20 @@ msgid "revisions to view in diff tool"
 msgstr ""
 
 msgid "bundle file to preview"
-msgstr "Csomag file előnézet"
+msgstr ""
 
 msgid "launch visual diff tool"
-msgstr "Vizual diff indítása"
+msgstr ""
 
 msgid "print license"
-msgstr "license nyomtatása"
+msgstr ""
 
 msgid "thg version [OPTION]"
 msgstr ""
 
 #, python-format
 msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
-msgstr "TortoiseHg Dialógusok (verzió %s), Mercurial (verzió %s)\n"
+msgstr ""
 
 msgid "Location:"
 msgstr ""
@@ -5513,7 +5472,7 @@ msgid "Start"
 msgstr ""
 
 msgid "Settings"
-msgstr "Beállítások"
+msgstr "Asetukset"
 
 msgid "<unspecified>"
 msgstr ""
@@ -6484,7 +6443,7 @@ msgid "Kiln Bfiles"
 msgstr ""
 
 msgid "Patterns"
-msgstr "Minták"
+msgstr ""
 
 msgid ""
 "Files with names meeting the specified patterns will be automatically added "
@@ -6784,7 +6743,7 @@ msgid "Refresh Toolbar"
 msgstr ""
 
 msgid "Refresh"
-msgstr "Frissítés"
+msgstr ""
 
 msgid "New Shelf"
 msgstr ""
@@ -6923,7 +6882,7 @@ msgid "Uncheck"
 msgstr ""
 
 msgid "status"
-msgstr "státusz"
+msgstr ""
 
 msgid "Failed to refresh"
 msgstr ""
@@ -6941,7 +6900,7 @@ msgid "M"
 msgstr ""
 
 msgid "Filename"
-msgstr "Fájlnév"
+msgstr ""
 
 msgid "Size (KB)"
 msgstr ""
@@ -7049,7 +7008,7 @@ msgid "Manage HTTPS connection security and user authentication"
 msgstr ""
 
 msgid "Save"
-msgstr ""
+msgstr "Tallenna"
 
 msgid "Save current URL under an alias"
 msgstr ""
@@ -7061,7 +7020,7 @@ msgid "Related Paths:"
 msgstr ""
 
 msgid "branch: "
-msgstr "ág: "
+msgstr ""
 
 msgid "bookmark: "
 msgstr ""
@@ -7077,7 +7036,7 @@ msgid "&Edit..."
 msgstr ""
 
 msgid "&Remove..."
-msgstr ""
+msgstr "&Poista..."
 
 msgid "Repository not local"
 msgstr ""
@@ -7467,7 +7426,7 @@ msgid "local"
 msgstr ""
 
 msgid "Move"
-msgstr "Mozgatás"
+msgstr ""
 
 #, python-format
 msgid "Moved tag %s to changeset %s (from changeset %s)"
@@ -7693,7 +7652,7 @@ msgstr ""
 
 #, python-format
 msgid "%s : %s"
-msgstr ""
+msgstr "%s : %s"
 
 msgid "No diff tool found"
 msgstr ""
@@ -7794,7 +7753,7 @@ msgid "Config File:"
 msgstr ""
 
 msgid "Open"
-msgstr ""
+msgstr "Avaa"
 
 msgid "New &Workbench"
 msgstr ""
@@ -7809,7 +7768,7 @@ msgid "&Open Repository..."
 msgstr ""
 
 msgid "&File"
-msgstr ""
+msgstr "&Tiedosto"
 
 msgid "&View"
 msgstr ""
@@ -7818,7 +7777,7 @@ msgid "&Repository"
 msgstr ""
 
 msgid "&Help"
-msgstr ""
+msgstr "&Ohje"
 
 msgid "&Dock Toolbar"
 msgstr ""
@@ -8115,14 +8074,14 @@ msgid "cannot move into applied patches"
 msgstr ""
 
 msgid "abort: "
-msgstr "megszakadt: "
+msgstr ""
 
 msgid "hint: "
 msgstr ""
 
 #, python-format
 msgid "HTTP Error: %d (%s)"
-msgstr ""
+msgstr "HTTP-virhe: %d (%s)"
 
 #, python-format
 msgid "URLError: %s"
@@ -8133,11 +8092,11 @@ msgstr ""
 
 #, python-format
 msgid "SSL: unknown error %s:%s"
-msgstr ""
+msgstr "SSL: tuntematon virhe %s:%s"
 
 #, python-format
 msgid "SSL error: %s"
-msgstr ""
+msgstr "SSL virhe: %s"
 
 msgid "hgsubversion packaged with thg"
 msgstr ""
@@ -8181,50 +8140,50 @@ msgstr ""
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d vuosi"
+msgstr[1] "%d vuotta"
 
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d kuukausi"
+msgstr[1] "%d kuukautta"
 
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d viikko"
+msgstr[1] "%d viikkoa"
 
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d päivä"
+msgstr[1] "%d päivää"
 
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d tunti"
+msgstr[1] "%d tuntia"
 
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d minuutti"
+msgstr[1] "%d minuuttia"
 
 #, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d sekunti"
+msgstr[1] "%d sekuntia"
 
 msgid "in the future"
 msgstr ""
 
 msgid "now"
-msgstr ""
+msgstr "nyt"
 
 #, python-format
 msgid "command parse error: %s"
@@ -8259,7 +8218,7 @@ msgid "Repository status & changes"
 msgstr ""
 
 msgid "Add Files..."
-msgstr ""
+msgstr "Lisää tiedostoja..."
 
 msgid "Add files to version control"
 msgstr ""
@@ -8301,7 +8260,7 @@ msgid "Move changes between working dir and patch"
 msgstr ""
 
 msgid "Synchronize"
-msgstr "Szinkronizál"
+msgstr ""
 
 msgid "Synchronize with remote repository"
 msgstr ""
@@ -8310,7 +8269,7 @@ msgid "Start web server for this repository"
 msgstr ""
 
 msgid "Update..."
-msgstr ""
+msgstr "Päivitä..."
 
 msgid "Update working directory"
 msgstr ""
@@ -8322,7 +8281,7 @@ msgid "Update icons for this repository"
 msgstr ""
 
 msgid "Global Settings"
-msgstr ""
+msgstr "Yleisasetukset"
 
 msgid "Configure user wide settings"
 msgstr ""
@@ -8340,7 +8299,7 @@ msgid "Configure Explorer extension"
 msgstr ""
 
 msgid "About TortoiseHg"
-msgstr "TortoiseHg névjegye"
+msgstr ""
 
 msgid "Show About Dialog"
 msgstr ""
@@ -8364,7 +8323,7 @@ msgid "Detect renames and copies"
 msgstr ""
 
 msgid "Search History"
-msgstr "Keresés előzményei"
+msgstr ""
 
 msgid "Search file revisions for patterns"
 msgstr ""
@@ -8377,10 +8336,10 @@ msgstr ""
 
 #, python-format
 msgid "unrecognized response: %s"
-msgstr "ismeretlen válasz: %s"
+msgstr ""
 
 msgid "password: "
-msgstr "jelszó: "
+msgstr ""
 
 #, python-format
 msgid "repository %s not found"
@@ -8395,1068 +8354,3 @@ msgstr ""
 
 msgid "win32ill: interrupted while stopping message loop\n"
 msgstr ""
-
-#~ msgid "(version %s)"
-#~ msgstr "verzió %s"
-
-#~ msgid "with %s"
-#~ msgstr "%s -al"
-
-#~ msgid "A new version of TortoiseHg is ready for download!"
-#~ msgstr "A TortoiseHG új verziója letölthető!"
-
-#~ msgid "Copyright 2008-2010 Steve Borho and others"
-#~ msgstr "Szerzői jog 2008-2010 Steve Borho és mások"
-
-#~ msgid "Several icons are courtesy of the TortoiseSVN project"
-#~ msgstr "Néhány ikon a TortoiseSVN projekt jóvoltából"
-
-#~ msgid "Archive"
-#~ msgstr "Archívum"
-
-#~ msgid "Canceled archiving"
-#~ msgstr "Archíválás megszakítva"
-
-#~ msgid "Archived successfully"
-#~ msgstr "Archíválás kész"
-
-#~ msgid "Archive revision:"
-#~ msgstr "Archív revízió:"
-
-#~ msgid "Failed to archive"
-#~ msgstr "Archíválás sikertelen"
-
-#~ msgid "Compressed zip archives"
-#~ msgstr "Tömörített zip arhívum"
-
-#~ msgid "All Files (*.*)"
-#~ msgstr "Az összes fájl (*.*)"
-
-#~ msgid ""
-#~ "The destination \"%s\" already exists!\n"
-#~ "\n"
-#~ "Do you want to overwrite it?"
-#~ msgstr ""
-#~ "A cél \"%s\" létezik!\n"
-#~ "\n"
-#~ "Felül írja?"
-
-#~ msgid ""
-#~ "The directory \"%s\" isn't empty!\n"
-#~ "\n"
-#~ "Do you want to overwrite it?"
-#~ msgstr ""
-#~ "A könyvtár \"%s\" nem üres!\n"
-#~ "\n"
-#~ "Felül írja?"
-
-#~ msgid "Old name:"
-#~ msgstr "Régi név:"
-
-#~ msgid "Bookmark input is empty"
-#~ msgstr "Könyvjelző bemenet üres"
-
-#~ msgid "unexpected type: %s"
-#~ msgstr "Váratlan típus: %s"
-
-#~ msgid "unexpected response id: %s"
-#~ msgstr "nem várt válasz azonosító: %s"
-
-#~ msgid "Error in bookmarking"
-#~ msgstr "Hiba a könyvjelzés közben"
-
-#~ msgid "Bookmark \"%s\" has been added"
-#~ msgstr "\"%s\" Könyvjelző hozzáadva"
-
-#~ msgid "Bookmarking completed"
-#~ msgstr "Könyvjelzés sikeres"
-
-#~ msgid "Please enter bookmark name"
-#~ msgstr "Kérjük adja meg a könyvjelző nevét"
-
-#~ msgid "Bookmark name is empty"
-#~ msgstr "Könyvjelző név üres"
-
-#~ msgid "Bookmark \"%s\" has been moved"
-#~ msgstr "\"%s\" könyvjelző mozgatva"
-
-#~ msgid "Bookmark new name input is empty"
-#~ msgstr "Új könyvjelző név üres"
-
-#~ msgid "Bookmark \"%s\" has been removed"
-#~ msgstr "\"%s\" könyvjelző eltávolítva"
-
-#~ msgid "Please select bookmark name to remove"
-#~ msgstr "Kérem válassza ki az eltávolítani kívánt könyvjelzőt"
-
-#~ msgid "Please enter new bookmark name"
-#~ msgstr "Kérjük adja meg az új könyvjelző nevét"
-
-#~ msgid "path"
-#~ msgstr "útvonal"
-
-#~ msgid "browser"
-#~ msgstr "böngésző"
-
-#~ msgid "Bookmark \"%s\" has been renamed to \"%s\""
-#~ msgstr "Könyvjelző \"%s\" átnevezve \"%s\"-re"
-
-#~ msgid "No bookmark named \"%s\" exists"
-#~ msgstr "\"%s\" nevű könyvjelző nem létezik"
-
-#~ msgid "a bookmark named \"%s\" already exists"
-#~ msgstr "\"%s\" könyvjelző már létezik"
-
-#~ msgid "type"
-#~ msgstr "típus"
-
-#~ msgid "[All Files]"
-#~ msgstr "[Minden Fájl]"
-
-#~ msgid "Repository Error:  %s, refresh suggested"
-#~ msgstr "Adattár hiba: %s, frissítés javasolt"
-
-#~ msgid "unknown hunk type: %s"
-#~ msgstr "ismeretlen púp: %s"
-
-#~ msgid "Save as.."
-#~ msgstr "Mentés másként..."
-
-#~ msgid "[no hunks to display]"
-#~ msgstr "[nincsenek megjeleníthető púpok]"
-
-#~ msgid " %s is larger than the specified max diff size"
-#~ msgstr " %s nagyobb, mint a megengedett maximális különbség méret"
-
-#~ msgid "_Revert File Contents"
-#~ msgstr "File _Visszaállítása"
-
-#~ msgid "_File History"
-#~ msgstr "_Fájl története"
-
-#~ msgid "_Annotate File"
-#~ msgstr "File _Címkézése"
-
-#~ msgid "Revert %s to contents at revision %d?"
-#~ msgstr "Visszaállított %s tartalom a %d verzióban"
-
-#~ msgid "Diff to second Parent"
-#~ msgstr "Különbség a második szülőhöz képest"
-
-#~ msgid "TortoiseHg Clone"
-#~ msgstr "TortoiseHg Klón"
-
-#~ msgid "Bundle..."
-#~ msgstr "Csomag..."
-
-#~ msgid "Enable _Wordwrap"
-#~ msgstr "_Sortörés engedélyezése"
-
-#~ msgid "Select a Mercurial Bundle"
-#~ msgstr "Válasszon Mercurial csomagot"
-
-#~ msgid "Unable to save file"
-#~ msgstr "A file nem menthető"
-
-#~ msgid "Confirm revert file to old revision"
-#~ msgstr "Visszaállított fájl jóváhagyása a régi verzióhoz"
-
-#~ msgid "Use uncompressed transfer"
-#~ msgstr "Tömörítettlen adatátvitel használata"
-
-#~ msgid "Advanced options"
-#~ msgstr "Speciális beállítások"
-
-#~ msgid "Source path:"
-#~ msgstr "Forrás elérési útvonala:"
-
-#~ msgid "Failed to clone"
-#~ msgstr "Klónozás sikertelen"
-
-#~ msgid "Cloned successfully"
-#~ msgstr "Klónozás sikeres"
-
-#~ msgid "Branch Operations"
-#~ msgstr "Branch műveletek"
-
-#~ msgid "Source and destination are the same"
-#~ msgstr "Forrás és cél azonos"
-
-#~ msgid "Canceled updating"
-#~ msgstr "Frissítés megszakítva"
-
-#~ msgid "Please specify different paths"
-#~ msgstr "Kérjük adjon meg különböző útvonalakat"
-
-#~ msgid "Please enter a valid source path"
-#~ msgstr "Kérjük adjon meg valós elérési útvonalat"
-
-#~ msgid "Clone"
-#~ msgstr "Klón"
-
-#~ msgid "Mercurial bundles"
-#~ msgstr "Mercurial csomagok"
-
-#~ msgid "Source path is empty"
-#~ msgstr "Forrás útvonal üres"
-
-#~ msgid "merging "
-#~ msgstr "összemásolás "
-
-#~ msgid "Close current named branch"
-#~ msgstr "Aktális elnevezésű ág zárása"
-
-#~ msgid "Ignore Max Diff Size"
-#~ msgstr "Maxximális különbözet méret figyelmenkívül hagyása"
-
-#~ msgid "Toolbar"
-#~ msgstr "Eszköztár"
-
-#~ msgid "Always Show Output"
-#~ msgstr "Mindíg mutassa a kimenetet"
-
-#~ msgid "_View"
-#~ msgstr "_Nézet"
-
-#~ msgid "_Operations"
-#~ msgstr "_Műveletek"
-
-#~ msgid "_Undo"
-#~ msgstr "_Visszavonás"
-
-#~ msgid "_Commit"
-#~ msgstr "_Kommit"
-
-#~ msgid "Advanced"
-#~ msgstr "Haladó"
-
-#~ msgid "_Forget"
-#~ msgstr "_Felejtse el"
-
-#~ msgid "_Diff"
-#~ msgstr "_Különbség"
-
-#~ msgid "_Remove"
-#~ msgstr "_Eltávolítás"
-
-#~ msgid "undo recent commit"
-#~ msgstr "Aktuális commit visszavonása"
-
-#~ msgid "Show/Hide Patch Queue"
-#~ msgstr "Mutatása/Elrejtése a Javító Sornak"
-
-#~ msgid "_Add"
-#~ msgstr "_Hozzáadás"
-
-#~ msgid "Re_vert"
-#~ msgstr "Visszaállítás"
-
-#~ msgid "Save commit message at exit?"
-#~ msgstr "Mentse a kommit üzenetet kilépéskor?"
-
-#~ msgid "commit"
-#~ msgstr "kommit"
-
-#~ msgid "Not at head"
-#~ msgstr "Nem a fej"
-
-#~ msgid "Patch Preview"
-#~ msgstr "Javítás Előnézet"
-
-#~ msgid "Auto-includes:"
-#~ msgstr "Automatikusa-magába foglaltak:"
-
-#~ msgid "Committer:"
-#~ msgstr "Kommitáló:"
-
-#~ msgid "Push after commit"
-#~ msgstr "Push a kommit után"
-
-#~ msgid "Recent commit messages..."
-#~ msgstr "Aktuális kommit üzenet"
-
-#~ msgid "Commit Preview"
-#~ msgstr "Kommit Előnézet"
-
-#~ msgid "create new MQ patch"
-#~ msgstr "új MQ patch létrehozása"
-
-#~ msgid "neither parent is a head, commit to add a new head"
-#~ msgstr "egyik szülős sem a fej, kommital új fej létrehozása"
-
-#~ msgid "Unable to create "
-#~ msgstr "Nem lehet létrehozni "
-
-#~ msgid "Merge "
-#~ msgstr "Egyesítés "
-
-#~ msgid "Patch Contents"
-#~ msgstr "Javítás Tartalma"
-
-#~ msgid "close branch: "
-#~ msgstr "ág zárása: "
-
-#~ msgid "No committable files selected"
-#~ msgstr "Nincs kommitálható fájl kiválasztva"
-
-#~ msgid "new branch: "
-#~ msgstr "Új ág: "
-
-#~ msgid "parent is not a head, commit to add a new head"
-#~ msgstr "szülő nem a fej, kommital új fej létrehozása"
-
-#~ msgid "Errors during rollback!"
-#~ msgstr "Hiba a visszagörgetés alatt!"
-
-#~ msgid ""
-#~ "Unable to undo!\n"
-#~ "\n"
-#~ "Tip revision differs from last commit."
-#~ msgstr ""
-#~ "Nem lehet visszavonni!\n"
-#~ "\n"
-#~ "Tipp: Verzió különbség az utolsó érvényesítéskor"
-
-#~ msgid "Add/Remove the following files?"
-#~ msgstr "Hozzáadja/Eltávolítja a következő fájlokat?"
-
-#~ msgid "Confirm Add/Remove"
-#~ msgstr "Hozzáadás/Eltávolítás jóváhagyása"
-
-#~ msgid "Unable to apply patch"
-#~ msgstr "Nem lehet a javítást alkalamzni"
-
-#~ msgid "Confirm Undo Commit"
-#~ msgstr "Visszavonási commit jóváhagyása"
-
-#~ msgid "Undo Commit"
-#~ msgstr "Jóváhagyás visszavonása"
-
-#~ msgid "Commit: Invalid username"
-#~ msgstr "Jóváhagyás: Hibás felhasználóinév"
-
-#~ msgid ""
-#~ "The following lines are over the %i-character limit: %s.\n"
-#~ "\n"
-#~ "Ignore format policy and continue commit?"
-#~ msgstr ""
-#~ "A %i sorban a karakterek száma nagyobb mint %s.\n"
-#~ "\n"
-#~ "Hagyja figyelmenkívül a formázási előírást és folytassa a kommitot?"
-
-#~ msgid ""
-#~ "The summary line is not followed by a blank line.\n"
-#~ "\n"
-#~ "Ignore format policy and continue commit?"
-#~ msgstr ""
-#~ "Az összefoglaló sort nem üres sor követi.\n"
-#~ "\n"
-#~ "Hagyja figyelmenkívül a formázási előírást és folytassa a kommitot?"
-
-#~ msgid ""
-#~ "Your username has not been configured.\n"
-#~ "\n"
-#~ "Please configure your username and try again"
-#~ msgstr ""
-#~ "Felhasználóinév nincs konfigurálva\n"
-#~ "\n"
-#~ "Kérjük konfigurálja és próbálja újra."
-
-#~ msgid "Message format configuration error"
-#~ msgstr "Üzenet formátum konfigurálási hiba"
-
-#~ msgid ""
-#~ "The summary line length of %i is greater than %i.\n"
-#~ "\n"
-#~ "Ignore format policy and continue commit?"
-#~ msgstr ""
-#~ "Az összegfoglaló sor hossza %i nagyobb mint %i\n"
-#~ "\n"
-#~ "Hagyja figyelmenkívül a formázási előírást és folytassa a kommitot?"
-
-#~ msgid "Confirm Commit"
-#~ msgstr "Érvényesítés jóváhagyása"
-
-#~ msgid "App_ly Format"
-#~ msgstr "Formátú Érvényesítése"
-
-#~ msgid "Paste _Filenames"
-#~ msgstr "_Fájlnevek beillesztése"
-
-#~ msgid "Aborted committing"
-#~ msgstr "Megszakított érvényesítés"
-
-#~ msgid "Cannot run now"
-#~ msgstr "Jelenleg nem futtatható"
-
-#~ msgid "C_onfigure Format..."
-#~ msgstr "Formátúm beállítás"
-
-#~ msgid "Committing changes..."
-#~ msgstr "Változások véglegesítése…"
-
-#~ msgid "Failed to commit"
-#~ msgstr "Hibás érvényesítés"
-
-#~ msgid "The summary line is not followed by a blank line"
-#~ msgstr "Az összefoglaló sort nem követi üres sor"
-
-#~ msgid "The summary line length of %i is greater than %i"
-#~ msgstr "Az összefoglaló sor hossza %i nagyobb mint %i"
-
-#~ msgid "Message format needs to be configured"
-#~ msgstr "Üzenet formátúm konfigurálása szükséges"
-
-#~ msgid "Info Required"
-#~ msgstr "Információ Szükséges"
-
-#~ msgid "Updating..."
-#~ msgstr "Frissítés..."
-
-#~ msgid "Displaying all items"
-#~ msgstr "Összes elem megjelenítése"
-
-#~ msgid "Stop operation on current tab"
-#~ msgstr "Művelet leállítása az aktuális tabon"
-
-#~ msgid "New Search"
-#~ msgstr "Új keresés"
-
-#~ msgid "Open new search tab"
-#~ msgstr "Új kereső fül megnyitása"
-
-#~ msgid "Invalid path"
-#~ msgstr "Érvénytelen útvonal"
-
-#~ msgid "Selecting %(sel)d, displaying %(count)d of %(total)d items"
-#~ msgstr "Kiválaszt %(sel)d, megjelenít %(count)d a %(total)d elemből"
-
-#~ msgid "Selecting %(sel)d of %(total)d, displaying all items"
-#~ msgstr "Kiválaszt %(sel)d a %(total)dból, összes elem megjelenítése"
-
-#~ msgid "_View File at Revision"
-#~ msgstr "Fájl Megtekintése a Verzióban"
-
-#~ msgid "_Zoom to Change"
-#~ msgstr "_Nagyitás a változásra"
-
-#~ msgid "_Annotate Parent"
-#~ msgstr "Szülő Megjelölése"
-
-#~ msgid "Di_splay Change"
-#~ msgstr "Változások Megjelenítése"
-
-#~ msgid ""
-#~ "Comma separated list of exclusion patterns.  Exclusion patterns are "
-#~ "applied after inclusion patterns."
-#~ msgstr ""
-#~ "Vesszővel elválasztva a kivételi minták. A kivételi minta az alkalmazott "
-#~ "minták után kerül kiértékelésre."
-
-#~ msgid "Start this search"
-#~ msgstr "Keresés indítása"
-
-#~ msgid ""
-#~ "Comma separated list of inclusion patterns.  By default, the entire "
-#~ "repository is searched."
-#~ msgstr ""
-#~ "Vesszővel elválasztva a keresési minták. Alapértelmezésként a teljes "
-#~ "repository-ban keres"
-
-#~ msgid "Show line numbers"
-#~ msgstr "Sorok számának mutatása"
-
-#~ msgid "Error: %s"
-#~ msgstr "Hiba: %s"
-
-#~ msgid "Abort: %s"
-#~ msgstr "Megszakítás: %s"
-
-#~ msgid "Invalid regular expression"
-#~ msgstr "Érvénytelen reguláris kifejezés"
-
-#~ msgid "You must provide a search expression"
-#~ msgstr "Keresési kifejezés megadása kötelező"
-
-#~ msgid "Show all matching revisions"
-#~ msgstr "Összes egyező verzió megjelenítése"
-
-#~ msgid "No regular expression given"
-#~ msgstr "Nincs megadva reguláris kifejezés"
-
-#~ msgid "Matches"
-#~ msgstr "Találatok"
-
-#~ msgid "Repository Explorer"
-#~ msgstr "Repository Explorer"
-
-#~ msgid "Unable to annotate "
-#~ msgstr "Nem cimkézhető "
-
-#~ msgid "File is unrevisioned"
-#~ msgstr "Fájl nem verziózott"
-
-#~ msgid "Search \"%s\""
-#~ msgstr "Keresés \"%s\""
-
-#~ msgid "_Tools"
-#~ msgstr "_Eszközök"
-
-#~ msgid "Loading history..."
-#~ msgstr "Változások betöltése..."
-
-#~ msgid "Index"
-#~ msgstr "Tárgymutató"
-
-#~ msgid "Contents"
-#~ msgstr "Tartalom"
-
-#~ msgid " Aborted"
-#~ msgstr " Megszakítva"
-
-#~ msgid "_Help"
-#~ msgstr "_Súgó"
-
-#~ msgid "Serve"
-#~ msgstr "Szolgáltat"
-
-#~ msgid "Recovery"
-#~ msgstr "Visszaállítás"
-
-#~ msgid "Shelve"
-#~ msgstr "Mellőz"
-
-#~ msgid "Do you want to abort?"
-#~ msgstr "Biztosa megszakítja"
-
-#~ msgid "making snapshot of %d files from rev %s\n"
-#~ msgstr "Pillanat felvétel készítése a %d fájlról a%s verzióban\n"
-
-#~ msgid "edit failed"
-#~ msgstr "szerkestés sikertelen"
-
-#~ msgid "Select"
-#~ msgstr "Kiválaszt"
-
-#~ msgid " Messages and Errors"
-#~ msgstr " Üzenetek és Hibák"
-
-#~ msgid "Confirm Abort"
-#~ msgstr "Megszakítás Jóváhagyása"
-
-#~ msgid "unknown mode name: %s"
-#~ msgstr "ismeretlen mód név: %s"
-
-#~ msgid "Ambiguous Revision"
-#~ msgstr "Azonos nevű revízió"
-
-#~ msgid "Select Revision"
-#~ msgstr "Revízió kiválasztása"
-
-#~ msgid "Select Folder"
-#~ msgstr "Könyvtárválasztás"
-
-#~ msgid "All files"
-#~ msgstr "Minden fájl"
-
-#~ msgid "Save File"
-#~ msgstr "Fájl mentése"
-
-#~ msgid "Invalid Revision"
-#~ msgstr "Érvénytelen Revízió"
-
-#~ msgid "revision number, changeset ID, branch or tag"
-#~ msgstr "revízió szám, változás ID, ág vagy cimke"
-
-#~ msgid "Lang \"%s\" can not be set.\n"
-#~ msgstr "Nyelv \"%s\" nem beállítható.\n"
-
-#~ msgid ""
-#~ "Select language for spell checking.\n"
-#~ "\n"
-#~ "Empty is for the default language.\n"
-#~ "When all text is highlited, the dictionary\n"
-#~ "is probably not installed.\n"
-#~ "\n"
-#~ "examples: en, en_GB, en_US"
-#~ msgstr ""
-#~ "Nyelv választása a helyesírásellenörzéshez.\n"
-#~ "\n"
-#~ "Ha üres akkor az alapértelemzett nyelv lesz használva.\n"
-#~ "Ha az össze szöveg hibásnak van megjelölve, akkor lehet\n"
-#~ "hogy a szótár nincs installálva"
-
-#~ msgid "Accept Match"
-#~ msgstr "Egyezés Elfogadása"
-
-#~ msgid "Differences from Source to Dest"
-#~ msgstr "Kölömbség a Forrás és a Cél között"
-
-#~ msgid "Candidate Matches"
-#~ msgstr "Jelölt Egyeződések"
-
-#~ msgid "Minimum Simularity Percentage"
-#~ msgstr "Minimális hasonlóság Százalékban"
-
-#~ msgid "Find Copies"
-#~ msgstr "Másolatok keresése"
-
-#~ msgid "Unrevisioned Files"
-#~ msgstr "Nem Revíziózott Fájlok"
-
-#~ msgid "Spell Check Language"
-#~ msgstr "Helyesírás Ellenörés Nyelve"
-
-#~ msgid "Changeset Description"
-#~ msgstr "Változás Ismertető"
-
-#~ msgid "Backout changeset - %s"
-#~ msgstr "Megszegett változás halmaz - %s"
-
-#~ msgid "Backout commit message"
-#~ msgstr "Megszegett jóváhagyási üzenet"
-
-#~ msgid "Diff to _local"
-#~ msgstr "Különbség a _helyihez képest"
-
-#~ msgid "_Visual Diff"
-#~ msgstr "_Vizuális különbség"
-
-#~ msgid "%s changeset "
-#~ msgstr "%s változás halmaz "
-
-#~ msgid "_View at Revision"
-#~ msgstr "Revízió Nézése"
-
-#~ msgid "_Save at Revision..."
-#~ msgstr "Revízióhoz Menté_s"
-
-#~ msgid "refresh top MQ patch"
-#~ msgstr "felső MR javítás frissítése"
-
-#~ msgid "_Commit (+1 head)"
-#~ msgstr "_Jóváhagy (+1 fej)"
-
-#~ msgid "Nothing Commited"
-#~ msgstr "Semmi jóváhagyott"
-
-#~ msgid "Datamine"
-#~ msgstr "Adattípus"
-
-#~ msgid ""
-#~ "== %s and %s have identical contents ==\n"
-#~ "\n"
-#~ msgstr ""
-#~ "== %s és %s azonosító tartalomnak kell lennie ==\n"
-#~ "\n"
-
-#~ msgid "finding source of "
-#~ msgstr "forrás keresése "
-
-#~ msgid "%s - datamine"
-#~ msgstr "%s - adattípus"
-
-#~ msgid "commit to merge one head"
-#~ msgstr "jóváhagyás egy fej összeölvaszáthoz"
-
-#~ msgid "_Commit (-1 head)"
-#~ msgstr "_Jóváhagy (-1 fej)"
-
-#~ msgid "Command Log"
-#~ msgstr "Parancs Log"
-
-#~ msgid "Send"
-#~ msgstr "Küld"
-
-#~ msgid "unknown CmdWidget style: %s"
-#~ msgstr "ismeretlem CmdWidget stílus: %s"
-
-#~ msgid "invalid state"
-#~ msgstr "Nem megfelelő állapot"
-
-#~ msgid "Test"
-#~ msgstr "Teszt"
-
-#~ msgid "Close this"
-#~ msgstr "Elem bezárása"
-
-#~ msgid "Stop transaction"
-#~ msgstr "Tranzakció megállítása"
-
-#~ msgid "Send emails"
-#~ msgstr "Email-ek küldése"
-
-#~ msgid "Toggle log window"
-#~ msgstr "Log ablak kapcsoló"
-
-#~ msgid ""
-#~ "\n"
-#~ "[command interrupted]"
-#~ msgstr ""
-#~ "\n"
-#~ "[parancs megszakítva]"
-
-#~ msgid "Configure"
-#~ msgstr "Konfigurálás"
-
-#~ msgid "Envelope"
-#~ msgstr "Boríték"
-
-#~ msgid "Email revisions "
-#~ msgstr "Email revízió "
-
-#~ msgid "Show emails which would be sent"
-#~ msgstr "Elküldött email-ek megjelenítése"
-
-#~ msgid "Configure email settings"
-#~ msgstr "Email beállítások"
-
-#~ msgid "Email outgoing changes"
-#~ msgstr "Email a kimenőváltozásokról"
-
-#~ msgid "Email Mercurial Patches"
-#~ msgstr "Mercurial Javítások Email"
-
-#~ msgid "Flags:"
-#~ msgstr "Jelölések:"
-
-#~ msgid ""
-#~ "This feature is only available when sending outgoing changesets. It is "
-#~ "not applicable with revision ranges."
-#~ msgstr ""
-#~ "Ez csak akkor választható, ha kimenő változást küldünk. Nem alkalmazható "
-#~ "revízió töredékekre."
-
-#~ msgid "Patch Series (Bundle) Description"
-#~ msgstr "Javító Csomag Leírás"
-
-#~ msgid "Info required"
-#~ msgstr "Információ szükséges"
-
-#~ msgid "You must specify a sender address"
-#~ msgstr "A küldő címet kötelező megadni"
-
-#~ msgid "You must specify a recipient"
-#~ msgstr "Fogadó megadása szükséges"
-
-#~ msgid "You must configure SMTP"
-#~ msgstr "Kérjük konfigurálja az SMPT beállításokat"
-
-#~ msgid "Apply to:"
-#~ msgstr "Hatáskör:"
-
-#~ msgid "Remove Selected"
-#~ msgstr "A kijelöltek eltávolítása"
-
-#~ msgid "Unknown Files"
-#~ msgstr "Ismeretlen fájlok"
-
-#~ msgid "Filters"
-#~ msgstr "Szűrők"
-
-#~ msgid "TortoiseHg Init"
-#~ msgstr "TortoiseHg Init"
-
-#~ msgid "Add special files (.hgignore, ...)"
-#~ msgstr "Speciális fájlok hozzáadása (.hgignore, ...)"
-
-#~ msgid "Make repo compatible with Mercurial 1.0"
-#~ msgstr "Repsitory legyen kompatibilis a Mercurial 1.0-val"
-
-#~ msgid "Destination path is empty"
-#~ msgstr "Cél útvonal üres"
-
-#~ msgid "Please enter the directory path"
-#~ msgstr "Kérjük adja meg a könytár útvonalát"
-
-#~ msgid "Unable to create new repository"
-#~ msgstr "Nem lehet új repository-t létrehozni"
-
-#~ msgid "Error when creating repository"
-#~ msgstr "Hiba a repository létrehozása közben"
-
-#~ msgid "response expected"
-#~ msgstr "vár válasz"
-
-#~ msgid "[command returned code %d "
-#~ msgstr "[parancs visszatérési értéke %d "
-
-#~ msgid "[command completed successfully "
-#~ msgstr "[parancs sikeresen végrehajtva "
-
-#~ msgid "hgtk: unknown command '%s'\n"
-#~ msgstr "hgtk: ismeretlen parancs '%s'\n"
-
-#~ msgid "hgtk: %s\n"
-#~ msgstr "hgtk: %s\n"
-
-#~ msgid "hgtk %s: %s\n"
-#~ msgstr "hgtk %s: %s\n"
-
-#~ msgid "Rename error"
-#~ msgstr "Átnevezési hiba"
-
-#~ msgid "rename takes one or two path arguments"
-#~ msgstr "az átnevezéshez egy vagy kettő útvonal argumentum szükséges"
-
-#~ msgid "There is no Mercurial repository here (.hg not found)"
-#~ msgstr "Nem Mercurial repository (.hg nem található)"
-
-#~ msgid "mpatch error"
-#~ msgstr "mpatch hiba"
-
-#~ msgid "mpatch expects *.rej file argument\n"
-#~ msgstr "mpatch *rej argumentumot vár\n"
-
-#~ msgid "use \"hgtk help\" for the full list of commands"
-#~ msgstr "használja a \"hgtk help\" a teljes parancslistához"
-
-#~ msgid ""
-#~ "use \"hgtk help\" for the full list of commands or \"hgtk -v\" for details"
-#~ msgstr ""
-#~ "használja \"hgtk help\" teljes parancslistához vagy \"hgtk -v\" a "
-#~ "részletekért"
-
-#~ msgid "use \"hgtk -v help%s\" to show aliases and global options"
-#~ msgstr "a \"hgtk -v help%s\" megmutatja az aliasokat és a globális opciókat"
-
-#~ msgid "Glob:"
-#~ msgstr "Glob:"
-
-#~ msgid "use \"hgtk -v help %s\" to show global options"
-#~ msgstr "a \"hgtk -v help %s\" használata megmutaja a globális opciókat"
-
-#~ msgid "(No help text available)"
-#~ msgstr "(Súgó nem található)"
-
-#~ msgid "Hgtk - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
-#~ msgstr "Hgtk - TortoiseHg Grafikus eszköz a Mercurial SCM (Hg)-hoz\n"
-
-#~ msgid "hgtk about"
-#~ msgstr "hgtk-ról"
-
-#~ msgid "hgtk add [FILE]..."
-#~ msgstr "hgtk [FILE] hozzáadása..."
-
-#~ msgid "hgtk hgignore [FILE]"
-#~ msgstr "hgtk hgignore [FILE]"
-
-#~ msgid "hgtk datamine"
-#~ msgstr "hgtk datamine"
-
-#~ msgid "hgtk commit [OPTIONS] [FILE]..."
-#~ msgstr "hgtk commit [OPTIONS] [FILE]..."
-
-#~ msgid "hgtk log [OPTIONS] [FILE]"
-#~ msgstr "hgtk log [OPTIONS] [FILE]"
-
-#~ msgid "hgtk init [DEST]"
-#~ msgstr "hgtk init [DEST]"
-
-#~ msgid "revision to merge with"
-#~ msgstr "revízió összemásolása"
-
-#~ msgid "hgtk recovery"
-#~ msgstr "hgtk recovery"
-
-#~ msgid "hgtk merge"
-#~ msgstr "hgtk merge"
-
-#~ msgid "hgtk synch"
-#~ msgstr "hgtk synch"
-
-#~ msgid "hgtk shelve"
-#~ msgstr "hgtk shelve"
-
-#~ msgid "hgtk status [FILE]..."
-#~ msgstr "hgtk status [FILE]..."
-
-#~ msgid " - commit"
-#~ msgstr " - commit"
-
-#~ msgid "limit number of changes displayed"
-#~ msgstr "megjelenített változások korlátja"
-
-#~ msgid "revisions to compare"
-#~ msgstr "revíziók összehasonlítása"
-
-#~ msgid "udpate all repos in current dir"
-#~ msgstr "Összes repo frissítése az aktuális könyvtárban"
-
-#~ msgid "import to the repository"
-#~ msgstr "importálás a repositoryba"
-
-#~ msgid "show the command options"
-#~ msgstr "parancs opciók mutatása"
-
-#~ msgid "Merges"
-#~ msgstr "Összefésülések"
-
-#~ msgid "Hide Merges"
-#~ msgstr "Összefésülésekk elrejtése"
-
-#~ msgid "Move Up"
-#~ msgstr "Mozgatás felfelé"
-
-#~ msgid "Move Down"
-#~ msgstr "Mozgatás lefelé"
-
-#~ msgid "Ancestry"
-#~ msgstr "Származás"
-
-#~ msgid "Tagged"
-#~ msgstr "Címke:"
-
-#~ msgid "Heads"
-#~ msgstr "Fejek"
-
-#~ msgid "Columns"
-#~ msgstr "Oszlopok"
-
-#~ msgid "Log Details"
-#~ msgstr "Részletes log"
-
-#~ msgid "Custom Filter"
-#~ msgstr "Saját Szűrő"
-
-#~ msgid "File Patterns"
-#~ msgstr "Fájl sablonok"
-
-#~ msgid ""
-#~ "New changesets from the preview bundle are still pending.\n"
-#~ "\n"
-#~ "Accept or reject the new changesets?"
-#~ msgstr ""
-#~ "Új változások az előnézeti csomagban még mindíg várakoznak.\n"
-#~ "\n"
-#~ "Elfogadja vagy elveti a változásokat?"
-
-#~ msgid "Keywords"
-#~ msgstr "Kulcsszavak"
-
-#~ msgid "Accept new Changesets"
-#~ msgstr "Új változások elfogadása"
-
-#~ msgid "&Accept"
-#~ msgstr "El&fogadás"
-
-#~ msgid "Branches..."
-#~ msgstr "Branchek..."
-
-#~ msgid "Branch Filter"
-#~ msgstr "Branch Szűrő"
-
-#~ msgid "Launch recovery tool"
-#~ msgstr "Visszaállító eszköz indítása"
-
-#~ msgid "Launch web server"
-#~ msgstr "Webszerver indítása"
-
-#~ msgid "Launch commit tool"
-#~ msgstr "Kommit eszköz indítása"
-
-#~ msgid "Launch data mining tool"
-#~ msgstr "Adatbányás eszköz indítása"
-
-#~ msgid "&Reject"
-#~ msgstr "El&utasítás"
-
-#~ msgid " (Bundle Preview)"
-#~ msgstr " (Csomag Előnézet)"
-
-#~ msgid "Reload revision history"
-#~ msgstr "Revízió történet újraolvasása"
-
-#~ msgid "Re_fresh"
-#~ msgstr "_Frissítés"
-
-#~ msgid "Load more Revisions"
-#~ msgstr "Többi Revízió betöltése"
-
-#~ msgid "Tags"
-#~ msgstr "Címkék"
-
-#~ msgid "Identify"
-#~ msgstr "Azonosító"
-
-#~ msgid "Branches"
-#~ msgstr "Ágak"
-
-#~ msgid "Load all Revisions"
-#~ msgstr "Összes Revízió Betöltése"
-
-#~ msgid "Pending"
-#~ msgstr "Függőben"
-
-#~ msgid "Revision..."
-#~ msgstr "Revízió..."
-
-#~ msgid "_Navigate"
-#~ msgstr "_Navigálás"
-
-#~ msgid "Color by Branch"
-#~ msgstr "Ágak színezése"
-
-#~ msgid "Choose Details..."
-#~ msgstr "Részletezettség..."
-
-#~ msgid "Compact Graph"
-#~ msgstr "Egyszerűsített Graficon"
-
-#~ msgid "_Synchronize"
-#~ msgstr "_Szinkronizálás"
-
-#~ msgid "Previously Selected"
-#~ msgstr "Korábban Kiválasztott"
-
-#~ msgid "Tip"
-#~ msgstr "Tipp"
-
-#~ msgid "Add Bundle..."
-#~ msgstr "Csomag hozzáadása..."
-
-#~ msgid "Accept Bundle"
-#~ msgstr "Csomag Elfogadás"
-
-#~ msgid "Reject Bundle"
-#~ msgstr "Csomag Visszautasítás"
-
-#~ msgid "Import..."
-#~ msgstr "Importálás…"
-
-#~ msgid "Push"
-#~ msgstr "Feltol"
-
-#~ msgid "Email..."
-#~ msgstr "E-mail..."
-
-#~ msgid "Configure Paths..."
-#~ msgstr "Elérési utak…"
-
-#~ msgid "Outgoing"
-#~ msgstr "Kimenő"
-
-#~ msgid "Incoming"
-#~ msgstr "Bejövő"
-
-#~ msgid "Parent: %(rev)s"
-#~ msgstr "Szülő: %(rev)s"
-
-#~ msgid "Search %d"
-#~ msgstr "Keresés %d"
-
-#~ msgid ""
-#~ "hgtk: command '%s' is ambiguous:\n"
-#~ "    %s\n"
-#~ msgstr ""
-#~ "hgtk: parancs '%s' nem egyedi:\n"
-#~ "    %s\n"
-
-#~ msgid "%s does not exist\n"
-#~ msgstr "%s nem létezik\n"
-
-#~ msgid "File is binary.\n"
-#~ msgstr "Az állomány bináris.\n"
-
-#~ msgid "File is larger than the specified max size.\n"
-#~ msgstr "Az állomány nagyobb a megadott maximumnál.\n"

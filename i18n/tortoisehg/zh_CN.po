@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
 "PO-Revision-Date: 2015-09-03 18:15+0000\n"
 "Last-Translator: yfdyh000 <yfdyh000@gmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:30+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:46+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 "Language: zh_CN\n"
 
 msgid "TortoiseHg Overlay Icon Server"
@@ -28,7 +28,7 @@ msgstr "退出"
 msgid "About"
 msgstr "关于"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -653,6 +653,12 @@ msgstr "没有 \"runcommand\" 能力"
 #, python-format
 msgid "corrupted command result: %r"
 msgstr "损坏的命令结果: %r"
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
+msgstr ""
 
 #, python-format
 msgid "failed to encode input: %s"
@@ -2065,6 +2071,9 @@ msgstr "所有历史"
 msgid "Report only the first match per file"
 msgstr "仅报告每个文件的首个匹配"
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "跟踪复制和重命名操作"
 
@@ -2964,6 +2973,54 @@ msgstr "补丁日期:"
 msgid "Patch user:"
 msgstr "补丁用户:"
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr "发布审核(&R)"
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr "无效的设置 - The ReviewBoard server is not setup"
 
@@ -3031,9 +3088,6 @@ msgstr "%p%"
 
 msgid "Connecting to Review Board..."
 msgstr "正在连接审核面板..."
-
-msgid "Post &Review"
-msgstr "发布审核(&R)"
 
 msgid "Target:"
 msgstr "目标:"
@@ -3131,31 +3185,6 @@ msgstr "新补丁说明:"
 
 msgid "Patches to fold"
 msgstr "要折叠(fold)的补丁"
-
-msgid "Rename Error"
-msgstr "更名出错"
-
-msgid "Could not rename existing patchfile"
-msgstr "无法重命名现有的补丁文件"
-
-msgid "Could not delete existing patchfile"
-msgstr "无法删除现有的补丁文件"
-
-msgid "QRename - Check patchname"
-msgstr "QRename - 请检查补丁名称"
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr "补丁名称 <b>%s</b> 已存在："
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr "添加 .OLD 扩展名到已有的补丁文件"
-
-msgid "Overwrite existing patchfile"
-msgstr "覆盖已有的补丁文件"
-
-msgid "Go back and change new patchname"
-msgstr "返回并更改新的补丁名称"
 
 msgid "&Undo"
 msgstr "撤销(&U)"
@@ -3502,6 +3531,9 @@ msgstr "复制源 -> 目标"
 
 msgid "Copy Error"
 msgstr "复制出错"
+
+msgid "Rename Error"
+msgstr "更名出错"
 
 msgid "Select Source File"
 msgstr "选择源文件。"
@@ -4239,6 +4271,9 @@ msgstr "剥离(&S)..."
 msgid "Post to Re&view Board..."
 msgstr "发布到审核面板(&V)..."
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr "远程更新(&R)..."
 
@@ -4304,6 +4339,9 @@ msgstr "修剪选中(&P)..."
 
 msgid "Post Selected to Review Board..."
 msgstr "发布选中项到审核面板..."
+
+msgid "Post Selected to Phabricator..."
+msgstr ""
 
 msgid "Apply patch"
 msgstr "应用补丁"
@@ -4420,6 +4458,13 @@ msgstr "更多选项(&M)..."
 
 msgid "Unable to merge"
 msgstr "无法合并"
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
 
 msgid "You cannot merge a revision with itself"
 msgstr "您无法将一个修订与其自身合并"
@@ -5713,6 +5758,15 @@ msgid ""
 "newly-created repository."
 msgstr "如果指定，目录中的文件将被复制到新创建的仓库，例如 .hgignore 文件。"
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr "工作台"
 
@@ -6498,14 +6552,18 @@ msgid "Changeset Link"
 msgstr "变更集链接"
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -11241,55 +11299,3 @@ msgstr "win32ill: 停止消息循环时被中断\n"
 
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr "忽略对空行的修改. 默认: 否"
-
-#~ msgid "Precursors:"
-#~ msgstr "先驱:"
-
-#~ msgid "List Font"
-#~ msgstr "列表字体"
-
-#~ msgid ""
-#~ "The command that will be executed.\n"
-#~ "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
-#~ "executable command.\n"
-#~ "You can use several {VARIABLES} to compose your command:\n"
-#~ "- {ROOT}: The path to the current repository root.\n"
-#~ "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
-#~ "hash respectively.\n"
-#~ "- {SELECTEDFILES}: The list of files selected by the user on the revision "
-#~ "details file list.\n"
-#~ "- {FILES}: The list of files touched by the selected revision.\n"
-#~ "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
-#~ msgstr ""
-#~ "将要执行的命令。\n"
-#~ "使用 \"hg\" (而不是 \"hg.exe\") 作为可执行命令来执行 Mercurial 命令。\n"
-#~ "您可以使用多个 {VARIABLES} 来构成您的命令。\n"
-#~ "- {ROOT}: 当前仓库的根路径。\n"
-#~ "- {REV} / {REVID}: 选中的修订号 / 十六进制修订哈希值。\n"
-#~ "- {SELECTEDFILES}: 用户在修订细节文件列表中选中的文件的列表。\n"
-#~ "- {FILES}: 涉及选中修订的文件列表。\n"
-#~ "- {ALLFILES}: Mercurial 对选中的修订中跟踪的所有文件。"
-
-#~ msgid ""
-#~ "Changesets within the interval, see <a href=\"http://www.selenic.com/"
-#~ "mercurial/hg.1.html#dates\">help dates</a>"
-#~ msgstr ""
-#~ "间隔内的变更集，见<a href=\"http://www.selenic.com/mercurial/hg.1."
-#~ "html#dates\">日期帮助</a>"
-
-#~ msgid ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
-#~ msgstr ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">revsets 帮"
-#~ "助</a>"
-
-#~ msgid "Font used to display file lists. Default: sans 9"
-#~ msgstr "显示文件列表的字体。默认：sans 9"
-
-#~ msgid ""
-#~ "http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
-#~ "html#tsvn-dug-settings-icon-set"
-#~ msgstr ""
-#~ "http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
-#~ "html#tsvn-dug-settings-icon-set"

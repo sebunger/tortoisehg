@@ -29,6 +29,7 @@ from .qtgui import (
 
 from hgext import mq
 from mercurial import (
+    pycompat,
     scmutil,
 )
 
@@ -83,7 +84,7 @@ class QFoldDialog(QDialog):
                 spp.msgte.setText(spp.composeMsg(self.getPatchList()))
             def getPatchList(self):
                 return [hglib.fromunicode(self.item(i).text()) \
-                        for i in xrange(0, self.count())]
+                        for i in pycompat.xrange(0, self.count())]
 
         ugb = QGroupBox(_('Patches to fold'))
         ugb.setLayout(QVBoxLayout())
@@ -153,7 +154,7 @@ class QFoldDialog(QDialog):
                 'message': unicode(self.msgte.text())}
 
     def patches(self):
-        return map(hglib.tounicode, self.ulw.getPatchList())
+        return pycompat.maplist(hglib.tounicode, self.ulw.getPatchList())
 
     def accept(self):
         self._writesettings()

@@ -34,6 +34,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     repoview,
     scmutil,
     util,
@@ -469,7 +470,7 @@ class RepoFilterBar(QToolBar):
         priomap = {self._repo.dirstate.branch(): -2, 'default': -1}
         branches = sorted(branches, key=lambda e: priomap.get(e, 0))
 
-        branches = map(hglib.tounicode, branches)
+        branches = pycompat.maplist(hglib.tounicode, branches)
 
         self._branchCombo.blockSignals(True)
         self._branchCombo.clear()

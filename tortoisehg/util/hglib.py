@@ -7,7 +7,6 @@
 
 from __future__ import absolute_import
 
-import cStringIO
 import glob
 import os
 import re
@@ -23,11 +22,12 @@ from mercurial import (
     extensions,
     fancyopts,
     filemerge,
-    fileset,
+    filesetlang,
     mdiff,
     merge as mergemod,
     patch as patchmod,
     pathutil,
+    pycompat,
     rcutil,
     revset as revsetmod,
     revsetlang,
@@ -666,7 +666,7 @@ def extractchoices(prompttext):
     msg = m.group(1)
     choices = [p.strip(' ') for p in m.group(2).split('$$')]
     resps = [p[p.index('&') + 1].lower() for p in choices]
-    return msg, zip(resps, choices)
+    return msg, pycompat.ziplist(resps, choices)
 
 def displaytime(date):
     return dateutil.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
@@ -855,8 +855,8 @@ _stringify = '%s'.__mod__
 
 # ASCII code -> escape sequence (see PyString_Repr())
 _escapecharmap = []
-_escapecharmap.extend('\\x%02x' % x for x in xrange(32))
-_escapecharmap.extend(chr(x) for x in xrange(32, 127))
+_escapecharmap.extend('\\x%02x' % x for x in pycompat.xrange(32))
+_escapecharmap.extend(chr(x) for x in pycompat.xrange(32, 127))
 _escapecharmap.append('\\x7f')
 _escapecharmap[0x09] = '\\t'
 _escapecharmap[0x0a] = '\\n'
@@ -1010,7 +1010,7 @@ def formatfilespec(expr, *args):
     but the list must not be empty.
     """
     listfuncs = {}
-    return _formatspec(expr, args, fileset.parse, listfuncs)
+    return _formatspec(expr, args, filesetlang.parse, listfuncs)
 
 def formatrevspec(expr, *args):
     r"""Build revset expression by template and positional arguments
@@ -1079,7 +1079,7 @@ def buildcmdargs(name, *args, **opts):
     ['tag', u'--message=\xc1', u'\xc0']
     """
     fullargs = [_stringify(name)]
-    for k, v in opts.iteritems():
+    for k, v in opts.items():
         if v is None:
             continue
 
@@ -1176,7 +1176,7 @@ def parsecmdline(cmdline, cwd):
     _ = _gettext  # TODO: use unicode version globally
     # shlex can't process unicode on Python < 2.7.3
     cmdline = cmdline.encode('utf-8')
-    src = cStringIO.StringIO(cmdline)
+    src = pycompat.bytesio(cmdline)
     lex = shlex.shlex(src, posix=True)
     lex.whitespace_split = True
     lex.commenters = ''

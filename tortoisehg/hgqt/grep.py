@@ -49,6 +49,7 @@ from mercurial import (
     error,
     hg,
     match,
+    pycompat,
     subrepo,
     ui,
     scmutil,
@@ -344,7 +345,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
                 # re-compile with whole-word wrapping, we know pattern is safe
                 pattern = r'\b(?:%s)\b' % pattern
                 regexp = re.compile(pattern, icase and re.I or 0)
-        except Exception, inst:
+        except Exception as inst:
             msg = _('grep: invalid match pattern: %s\n') % \
                     hglib.tounicode(str(inst))
             self.showMessage.emit(msg)
@@ -355,9 +356,9 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.tv.icase = icase
         self.regexple.selectAll()
         inc = hglib.fromunicode(self.incle.text())
-        if inc: inc = map(str.strip, inc.split(','))
+        if inc: inc = pycompat.maplist(str.strip, inc.split(','))
         exc = hglib.fromunicode(self.excle.text())
-        if exc: exc = map(str.strip, exc.split(','))
+        if exc: exc = pycompat.maplist(str.strip, exc.split(','))
         revstr = hglib.fromunicode(self.revle.text()).strip()
 
         self.addHistory(pattern, inc or [], exc or [])
@@ -374,7 +375,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             try:
                 rev = scmutil.revsymbol(self.repo, revstr or '.').rev()
                 ctx = self.repo[rev]
-            except error.RepoError, e:
+            except error.RepoError as e:
                 msg = _('grep: %s\n') % hglib.tounicode(str(e))
                 self.showMessage.emit(msg)
                 return
@@ -407,7 +408,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.regexple.setFocus()
         count = self.tv.model().rowCount(None)
         if count:
-            for col in xrange(COL_TEXT):
+            for col in pycompat.xrange(COL_TEXT):
                 self.tv.resizeColumnToContents(col)
             self.tv.setSortingEnabled(True)
         if self.thread.completed == False:
@@ -490,7 +491,7 @@ class HistorySearchThread(QThread):
                     'exclude':self.exc}
             u = incrui(self.repo.ui)
             commands.grep(u, self.repo, self.pattern, **opts)
-        except Exception, e:
+        except Exception as e:
             self.showMessage.emit(str(e))
         except KeyboardInterrupt:
             self.showMessage.emit(_('Interrupted'))
@@ -530,7 +531,7 @@ class CtxSearchThread(QThread):
             matchfn.bad = badfn
             self.searchRepo(self.ctx, '', matchfn)
             self.completed = True
-        except Exception, e:
+        except Exception as e:
             self.showMessage.emit(hglib.tounicode(str(e)))
 
     def searchRepo(self, ctx, prefix, matchfn):
@@ -750,7 +751,8 @@ class MatchTree(QTableView):
                     defer.append([rev, path, line])
             if crev is not None:
                 dlg = visdiff.visualdiff(ui, repo,
-                                         map(hglib.fromunicode, files),
+                                         pycompat.maplist(hglib.fromunicode,
+                                                          files),
                                          {'change':crev})
                 if dlg:
                     dlg.exec_()
@@ -802,10 +804,10 @@ class MatchModel(QAbstractTableModel):
             else:
                 snapshots[rev].append(path)
         urls = []
-        for rev, paths in snapshots.iteritems():
+        for rev, paths in snapshots.items():
             if rev is not None:
                 repo = self._repoagent.rawRepo()
-                lpaths = map(hglib.fromunicode, paths)
+                lpaths = pycompat.maplist(hglib.fromunicode, paths)
                 lbase, _ = visdiff.snapshot(repo, lpaths, repo[rev])
                 base = hglib.tounicode(lbase)
             else:

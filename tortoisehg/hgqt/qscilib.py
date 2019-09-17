@@ -763,7 +763,7 @@ def readFile(editor, filename, encoding=None):
     if encoding:
         try:
             text = data.decode(encoding)
-        except UnicodeDecodeError, inst:
+        except UnicodeDecodeError as inst:
             qtlib.WarningMsgBox(_('Text Translation Failure'),
                                 _('Could not translate the file content from '
                                   'native encoding.'),
@@ -785,7 +785,7 @@ def writeFile(editor, filename, encoding=None):
             data = unicode(text).encode(encoding)
         else:
             data = hglib.fromunicode(text)
-    except UnicodeEncodeError, inst:
+    except UnicodeEncodeError as inst:
         qtlib.WarningMsgBox(_('Unable to write file'),
                             _('Could not translate the file content to '
                               'native encoding.'),

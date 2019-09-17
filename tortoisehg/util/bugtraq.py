@@ -5,7 +5,13 @@ from comtypes import IUnknown, GUID, COMMETHOD, POINTER, COMError
 from comtypes.typeinfo import ITypeInfo
 from comtypes.client import CreateObject
 from comtypes.automation import _midlSAFEARRAY
-from _winreg import *
+try:
+    import _winreg as winreg
+    winreg.CloseKey
+    from _winreg import *
+except ImportError:
+    from winreg import *
+
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util.i18n import _
 
@@ -180,7 +186,7 @@ def get_issue_plugins():
             "{3494FA92-B139-4730-9591-01135D5E7831}")
     ret = []
     enumerator = cm.EnumClassesOfCategories((CATID_BugTraqProvider,),())
-    while 1:
+    while True:
         try:
             clsid = enumerator.Next()
             if clsid == ():

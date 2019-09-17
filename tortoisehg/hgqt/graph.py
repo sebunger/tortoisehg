@@ -438,7 +438,7 @@ class _FamilyLineRev(object):
                                     if kv[0] not in excluded_descendants)
 
         if self.visible:
-            for nd, is_p1 in next_descendants.iteritems():
+            for nd, is_p1 in next_descendants.items():
                 nd.destinations.append((self.rev, LINE_TYPE_FAMILY, is_p1))
 
             # `next_descendants` are also excluded from next_descendants
@@ -461,7 +461,7 @@ class _FamilyLineRev(object):
         self.next_descendants = self.excluded_descendants = None
 
     def add_next_descendants(self, descendants):
-        for d, is_p1 in descendants.iteritems():
+        for d, is_p1 in descendants.items():
             if d in self.next_descendants:
                 self.next_descendants[d] |= is_p1
             else:

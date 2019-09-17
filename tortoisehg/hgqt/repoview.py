@@ -61,7 +61,11 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import error, scmutil
+from mercurial import (
+    error,
+    pycompat,
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -87,6 +91,7 @@ class HgRepoView(QTableView):
         self.cfgname = cfgname
         self.colselect = colselect
         self.setShowGrid(False)
+        self.setWordWrap(False)
 
         vh = self.verticalHeader()
         vh.hide()
@@ -200,7 +205,8 @@ class HgRepoView(QTableView):
     def visibleColumns(self):
         hh = self.horizontalHeader()
         return [self.model().allColumns()[hh.logicalIndex(visualindex)]
-                for visualindex in xrange(hh.count() - hh.hiddenSectionCount())]
+                for visualindex in pycompat.xrange(hh.count()
+                                                   - hh.hiddenSectionCount())]
 
     def setVisibleColumns(self, visiblecols):
         if not self.model() or visiblecols == self.visibleColumns():
@@ -518,7 +524,7 @@ class GraphDelegate(QStyledItemDelegate):
             lines = [((start, end), e) for (start, end), e in lines
                      if start < visibleend or end < visibleend]
             # remove hidden lines that can be partly visible due to antialiasing
-            lines = dict(sorted(lines, key=lineimportance)).items()
+            lines = list(dict(sorted(lines, key=lineimportance)).items())
             # still necessary to sort by importance because lines can partially
             # overlap near contact point
             lines.sort(key=lineimportance)
@@ -805,7 +811,7 @@ class ColumnSelectDialog(QDialog):
 
     def selectedColumns(self):
         cols = []
-        for i in xrange(self.list.count()):
+        for i in pycompat.xrange(self.list.count()):
             item = self.list.item(i)
             if item.checkState() == Qt.Checked:
                 cols.append(item.columnid)

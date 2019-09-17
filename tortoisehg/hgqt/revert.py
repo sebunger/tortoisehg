@@ -20,6 +20,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from mercurial.node import nullid
 
 from ..util import hglib
@@ -107,7 +111,7 @@ class RevertDialog(QDialog):
                 return
             cmdline = hglib.buildcmdargs('revert', all=True, rev=rev)
         else:
-            files = map(hglib.tounicode, self.wfiles)
+            files = pycompat.maplist(hglib.tounicode, self.wfiles)
             cmdline = hglib.buildcmdargs('revert', rev=rev, *files)
         self.bbox.button(QDialogButtonBox.Ok).setEnabled(False)
         self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)

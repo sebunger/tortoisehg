@@ -130,7 +130,6 @@ class StripWidget(cmdui.AbstractCmdWidget):
         striprevs = list(self.repo.changelog.descendants([rev]))
         striprevs.append(rev)
         striprevs.sort()
-        self.cslist.clear()
         self.cslist.update(striprevs)
         return True
 
@@ -156,7 +155,7 @@ class StripWidget(cmdui.AbstractCmdWidget):
 
     def runCommand(self):
         opts = {'verbose': True}
-        opts.update((n, w.isChecked()) for n, w in self._optchks.iteritems())
+        opts.update((n, w.isChecked()) for n, w in self._optchks.items())
 
         wc = self.repo[None]
         wcparents = wc.parents()

@@ -33,6 +33,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import hglib
 from ..util.i18n import _
 from . import (
@@ -273,7 +277,7 @@ class ImportDialog(QDialog):
     def _runCommand(self):
         if self.cslist.curitems is None:
             return
-        cmdline = map(str, self._targetcommand())
+        cmdline = pycompat.maplist(str, self._targetcommand())
         if cmdline == ['copy']:
             # import to shelf
             self.repo.thgshelves()  # initialize repo.shelfdir
@@ -286,7 +290,7 @@ class ImportDialog(QDialog):
         if self.p0chk.isChecked():
             cmdline.append('-p0')
         cmdline.extend(['--verbose', '--'])
-        cmdline.extend(map(hglib.tounicode, self.cslist.curitems))
+        cmdline.extend(pycompat.maplist(hglib.tounicode, self.cslist.curitems))
         sess = self._repoagent.runCommand(cmdline, self)
         self._cmdcontrol.setSession(sess)
         sess.commandFinished.connect(self._onCommandFinished)

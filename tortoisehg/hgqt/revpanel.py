@@ -8,7 +8,10 @@
 
 from __future__ import absolute_import
 
+import cgi
+
 from mercurial import (
+    cmdutil,
     error,
     scmutil,
 )
@@ -22,7 +25,7 @@ from . import (
 
 def label_func(widget, item, ctx):
     if item == 'cset':
-        if type(ctx.rev()) is str:
+        if isinstance(ctx.rev(), str):
             return _('Patch:')
         return _('Changeset:')
     elif item == 'parents':
@@ -107,22 +110,37 @@ def data_func(widget, item, ctx):
     raise csinfo.UnknownItem(item)
 
 def create_markup_func(ui):
-    def link_markup(revnum, revid, linkpattern=None):
+    def link_markup(revnum, revid, linkpattern=None, ctx=None):
         mrevid = revid_markup('%s (%s)' % (revnum, revid))
         if linkpattern is None:
             return mrevid
-        link = linkpattern.replace('{node|short}', revid).replace('{rev}', revnum)
-        return '<a href="%s">%s</a>' % (link, mrevid)
+
+        if linkpattern == 'cset:{node|short}':
+            # this is the linkpattern for thg internal hyperlinks
+            href = 'cset:%s' % revid
+        else:
+            if ctx is None:
+                return mrevid
+            try:
+                # evaluates a generic mercurial template for changeset.link
+                href = cmdutil.rendertemplate(ctx, linkpattern)
+            except (error.Abort, error.ParseError):
+                return mrevid
+
+        return '<a href="%s">%s</a>' % (cgi.escape(href, True), mrevid)
+
     def revline_markup(revnum, revid, summary, highlight=None,
-                       branch=None, linkpattern='cset:{node|short}'):
+                       branch=None, linkpattern='cset:{node|short}', ctx=None):
         def branch_markup(branch):
             opts = dict(fg='black', bg='#aaffaa')
+
             return qtlib.markup(' %s ' % branch, **opts)
+
         summary = qtlib.markup(summary)
         if branch:
             branch = branch_markup(branch)
         if revid:
-            rev = link_markup(revnum, revid, linkpattern=linkpattern)
+            rev = link_markup(revnum, revid, linkpattern=linkpattern, ctx=ctx)
             if branch:
                 return '%s %s %s' % (rev, branch, summary)
             return '%s %s' % (rev, summary)
@@ -131,6 +149,7 @@ def create_markup_func(ui):
             if branch:
                 return '%s - %s %s' % (revnum, branch, summary)
             return '%s - %s' % (revnum, summary)
+
     def markup_func(widget, item, value):
         if item in ('cset', 'graft', 'transplant', 'mqoriginalparent',
                     'p4', 'svn', 'converted'):
@@ -140,7 +159,7 @@ def create_markup_func(ui):
                 linkpattern = 'cset:{node|short}'
             if isinstance(value, basestring):
                 return revid_markup(value)
-            return revline_markup(linkpattern=linkpattern, *value)
+            return revline_markup(linkpattern=linkpattern, *value, ctx=widget.ctx)
         elif item in ('parents', 'children', 'predecessors', 'successors'):
             csets = []
             for cset in value:
@@ -150,6 +169,7 @@ def create_markup_func(ui):
                     csets.append(revline_markup(*cset))
             return csets
         raise csinfo.UnknownItem(item)
+
     return markup_func
 
 def RevPanelWidget(repo):

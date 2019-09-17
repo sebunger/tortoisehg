@@ -36,6 +36,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     scmutil,
 )
 
@@ -73,10 +74,11 @@ class RemoteUpdateWidget(cmdui.AbstractCmdWidget):
         combo.setEditable(True)
         form.addRow(_('Update to:'), combo)
 
-        combo.addItems(map(hglib.tounicode, hglib.namedbranches(repo)))
-        tags = list(self.repo.tags()) + repo._bookmarks.keys()
+        combo.addItems(pycompat.maplist(hglib.tounicode,
+                                        hglib.namedbranches(repo)))
+        tags = list(self.repo.tags()) + list(repo._bookmarks.keys())
         tags.sort(reverse=True)
-        combo.addItems(map(hglib.tounicode, tags))
+        combo.addItems(pycompat.maplist(hglib.tounicode, tags))
 
         if rev is None:
             selecturev = hglib.tounicode(self.repo.dirstate.branch())

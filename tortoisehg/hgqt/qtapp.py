@@ -245,7 +245,7 @@ class ExceptionCatcher(QObject):
             rfd = self._wakeupsn.socket()
             try:
                 os.read(rfd, 1)
-            except OSError, inst:
+            except OSError as inst:
                 self._ui.debug('failed to read wakeup fd: %s\n' % inst)
             self._wakeupsn.setEnabled(True)
 
@@ -375,7 +375,7 @@ def _fixapplicationfont():
     if lf.lfWeight != win32con.FW_DONTCARE:
         weights = [(0, QFont.Light), (400, QFont.Normal), (600, QFont.DemiBold),
                    (700, QFont.Bold), (800, QFont.Black)]
-        n, w = filter(lambda e: e[0] <= lf.lfWeight, weights)[-1]
+        n, w = [e for e in weights if e[0] <= lf.lfWeight][-1]
         f.setWeight(w)
     f.setPixelSize(abs(lf.lfHeight))
     QApplication.setFont(f, 'QWidget')
@@ -521,10 +521,10 @@ class QtRunner(QObject):
                 reporoot = repoagent.rootPath()
                 args.insert(0, repoagent)
             return dlgfunc(self._ui, *args, **opts), reporoot
-        except error.RepoError, inst:
+        except error.RepoError as inst:
             qtlib.WarningMsgBox(_('Repository Error'),
                                 hglib.tounicode(str(inst)))
-        except error.Abort, inst:
+        except error.Abort as inst:
             qtlib.WarningMsgBox(_('Abort'),
                                 hglib.tounicode(str(inst)),
                                 hglib.tounicode(inst.hint or ''))

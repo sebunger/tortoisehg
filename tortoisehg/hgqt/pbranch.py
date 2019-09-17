@@ -453,7 +453,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
         # TODO: Fix this - it looks ugly
         try:
             os.mkdir(cachepath)
-        except OSError, err:
+        except OSError as err:
             if err.errno != errno.EEXIST:
                 raise
         # TODO: Convert filename if any funny characters are present
@@ -468,7 +468,7 @@ class PatchBranchWidget(QWidget, qtlib.TaskWidget):
             pf = open(patchfile, 'wb')
             try:
                 pf.writelines(self.pdiff(patchname))
-            #  except (error.Abort, error.RepoError), e:
+            #  except (error.Abort, error.RepoError) as e:
             #      # Do something with str(e)
             finally:
                 pf.close()

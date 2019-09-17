@@ -16,8 +16,12 @@ memory for repositories with a lot of history.
 import itertools
 from collections import defaultdict
 
-from mercurial import revset
-from mercurial import util
+from mercurial import (
+    pycompat,
+    revset,
+    util,
+)
+
 from tortoisehg.util import obsoleteutil
 from tortoisehg.hgqt import graph as graphmod
 from tortoisehg.hgqt.graph import (
@@ -367,7 +371,7 @@ class Graph(object):
                 revs[rev_index:rev_index + 1] = parents_to_add
             self._graph[rev] = (
                 rev_index, prevs, revs[:],
-                list(itertools.chain(*actedge.values())))
+                list(itertools.chain(*list(actedge.values()))))
 
             yield rev
 
@@ -395,7 +399,7 @@ class Graph(object):
 
         if fillstep is not None:
             if self._grapher:
-                for i in xrange(0, fillstep):
+                for i in pycompat.xrange(0, fillstep):
                     if next(self._grapher, -1) == -1:
                         self._grapher = None
                         break

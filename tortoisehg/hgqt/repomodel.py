@@ -38,6 +38,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
 )
 from mercurial.utils import (
     dateutil,
@@ -293,7 +294,7 @@ class HgRepoListModel(QAbstractTableModel):
                 self._shrinkRowCount()  # avoid further exceptions at data()
                 raise
             self._expandRowCount()  # old rows may be mapped to inserted rows
-            for rev, ois in oldindexmap.iteritems():
+            for rev, ois in oldindexmap.items():
                 try:
                     row = self.graph.index(rev)
                 except ValueError:
@@ -345,7 +346,7 @@ class HgRepoListModel(QAbstractTableModel):
             # new query is already running
             return
         if ret == 0:
-            revs = map(int, str(sess.readAll()).splitlines())
+            revs = pycompat.maplist(int, str(sess.readAll()).splitlines())
             if revs:
                 self.showMessage.emit(_('%d matches found') % len(revs))
             else:
@@ -526,7 +527,7 @@ class HgRepoListModel(QAbstractTableModel):
         # example, and result in RevlogError. (issue #429)
         try:
             return self._safedata(index, role)
-        except error.RevlogError, e:
+        except error.RevlogError as e:
             if 'THGDEBUG' in os.environ:
                 raise
             if role == Qt.DisplayRole:
@@ -539,7 +540,8 @@ class HgRepoListModel(QAbstractTableModel):
         graphlen = len(self.graph)
         cachelen = len(self._cache)
         if graphlen > cachelen:
-            self._cache.extend({} for _i in xrange(graphlen - cachelen))
+            self._cache.extend({} for _i in
+                               pycompat.xrange(graphlen - cachelen))
         data = self._cache[row]
         idx = (role, index.column())
         if idx not in data:
@@ -650,7 +652,7 @@ class HgRepoListModel(QAbstractTableModel):
             destpatch = None  # next to working rev
 
         cmdline = hglib.buildcmdargs('qreorder', after=destpatch, *dragpatches)
-        cmdline = map(hglib.tounicode, cmdline)
+        cmdline = pycompat.maplist(hglib.tounicode, cmdline)
         self._repoagent.runCommand(cmdline)
         return True
 
@@ -677,7 +679,7 @@ class HgRepoListModel(QAbstractTableModel):
         if self._filterbranch:
             # look for the first active revision as last ditch; should be
             # removed if filterbranch is merged with revset
-            for row in xrange(len(self.graph)):
+            for row in pycompat.xrange(len(self.graph)):
                 gnode = self.graph[row]
                 if not isinstance(gnode.rev, int):
                     continue
@@ -742,7 +744,7 @@ class HgRepoListModel(QAbstractTableModel):
 
     def _getrev(self, ctx):
         rev = ctx.rev()
-        if type(rev) is int:
+        if isinstance(rev, int):
             return str(rev)
         elif rev is None:
             return u'%d+' % ctx.p1().rev()
@@ -812,7 +814,7 @@ class HgRepoListModel(QAbstractTableModel):
             labels.append((hglib.tounicode(tag), style))
 
         names = set(self.repo.ui.configlist('experimental', 'thg.displaynames'))
-        for name, ns in self.repo.names.iteritems():
+        for name, ns in self.repo.names.items():
             if name not in names:
                 continue
             # we will use the templatename as the color name since those

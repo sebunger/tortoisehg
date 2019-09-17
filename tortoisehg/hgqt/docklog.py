@@ -30,6 +30,7 @@ from .qtgui import (
 
 from mercurial import (
     commands,
+    pycompat,
     util,
 )
 
@@ -349,7 +350,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
             basecmdline = '%s %%s' % (cmdtype)
             matches = [basecmdline % c for c in matchingcmds]
         else:
-            scmdtype = matchingcmds.keys()[0]
+            scmdtype = list(matchingcmds)[0]
             cmdspec = matchingcmds[scmdtype]
             opts = cmdtable[cmdspec][1]
             def findcmdopt(cmdopt):
@@ -476,7 +477,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
         self._commandIdx = 0
         try:
             args = hglib.parsecmdline(cmdline, self._workingDirectory())
-        except ValueError, e:
+        except ValueError as e:
             self.closePrompt()
             self._logwidget.appendLog(unicode(e) + '\n', 'ui.error')
             self.openPrompt()
@@ -509,7 +510,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
             if self.repoRootPath():
                 args = ['-R', self.repoRootPath()] + args
             # TODO: show errors
-            run.dispatch(map(hglib.fromunicode, args))
+            run.dispatch(pycompat.maplist(hglib.fromunicode, args))
         finally:
             self.openPrompt()
 
@@ -558,7 +559,7 @@ class LogDockWidget(QDockWidget):
         self.setFocusProxy(w)
 
     def _findConsoleFor(self, root):
-        for i in xrange(self._consoles.count()):
+        for i in pycompat.xrange(self._consoles.count()):
             w = self._consoles.widget(i)
             if w.repoRootPath() == root:
                 return w

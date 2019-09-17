@@ -7,9 +7,18 @@
 
 import os
 import re
-import cStringIO
-import ConfigParser
-from mercurial import error, util, config as config_mod
+
+from mercurial import (
+    config as config_mod,
+    error,
+    pycompat,
+    util,
+)
+
+if pycompat.ispy3:
+    import configparser
+else:
+    import ConfigParser as configparser
 
 try:
     from iniparse import INIConfig
@@ -200,10 +209,10 @@ class _wconfig(object):
             try:
                 # TODO: optionxformvalue isn't used by INIConfig ?
                 return INIConfig(fp=fp, optionxformvalue=None)
-            except ConfigParser.MissingSectionHeaderError, err:
+            except configparser.MissingSectionHeaderError as err:
                 raise error.ParseError(err.message.splitlines()[0],
                                        '%s:%d' % (err.filename, err.lineno))
-            except ConfigParser.ParsingError, err:
+            except configparser.ParsingError as err:
                 if err.errors:
                     loc = '%s:%d' % (err.filename, err.errors[0][0])
                 else:
@@ -238,7 +247,7 @@ class _wconfig(object):
                                 getattr(ini, 'new_namespace'))
                 return newns(section)
 
-        for k, v in self._sections.iteritems():
+        for k, v in self._sections.items():
             v._replaylog(getsection(ini, k))
 
     def __getattr__(self, name):
@@ -264,7 +273,7 @@ def readfile(path):
 def writefile(config, path):
     """Write the given config obj to the specified file"""
     # normalize line endings
-    buf = cStringIO.StringIO()
+    buf = pycompat.bytesio()
     config.write(buf)
     data = '\n'.join(buf.getvalue().splitlines()) + '\n'
 

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
 "PO-Revision-Date: 2015-09-07 12:25+0000\n"
 "Last-Translator: Yuya Nishihara <Unknown>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:27+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:43+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg オーバーレイアイコンサーバ"
@@ -29,7 +29,7 @@ msgstr "終了"
 msgid "About"
 msgstr "バージョン情報"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -657,6 +657,12 @@ msgstr ""
 
 #, python-format
 msgid "corrupted command result: %r"
+msgstr ""
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
 msgstr ""
 
 #, python-format
@@ -2080,6 +2086,9 @@ msgstr "全履歴"
 msgid "Report only the first match per file"
 msgstr "ファイルごとにマッチした最初の行のみ表示"
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "コピーと名前変更を追跡"
 
@@ -2993,6 +3002,54 @@ msgstr "パッチの日付:"
 msgid "Patch user:"
 msgstr "パッチ作成者:"
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr "レビューを投稿(&R)"
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr "設定が不正です - レビューボードサーバーが設定されていません"
 
@@ -3056,9 +3113,6 @@ msgstr "%p%"
 
 msgid "Connecting to Review Board..."
 msgstr "レビューボードに接続中..."
-
-msgid "Post &Review"
-msgstr "レビューを投稿(&R)"
 
 msgid "Target:"
 msgstr "対象:"
@@ -3156,31 +3210,6 @@ msgstr "新しいパッチメッセージ:"
 
 msgid "Patches to fold"
 msgstr "統合するパッチ"
-
-msgid "Rename Error"
-msgstr "名前の変更エラー"
-
-msgid "Could not rename existing patchfile"
-msgstr "既存のパッチファイルの名前を変えられません"
-
-msgid "Could not delete existing patchfile"
-msgstr "既存のパッチファイルを削除できません"
-
-msgid "QRename - Check patchname"
-msgstr "QRename - パッチの改名"
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr "パッチ名<b>%s</b>はすでに存在しています:"
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr ".OLD拡張子を既存のパッチファイルに追加"
-
-msgid "Overwrite existing patchfile"
-msgstr "既存のパッチファイルを上書き"
-
-msgid "Go back and change new patchname"
-msgstr "戻って別のパッチ名に変更"
 
 msgid "&Undo"
 msgstr "取り消し(&U)"
@@ -3532,6 +3561,9 @@ msgstr "変更元から変更先にコピーする"
 
 msgid "Copy Error"
 msgstr "コピーエラー"
+
+msgid "Rename Error"
+msgstr "名前の変更エラー"
 
 msgid "Select Source File"
 msgstr "元ファイルの選択"
@@ -4271,6 +4303,9 @@ msgstr "除外 (&strip)..."
 msgid "Post to Re&view Board..."
 msgstr "レビューボードに投稿 (postre&view)..."
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr ""
 
@@ -4336,6 +4371,9 @@ msgstr ""
 
 msgid "Post Selected to Review Board..."
 msgstr "選択した部分をレビューボードに投稿..."
+
+msgid "Post Selected to Phabricator..."
+msgstr ""
 
 msgid "Apply patch"
 msgstr "パッチを適用"
@@ -4458,6 +4496,13 @@ msgstr ""
 
 msgid "Unable to merge"
 msgstr "マージできませんでした"
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
 
 msgid "You cannot merge a revision with itself"
 msgstr ""
@@ -5780,6 +5825,15 @@ msgid ""
 "newly-created repository."
 msgstr ""
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr "ワークベンチ"
 
@@ -6589,14 +6643,18 @@ msgid "Changeset Link"
 msgstr "リビジョンリンク"
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -11557,9 +11615,6 @@ msgstr ""
 #~ msgid "Push new branch"
 #~ msgstr "新規ブランチをプッシュ"
 
-#~ msgid "List Font"
-#~ msgstr "一覧フォント"
-
 #~ msgid "Backed out successfully, you must now commit the results"
 #~ msgstr "バックアウトしました。結果をコミットしてください。"
 
@@ -11599,23 +11654,11 @@ msgstr ""
 #~ msgid "delete of shelve backup failed"
 #~ msgstr "バックアップファイルを削除できません"
 
-#~ msgid "Font used to display file lists. Default: sans 9"
-#~ msgstr ""
-#~ "ファイル一覧を表示するフォントの設定です。デフォルトは sans の9ポイントで"
-#~ "す。"
-
 #~ msgid " Aborted"
 #~ msgstr " が中断されました"
 
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "中断: バックアップの復元に失敗しました %s\n"
-
-#~ msgid ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
-#~ msgstr ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">指定方法に"
-#~ "ついて</a>"
 
 #~ msgid "file %s already exists\n"
 #~ msgstr "ファイル %s はすでに存在しています\n"
@@ -11634,20 +11677,6 @@ msgstr ""
 
 #~ msgid "removing backup file : %r\n"
 #~ msgstr "バックアップを除去中: %r\n"
-
-#~ msgid ""
-#~ "Changesets affecting files matched by pattern.  See <a href=\"http://www."
-#~ "selenic.com/mercurial/hg.1.html#patterns\">help patterns</a>"
-#~ msgstr ""
-#~ "パターンに合致するファイルに改変を行ったリビジョン群。 <a href=\"http://"
-#~ "www.selenic.com/mercurial/hg.1.html#patterns\">パターンの詳細</a>"
-
-#~ msgid ""
-#~ "Changesets within the interval, see <a href=\"http://www.selenic.com/"
-#~ "mercurial/hg.1.html#dates\">help dates</a>"
-#~ msgstr ""
-#~ "指定期間中のリビジョン群。 <a href=\"http://www.selenic.com/mercurial/"
-#~ "hg.1.html#dates\">期間指定の詳細</a>"
 
 #~ msgid "Restart merge with"
 #~ msgstr "指定ツールで再マージ"

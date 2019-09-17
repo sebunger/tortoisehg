@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import cgi
 import os
@@ -196,8 +196,9 @@ class BugReport(QDialog):
                         os.path.join(_safegetcwd(), 'bugreport.txt'),
                         _('Text files (*.txt)'))
             if fname:
-                open(fname, 'wb').write(hglib.fromunicode(self.text))
-        except (EnvironmentError), e:
+                with open(fname, 'wb') as fp:
+                    fp.write(hglib.fromunicode(self.text))
+        except EnvironmentError as e:
             QMessageBox.critical(self, _('Error writing file'), str(e))
 
     def accept(self):
@@ -236,8 +237,8 @@ class ExceptionMsgBox(QDialog):
                 msgopts['arg' + str(i)] = cgi.escape(hglib.tounicode(val))
             try:
                 text = text % msgopts
-            except Exception, e:
-                print e, msgopts
+            except Exception as e:
+                print(e, msgopts)
         else:
             self._mainlabel = QLabel('<b>%s</b>' % cgi.escape(main),
                                      textInteractionFlags=labelflags)
@@ -274,7 +275,7 @@ class ExceptionMsgBox(QDialog):
                         self.ui = hglib.loadui()
                 fake = FakeRepo()
                 qtlib.editfiles(fake, [fname], lineno, parent=self)
-            except Exception, e:
+            except Exception as e:
                 qtlib.openlocalurl(fname)
         if ref.startswith('#fix:'):
             from tortoisehg.hgqt import settings

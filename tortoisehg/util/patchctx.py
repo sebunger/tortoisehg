@@ -5,12 +5,19 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+from __future__ import print_function
+
 import os
 import binascii
-import cStringIO
 
-from mercurial import patch, util, error
-from mercurial import node
+from mercurial import (
+    error,
+    node,
+    patch,
+    pycompat,
+    util,
+)
+
 from mercurial.utils import (
     dateutil,
 )
@@ -102,7 +109,7 @@ class patchctx(object):
 
     def __str__(self):      return node.short(self.node())
     def node(self):         return self._node
-    def files(self):        return self._files.keys()
+    def files(self):        return list(self._files.keys())
     def rev(self):          return self._rev
     def hex(self):          return node.hex(self.node())
     def user(self):         return self._user
@@ -181,7 +188,7 @@ class patchctx(object):
         if wfile == self._parseErrorFileName:
             return '\n\n\nErrors while parsing patch:\n'+str(self._parseerror)
         if wfile in self._files:
-            buf = cStringIO.StringIO()
+            buf = pycompat.bytesio()
             for chunk in self._files[wfile]:
                 chunk.write(buf)
             return buf.getvalue()
@@ -226,12 +233,12 @@ class patchctx(object):
                     files[path] = [chunk]
                     self._fileorder.append(path)
                 files[path].extend(chunk.hunks)
-        except (patch.PatchError, AttributeError), e:
+        except (patch.PatchError, AttributeError) as e:
             self._status[2].append(self._parseErrorFileName)
             files[self._parseErrorFileName] = []
             self._parseerror = e
             if 'THGDEBUG' in os.environ:
-                print e
+                print(e)
         finally:
             pf.close()
         return files

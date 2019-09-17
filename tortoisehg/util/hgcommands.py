@@ -14,6 +14,7 @@ import socket
 from mercurial import (
     error,
     extensions,
+    pycompat,
     registrar,
     sslutil,
     util,
@@ -67,7 +68,8 @@ def debuggethostfingerprint(ui, repo, source='default', **opts):
         sock.close()
 
     s = hashlib.sha256(peercert).hexdigest()
-    ui.write('sha256:', ':'.join([s[x:x + 2] for x in xrange(0, len(s), 2)]),
+    ui.write('sha256:', ':'.join([s[x:x + 2] for x
+                                  in pycompat.xrange(0, len(s), 2)]),
              '\n')
 
 def postinitskel(ui, repo, hooktype, result, pats, **kwargs):

@@ -21,7 +21,7 @@ def _dispatch(orig, req):
     ui = req.ui
     try:
         return orig(req)
-    except subrepo.SubrepoAbort, e:
+    except subrepo.SubrepoAbort as e:
         errormsg = str(e)
         label = 'ui.error'
         if e.subrepo:
@@ -29,16 +29,16 @@ def _dispatch(orig, req):
         ui.write_err(_('abort: ') + errormsg + '\n', label=label)
         if e.hint:
             ui.write_err(_('hint: ') + str(e.hint) + '\n', label=label)
-    except error.Abort, e:
+    except error.Abort as e:
         ui.write_err(_('abort: ') + str(e) + '\n', label='ui.error')
         if e.hint:
             ui.write_err(_('hint: ') + str(e.hint) + '\n', label='ui.error')
-    except error.RepoError, e:
+    except error.RepoError as e:
         ui.write_err(str(e) + '\n', label='ui.error')
-    except urllib2.HTTPError, e:
+    except urllib2.HTTPError as e:
         err = _('HTTP Error: %d (%s)') % (e.code, e.msg)
         ui.write_err(err + '\n', label='ui.error')
-    except urllib2.URLError, e:
+    except urllib2.URLError as e:
         err = _('URLError: %s') % str(e.reason)
         try:
             import ssl  # Python 2.6 or backport for 2.5

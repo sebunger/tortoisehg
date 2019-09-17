@@ -157,7 +157,7 @@ class GraftDialog(QDialog):
         ui = self.repo.ui
         qs = QSettings()
         qs.beginGroup('graft')
-        for n, w in self._optchks.iteritems():
+        for n, w in self._optchks.items():
             if n == 'autoresolve':
                 w.setChecked(ui.configbool('tortoisehg', n,
                                            qtlib.readBool(qs, n, True)))
@@ -168,7 +168,7 @@ class GraftDialog(QDialog):
     def _writeSettings(self):
         qs = QSettings()
         qs.beginGroup('graft')
-        for n, w in self._optchks.iteritems():
+        for n, w in self._optchks.items():
             qs.setValue(n, w.isChecked())
         qs.endGroup()
 
@@ -200,7 +200,7 @@ class GraftDialog(QDialog):
     def graft(self):
         self.graftbtn.setEnabled(False)
         self.cancelbtn.setVisible(False)
-        opts = dict((n, w.isChecked()) for n, w in self._optchks.iteritems())
+        opts = dict((n, w.isChecked()) for n, w in self._optchks.items())
         itool = opts.pop('autoresolve') and 'merge' or 'fail'
         opts['config'] = 'ui.merge=internal:%s' % itool
         if os.path.exists(self._graftstatefile):
