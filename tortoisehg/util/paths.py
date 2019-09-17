@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+from __future__ import print_function
+
 try:
     from tortoisehg.util.config import (icon_path, bin_path, license_path,
                                         locale_path)
@@ -33,7 +35,7 @@ def get_tortoise_icon(icon):
     if os.path.isfile(icopath):
         return icopath
     else:
-        print 'icon not found', icon
+        print('icon not found', icon)
         return None
 
 def get_icon_path():

@@ -5,7 +5,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import os
 
@@ -24,6 +24,10 @@ from .qtcore import (
 )
 from .qtgui import (
     QFont,
+)
+
+from mercurial import (
+    pycompat,
 )
 
 from ..util import hglib
@@ -53,16 +57,16 @@ def readXml(source, rootElementName):
     if xr.readNextStartElement():
         ele = str(xr.name())
         if ele != rootElementName:
-            print "unexpected xml element '%s' "\
-                  "(was looking for %s)" % (ele, rootElementName)
+            print("unexpected xml element '%s' "
+                  "(was looking for %s)" % (ele, rootElementName))
             return
     if xr.hasError():
-        print hglib.fromunicode(xr.errorString(), 'replace')
+        print(hglib.fromunicode(xr.errorString(), 'replace'))
     if xr.readNextStartElement():
         itemread = repotreeitem.undumpObject(xr)
         xr.skipCurrentElement()
     if xr.hasError():
-        print hglib.fromunicode(xr.errorString(), 'replace')
+        print(hglib.fromunicode(xr.errorString(), 'replace'))
     return itemread
 
 def iterRepoItemFromXml(source):
@@ -390,7 +394,7 @@ class RepoTreeModel(QAbstractItemModel):
             item._sharedpath = tmpitem._sharedpath
             item._valid = tmpitem._valid
             self._emitItemDataChanged(item)
-        return map(hglib.tounicode, invalidpaths)
+        return pycompat.maplist(hglib.tounicode, invalidpaths)
 
     def updateCommonPaths(self, showShortPaths=None):
         if showShortPaths is not None:

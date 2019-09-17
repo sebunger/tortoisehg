@@ -36,6 +36,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import hglib
 from ..util.i18n import _
 from . import (
@@ -263,7 +267,7 @@ class ResolveDialog(QDialog):
             for root, wfile in selected:
                 if root == curroot:
                     cmd.append(os.path.normpath(os.path.join(root, wfile)))
-            cmdlines.append(map(hglib.tounicode, cmd))
+            cmdlines.append(pycompat.maplist(hglib.tounicode, cmd))
             selected = [(r, w) for r, w in selected if r != curroot]
         if cmdlines:
             sess = self._repoagent.runCommandSequence(cmdlines, self)

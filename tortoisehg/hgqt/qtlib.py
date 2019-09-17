@@ -67,6 +67,7 @@ from .qtgui import (
 from mercurial import (
     color,
     extensions,
+    pycompat,
     util,
 )
 from mercurial.utils import (
@@ -223,10 +224,10 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
                 expanded.append(phrase)
             expanded.append(toolpath[pos:])
             cmdline = ' '.join(expanded + files)
-        except ValueError, e:
+        except ValueError as e:
             # '[' or ']' not found
             pass
-        except TypeError, e:
+        except TypeError as e:
             # variable expansion failed
             pass
 
@@ -248,7 +249,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
             cmdline = procutil.quotecommand(cmdline)
             subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
                              stderr=None, stdout=None, stdin=None, cwd=cwd)
-    except (OSError, EnvironmentError), e:
+    except (OSError, EnvironmentError) as e:
         QMessageBox.warning(parent,
                 _('Editor launch failure'),
                 u'%s : %s' % (hglib.tounicode(cmdline),
@@ -288,7 +289,8 @@ def openshell(root, reponame, ui=None):
                 # can't parse shellcmd in POSIX way
                 started = QProcess.startDetached(hglib.tounicode(shellcmd))
             else:
-                fullargs = map(hglib.tounicode, shlex.split(shellcmd))
+                fullargs = pycompat.maplist(hglib.tounicode,
+                                            shlex.split(shellcmd))
                 started = QProcess.startDetached(fullargs[0], fullargs[1:])
         finally:
             os.chdir(cwd)
@@ -838,7 +840,7 @@ class CustomPrompt(QMessageBox):
         return self.exec_()
 
     def keyPressEvent(self, event):
-        for k, btn in self.hotkeys.iteritems():
+        for k, btn in self.hotkeys.items():
             if event.text() == k:
                 btn.clicked.emit(False)
         super(CustomPrompt, self).keyPressEvent(event)
@@ -1102,7 +1104,7 @@ class StatusLabel(QWidget):
             elif isinstance(icon, basestring):
                 icon = geticon(icon)
             elif not isinstance(icon, QIcon):
-                raise TypeError, '%s: bool, str or QIcon' % type(icon)
+                raise TypeError('%s: bool, str or QIcon' % type(icon))
             self.status_icon.setVisible(True)
             self.status_icon.setPixmap(icon.pixmap(16, 16))
 
@@ -1286,7 +1288,7 @@ class DialogKeeper(QObject):
                 del self._keytodlgs[key]
 
     def count(self):
-        return sum(len(dlgs) for dlgs in self._keytodlgs.itervalues())
+        return sum(len(dlgs) for dlgs in self._keytodlgs.values())
 
     @staticmethod
     def _defaultgenkey(_parent, *args, **_kwargs):

@@ -293,14 +293,14 @@ class RepoRegistryView(QDockWidget):
                       'showNetworkSubrepos': False, 'showShortPaths': True}
         s = QSettings()
         s.beginGroup('Workbench')  # for compatibility with old release
-        for key, action in self._settingactions.iteritems():
+        for key, action in self._settingactions.items():
             action.setChecked(qtlib.readBool(s, key, defaultmap[key]))
         s.endGroup()
 
     def _saveSettings(self):
         s = QSettings()
         s.beginGroup('Workbench')  # for compatibility with old release
-        for key, action in self._settingactions.iteritems():
+        for key, action in self._settingactions.items():
             s.setValue(key, action.isChecked())
         s.endGroup()
         s.beginGroup('reporegistry')
@@ -336,7 +336,7 @@ class RepoRegistryView(QDockWidget):
         ax['showShortPaths'].setEnabled(ax['showPaths'].isChecked())
 
     def settingActions(self):
-        return sorted(self._settingactions.itervalues(),
+        return sorted(self._settingactions.values(),
                       key=lambda a: a.data())
 
     def _isSettingEnabled(self, key):
@@ -697,18 +697,17 @@ class RepoRegistryView(QDockWidget):
         hgsubfilename = os.path.join(root, '.hgsub')
 
         try:
-            f = open(hgsubfilename, 'r')
             hgsub = []
             found = False
-            for line in f.readlines():
-                spath = os.path.normcase(
-                    os.path.normpath(
-                        line.split('=')[0].strip()))
-                if spath != relsubpath:
-                    hgsub.append(line)
-                else:
-                    found = True
-            f.close()
+            with open(hgsubfilename, 'r') as f:
+                for line in f:
+                    spath = os.path.normcase(
+                        os.path.normpath(
+                            line.split('=')[0].strip()))
+                    if spath != relsubpath:
+                        hgsub.append(line)
+                    else:
+                        found = True
         except IOError:
             qtlib.ErrorMsgBox(_('Could not open .hgsub file'),
                 _('Cannot read the .hgsub file.<p>'
@@ -731,9 +730,8 @@ class RepoRegistryView(QDockWidget):
         if answer != 0:
             return
         try:
-            f = open(hgsubfilename, 'w')
-            f.writelines(hgsub)
-            f.close()
+            with open(hgsubfilename, 'w') as f:
+                f.writelines(hgsub)
             qtlib.InfoMsgBox(_('Subrepository removed from .hgsub'),
                 _('The selected subrepository has been removed '
                   'from the .hgsub file.<p>'

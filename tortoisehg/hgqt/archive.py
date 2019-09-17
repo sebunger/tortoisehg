@@ -29,6 +29,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     scmutil,
 )
 
@@ -158,7 +159,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         # set default values
         self.prevtarget = None
         self.rev_combo.addItem(WD_PARENT)
-        self.rev_combo.addItems(map(hglib.tounicode,
+        self.rev_combo.addItems(pycompat.maplist(hglib.tounicode,
                                     hglib.namedbranches(self.repo)))
         tags = list(self.repo.tags())
         tags.sort(reverse=True)
@@ -248,7 +249,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
             return path
         def remove_rev(path):
             l = ''
-            for i in xrange(self.rev_combo.count() - 1):
+            for i in pycompat.xrange(self.rev_combo.count() - 1):
                 l += unicode(self.rev_combo.itemText(i))
             revs = [rev[0] for rev in l]
             revs.append(wdrev)

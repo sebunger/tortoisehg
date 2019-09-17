@@ -79,7 +79,7 @@ class AboutDialog(QDialog):
         self.copyright_lbl = QLabel()
         self.copyright_lbl.setAlignment(Qt.AlignCenter)
         self.copyright_lbl.setText('\n'
-                + _('Copyright 2008-2018 Steve Borho and others'))
+                + _('Copyright 2008-2019 Steve Borho and others'))
         self.vbox.addWidget(self.copyright_lbl)
         self.courtesy_lbl = QLabel()
         self.courtesy_lbl.setAlignment(Qt.AlignCenter)
@@ -213,7 +213,8 @@ class LicenseDialog(QDialog):
         self.lic_txt.setTextInteractionFlags(
                 Qt.TextSelectableByKeyboard|Qt.TextSelectableByMouse)
         try:
-            lic = open(paths.get_license_path(), 'rb').read()
+            with open(paths.get_license_path(), 'rb') as fp:
+                lic = fp.read()
             self.lic_txt.setPlainText(lic)
         except (IOError):
             pass

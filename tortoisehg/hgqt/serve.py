@@ -21,6 +21,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     util,
 )
 
@@ -97,7 +98,8 @@ class ServeDialog(QDialog):
         if self.isstarted():
             return
 
-        self._agent.runCommand(map(hglib.tounicode, self._cmdargs()))
+        self._agent.runCommand(pycompat.maplist(hglib.tounicode,
+                                                self._cmdargs()))
 
     def _cmdargs(self):
         """Build command args to run server"""

@@ -41,6 +41,7 @@ from .qtgui import (
 from mercurial import (
     hg,
     patch,
+    pycompat,
     similar,
 )
 
@@ -258,7 +259,7 @@ class DetectRenameDialog(QDialog):
 
     def searchfinished(self):
         self.stbar.clearProgress()
-        for col in xrange(3):
+        for col in pycompat.xrange(3):
             self.matchtv.resizeColumnToContents(col)
         self.findbtn.setEnabled(self.unrevlist.count())
         self.matchbtn.setEnabled(len(self.matchtv.model().rows))
@@ -288,7 +289,7 @@ class DetectRenameDialog(QDialog):
                       'destination file:\n%s. Aborting!') % udest)
                 return
             remdests[dest] = src
-        for dest, src in remdests.iteritems():
+        for dest, src in remdests.items():
             if not os.path.exists(self.repo.wjoin(src)):
                 wctx.forget([src]) # !->R
             wctx.copy(src, dest)
@@ -456,7 +457,7 @@ class RenameSearchThread(QThread):
             self.search(self.repo)
         except KeyboardInterrupt:
             pass
-        except Exception, e:
+        except Exception as e:
             self.showMessage.emit(hglib.tounicode(str(e)))
         finally:
             self.threadid = None

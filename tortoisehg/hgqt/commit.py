@@ -56,6 +56,7 @@ from mercurial import (
     error,
     obsolete,  # delete if obsolete becomes enabled by default
     phases,
+    pycompat,
     scmutil,
 )
 from mercurial.utils import (
@@ -107,7 +108,7 @@ def readopts(ui):
 
 def commitopts2str(opts, mode='commit'):
     optslist = []
-    for opt, value in opts.iteritems():
+    for opt, value in opts.items():
         if opt in ['user', 'date', 'pushafter', 'autoinc',
                    'recurseinsubrepos']:
             if mode == 'merge' and opt == 'autoinc':
@@ -275,7 +276,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 try:
                     parameters = self.opts['bugtraqparameters']
                     linktext = self.bugtraq.get_link_text(parameters)
-                except Exception, e:
+                except Exception as e:
                     tracker = self.opts['bugtraqplugin'].split(' ', 1)[1]
                     errormsg =  _('Failed to load issue tracker \'%s\': %s') \
                                  % (tracker, hglib.tounicode(str(e)))
@@ -408,7 +409,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             ctx = r['.']
             return (ctx.phase() != phases.public) \
                 and len(r[None].parents()) < 2 \
-                and (obsolete._enabled or not ctx.children())
+                and (obsolete.isenabled(self.repo, obsolete.allowunstableopt)
+                     or not ctx.children())
 
         acts = [
             ('commit', _('Commit changes'), _('Commit'), notpatch),
@@ -445,7 +447,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         committb.setBold()
         committb.setPopupMode(QToolButton.MenuButtonPopup)
         fmk = lambda s: committb.fontMetrics().width(hglib.tounicode(s[2]))
-        committb._width = max(map(fmk, acts)) + 4*committb.menuButtonWidth()
+        committb._width = (max(pycompat.maplist(fmk, acts))
+                           + 4*committb.menuButtonWidth())
 
         class CommitButtonMenu(QMenu):
             def __init__(self, parent, repo):
@@ -653,7 +656,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 for tokentype, value in lexer.get_tokens(contents):
                     if tokentype in Token.Name and len(value) > 4:
                         tokens.add(value)
-            except ClassNotFound, TypeError:
+            except (ClassNotFound, TypeError):
                 pass
         except ImportError:
             pass
@@ -717,6 +720,12 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.lastCommitMsgs['amend'] = ('', False)  # avoid loading stale cache
         # refresh() may load/save the stale 'amend' message in commitSetAction()
         self.refresh()
+
+        # Updating after refreshWctx() leaves stale files in the commit list
+        # after amend + evolve + update.
+        if curraction._name == 'amend':
+            self.commitSetAction()
+
         self.stwidget.refreshWctx() # Trigger reload of working context
         # clear the last 'amend' message
         # do not clear the last 'commit' message because there are many cases
@@ -983,7 +992,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             merge = False
             files = self.stwidget.getChecked('MAR?!IS')
             # make list of files with partial change selections
-            for fname, c in self.stwidget.partials.iteritems():
+            for fname, c in self.stwidget.partials.items():
                 if c.excludecount > 0 and c.excludecount < len(c.hunks):
                     partials.append(fname)
             self.files = set(files + partials)
@@ -1013,7 +1022,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             checkedUnknowns, lfiles = result
             if lfiles:
                 cmd = ['add', '--large', '--']
-                cmd.extend(map(hglib.escapepath, lfiles))
+                cmd.extend(pycompat.maplist(hglib.escapepath, lfiles))
                 commandlines.append(cmd)
         if checkedUnknowns:
             confirm = self.repo.ui.configbool('tortoisehg',
@@ -1028,7 +1037,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 res = 0
             if res == 0:
                 cmd = ['add', '--']
-                cmd.extend(map(hglib.escapepath, checkedUnknowns))
+                cmd.extend(pycompat.maplist(hglib.escapepath, checkedUnknowns))
                 commandlines.append(cmd)
             else:
                 return
@@ -1046,7 +1055,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 res = 0
             if res == 0:
                 cmd = ['remove', '--']
-                cmd.extend(map(hglib.escapepath, checkedMissing))
+                cmd.extend(pycompat.maplist(hglib.escapepath, checkedMissing))
                 commandlines.append(cmd)
             else:
                 return
@@ -1086,7 +1095,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             assert not self.stwidget.partials
 
         cmdline.append('--')
-        cmdline.extend(map(hglib.escapepath, self.files))
+        cmdline.extend(pycompat.maplist(hglib.escapepath, self.files))
         if len(repo[None].parents()) == 1:
             for fname in self.opts.get('autoinc', '').split(','):
                 fname = fname.strip()
@@ -1109,7 +1118,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.currentAction = action
         self.progress.emit(*cmdui.startProgress(_topicmap[action], ''))
         self.commitButtonEnable.emit(False)
-        ucmdlines = [map(hglib.tounicode, xs) for xs in cmdlines]
+        ucmdlines = [pycompat.maplist(hglib.tounicode, xs) for xs in cmdlines]
         self._cmdsession = sess = self._repoagent.runCommandSequence(ucmdlines,
                                                                      self)
         sess.commandFinished.connect(self.commandFinished)
@@ -1321,7 +1330,7 @@ class DetailsDialog(QDialog):
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
-        except IOError, e:
+        except IOError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
 
@@ -1344,7 +1353,7 @@ class DetailsDialog(QDialog):
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
-        except IOError, e:
+        except IOError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
 
@@ -1367,7 +1376,7 @@ class DetailsDialog(QDialog):
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
-        except IOError, e:
+        except IOError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
 
@@ -1390,7 +1399,7 @@ class DetailsDialog(QDialog):
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
-        except IOError, e:
+        except IOError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(e), parent=self)
 
@@ -1420,7 +1429,7 @@ class DetailsDialog(QDialog):
         if not user:
             try:
                 self.repo.ui.username()
-            except error.Abort, e:
+            except error.Abort as e:
                 if e.hint:
                     err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                                 hglib.tounicode(e.hint))

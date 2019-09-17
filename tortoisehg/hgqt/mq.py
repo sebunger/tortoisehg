@@ -47,6 +47,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     scmutil,
 )
 
@@ -79,7 +80,7 @@ def _checkForRejects(repo, rawoutput, parent=None):
             rejfiles[wfile] = (r == QDialog.Accepted)
 
     # empty rejfiles means we failed to parse output message
-    return bool(rejfiles) and all(rejfiles.itervalues())
+    return bool(rejfiles) and all(rejfiles.values())
 
 class QueueManagementActions(QObject):
     """Container for patch queue management actions"""
@@ -97,7 +98,7 @@ class QueueManagementActions(QObject):
             'deleteQueue': QAction(_('&Delete Queue...'), self),
             'purgeQueue':  QAction(_('&Purge Queue...'), self),
             }
-        for name, action in self._actions.iteritems():
+        for name, action in self._actions.items():
             action.triggered.connect(getattr(self, '_' + name))
         self._updateActions()
 
@@ -107,7 +108,7 @@ class QueueManagementActions(QObject):
 
     def _updateActions(self):
         enabled = bool(self._repoagent) and self._cmdsession.isFinished()
-        for action in self._actions.itervalues():
+        for action in self._actions.values():
             action.setEnabled(enabled)
 
     def createMenu(self, parent=None):
@@ -320,7 +321,7 @@ class PatchQueueActions(QObject):
         return self._runCommand('qdelete', patches, dlg.options())
 
     def foldPatches(self, patches):
-        lpatches = map(hglib.fromunicode, patches)
+        lpatches = pycompat.maplist(hglib.fromunicode, patches)
         dlg = qfold.QFoldDialog(self._repoagent, lpatches, self.parent())
         dlg.finished.connect(dlg.deleteLater)
         if not dlg.exec_():
@@ -484,7 +485,7 @@ class PatchQueueModel(QAbstractListModel):
         return len(self._series)
 
     def appliedCount(self):
-        return sum(s == 'applied' for s in self._statusmap.itervalues())
+        return sum(s == 'applied' for s in self._statusmap.values())
 
     def patchName(self, index):
         if not index.isValid():
@@ -494,7 +495,8 @@ class PatchQueueModel(QAbstractListModel):
     def patchGuards(self, index):
         if not index.isValid():
             return []
-        return map(hglib.tounicode, self._seriesguards[index.row()])
+        return pycompat.maplist(hglib.tounicode,
+                                self._seriesguards[index.row()])
 
     def isApplied(self, index):
         if not index.isValid():
@@ -575,7 +577,7 @@ class PatchQueueModel(QAbstractListModel):
             after = None  # next to working rev
         patches = str(data.data('application/vnd.thg.mq.series')).splitlines()
         cmdline = hglib.buildcmdargs('qreorder', after=after, *patches)
-        cmdline = map(hglib.tounicode, cmdline)
+        cmdline = pycompat.maplist(hglib.tounicode, cmdline)
         self._repoagent.runCommand(cmdline)
         return True
 
@@ -800,7 +802,7 @@ class MQPatchesWidget(QDockWidget):
     def _onDelete(self):
         model = self._queueListWidget.model()
         selmodel = self._queueListWidget.selectionModel()
-        patches = map(model.patchName, selmodel.selectedRows())
+        patches = pycompat.maplist(model.patchName, selmodel.selectedRows())
         self._patchActions.deletePatches(patches)
 
     @pyqtSlot()
@@ -914,7 +916,8 @@ class MQPatchesWidget(QDockWidget):
             newguards.append(guard)
         elif guard in newguards:
             newguards.remove(guard)
-        self._patchActions.selectGuards(map(hglib.tounicode, newguards))
+        self._patchActions.selectGuards(pycompat.maplist(hglib.tounicode,
+                                                         newguards))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:

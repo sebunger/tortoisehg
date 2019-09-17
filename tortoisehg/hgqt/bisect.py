@@ -160,9 +160,9 @@ class BisectDialog(QDialog):
         try:
             ctx = scmutil.revsymbol(self.repo, hglib.fromunicode(changeid))
             return ctx.rev()
-        except (error.LookupError, error.RepoLookupError), e:
+        except (error.LookupError, error.RepoLookupError) as e:
             self._stbar.showMessage(hglib.tounicode(str(e)))
-        except error.Abort, e:
+        except error.Abort as e:
             if e.hint:
                 err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                             hglib.tounicode(e.hint))

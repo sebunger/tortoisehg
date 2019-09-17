@@ -36,6 +36,7 @@ from .qtgui import (
 
 from mercurial import (
     extensions,
+    pycompat,
     scmutil,
 )
 
@@ -74,7 +75,7 @@ class LoadReviewDataThread(QThread):
                                                     pwd)
                 self.loadCombos()
 
-            except rb.ReviewBoardError, e:
+            except rb.ReviewBoardError as e:
                 msg = e.msg
             except TypeError:
                 msg = _("Invalid reviewboard plugin. Please download the "
@@ -217,7 +218,7 @@ class PostReviewDialog(QDialog):
         def itercombo(w):
             if w.currentText():
                 yield w.currentText()
-            for i in xrange(w.count()):
+            for i in pycompat.xrange(w.count()):
                 if w.itemText(i) != w.currentText():
                     yield w.itemText(i)
 
@@ -348,7 +349,7 @@ class PostReviewDialog(QDialog):
 
         def cmdargs(opts):
             args = []
-            for k, v in opts.iteritems():
+            for k, v in opts.items():
                 if isinstance(v, bool):
                     if v:
                         args.append('--%s' % k.replace('_', '-'))
@@ -365,8 +366,8 @@ class PostReviewDialog(QDialog):
         self.qui.post_review_button.setEnabled(False)
         self.qui.close_button.setEnabled(False)
 
-        cmdline = map(hglib.tounicode,
-                      ['postreview'] + cmdargs(opts) + [revstr])
+        cmdline = pycompat.maplist(hglib.tounicode,
+                                   ['postreview'] + cmdargs(opts) + [revstr])
         self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
         del self._cmdoutputs[:]
         sess.commandFinished.connect(self.onCompletion)

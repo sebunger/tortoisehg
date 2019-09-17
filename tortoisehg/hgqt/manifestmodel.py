@@ -31,6 +31,8 @@ from .qtgui import (
 from mercurial import (
     error,
     match as matchmod,
+    pycompat,
+    scmutil,
 )
 
 from ..util import hglib
@@ -199,7 +201,7 @@ class ManifestModel(QAbstractItemModel):
         ctx = self._rootentry.ctx
         if ctx.rev() is not None:
             repo = self._repoagent.rawRepo()
-            lfiles = map(hglib.fromunicode, files)
+            lfiles = pycompat.maplist(hglib.fromunicode, files)
             lbase, _fns = visdiff.snapshot(repo, lfiles, ctx)
             base = hglib.tounicode(lbase)
         else:
@@ -483,6 +485,8 @@ class _Entry(object):
         # leaf node should not be False because of len(node) == 0
         return True
 
+    __bool__ = __nonzero__
+
     def __getitem__(self, name):
         return self._child[name]
 
@@ -511,7 +515,7 @@ class _Entry(object):
 
     def sort(self, reverse=False):
         """Sort the entries recursively; directories first"""
-        for e in self._child.itervalues():
+        for e in self._child.values():
             e.sort(reverse=reverse)
         self._nameindex.sort(
             key=lambda s: (not self[s].isdir, os.path.normcase(s)),
@@ -544,14 +548,14 @@ def _makematcher(repo, ctx, pat, changedonly):
         include.extend('path:%s' % p for p in ctx.files())
         if not include:
             # no match
-            return matchmod.exact(repo.root, cwd, [])
+            return scmutil.matchfiles(repo, [])  # TODO: use matchmod.never()
 
     try:
         return matchmod.match(repo.root, cwd, patterns, include=include,
                               default='relglob', auditor=repo.auditor, ctx=ctx)
     except (error.Abort, error.ParseError):
         # no match
-        return matchmod.exact(repo.root, cwd, [])
+        return scmutil.matchfiles(repo, [])  # TODO: use matchmod.never()
 
 
 class _listnodeop(object):
@@ -650,8 +654,8 @@ def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
             smatch = matchmod.subdirmatcher(path, match)
             try:
                 srepo = ctx.sub(path)._repo
-                e.ctx = srepo[substate[1]]
-                e.pctx = srepo[psubstate[1] or 'null']
+                e.ctx = scmutil.revsymbol(srepo, substate[1])
+                e.pctx = scmutil.revsymbol(srepo, psubstate[1] or 'null')
                 _populaterepo(e, srepo, nodeop, statusfilter, smatch)
             except (error.RepoError, EnvironmentError):
                 pass

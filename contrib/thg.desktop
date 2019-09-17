@@ -2,7 +2,10 @@
 Type=Application
 Name=TortoiseHg
 GenericName=Version Control GUI
+GenericName[ru]=Графический интерфейс для системы контроля версий
 Comment=GUI application for using Mercurial
+Comment[ru]=Графический интерфейс для Mercurial
 Icon=thg_logo
 Exec=thg --nofork
 Categories=Development;RevisionControl;
+X-Desktop-File-Install-Version=0.23

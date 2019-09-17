@@ -56,6 +56,7 @@ from .qtgui import (
 from mercurial import (
     hg,
     httpconnection,
+    pycompat,
     util,
 )
 
@@ -78,11 +79,11 @@ from . import (
 )
 
 def parseurl(url):
-    assert type(url) == unicode
+    assert isinstance(url, unicode)
     return util.url(hglib.fromunicode(url))
 
 def linkify(url):
-    assert type(url) == unicode
+    assert isinstance(url, unicode)
     u = util.url(hglib.fromunicode(url))
     if u.scheme in ('local', 'http', 'https'):
         safe = util.hidepassword(hglib.fromunicode(url))
@@ -325,7 +326,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         return 0
 
     def refreshTargets(self, rev):
-        if type(rev) is not int:
+        if not isinstance(rev, int):
             return
 
         if rev >= len(self.repo):
@@ -355,7 +356,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.refreshUrl()
 
             s = QSettings()
-            for opt, val in self.opts.iteritems():
+            for opt, val in self.opts.items():
                 if isinstance(val, str):
                     val = hglib.tounicode(val)
                 s.setValue('sync/' + opt, val)
@@ -432,7 +433,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.urlChanged()
 
         opts = []
-        for opt, value in self.opts.iteritems():
+        for opt, value in self.opts.items():
             if value is True:
                 opts.append('--'+opt)
             elif value:
@@ -680,7 +681,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         if not self.opts.get('mq'):
             cmdline.append(lurl)
-        ucmdline = map(hglib.tounicode, cmdline)
+        ucmdline = pycompat.maplist(hglib.tounicode, cmdline)
         # bypass overlay of incoming bundle to pull changes
         overlay = ucmdline[0] not in ('fetch', 'incoming', 'pull')
         self._cmdsession = sess = self._repoagent.runCommand(ucmdline, self,
@@ -1059,7 +1060,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         try:
             wconfig.writefile(cfg, fn)
             self._repoagent.pollStatus()
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         self.reload()
@@ -1144,8 +1145,8 @@ class PostPullDialog(QDialog):
             sd.exec_()
 
     def getValue(self):
-        return iter(op for op, chk in self._opchecks.iteritems()
-                    if chk.isChecked()).next()
+        return next(iter(op for op, chk in self._opchecks.items()
+                    if chk.isChecked()))
 
     def accept(self):
         path = self.repo.vfs.join('hgrc')
@@ -1162,7 +1163,7 @@ class PostPullDialog(QDialog):
                     self.autoresolve_chk.isChecked())
             wconfig.writefile(cfg, fn)
             self._repoagent.pollStatus()
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         super(PostPullDialog, self).accept()
@@ -1251,7 +1252,7 @@ class SaveDialog(QDialog):
             cfg.remove('paths', self.origalias)
         try:
             wconfig.writefile(cfg, fn)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         if self.updatesubpaths.isChecked():
@@ -1543,7 +1544,7 @@ are expanded in the filename.'''))
         try:
             wconfig.writefile(cfg, fn)
             self._repoagent.pollStatus()
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         super(SecureDialog, self).accept()

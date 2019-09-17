@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+from __future__ import print_function
+
 import cgi, time
 
 from mercurial import ui
@@ -91,4 +93,4 @@ if __name__ == "__main__":
     u = htmlui.load()
     repo = hg.repository(u)
     repo.status()
-    print u.getdata()[0]
+    print(u.getdata()[0])

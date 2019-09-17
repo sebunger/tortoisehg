@@ -10,6 +10,10 @@ from __future__ import absolute_import
 import os
 import re
 
+from mercurial import (
+    pycompat,
+)
+
 from . import (
     qsci as Qsci,
     qtgui as QtGui,
@@ -24,7 +28,7 @@ if hasattr(QtGui.QColor, 'getHslF'):
             return  # fast path
 
         # QsciLexer defines 128 styles by default
-        for style in xrange(128):
+        for style in pycompat.xrange(128):
             h, s, l, a = lexer.color(style).getHslF()
             pl = lexer.paper(style).lightnessF()
             if abs(l - pl) < 0.2:

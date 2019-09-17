@@ -34,6 +34,7 @@ from mercurial import (
     copies,
     error,
     match,
+    pycompat,
     scmutil,
     util,
 )
@@ -127,9 +128,8 @@ def snapshot(repo, files, ctx):
                 os.makedirs(destdir)
             fctx = ctx[wfn]
             data = repo.wwritedata(wfn, fctx.data())
-            f = open(dest, 'wb')
-            f.write(data)
-            f.close()
+            with open(dest, 'wb') as f:
+                f.write(data)
             if 'x' in fctx.flags():
                 util.setflags(dest, False, True)
             if ctx.rev() is None:
@@ -166,7 +166,7 @@ def launchtool(cmd, opts, replace, block):
                                 stdin=subprocess.PIPE)
         if block:
             proc.communicate()
-    except (OSError, EnvironmentError), e:
+    except (OSError, EnvironmentError) as e:
         QMessageBox.warning(None,
                 _('Tool launch failure'),
                 _('%s : %s') % (cmd, str(e)))
@@ -198,7 +198,7 @@ def besttool(ui, tools, force=None):
     for t in tools.keys():
         try:
             p = ui.configint('merge-tools', t + '.priority', 0)
-        except error.ConfigError, inst:
+        except error.ConfigError as inst:
             ui.warn('visdiff: %s\n' % inst)
             p = 0
         pris.append((-p, t))
@@ -238,9 +238,13 @@ def visualdiff(ui, repo, pats, opts):
     pats = scmutil.expandpats(pats)
     m = match.match(repo.root, '', pats, None, None, 'relpath')
     n2 = ctx2.node()
-    mod_a, add_a, rem_a = map(set, repo.status(ctx1a.node(), n2, m)[:3])
+    mod_a, add_a, rem_a = pycompat.maplist(set,
+                                           repo.status(ctx1a.node(),
+                                                       n2, m)[:3])
     if ctx1b:
-        mod_b, add_b, rem_b = map(set, repo.status(ctx1b.node(), n2, m)[:3])
+        mod_b, add_b, rem_b = pycompat.maplist(set,
+                                               repo.status(ctx1b.node(),
+                                                           n2, m)[:3])
         cpy = copies.mergecopies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
     else:
         cpy = copies.pathcopies(ctx1a, ctx2)
@@ -275,7 +279,7 @@ def visualdiff(ui, repo, pats, opts):
         else:
             toollist.add(preferred)
 
-    cto = cpy.keys()
+    cto = list(cpy.keys())
     for path in MAR:
         if path in cto:
             hascopies = True
@@ -455,7 +459,7 @@ class FileSelectionDialog(QDialog):
             hbox.addWidget(lbl)
             hbox.addWidget(combo, 1)
             layout.addLayout(hbox)
-            for i, name in enumerate(tools.iterkeys()):
+            for i, name in enumerate(tools.keys()):
                 combo.addItem(name)
                 if name == preferred:
                     defrow = i
@@ -540,7 +544,7 @@ class FileSelectionDialog(QDialog):
                 break
         else:
             selected = self.preferred
-        for i, name in enumerate(self.tools.iterkeys()):
+        for i, name in enumerate(self.tools.keys()):
             if name == selected:
                 self.toolCombo.setCurrentIndex(i)
 

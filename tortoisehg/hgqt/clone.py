@@ -34,6 +34,7 @@ from mercurial import (
     cmdutil,
     commands,
     hg,
+    pycompat,
 )
 
 from ..util import hglib
@@ -251,7 +252,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         for key, combo in [('source', self.src_combo),
                            ('dest', self.dest_combo)]:
             l = [combo.currentText()]
-            l.extend(combo.itemText(i) for i in xrange(combo.count())
+            l.extend(combo.itemText(i) for i in pycompat.xrange(combo.count())
                      if combo.itemText(i) != combo.currentText())
             qs.setValue(key, l[:10])
 

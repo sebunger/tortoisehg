@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import getopt
 import os
@@ -20,6 +20,7 @@ from mercurial import (
     extensions,
     fancyopts,
     pathutil,
+    pycompat,
     registrar,
     scmutil,
     util,
@@ -49,7 +50,7 @@ except ImportError:
     config_nofork = None
 
 shortlicense = '''
-Copyright (C) 2008-2018 Steve Borho <steve@borho.org> and others.
+Copyright (C) 2008-2019 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
@@ -68,17 +69,17 @@ def dispatch(args, u=None):
         if '--debugger' in args:
             pdb.set_trace()
         return _runcatch(u, args)
-    except error.ParseError, e:
+    except error.ParseError as e:
         qtapp.earlyExceptionMsgBox(hglib.tounicode(str(e)))
-    except SystemExit, e:
+    except SystemExit as e:
         return e.code
-    except Exception, e:
+    except Exception as e:
         if '--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
         qtapp.earlyBugReport(e)
         return -1
     except KeyboardInterrupt:
-        print _('\nCaught keyboard interrupt, aborting.\n')
+        print(_('\nCaught keyboard interrupt, aborting.\n'))
         return -1
 
 def portable_fork(ui, opts):
@@ -97,7 +98,7 @@ def portable_fork(ui, opts):
     os.environ['THG_GUI_SPAWN'] = '1'
     try:
         _forkbg(ui)
-    except OSError, inst:
+    except OSError as inst:
         ui.warn(_('failed to fork GUI process: %s\n') % inst.strerror)
 
 # native window API can't be used after fork() on Mac OS X
@@ -217,7 +218,7 @@ def _parse(ui, args):
 
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
-    except getopt.GetoptError, inst:
+    except getopt.GetoptError as inst:
         raise error.CommandError(None, inst)
 
     if args:
@@ -243,7 +244,7 @@ def _parse(ui, args):
 
     try:
         args = fancyopts.fancyopts(args, c, cmdoptions, True)
-    except getopt.GetoptError, inst:
+    except getopt.GetoptError as inst:
         raise error.CommandError(cmd, inst)
 
     # separate global options back out
@@ -273,22 +274,22 @@ def _runcatch(ui, args):
             return runcommand(ui, args)
         finally:
             ui.flush()
-    except error.AmbiguousCommand, inst:
+    except error.AmbiguousCommand as inst:
         ui.warn(_("thg: command '%s' is ambiguous:\n    %s\n") %
                 (inst.args[0], " ".join(inst.args[1])))
-    except error.UnknownCommand, inst:
+    except error.UnknownCommand as inst:
         ui.warn(_("thg: unknown command '%s'\n") % inst.args[0])
         help_(ui, 'shortlist')
-    except error.CommandError, inst:
+    except error.CommandError as inst:
         if inst.args[0]:
             ui.warn(_("thg %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
             ui.warn(_("thg: %s\n") % inst.args[1])
             help_(ui, 'shortlist')
-    except error.RepoError, inst:
+    except error.RepoError as inst:
         ui.warn(_("abort: %s!\n") % inst)
-    except error.Abort, inst:
+    except error.Abort as inst:
         ui.warn(_("abort: %s\n") % inst)
         if inst.hint:
             ui.warn(_("(%s)\n") % inst.hint)
@@ -372,6 +373,7 @@ def _runcommand(ui, options, cmd, cmdfunc):
 
     if options['profile']:
         format = ui.config('profiling', 'format', default='text')
+        field = ui.config('profiling', 'sort')
 
         if not format in ['text', 'kcachegrind']:
             ui.warn(_("unrecognized profiling format '%s'"
@@ -406,7 +408,7 @@ def _runcommand(ui, options, cmd, cmdfunc):
             else:
                 # format == 'text'
                 stats = lsprof.Stats(p.getstats())
-                stats.sort()
+                stats.sort(pycompat.sysstr(field))
                 stats.pprint(top=10, file=ostream, climit=5)
 
             if output:
@@ -614,7 +616,8 @@ def debugruncommand(ui, repoagent, *cmdline, **opts):
         raise error.Abort(_('no command specified'))
     dlg = cmdui.CmdSessionDialog()
     dlg.setLogVisible(ui.verbose)
-    sess = repoagent.runCommand(map(hglib.tounicode, cmdline), dlg)
+    sess = repoagent.runCommand(pycompat.maplist(hglib.tounicode, cmdline),
+                                dlg)
     dlg.setSession(sess)
     return dlg
 
@@ -738,7 +741,7 @@ def help_(ui, name=None, with_version=False, **opts):
         stable = {k.lstrip('^'): e for k, e in table.items()}
         try:
             aliases, i = cmdutil.findcmd(name, stable, False)
-        except error.AmbiguousCommand, inst:
+        except error.AmbiguousCommand as inst:
             select = lambda c: c.lstrip('^').startswith(inst.args[0])
             helplist(_('list of commands:\n\n'), select)
             return
@@ -768,7 +771,7 @@ def help_(ui, name=None, with_version=False, **opts):
     def helplist(header, select=None):
         h = {}
         cmds = {}
-        for c, e in table.iteritems():
+        for c, e in table.items():
             f = c.split("|", 1)[0]
             if select and not select(f):
                 continue
@@ -834,7 +837,7 @@ def help_(ui, name=None, with_version=False, **opts):
                 f(name)
                 i = None
                 break
-            except error.UnknownCommand, inst:
+            except error.UnknownCommand as inst:
                 i = inst
         if i:
             raise i

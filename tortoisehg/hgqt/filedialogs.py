@@ -53,6 +53,7 @@ from .qtgui import (
 )
 
 from mercurial import (
+    pycompat,
     scmutil,
 )
 
@@ -115,7 +116,7 @@ class _FileDiffScintilla(Scintilla):
         scale = self.textHeight(0)  # Currently all lines are the same height
         n = min(viewport.height() / scale + 1, self.lines() - start)
         lines = []
-        for i in xrange(0, n):
+        for i in pycompat.xrange(0, n):
             m = self.markersAtLine(start + i)
             if m & (1 << _MARKERPLUSLINE):
                 lines.append((i, _colormap['+'], ))
@@ -316,7 +317,7 @@ class FileLogDialog(_AbstractFileDialog):
         else:
             texts = {'visualDiff': _('Diff &Changeset to Parent'),
                      'visualDiffFile': _('&Diff to Parent')}
-        for n, t in texts.iteritems():
+        for n, t in texts.items():
             self._fileactions.action(n).setText(t)
 
     @pyqtSlot()
@@ -493,7 +494,8 @@ class FileDiffDialog(_AbstractFileDialog):
         lay.setContentsMargins(0, 0, 0, 0)
 
         try:
-            contents = open(self.repo.wjoin(self.filename), "rb").read(1024)
+            with open(self.repo.wjoin(self.filename), "rb") as fp:
+                contents = fp.read(1024)
             lexer = lexers.getlexer(self.repo.ui, self.filename, contents, self)
         except Exception:
             lexer = None
@@ -760,7 +762,7 @@ class FileDiffDialog(_AbstractFileDialog):
                 pass
 
             else:
-                raise ValueError, 'unknown tag %r' % (tag,)
+                raise ValueError('unknown tag %r' % (tag,))
 
         # ok, let's enable GUI refresh for code viewers and diff-block displayers
         for side in sides:

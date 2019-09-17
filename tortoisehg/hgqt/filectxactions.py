@@ -27,6 +27,10 @@ from .qtgui import (
     QWidget,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import (
     hglib,
     shlib,
@@ -140,7 +144,7 @@ class FilectxActions(QObject):
 
         self._actions = {}
         self._customactions = {}
-        for name, d in self._actiontable.iteritems():
+        for name, d in self._actiontable.items():
             desc, icon, key, tip, fdfilters = d
             # QAction must be owned by QWidget; otherwise statusTip for context
             # menu cannot be displayed (QTBUG-16114)
@@ -176,7 +180,8 @@ class FilectxActions(QObject):
     def _updateActions(self):
         idle = self._cmdsession.isFinished()
         selfds = self._selfds
-        allactions = self._actions.values() + self._customactions.values()
+        allactions = (list(self._actions.values())
+                    + list(self._customactions.values()))
         for act, fdfilters in allactions:
             act.setEnabled(idle and bool(_filterby(fdfilters, selfds)))
 
@@ -190,7 +195,7 @@ class FilectxActions(QObject):
 
     def actions(self):
         """List of the actions; The owner widget should register them"""
-        return [a for a, _f in self._actions.itervalues()]
+        return [a for a, _f in self._actions.values()]
 
     def action(self, name):
         return self._actions[name][0]
@@ -371,7 +376,8 @@ class FilectxActions(QObject):
                 (_notpatch, _notsubroot, _filestatus('MAR!')))
     def copyPatch(self, fds):
         paths = [hglib.escapepath(fd.filePath()) for fd in fds]
-        revs = map(hglib.escaperev, [fds[0].baseRev(), fds[0].rev()])
+        revs = pycompat.maplist(hglib.escaperev,
+                                [fds[0].baseRev(), fds[0].rev()])
         cmdline = hglib.buildcmdargs('diff', *paths, r=revs)
         sess = self._runCommand(cmdline)
         sess.setCaptureOutput(True)

@@ -327,7 +327,7 @@ class ShelveDialog(QDialog):
             self.refreshCombos()
             if shelfpath in self.shelves:
                 self.combob.setCurrentIndex(self.shelves.index(shelfpath))
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.showMessage(hglib.tounicode(str(e)))
 
     @pyqtSlot()
@@ -340,7 +340,7 @@ class ShelveDialog(QDialog):
         try:
             os.unlink(shelf)
             self.showMessage(_('Shelf deleted'))
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.showMessage(hglib.tounicode(str(e)))
         self.refreshCombos()
 
@@ -354,7 +354,7 @@ class ShelveDialog(QDialog):
                 self.repo.ui.quiet = True
                 commands.revert(self.repo.ui, self.repo, all=True)
                 self.repo.ui.quiet = False
-            except (EnvironmentError, error.Abort), e:
+            except (EnvironmentError, error.Abort) as e:
                 self.showMessage(hglib.tounicode(str(e)))
                 self.refreshCombos()
             return
@@ -367,7 +367,7 @@ class ShelveDialog(QDialog):
             f = open(shelf, "w")
             f.close()
             self.showMessage(_('Shelf cleared'))
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.showMessage(hglib.tounicode(str(e)))
         self.refreshCombos()
 
@@ -381,7 +381,7 @@ class ShelveDialog(QDialog):
         try:
             os.unlink(shelf)
             self.showMessage(_('Shelf deleted'))
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.showMessage(hglib.tounicode(str(e)))
         self.refreshCombos()
 
@@ -396,7 +396,7 @@ class ShelveDialog(QDialog):
             f = open(shelf, "w")
             f.close()
             self.showMessage(_('Shelf cleared'))
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.showMessage(hglib.tounicode(str(e)))
         self.refreshCombos()
 

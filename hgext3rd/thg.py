@@ -11,13 +11,17 @@ version of the tortoisehg workbench.
 """
 
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 import os
 import sys
 
 from mercurial.i18n import _
-from mercurial import registrar, ui
+from mercurial import (
+    pycompat,
+    registrar,
+    ui,
+)
 
 testedwith = '4.3'
 
@@ -30,7 +34,7 @@ if hasattr(sys, "frozen"):
         sys.stdin = None
         if 'THGDEBUG' in os.environ:
             import win32traceutil
-            print 'starting'
+            print('starting')
     # os.Popen() needs this, and Mercurial still uses os.Popen
     if 'COMSPEC' not in os.environ:
         comspec = os.path.join(os.environ.get('SystemRoot', r'C:\Windows'),
@@ -79,7 +83,7 @@ demandimport.enable()
 # Verify we can reach TortoiseHg sources first
 try:
     import tortoisehg.hgqt.run
-except ImportError, e:
+except ImportError as e:
     sys.stderr.write(str(e)+'\n')
     sys.stderr.write("abort: couldn't find tortoisehg libraries in [%s]\n" %
                      os.pathsep.join(sys.path))
@@ -107,8 +111,7 @@ def enforceversion():
 def cmdview(ui, repo, *pats, **opts):
     """start light interactive history viewer from tortoisehg"""
     enforceversion()
-    import cStringIO
-    mystderr = cStringIO.StringIO()
+    mystderr = pycompat.bytesio()
     origstderr = sys.stderr
     sys.stderr = mystderr
     sys.__stdout__ = sys.stdout

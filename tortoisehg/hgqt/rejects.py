@@ -7,8 +7,6 @@
 
 from __future__ import absolute_import
 
-import cStringIO
-
 from . import qsci as Qsci
 from .qtcore import (
     QPoint,
@@ -30,7 +28,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import patch
+from mercurial import (
+    patch,
+    pycompat,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -131,17 +132,18 @@ class RejectsDialog(QDialog):
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
 
-        buf = cStringIO.StringIO()
+        buf = pycompat.bytesio()
         try:
             buf.write('diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % path)
-            buf.write(open(path + '.rej', 'rb').read())
+            with open(path + '.rej', 'rb') as fp:
+                buf.write(fp.read())
             buf.seek(0)
-        except IOError, e:
+        except IOError as e:
             pass
         try:
             header = patch.parsepatch(buf)[0]
             self.chunks = header.hunks
-        except (patch.PatchError, IndexError), e:
+        except (patch.PatchError, IndexError) as e:
             self.chunks = []
 
         for chunk in self.chunks:
@@ -196,7 +198,7 @@ class RejectsDialog(QDialog):
     def showChunk(self, row):
         if row == -1 or self.updating:
             return
-        buf = cStringIO.StringIO()
+        buf = pycompat.bytesio()
         chunk = self.chunks[row]
         chunk.write(buf)
         chunkstr = buf.getvalue().decode(self._textEncoding(), 'replace')

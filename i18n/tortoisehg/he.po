@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
 "PO-Revision-Date: 2009-10-18 09:25+0000\n"
 "Last-Translator: peso <peer.sommerlund@gmail.com>\n"
 "Language-Team: Hebrew <he@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:26+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:42+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -27,7 +27,7 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -641,6 +641,12 @@ msgstr ""
 
 #, python-format
 msgid "corrupted command result: %r"
+msgstr ""
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
 msgstr ""
 
 #, python-format
@@ -2028,6 +2034,9 @@ msgstr ""
 msgid "Report only the first match per file"
 msgstr ""
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr ""
 
@@ -2899,6 +2908,54 @@ msgstr ""
 msgid "Patch user:"
 msgstr ""
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr ""
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr ""
 
@@ -2961,9 +3018,6 @@ msgid "%p%"
 msgstr ""
 
 msgid "Connecting to Review Board..."
-msgstr ""
-
-msgid "Post &Review"
 msgstr ""
 
 msgid "Target:"
@@ -3065,31 +3119,6 @@ msgid "New patch message:"
 msgstr ""
 
 msgid "Patches to fold"
-msgstr ""
-
-msgid "Rename Error"
-msgstr ""
-
-msgid "Could not rename existing patchfile"
-msgstr ""
-
-msgid "Could not delete existing patchfile"
-msgstr ""
-
-msgid "QRename - Check patchname"
-msgstr ""
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr ""
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr ""
-
-msgid "Overwrite existing patchfile"
-msgstr ""
-
-msgid "Go back and change new patchname"
 msgstr ""
 
 msgid "&Undo"
@@ -3433,6 +3462,9 @@ msgid "Copy source -> destination"
 msgstr ""
 
 msgid "Copy Error"
+msgstr ""
+
+msgid "Rename Error"
 msgstr ""
 
 msgid "Select Source File"
@@ -4161,6 +4193,9 @@ msgstr ""
 msgid "Post to Re&view Board..."
 msgstr ""
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr ""
 
@@ -4225,6 +4260,9 @@ msgid "&Prune Selected..."
 msgstr ""
 
 msgid "Post Selected to Review Board..."
+msgstr ""
+
+msgid "Post Selected to Phabricator..."
 msgstr ""
 
 msgid "Apply patch"
@@ -4336,6 +4374,13 @@ msgid "&More Options..."
 msgstr ""
 
 msgid "Unable to merge"
+msgstr ""
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
 msgstr ""
 
 msgid "You cannot merge a revision with itself"
@@ -5604,6 +5649,15 @@ msgid ""
 "newly-created repository."
 msgstr ""
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr ""
 
@@ -6344,14 +6398,18 @@ msgid "Changeset Link"
 msgstr ""
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""

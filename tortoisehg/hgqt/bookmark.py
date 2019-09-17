@@ -34,6 +34,10 @@ from .qtgui import (
     QWidget,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import hglib
 from ..util.i18n import _
 from . import (
@@ -136,7 +140,7 @@ class BookmarkDialog(QDialog):
         return self._repoagent.rawRepo()
 
     def _allBookmarks(self):
-        return map(hglib.tounicode, self.repo._bookmarks)
+        return pycompat.maplist(hglib.tounicode, self.repo._bookmarks)
 
     @pyqtSlot()
     def refresh(self):

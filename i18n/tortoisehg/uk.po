@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
 "PO-Revision-Date: 2018-02-05 16:48+0000\n"
 "Last-Translator: onekosha <Unknown>\n"
 "Language-Team: Ukrainian <uk@li.org>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:29+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:45+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "Сервер TortoiseHg"
@@ -28,7 +28,7 @@ msgstr "Закрити"
 msgid "About"
 msgstr "Про програму"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -662,6 +662,12 @@ msgstr "не \"runcommand\" здатність"
 #, python-format
 msgid "corrupted command result: %r"
 msgstr "пошкоджений результат команди: %r"
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
+msgstr ""
 
 #, python-format
 msgid "failed to encode input: %s"
@@ -2108,6 +2114,9 @@ msgstr "Вся історія"
 msgid "Report only the first match per file"
 msgstr "Звітувати лише за першими збігами у файлі"
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "Відстежувати копіювання та перейменування"
 
@@ -3028,6 +3037,54 @@ msgstr "Дата латки:"
 msgid "Patch user:"
 msgstr "Виконавець латки:"
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr "Надіслати відгук"
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr "Помилкові налаштування - сервер рецензування не налаштований"
 
@@ -3095,9 +3152,6 @@ msgstr "%p%"
 
 msgid "Connecting to Review Board..."
 msgstr "Під`єднати до Review Board..."
-
-msgid "Post &Review"
-msgstr "Надіслати відгук"
 
 msgid "Target:"
 msgstr "Ціль:"
@@ -3203,31 +3257,6 @@ msgstr "Нове повідомлення латки:"
 
 msgid "Patches to fold"
 msgstr "Підшити до латок"
-
-msgid "Rename Error"
-msgstr "Помилка зміни назви"
-
-msgid "Could not rename existing patchfile"
-msgstr "Не можливо змінити назву існуючому файлу латок"
-
-msgid "Could not delete existing patchfile"
-msgstr "Не можливо знищити існуючий файл латок"
-
-msgid "QRename - Check patchname"
-msgstr "QRename - перевірте назву латки"
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr "Латка з назвою <b>%s</b> вже існує:"
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr "Додавати розширення .OLD до існуючих файлів латок"
-
-msgid "Overwrite existing patchfile"
-msgstr "Перезаписати існуючі файли латок"
-
-msgid "Go back and change new patchname"
-msgstr "Повернутися назад та змінити на нову назву латки"
 
 msgid "&Undo"
 msgstr "Скасувати"
@@ -3599,6 +3628,9 @@ msgstr "Копіювати джерело в призначення"
 
 msgid "Copy Error"
 msgstr "Помилка копіювання"
+
+msgid "Rename Error"
+msgstr "Помилка зміни назви"
 
 msgid "Select Source File"
 msgstr "Обрати файл джерела"
@@ -4348,6 +4380,9 @@ msgstr "Відтяти..."
 msgid "Post to Re&view Board..."
 msgstr "Опублікувати на дошку огляду..."
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr "Поновити зовнішне..."
 
@@ -4413,6 +4448,9 @@ msgstr "Підчистити вказане..."
 
 msgid "Post Selected to Review Board..."
 msgstr "Надіслати вибране до Review Board..."
+
+msgid "Post Selected to Phabricator..."
+msgstr ""
 
 msgid "Apply patch"
 msgstr "Застосувати латку"
@@ -4534,6 +4572,13 @@ msgstr "Більше параметрів..."
 
 msgid "Unable to merge"
 msgstr "Злиття не можливе"
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
 
 msgid "You cannot merge a revision with itself"
 msgstr "Неможна зливати правку саму з собою"
@@ -5911,6 +5956,15 @@ msgstr ""
 "Якщо вказано, файли в сховищі, як то .hgignore, копіюватимуться до щойно "
 "створеного сховища."
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr "Робоче середовище"
 
@@ -6810,23 +6864,19 @@ msgid "Changeset Link"
 msgstr "Посилання на набір змін"
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
-"Якщо \"template string\" встановлено​​, виявлятиметься номер правки і короткі "
-"хеші, які показуватимуть на панелі перегляду у посиланнях.<br>\"template "
-"string\" використовуватиме\"mercurial template\"-схожий синтаксис, і в даний "
-"час має два шаблони:<ul><li>{node|short} : замінити 12 цифр id правки "
-"(зазначимо, що {node} сам по собі зараз не підтримується).<li>{rev} : "
-"замінити номер правки.</ul>До прикладу, аби посилатися на фіксовані сторінки "
-"на BitBucket, які ви можете встановити:<br>https://bitbucket.org/tortoisehg/"
-"thg/commits/{node|short}"
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
 msgstr "Шлях до Review Board, наприклад \"http://demo.reviewboard.org\""
@@ -10577,16 +10627,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ msgid "hunk %d already applied at line %d (fuzz %d)\n"
 #~ msgstr "частина %d вже прийнята для рядка %d (fuzz %d)\n"
 
-#~ msgid ""
-#~ "Changesets within the interval, see <a href=\"http://www.selenic.com/"
-#~ "mercurial/hg.1.html#dates\">help dates</a>"
-#~ msgstr ""
-#~ "Набір змін в інтервалі, дивись <a href=\"http://www.selenic.com/mercurial/"
-#~ "hg.1.html#dates\">довідку дат</a>"
-
-#~ msgid "List Font"
-#~ msgstr "Шрифт списків"
-
 #~ msgid "Invalid date specification"
 #~ msgstr "Помилковий формат дати"
 
@@ -11507,10 +11547,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ msgid "Character encoding name"
 #~ msgstr "Система кодування символів."
 
-#~ msgid "Font used to display file lists. Default: sans 9"
-#~ msgstr ""
-#~ "Шрифт використовуваний для відображення списку файлів. Типово: sans 9."
-
 #~ msgid ""
 #~ "Defines the command to run when an issue number is recognized. You may "
 #~ "include groups in issue.regex, and corresponding {n} tokens in issue.link "
@@ -11524,17 +11560,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ "ціле невід'ємне). {0} посилається на весь рядок супроводу issue.regex, а "
 #~ "{1} відноситься до першої групи і так далі. Якщо ні {n} tokensare "
 #~ "знайдений в issue.link, весь співпалий рядок додасться замість цього."
-
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before "
-#~ "removing files in a commit. If True, a confirmation dialog will be "
-#~ "showed. If False, selected deleted files will be included in the commit "
-#~ "with no confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "Визначає, чи повинен TortoiseHg показати діалогове вікно підтвердження, "
-#~ "перед вилученням файлів під час фіксації. Якщо Так, діалогове вікно "
-#~ "підтвердження вилучення буде показано. Якщо Ні, вибрані файли будуть "
-#~ "вилучені під час фіксації без діалогу підтвердження. Типово: так."
 
 #~ msgid "Select Local Folder"
 #~ msgstr "Обрати локальну теку"
@@ -11795,17 +11820,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ msgstr ""
 #~ "Якщо Так, тоді багаторядковий набір змін буде зведений в один довжиною до "
 #~ "80 символів. Типово: ні."
-
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before adding "
-#~ "new files in a commit. If True, a confirmation dialog will be showed. If "
-#~ "False, selected new files will be included in the commit with no "
-#~ "confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "Визначає, чи повинен TortoiseHg відображати діалогове вікно "
-#~ "підтвердження, перш ніж додавати нові файли в фіксацію. Якщо Так, "
-#~ "діалогове вікно для підтвердження додавання буде показано. Якщо Ні, файли "
-#~ "будуть включені до фіксації без діалогу підтвердження. Типово: так."
 
 #~ msgid "shelve this change to %r?"
 #~ msgstr "відкласти зміну у %r?"
@@ -12084,61 +12098,30 @@ msgstr "win32ill: переривається коли зупиняється ц�
 #~ msgid "Bisect"
 #~ msgstr "Половинити"
 
-#~ msgid ""
-#~ "Changesets affecting files matched by pattern.  See <a href=\"http://www."
-#~ "selenic.com/mercurial/hg.1.html#patterns\">help patterns</a>"
-#~ msgstr ""
-#~ "Набір змін зачіпає файли, які відповідали шаблону. Дивись <a href="
-#~ "\"http://www.selenic.com/mercurial/hg.1.html#patterns\">довідку по "
-#~ "зразкам</a>"
-
-#~ msgid ""
-#~ "http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
-#~ "html#tsvn-dug-settings-icon-set"
-#~ msgstr ""
-#~ "http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
-#~ "html#tsvn-dug-settings-icon-set"
-
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr "Відкинути всі зміни із злиттям цільової (іншої) правки"
 
-#~ msgid "Precursors:"
-#~ msgstr "Попередники:"
-
 #~ msgid ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
+#~ "A \"template string\" that, when set, turns the revision number and short "
+#~ "hashes that are shown on the revision panels into links.<br>The "
+#~ "\"template string\" uses a \"mercurial template\"-like syntax that "
+#~ "currently accepts two template expressions:<ul><li>{node|short} : "
+#~ "replaced by the 12 digit revision id (note that {node} on its own is "
+#~ "currently unsupported).<li>{rev} : replaced by the revision number.</"
+#~ "ul>For example, in order to link to bitbucket commit pages you can set "
+#~ "this to:<br>https://bitbucket.org/tortoisehg/thg/commits/{node|short}"
 #~ msgstr ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">довідка "
-#~ "про сукупність набору правок</a>"
+#~ "Якщо \"template string\" встановлено​​, виявлятиметься номер правки і "
+#~ "короткі хеші, які показуватимуть на панелі перегляду у посиланнях.<br>"
+#~ "\"template string\" використовуватиме\"mercurial template\"-схожий "
+#~ "синтаксис, і в даний час має два шаблони:<ul><li>{node|short} : замінити "
+#~ "12 цифр id правки (зазначимо, що {node} сам по собі зараз не "
+#~ "підтримується).<li>{rev} : замінити номер правки.</ul>До прикладу, аби "
+#~ "посилатися на фіксовані сторінки на BitBucket, які ви можете встановити:"
+#~ "<br>https://bitbucket.org/tortoisehg/thg/commits/{node|short}"
 
 #~ msgid "Display local changes that will be pushed to selected repository"
 #~ msgstr "Показати місцеві зміни, що будуть внесені до обраного сховища"
-
-#~ msgid ""
-#~ "The command that will be executed.\n"
-#~ "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
-#~ "executable command.\n"
-#~ "You can use several {VARIABLES} to compose your command:\n"
-#~ "- {ROOT}: The path to the current repository root.\n"
-#~ "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
-#~ "hash respectively.\n"
-#~ "- {SELECTEDFILES}: The list of files selected by the user on the revision "
-#~ "details file list.\n"
-#~ "- {FILES}: The list of files touched by the selected revision.\n"
-#~ "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
-#~ msgstr ""
-#~ "Команда, яка будуть виконнана.\n"
-#~ "Для виконання команди Mercurial використовуйте \"hg\" (а не \"hg.exe\"), "
-#~ "як виконувану команду.\n"
-#~ "Ви можете використовувати кілька {VARIABLES} для створення команди:\n"
-#~ "- {ROOT}: Шлях до поточного кореню сховища.\n"
-#~ "- {REV} / {REVID}: вказаний номер правки/шістнадцяткового ідентифікатора "
-#~ "хеш-відповідно.\n"
-#~ "- {SELECTEDFILES}: Список файлів, обраних користувачем для розлогого "
-#~ "перегляду.\n"
-#~ "- {FILES}: Список файлів вказаної правки.\n"
-#~ "- {ALLFILES}: Усі файли, контрольовані Mercurial для вказаної правки."
 
 #~ msgid "Archive"
 #~ msgstr "Архівувати"
@@ -12279,9 +12262,6 @@ msgstr "win32ill: переривається коли зупиняється ц�
 
 #~ msgid "Confirm Abort"
 #~ msgstr "Підтвердити переривання"
-
-#~ msgid "Copyright 2008-2016 Steve Borho and others"
-#~ msgstr "Авторські права 2008-2016 Стів Борхо (Steve Borho) та інші."
 
 #~ msgid "Copyright 2008-2010 Steve Borho and others"
 #~ msgstr "Copyright 2008-2010 Steve Borho та інші."

@@ -9,7 +9,6 @@
 from __future__ import absolute_import
 
 import binascii
-import cStringIO
 import os
 import shlex  # used by runCustomCommand
 import subprocess  # used by runCustomCommand
@@ -45,6 +44,7 @@ from .qtgui import (
 from mercurial import (
     error,
     phases,
+    pycompat,
     scmutil,
 )
 from mercurial.utils import (
@@ -71,6 +71,7 @@ from . import (
     matching,
     merge,
     mq,
+    phabreview,
     postreview,
     prune,
     purge,
@@ -280,7 +281,7 @@ class RepoWidget(QWidget):
 
     def currentTaskTabName(self):
         indexmap = dict((idx, name)
-                        for name, idx in self._namedTabs.iteritems())
+                        for name, idx in self._namedTabs.items())
         return indexmap.get(self.taskTabsWidget.currentIndex())
 
     @pyqtSlot(str)
@@ -808,7 +809,7 @@ class RepoWidget(QWidget):
                 return
             try:
                 rev = self.repo['.'].rev()
-            except error.LookupError, e:
+            except error.LookupError as e:
                 InfoMsgBox(_('Repository Error'),
                            _('Unable to determine working copy revision\n') +
                            hglib.tounicode(e))
@@ -838,7 +839,7 @@ class RepoWidget(QWidget):
     @pyqtSlot(str, dict)
     def grep(self, pattern='', opts={}):
         """Open grep task tab"""
-        opts = dict((str(k), str(v)) for k, v in opts.iteritems())
+        opts = dict((str(k), str(v)) for k, v in opts.items())
         self.taskTabsWidget.setCurrentIndex(self._namedTabs['grep'])
         self.grepDemand.setSearch(pattern, **opts)
         self.grepDemand.runSearch()
@@ -891,12 +892,12 @@ class RepoWidget(QWidget):
         try:
             self.revDetailsWidget.onRevisionSelected(rev)
             self.revisionSelected.emit(rev)
-            if type(rev) != str:
+            if not isinstance(rev, str):
                 # Regular patch or working directory
                 self.grepDemand.forward('setRevision', rev)
                 self.syncDemand.forward('refreshTargets', rev)
                 self.commitDemand.forward('setRev', rev)
-        except (IndexError, error.RevlogError, error.Abort), e:
+        except (IndexError, error.RevlogError, error.Abort) as e:
             self.showMessage(hglib.tounicode(str(e)))
 
         cw = self.taskTabsWidget.currentWidget()
@@ -936,7 +937,7 @@ class RepoWidget(QWidget):
                 self.repo.thginvalidate()
             self.rebuildGraph()
             self.reloadTaskTab()
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.showMessage(hglib.tounicode(str(e)))
 
     def rebuildGraph(self):
@@ -954,7 +955,7 @@ class RepoWidget(QWidget):
         'Repository has detected a changelog / dirstate change'
         try:
             self.rebuildGraph()
-        except (error.RevlogError, error.RepoError), e:
+        except (error.RevlogError, error.RepoError) as e:
             self.showMessage(hglib.tounicode(str(e)))
 
     @pyqtSlot()
@@ -1017,7 +1018,7 @@ class RepoWidget(QWidget):
             if r == QMessageBox.Yes:
                 self._repoagent.abortCommands()
             return False
-        for i in xrange(self.taskTabsWidget.count()):
+        for i in pycompat.xrange(self.taskTabsWidget.count()):
             w = self.taskTabsWidget.widget(i)
             if w.canExit():
                 continue
@@ -1130,7 +1131,7 @@ class RepoWidget(QWidget):
     def doubleSelectionMenu(self, point, selection):
         for r in selection:
             # No pair menu if working directory or unapplied patch
-            if type(r) is not int:
+            if not isinstance(r, int):
                 return
 
         self._selectionMenuExec(point, selection, self.paircmenu,
@@ -1139,7 +1140,7 @@ class RepoWidget(QWidget):
     def multipleSelectionMenu(self, point, selection):
         for r in selection:
             # No multi menu if working directory or unapplied patch
-            if type(r) is not int:
+            if not isinstance(r, int):
                 return
 
         self._selectionMenuExec(point, selection, self.multicmenu,
@@ -1149,7 +1150,7 @@ class RepoWidget(QWidget):
         q = self.repo.mq
         ispushable = False
         unapplied = 0
-        for i in xrange(q.seriesend(), len(q.series)):
+        for i in pycompat.xrange(q.seriesend(), len(q.series)):
             pushable, reason = q.pushable(i)
             if pushable:
                 if unapplied == 0:
@@ -1328,6 +1329,10 @@ class RepoWidget(QWidget):
               _('Post to Re&view Board...'), 'reviewboard',
               self.sendToReviewBoard)
 
+        entry(items, menu, 'phabricator', enablefuncs['isrev'],
+              _('Post to Phabricator...'), 'phabricator',
+              self.sendToPhabricator)
+
         entry(items, menu, 'rupdate', enablefuncs['fixed'],
               _('&Remote Update...'), 'hg-update', self.rupdate)
 
@@ -1481,6 +1486,12 @@ class RepoWidget(QWidget):
             a.triggered.connect(self.sendToReviewBoard)
             menu.addAction(a)
 
+        if 'phabricator' in self.repo.extensions():
+            menu.addSeparator()
+            a = QAction(_('Post Selected to Phabricator...'), self)
+            a.triggered.connect(self.sendToPhabricator)
+            menu.addAction(a)
+
         self._setupCustomSubmenu(items, menu,
                                  'workbench.pairselection.custom-menu')
 
@@ -1490,10 +1501,10 @@ class RepoWidget(QWidget):
     def generateUnappliedPatchMenu(self):
         def qdeleteact():
             """Delete unapplied patch(es)"""
-            patches = map(hglib.tounicode, self.menuselection)
+            patches = pycompat.maplist(hglib.tounicode, self.menuselection)
             self._mqActions.deletePatches(patches)
         def qfoldact():
-            patches = map(hglib.tounicode, self.menuselection)
+            patches = pycompat.maplist(hglib.tounicode, self.menuselection)
             self._mqActions.foldPatches(patches)
 
         menu = QMenu(self)
@@ -1551,6 +1562,10 @@ class RepoWidget(QWidget):
         entry(items, menu, 'reviewboard', enablefuncs['istrue'],
               _('Post Selected to Review Board...'), None,
               self.sendToReviewBoard)
+
+        entry(items, menu, 'phabricator', enablefuncs['istrue'],
+              _('Post Selected to Phabricator...'), None,
+              self.sendToPhabricator)
 
         self._setupCustomSubmenu(items, menu,
                                  'workbench.multipleselection.custom-menu')
@@ -1798,7 +1813,7 @@ class RepoWidget(QWidget):
             return
         if ret != 0:
             return
-        revs = map(int, str(sess.readAll()).splitlines())
+        revs = pycompat.maplist(int, str(sess.readAll()).splitlines())
         if not revs:
             return
         self._dialogs.open(RepoWidget._createMergeDialog, revs[-1])
@@ -1884,6 +1899,14 @@ class RepoWidget(QWidget):
 
     def _createPostReviewDialog(self, revs):
         return postreview.PostReviewDialog(self.repo.ui, self._repoagent, revs)
+
+    @pyqtSlot()
+    def sendToPhabricator(self):
+        self._dialogs.open(RepoWidget._createPhabReviewDialog,
+                           tuple(self.repoview.selectedRevisions()))
+
+    def _createPhabReviewDialog(self, revs):
+        return phabreview.PhabReviewDialog(self._repoagent, revs)
 
     def rupdate(self):
         import rupdate
@@ -2209,7 +2232,7 @@ class RepoWidget(QWidget):
         cmd = shlex.split(command)
         cmdtype = cmd[0].lower()
         if cmdtype == 'hg':
-            sess = self._runCommand(map(hglib.tounicode, cmd[1:]))
+            sess = self._runCommand(pycompat.maplist(hglib.tounicode, cmd[1:]))
             sess.commandFinished.connect(self._notifyWorkingDirChanges)
             return
         elif cmdtype == 'thg':
@@ -2219,7 +2242,7 @@ class RepoWidget(QWidget):
             else:
                 cmd += ['--repository', self.repo.root]
                 _ui = self.repo.ui.copy()
-            _ui.ferr = cStringIO.StringIO()
+            _ui.ferr = pycompat.bytesio()
             # avoid circular import of hgqt.run by importing it inplace
             from . import run
             res = run.dispatch(cmd, u=_ui)
@@ -2240,7 +2263,7 @@ class RepoWidget(QWidget):
         # Otherwise, run the selected command in the background
         try:
             res = subprocess.Popen(command, cwd=workingdir, shell=True)
-        except OSError, ex:
+        except OSError as ex:
             res = 1
             qtlib.ErrorMsgBox(_('Failed to execute custom command'),
                 _('The command "%s" could not be executed.') % hglib.tounicode(command),

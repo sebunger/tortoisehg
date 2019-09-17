@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+from __future__ import print_function
+
 import os
 
 from mercurial import hg, node, error
@@ -191,9 +193,9 @@ def open_repo(path):
             return repo
         except error.RepoError:
             pass
-        except StandardError, e:
-            print "error while opening repo %s:" % path
-            print e
+        except Exception as e:
+            print("error while opening repo %s:" % path)
+            print(e)
 
     return None
 

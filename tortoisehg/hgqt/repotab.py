@@ -20,14 +20,19 @@ from .qtcore import (
 from .qtgui import (
     QAction,
     QActionGroup,
+    QKeySequence,
     QMenu,
+    QShortcut,
     QStackedLayout,
     QTabBar,
     QVBoxLayout,
     QWidget,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    pycompat,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -85,6 +90,7 @@ class RepoTabWidget(QWidget):
         tabbar.setDocumentMode(True)
         tabbar.setExpanding(False)
         tabbar.setTabsClosable(True)
+        tabbar.setUsesScrollButtons(True)
         tabbar.setMovable(True)
         tabbar.currentChanged.connect(self._onCurrentTabChanged)
         tabbar.tabCloseRequested.connect(self.closeTab)
@@ -111,6 +117,9 @@ class RepoTabWidget(QWidget):
         self._titlemapper.mapped[QWidget].connect(self._updateTitle)
 
         self._updateTabSwitchActions()
+
+        QShortcut(QKeySequence.NextChild, self, self._next_tab)
+        QShortcut(QKeySequence.PreviousChild, self, self._prev_tab)
 
     def openRepo(self, root, bundle=None):
         """Open the specified repository in new tab"""
@@ -163,12 +172,12 @@ class RepoTabWidget(QWidget):
         return False
 
     def closeAllTabs(self):
-        return self._closeTabs(range(self.count()))
+        return self._closeTabs(list(range(self.count())))
 
     def _closeTabs(self, indexes):
         if not self._checkTabsClosable(indexes):
             return False
-        self._lastclosedpaths = map(self.repoRootPath, indexes)
+        self._lastclosedpaths = pycompat.maplist(self.repoRootPath, indexes)
         self._removeTabs(indexes)
         return True
 
@@ -262,7 +271,7 @@ class RepoTabWidget(QWidget):
     @pyqtSlot()
     def _closeNotLastClickedTabs(self):
         if self._lastclickedindex >= 0:
-            self._closeTabs([i for i in xrange(self.count())
+            self._closeTabs([i for i in pycompat.xrange(self.count())
                              if i != self._lastclickedindex])
 
     @pyqtSlot()
@@ -281,7 +290,7 @@ class RepoTabWidget(QWidget):
     def _initTabSwitchActions(self):
         self._swactions = QActionGroup(self)
         self._swactions.triggered.connect(self._setCurrentTabByAction)
-        for i in xrange(9):
+        for i in pycompat.xrange(9):
             a = self._swactions.addAction('')
             a.setCheckable(True)
             a.setData(i)
@@ -304,6 +313,14 @@ class RepoTabWidget(QWidget):
         index = action.data()
         self.setCurrentIndex(index)
 
+    @pyqtSlot()
+    def _prev_tab(self):
+        self._tabbar.setCurrentIndex(self._tabbar.currentIndex() - 1)
+
+    @pyqtSlot()
+    def _next_tab(self):
+        self._tabbar.setCurrentIndex(self._tabbar.currentIndex() + 1)
+
     def currentRepoRootPath(self):
         return self.repoRootPath(self.currentIndex())
 
@@ -311,7 +328,7 @@ class RepoTabWidget(QWidget):
         return unicode(self._tabbar.tabToolTip(index))
 
     def _findIndexesByRepoRootPath(self, root):
-        for i in xrange(self.count()):
+        for i in pycompat.xrange(self.count()):
             if self.repoRootPath(i) == root:
                 yield i
 
@@ -370,7 +387,7 @@ class RepoTabWidget(QWidget):
     def _indexOf(self, rw):
         if self.currentWidget() is rw:
             return self.currentIndex()  # fast path
-        for i in xrange(self.count()):
+        for i in pycompat.xrange(self.count()):
             if self._widget(i) is rw:
                 return i
         return -1
@@ -381,7 +398,7 @@ class RepoTabWidget(QWidget):
     def _createRepoWidget(self, root, bundle=None):
         try:
             repoagent = self._repomanager.openRepoAgent(root)
-        except (error.Abort, error.RepoError), e:
+        except (error.Abort, error.RepoError) as e:
             qtlib.WarningMsgBox(_('Failed to open repository'),
                                 hglib.tounicode(str(e)), parent=self)
             return

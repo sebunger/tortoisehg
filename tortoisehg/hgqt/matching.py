@@ -75,7 +75,7 @@ class MatchDialog(QDialog):
         # make it easy to match the workding directory parent revision
         combo.addItem(hglib.tounicode('.'))
 
-        tags = list(self.repo.tags()) + self.repo._bookmarks.keys()
+        tags = list(self.repo.tags()) + list(self.repo._bookmarks.keys())
         tags.sort(reverse=True)
         for tag in tags:
             combo.addItem(hglib.tounicode(tag))

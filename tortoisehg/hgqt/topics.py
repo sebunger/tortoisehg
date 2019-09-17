@@ -26,6 +26,10 @@ from .qtgui import (
     QWidget,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import hglib
 from ..util.obsoleteutil import first_known_successors
 from ..util.i18n import _
@@ -113,8 +117,8 @@ class TopicsDialog(QDialog):
         return self._repoagent.rawRepo()
 
     def _allTopics(self):
-        return map(hglib.tounicode, self.repo._topics) if self.repo._topics \
-            else []
+        return (pycompat.maplist(hglib.tounicode, self.repo._topics)
+                if self.repo._topics else [])
 
     @pyqtSlot()
     def refresh(self):

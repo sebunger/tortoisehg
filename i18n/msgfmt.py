@@ -31,9 +31,14 @@ Exceptions:
   * msgfmt.PoSyntaxError if the po file has syntax errors
 
 """
+from __future__ import print_function
+
 import struct
 import array
-from cStringIO import StringIO
+
+from mercurial import (
+    pycompat,
+)
 
 __version__ = "1.1-pythongettext"
 
@@ -65,7 +70,7 @@ class Msgfmt:
         elif isinstance(self.po, list):
             output = self.po
         if not output:
-            raise ValueError, "self.po is invalid! %s" % type(self.po)
+            raise ValueError("self.po is invalid! %s" % type(self.po))
         return output
 
     def add(self, context, id, str, fuzzy):
@@ -78,9 +83,8 @@ class Msgfmt:
 
     def generate(self):
         "Return the generated output."
-        keys = self.messages.keys()
         # the keys are sorted in the .mo file
-        keys.sort()
+        keys = sorted(self.messages.keys())
         offsets = []
         ids = strs = ''
         for id in keys:
@@ -174,8 +178,8 @@ class Msgfmt:
                 # This is a message with plural forms
                 elif l.startswith('msgid_plural'):
                     if section != ID:
-                        print >> sys.stderr, 'msgid_plural not preceeded by msgid on %s:%d' %\
-                            (infile, lno)
+                        print('msgid_plural not preceeded by msgid on %s:%d' %
+                              (infile, lno), file=sys.stderr)
                         sys.exit(1)
                     l = l[12:]
                     msgid += '\0' # separator of singular and plural
@@ -185,16 +189,16 @@ class Msgfmt:
                     section = STR
                     if l.startswith('msgstr['):
                         if not is_plural:
-                            print >> sys.stderr, 'plural without msgid_plural on %s:%d' %\
-                                (infile, lno)
+                            print('plural without msgid_plural on %s:%d' %
+                                  (infile, lno), file=sys.stderr)
                             sys.exit(1)
                         l = l.split(']', 1)[1]
                         if msgstr:
                             msgstr += '\0' # Separator of the various plural forms
                     else:
                         if is_plural:
-                            print >> sys.stderr, 'indexed msgstr required for plural on  %s:%d' %\
-                                (infile, lno)
+                            print('indexed msgstr required for plural on %s:%d' %
+                                  (infile, lno), file=sys.stderr)
                             sys.exit(1)
                         l = l[6:]
             # Skip empty lines
@@ -204,7 +208,7 @@ class Msgfmt:
             # XXX: Does this always follow Python escape semantics?
             try:
                 l = eval(l)
-            except Exception, msg:
+            except Exception as msg:
                 raise PoSyntaxError('%s (line %d of po file %s): \n%s' % (msg, lno, self.name, l))
             if section == CTXT:
                 msgctxt += l
@@ -223,4 +227,4 @@ class Msgfmt:
             self.po.close()
 
     def getAsFile(self):
-        return StringIO(self.get())
+        return pycompat.bytesio(self.get())

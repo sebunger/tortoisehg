@@ -52,6 +52,7 @@ from mercurial import (
     context,
     error,
     hg,
+    pycompat,
     scmutil,
     util,
 )
@@ -305,7 +306,7 @@ class StatusWidget(QWidget):
         # remove files from the partials dictionary if they are not partial
         # selections, in order to simplify refresh.
         dels = []
-        for file, oldchanges in self.partials.iteritems():
+        for file, oldchanges in self.partials.items():
             assert file in self.tv.model().checked
             if oldchanges.excludecount == 0:
                 self.tv.model().checked[file] = True
@@ -597,7 +598,7 @@ class StatusWidget(QWidget):
             checked = model.getChecked()
             if types is None:
                 files = []
-                for f, v in checked.iteritems():
+                for f, v in checked.items():
                     if f in self.partials:
                         changes = self.partials[f]
                         if changes.excludecount < len(changes.hunks):
@@ -624,7 +625,7 @@ class StatusWidget(QWidget):
     def onSelectionChange(self):
         model = self.tv.model()
         selmodel = self.tv.selectionModel()
-        selfds = map(model.fileData, selmodel.selectedRows())
+        selfds = pycompat.maplist(model.fileData, selmodel.selectedRows())
         self._fileactions.setFileDataList(selfds)
 
     # Disabled decorator because of bug in older PyQt releases
@@ -681,7 +682,7 @@ class StatusThread(QThread):
         self.patchecked = {}
 
     def run(self):
-        extract = lambda x, y: dict(zip(x, map(y.get, x)))
+        extract = lambda x, y: dict(zip(x, pycompat.maplist(y.get, x)))
         stopts = extract(('unknown', 'ignored', 'clean'), self.opts)
         patchecked = {}
         try:
@@ -723,11 +724,11 @@ class StatusThread(QThread):
             for s in wctx.substate:
                 if wctx.sub(s).dirty():
                     wctx.dirtySubrepos.append(s)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.showMessage.emit(hglib.tounicode(str(e)))
-        except (error.LookupError, error.RepoError, error.ConfigError), e:
+        except (error.LookupError, error.RepoError, error.ConfigError) as e:
             self.showMessage.emit(hglib.tounicode(str(e)))
-        except error.Abort, e:
+        except error.Abort as e:
             if e.hint:
                 err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                             hglib.tounicode(e.hint))

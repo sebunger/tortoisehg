@@ -74,10 +74,10 @@ def _findeditor(repo, files):
         if t not in tools:
             try:
                 priority = int(_toolstr(ui, t, "priority", "0"))
-            except ValueError, e:
+            except ValueError as e:
                 priority = -100
             tools[t] = priority
-    names = tools.keys()
+    names = list(tools.keys())
     tools = sorted([(-p, t) for t, p in tools.items()])
     editor = ui.config('tortoisehg', 'editor')
     if editor:

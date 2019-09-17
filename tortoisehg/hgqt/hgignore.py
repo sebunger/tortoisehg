@@ -257,7 +257,7 @@ class HgignoreDialog(QDialog):
             try:
                 match.match(self.repo.root, '', [], [test])
                 self.insertFilters([newfilter], False)
-            except error.Abort, inst:
+            except error.Abort as inst:
                 qtlib.WarningMsgBox(_('Invalid glob expression'), str(inst),
                                     parent=self)
                 return
@@ -267,14 +267,15 @@ class HgignoreDialog(QDialog):
                 match.match(self.repo.root, '', [], [test])
                 re.compile(test)
                 self.insertFilters([newfilter], True)
-            except (error.Abort, re.error), inst:
+            except (error.Abort, re.error) as inst:
                 qtlib.WarningMsgBox(_('Invalid regexp expression'), str(inst),
                                     parent=self)
                 return
 
     def refresh(self):
         try:
-            l = open(self.ignorefile, 'rb').readlines()
+            with open(self.ignorefile, 'rb') as fp:
+                l = fp.readlines()
             self.doseoln = l[0].endswith('\r\n')
         except (IOError, ValueError, IndexError):
             self.doseoln = os.name == 'nt'
@@ -291,10 +292,10 @@ class HgignoreDialog(QDialog):
             self.repo.lfstatus = True
             self.lclunknowns = self.repo.status(unknown=True)[4]
             self.repo.lfstatus = False
-        except (EnvironmentError, error.RepoError), e:
+        except (EnvironmentError, error.RepoError) as e:
             qtlib.WarningMsgBox(_('Unable to read repository status'),
                                 uni(str(e)), parent=self)
-        except error.Abort, e:
+        except error.Abort as e:
             if e.hint:
                 err = _('%s (hint: %s)') % (uni(str(e)), uni(e.hint))
             else:
@@ -339,7 +340,7 @@ class HgignoreDialog(QDialog):
                     commands.add(hglib.loadui(), self.repo, self.ignorefile)
             shlib.shell_notify([self.ignorefile])
             self.ignoreFilterUpdated.emit()
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             qtlib.WarningMsgBox(_('Unable to write .hgignore file'),
                                 hglib.tounicode(str(e)), parent=self)
 

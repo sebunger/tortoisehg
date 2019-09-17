@@ -24,6 +24,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     scmutil,
 )
 
@@ -68,10 +69,11 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
             except error.RepoLookupError:
                 pass
 
-        combo.addItems(map(hglib.tounicode, hglib.namedbranches(repo)))
-        tags = list(self.repo.tags()) + repo._bookmarks.keys()
+        combo.addItems(pycompat.maplist(hglib.tounicode,
+                                        hglib.namedbranches(repo)))
+        tags = list(self.repo.tags()) + list(repo._bookmarks.keys())
         tags.sort(reverse=True)
-        combo.addItems(map(hglib.tounicode, tags))
+        combo.addItems(pycompat.maplist(hglib.tounicode, tags))
 
         if rev is None:
             selecturev = hglib.tounicode(self.repo.dirstate.branch())
@@ -264,22 +266,23 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                         self, bookmarks, hglib.activebookmark(self.repo)).run()
                 if selectedbookmark:
                     rev = selectedbookmark
-                elif (scmutil.revsymbol(self.repo, rev)
-                      == scmutil.revsymbol(self.repo,
-                                           hglib.activebookmark(self.repo))):
-                    deactivatebookmark = qtlib.QuestionMsgBox(
-                        _('Deactivate current bookmark?'),
-                        _('Do you really want to deactivate the <i>%s</i> '
-                          'bookmark?')
-                        % hglib.tounicode(hglib.activebookmark(self.repo)))
-                    if deactivatebookmark:
-                        cmdline = ['bookmark']
-                        if self.verbose_chk.isChecked():
-                            cmdline += ['--verbose']
-                        cmdline += ['-i',
-                                    hglib.tounicode(hglib.activebookmark(self.repo))]
-                        return self._repoagent.runCommand(cmdline, self)
-                    return cmdcore.nullCmdSession()
+                else:
+                    activebookmark = hglib.activebookmark(self.repo)
+                    if (activebookmark and scmutil.revsymbol(self.repo, rev)
+                        == scmutil.revsymbol(self.repo, activebookmark)):
+                        deactivatebookmark = qtlib.QuestionMsgBox(
+                            _('Deactivate current bookmark?'),
+                            _('Do you really want to deactivate the <i>%s</i> '
+                              'bookmark?')
+                            % hglib.tounicode(activebookmark))
+                        if deactivatebookmark:
+                            cmdline = ['bookmark']
+                            if self.verbose_chk.isChecked():
+                                cmdline += ['--verbose']
+                            cmdline += ['-i',
+                                        hglib.tounicode(activebookmark)]
+                            return self._repoagent.runCommand(cmdline, self)
+                        return cmdcore.nullCmdSession()
 
         cmdline.append('--rev')
         cmdline.append(rev)
@@ -383,7 +386,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                 else:
                     return cmdcore.nullCmdSession()
 
-        cmdline = map(hglib.tounicode, cmdline)
+        cmdline = pycompat.maplist(hglib.tounicode, cmdline)
         return self._repoagent.runCommand(cmdline, self)
 
     @pyqtSlot(bool)

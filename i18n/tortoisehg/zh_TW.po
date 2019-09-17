@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
 "PO-Revision-Date: 2015-09-16 10:35+0000\n"
 "Last-Translator: leolarrel Wang <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:30+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:46+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr ""
@@ -27,7 +27,7 @@ msgstr "離開"
 msgid "About"
 msgstr "關於"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -651,6 +651,12 @@ msgstr "沒有\"runcommand\"功能"
 
 #, python-format
 msgid "corrupted command result: %r"
+msgstr ""
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
 msgstr ""
 
 #, python-format
@@ -2050,6 +2056,9 @@ msgstr "所有歷史"
 msgid "Report only the first match per file"
 msgstr "只回報每個檔案第一個符合的"
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "追蹤複製和更名"
 
@@ -2938,6 +2947,54 @@ msgstr "補丁日期:"
 msgid "Patch user:"
 msgstr "補丁使用者:"
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr ""
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr "無效的設定 - The ReviewBoard server 沒有設定"
 
@@ -3001,9 +3058,6 @@ msgstr ""
 
 msgid "Connecting to Review Board..."
 msgstr "連線到Review Board..."
-
-msgid "Post &Review"
-msgstr ""
 
 msgid "Target:"
 msgstr "目標:"
@@ -3102,31 +3156,6 @@ msgstr "新的補丁訊息:"
 
 msgid "Patches to fold"
 msgstr "將合併的補丁"
-
-msgid "Rename Error"
-msgstr "重新命名錯誤"
-
-msgid "Could not rename existing patchfile"
-msgstr "不能重新命名存在的補丁檔"
-
-msgid "Could not delete existing patchfile"
-msgstr "不能刪除存在的補丁檔"
-
-msgid "QRename - Check patchname"
-msgstr "QRename - 檢查補丁名字"
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr "補丁名字<b>%s</b>已經存在"
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr "新增.OLD附檔名到已存在的補丁檔"
-
-msgid "Overwrite existing patchfile"
-msgstr "複寫存在的補丁檔"
-
-msgid "Go back and change new patchname"
-msgstr "返回然後改變新的補丁名字"
 
 msgid "&Undo"
 msgstr ""
@@ -3470,6 +3499,9 @@ msgstr "複製來源 -> 目的地"
 
 msgid "Copy Error"
 msgstr "複製錯誤"
+
+msgid "Rename Error"
+msgstr "重新命名錯誤"
 
 msgid "Select Source File"
 msgstr "選擇來源檔"
@@ -4198,6 +4230,9 @@ msgstr "剝除(&S)..."
 msgid "Post to Re&view Board..."
 msgstr ""
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr "遠端更新(&R)..."
 
@@ -4262,6 +4297,9 @@ msgid "&Prune Selected..."
 msgstr ""
 
 msgid "Post Selected to Review Board..."
+msgstr ""
+
+msgid "Post Selected to Phabricator..."
 msgstr ""
 
 msgid "Apply patch"
@@ -4379,6 +4417,13 @@ msgstr ""
 
 msgid "Unable to merge"
 msgstr "不能合併"
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
 
 msgid "You cannot merge a revision with itself"
 msgstr "你不能合併自己"
@@ -5657,6 +5702,15 @@ msgid ""
 "newly-created repository."
 msgstr ""
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr "工作台"
 
@@ -6407,14 +6461,18 @@ msgid "Changeset Link"
 msgstr "連結變更集"
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -9734,9 +9792,6 @@ msgstr ""
 #~ msgid "Overwrite existing '%s' path?"
 #~ msgstr "覆寫已存在的'%s'路徑?"
 
-#~ msgid "Font used to display file lists. Default: sans 9"
-#~ msgstr "顯示檔案列表所使用的字型.預設: sans 9"
-
 #~ msgid "file patterns \"%s\""
 #~ msgstr "檔案樣式\"%s\""
 
@@ -9748,9 +9803,6 @@ msgstr ""
 
 #~ msgid "Move files to directory..."
 #~ msgstr "移動檔案到目錄..."
-
-#~ msgid "List Font"
-#~ msgstr "列表字型"
 
 #~ msgid "Preset fonts:"
 #~ msgstr "預設字型;"
@@ -10246,24 +10298,6 @@ msgstr ""
 
 #~ msgid "Backout..."
 #~ msgstr "回退 ..."
-
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before "
-#~ "removing files in a commit. If True, a confirmation dialog will be "
-#~ "showed. If False, selected deleted files will be included in the commit "
-#~ "with no confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "決定當TortoiseHg在一個提交裡面刪除檔案時,是否要顯示確認視窗.如果是False,"
-#~ "TortoiseHg在刪除檔案時不會顯示確認視窗.預設: True"
-
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before adding "
-#~ "new files in a commit. If True, a confirmation dialog will be showed. If "
-#~ "False, selected new files will be included in the commit with no "
-#~ "confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "決定當TortoiseHg增加新檔案到一個提交裡面時,是否要顯示確認視窗.如果是False,"
-#~ "TortoiseHg增加新檔案時不會顯示確認視窗.預設: True"
 
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr "合併目的(其他)修訂版時移除掉所有的變更"

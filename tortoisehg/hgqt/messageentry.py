@@ -24,6 +24,10 @@ from .qtgui import (
     QFontMetrics,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util.i18n import _
 from . import (
     qscilib,
@@ -195,7 +199,7 @@ class MessageEntry(qscilib.Scintilla):
         if b == e == 0:
             return line + 1
 
-        group = [lines[l] for l in xrange(b, e+1)]
+        group = [lines[l] for l in pycompat.xrange(b, e+1)]
         MARKER = u'\033\033\033\033\033'
         curlinenum, curcol = self.getCursorPosition()
         if b <= curlinenum <= e:

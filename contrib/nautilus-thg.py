@@ -130,7 +130,7 @@ class HgExtensionDefault(GObject.GObject):
             return hg.repository(hglib.loadui(), path=p)
         except error.RepoError:
             return None
-        except StandardError, e:
+        except Exception as e:
             debugf(e)
             return None
 
@@ -384,7 +384,7 @@ class HgExtensionIcons(HgExtensionDefault):
             if emblem is not None:
                 vfs_file.add_emblem(emblem)
             vfs_file.add_string_attribute('hg_status', status)
-        except StandardError, e:
+        except Exception as e:
             debugf(e)
         return True
 

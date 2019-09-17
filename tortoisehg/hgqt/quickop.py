@@ -29,6 +29,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     util,
 )
 
@@ -106,7 +107,7 @@ class QuickOpDialog(QDialog):
         defcheck = checktypes[self.command]
 
         opts = {}
-        for s, val in status.statusTypes.iteritems():
+        for s, val in status.statusTypes.items():
             opts[val.name] = s in filetypes
 
         opts['checkall'] = True # pre-check all matching files
@@ -185,7 +186,7 @@ class QuickOpDialog(QDialog):
             cmdlines.append(hglib.buildcmdargs(self.command, *lfiles, **lopts))
         self.files = files + lfiles
 
-        ucmdlines = [map(hglib.tounicode, xs) for xs in cmdlines]
+        ucmdlines = [pycompat.maplist(hglib.tounicode, xs) for xs in cmdlines]
         self._cmdsession = sess = self._repoagent.runCommandSequence(ucmdlines,
                                                                      self)
         sess.commandFinished.connect(self.commandFinished)
@@ -219,7 +220,7 @@ class QuickOpDialog(QDialog):
             self.repo.lfstatus = True
             try:
                 repostate = self.repo.status()
-            except (EnvironmentError, error.Abort), e:
+            except (EnvironmentError, error.Abort) as e:
                 qtlib.WarningMsgBox(_('Unable to read repository status'),
                                     hglib.tounicode(str(e)), parent=self)
                 return
@@ -301,7 +302,7 @@ class HeadlessQuickop(QObject):
         QObject.__init__(self)
         self.files = cmdline[1:]
         self._cmddialog = cmdui.CmdSessionDialog()
-        sess = repoagent.runCommand(map(hglib.tounicode, cmdline))
+        sess = repoagent.runCommand(pycompat.maplist(hglib.tounicode, cmdline))
         sess.commandFinished.connect(self.commandFinished)
         self._cmddialog.setSession(sess)
 

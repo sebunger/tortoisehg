@@ -23,9 +23,9 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         try:
             # patch files in tmp directory
             patch.patchrepo(ui, repo, repo['.'], store, fp, 1, prefix='')
-            store.keys = set(store.files.keys() + store.data.keys())
+            store.keys = set(list(store.files.keys()) + list(store.data.keys()))
             repo._filestore = store
-        except patch.PatchError, e:
+        except patch.PatchError as e:
             raise error.Abort(str(e))
         finally:
             fp.close()

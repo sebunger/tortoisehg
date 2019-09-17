@@ -36,6 +36,10 @@ from .qtgui import (
     qApp,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import (
     hglib,
     paths,
@@ -428,7 +432,7 @@ class Workbench(QMainWindow):
         """repository has been switched, fill urlCombo with URLs"""
         pathdict = dict((hglib.tounicode(alias), hglib.tounicode(path))
                          for alias, path in repo.ui.configitems('paths'))
-        aliases = pathdict.keys()
+        aliases = list(pathdict.keys())
 
         combo_setting = repo.ui.config('tortoisehg', 'workbench.target-combo',
                                        'auto')
@@ -1152,7 +1156,8 @@ class Workbench(QMainWindow):
         lastactiverepo = ''
         if self.actionSaveRepos.isChecked():
             tw = self.repoTabsWidget
-            repostosave = map(tw.repoRootPath, xrange(tw.count()))
+            repostosave = pycompat.maplist(tw.repoRootPath,
+                                           pycompat.xrange(tw.count()))
             lastactiverepo = tw.currentRepoRootPath()
         if not self.repoTabsWidget.closeAllTabs():
             event.ignore()
