@@ -1,4 +1,4 @@
 version=3
 opts=dversionmangle=s/[\+~]dfsg\d+// https://bitbucket.org/tortoisehg/targz/downloads/ tortoisehg-(.*)\.tar\.gz
 # the following line can be used to get the latest version from HG tags
-#opts=dversionmangle=s/[\+~]dfsg\d+// https://bitbucket.org/tortoisehg/stable/downloads/ /tortoisehg/stable/get/(0.*)\.gz
+opts=dversionmangle=s/[\+~]dfsg\d+// https://bitbucket.org/tortoisehg/thg/downloads/?tab=tags /tortoisehg/thg/get/([0-9].*)\.tar\.bz2
