@@ -128,7 +128,7 @@ class RepoTreeModel(QAbstractItemModel):
     def index(self, row, column, parent=QModelIndex()):
         if not self.hasIndex(row, column, parent):
             return QModelIndex()
-        if (not parent.isValid()):
+        if not parent.isValid():
             parentItem = self.rootItem
         else:
             parentItem = parent.internalPointer()
@@ -342,7 +342,8 @@ class RepoTreeModel(QAbstractItemModel):
     def indexFromItemPath(self, path, column=0):
         """Model index for the item specified by the given virtual path"""
         try:
-            item = repotreeitem.findbyitempath(self.rootItem, unicode(path))
+            item = repotreeitem.findbyitempath(self.rootItem,
+                                               pycompat.unicode(path))
         except ValueError:
             return QModelIndex()
         return self._indexFromItem(item, column)
@@ -408,7 +409,7 @@ class RepoTreeModel(QAbstractItemModel):
 
     @pyqtSlot(str)
     def _updateShortName(self, uroot):
-        uroot = unicode(uroot)
+        uroot = pycompat.unicode(uroot)
         repoagent = self._repomanager.repoAgent(uroot)
         it = self.getRepoItem(uroot)
         if it:
@@ -417,7 +418,7 @@ class RepoTreeModel(QAbstractItemModel):
 
     @pyqtSlot(str)
     def _updateBaseNode(self, uroot):
-        uroot = unicode(uroot)
+        uroot = pycompat.unicode(uroot)
         repo = self._repomanager.repoAgent(uroot).rawRepo()
         it = self.getRepoItem(uroot)
         if it:

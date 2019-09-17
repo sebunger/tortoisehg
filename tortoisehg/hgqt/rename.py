@@ -26,7 +26,10 @@ from .qtgui import (
     QSizePolicy,
 )
 
-from mercurial import util
+from mercurial import (
+    pycompat,
+    util,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -104,10 +107,10 @@ class RenameWidget(cmdui.AbstractCmdWidget):
         return self._repoagent.rawRepo()
 
     def source(self):
-        return unicode(self.src_txt.text())
+        return pycompat.unicode(self.src_txt.text())
 
     def destination(self):
-        return unicode(self.dest_txt.text())
+        return pycompat.unicode(self.dest_txt.text())
 
     def _sourceFile(self):
         root = self._repoagent.rootPath()
@@ -153,7 +156,7 @@ class RenameWidget(cmdui.AbstractCmdWidget):
     def to_relative_path(self, fullpath):  # unicode or QString
         if not fullpath:
             return
-        fullpath = util.normpath(unicode(fullpath))
+        fullpath = util.normpath(pycompat.unicode(fullpath))
         pathprefix = util.normpath(hglib.tounicode(self.repo.root)) + '/'
         if not os.path.normcase(fullpath).startswith(os.path.normcase(pathprefix)):
             return
@@ -169,7 +172,7 @@ class RenameWidget(cmdui.AbstractCmdWidget):
 
     def isCaseFoldingOnWin(self):
         fullsrc, fulldest = self._sourceFile(), self._destinationFile()
-        return (fullsrc.upper() == fulldest.upper() and sys.platform == 'win32')
+        return fullsrc.upper() == fulldest.upper() and sys.platform == 'win32'
 
     def compose_command(self):
         name = self.isCopyCommand() and 'copy' or 'rename'

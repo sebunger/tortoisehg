@@ -112,7 +112,7 @@ class Msgfmt:
         # binary compatible with the gnu gettext format produced by:
         # msgfmt file.po --no-hash
         output = struct.pack("Iiiiiii",
-                             0x950412deL,       # Magic
+                             0x950412de,        # Magic
                              0,                 # Version
                              len(keys),         # # of entries
                              7*4,               # start of key index

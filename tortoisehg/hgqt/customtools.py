@@ -727,12 +727,14 @@ class CustomToolConfigDialog(CustomConfigDialog):
                        ]
     _defaulticonstring = _('<default icon>')
 
-    def __init__(self, parent=None, toolname=None, toolconfig={}):
+    def __init__(self, parent=None, toolname=None, toolconfig=None):
         super(CustomToolConfigDialog, self).__init__(parent,
             dialogname='customtools',
             windowTitle=_('Configure Custom Tool'),
             windowIcon=qtlib.geticon(DEFAULTICONNAME))
 
+        if toolconfig is None:
+            toolconfig = {}
         vbox = self.formvbox
 
         command = toolconfig.get('command', '')

@@ -8,7 +8,6 @@
 from __future__ import absolute_import
 
 import re
-import urllib
 
 from .qtcore import (
     QTimer,
@@ -33,6 +32,11 @@ from .qtgui import (
 
 from mercurial.i18n import _ as hggettext
 
+from mercurial import (
+    pycompat,
+    util,
+)
+
 from ..util import hglib
 from ..util.i18n import _
 from . import qtlib
@@ -40,7 +44,8 @@ from . import qtlib
 # Strings and regexes used to convert hashes and subrepo paths into links
 _hashregex = re.compile(r'\b[0-9a-fA-F]{12,}')
 # Currently converting subrepo paths into links only works in English
-_subrepoindicatorpattern = hglib.tounicode(hggettext('(in subrepo %s)') + '\n')
+_subrepoindicatorpattern = hglib.tounicode(hggettext(b'(in subrepo %s)')
+                                           + b'\n')
 
 def _linkifyHash(message, subrepo=''):
     if subrepo:
@@ -78,7 +83,7 @@ def linkifyMessage(message, subrepo=None):
     u'abort: <a href="repo:foo\\goo?0123456789ab">0123456789ab</a>!
     (in subrepo <a href="repo:foo\\goo?0123456789ab">foo\\goo</a>)<br>'
     """
-    message = unicode(message)
+    message = pycompat.unicode(message)
     message = _linkifyHash(message, subrepo)
     if subrepo:
         hash = ''
@@ -370,7 +375,7 @@ class InfoBarPlaceholder(QWidget):
 
     @pyqtSlot(str, str)
     def showOutput(self, msg, label, maxlines=2, maxwidth=140):
-        labelslist = unicode(label).split()
+        labelslist = pycompat.unicode(label).split()
         if 'ui.error' in labelslist:
             # Check if a subrepo is set in the label list
             subrepo = None
@@ -379,11 +384,11 @@ class InfoBarPlaceholder(QWidget):
                 if label.startswith(subrepolabel):
                     # The subrepo "label" is encoded ascii
                     subrepo = hglib.tounicode(
-                        urllib.unquote(str(label)[len(subrepolabel):]))
+                        util.urlreq.unquote(str(label)[len(subrepolabel):]))
                     break
             # Limit the text shown on the info bar to maxlines lines of up to
             # maxwidth chars
-            msglines = unicode(msg).strip().splitlines()
+            msglines = pycompat.unicode(msg).strip().splitlines()
             infolines = []
             for line in msglines[0:maxlines]:
                 if len(line) > maxwidth:

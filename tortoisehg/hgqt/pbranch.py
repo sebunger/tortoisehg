@@ -45,6 +45,7 @@ from .qtgui import (
 from mercurial import (
     error,
     extensions,
+    pycompat,
 )
 from mercurial.utils import (
     dateutil,
@@ -714,7 +715,7 @@ class PatchBranchModel(QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             text = self._columnmap[column](ctx, gnode)
-            if not isinstance(text, unicode):
+            if not isinstance(text, pycompat.unicode):
                 text = hglib.tounicode(text)
             return text
         elif role == Qt.ForegroundRole:
@@ -910,11 +911,11 @@ class PNewDialog(QDialog):
         return self.patchnamele.text()
 
     def getCmd(self):
-        cmd = ['pnew', unicode(self.patchname())]
+        cmd = ['pnew', pycompat.unicode(self.patchname())]
         optList = [('patchtext','--text'),
                    ('patchdate','--date'),
                    ('patchuser','--user')]
         for v,o in optList:
             if getattr(self,v+'cb').isChecked():
-                cmd.extend([o,unicode(getattr(self,v+'le').text())])
+                cmd.extend([o, pycompat.unicode(getattr(self,v+'le').text())])
         return cmd

@@ -9,6 +9,10 @@ from __future__ import absolute_import
 
 import os
 
+from mercurial import (
+    pycompat,
+)
+
 from .qtcore import (
     QAbstractTableModel,
     QModelIndex,
@@ -79,7 +83,7 @@ class WebconfForm(QWidget):
     def _getlocalpath_from_dropevent(event):
         m = event.mimeData()
         if m.hasFormat('text/uri-list') and len(m.urls()) == 1:
-            return unicode(m.urls()[0].toLocalFile())
+            return pycompat.unicode(m.urls()[0].toLocalFile())
 
     def setwebconf(self, webconf):
         """set current webconf object"""
@@ -95,7 +99,7 @@ class WebconfForm(QWidget):
         """current webconf object"""
         def curconf(w):
             i = w.currentIndex()
-            _path, conf = unicode(w.itemText(i)), w.itemData(i)
+            _path, conf = pycompat.unicode(w.itemText(i)), w.itemData(i)
             return conf
 
         return curconf(self._qui.path_edit)
@@ -170,7 +174,7 @@ class WebconfForm(QWidget):
         origpath, origlocalpath = self._webconfmodel.getpathmapat(index.row())
         path, localpath = _PathDialog.geteditpathmap(
             self, path=origpath, localpath=origlocalpath,
-            invalidpaths=set(self._webconfmodel.paths) - set([origpath]))
+            invalidpaths=set(self._webconfmodel.paths) - {origpath})
         if not path:
             return
         if path != origpath:
@@ -238,12 +242,12 @@ class _PathDialog(QDialog):
     @property
     def path(self):
         """value of path field"""
-        return unicode(self._path_edit.text())
+        return pycompat.unicode(self._path_edit.text())
 
     @property
     def localpath(self):
         """value of localpath field"""
-        return unicode(self._localpath_edit.text())
+        return pycompat.unicode(self._localpath_edit.text())
 
     @pyqtSlot()
     def _browse_localpath(self):
@@ -252,7 +256,7 @@ class _PathDialog(QDialog):
         if not path:
             return
 
-        path = unicode(path)
+        path = pycompat.unicode(path)
         if os.path.exists(os.path.join(path, '.hgsub')):
             self._localpath_edit.setText(os.path.join(path, '**'))
         else:

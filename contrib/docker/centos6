@@ -1,0 +1,35 @@
+FROM centos:centos6
+RUN yum install -y \
+	gcc \
+	gettext \
+	make \
+	python-devel \
+	python-docutils \
+	rpm-build \
+	tar
+
+# For creating repo meta data
+RUN yum install -y createrepo
+
+# THg GUI dependencies
+RUN yum install -y \
+	dejavu-sans-fonts \
+	dejavu-sans-mono-fonts \
+	epel-release \
+	PyQt4-devel \
+	python-iniparse \
+	qscintilla-python
+
+# THg tests dependencies
+RUN yum install -y python-pip && \
+	pip install mock nose
+
+# RPM build dependencies
+RUN yum install -y \
+	desktop-file-utils \
+	python-sphinx
+
+# Allow installing Mercurial at run-time
+RUN yum install -y sudo && \
+	sed -i -e 's/Defaults    requiretty.*/ #Defaults    requiretty/g' /etc/sudoers && \
+	echo "ALL ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers

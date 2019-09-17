@@ -76,7 +76,7 @@ class ManifestModel(QAbstractItemModel):
         self._iconcache = {}  # (path, status, subkind): icon
         self._repoagent = repoagent
 
-        self._namefilter = unicode(namefilter or '')
+        self._namefilter = pycompat.unicode(namefilter or '')
         assert all(c in 'MARSC' for c in statusfilter)
         self._statusfilter = statusfilter
         self._changedfilesonly = False
@@ -238,7 +238,7 @@ class ManifestModel(QAbstractItemModel):
             return QModelIndex()
 
         try:
-            e = self._nodeop.findpath(self._rootentry, unicode(path))
+            e = self._nodeop.findpath(self._rootentry, pycompat.unicode(path))
         except KeyError:
             return QModelIndex()
 
@@ -317,7 +317,7 @@ class ManifestModel(QAbstractItemModel):
     @pyqtSlot(str)
     def setNameFilter(self, pattern):
         """Filter file name by partial match of glob pattern"""
-        pattern = unicode(pattern)
+        pattern = pycompat.unicode(pattern)
         if self._namefilter == pattern:
             return
         self._namefilter = pattern
@@ -692,7 +692,7 @@ class ManifestCompleter(QCompleter):
         >>> c.splitPath(u'foo/')
         [u'foo', u'']
         """
-        return unicode(path).split('/')
+        return pycompat.unicode(path).split('/')
 
     def pathFromIndex(self, index):
         if not index.isValid():

@@ -1045,7 +1045,7 @@ class WctxModel(QAbstractTableModel):
         self.layoutAboutToBeChanged.emit()
         self.beginResetModel()
         self.rows = [r for r in self.unfiltered
-                     if unicode(match) in r[COL_PATH_DISPLAY]]
+                     if pycompat.unicode(match) in r[COL_PATH_DISPLAY]]
         self.layoutChanged.emit()
         self.endResetModel()
 
@@ -1187,7 +1187,7 @@ class StatusDialog(QDialog):
         QTimer.singleShot(0, self.stwidget.refreshWctx)
 
     def linkActivated(self, link):
-        link = unicode(link)
+        link = pycompat.unicode(link)
         if link.startswith('repo:'):
             self._subdialogs.open(link[len('repo:'):])
 

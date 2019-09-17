@@ -198,7 +198,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
 
     def browse_clicked(self):
         """Select the destination directory or file"""
-        dest = unicode(self.dest_edit.text())
+        dest = pycompat.unicode(self.dest_edit.text())
         if not os.path.exists(dest):
             dest = os.path.dirname(dest)
         select = self.get_selected_archive_type()
@@ -250,7 +250,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         def remove_rev(path):
             l = ''
             for i in pycompat.xrange(self.rev_combo.count() - 1):
-                l += unicode(self.rev_combo.itemText(i))
+                l += pycompat.unicode(self.rev_combo.itemText(i))
             revs = [rev[0] for rev in l]
             revs.append(wdrev)
             if not self.prevtarget is None:
@@ -266,7 +266,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
             if select['type'] != 'files':
                 path += select['ext']
             return path
-        text = unicode(self.rev_combo.currentText())
+        text = pycompat.unicode(self.rev_combo.currentText())
         if len(text) == 0:
             self.commandChanged.emit()
             return
@@ -279,7 +279,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
             except (error.RepoError, error.LookupError):
                 self.commandChanged.emit()
                 return
-        path = unicode(self.dest_edit.text())
+        path = pycompat.unicode(self.dest_edit.text())
         path = remove_ext(path)
         path = remove_rev(path)
         path = add_rev(path, text)
@@ -323,7 +323,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
     def runCommand(self):
         # verify input
         type = self.get_selected_archive_type()['type']
-        dest = unicode(self.dest_edit.text())
+        dest = pycompat.unicode(self.dest_edit.text())
         if os.path.exists(dest):
             if type == 'files':
                 if os.path.isfile(dest):

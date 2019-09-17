@@ -710,7 +710,7 @@ class Workbench(QMainWindow):
     @pyqtSlot(str, bool)
     def openRepo(self, root, reuse, bundle=None):
         """Open tab of the specified repo [unicode]"""
-        root = unicode(root)
+        root = pycompat.unicode(root)
         if not root or root.startswith('ssh://'):
             return
         if reuse and self.repoTabsWidget.selectRepo(root):
@@ -732,7 +732,7 @@ class Workbench(QMainWindow):
     def dragEnterEvent(self, event):
         d = event.mimeData()
         for u in d.urls():
-            root = paths.find_root(unicode(u.toLocalFile()))
+            root = paths.find_root(pycompat.unicode(u.toLocalFile()))
             if root:
                 event.setDropAction(Qt.LinkAction)
                 event.accept()
@@ -742,7 +742,7 @@ class Workbench(QMainWindow):
         accept = False
         d = event.mimeData()
         for u in d.urls():
-            root = paths.find_root(unicode(u.toLocalFile()))
+            root = paths.find_root(pycompat.unicode(u.toLocalFile()))
             if root:
                 self.showRepo(root)
                 accept = True
@@ -826,7 +826,7 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(str)
     def _onCurrentRepoChanged(self, curpath):
-        curpath = unicode(curpath)
+        curpath = pycompat.unicode(curpath)
         self._console.setCurrentRepoRoot(curpath or None)
         self.reporegistry.setActiveTabRepo(curpath)
         if curpath:
@@ -855,8 +855,13 @@ class Workbench(QMainWindow):
                 getattr(w, name)(checked)
         return forwarder
 
-    def _repofwd(self, name, params=[], namedparams={}):
+    def _repofwd(self, name, params=None, namedparams=None):
         """Return function to forward action to the current repo tab"""
+        if params is None:
+            params = []
+        if namedparams is None:
+            namedparams = {}
+
         def forwarder():
             w = self._currentRepoWidget()
             if w:
@@ -977,8 +982,8 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(str, str)
     def _openClonedRepo(self, root, sourceroot):
-        root = unicode(root)
-        sourceroot = unicode(sourceroot)
+        root = pycompat.unicode(root)
+        sourceroot = pycompat.unicode(sourceroot)
         self.reporegistry.addClonedRepo(root, sourceroot)
         self.showRepo(root)
 
@@ -989,7 +994,7 @@ class Workbench(QMainWindow):
         if root:
             cwd = os.path.dirname(root)
         else:
-            cwd = os.getcwdu()
+            cwd = hglib.getcwdu()
         FD = QFileDialog
         path = FD.getExistingDirectory(self, caption, cwd,
                                        FD.ShowDirsOnly | FD.ReadOnly)
@@ -1097,7 +1102,7 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'saveLastSyncPaths',
             self.actionSaveLastSyncPaths.isChecked())
         s.setValue(wb + 'lastactiverepo', lastactiverepo)
-        s.setValue(wb + 'openrepos', (',').join(repostosave))
+        s.setValue(wb + 'openrepos', ','.join(repostosave))
         s.beginWriteArray('lastreposyncpaths')
         lastreposyncpaths = {}
         if self.actionSaveLastSyncPaths.isChecked():

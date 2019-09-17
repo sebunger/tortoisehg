@@ -1,4 +1,4 @@
-tortoisehg (5.0.2-1) unstable; urgency=medium
+tortoisehg (5.1-1) unstable; urgency=medium
 
   * New maintainer (Closes: #922565).
   * New upstream version (Closes: #921704).

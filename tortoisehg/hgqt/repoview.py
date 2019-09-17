@@ -366,22 +366,72 @@ class HgRepoView(QTableView):
                 self._in_history = True
                 self.setCurrentIndex(idx)
 
+    def _symbolic_rev_to_numeric_rev(self, symbolic_rev):
+        """Converts symbolic_rev into a numeric revision number for the local
+        repository.
+
+        symbolic_rev may be either:
+        - a numeric revision
+        - a mercurial commit hash
+        - a git commit hash. This is looked up for only if no matches are found
+          for the preceding cases, and the hg-git extension is loaded
+
+        If no revision is found for symbolic_rev, the function raises an
+        error.RepoError or an error.LookupError, which have to be handled
+        by the caller.
+        """
+        if isinstance(symbolic_rev, int):
+            return symbolic_rev
+
+        if isinstance(symbolic_rev, pycompat.unicode):
+            symbolic_rev = hglib.fromunicode(symbolic_rev)
+
+        try:
+            # look for a mercurial commit hash
+            return scmutil.revsymbol(self.repo, symbolic_rev).rev()
+        except error.RepoError:
+            if 'hggit' not in self.repo.extensions():
+                # hg-git is not installed, do not try doing a gitnode() lookup
+                raise
+            # look for a git commit hash
+            baseset = self.repo.revs('gitnode(%s)', symbolic_rev)
+
+            if len(baseset) == 0:
+                raise error.RepoLookupError("No revision found with gitnode"
+                                            "('%s')" % symbolic_rev)
+
+            # There would not be any strict requirement to check for
+            # len(baseset) > 1, since hg-git already raises a LookupError if it
+            # gets passed an ambiguous hash.
+            # However, leaving a case unhandled can always be a source of bugs
+            # later, so let's be exhaustive instead.
+            if len(baseset) > 1:
+                raise error.AmbiguousPrefixLookupError(
+                    symbolic_rev, self.repo.githandler.map_file,
+                    'Ambiguous commit hash')
+
+            return baseset.first()
+
     def goto(self, rev):
         """
         Select revision 'rev' (can be anything understood by repo[])
         """
-        if isinstance(rev, unicode):
-            rev = hglib.fromunicode(rev)
-        if not isinstance(rev, int):
-            try:
-                rev = scmutil.revsymbol(self.repo, rev).rev()
-            except error.RepoError:
-                self.showMessage.emit(_("Can't find revision '%s'")
-                                      % hglib.tounicode(str(rev)))
-                return
-            except LookupError as e:
-                self.showMessage.emit(hglib.tounicode(str(e)))
-                return
+        try:
+            rev = self._symbolic_rev_to_numeric_rev(rev)
+        except error.RepoError:
+            self.showMessage.emit(_("Can't find revision '%s'")
+                                  % hglib.tounicode(str(rev)))
+            return
+        # When Mercurial is not able to disambiguate commit hash prefixes,
+        # it raises an error.AmbiguousPrefixLookupError, which ultimately
+        # comes from its revlog._partialmatch(). However, in the same
+        # situation hg-git (currently 2135ddef6d6e) raises a less specific
+        # error.LookupError from its revset_gitnode().
+        #
+        # We cannot narrow this clause until hg-git is updated.
+        except error.LookupError as e:
+            self.showMessage.emit(hglib.tounicode(str(e)))
+            return
 
         idx = self.model().indexFromRev(rev)
         if idx.isValid():

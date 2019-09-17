@@ -133,7 +133,7 @@ def openlocalurl(path):
     if isinstance(path, str):
         path = hglib.tounicode(path)
     else:
-        path = unicode(path)
+        path = pycompat.unicode(path)
     if os.name == 'nt' and path.startswith('\\\\'):
         # network share, special handling because of qt bug 13359
         # see https://bugreports.qt.io/browse/QTBUG-13359
@@ -309,7 +309,7 @@ def openshell(root, reponame, ui=None):
 def readBool(qs, key, default=False):
     """Read the specified value from QSettings and coerce into bool"""
     v = qs.value(key, default)
-    if isinstance(v, basestring):
+    if hglib.isbasestring(v):
         # qvariant.cpp:qt_convertToBool()
         return not (v == '0' or v == 'false' or v == '')
     return bool(v)
@@ -338,22 +338,22 @@ def readString(qs, key, default=''):
     """Read the specified value from QSettings and coerce into string"""
     v = qs.value(key, default)
     if v is None:
-        return unicode(default)
+        return pycompat.unicode(default)
     try:
-        return unicode(v)
+        return pycompat.unicode(v)
     except ValueError:
-        return unicode(default)
+        return pycompat.unicode(default)
 
 def readStringList(qs, key, default=()):
     """Read the specified value from QSettings and coerce into string list"""
     v = qs.value(key, default)
     if v is None:
         return list(default)
-    if isinstance(v, basestring):
+    if hglib.isbasestring(v):
         # qvariant.cpp:convert()
         return [v]
     try:
-        return [unicode(e) for e in v]
+        return [pycompat.unicode(e) for e in v]
     except (TypeError, ValueError):
         return list(default)
 
@@ -639,7 +639,7 @@ def getallicons():
         d = QDir(path)
         d.setNameFilters(['*%s' % sfx])
         for iconname in d.entryList():
-            iconset.add(unicode(iconname).rsplit('.', 1)[0])
+            iconset.add(pycompat.unicode(iconname).rsplit('.', 1)[0])
     return sorted(iconset)
 
 def _findscalableicon(name):
@@ -784,7 +784,9 @@ def getfont(name):
     return _fontcache[name]
 
 def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Ok,
-                 labels=[], parent=None, defaultbutton=None):
+                 labels=None, parent=None, defaultbutton=None):
+    if labels is None:
+        labels = []
     msg = QMessageBox(parent)
     msg.setIcon(icon)
     msg.setWindowTitle(title)
@@ -1101,7 +1103,7 @@ class StatusLabel(QWidget):
         else:
             if isinstance(icon, bool):
                 icon = geticon(icon and 'thg-success' or 'thg-error')
-            elif isinstance(icon, basestring):
+            elif hglib.isbasestring(icon):
                 icon = geticon(icon)
             elif not isinstance(icon, QIcon):
                 raise TypeError('%s: bool, str or QIcon' % type(icon))
@@ -1120,7 +1122,7 @@ class LabeledSeparator(QWidget):
         box.setContentsMargins(*(0,)*4)
 
         if label:
-            if isinstance(label, basestring):
+            if hglib.isbasestring(label):
                 label = QLabel(label)
             box.addWidget(label)
 

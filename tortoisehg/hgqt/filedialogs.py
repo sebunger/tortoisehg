@@ -168,7 +168,7 @@ class _AbstractFileDialog(QMainWindow):
         self.setupUi()
         self._show_rev = None
 
-        assert not isinstance(filename, unicode)
+        assert not isinstance(filename, pycompat.unicode)
         self.filename = filename
 
         self.setWindowTitle(_('Hg file log viewer [%s] - %s')
@@ -367,7 +367,7 @@ class FileLogDialog(_AbstractFileDialog):
 
     @pyqtSlot(str)
     def onLinkActivated(self, link):
-        link = unicode(link)
+        link = pycompat.unicode(link)
         if ':' in link:
             scheme, param = link.split(':', 1)
             if scheme == 'cset':
@@ -834,7 +834,7 @@ class FileDiffDialog(_AbstractFileDialog):
 
         blo, bhi = self._diffmatch[oside][i]
         vbar = self.viewers[oside].verticalScrollBar()
-        if (dv) < (bhi - blo):
+        if dv < (bhi - blo):
             bvalue = blo + dv
         else:
             bvalue = bhi

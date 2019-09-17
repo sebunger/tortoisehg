@@ -100,14 +100,13 @@ def enforceversion():
     if errmsg:
         from tortoisehg.hgqt.bugreport import run
         from tortoisehg.hgqt.run import qtrun
-        opts = {}
-        opts['cmd'] = ' '.join(sys.argv)
-        opts['error'] = '\n' + errmsg + '\n'
-        opts['nofork'] = True
+        opts = {'cmd': ' '.join(sys.argv),
+                'error': '\n' + errmsg + '\n',
+                'nofork': True}
         qtrun(run, ui.ui(), **opts)
         sys.exit(1)
 
-@command('view', [], _("hg view`"), inferrepo=True)
+@command('view', [], _("hg view"), inferrepo=True)
 def cmdview(ui, repo, *pats, **opts):
     """start light interactive history viewer from tortoisehg"""
     enforceversion()
@@ -130,10 +129,9 @@ def cmdview(ui, repo, *pats, **opts):
         for l in stderrout.splitlines():
             if l.startswith(errors):
                 from tortoisehg.hgqt.bugreport import run
-                opts = {}
-                opts['cmd'] = ' '.join(sys.argv)
-                opts['error'] = 'Recoverable error (stderr):\n' + stderrout
-                opts['nofork'] = True
+                opts = {'cmd': ' '.join(sys.argv),
+                        'error': 'Recoverable error (stderr):\n' + stderrout,
+                        'nofork': True}
                 qtrun(run, ui.ui(), **opts)
                 break
         sys.exit(ret)

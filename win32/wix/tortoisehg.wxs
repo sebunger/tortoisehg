@@ -1,0 +1,366 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+
+  <!-- Copyright 2010 Steve Borho <steve@borho.org>
+
+  This software may be used and distributed according to the terms of the
+  GNU General Public License version 2 or any later version. -->
+
+  <?include guids.wxi ?>
+  <?include defines.wxi ?>
+
+  <?if $(var.Platform) = "x64" ?>
+    <?define PFolder = ProgramFiles64Folder ?>
+  <?else?>
+    <?define PFolder = ProgramFilesFolder ?>
+  <?endif?>
+
+  <?define ProgramRegKey = Software\TortoiseHg ?>
+
+  <?ifndef ProductName ?>
+    <?define ProductName = TortoiseHg ?>
+  <?endif?>
+
+  <Product Name='$(var.ProductName) $(var.Version) ($(var.Platform))'
+           Id='$(var.ProductId)'
+           Version='$(var.Version)'
+           UpgradeCode='$(var.ProductUpgradeCode)'
+           Language='1033' Codepage='1252'
+           Manufacturer='Steve Borho and others'>
+
+    <Package Id='*' Keywords='Installer'
+             Description="Windows shell extension for Mercurial DVCS (version $(var.Version))"
+             Manufacturer='Steve Borho and others'
+             InstallerVersion='300' Languages='1033' Compressed='yes'
+             SummaryCodepage='1252' Platform='$(var.Platform)'
+             Comments='$(var.Comments)'
+    />
+
+    <Media Id='1' Cabinet='tortoisehg.cab' EmbedCab='yes' CompressionLevel='high'
+           DiskPrompt='CD-ROM #1'
+    />
+    <Property Id='DiskPrompt' Value="TortoiseHg $(var.Version) Installation [1]" />
+
+    <Property Id='INSTALLDIR'>
+      <ComponentSearch Id='SearchForMainExecutableComponent'
+                       Guid='$(var.ComponentMainExecutableGUID)'
+      />
+    </Property>
+    <Property Id='INNOSETUPINSTALL'>
+        <RegistrySearch
+          Id='SearchForOldInnoSetupTortoiseHg' Win64='$(var.IsX64)'
+          Root='HKLM'
+          Key='SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\TortoiseHg_is1'
+          Type='directory'
+          Name='InstallLocation'
+        />
+    </Property>
+    <?if $(var.Platform) = "x86" ?>
+      <Condition Message =
+        "The x86 installer may not be used on a x64 platform"
+          >NOT VersionNT64
+      </Condition>
+    <?endif?>
+    <Condition Message =
+      "Backup your user Mercurial.ini file, then uninstall [INNOSETUPINSTALL] before installing this package."
+         >Installed OR NOT INNOSETUPINSTALL
+    </Condition>
+    <Condition Message=
+      'TortoiseHg requires Windows XP or higher'
+        >VersionNT >= 501
+    </Condition>
+
+    <!--Property Id='ARPCOMMENTS'>any comments</Property-->
+    <Property Id='ARPHELPLINK'>https://tortoisehg.bitbucket.io/</Property>
+    <Property Id='ARPURLINFOABOUT'>https://tortoisehg.bitbucket.io/about.html</Property>
+    <Property Id='ARPURLUPDATEINFO'>https://tortoisehg.bitbucket.io/</Property>
+    <Property Id='ARPHELPTELEPHONE'>https://mercurial-scm.org/wiki/Support</Property>
+    <Property Id='ARPPRODUCTICON'>thgIcon.ico</Property>
+    <Property Id='HGVSURL'>https://hgvs.multicorewareinc.com/thg-install</Property>
+
+    <Property Id='INSTALLEDTORTOISEHGPRODUCTS' Secure='yes'></Property>
+    <Property Id='REINSTALLMODE'>amus</Property>
+
+    <!--Auto-accept the license page-->
+    <Property Id='LicenseAccepted'>1</Property>
+
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='$(var.PFolder)' Name='PFiles'>
+        <Directory Id='INSTALLDIR' Name='TortoiseHg'>
+          <Component Id='MainExecutable' Guid='$(var.ComponentMainExecutableGUID)' Win64='$(var.IsX64)'>
+            <File Id='thgwEXE' Name='thgw.exe' KeyPath='yes' Source='dist\thgw.exe'/>
+            <Shortcut Id="thgStartMenu" Directory="ProgramMenuDir"
+                      Name="TortoiseHg Workbench"
+                      Icon="thgIcon.ico" IconIndex="0" Advertise="yes"
+            />
+            <Environment Id="Environment" Name="PATH" Part="last" System="yes"
+                         Permanent="no" Value="[INSTALLDIR]" Action="set"
+            />
+          </Component>
+          <Component Id='ExtensionVersions' Guid='$(var.ExtensionVersions.guid)' Win64='$(var.IsX64)'>
+            <File Id='ExtensionVersions' Name='extension-versions.txt'
+                  KeyPath='yes'
+                  Source='..\extension-versions.txt'
+            />
+          </Component>
+          <Component Id='docdiffEXE' Guid='$(var.docdiffEXE.guid)' Win64='$(var.IsX64)'>
+            <File Id='docdiffEXE' Name='docdiff.exe' KeyPath='yes'
+                  Source='dist\docdiff.exe'
+            />
+          </Component>
+          <Component Id='COPYING' Guid='$(var.COPYING.guid)' Win64='$(var.IsX64)'>
+            <File Id='COPYING' Name='COPYING.txt' Source='COPYING.txt'/>
+          </Component>
+
+          <?if $(var.Platform) = "x64" ?>
+            <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)' Win64='$(var.IsX64)'>
+              <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
+                    Source='..\contrib\Pageant-x64.exe'
+              />
+            </Component>
+          <?else?>
+            <Component Id='PageantEXE' Guid='$(var.PageantEXE.guid)' Win64='$(var.IsX64)'>
+              <File Id='PageantEXE' Name='Pageant.exe' KeyPath='yes'
+                    Source='..\contrib\Pageant-x86.exe'
+              />
+            </Component>
+          <?endif?>
+
+          <Directory Id='docFolder' Name='doc'>
+            <Component Id='chmFile' Guid='$(var.chmFile.guid)' Win64='$(var.IsX64)'>
+              <File Id='chmFile' Name='TortoiseHg.chm' KeyPath='yes'
+                    Source='doc\build\chm\TortoiseHg.chm' >
+                  <Shortcut Id="chmStartMenu" Directory="ProgramMenuDir"
+                            Name="TortoiseHg Manual (CHM)"
+                            Icon="thgIcon.ico" IconIndex="0" Advertise="yes"
+                  />
+              </File>
+            </Component>
+            <Component Id='hgbook' Guid='$(var.hgbook.guid)' Win64='$(var.IsX64)'>
+              <File Id='hgbook' Name='hgbook.pdf' KeyPath='yes'
+                    Source='..\misc\hgbook.pdf'>
+                  <Shortcut Id="hgbookStartMenu" Directory="ProgramMenuDir"
+                            Name="Mercurial - The Definitive Guide (PDF)"
+                            Icon="hgIcon.ico" IconIndex="0" Advertise="yes"
+                  />
+              </File>
+            </Component>
+          </Directory>
+
+          <Directory Id='HGRCD' Name='hgrc.d'>
+            <Component Id='mercurial.rc' Guid='$(var.mercurial.rc.guid)' Win64='$(var.IsX64)'>
+              <File Id='mercurial.rc' Name='Mercurial.rc' ReadOnly='yes'
+                    Source='win32\mercurial.rc'
+              />
+            </Component>
+            <Component Id='mergetools.rc' Guid='$(var.mergetools.rc.guid)' Win64='$(var.IsX64)'>
+              <File Id='mergetools.rc' Name='MergeTools.rc' ReadOnly='yes'
+                    Source='contrib\mergetools.rc'
+              />
+            </Component>
+            <Component Id='editortools.rc' Guid='$(var.editortools.rc.guid)' Win64='$(var.IsX64)'>
+              <File Id='editortools.rc' Name='EditorTools.rc' ReadOnly='yes'
+                    Source='contrib\editortools.rc'
+              />
+            </Component>
+            <Component Id='terminaltools.rc' Guid='$(var.terminaltools.rc.guid)' Win64='$(var.IsX64)'>
+              <File Id='terminaltools.rc' Name='TerminalTools.rc' ReadOnly='yes'
+                    Source='contrib\terminaltools.rc'
+              />
+            </Component>
+            <Component Id="mergepatterns.rc" Guid='$(var.mergepatterns.rc.guid)' Win64='$(var.IsX64)'>
+              <File Id='mergepatterns.rc' Name='MergePatterns.rc'
+                    ReadOnly='yes' KeyPath='yes'
+                    Source='win32\mergepatterns.rc'
+              />
+            </Component>
+            <Component Id='paths.rc' Guid='$(var.paths.rc.guid)' Win64='$(var.IsX64)'>
+              <CreateFolder/>
+              <IniFile Id="ini0" Action="createLine" Directory="HGRCD" Name="Paths.rc"
+                Section="merge-tools" Key="kdiff3.executable" Value="[INSTALLDIR]lib\kdiff3.exe" />
+              <IniFile Id="ini1" Action="createLine" Directory="HGRCD" Name="Paths.rc"
+                Section="ui" Key="ssh" Value='"[INSTALLDIR]lib\TortoisePlink.exe" -ssh -2' />
+              <IniFile Id="ini2" Action="createLine" Directory="HGRCD" Name="Paths.rc"
+                Section="merge-tools" Key="kdiff3-noauto.executable"
+                Value="[INSTALLDIR]lib\kdiff3.exe" />
+              <!-- Hack for Qt 5.9 /-->
+              <IniFile Id="ini3" Action="createLine" Directory="HGRCD" Name="Paths.rc"
+                Section="terminal-tools" Key="qt5spawncmd.executable"
+                Value="[INSTALLDIR]lib\spawn.cmd" />
+              <IniFile Id="ini4" Action="createLine" Directory="HGRCD" Name="Paths.rc"
+                Section="terminal-tools" Key="qt5spawncmd.args" Value="%(reponame)s" />
+              <IniFile Id="ini5" Action="createLine" Directory="HGRCD" Name="Paths.rc"
+                Section="terminal-tools" Key="qt5spawncmd.priority" Value="0" />
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ProgramMenuDir" Name="TortoiseHg">
+          <Component Id="ProgramMenuDir" Guid="$(var.ProgramMenuDir.guid)">
+            <RemoveFolder Id='ProgramMenuDir' On='uninstall' />
+            <RegistryValue
+              Root='HKCU' Key='$(var.ProgramRegKey)'
+              Type='string' Value='[INSTALLDIR]' KeyPath='yes'
+            />
+            <Shortcut Id='UrlShortcut' Directory='ProgramMenuDir' Name='TortoiseHg Web Site'
+                      Target='[ARPHELPLINK]' Icon="thgIcon.ico" IconIndex='0' />
+            <Shortcut Id='HgVsShortcut' Directory='ProgramMenuDir' Name='Install HgVs Plugin'
+                      Target='[HGVSURL]' Icon="thgIcon.ico" IconIndex='0' />
+            <!-- Shortcut Id="UninstallProduct" Name="Uninstall TortoiseHg"
+                      Target="[System64Folder]msiexec.exe"
+                      Arguments="/x [ProductCode]"
+                      Description="Uninstalls TortoiseHg" /-->
+          </Component>
+        </Directory>
+      </Directory>
+
+      <?if $(var.Platform) = "x86" ?>
+        <Merge Id='VCRedist' DiskId='1' Language='1033'
+              SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x86_msm.msm'/>
+        <Merge Id='VCRedistPolicy' DiskId='1' Language='1033'
+              SourceFile='$(var.VCRedistSrcDir)\policy.x.xx.microsoft.vcxx.crt.x86_msm.msm'/>
+      <?else?>
+        <Merge Id='VCRedist' DiskId='1' Language='1033'
+              SourceFile='$(var.VCRedistSrcDir)\microsoft.vcxx.crt.x64_msm.msm'/>
+        <Merge Id='VCRedistPolicy' DiskId='1' Language='1033'
+              SourceFile='$(var.VCRedistSrcDir)\policy.x.xx.microsoft.vcxx.crt.x64_msm.msm'/>
+      <?endif?>
+
+    </Directory>
+
+    <Feature Id='Complete' Title='TortoiseHg'
+             Display='expand' Level='1' ConfigurableDirectory='INSTALLDIR'
+             Description='The complete package' >
+      <Feature Id='MainProgram' Title='Program'
+               Level='1' Absent='disallow' Display='hidden'
+               Description='Command line applications: hg, thg' >
+        <ComponentRef Id='MainExecutable' />
+        <ComponentRef Id='ProgramMenuDir' />
+        <ComponentRef Id='COPYING' />
+        <ComponentRef Id='mercurial.rc' />
+        <ComponentRef Id='mergetools.rc' />
+        <ComponentRef Id='editortools.rc' />
+        <ComponentRef Id='terminaltools.rc' />
+        <ComponentRef Id='paths.rc' />
+        <ComponentRef Id='ExtensionVersions' />
+        <ComponentGroupRef Id='helpFolder' />
+        <ComponentRef Id='distOutput' />
+        <ComponentRef Id='libOutput' />
+        <ComponentRef Id='TortoisePlinkEXE' />
+        <ComponentRef Id='imageFormats' />
+        <?if $(var.Platform) = "x64" ?>
+          <ComponentRef Id='platforms' />
+        <?endif?>
+        <ComponentGroupRef Id='templatesFolder' />
+        <ComponentRef Id='Icons' />
+      </Feature>
+      <Feature Id='VCRedist' Title='Visual C++ 9.0 Runtime'
+               AllowAdvertise='no' Display='hidden' Level='1'>
+        <MergeRef Id='VCRedist'/>
+        <MergeRef Id='VCRedistPolicy' />
+      </Feature>
+      <!-- referencing of the shellext features with FeatureRef sorts the
+           shellext features in some unknown and not controllable ridiculous
+           order in the feature dialog, so we have to include them here to
+           preserve and control ordering -->
+      <?include $(var.ShellextRepoFolder)/wix/features.wxi ?>
+      <Feature Id='Locales' Level='1'
+               Title='Translations'
+               Description='Mercurial and TortoiseHg Translations'>
+        <ComponentGroupRef Id='localeFolder' />
+        <ComponentGroupRef Id='thgLocaleFolder' />
+      </Feature>
+      <Feature Id='ThgDocumentation' Level='1'
+               Title='Documentation'
+               Description='TortoiseHg Manual and HTML man pages'>
+        <Feature Id='CHM' Level='1'
+                 Title='CHM'
+                 Description='Compiled HTML'>
+          <ComponentRef Id='chmFile' />
+        </Feature>
+        <Feature Id='HgDocumentation' Level='1'
+                 Title='Man Pages'
+                 Description='Mercurial HTML man pages'>
+          <ComponentGroupRef Id='docFolder' />
+        </Feature>
+        <Feature Id='HgBook'  Level='1'
+                 Title='Mercurial: The Definitive Guide'
+                 Description="Mercurial book by Bryan O'Sullivan">
+          <ComponentRef Id='hgbook' />
+        </Feature>
+      </Feature>
+      <Feature Id='KDiff3' Level='1'
+               Title='KDiff3'
+               Description='Diff/Merge Tool'>
+        <ComponentRef Id='KDiff3EXE' />
+      </Feature>
+      <Feature Id='SSHUtils' Level='1'
+               Title='SSH Utils'
+               Description='Pageant key agent'>
+        <ComponentRef Id='PageantEXE' />
+      </Feature>
+      <Feature Id='Misc' Level='1'
+               Title='Miscellaneous'
+               Description='Contributed scripts'>
+        <Feature Id='HGContrib' Level='1'
+                 Title='Contrib'
+                 Description='Mercurial contrib/'>
+          <ComponentGroupRef Id='contribFolder' />
+        </Feature>
+        <Feature Id='DocDiffFeature' Level='1'
+                 Title='Doc Diff Scripts'
+                 Description='TortoiseSVN scripts for comparing binary files'>
+          <ComponentGroupRef Id='DiffScripts' />
+          <ComponentRef Id='docdiffEXE' />
+          <ComponentRef Id='mergepatterns.rc' />
+        </Feature>
+      </Feature>
+    </Feature>
+
+    <InstallExecuteSequence>
+        <!-- AppSearch must be done before RemoveExistingProducts and before
+             FindRelatedProducts -->
+        <AppSearch Sequence="1"></AppSearch>
+        <Custom Action='CallTerminate' Before='InstallValidate'>
+            INSTALLEDTORTOISEHGPRODUCTS
+        </Custom>
+        <RemoveExistingProducts After="InstallValidate">
+            INSTALLEDTORTOISEHGPRODUCTS
+        </RemoveExistingProducts>
+        <?if $(var.Platform) = "x64" ?>
+          <Custom Action='StartOverlayServerEXE' After='InstallFinalize'>
+            <![CDATA[&OverlaysX86=3 OR &OverlaysX64=3]]>
+          </Custom>
+        <?else?>
+          <Custom Action='StartOverlayServerEXE' After='InstallFinalize'>
+            <![CDATA[&OverlaysX86=3]]>
+          </Custom>
+        <?endif?>
+    </InstallExecuteSequence>
+
+    <Upgrade Id='$(var.ProductUpgradeCode)'>
+      <UpgradeVersion
+        IncludeMinimum='yes' Minimum='0.0.0' IncludeMaximum='no' OnlyDetect='no'
+        Property='INSTALLEDTORTOISEHGPRODUCTS'
+      />
+    </Upgrade>
+
+    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT" Value =
+      "NOTE: Logoff/logon or restarting explorer may be needed to start the overlay icons"
+    />
+
+    <SetProperty Id="ARPINSTALLLOCATION" Value="[INSTALLDIR]" After="CostFinalize" />
+
+    <WixVariable Id="WixUILicenseRtf" Value="win32\wix\COPYING.rtf" />
+    <WixVariable Id="WixUIBannerBmp" Value="win32\wix\WixUIBannerBmp.bmp" />
+    <WixVariable Id="WixUIDialogBmp" Value="win32\wix\WixUIDialogBmp.bmp" />
+
+    <Icon Id="thgIcon.ico" SourceFile="icons\thg_logo.ico" />
+    <Icon Id="hgIcon.ico" SourceFile="icons\hg.ico" />
+  </Product>
+</Wix>

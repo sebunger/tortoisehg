@@ -21,7 +21,10 @@ from .qtgui import (
     QWidget,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    pycompat,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -139,7 +142,7 @@ class SummaryInfo(object):
                 revnum = self.get_data('revnum', *args)
                 revid = self.get_data('revid', *args)
                 if revid:
-                    return (revnum, revid)
+                    return revnum, revid
                 return None
             elif item == 'revnum':
                 return ctx.rev()
@@ -166,7 +169,7 @@ class SummaryInfo(object):
                 date = self.get_data('date', *args)
                 age = self.get_data('age', *args)
                 if date and age:
-                    return (date, age)
+                    return date, age
                 return None
             elif item == 'date':
                 date = ctx.date()
@@ -308,7 +311,7 @@ class SummaryInfo(object):
                 return str(value)
             elif item == 'svn':
                 # svn is always in utf-8 because ctx.extra() isn't converted
-                return unicode(value, 'utf-8', 'replace')
+                return pycompat.unicode(value, 'utf-8', 'replace')
             elif item in ('rawbranch', 'branch'):
                 opts = dict(fg='black', bg='#aaffaa')
                 return qtlib.markup(' %s ' % value, **opts)
@@ -344,7 +347,7 @@ class SummaryInfo(object):
     def get_widget(self, item, widget, ctx, custom, **kargs):
         args = (widget, ctx, custom)
         def default_func(widget, item, markups):
-            if isinstance(markups, basestring):
+            if hglib.isbasestring(markups):
                 markups = (markups,)
             labels = []
             for text in markups:
@@ -455,7 +458,7 @@ class SummaryPanel(SummaryBase, QWidget):
 
         if 'margin' in self.csstyle:
             margin = self.csstyle['margin']
-            assert isinstance(margin, (int, long))
+            assert isinstance(margin, (int, pycompat.long))
             buf = '<table style="margin: %spx">' % margin
         else:
             buf = '<table>'
@@ -465,7 +468,7 @@ class SummaryPanel(SummaryBase, QWidget):
             if not markups:
                 continue
             label = qtlib.markup(self.get_label(item), weight='bold')
-            if isinstance(markups, basestring):
+            if hglib.isbasestring(markups):
                 markups = [markups,]
             buf += PANEL_TMPL % (label, markups.pop(0))
             for markup in markups:
@@ -528,7 +531,7 @@ class SummaryLabel(SummaryBase, QLabel):
                 markups = self.get_markup(item)
                 if not markups:
                     continue
-                if isinstance(markups, basestring):
+                if hglib.isbasestring(markups):
                     markups = (markups,)
                 data[item] = ', '.join(markups)
             if len(data) == 0:

@@ -79,11 +79,11 @@ from . import (
 )
 
 def parseurl(url):
-    assert isinstance(url, unicode)
+    assert isinstance(url, pycompat.unicode)
     return util.url(hglib.fromunicode(url))
 
 def linkify(url):
-    assert isinstance(url, unicode)
+    assert isinstance(url, pycompat.unicode)
     u = util.url(hglib.fromunicode(url))
     if u.scheme in ('local', 'http', 'https'):
         safe = util.hidepassword(hglib.fromunicode(url))
@@ -423,7 +423,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         sm.currentRowChanged.connect(self.pathSelected)
 
     def currentUrl(self):
-        return unicode(self.urlentry.text())
+        return pycompat.unicode(self.urlentry.text())
 
     def urlChanged(self):
         self.securebutton.setEnabled('https://' in self.currentUrl())
@@ -482,11 +482,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def dropEvent(self, event):
         data = event.mimeData()
         if data.hasUrls():
-            url = unicode(data.urls()[0].toString())
+            url = pycompat.unicode(data.urls()[0].toString())
             event.setDropAction(Qt.CopyAction)
             event.accept()
         elif data.hasText():
-            url = unicode(data.text())
+            url = pycompat.unicode(data.text())
             event.setDropAction(Qt.CopyAction)
             event.accept()
         else:
@@ -531,7 +531,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.cmenu.exec_(point)
 
     def exploreurl(self):
-        url = unicode(self.menuurl)
+        url = pycompat.unicode(self.menuurl)
         u = parseurl(url)
         if not u.scheme or u.scheme == 'file':
             qtlib.openlocalurl(u.path)
@@ -539,7 +539,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             QDesktopServices.openUrl(QUrl(url))
 
     def terminalurl(self):
-        url = unicode(self.menuurl)
+        url = pycompat.unicode(self.menuurl)
         u = parseurl(url)
         if u.scheme and u.scheme != 'file':
             qtlib.InfoMsgBox(_('Repository not local'),
@@ -549,7 +549,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def editurl(self):
         alias = hglib.fromunicode(self.menualias)
-        urlu = unicode(self.menuurl)
+        urlu = pycompat.unicode(self.menuurl)
         dlg = SaveDialog(self._repoagent, alias, urlu, self, edit=True)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)

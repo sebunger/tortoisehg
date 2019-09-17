@@ -113,7 +113,7 @@ class SettingsCombo(QComboBox):
         else:
             settings = opts['settings']
             slist = qtlib.readStringList(settings, 'settings/' + opts['cpath'])
-            self.previous = [unicode(s) for s in slist if s]
+            self.previous = [pycompat.unicode(s) for s in slist if s]
         self.setMinimumWidth(ENTRY_WIDTH)
 
     def resetList(self):
@@ -161,7 +161,7 @@ class SettingsCombo(QComboBox):
         self.resetList()
 
     def value(self):
-        utext = unicode(self.currentText())
+        utext = pycompat.unicode(self.currentText())
         if utext == _unspecstr:
             return None
         if ('nohist' in self.opts or utext in self.defaults + self.previous
@@ -283,7 +283,7 @@ def _describeFont(font):
     if not font:
         return _unspecstr
 
-    s = unicode(font.family())
+    s = pycompat.unicode(font.family())
     s += ", "  + _("%dpt") % font.pointSize()
     if font.bold():
         s += ", " + _("Bold")
@@ -497,7 +497,9 @@ class PathBrowser(QWidget):
     def isDirty(self):
         return self.value() != self.curvalue
 
-def genEditCombo(opts, defaults=[]):
+def genEditCombo(opts, defaults=None):
+    if defaults is None:
+        defaults = []
     opts['canedit'] = True
     opts['defaults'] = defaults
     return SettingsCombo(**opts)
@@ -521,8 +523,10 @@ def genTextEntry(opts):
     'Generate a multi-line text input entry box'
     return TextEntry(**opts)
 
-def genDefaultCombo(opts, defaults=[]):
+def genDefaultCombo(opts, defaults=None):
     'user must select from a list'
+    if defaults is None:
+        defaults = []
     opts['defaults'] = defaults
     opts['nohist'] = True
     return SettingsCombo(**opts)
@@ -1367,7 +1371,7 @@ class SettingsDialog(QDialog):
 
     @pyqtSlot(str)
     def _pushRestartRequest(self, key):
-        self._restartreqs.add(unicode(key))
+        self._restartreqs.add(pycompat.unicode(key))
 
     def applyChanges(self):
         results = [self.conftabs.widget(i).applyChanges()
@@ -1509,7 +1513,7 @@ class SettingsForm(QWidget):
     @pyqtSlot(int)
     def activatePage(self, index):
         if index >= 0:
-            self._activepagename = unicode(INFO[index][0]['name'])
+            self._activepagename = pycompat.unicode(INFO[index][0]['name'])
 
         stackindex = self.pageListIndexToStack.get(index, -1)
         if stackindex >= 0:

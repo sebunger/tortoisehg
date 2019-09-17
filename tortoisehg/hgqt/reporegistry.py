@@ -36,6 +36,7 @@ from .qtgui import (
 from mercurial import (
     commands,
     hg,
+    pycompat,
     util,
 )
 
@@ -53,7 +54,7 @@ from . import (
 def settingsfilename():
     """Return path to thg-reporegistry.xml as unicode"""
     s = QSettings()
-    dir = os.path.dirname(unicode(s.fileName()))
+    dir = os.path.dirname(pycompat.unicode(s.fileName()))
     return dir + '/' + 'thg-reporegistry.xml'
 
 
@@ -155,7 +156,7 @@ class RepoTreeView(QTreeView):
                 # Event is a drop of an external repo
                 accept = False
                 for u in data.urls():
-                    uroot = paths.find_root(unicode(u.toLocalFile()))
+                    uroot = paths.find_root(pycompat.unicode(u.toLocalFile()))
                     if uroot and not m.isKnownRepoRoot(uroot, standalone=True):
                         repoindex = m.addRepo(uroot, row, group)
                         m.loadSubrepos(repoindex)
@@ -401,7 +402,7 @@ class RepoRegistryView(QDockWidget):
     @pyqtSlot(str)
     def _addAndScanRepo(self, uroot):
         """Add repo if not exists; called when the workbench has opened it"""
-        uroot = unicode(uroot)
+        uroot = pycompat.unicode(uroot)
         m = self.tview.model()
         knownindex = m.indexFromRepoRoot(uroot)
         if knownindex.isValid():
@@ -517,7 +518,7 @@ class RepoRegistryView(QDockWidget):
     def addtomenu(self, menu, actlist):
         menu.clear()
         for act in actlist:
-            if isinstance(act, basestring) and act in self._actions:
+            if hglib.isbasestring(act) and act in self._actions:
                 menu.addAction(self._actions[act])
             elif isinstance(act, tuple) and len(act) == 2:
                 submenu = menu.addMenu(act[0])
@@ -555,7 +556,7 @@ class RepoRegistryView(QDockWidget):
                                        options=FD.ShowDirsOnly | FD.ReadOnly)
         if path:
             m = self.tview.model()
-            uroot = paths.find_root(unicode(path))
+            uroot = paths.find_root(pycompat.unicode(path))
             if uroot and not m.isKnownRepoRoot(uroot, standalone=True):
                 index = m.addRepo(uroot, parent=self.tview.currentIndex())
                 self._scanAddedRepo(index)
@@ -565,7 +566,7 @@ class RepoRegistryView(QDockWidget):
         root = self._currentRepoRoot()
         caption = _('Select an existing repository to add as a subrepo')
         FD = QFileDialog
-        path = unicode(FD.getExistingDirectory(caption=caption,
+        path = pycompat.unicode(FD.getExistingDirectory(caption=caption,
             directory=root, options=FD.ShowDirsOnly | FD.ReadOnly))
         if path:
             path = os.path.normpath(path)
@@ -884,7 +885,7 @@ class RepoRegistryView(QDockWidget):
 
     @pyqtSlot(str)
     def scanRepo(self, uroot):
-        uroot = unicode(uroot)
+        uroot = pycompat.unicode(uroot)
         m = self.tview.model()
         index = m.indexFromRepoRoot(uroot)
         if index.isValid():

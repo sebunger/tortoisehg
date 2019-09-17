@@ -118,7 +118,7 @@ _ENABLE_MENU_FUNCS = {
     'isctx'  : lambda ap, wd, tags, ph: True,
     'fixed'  : lambda ap, wd, tags, ph: not (ap or wd),
     'applied': lambda ap, wd, tags, ph: ap,
-    'qgoto'  : lambda ap, wd, tags, ph: ('qparent' in tags) or (ap),
+    'qgoto'  : lambda ap, wd, tags, ph: ('qparent' in tags) or ap,
     'istrue' : lambda ap, wd, tags, ph: True,
     'isdraftorwd': lambda ap, wd, tags, ph: bool(ph > 0 or wd),
 }
@@ -370,7 +370,7 @@ class RepoWidget(QWidget):
 
     @pyqtSlot(str)
     def _openLink(self, link):
-        link = unicode(link)
+        link = pycompat.unicode(link)
         handlers = {'cset': self.goto,
                     'log': lambda a: self.makeLogVisible.emit(True),
                     'repo': self._openRepoLink,
@@ -459,7 +459,7 @@ class RepoWidget(QWidget):
     def setBundle(self, bfile, bsource=None):
         if self._repoagent.overlayUrl():
             self.clearBundle()
-        self.bundlesource = bsource and unicode(bsource) or None
+        self.bundlesource = bsource and pycompat.unicode(bsource) or None
         oldlen = len(self.repo)
         # no "bundle:<bfile>" because bfile may contain "+" separator
         self._repoagent.setOverlay(bfile)
@@ -719,13 +719,13 @@ class RepoWidget(QWidget):
         return filepaths
 
     def dragEnterEvent(self, event):
-        paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
+        paths = [pycompat.unicode(u.toLocalFile()) for u in event.mimeData().urls()]
         if self.detectPatches(paths):
             event.setDropAction(Qt.CopyAction)
             event.accept()
 
     def dropEvent(self, event):
-        paths = [unicode(u.toLocalFile()) for u in event.mimeData().urls()]
+        paths = [pycompat.unicode(u.toLocalFile()) for u in event.mimeData().urls()]
         patches = self.detectPatches(paths)
         if not patches:
             return
@@ -837,8 +837,10 @@ class RepoWidget(QWidget):
     ## End workbench event forwards
 
     @pyqtSlot(str, dict)
-    def grep(self, pattern='', opts={}):
+    def grep(self, pattern='', opts=None):
         """Open grep task tab"""
+        if opts is None:
+            opts = {}
         opts = dict((str(k), str(v)) for k, v in opts.items())
         self.taskTabsWidget.setCurrentIndex(self._namedTabs['grep'])
         self.grepDemand.setSearch(pattern, **opts)
@@ -917,7 +919,7 @@ class RepoWidget(QWidget):
 
     def onRevisionActivated(self, rev):
         qgoto = False
-        if isinstance(rev, basestring):
+        if hglib.isbasestring(rev):
             qgoto = True
         else:
             ctx = self.repo[rev]
@@ -1603,7 +1605,7 @@ class RepoWidget(QWidget):
                 _('Patch Files (*.patch)'))
             if not ret:
                 return
-            epath = unicode(ret)
+            epath = pycompat.unicode(ret)
             udir = os.path.dirname(epath)
             custompath = True
         else:
@@ -1611,7 +1613,7 @@ class RepoWidget(QWidget):
                                                    hglib.tounicode(self.repo.root))
             if not udir:
                 return
-            udir = unicode(udir)
+            udir = pycompat.unicode(udir)
             ename = self._repoagent.shortName() + '_%r.patch'
             epath = os.path.join(udir, ename)
             custompath = False
@@ -1959,7 +1961,7 @@ class RepoWidget(QWidget):
             cmdline.extend(['--rev', str(tip)])
         else:
             cmdline.extend(['--rev', 'heads(descendants(%s))' % base])
-        cmdline.append(unicode(file))
+        cmdline.append(pycompat.unicode(file))
         self._runCommand(cmdline)
 
     def _buildPatch(self, command=None):

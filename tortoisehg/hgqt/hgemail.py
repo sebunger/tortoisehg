@@ -197,7 +197,7 @@ class EmailDialog(QDialog):
         """Generate opts for patchbomb by form values"""
         def headertext(s):
             # QLineEdit may contain newline character
-            return re.sub(r'\s', ' ', unicode(s))
+            return re.sub(r'\s', ' ', pycompat.unicode(s))
 
         opts['to'] = headertext(self._qui.to_edit.currentText())
         opts['cc'] = headertext(self._qui.cc_edit.currentText())

@@ -325,7 +325,7 @@ class RepoTabWidget(QWidget):
         return self.repoRootPath(self.currentIndex())
 
     def repoRootPath(self, index):
-        return unicode(self._tabbar.tabToolTip(index))
+        return pycompat.unicode(self._tabbar.tabToolTip(index))
 
     def _findIndexesByRepoRootPath(self, root):
         for i in pycompat.xrange(self.count()):
@@ -423,12 +423,13 @@ class RepoTabWidget(QWidget):
         rw = self.sender()
         assert isinstance(rw, repowidget.RepoWidget)
         progress = cmdcore.ProgressMessage(
-            unicode(topic), pos, unicode(item), unicode(unit), total)
+            pycompat.unicode(topic), pos, pycompat.unicode(item),
+            pycompat.unicode(unit), total)
         self.progressReceived.emit(rw.repoRootPath(), progress)
 
     @pyqtSlot(str)
     def _openLinkedRepo(self, path):
-        uri = unicode(path).split('?', 1)
+        uri = pycompat.unicode(path).split('?', 1)
         path = hglib.normreporoot(uri[0])
         rev = None
         if len(uri) > 1:

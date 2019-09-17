@@ -35,8 +35,10 @@ from . import (
 
 class SignDialog(QDialog):
 
-    def __init__(self, repoagent, rev='tip', parent=None, opts={}):
+    def __init__(self, repoagent, rev='tip', parent=None, opts=None):
         super(SignDialog, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 

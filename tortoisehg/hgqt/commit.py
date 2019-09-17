@@ -91,14 +91,13 @@ else:
     _hasbugtraq = False
 
 def readopts(ui):
-    opts = {}
-    opts['ciexclude'] = ui.config('tortoisehg', 'ciexclude', '')
-    opts['pushafter'] = ui.config('tortoisehg', 'cipushafter', '')
-    opts['autoinc'] = ui.config('tortoisehg', 'autoinc', '')
-    opts['recurseinsubrepos'] = ui.config('tortoisehg', 'recurseinsubrepos')
-    opts['bugtraqplugin'] = ui.config('tortoisehg', 'issue.bugtraqplugin')
-    opts['bugtraqparameters'] = ui.config('tortoisehg',
-                                          'issue.bugtraqparameters')
+    opts = {'ciexclude': ui.config('tortoisehg', 'ciexclude', ''),
+            'pushafter': ui.config('tortoisehg', 'cipushafter', ''),
+            'autoinc': ui.config('tortoisehg', 'autoinc', ''),
+            'recurseinsubrepos': ui.config('tortoisehg', 'recurseinsubrepos'),
+            'bugtraqplugin': ui.config('tortoisehg', 'issue.bugtraqplugin'),
+            'bugtraqparameters': ui.config('tortoisehg',
+                                           'issue.bugtraqparameters')}
     if opts['bugtraqparameters']:
         opts['bugtraqparameters'] = os.path.expandvars(
             opts['bugtraqparameters'])
@@ -126,11 +125,11 @@ def mergecommitmessage(repo):
     if wctx.p1().branch() == wctx.p2().branch():
         msgset = i18n.keepgettext()._('Merge')
         text = engmsg and msgset['id'] or msgset['str']
-        text = unicode(text)
+        text = pycompat.unicode(text)
     else:
         msgset = i18n.keepgettext()._('Merge with %s')
         text = engmsg and msgset['id'] or msgset['str']
-        text = unicode(text) % hglib.tounicode(wctx.p2().branch())
+        text = pycompat.unicode(text) % hglib.tounicode(wctx.p2().branch())
     return text
 
 def _getUserOptions(opts, *optionlist):
@@ -453,7 +452,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         class CommitButtonMenu(QMenu):
             def __init__(self, parent, repo):
                 self.repo = repo
-                return QMenu.__init__(self, parent)
+                QMenu.__init__(self, parent)
             def getActionByName(self, act):
                 return [a for a in self.actions() if a._name == act][0]
             def showEvent(self, event):
@@ -637,7 +636,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if self.msgte.lexer() is None:
             # qsci will crash if None is passed to QsciAPIs constructor
             return
-        wfile = unicode(wfile)
+        wfile = pycompat.unicode(wfile)
         self._apis = QsciAPIs(self.msgte.lexer())
         tokens = set()
         for e in self.stwidget.getChecked():
@@ -651,7 +650,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             from pygments.token import Token
             from pygments.util import ClassNotFound
             try:
-                contents = unicode(contents)
+                contents = pycompat.unicode(contents)
                 lexer = guess_lexer_for_filename(wfile, contents)
                 for tokentype, value in lexer.get_tokens(contents):
                     if tokentype in Token.Name and len(value) > 4:
@@ -781,7 +780,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         if self.hasmqbutton:
             parent = _('Parent:')
             patchname = _('Patch name:')
-            text = unicode(self.pcsinfo.revlabel.text())
+            text = pycompat.unicode(self.pcsinfo.revlabel.text())
             cellend = '</td>'
             firstidx = text.find(cellend) + len(cellend)
             secondidx = text[firstidx:].rfind('</tr>')
@@ -804,7 +803,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                         'tortoisehg', 'engmsg', False)
                     msgset = i18n.keepgettext()._('Close %s branch')
                     text = engmsg and msgset['id'] or msgset['str']
-                    self.setMessage(unicode(text) %
+                    self.setMessage(pycompat.unicode(text) %
                                     hglib.tounicode(self.repo[None].branch()))
             self.msgte.setFocus()
             self.refresh()
@@ -877,7 +876,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.msgte.loadSettings(s, lpref+'msgte')
         self.stwidget.loadSettings(s, lpref+'status')
         self.msghistory = qtlib.readStringList(s, gpref + 'history-' + repoid)
-        self.msghistory = [unicode(m) for m in self.msghistory if m]
+        self.msghistory = [pycompat.unicode(m) for m in self.msghistory if m]
         self.updateRecentMessages()
         self.userhist = qtlib.readStringList(s, gpref + 'userhist')
         self.userhist = [u for u in self.userhist if u]
@@ -910,7 +909,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             pass
 
     def addMessageToHistory(self, umsg):
-        umsg = unicode(umsg)
+        umsg = pycompat.unicode(umsg)
         if umsg in self.msghistory:
             self.msghistory.remove(umsg)
         self.msghistory.insert(0, umsg)
@@ -1518,7 +1517,7 @@ class CommitDialog(QDialog):
         qtlib.newshortcutsforstdkey(QKeySequence.Refresh, self, self.refresh)
 
     def linkActivated(self, link):
-        link = unicode(link)
+        link = pycompat.unicode(link)
         if link.startswith('repo:'):
             self._subdialogs.open(link[len('repo:'):])
 

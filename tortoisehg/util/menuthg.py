@@ -114,8 +114,10 @@ class TortoiseMenu(object):
 
 class TortoiseSubmenu(TortoiseMenu):
 
-    def __init__(self, menutext, helptext, menus=[], icon=None):
+    def __init__(self, menutext, helptext, menus=None, icon=None):
         TortoiseMenu.__init__(self, menutext, helptext, None, icon)
+        if menus is None:
+            menus = []
         self.menus = menus[:]
 
     def add_menu(self, menutext, helptext, hgcmd, icon=None, state=True):
@@ -281,11 +283,11 @@ class menuThg:
             if cachethg.ROOT in states and len(states) == 1:
                 states.add(cachethg.MODIFIED)
 
-        changed = bool(states & set([cachethg.ADDED, cachethg.MODIFIED]))
+        changed = bool(states & {cachethg.ADDED, cachethg.MODIFIED})
         modified = cachethg.MODIFIED in states
         clean = cachethg.UNCHANGED in states
         tracked = changed or modified or clean
-        new = bool(states & set([cachethg.UNKNOWN, cachethg.IGNORED]))
+        new = bool(states & {cachethg.UNKNOWN, cachethg.IGNORED})
 
         menu = thg_menu(repo.ui, self.promoted, self.name)
         if changed or cachethg.UNKNOWN in states or 'qtip' in repo['.'].tags():

@@ -319,9 +319,8 @@ class ResolveDialog(QDialog):
     def v3way(self):
         paths = self.getVdiffFiles(self.rtree)
         if paths:
-            opts = {}
-            opts['rev'] = []
-            opts['tool'] = self.tcombo.readValue()
+            opts = {'rev': [],
+                    'tool': self.tcombo.readValue()}
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
             if dlg:
                 dlg.exec_()
@@ -329,9 +328,8 @@ class ResolveDialog(QDialog):
     def vp0(self):
         paths = self.getVdiffFiles(self.rtree)
         if paths:
-            opts = {}
-            opts['rev'] = ['p1()']
-            opts['tool'] = self.tcombo.readValue()
+            opts = {'rev': ['p1()'],
+                    'tool': self.tcombo.readValue()}
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
             if dlg:
                 dlg.exec_()
@@ -339,9 +337,8 @@ class ResolveDialog(QDialog):
     def vp1(self):
         paths = self.getVdiffFiles(self.rtree)
         if paths:
-            opts = {}
-            opts['rev'] = ['p2()']
-            opts['tool'] = self.tcombo.readValue()
+            opts = {'rev': ['p2()'],
+                    'tool': self.tcombo.readValue()}
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
             if dlg:
                 dlg.exec_()
@@ -349,9 +346,8 @@ class ResolveDialog(QDialog):
     def diffLocToAnc(self):
         paths = self.getVdiffFiles(self.utree)
         if paths:
-            opts = {}
-            opts['rev'] = ['ancestor(p1(),p2())..p1()']
-            opts['tool'] = self.tcombo.readValue()
+            opts = {'rev': ['ancestor(p1(),p2())..p1()'],
+                    'tool': self.tcombo.readValue()}
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
             if dlg:
                 dlg.exec_()
@@ -359,9 +355,8 @@ class ResolveDialog(QDialog):
     def diffOthToAnc(self):
         paths = self.getVdiffFiles(self.utree)
         if paths:
-            opts = {}
-            opts['rev'] = ['ancestor(p1(),p2())..p2()']
-            opts['tool'] = self.tcombo.readValue()
+            opts = {'rev': ['ancestor(p1(),p2())..p2()'],
+                    'tool': self.tcombo.readValue()}
             dlg = visdiff.visualdiff(self.repo.ui, self.repo, paths, opts)
             if dlg:
                 dlg.exec_()

@@ -33,7 +33,6 @@ except ImportError:
 demandimport.enable()
 
 import subprocess
-import urllib
 
 from mercurial import hg, match, util, error
 from mercurial.utils import (
@@ -103,7 +102,7 @@ class HgExtensionDefault(GObject.GObject):
     def get_path_for_vfs_file(self, vfs_file, store=True):
         if vfs_file.get_uri_scheme() != 'file':
             return None
-        path = urllib.unquote(vfs_file.get_uri()[7:])
+        path = util.urlreq.unquote(vfs_file.get_uri()[7:])
         if vfs_file.is_gone():
             self.allvfs.pop(path, '')
             return None
