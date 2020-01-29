@@ -115,7 +115,8 @@ class ServeDialog(QDialog):
         if not hasattr(self._webconf, 'write'):
             return self._webconf.path
 
-        fd, fname = tempfile.mkstemp(prefix='webconf_', dir=qtlib.gettempdir())
+        fd, fname = tempfile.mkstemp(prefix=b'webconf_',
+                                     dir=qtlib.gettempdir())
         f = os.fdopen(fd, 'w')
         try:
             self._webconf.write(f)
@@ -260,7 +261,7 @@ def run(ui, *pats, **opts):
     lui, webconf = _readconfig(ui, repopath, webconfpath)
     dlg = ServeDialog(lui, webconf=webconf)
     try:
-        dlg.setport(int(lui.config('web', 'port', '8000')))
+        dlg.setport(int(lui.config('web', 'port')))
     except ValueError:
         pass
 

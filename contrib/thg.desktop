@@ -9,3 +9,4 @@ Icon=thg_logo
 Exec=thg --nofork
 Categories=Development;RevisionControl;
 X-Desktop-File-Install-Version=0.23
+StartupWMClass=org.tortoisehg.python3

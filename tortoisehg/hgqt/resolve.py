@@ -253,8 +253,10 @@ class ResolveDialog(QDialog):
         paths = []
         if not tree.selectionModel():
             return paths
+        model = tree.model()
+        assert model is not None
         for idx in tree.selectionModel().selectedRows():
-            root, wfile = tree.model().getPathForIndex(idx)
+            root, wfile = model.getPathForIndex(idx)
             paths.append((root, wfile))
         return paths
 
@@ -365,7 +367,7 @@ class ResolveDialog(QDialog):
     def refresh(self):
         u, r = [], []
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
-            if status == 'u':
+            if status == b'u':
                 u.append((root, path))
             else:
                 r.append((root, path))
@@ -379,6 +381,7 @@ class ResolveDialog(QDialog):
 
         model = self.utree.model()
         smodel = self.utree.selectionModel()
+        assert model is not None
         sflags = QItemSelectionModel.Select | QItemSelectionModel.Rows
         for i, path in enumerate(u):
             if path in paths:
@@ -397,6 +400,7 @@ class ResolveDialog(QDialog):
 
         model = self.rtree.model()
         smodel = self.rtree.selectionModel()
+        assert model is not None
         for i, path in enumerate(r):
             if path in paths:
                 smodel.select(model.index(i, 0), sflags)
@@ -415,7 +419,9 @@ class ResolveDialog(QDialog):
     def reject(self):
         s = QSettings()
         s.setValue('resolve/geom', self.saveGeometry())
-        if self.utree.model().rowCount() > 0:
+        model = self.utree.model()
+        assert model is not None
+        if model.rowCount() > 0:
             main = _('Exit without finishing resolve?')
             text = _('Unresolved conflicts remain. Are you sure?')
             labels = ((QMessageBox.Yes, _('E&xit')),
@@ -455,7 +461,7 @@ class ResolveDialog(QDialog):
         self.rtreecmenu.popup(self.rtree.viewport().mapToGlobal(point))
 
     def utreeDoubleClicked(self):
-        if self.repo.ui.configbool('tortoisehg', 'autoresolve', True):
+        if self._repoagent.configBool('tortoisehg', 'autoresolve', True):
             self.merge()
         else:
             self.merge('internal:merge')

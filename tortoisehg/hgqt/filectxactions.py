@@ -166,6 +166,12 @@ class FilectxActions(QObject):
         # override to add actions that cannot be declared as actionSlot
         pass
 
+    def _parentWidget(self):
+        # type: () -> QWidget
+        p = self.parent()
+        assert isinstance(p, QWidget)
+        return p
+
     @property
     def _ui(self):
         repo = self._repoagent.rawRepo()
@@ -201,7 +207,7 @@ class FilectxActions(QObject):
         return self._actions[name][0]
 
     def _addAction(self, name, action, fdfilters):
-        assert name not in self._actions
+        assert name not in self._actions, name
         self._actions[name] = action, fdfilters
 
     def _runCommand(self, cmdline):
@@ -227,7 +233,7 @@ class FilectxActions(QObject):
     @pyqtSlot(int)
     def _onCommandFinished(self, ret):
         if ret == 255:
-            cmdui.errorMessageBox(self._cmdsession, self.parent())
+            cmdui.errorMessageBox(self._cmdsession, self._parentWidget())
         self._updateActions()
 
     @actionSlot(_('File &History / Annotate'), 'hg-log', 'Shift+Return',
@@ -275,36 +281,37 @@ class FilectxActions(QObject):
     @actionSlot(_('Diff &Changeset to Parent'), 'visualdiff', None, '',
                 _notpatch)
     def visualDiff(self, fds):
-        self._visualDiffToBase(fds, [])
+        self._visualDiffToBase(fds[0], [])
 
     @actionSlot(_('Diff Changeset to Loc&al'), 'ldiff', None, '',
                 _committed)
     def visualDiffToLocal(self, fds):
-        self._visualDiff(fds, [], rev=['rev(%d)' % fds[0].rev()])
+        self._visualDiff(fds[0], [], rev=['rev(%d)' % fds[0].rev()])
 
     @actionSlot(_('&Diff to Parent'), 'visualdiff', 'Ctrl+D',
                 _('View file changes in external diff tool'),
                 (_notpatch, _notsubroot, _filestatus('MAR!')))
     def visualDiffFile(self, fds):
-        self._visualDiffToBase(fds, _lcanonpaths(fds))
+        self._visualDiffToBase(fds[0], fds)
 
     @actionSlot(_('Diff to &Local'), 'ldiff', 'Shift+Ctrl+D',
                 _('View changes to current in external diff tool'),
                 _committed)
     def visualDiffFileToLocal(self, fds):
-        self._visualDiff(fds, _lcanonpaths(fds), rev=['rev(%d)' % fds[0].rev()])
+        self._visualDiff(fds[0], fds, rev=['rev(%d)' % fds[0].rev()])
 
-    def _visualDiffToBase(self, fds, filenames):
-        if fds[0].baseRev() == fds[0].parentRevs()[0]:
-            self._visualDiff(fds, filenames, change=fds[0].rev())  # can 3-way
+    def _visualDiffToBase(self, an_fd, fds):
+        if an_fd.baseRev() == an_fd.parentRevs()[0]:
+            self._visualDiff(an_fd, fds, change=an_fd.rev())  # can 3-way
         else:
-            revs = [fds[0].baseRev()]
-            if fds[0].rev() is not None:
-                revs.append(fds[0].rev())
-            self._visualDiff(fds, filenames, rev=['rev(%d)' % r for r in revs])
+            revs = [an_fd.baseRev()]
+            if an_fd.rev() is not None:
+                revs.append(an_fd.rev())
+            self._visualDiff(an_fd, fds, rev=['rev(%d)' % r for r in revs])
 
-    def _visualDiff(self, fds, filenames, **opts):
-        repo = self._repoAgentFor(fds[0]).rawRepo()
+    def _visualDiff(self, an_fd, fds, **opts):
+        filenames = _lcanonpaths(fds)
+        repo = self._repoAgentFor(an_fd).rawRepo()
         dlg = visdiff.visualdiff(repo.ui, repo, filenames, opts)
         if dlg:
             dlg.exec_()
@@ -321,7 +328,7 @@ class FilectxActions(QObject):
         base, _ = visdiff.snapshot(repo, filenames, ctx)
         files = [os.path.join(base, filename)
                  for filename in filenames]
-        qtlib.editfiles(repo, files, parent=self.parent())
+        qtlib.editfiles(repo, files, parent=self._parentWidget())
 
     @actionSlot(_('&Save at Revision...'), None, 'Shift+Ctrl+S',
                 _('Save file as it appeared at this revision'),
@@ -336,7 +343,7 @@ class FilectxActions(QObject):
                 extfilter.insert(0, "*%s" % ext)
 
             result, _filter = QFileDialog.getSaveFileName(
-                self.parent(), _("Save file to"), filename,
+                self._parentWidget(), _("Save file to"), filename,
                 ";;".join(extfilter))
             if not result:
                 continue
@@ -354,15 +361,15 @@ class FilectxActions(QObject):
     def editLocalFile(self, fds):
         repo = self._repoAgentFor(fds[0]).rawRepo()
         filenames = _lcanonpaths(fds)
-        qtlib.editfiles(repo, filenames, parent=self.parent())
+        qtlib.editfiles(repo, filenames, parent=self._parentWidget())
 
     @actionSlot(_('&Open Local'), None, 'Shift+Ctrl+L',
                 _('Edit current file in working copy'),
                 (_isfile, _filestatus('MACI?')))
     def openLocalFile(self, fds):
         repo = self._repoAgentFor(fds[0]).rawRepo()
-        filenames = _lcanonpaths(fds)
-        qtlib.openfiles(repo, filenames)
+        for fd in fds:
+            qtlib.openlocalurl(fd.absoluteFilePath())
 
     @actionSlot(_('E&xplore Local'), 'system-file-manager', None,
                 _('Open parent folder of current file in the system file '
@@ -404,13 +411,13 @@ class FilectxActions(QObject):
                 _notpatch)
     def revertFile(self, fds):
         repoagent = self._repoAgentFor(fds[0])
-        fileSelection = _lcanonpaths(fds)
+        fileSelection = [e.canonicalFilePath() for e in fds]
         rev = fds[0].rev()
         if rev is None:
             repo = repoagent.rawRepo()
             rev = repo[rev].p1().rev()
         dlg = revert.RevertDialog(repoagent, fileSelection, rev,
-                                  parent=self.parent())
+                                  parent=self._parentWidget())
         dlg.exec_()
 
     @actionSlot(_('Open S&ubrepository'), 'thg-repository-open', None,
@@ -445,7 +452,7 @@ class FilectxActions(QObject):
 
     def setupCustomToolsMenu(self, location):
         tools, toollist = hglib.tortoisehgtools(self._ui, location)
-        submenu = QMenu(_('Custom Tools'), self.parent())
+        submenu = QMenu(_('Custom Tools'), self._parentWidget())
         submenu.triggered.connect(self._runCustomCommandByMenu)
         for name in toollist:
             if name == '|':
@@ -497,7 +504,7 @@ class WctxActions(FilectxActions):
         qtlib.setContextMenuShortcut(a, 'Ctrl+Shift+E')
         a.setShortcutContext(Qt.WidgetWithChildrenShortcut)
         a = self.action('addLargefile')
-        a.setVisible('largefiles' in repo.extensions())
+        a.setVisible(b'largefiles' in repo.extensions())
         self._addAction('renameFileMenu', *self._createRenameFileMenu())
         self._addAction('remergeFileMenu', *self._createRemergeFileMenu())
 
@@ -531,7 +538,7 @@ class WctxActions(FilectxActions):
     @actionSlot(_('Diff &Local'), 'ldiff', 'Ctrl+Shift+D', '',
                 (_indirectbaserev, _notsubroot, _filestatus('MARC!')))
     def visualDiffLocalFile(self, fds):
-        self._visualDiff(fds, _lcanonpaths(fds))
+        self._visualDiff(fds[0], fds)
 
     @actionSlot(_('&View Missing'), None, None, '',
                 (_isfile, _filestatus('R!')))
@@ -549,14 +556,14 @@ class WctxActions(FilectxActions):
                 (_notsubroot, _filestatus('RI?')))
     def addFile(self, fds):
         repo = self._repoAgentFor(fds[0]).rawRepo()
-        if 'largefiles' in repo.extensions():
+        if b'largefiles' in repo.extensions():
             self._addFileWithPrompt(fds)
         else:
             self._runWorkingFileCommand('add', fds)
 
     def _addFileWithPrompt(self, fds):
         repo = self._repoAgentFor(fds[0]).rawRepo()
-        result = lfprompt.promptForLfiles(self.parent(), repo.ui, repo,
+        result = lfprompt.promptForLfiles(self._parentWidget(), repo.ui, repo,
                                           _lcanonpaths(fds))
         if not result:
             return
@@ -582,7 +589,7 @@ class WctxActions(FilectxActions):
     @actionSlot(_('&Delete Unversioned...'), 'hg-purge', 'Delete', '',
                 (_notsubroot, _filestatus('?I')))
     def purgeFile(self, fds):
-        parent = self.parent()
+        parent = self._parentWidget()
         files = [hglib.fromunicode(fd.filePath()) for fd in fds]
         res = qtlib.CustomPrompt(
             _('Confirm Delete Unversioned'),
@@ -601,7 +608,7 @@ class WctxActions(FilectxActions):
     @actionSlot(_('&Revert...'), 'hg-revert', None, '',
                 _filestatus('MAR!'))
     def revertWorkingFile(self, fds):
-        parent = self.parent()
+        parent = self._parentWidget()
         files = _lcanonpaths(fds)
         wctx = fds[0].rawContext()
         revertopts = {'date': None, 'rev': '.', 'all': False}
@@ -649,8 +656,8 @@ class WctxActions(FilectxActions):
         from tortoisehg.hgqt.rename import RenameDialog
         srcfd, = fds
         repoagent = self._repoAgentFor(srcfd)
-        dlg = RenameDialog(repoagent, self.parent(), srcfd.canonicalFilePath(),
-                           iscopy=iscopy)
+        dlg = RenameDialog(repoagent, self._parentWidget(),
+                           srcfd.canonicalFilePath(), iscopy=iscopy)
         if dlg.exec_() == 0:
             self._notifyChanges()
 
@@ -659,7 +666,7 @@ class WctxActions(FilectxActions):
     def editHgignore(self, fds):
         from tortoisehg.hgqt.hgignore import HgignoreDialog
         repoagent = self._repoAgentFor(fds[0])
-        parent = self.parent()
+        parent = self._parentWidget()
         files = _lcanonpaths(fds)
         dlg = HgignoreDialog(repoagent, parent, *files)
         dlg.finished.connect(dlg.deleteLater)
@@ -671,7 +678,7 @@ class WctxActions(FilectxActions):
                 (_single, _isfile, _filestatus('?I'), _filepath(r'\.rej$')))
     def editRejects(self, fds):
         lpath = hglib.fromunicode(fds[0].absoluteFilePath()[:-4])  # drop .rej
-        dlg = rejects.RejectsDialog(self._ui, lpath, self.parent())
+        dlg = rejects.RejectsDialog(self._ui, lpath, self._parentWidget())
         if dlg.exec_():
             self._notifyChanges()
 
@@ -680,7 +687,7 @@ class WctxActions(FilectxActions):
     def guessRename(self, fds):
         from tortoisehg.hgqt.guess import DetectRenameDialog
         repoagent = self._repoAgentFor(fds[0])
-        parent = self.parent()
+        parent = self._parentWidget()
         files = _lcanonpaths(fds)
         dlg = DetectRenameDialog(repoagent, parent, *files)
         def matched():
@@ -708,7 +715,7 @@ class WctxActions(FilectxActions):
         self._runWorkingFileCommand('resolve', fds)
 
     def _createRenameFileMenu(self):
-        menu = QMenu(_('Was renamed from'), self.parent())
+        menu = QMenu(_('Was renamed from'), self._parentWidget())
         menu.aboutToShow.connect(self._updateRenameFileMenu)
         menu.triggered.connect(self._renameFrom)
         fdfilters = (_single, _isfile, _filestatus('?'), _anydeleted)
@@ -717,7 +724,7 @@ class WctxActions(FilectxActions):
     @pyqtSlot()
     def _updateRenameFileMenu(self):
         menu = self.sender()
-        assert isinstance(menu, QMenu)
+        assert isinstance(menu, QMenu), repr(menu)
         menu.clear()
         fds = self.fileDataListForAction('renameFileMenu')
         if not fds:
@@ -740,7 +747,7 @@ class WctxActions(FilectxActions):
         sess.commandFinished.connect(self._notifyChangesOnCommandFinished)
 
     def _createRemergeFileMenu(self):
-        menu = QMenu(_('Restart Merge &with'), self.parent())
+        menu = QMenu(_('Restart Merge &with'), self._parentWidget())
         menu.aboutToShow.connect(self._populateRemergeFileMenu)  # may be slow
         menu.triggered.connect(self._remergeFileWith)
         return menu.menuAction(), (_notsubroot, _mergestatus('U'))
@@ -748,7 +755,7 @@ class WctxActions(FilectxActions):
     @pyqtSlot()
     def _populateRemergeFileMenu(self):
         menu = self.sender()
-        assert isinstance(menu, QMenu)
+        assert isinstance(menu, QMenu), repr(menu)
         menu.aboutToShow.disconnect(self._populateRemergeFileMenu)
         for tool in hglib.mergetools(self._ui):
             menu.addAction(hglib.tounicode(tool))

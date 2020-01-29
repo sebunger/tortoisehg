@@ -210,7 +210,7 @@ class LockDialog(QDialog):
         if op == 'lock':
             if wfile in locks and locks[wfile][1]:
                 self.showMessage.emit(_('Lock of %s successful') % wfile)
-                qtlib.openlocalurl(self.operation[1])
+                qtlib.openlocalurl(wfile)
             else:
                 self.showMessage.emit(_('Lock of %s failed, retry') % wfile)
         elif op == 'unlock':

@@ -4,10 +4,12 @@ syntax: glob
 *.rej
 *.pyc
 *.pyo
+.pytype/
 build/
 doc/build-*/
 rpmbuild/
 tests/*.err
+tests/.testtimes
 tests/hghave
 dist/
 Output/
@@ -45,3 +47,11 @@ mercurial
 .idea/
 .eggs/
 *.iml
+.vscode
+contrib/packaging/macos/src/thg.py
+contrib/packaging/macos/src/thg
+contrib/packaging/macos/src/hg
+contrib/packaging/macos/toolchain/downloads
+contrib/packaging/macos/toolchain/toolchain-qt4
+contrib/packaging/macos/toolchain/toolchain-qt5
+contrib/packaging/macos/releases

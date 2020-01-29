@@ -35,24 +35,24 @@ configitem = registrar.configitem(configtable)
 
 testedwith = hgversion.testedwith
 
-configitem('tortoisehg', 'initskel')
+configitem(b'tortoisehg', b'initskel')
 
-@command('debuggethostfingerprint',
-    [('', 'insecure', None,
+@command(b'debuggethostfingerprint',
+    [(b'', b'insecure', None,
       _('do not verify server certificate (ignoring web.cacerts config)')),
      ],
     _('[--insecure] [SOURCE]'),
     optionalrepo=True)
-def debuggethostfingerprint(ui, repo, source='default', **opts):
+def debuggethostfingerprint(ui, repo, source=b'default', **opts):
     """retrieve a fingerprint of the server certificate
 
     Specify --insecure to disable SSL verification.
     """
     source = ui.expandpath(source)
     u = util.url(source)
-    scheme = (u.scheme or '').split('+')[-1]
+    scheme = (u.scheme or b'').split(b'+')[-1]
     host = u.host
-    port = util.getport(u.port or scheme or '-1')
+    port = util.getport(u.port or scheme or b'-1')
     if scheme != 'https' or not host or not (0 <= port <= 65535):
         raise error.Abort(_('unsupported URL: %s') % source)
 
@@ -74,16 +74,16 @@ def debuggethostfingerprint(ui, repo, source='default', **opts):
 
 def postinitskel(ui, repo, hooktype, result, pats, **kwargs):
     """create common files in new repository"""
-    assert hooktype == 'post-init'
+    assert hooktype == b'post-init', hooktype
     if result:
         return
-    dest = ui.expandpath(pats and pats[0] or '.')
-    skel = ui.config('tortoisehg', 'initskel')
+    dest = ui.expandpath(pats and pats[0] or b'.')
+    skel = ui.config(b'tortoisehg', b'initskel')
     if skel:
         # copy working tree from user-defined path if any
         skel = util.expandpath(skel)
         for name in os.listdir(skel):
-            if name == '.hg':
+            if name == b'.hg':
                 continue
             util.copyfiles(os.path.join(skel, name),
                            os.path.join(dest, name),
@@ -91,7 +91,7 @@ def postinitskel(ui, repo, hooktype, result, pats, **kwargs):
         return
     # create .hg* files, mainly to workaround Explorer's problem in creating
     # files with a name beginning with a dot
-    open(os.path.join(dest, '.hgignore'), 'a').close()
+    open(os.path.join(dest, b'.hgignore'), 'a').close()
 
 def _applymovemqpatches(q, after, patches):
     fullindexes = dict((q.guard_re.split(rpn, 1)[0], i)
@@ -114,12 +114,12 @@ def _applymovemqpatches(q, after, patches):
     q.parseseries()
     q.seriesdirty = True
 
-@mqcommand('qreorder',
-    [('', 'after', '', _('move after the specified patch'))],
+@mqcommand(b'qreorder',
+    [(b'', b'after', '', _('move after the specified patch'))],
     _('[--after PATCH] PATCH...'))
 def qreorder(ui, repo, *patches, **opts):
     """move patches to the beginning or after the specified patch"""
-    after = opts['after'] or None
+    after = opts[b'after'] or None
     q = repo.mq
     if any(n not in q.series for n in patches):
         raise error.Abort(_('unknown patch to move specified'))
@@ -147,7 +147,7 @@ def qreorder(ui, repo, *patches, **opts):
 
 def uisetup(ui):
     try:
-        extensions.find('mq')
+        extensions.find(b'mq')
         cmdtable.update(_mqcmdtable)
     except KeyError:
         pass

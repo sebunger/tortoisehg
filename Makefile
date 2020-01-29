@@ -1,4 +1,5 @@
 PYTHON = python
+PYTYPE = pytype
 
 HGPATH =
 ifneq ($(HGPATH),)
@@ -32,6 +33,15 @@ tests:
 	$(PYTHON) tests/run-tests.py -a extensions=largefiles
 	$(PYTHON) tests/run-hgtests.py
 
+.PHONY: pytype
+pytype: PYTHON_VERSION = 3.7
+pytype:
+	@[ -n "$(HGPATH)" ] || { echo "HGPATH not specified"; false; }
+	@[ -d "$(HGPATH)" ] || { echo "HGPATH not found: $(HGPATH)"; false; }
+	$(PYTYPE) -P ".:$(HGPATH)" -V "$(PYTHON_VERSION)" --config pytype.cfg
+	@echo 'pytype crashed while generating the following type stubs:'
+	find .pytype/pyi -name '*.pyi' | xargs grep -l '# Caught error' | sort
+
 .PHONY: app
 app: DISTDIR = dist/app
 app: SETUPCFG = contrib/setup-py2app.cfg
@@ -46,6 +56,7 @@ app:
 .PHONY: clean
 clean:
 	$(PYTHON) setup.py clean
+	$(RM) -R .pytype
 
 .PHONY: distclean
 distclean: clean

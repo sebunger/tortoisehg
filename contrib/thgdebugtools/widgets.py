@@ -7,12 +7,12 @@
 
 from __future__ import absolute_import
 
-import cgi
 import gc
 import pprint
 import re
 import weakref
 
+from tortoisehg.hgqt import qtlib
 from tortoisehg.hgqt.qtcore import (
     QObject,
     QTimer,
@@ -212,7 +212,8 @@ class GcInfoDialog(QDialog):
         self._infoEdit.clear()
         self._infoEdit.append('<h1>Referrers</h1>')
         self._infoEdit.append('<pre>%s</pre>'
-                              % cgi.escape(pprint.pformat(referrers)))
+                              % qtlib.htmlescape(pprint.pformat(referrers),
+                                                 False))
         del referrers
         self._targetWidgetRef = weakref.ref(w)
         self._updateButtons()

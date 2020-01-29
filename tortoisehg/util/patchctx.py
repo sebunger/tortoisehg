@@ -11,6 +11,7 @@ import os
 import binascii
 
 from mercurial import (
+    encoding,
     error,
     node,
     patch,
@@ -38,7 +39,7 @@ class patchctx(object):
         """
         self._path = patchpath
         if rev:
-            assert isinstance(rev, str)
+            assert isinstance(rev, bytes), repr(rev)
             self._patchname = rev
         else:
             self._patchname = os.path.basename(patchpath)
@@ -53,7 +54,7 @@ class patchctx(object):
         self._mtime = None
         self._fsize = 0
         self._parseerror = None
-        self._phase = 'draft'
+        self._phase = b'draft'
 
         try:
             self._mtime = os.path.getmtime(patchpath)
@@ -68,7 +69,7 @@ class patchctx(object):
             self._branch = ph.branch or ''
             self._node = binascii.unhexlify(ph.nodeid)
             if self._repo.ui.configbool('mq', 'secret'):
-                self._phase = 'secret'
+                self._phase = b'secret'
         except TypeError:
             pass
         except AttributeError:
@@ -80,8 +81,8 @@ class patchctx(object):
         except error.ConfigError:
             pass
 
-        self._user = ph.user or ''
-        self._desc = ph.message and '\n'.join(ph.message).strip() or ''
+        self._user = ph.user or b''
+        self._desc = ph.message and b'\n'.join(ph.message).strip() or b''
         date = None
         if ph.date:
             try:
@@ -107,7 +108,11 @@ class patchctx(object):
     def __iter__(self):
         return iter(sorted(self._files))
 
-    def __str__(self):      return node.short(self.node())
+    def __bytes__(self):
+        return node.short(self.node())
+
+    __str__ = encoding.strmethod(__bytes__)
+
     def node(self):         return self._node
     def files(self):        return list(self._files.keys())
     def rev(self):          return self._rev
@@ -207,12 +212,12 @@ class patchctx(object):
 
         M, A, R = 0, 1, 2
         def get_path(a, b):
-            type = (a == '/dev/null') and A or M
-            type = (b == '/dev/null') and R or type
-            rawpath = (b != '/dev/null') and b or a
-            if not (rawpath.startswith('a/') or rawpath.startswith('b/')):
+            type = (a == b'/dev/null') and A or M
+            type = (b == b'/dev/null') and R or type
+            rawpath = (b != b'/dev/null') and b or a
+            if not (rawpath.startswith(b'a/') or rawpath.startswith(b'b/')):
                 return type, rawpath
-            return type, rawpath.split('/', 1)[-1]
+            return type, rawpath.split(b'/', 1)[-1]
 
         files = {}
         pf = open(self._path, 'rb')

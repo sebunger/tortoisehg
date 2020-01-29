@@ -44,11 +44,13 @@ from .qtnetwork import (
 )
 
 from mercurial import (
+    encoding,
     error,
     pycompat,
 )
 from mercurial.utils import (
     procutil,
+    stringutil,
 )
 
 from ..util import (
@@ -59,6 +61,7 @@ from ..util import (
 from ..util.i18n import _
 from . import (
     bugreport,
+    hgconfig,
     qtlib,
     thgrepo,
     workbench,
@@ -79,10 +82,10 @@ if PYQT_VERSION < 0x40705 or QT_VERSION < 0x40600:
 
 if getattr(sys, 'frozen', False) and os.name == 'nt':
     # load icons and translations
-    from . import icons_rc, translations_rc
+    from . import icons_rc, translations_rc  # pytype: disable=import-error
 
 try:
-    from thginithook import thginithook
+    from thginithook import thginithook  # pytype: disable=import-error
 except ImportError:
     thginithook = None
 
@@ -139,27 +142,30 @@ class ExceptionCatcher(QObject):
         self._exceptionOccured.connect(self.putexception,
                                        Qt.QueuedConnection)
 
-        self._ui.debug('setting up excepthook\n')
-        self._origexcepthook = sys.excepthook
-        sys.excepthook = self.ehook
+        self._origexcepthook = None
+        if not self._ui.configbool(b'tortoisehg', b'traceback'):
+            self._ui.debug(b'setting up excepthook\n')
+            self._origexcepthook = sys.excepthook
+            sys.excepthook = self.ehook
+
         self._originthandler = signal.signal(signal.SIGINT, self._inthandler)
         self._initWakeup()
 
     def release(self):
-        if not self._origexcepthook:
-            return
-        self._ui.debug('restoring excepthook\n')
-        sys.excepthook = self._origexcepthook
-        self._origexcepthook = None
-        signal.signal(signal.SIGINT, self._originthandler)
-        self._originthandler = None
-        self._releaseWakeup()
+        if self._origexcepthook:
+            self._ui.debug(b'restoring excepthook\n')
+            sys.excepthook = self._origexcepthook
+            self._origexcepthook = None
+        if self._originthandler:
+            signal.signal(signal.SIGINT, self._originthandler)
+            self._originthandler = None
+            self._releaseWakeup()
 
     def ehook(self, etype, evalue, tracebackobj):
         'Will be called by any thread, on any unhandled exception'
         if self._ui.debugflag:
             elist = traceback.format_exception(etype, evalue, tracebackobj)
-            self._ui.debug(''.join(elist))
+            self._ui.debug(encoding.strtolocal(''.join(elist)))
         self._exceptionOccured.emit(etype, evalue, tracebackobj)
         # not thread-safe to touch self.errors here
 
@@ -294,20 +300,20 @@ class GarbageCollector(QObject):
         l0, l1, l2 = gc.get_count()
         if l0 > self.threshold[0]:
             num = gc.collect(0)
-            self._ui.debug('GarbageCollector.check: %d %d %d\n' % (l0, l1, l2))
-            self._ui.debug('collected gen 0, found %d unreachable\n' % num)
+            self._ui.debug(b'GarbageCollector.check: %d %d %d\n' % (l0, l1, l2))
+            self._ui.debug(b'collected gen 0, found %d unreachable\n' % num)
             if l1 > self.threshold[1]:
                 num = gc.collect(1)
-                self._ui.debug('collected gen 1, found %d unreachable\n' % num)
+                self._ui.debug(b'collected gen 1, found %d unreachable\n' % num)
                 if l2 > self.threshold[2]:
                     num = gc.collect(2)
-                    self._ui.debug('collected gen 2, found %d unreachable\n'
+                    self._ui.debug(b'collected gen 2, found %d unreachable\n'
                                    % num)
 
     def debug_cycles(self):
         gc.collect()
         for obj in gc.garbage:
-            self._ui.debug('%s, %r, %s\n' % (obj, obj, type(obj)))
+            self._ui.debug(b'%s, %r, %s\n' % (obj, obj, type(obj)))
 
 
 def allowSetForegroundWindow(processid=-1):
@@ -317,7 +323,7 @@ def allowSetForegroundWindow(processid=-1):
         # on windows we must explicitly allow bringing the main window to
         # the foreground. To do so we must use ctypes
         try:
-            from ctypes import windll
+            from ctypes import windll  # pytype: disable=import-error
             windll.user32.AllowSetForegroundWindow(processid)
         except ImportError:
             pass
@@ -334,7 +340,7 @@ def connectToExistingWorkbench(root, revset=None):
     server)
     """
     if revset:
-        data = '\0'.join([root, revset])
+        data = b'\0'.join([root, revset])
     else:
         data = root
     servername = QApplication.applicationName() + '-' + _ugetuser()
@@ -361,7 +367,7 @@ def _fixapplicationfont():
     if os.name != 'nt':
         return
     try:
-        import win32gui, win32con
+        import win32gui, win32con  # pytype: disable=import-error
     except ImportError:
         return
 
@@ -396,6 +402,7 @@ class QtRunner(QObject):
     def __init__(self):
         super(QtRunner, self).__init__()
         self._ui = None
+        self._config = None
         self._mainapp = None
         self._exccatcher = None
         self._server = None
@@ -422,6 +429,7 @@ class QtRunner(QObject):
                 QFont.insertSubstitution('.Lucida Grande UI', 'Lucida Grande')
 
         self._ui = ui
+        self._config = hgconfig.HgConfig(ui)
         self._mainapp = QApplication(sys.argv)
 
         if QT_VERSION >= 0x50000:
@@ -472,7 +480,7 @@ class QtRunner(QObject):
             return self._mainapp.exec_()
         finally:
             self._exccatcher.release()
-            self._mainapp = self._ui = None
+            self._mainapp = self._ui = self._config = None
 
     @pyqtSlot()
     def _quitGracefully(self):
@@ -521,10 +529,10 @@ class QtRunner(QObject):
             return dlgfunc(self._ui, *args, **opts), reporoot
         except error.RepoError as inst:
             qtlib.WarningMsgBox(_('Repository Error'),
-                                hglib.tounicode(str(inst)))
+                                hglib.tounicode(stringutil.forcebytestr(inst)))
         except error.Abort as inst:
             qtlib.WarningMsgBox(_('Abort'),
-                                hglib.tounicode(str(inst)),
+                                hglib.tounicode(stringutil.forcebytestr(inst)),
                                 hglib.tounicode(inst.hint or ''))
         if reporoot:
             self._repomanager.releaseRepoAgent(reporoot)
@@ -548,17 +556,18 @@ class QtRunner(QObject):
 
     def createWorkbench(self):
         """Create Workbench window and keep single reference"""
-        assert self._ui and self._mainapp and self._repomanager
+        assert self._ui and self._config and self._mainapp and self._repomanager
         assert not self._workbench
-        self._workbench = workbench.Workbench(self._ui, self._repomanager)
+        self._workbench = workbench.Workbench(
+            self._ui, self._config, self._repomanager)
         return self._workbench
 
     @pyqtSlot(str)
     def openRepoInWorkbench(self, uroot):
         """Show the specified repository in Workbench; reuses the existing
         Workbench process"""
-        assert self._ui
-        singlewb = self._ui.configbool('tortoisehg', 'workbench.single', True)
+        assert self._config
+        singlewb = self._config.configBool('tortoisehg', 'workbench.single')
         # only if the server is another process; otherwise it would deadlock
         if (singlewb and not self._server
             and connectToExistingWorkbench(hglib.fromunicode(uroot))):
@@ -592,9 +601,9 @@ class QtRunner(QObject):
         socket = self._server.nextPendingConnection()
         if socket:
             socket.waitForReadyRead(10000)
-            data = str(socket.readAll())
-            if data and data != '[echo]':
-                args = data.split('\0', 1)
+            data = bytes(socket.readAll())
+            if data and data != b'[echo]':
+                args = data.split(b'\0', 1)
                 if len(args) > 1:
                     uroot, urevset = map(hglib.tounicode, args)
                 else:

@@ -124,9 +124,9 @@ class HgClient(object):
     >>> hg.commit('-m', 'add bar')
     hg commit --cwd /tmp/foo -m add bar
 
-    >>> hg.wjoin('bar/baz')
+    >>> hg.wjoin(b'bar/baz')
     '/tmp/foo/bar/baz'
-    >>> hg.wjoin('/absolute/path')
+    >>> hg.wjoin(b'/absolute/path')
     Traceback (most recent call last):
       ...
     ValueError: not a relative path: /absolute/path

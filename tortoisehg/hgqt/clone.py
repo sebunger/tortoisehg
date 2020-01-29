@@ -45,10 +45,17 @@ from . import (
     qtlib,
 )
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Optional,
+        Text,
+        Tuple,
+    )
+
 def _startrev_available():
-    entry = cmdutil.findcmd('clone', commands.table)[1]
+    entry = cmdutil.findcmd(b'clone', commands.table)[1]
     longopts = set(e[1] for e in entry[1])
-    return 'startrev' in longopts
+    return b'startrev' in longopts
 
 def _suggesteddest(src, basedest):
     if '://' in basedest:
@@ -71,24 +78,11 @@ def _suggesteddest(src, basedest):
 
 class CloneWidget(cmdui.AbstractCmdWidget):
 
-    def __init__(self, ui, cmdagent, args=None, opts=None, parent=None):
+    def __init__(self, config, cmdagent, parent=None):
         super(CloneWidget, self).__init__(parent)
-        if opts is None:
-            opts = {}
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self._config = config
         self._cmdagent = cmdagent
-        self.ui = ui
-
-        dest = src = (self.ui.config('tortoisehg', 'defaultclonedest')
-                      or os.getcwd())
-        if args:
-            if len(args) > 1:
-                src = args[0]
-                dest = args[1]
-            else:
-                src = args[0]
-        udest = hglib.tounicode(dest)
-        usrc = hglib.tounicode(src)
 
         ## main layout
         form = QFormLayout()
@@ -123,8 +117,9 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             qtlib.allowCaseChangingInput(combo)
             combo.installEventFilter(qtlib.BadCompletionBlocker(combo))
 
-        self.setSource(usrc)
-        self.setDestination(udest)
+        self.setSource(config.configString('tortoisehg', 'defaultclonedest')
+                       or hglib.getcwdu())
+        self.setDestination(self.source())
 
         ### options
         expander = qtlib.ExpanderLabel(_('Options'), False)
@@ -159,6 +154,10 @@ class CloneWidget(cmdui.AbstractCmdWidget):
                 return chk, text, btn
             else:
                 return chk, text
+        def chktext3(chklabel, btnlabel, btnslot, stretch=None):
+            # type: (Text, Text, pyqtSlot, Optional[int]) -> Tuple[QCheckBox, QLineEdit, QPushButton]
+            assert btnlabel
+            return chktext(chklabel, btnlabel, btnslot, stretch)
 
         self.rev_chk, self.rev_text = chktext(_('Clone to revision:'),
                                               stretch=40)
@@ -171,14 +170,19 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         optbox.addWidget(self.noupdate_chk)
         optbox.addWidget(self.pproto_chk)
         optbox.addWidget(self.stream_chk)
+        self._opt_checks = {
+            'noupdate': self.noupdate_chk,
+            'pull': self.pproto_chk,
+            'stream': self.stream_chk,
+        }
 
         self.qclone_chk, self.qclone_txt, self.qclone_btn = \
-                chktext(_('Include patch queue'), btnlabel=_('Browse...'),
-                        btnslot=self._browsePatchQueue)
+                chktext3(_('Include patch queue'), btnlabel=_('Browse...'),
+                         btnslot=self._browsePatchQueue)
 
         self.proxy_chk = QCheckBox(_('Use proxy server'))
         optbox.addWidget(self.proxy_chk)
-        useproxy = bool(self.ui.config('http_proxy', 'host'))
+        useproxy = bool(config.configString('http_proxy', 'host'))
         self.proxy_chk.setEnabled(useproxy)
         self.proxy_chk.setChecked(useproxy)
 
@@ -225,13 +229,6 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         # prepare to show
         optwidget.hide()
 
-        rev = opts.get('rev')
-        if rev:
-            self.rev_chk.setChecked(True)
-            self.rev_text.setText(hglib.tounicode(rev))
-        self.noupdate_chk.setChecked(bool(opts.get('noupdate')))
-        self.pproto_chk.setChecked(bool(opts.get('pull')))
-        self.stream_chk.setChecked(bool(opts.get('stream')))
         self.startrev_chk.setVisible(_startrev_available())
         self.startrev_text.setVisible(_startrev_available())
 
@@ -259,14 +256,14 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             qs.setValue(key, l[:10])
 
     def source(self):
-        return pycompat.unicode(self.src_combo.currentText()).strip()
+        return self.src_combo.currentText().strip()
 
     def setSource(self, url):
         self.src_combo.setCurrentIndex(self.src_combo.findText(url))
         self.src_combo.setEditText(url)
 
     def destination(self):
-        return pycompat.unicode(self.dest_combo.currentText()).strip()
+        return self.dest_combo.currentText().strip()
 
     def setDestination(self, url):
         self.dest_combo.setCurrentIndex(self.dest_combo.findText(url))
@@ -276,29 +273,40 @@ class CloneWidget(cmdui.AbstractCmdWidget):
     def _suggestDestination(self):
         self.setDestination(_suggesteddest(self.source(), self.destination()))
 
+    def revSymbol(self):
+        if not self.rev_chk.isChecked():
+            return ''
+        return self.rev_text.text().strip()
+
+    def setRevSymbol(self, rev):
+        self.rev_chk.setChecked(bool(rev))
+        self.rev_text.setText(rev)
+
+    def testOption(self, key):
+        return self._opt_checks[key].isChecked()
+
+    def setOption(self, key, on):
+        self._opt_checks[key].setChecked(on)
+
     @pyqtSlot()
     def _composeCommand(self):
         opts = {
-            'noupdate': self.noupdate_chk.isChecked(),
-            'stream': self.stream_chk.isChecked(),
-            'pull': self.pproto_chk.isChecked(),
             'verbose': True,
             'config': [],
             }
-        if (self.ui.config('http_proxy', 'host')
+        for k in self._opt_checks:
+            opts[k] = self.testOption(k)
+        if (self._config.configString('http_proxy', 'host')
             and not self.proxy_chk.isChecked()):
+            assert isinstance(opts['config'], list)  # help pytype
             opts['config'].append('http_proxy.host=')
         if self.remote_chk.isChecked():
-            opts['remotecmd'] = pycompat.unicode(
-                                    self.remote_text.text()).strip() or None
-        if self.rev_chk.isChecked():
-            opts['rev'] = pycompat.unicode(
-                              self.rev_text.text()).strip() or None
+            opts['remotecmd'] = self.remote_text.text().strip() or None
+        opts['rev'] = self.revSymbol() or None
         if self.startrev_chk.isChecked():
-            opts['startrev'] = (pycompat.unicode(
-                                    self.startrev_text.text()).strip()
-                                or None)
+            opts['startrev'] = self.startrev_text.text().strip() or None
         if self.largefiles_chk.isChecked():
+            assert isinstance(opts['config'], list)  # help pytype
             opts['config'].append('extensions.largefiles=')
 
         src = self.source()
@@ -308,8 +316,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
 
         if self.qclone_chk.isChecked():
             name = 'qclone'
-            opts['patches'] = (pycompat.unicode(self.qclone_txt.text()).strip()
-                                  or None)
+            opts['patches'] = self.qclone_txt.text().strip() or None
         else:
             name = 'clone'
 
@@ -352,8 +359,7 @@ class CloneWidget(cmdui.AbstractCmdWidget):
     def _browsePatchQueue(self):
         FD = QFileDialog
         caption = _("Select patch folder")
-        upatchroot = os.path.join(pycompat.unicode(
-                          self.src_combo.currentText()), '.hg')
+        upatchroot = os.path.join(self.src_combo.currentText(), '.hg')
         upath = FD.getExistingDirectory(self, caption, upatchroot,
                                         QFileDialog.ShowDirsOnly)
         if upath:
@@ -370,7 +376,7 @@ class CloneDialog(cmdui.CmdControlDialog):
 
     clonedRepository = pyqtSignal(str, str)
 
-    def __init__(self, ui, args=None, opts={}, parent=None):
+    def __init__(self, ui, config, parent=None):
         super(CloneDialog, self).__init__(parent)
 
         cwd = os.getcwd()
@@ -382,7 +388,7 @@ class CloneDialog(cmdui.CmdControlDialog):
         self.setRunButtonText(_('&Clone'))
         self._cmdagent = cmdagent = cmdcore.CmdAgent(ui, self)
         cmdagent.serviceStopped.connect(self.reject)
-        self.setCommandWidget(CloneWidget(ui, cmdagent, args, opts, self))
+        self.setCommandWidget(CloneWidget(config, cmdagent, self))
         self.commandFinished.connect(self._emitCloned)
 
     def source(self):
@@ -398,6 +404,20 @@ class CloneDialog(cmdui.CmdControlDialog):
     def setDestination(self, url):
         assert self.isCommandFinished()
         self.commandWidget().setDestination(url)
+
+    def revSymbol(self):
+        return self.commandWidget().revSymbol()
+
+    def setRevSymbol(self, rev):
+        assert self.isCommandFinished()
+        self.commandWidget().setRevSymbol(rev)
+
+    def testOption(self, key):
+        return self.commandWidget().testOption(key)
+
+    def setOption(self, key, on):
+        assert self.isCommandFinished()
+        self.commandWidget().setOption(key, on)
 
     @pyqtSlot(int)
     def _emitCloned(self, ret):

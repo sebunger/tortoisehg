@@ -15,6 +15,8 @@ from mercurial import (
     util,
 )
 
+from tortoisehg.util import hglib
+
 if pycompat.ispy3:
     import configparser
 else:
@@ -63,6 +65,9 @@ class _wsortdict(object):
 
     def _logset(self, key, val):
         """Record set operation to log; called also by _wconfig"""
+        if pycompat.ispy3:
+            key = pycompat.sysstr(key)
+            val = hglib.tounicode(val)
         def op(target):
             target[key] = val
         self._log.append(op)
@@ -104,6 +109,8 @@ class _wsortdict(object):
 
     def _logdel(self, key):
         """Record del operation to log"""
+        if pycompat.ispy3:
+            key = pycompat.sysstr(key)
         def op(target):
             try:
                 del target[key]
@@ -176,6 +183,9 @@ class _wconfig(object):
             self[s]._logupdate(src[s])
 
     def set(self, section, item, value, source=''):
+        assert isinstance(section, bytes), (section, item, value)
+        assert isinstance(item, bytes), (section, item, value)
+        assert isinstance(value, bytes), (section, item, value)
         self._setconfig(section, item, value, source)
         self[section]._logset(item, value)
 
@@ -232,11 +242,14 @@ class _wconfig(object):
             fp.seek(0)
             return newini(fp)
         else:
-            fp = util.posixfile(path, 'rb')
+            fp_data = fp_file = util.posixfile(path, b'rb')
+            if pycompat.ispy3:
+                data = hglib.tounicode(fp_data.read())
+                fp_data = pycompat.io.StringIO(data)
             try:
-                return newini(fp)
+                return newini(fp_data)
             finally:
-                fp.close()
+                fp_file.close()
 
     def _replaylogs(self, ini):
         def getsection(ini, section):
@@ -247,8 +260,11 @@ class _wconfig(object):
                                 getattr(ini, 'new_namespace'))
                 return newns(section)
 
-        for k, v in self._sections.items():
-            v._replaylog(getsection(ini, k))
+        for section, sortdict in self._sections.items():
+            if pycompat.ispy3:
+                section = pycompat.sysstr(section)
+            target = getsection(ini, section)
+            sortdict._replaylog(target)
 
     def __getattr__(self, name):
         return getattr(self._config, name)
@@ -272,10 +288,15 @@ def readfile(path):
 
 def writefile(config, path):
     """Write the given config obj to the specified file"""
-    # normalize line endings
-    buf = pycompat.bytesio()
-    config.write(buf)
-    data = '\n'.join(buf.getvalue().splitlines()) + '\n'
+    if pycompat.ispy3:
+        buf = pycompat.io.StringIO()
+        config.write(buf)
+        value = hglib.fromunicode(buf.getvalue())
+    else:
+        buf = pycompat.bytesio()
+        config.write(buf)
+        value = buf.getvalue()
+    data = pycompat.oslinesep.join(value.splitlines() + [b''])
 
     if os.name == 'nt':
         # no atomic rename to the existing file that may fail occasionally
@@ -285,7 +306,7 @@ def writefile(config, path):
     else:
         # atomic rename is reliable on Unix
         openfile = util.atomictempfile
-    f = openfile(os.path.realpath(path), 'w')
+    f = openfile(os.path.realpath(path), b'wb')
     try:
         f.write(data)
         f.close()

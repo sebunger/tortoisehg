@@ -12,7 +12,7 @@ from __future__ import absolute_import
 from .qtcore import QT_API
 
 if QT_API == 'PyQt4':
-    from PyQt4.Qsci import *
+    from PyQt4.Qsci import *  # pytype: disable=import-error
 elif QT_API == 'PyQt5':
     from PyQt5.Qsci import *
 else:

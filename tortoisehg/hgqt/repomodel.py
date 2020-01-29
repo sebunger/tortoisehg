@@ -71,7 +71,8 @@ UtcDateColumn = 11
 ChangesColumn = 12
 ConvertedColumn = 13
 PhaseColumn = 14
-FileColumn = 15
+TopicColumn = 15
+FileColumn = 16
 
 COLUMNHEADERS = (
     ('Graph', _('Graph', 'column header')),
@@ -89,6 +90,7 @@ COLUMNHEADERS = (
     ('Changes', _('Changes', 'column header')),
     ('Converted', _('Converted From', 'column header')),
     ('Phase', _('Phase', 'column header')),
+    ('Topic', _('Topic', 'column header')),
     ('Filename', _('Filename', 'column header')),
     )
 ALLCOLUMNS = tuple(name for name, _text in COLUMNHEADERS)
@@ -109,7 +111,7 @@ def _parsebranchcolors(value):
     [('foo bar', 'black'), ('foo:bar', 'white')]
 
     >>> _parsebranchcolors(r'\u00c0:black')
-    [('\xc0', 'black')]
+    [(u'\xc0', 'black')]
     >>> _parsebranchcolors('\xc0:black')
     [('\xc0', 'black')]
 
@@ -132,9 +134,10 @@ def _parsebranchcolors(value):
         key = key.replace('\\:', ':').replace('\\ ', ' ')
         if r'\u' in key:
             # apply unicode_escape only if \u found, so that raw non-ascii
-            # value isn't always mangled.
+            # value isn't always mangled. leave non-ascii string unmodified
+            # since we don't know how to feed it to unicode_escape decoder.
             try:
-                key = hglib.fromunicode(key.decode('unicode_escape'))
+                key = key.encode('ascii').decode('unicode_escape')
             except (UnicodeDecodeError, UnicodeEncodeError):
                 continue
         colors.append((key, val))
@@ -154,7 +157,7 @@ class HgRepoListModel(QAbstractTableModel):
     _defaultcolumns = ('Graph', 'Rev', 'Branch', 'Description', 'Author',
                        'Age', 'Tags', 'Phase')
 
-    _mqtags = ('qbase', 'qtip', 'qparent')
+    _mqtags = (b'qbase', b'qtip', b'qparent')
 
     def __init__(self, repoagent, parent=None):
         QAbstractTableModel.__init__(self, parent)
@@ -198,7 +201,7 @@ class HgRepoListModel(QAbstractTableModel):
 
         # Set the colors specified in the tortoisehg.brachcolors config key
         self._branch_colors.update(_parsebranchcolors(
-            self.repo.ui.config('tortoisehg', 'branchcolors')))
+            self._repoagent.configString('tortoisehg', 'branchcolors')))
 
     def setBranch(self, branch, allparents=False):
         branchchanged = (branch != self._filterbranch)
@@ -223,16 +226,16 @@ class HgRepoListModel(QAbstractTableModel):
             return graph.Graph(self.repo, [])  # no matches found
         if self._selectedrevs and self._filterbyrevset:
             opts['revset'] = self._selectedrevs
-            opts['showfamilyline'] = \
-                self.repo.ui.configbool('tortoisehg', 'showfamilyline', True)
+            opts['showfamilyline'] = self._repoagent.configBool(
+                'tortoisehg', 'showfamilyline')
             grapher = graph.revision_grapher(self.repo, opts)
-            if self.repo.ui.configbool('tortoisehg', 'graphopt', False):
+            if self._repoagent.configBool('tortoisehg', 'graphopt'):
                 return graphopt.Graph(self.repo, opts)
             return graph.Graph(self.repo, grapher)
         else:
             opts['allparents'] = self._allparents
             grapher = graph.revision_grapher(self.repo, opts)
-            if self.repo.ui.configbool('tortoisehg', 'graphopt', False):
+            if self._repoagent.configBool('tortoisehg', 'graphopt'):
                 g = graphopt.Graph(self.repo, opts)
             else:
                 g = graph.Graph(self.repo, grapher)
@@ -346,7 +349,7 @@ class HgRepoListModel(QAbstractTableModel):
             # new query is already running
             return
         if ret == 0:
-            revs = pycompat.maplist(int, str(sess.readAll()).splitlines())
+            revs = pycompat.maplist(int, bytes(sess.readAll()).splitlines())
             if revs:
                 self.showMessage.emit(_('%d matches found') % len(revs))
             else:
@@ -373,10 +376,13 @@ class HgRepoListModel(QAbstractTableModel):
             self._rebuildGraph()
 
     def _reloadConfig(self):
-        _ui = self.repo.ui
-        self._fill_step = int(_ui.config('tortoisehg', 'graphlimit', 500))
-        self._authorcolor = _ui.configbool('tortoisehg', 'authorcolor')
-        self._fullauthorname = _ui.configbool('tortoisehg', 'fullauthorname')
+        self._fill_step = self._repoagent.configInt('tortoisehg', 'graphlimit')
+        self._authorcolor = self._repoagent.configBool(
+            'tortoisehg', 'authorcolor')
+        self._fullauthorname = self._repoagent.configBool(
+            'tortoisehg', 'fullauthorname')
+        self._show_branch_head_label = self._repoagent.configBool(
+            'tortoisehg', 'show-branch-head-label')
 
     @pyqtSlot()
     def _invalidate(self):
@@ -625,18 +631,19 @@ class HgRepoListModel(QAbstractTableModel):
     def mimeData(self, indexes):
         data = set()
         for index in indexes:
-            row = str(index.row())
+            row = b'%d' % index.row()
             if row not in data:
                 data.add(row)
         qmd = QMimeData()
-        bytearray = QByteArray(','.join(sorted(data, reverse=True)))
+        bytearray = QByteArray(b','.join(sorted(data, reverse=True)))
         qmd.setData(mqpatchmimetype, bytearray)
         return qmd
 
     def dropMimeData(self, data, action, row, column, parent):
         if mqpatchmimetype not in data.formats():
             return False
-        dragrows = [int(r) for r in str(data.data(mqpatchmimetype)).split(',')]
+        dragrows = [int(r)
+                    for r in bytes(data.data(mqpatchmimetype)).split(b',')]
         destrow = parent.row()
         if destrow < 0:
             return False
@@ -664,11 +671,12 @@ class HgRepoListModel(QAbstractTableModel):
         """Index that should be selected when the model is initially loaded
         or the row previously selected is gone"""
         repo = self.repo
-        initialsel = repo.ui.config('tortoisehg', 'initialrevision', 'current')
-        changeid = {'current': '.',
-                    'tip': 'tip',
+        initialsel = self._repoagent.configString(
+            'tortoisehg', 'initialrevision')
+        changeid = {'current': b'.',
+                    'tip': b'tip',
                     'workingdir': None,
-                    }.get(initialsel, '.')
+                    }.get(initialsel, b'.')
         rev = repo[changeid].rev()
         if self._selectedrevs and rev not in self._selectedrevs:
             rev = max(self._selectedrevs)
@@ -715,10 +723,10 @@ class HgRepoListModel(QAbstractTableModel):
             if rev in self._latesttags:
                 continue
             ctx = repo[rev]
-            tags = [t for t in ctx.tags()
-                    if repo.tagtype(t) and repo.tagtype(t) != 'local']
+            tags = [hglib.tounicode(t) for t in ctx.tags()
+                    if repo.tagtype(t) and repo.tagtype(t) != b'local']
             if tags:
-                self._latesttags[rev] = ctx.date()[0], 0, ':'.join(sorted(tags))
+                self._latesttags[rev] = ctx.date()[0], 0, b':'.join(sorted(tags))
                 continue
             try:
                 # The tuples are laid out so the right one can be found by
@@ -739,8 +747,8 @@ class HgRepoListModel(QAbstractTableModel):
     def _gettags(self, ctx):
         if ctx.rev() is None:
             return ''
-        tags = [t for t in ctx.tags() if t not in self._mqtags]
-        return hglib.tounicode(','.join(tags))
+        tags = [hglib.tounicode(t) for t in ctx.tags() if t not in self._mqtags]
+        return ','.join(tags)
 
     def _getrev(self, ctx):
         rev = ctx.rev()
@@ -767,7 +775,7 @@ class HgRepoListModel(QAbstractTableModel):
                 return u'\u2605 ' + _('Working Directory') + u' \u2605'
             else:
                 return '*** ' + _('Working Directory') + ' ***'
-        if self.repo.ui.configbool('tortoisehg', 'longsummary'):
+        if self._repoagent.configBool('tortoisehg', 'longsummary'):
             limit = 0x7fffffff  # unlimited (elide it by view)
         else:
             limit = None  # first line
@@ -791,8 +799,9 @@ class HgRepoListModel(QAbstractTableModel):
                     labels.append((_('Not a head revision!'), 'log.warning'))
             return labels
 
-        if ctx.node() in branchheads:
-            labels.append((hglib.tounicode(branch), 'log.branch'))
+        if self._show_branch_head_label:
+            if ctx.node() in branchheads:
+                labels.append((hglib.tounicode(branch), 'log.branch'))
 
         if ctx.thgmqunappliedpatch():
             style = 'log.unapplied_patch'
@@ -813,9 +822,10 @@ class HgRepoListModel(QAbstractTableModel):
                 style = 'log.tag'
             labels.append((hglib.tounicode(tag), style))
 
-        names = set(self.repo.ui.configlist('experimental', 'thg.displaynames'))
+        names = set(self._repoagent.configStringList(
+            'experimental', 'thg.displaynames'))
         for name, ns in self.repo.names.items():
-            if name not in names:
+            if pycompat.sysstr(name) not in names:
                 continue
             # we will use the templatename as the color name since those
             # two should be the same
@@ -862,6 +872,9 @@ class HgRepoListModel(QAbstractTableModel):
         except:
             return 'draft'
 
+    def _gettopic(self, ctx):
+        return hglib.tounicode(ctx.extra().get(b'topic'))
+
     def _hasFileColumn(self):
         return False # no FileColumn
 
@@ -891,6 +904,7 @@ class HgRepoListModel(QAbstractTableModel):
         UtcDateColumn: lambda self, ctx: hglib.utctime(ctx.date()),
         ConvertedColumn: _getconv,
         PhaseColumn: _getphase,
+        TopicColumn: _gettopic,
         }
 
 

@@ -229,7 +229,7 @@ class MatchDialog(QDialog):
 
         self.rev_to_match_info_lbl.setText(_('Revision to Match:'))
         new_rev = hglib.fromunicode(self.rev_combo.currentText())
-        if new_rev.lower() == 'null':
+        if new_rev.lower() == b'null':
             self.match_btn.setEnabled(True)
             return
         try:

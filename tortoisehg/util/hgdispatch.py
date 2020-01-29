@@ -20,22 +20,22 @@ def _dispatch(orig, req):
     try:
         return orig(req)
     except subrepo.SubrepoAbort as e:
-        errormsg = str(e)
-        label = 'ui.error'
+        errormsg = bytes(e)
+        label = b'ui.error'
         if e.subrepo:
-            label += ' subrepo=%s' % util.urlreq.quote(e.subrepo)
-        ui.write_err(_('abort: ') + errormsg + '\n', label=label)
+            label += b' subrepo=%s' % util.urlreq.quote(e.subrepo)
+        ui.write_err(_('abort: ') + errormsg + b'\n', label=label)
         if e.hint:
-            ui.write_err(_('hint: ') + str(e.hint) + '\n', label=label)
+            ui.write_err(_('hint: ') + bytes(e.hint) + b'\n', label=label)
     except error.Abort as e:
-        ui.write_err(_('abort: ') + str(e) + '\n', label='ui.error')
+        ui.write_err(_('abort: ') + bytes(e) + b'\n', label=b'ui.error')
         if e.hint:
-            ui.write_err(_('hint: ') + str(e.hint) + '\n', label='ui.error')
+            ui.write_err(_('hint: ') + bytes(e.hint) + b'\n', label=b'ui.error')
     except error.RepoError as e:
-        ui.write_err(str(e) + '\n', label='ui.error')
+        ui.write_err(bytes(e) + b'\n', label=b'ui.error')
     except util.urlerr.httperror as e:
         err = _('HTTP Error: %d (%s)') % (e.code, e.msg)
-        ui.write_err(err + '\n', label='ui.error')
+        ui.write_err(err + '\n', label=b'ui.error')
     except util.urlerr.urlerror as e:
         err = _('URLError: %s') % str(e.reason)
         try:
@@ -52,7 +52,7 @@ def _dispatch(orig, req):
                         err = _('SSL error: %s') % reason
         except ImportError:
             pass
-        ui.write_err(err + '\n', label='ui.error')
+        ui.write_err(err + '\n', label=b'ui.error')
 
     return -1
 

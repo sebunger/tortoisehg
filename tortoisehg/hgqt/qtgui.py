@@ -13,8 +13,8 @@ from .qtcore import QT_API
 
 if QT_API == 'PyQt4':
     # http://pyqt.sourceforge.net/Docs/PyQt5/pyqt4_differences.html
-    from PyQt4.QtGui import *
-    from PyQt4.QtGui import QFileDialog as _QFileDialog
+    from PyQt4.QtGui import *  # pytype: disable=import-error
+    from PyQt4.QtGui import QFileDialog as _QFileDialog  # pytype: disable=import-error
     class QFileDialog(_QFileDialog):
         getOpenFileName = _QFileDialog.getOpenFileNameAndFilter
         getOpenFileNames = _QFileDialog.getOpenFileNamesAndFilter

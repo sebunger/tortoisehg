@@ -78,8 +78,8 @@ def check_copy():
 @with_both
 def check_contains():
     c = newwconfig({'foo.bar': 'baz'})
-    assert 'foo' in c
-    assert 'bar' not in c
+    assert 'foo' in c, c
+    assert 'bar' not in c, c
 
 @with_both
 def check_getitem():
@@ -91,7 +91,7 @@ def check_getitem():
 def check_getitem_empty_then_set_no_effect():
     c = newwconfig()
     c['unknown']['bar'] = 'baz'
-    assert not c.get('unknown', 'bar')
+    assert not c.get('unknown', 'bar'), c.get('unknown', 'bar')
 
 @with_both
 def check_set_followed_by_getitem_empty():
@@ -104,8 +104,8 @@ def check_set_followed_by_getitem_empty():
 @with_both
 def check_dict_contains():
     c = newwconfig({'foo.bar': 'x'})
-    assert 'bar' in c['foo']
-    assert 'baz' not in c['foo']
+    assert 'bar' in c['foo'], c['foo']
+    assert 'baz' not in c['foo'], c['foo']
 
 @with_both
 def check_dict_getitem():
@@ -149,7 +149,7 @@ def check_dict_update():
 def check_dict_delitem():
     c = newwconfig({'foo.bar': 'x'})
     del c['foo']['bar']
-    assert 'bar' not in c['foo']
+    assert 'bar' not in c['foo'], c['foo']
 
 @with_both
 def check_iter():
@@ -328,7 +328,7 @@ def check_write_conflict_set_del():
     wconfig.writefile(c0, fname)
 
     cr = wconfig.readfile(fname)
-    assert not cr.get('foo', 'bar')
+    assert not cr.get('foo', 'bar'), cr.get('foo', 'bar')
 
 @with_wconfig
 def check_write_conflict_del_del():
@@ -341,7 +341,7 @@ def check_write_conflict_del_del():
     wconfig.writefile(c0, fname)  # shouldn't raise KeyError
 
     cr = wconfig.readfile(fname)
-    assert not cr.get('foo', 'bar')
+    assert not cr.get('foo', 'bar'), cr.get('foo', 'bar')
 
 @with_wconfig
 def check_write_noconflict_set_set():
@@ -356,7 +356,8 @@ def check_write_noconflict_set_set():
     cr = wconfig.readfile(fname)
     assert_equals('z', cr.get('foo', 'bar'))
     assert_equals('y', cr.get('foo', 'baz'))
-    assert not c0.get('foo', 'baz')  # don't reload c1's change implicitly
+    # don't reload c1's change implicitly
+    assert not c0.get('foo', 'baz'), c0.get('foo', 'baz')
 
 @with_wconfig
 def check_write_noconflict_del():
@@ -368,8 +369,9 @@ def check_write_noconflict_del():
     wconfig.writefile(c0, fname)  # shouldn't override del foo.bar
 
     cr = wconfig.readfile(fname)
-    assert not cr.get('foo', 'bar')
-    assert c0.get('foo', 'bar')  # don't reload c1's change implicitly
+    assert not cr.get('foo', 'bar'), cr.get('foo', 'bar')
+    # don't reload c1's change implicitly
+    assert c0.get('foo', 'bar'), c0.get('foo', 'bar')
 
 
 @with_wconfig

@@ -47,7 +47,7 @@ from ..util.i18n import _
 from . import qtlib
 
 # Match parent2 first, so 'parent1?' will match both parent1 and parent
-_regex = '\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|chash)'
+_regex = b'\$(parent2|parent1?|child|plabel1|plabel2|clabel|repo|phash1|phash2|chash)'
 
 _nonexistant = _('[non-existant]')
 
@@ -104,18 +104,21 @@ def snapshotset(repo, ctxs, sa, sb, copies, copyworkingdir = False):
     return dirs, labels, fns_and_mtimes
 
 def snapshot(repo, files, ctx):
-    '''snapshot files as of some revision'''
-    dirname = os.path.basename(repo.root) or 'root'
-    dirname += '.%d' % _diffCount
+    '''snapshot repo files as of some revision, returning a tuple with the
+    created temporary snapshot dir and tuples of file info if using working
+    copy.'''
+    dirname = os.path.basename(repo.root) or b'root'
+    dirname += b'.%d' % _diffCount
     if ctx.rev() is not None:
-        dirname += '.%d' % ctx.rev()
+        dirname += b'.%d' % ctx.rev()
     base = os.path.join(qtlib.gettempdir(), dirname)
     fns_and_mtime = []
     if not os.path.exists(base):
         os.makedirs(base)
     for fn in files:
+        assert isinstance(fn, bytes), repr(fn)
         wfn = util.pconvert(fn)
-        if not wfn in ctx:
+        if wfn not in ctx:
             # File doesn't exist; could be a bogus modify
             continue
         dest = os.path.join(base, wfn)
@@ -130,7 +133,7 @@ def snapshot(repo, files, ctx):
             data = repo.wwritedata(wfn, fctx.data())
             with open(dest, 'wb') as f:
                 f.write(data)
-            if 'x' in fctx.flags():
+            if b'x' in fctx.flags():
                 util.setflags(dest, False, True)
             if ctx.rev() is None:
                 fns_and_mtime.append((dest, repo.wjoin(fn), 
@@ -144,7 +147,7 @@ def snapshot(repo, files, ctx):
 
 def launchtool(cmd, opts, replace, block):
     def quote(match):
-        key = match.group()[1:]
+        key = pycompat.sysstr(match.group()[1:])
         return procutil.shellquote(replace[key])
     if isinstance(cmd, pycompat.unicode):
         cmd = hglib.fromunicode(cmd)
@@ -154,9 +157,9 @@ def launchtool(cmd, opts, replace, block):
             lopts.append(hglib.fromunicode(opt))
         else:
             lopts.append(opt)
-    args = ' '.join(lopts)
+    args = b' '.join(lopts)
     args = re.sub(_regex, quote, args)
-    cmdline = procutil.shellquote(cmd) + ' ' + args
+    cmdline = procutil.shellquote(cmd) + b' ' + args
     cmdline = procutil.quotecommand(cmdline)
     try:
         proc = subprocess.Popen(cmdline, shell=True,
@@ -190,14 +193,14 @@ def filemerge(ui, fname, patchedfname):
 
 def besttool(ui, tools, force=None):
     'Select preferred or highest priority tool from dictionary'
-    preferred = force or ui.config('tortoisehg', 'vdiff') or \
-                         ui.config('ui', 'merge')
+    preferred = force or ui.config(b'tortoisehg', b'vdiff') or \
+                         ui.config(b'ui', 'merge')
     if preferred and preferred in tools:
         return preferred
     pris = []
     for t in tools.keys():
         try:
-            p = ui.configint('merge-tools', t + '.priority', 0)
+            p = ui.configint(b'merge-tools', t + b'.priority')
         except error.ConfigError as inst:
             ui.warn('visdiff: %s\n' % inst)
             p = 0
@@ -214,7 +217,9 @@ def visualdiff(ui, repo, pats, opts):
         ctx1b = None
         if change:
             # TODO: figure out what's the expect type
-            if isinstance(change,  str):
+            if isinstance(change, pycompat.unicode):
+                change = hglib.fromunicode(change)
+            if isinstance(change, bytes):
                 ctx2 = scmutil.revsymbol(repo, change)
             else:
                 ctx2 = repo[change]
@@ -224,7 +229,8 @@ def visualdiff(ui, repo, pats, opts):
             else:
                 ctx1a = p[0]
         else:
-            n1, n2 = scmutil.revpair(repo, revs)
+            n1, n2 = scmutil.revpair(repo, [hglib.fromunicode(rev)
+                                            for rev in revs])
             ctx1a, ctx2 = repo[n1], repo[n2]
             p = ctx2.parents()
             if not revs and len(p) > 1:
@@ -236,15 +242,16 @@ def visualdiff(ui, repo, pats, opts):
         return None
 
     pats = scmutil.expandpats(pats)
-    m = match.match(repo.root, '', pats, None, None, 'relpath')
+    m = match.match(repo.root, b'', pats, None, None, b'relpath')
     n2 = ctx2.node()
-    mod_a, add_a, rem_a = pycompat.maplist(set,
-                                           repo.status(ctx1a.node(),
-                                                       n2, m)[:3])
+
+    def _status(ctx):
+        status = repo.status(ctx.node(), n2, m)
+        return status.modified, status.added, status.removed
+
+    mod_a, add_a, rem_a = pycompat.maplist(set, _status(ctx1a))
     if ctx1b:
-        mod_b, add_b, rem_b = pycompat.maplist(set,
-                                               repo.status(ctx1b.node(),
-                                                           n2, m)[:3])
+        mod_b, add_b, rem_b = pycompat.maplist(set, _status(ctx1b))
         cpy = copies.mergecopies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
     else:
         cpy = copies.pathcopies(ctx1a, ctx2)
@@ -268,11 +275,11 @@ def visualdiff(ui, repo, pats, opts):
 
     # Build tool list based on diff-patterns matches
     toollist = set()
-    patterns = repo.ui.configitems('diff-patterns')
+    patterns = repo.ui.configitems(b'diff-patterns')
     patterns = [(p, t) for p,t in patterns if t in detectedtools]
     for path in MAR:
         for pat, tool in patterns:
-            mf = match.match(repo.root, '', [pat])
+            mf = match.match(repo.root, b'', [pat])
             if mf(path):
                 toollist.add(tool)
                 break
@@ -286,14 +293,14 @@ def visualdiff(ui, repo, pats, opts):
             break
     else:
         hascopies = False
-    force = repo.ui.configbool('tortoisehg', 'forcevdiffwin')
+    force = repo.ui.configbool(b'tortoisehg', b'forcevdiffwin')
     if len(toollist) > 1 or (hascopies and len(MAR) > 1) or force:
         usewin = True
     else:
         preferred = toollist.pop()
-        dirdiff = repo.ui.configbool('merge-tools', preferred + '.dirdiff')
-        dir3diff = repo.ui.configbool('merge-tools', preferred + '.dir3diff')
-        usewin = repo.ui.configbool('merge-tools', preferred + '.usewin')
+        dirdiff = repo.ui.configbool(b'merge-tools', preferred + b'.dirdiff')
+        dir3diff = repo.ui.configbool(b'merge-tools', preferred + b'.dir3diff')
+        usewin = repo.ui.configbool(b'merge-tools', preferred + b'.usewin')
         if not usewin and len(MAR) > 1:
             if ctx1b is not None:
                 usewin = not dir3diff
@@ -342,11 +349,12 @@ def visualdiff(ui, repo, pats, opts):
             label2 = 'working files'
 
         def getfile(fname, dir, label):
+            label = hglib.fromunicode(label)
             file = os.path.join(qtlib.gettempdir(), dir, fname)
             if os.path.isfile(file):
                 return fname+label, file
-            nullfile = os.path.join(qtlib.gettempdir(), 'empty')
-            fp = open(nullfile, 'w')
+            nullfile = os.path.join(qtlib.gettempdir(), b'empty')
+            fp = open(nullfile, 'wb')
             fp.close()
             return (hglib.fromunicode(_nonexistant, 'replace') + label,
                     nullfile)
@@ -518,7 +526,7 @@ class FileSelectionDialog(QDialog):
     def onToolSelected(self, tool):
         'user selected a tool from the tool combo'
         tool = hglib.fromunicode(tool)
-        assert tool in self.tools
+        assert tool in self.tools, tool
         self.diffpath, self.diffopts, self.mergeopts = self.tools[tool]
         self.updateDiffButtons(tool)
 
@@ -529,7 +537,7 @@ class FileSelectionDialog(QDialog):
             return
 
         repo = self.repo
-        patterns = repo.ui.configitems('diff-patterns')
+        patterns = repo.ui.configitems(b'diff-patterns')
         patterns = [(p, t) for p,t in patterns if t in self.tools]
 
         fname = self.list.item(row).text()[2:]
@@ -538,7 +546,7 @@ class FileSelectionDialog(QDialog):
             return
         self.curFile = fname
         for pat, tool in patterns:
-            mf = match.match(repo.root, '', [pat])
+            mf = match.match(repo.root, b'', [pat])
             if mf(fname):
                 selected = tool
                 break
@@ -561,13 +569,13 @@ class FileSelectionDialog(QDialog):
     def updateDiffButtons(self, tool):
         # hg>=4.4: configbool() may return None as the default is set to None
         if hasattr(self, 'p1button'):
-            d2 = self.repo.ui.configbool('merge-tools', tool + '.dirdiff')
-            d3 = self.repo.ui.configbool('merge-tools', tool + '.dir3diff')
+            d2 = self.repo.ui.configbool(b'merge-tools', tool + b'.dirdiff')
+            d3 = self.repo.ui.configbool(b'merge-tools', tool + b'.dir3diff')
             self.p1button.setEnabled(bool(d2))
             self.p2button.setEnabled(bool(d2))
             self.p3button.setEnabled(bool(d3))
         elif hasattr(self, 'dbutton'):
-            d2 = self.repo.ui.configbool('merge-tools', tool + '.dirdiff')
+            d2 = self.repo.ui.configbool(b'merge-tools', tool + b'.dirdiff')
             self.dbutton.setEnabled(bool(d2))
 
     def launch(self, fname):
@@ -586,7 +594,7 @@ class FileSelectionDialog(QDialog):
                 path = os.path.join(dir, util.localpath(source))
                 return source, path
             else:
-                nullfile = os.path.join(qtlib.gettempdir(), 'empty')
+                nullfile = os.path.join(qtlib.gettempdir(), b'empty')
                 fp = open(nullfile, 'w')
                 fp.close()
                 return hglib.fromunicode(_nonexistant, 'replace'), nullfile

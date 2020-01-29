@@ -71,6 +71,13 @@ from . import (
 )
 from .qscilib import Scintilla
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Dict,
+        List,
+        Text,
+    )
+
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
 
@@ -114,7 +121,7 @@ class _FileDiffScintilla(Scintilla):
 
         start = self.firstVisibleLine()
         scale = self.textHeight(0)  # Currently all lines are the same height
-        n = min(viewport.height() / scale + 1, self.lines() - start)
+        n = min(viewport.height() // scale + 1, self.lines() - start)
         lines = []
         for i in pycompat.xrange(0, n):
             m = self.markersAtLine(start + i)
@@ -168,7 +175,7 @@ class _AbstractFileDialog(QMainWindow):
         self.setupUi()
         self._show_rev = None
 
-        assert not isinstance(filename, pycompat.unicode)
+        assert not isinstance(filename, pycompat.unicode), repr(filename)
         self.filename = filename
 
         self.setWindowTitle(_('Hg file log viewer [%s] - %s')
@@ -496,7 +503,9 @@ class FileDiffDialog(_AbstractFileDialog):
         try:
             with open(self.repo.wjoin(self.filename), "rb") as fp:
                 contents = fp.read(1024)
-            lexer = lexers.getlexer(self.repo.ui, self.filename, contents, self)
+            lexer = lexers.getlexer(self.repo.ui,
+                                    hglib.tounicode(self.filename),
+                                    contents, self)
         except Exception:
             lexer = None
 
@@ -580,7 +589,10 @@ class FileDiffDialog(_AbstractFileDialog):
         self.timer.timeout.connect(self.idle_fill_files)
 
     def setupModels(self):
-        self.filedata = {'left': None, 'right': None}
+        self.filedata = {
+            'left': [],
+            'right': [],
+        }  # type: Dict[Text, List[pycompat.unicode]]
         self._invbarchanged = False
         self.filerevmodel = repomodel.FileRevModel(
             self._repoagent, self.filename, parent=self)

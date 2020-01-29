@@ -79,11 +79,11 @@ from . import (
 )
 
 def parseurl(url):
-    assert isinstance(url, pycompat.unicode)
+    assert isinstance(url, pycompat.unicode), repr(url)
     return util.url(hglib.fromunicode(url))
 
 def linkify(url):
-    assert isinstance(url, pycompat.unicode)
+    assert isinstance(url, pycompat.unicode), repr(url)
     u = util.url(hglib.fromunicode(url))
     if u.scheme in ('local', 'http', 'https'):
         safe = util.hidepassword(hglib.fromunicode(url))
@@ -93,7 +93,7 @@ def linkify(url):
 
 # ignore preceding white spaces because ui.prompt() for username/password
 # writes extra " "s to the output channel. (hg 3.1)
-_extractnodeids = re.compile(r'^\s*([0-9a-f]{40})$', re.MULTILINE).findall
+_extractnodeids = re.compile(br'^\s*([0-9a-f]{40})$', re.MULTILINE).findall
 
 class SyncWidget(QWidget, qtlib.TaskWidget):
     newCommand = pyqtSignal(cmdcore.CmdSession)
@@ -125,7 +125,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         for opt in ('force', 'new-branch', 'noproxy', 'debug', 'mq'):
             val = qtlib.readBool(s, 'sync/' + opt)
             if val:
-                if opt != 'mq' or 'mq' in self.repo.extensions():
+                if opt != 'mq' or b'mq' in self.repo.extensions():
                     self.opts[opt] = val
         for opt in ('remotecmd', 'branch'):
             val = hglib.fromunicode(qtlib.readString(s, 'sync/' + opt))
@@ -166,7 +166,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         newaction(_('Email outgoing changesets for remote repository'),
              'mail-forward', self.emailclicked)
 
-        if 'perfarce' in self.repo.extensions():
+        if b'perfarce' in self.repo.extensions():
             a = QAction(self)
             a.setToolTip(_('Manage pending perforce changelists'))
             a.setText('P4')
@@ -365,7 +365,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def reload(self):
         # Refresh configured paths
         self.paths = {}
-        fn = self.repo.vfs.join('hgrc')
+        fn = self.repo.vfs.join(b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if 'paths' in cfg:
             for alias in cfg['paths']:
@@ -376,8 +376,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         sm.currentRowChanged.connect(self.pathSelected)
 
         # Refresh post-pull
-        self.cachedpp = self.repo.postpull
-        name = _('Post Pull: ') + self.repo.postpull.title()
+        self.cachedpp = hglib.tounicode(self.repo.postpull)
+        name = _('Post Pull: ') + self.cachedpp.title()
         self.postpullbutton.setText(name)
 
         # Refresh related paths
@@ -404,11 +404,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             elif paths.is_on_fixed_drive(root):
                 # directly read the repository's configuration file
                 tempui = self.repo.ui.copy()
-                tempui.readconfig(os.path.join(root, '.hg', 'hgrc'))
+                tempui.readconfig(os.path.join(root, b'.hg', b'hgrc'))
                 ui = tempui
             else:
                 continue
-            for alias, path in ui.configitems('paths'):
+            for alias, path in ui.configitems(b'paths'):
                 if not util.hasscheme(path):
                     abs = os.path.abspath(util.localpath(path)).lower()
                 else:
@@ -457,6 +457,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def setUrl(self, newurl):
         'Set the current URL to the given alias or URL [unicode]'
         model = self.hgrctv.model()
+        assert model is not None
         for col in (0, 1):  # search known (alias, url)
             ixs = model.match(model.index(0, col), Qt.DisplayRole, newurl, 1,
                               Qt.MatchFixedString | Qt.MatchCaseSensitive)
@@ -661,7 +662,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return cmdcore.nullCmdSession()
 
         if u.scheme == 'https':
-            if self.repo.ui.configbool('insecurehosts', u.host):
+            if self.repo.ui.configbool(b'insecurehosts', u.host):
                 cmdline.append('--insecure')
             if u.user:
                 cleanurl = util.removeauth(lurl)
@@ -751,11 +752,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         url = self.currentUrl()
         link = self.linkifyWithTarget(url)
         if not url.startswith('p4://'):
-            bfile = hglib.fromunicode(url)
+            bfile = url.replace('/', '_')
             for badchar in (':', '*', '\\', '?', '#'):
                 bfile = bfile.replace(badchar, '')
-            bfile = bfile.replace('/', '_')
-            bfile = tempfile.mktemp('.hg', bfile+'_', qtlib.gettempdir())
+            fd, bfile = tempfile.mkstemp(
+                suffix=b'.hg',
+                prefix=hglib.fromunicode(bfile) + b'_',
+                dir=qtlib.gettempdir())
+            os.close(fd)
             self._lastbfile = hglib.tounicode(bfile)
             cmdline = ['incoming', '--quiet', '--bundle', bfile]
             sess = self.run(cmdline, ('force', 'branch', 'rev'))
@@ -786,8 +790,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         link = self.linkifyWithTarget(url or self.currentUrl())
 
         cmdline = ['pull', '--verbose']
-        uimerge = self.repo.ui.configbool('tortoisehg', 'autoresolve', True) \
-            and 'ui.merge=internal:merge' or 'ui.merge=internal:fail'
+        if self._repoagent.configBool('tortoisehg', 'autoresolve'):
+            uimerge = 'ui.merge=internal:merge'
+        else:
+            uimerge = 'ui.merge=internal:fail'
         if self.cachedpp == 'rebase':
             cmdline += ['--rebase', '--config', uimerge]
         elif self.cachedpp == 'update':
@@ -816,13 +822,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.pullCompleted.emit()
         # handle file conflicts during rebase
         if self.cachedpp in ('rebase', 'updateorrebase'):
-            if os.path.exists(self.repo.vfs.join('rebasestate')):
+            if os.path.exists(self.repo.vfs.join(b'rebasestate')):
                 dlg = rebase.RebaseDialog(self._repoagent, self)
                 dlg.exec_()
                 return
         # handle file conflicts during update
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
-            if status == 'u':
+            if status == b'u':
                 qtlib.InfoMsgBox(_('Merge caused file conflicts'),
                                 _('File conflicts need to be resolved'))
                 dlg = resolve.ResolveDialog(self._repoagent, self)
@@ -841,8 +847,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def _onOutgoingFinished(self, ret):
         link = self.linkifyWithTarget(self._lasturl)
         if ret == 0:
-            data = str(self._cmdsession.readAll())
-            nodes = _extractnodeids(data)
+            data = bytes(self._cmdsession.readAll())
+            nodes = [pycompat.sysstr(node) for node in _extractnodeids(data)]
             self.showMessage.emit(_('%d outgoing changesets to %s') %
                                   (len(nodes), link))
             self.outgoingNodes.emit(nodes)
@@ -897,7 +903,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     def pushclicked(self, confirm, rev=None, branch=None, pushall=False):
         if confirm is None:
-            confirm = self.repo.ui.configbool('tortoisehg', 'confirmpush', True)
+            confirm = self._repoagent.configBool('tortoisehg', 'confirmpush')
         if rev == '':
             rev = None
         if branch == '':
@@ -934,8 +940,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         if branch is None:
             branch = self.opts.get('branch')
         if not pushall and rev is None and branch is None:
-            defaultpush = self.repo.ui.config('tortoisehg', 'defaultpush',
-                                              'all')
+            defaultpush = self._repoagent.configString(
+                'tortoisehg', 'defaultpush')
             if self.targetcheckbox.isChecked():
                 pass
             elif defaultpush == 'all':
@@ -1013,7 +1019,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def _onOutgoingEmailFinished(self, ret):
         if ret == 0:
             cmdline = self.lastcmdline
-            data = str(self._cmdsession.readAll())
+            data = bytes(self._cmdsession.readAll())
             revs = tuple(self.repo[n].rev() for n in _extractnodeids(data))
             self.showMessage.emit(_('%d outgoing changesets') % len(revs))
             try:
@@ -1047,7 +1053,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot(str)
     def removeAlias(self, alias):
         alias = hglib.fromunicode(alias)
-        fn = self.repo.vfs.join('hgrc')
+        fn = self.repo.vfs.join(b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to remove URL'),
@@ -1087,15 +1093,15 @@ class PostPullDialog(QDialog):
         layout.addWidget(self._opchecks['none'])
         layout.addWidget(self._opchecks['update'])
 
-        if 'fetch' in repo.extensions():
+        if b'fetch' in repo.extensions():
             btntxt = _('Fetch - use fetch (auto merge pulled changes)')
         else:
             btntxt = _('Fetch - use fetch extension (fetch is not active!)')
         self._opchecks['fetch'] = chk = QRadioButton(btntxt)
         layout.addWidget(chk)
-        chk.setVisible('fetch' in repo.extensions())
+        chk.setVisible(b'fetch' in repo.extensions())
 
-        if 'rebase' in repo.extensions():
+        if b'rebase' in repo.extensions():
             rebasetxt = _('Rebase - rebase local commits above pulled changes')
             updateorrebasetxt = _('UpdateOrRebase - pull, then try to update '
                                   'or rebase')
@@ -1106,19 +1112,19 @@ class PostPullDialog(QDialog):
                                   '(rebase is not active!)')
         self._opchecks['rebase'] = chk = QRadioButton(rebasetxt)
         layout.addWidget(chk)
-        chk.setVisible('rebase' in repo.extensions())
+        chk.setVisible(b'rebase' in repo.extensions())
         self._opchecks['updateorrebase'] = chk = QRadioButton(updateorrebasetxt)
         layout.addWidget(chk)
-        chk.setVisible('rebase' in repo.extensions())
+        chk.setVisible(b'rebase' in repo.extensions())
 
-        chk = self._opchecks[repo.postpull]
+        chk = self._opchecks[hglib.tounicode(repo.postpull)]
         chk.setChecked(True)
         chk.show()
 
         self.autoresolve_chk = QCheckBox(_('Automatically resolve merge '
                                            'conflicts where possible'))
         self.autoresolve_chk.setChecked(
-            repo.ui.configbool('tortoisehg', 'autoresolve', True))
+            repoagent.configBool('tortoisehg', 'autoresolve'))
         layout.addWidget(self.autoresolve_chk)
 
         cfglabel = QLabel(_('<a href="config">Launch settings tool...</a>'))
@@ -1149,7 +1155,7 @@ class PostPullDialog(QDialog):
                     if chk.isChecked()))
 
     def accept(self):
-        path = self.repo.vfs.join('hgrc')
+        path = self.repo.vfs.join(b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save post pull operation'),
@@ -1233,7 +1239,7 @@ class SaveDialog(QDialog):
         self._updateUi()
 
     def savePath(self, repo, alias, path, confirm=True):
-        fn = repo.vfs.join('hgrc')
+        fn = repo.vfs.join(b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save an URL'),
@@ -1256,7 +1262,7 @@ class SaveDialog(QDialog):
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
                                 hglib.tounicode(str(e)), parent=self)
         if self.updatesubpaths.isChecked():
-            ctx = repo['.']
+            ctx = repo[b'.']
             for subname in ctx.substate:
                 if ctx.substate[subname][2] != 'hg':
                     continue
@@ -1329,7 +1335,7 @@ class SecureDialog(QDialog):
         repo = repoagent.rawRepo()
         self._url = urlu
         u = parseurl(urlu)
-        assert u.host
+        assert u.host, repr(u)
         uhost = hglib.tounicode(u.host)
         self.setWindowTitle(_('Security: ') + uhost)
         self.setWindowFlags(self.windowFlags() & \
@@ -1343,7 +1349,7 @@ class SecureDialog(QDialog):
         else:
             self.alias, auth = u.host, {}
         self.host = u.host
-        if cleanurl.startswith('svn+https://'):
+        if cleanurl.startswith(b'svn+https://'):
             self.schemes = 'svn+https'
         else:
             self.schemes = None
@@ -1364,11 +1370,11 @@ class SecureDialog(QDialog):
         self.insecureradio = QRadioButton(
             _('No host validation, but still encrypted (bad)'))
         hbox = QHBoxLayout()
-        fprint = repo.ui.config('hostsecurity', u.host + ':fingerprints', '')
+        fprint = repo.ui.config(b'hostsecurity', u.host + b':fingerprints')
         if not fprint:
-            fprint = repo.ui.config('hostfingerprints', u.host, '')
+            fprint = repo.ui.config(b'hostfingerprints', u.host, b'')
             if fprint:
-                fprint = 'sha1:' + fprint
+                fprint = b'sha1:' + fprint
         self.fprintentry = le = QLineEdit(fprint)
         self.fprintradio.toggled.connect(self.fprintentry.setEnabled)
         self.fprintentry.setEnabled(False)
@@ -1386,7 +1392,7 @@ class SecureDialog(QDialog):
         self.cacertradio.setChecked(True) # default
         if fprint:
             self.fprintradio.setChecked(True)
-        elif repo.ui.config('insecurehosts', u.host):
+        elif repo.ui.config(b'insecurehosts', u.host):
             self.insecureradio.setChecked(True)
 
         self.fprintradio.toggled.connect(self._updateUi)
@@ -1397,8 +1403,9 @@ class SecureDialog(QDialog):
         e.addItem(_('TLS 1.0'), 'tls1.0')
         e.addItem(_('TLS 1.1'), 'tls1.1')
         e.addItem(_('TLS 1.2'), 'tls1.2')
-        protocol = repo.ui.config('hostsecurity', '%s:minimumprotocol' % u.host)
-        e.setCurrentIndex(e.findData(hglib.tounicode(protocol or '')))
+        protocol = repo.ui.config(b'hostsecurity',
+                                  b'%s:minimumprotocol' % u.host)
+        e.setCurrentIndex(e.findData(hglib.tounicode(protocol or b'')))
         hbox = QHBoxLayout()
         hbox.addWidget(QLabel(_('Minimum Protocol')))
         hbox.addWidget(self._protocolcombo)
@@ -1427,7 +1434,7 @@ _('''Optional. Password to authenticate with. If not given, and the remote
 site requires basic or digest authentication, the user will be prompted for
 it.'''))
         form.addRow(_('Password'), e)
-        if 'mercurial_keyring' in repo.extensions():
+        if b'mercurial_keyring' in repo.extensions():
             e.clear()
             e.setEnabled(False)
             e.setToolTip(_('Mercurial keyring extension is enabled. '
@@ -1476,7 +1483,7 @@ are expanded in the filename.'''))
     def _onQueryFingerprintFinished(self, ret):
         sess = self._querysess
         if ret == 0:
-            data = str(sess.readAll())
+            data = bytes(sess.readAll())
             self.fprintentry.setText(hglib.tounicode(data).strip())
         else:
             cmdui.errorMessageBox(sess, self, _('Certificate Query Error'))
@@ -1672,7 +1679,7 @@ class OptionsDialog(QDialog):
             _('Temporarily disable configured HTTP proxy'))
         self.noproxycb.setChecked(opts.get('noproxy', False))
         layout.addWidget(self.noproxycb)
-        proxy = repo.ui.config('http_proxy', 'host')
+        proxy = repoagent.configString('http_proxy', 'host')
         self.noproxycb.setEnabled(bool(proxy))
 
         self.debugcb = QCheckBox(
@@ -1682,7 +1689,7 @@ class OptionsDialog(QDialog):
 
         self.mqcb = QCheckBox(_('Work on patch queue (--mq)'))
         self.mqcb.setChecked(opts.get('mq', False))
-        self.mqcb.setVisible('mq' in repo.extensions())
+        self.mqcb.setVisible(b'mq' in repo.extensions())
         layout.addWidget(self.mqcb)
 
         form = QFormLayout()

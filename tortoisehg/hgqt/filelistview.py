@@ -56,20 +56,25 @@ class HgFileListView(QTreeView):
 
     def currentFile(self):
         index = self.currentIndex()
-        return hglib.fromunicode(self.model().filePath(index))
+        model = self.model()
+        assert model is not None
+        return hglib.fromunicode(model.filePath(index))
 
     def setCurrentFile(self, path):
         model = self.model()
+        assert model is not None
         model.fetchMore(QModelIndex())  # make sure path is populated
         self.setCurrentIndex(model.indexFromPath(hglib.tounicode(path)))
 
     def getSelectedFiles(self):
         model = self.model()
+        assert model is not None
         return [hglib.fromunicode(model.filePath(index))
                 for index in self.selectedRows()]
 
     def _initCurrentIndex(self):
         m = self.model()
+        assert m is not None
         if m.rowCount() > 0:
             self.setCurrentIndex(m.index(0, 0))
         else:
@@ -96,6 +101,7 @@ class HgFileListView(QTreeView):
     def _emitFileChanged(self):
         index = self.currentIndex()
         m = self.model()
+        assert m is not None
         if index.isValid():
             # TODO: delete status from fileSelected because it isn't primitive
             # pseudo directory node has no status

@@ -168,7 +168,7 @@ class ChunksWidget(QWidget):
             dlg.exec_()
 
     def revertfile(self):
-        filenames = self.getSelectedFiles()
+        filenames = [hglib.tounicode(f) for f in self.getSelectedFiles()]
         if len(filenames) == 0:
             return
         rev = self.ctx.rev()
@@ -214,9 +214,9 @@ class ChunksWidget(QWidget):
         repo = self.repo
         ui.pushbuffer()
         try:
-            eolmode = ui.config('patch', 'eol', 'strict')
+            eolmode = ui.config(b'patch', b'eol')
             if eolmode.lower() not in patch.eolmodes:
-                eolmode = 'strict'
+                eolmode = b'strict'
             else:
                 eolmode = eolmode.lower()
             # 'updatestate' flag has no effect since hg 1.9
@@ -231,7 +231,7 @@ class ChunksWidget(QWidget):
         except (patch.PatchError, EnvironmentError) as err:
             ok = False
             self.showMessage.emit(hglib.tounicode(str(err)))
-        rejfilere = re.compile(r'\b%s\.rej\b' % re.escape(wfile))
+        rejfilere = re.compile(br'\b%s\.rej\b' % re.escape(wfile))
         for line in ui.popbuffer().splitlines():
             if rejfilere.search(line):
                 if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
@@ -283,12 +283,12 @@ class ChunksWidget(QWidget):
             revertall = qtlib.QuestionMsgBox(_('No chunks remain'), revertmsg)
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
-            fp = util.atomictempfile(ctx._path, 'wb')
+            fp = util.atomictempfile(ctx._path, b'wb')
             buf = pycompat.bytesio()
             try:
                 if ctx._ph.comments:
-                    buf.write('\n'.join(ctx._ph.comments))
-                    buf.write('\n\n')
+                    buf.write(b'\n'.join(ctx._ph.comments))
+                    buf.write(b'\n\n')
                 needsnewline = False
                 for wfile in ctx._fileorder:
                     if wfile == self.currentFile:
@@ -298,8 +298,8 @@ class ChunksWidget(QWidget):
                         for chunk in kchunks:
                             chunk.write(buf)
                     else:
-                        if buf.tell() and buf.getvalue()[-1] != '\n':
-                            buf.write('\n')
+                        if buf.tell() and not buf.getvalue().endswith(b'\n'):
+                            buf.write(b'\n')
                         for chunk in ctx._files[wfile]:
                             chunk.write(buf)
                 fp.write(buf.getvalue())
@@ -323,7 +323,7 @@ class ChunksWidget(QWidget):
                 wlock = repo.wlock()
                 try:
                     # atomictemp can preserve file permission
-                    wf = repo.wvfs(self.currentFile, 'wb', atomictemp=True)
+                    wf = repo.wvfs(self.currentFile, b'wb', atomictemp=True)
                     wf.write(self.diffbrowse.origcontents)
                     wf.close()
                     fp = pycompat.bytesio()
@@ -376,7 +376,7 @@ class ChunksWidget(QWidget):
                 ctx._files[wfile] = chunks
                 ctx._fileorder.append(wfile)
             repo.thgbackup(ctx._path)
-            fp = util.atomictempfile(ctx._path, 'wb')
+            fp = util.atomictempfile(ctx._path, b'wb')
             try:
                 if ctx._ph.comments:
                     fp.write('\n'.join(ctx._ph.comments))
@@ -411,7 +411,7 @@ class ChunksWidget(QWidget):
         ctx = self.ctx
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
-            fp = util.atomictempfile(ctx._path, 'wb')
+            fp = util.atomictempfile(ctx._path, b'wb')
             try:
                 if ctx._ph.comments:
                     fp.write('\n'.join(ctx._ph.comments))
@@ -430,7 +430,7 @@ class ChunksWidget(QWidget):
             repo.thgbackup(fullpath)
             wasadded = wfile in repo[None].added()
             try:
-                commands.revert(repo.ui, repo, fullpath, rev='.',
+                commands.revert(repo.ui, repo, fullpath, rev=b'.',
                                 no_backup=True)
                 if wasadded and os.path.exists(fullpath):
                     os.unlink(fullpath)
@@ -486,7 +486,9 @@ class ChunksWidget(QWidget):
 
     def setContext(self, ctx):
         self.diffbrowse.setContext(ctx)
-        self.filelist.model().setRawContext(ctx)
+        model = self.filelist.model()
+        assert isinstance(model, manifestmodel.ManifestModel)
+        model.setRawContext(ctx)
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)

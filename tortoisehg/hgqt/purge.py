@@ -129,12 +129,12 @@ class PurgeDialog(QDialog):
                     repo.lfstatus = True
                     stat = repo.status(ignored=True, unknown=True)
                     repo.lfstatus = False
-                    trashcan = repo.vfs.join('Trashcan')
+                    trashcan = repo.vfs.join(b'Trashcan')
                     if os.path.isdir(trashcan):
                         trash = os.listdir(trashcan)
                     else:
                         trash = []
-                    self.files = stat[4], stat[5], trash
+                    self.files = stat.unknown, stat.ignored, trash
                 except Exception as e:
                     self.error = str(e)
 
@@ -240,7 +240,7 @@ class PurgeThread(QThread):
 
         if opts['trash']:
             self.showMessage.emit(_('Deleting trash folder...'))
-            trashcan = repo.vfs.join('Trashcan')
+            trashcan = repo.vfs.join(b'Trashcan')
             try:
                 shutil.rmtree(trashcan)
             except EnvironmentError:
@@ -254,9 +254,10 @@ class PurgeThread(QThread):
                              unknown=opts['unknown'], clean=False)
         repo.lfstatus = False
         files = []
-        for k, i in [('unknown', 4), ('ignored', 5)]:
-            if opts[k]:
-                files.extend(status[i])
+        if opts['unknown']:
+            files.extend(status.unknown)
+        if opts['ignored']:
+            files.extend(status.ignored)
 
         def remove(remove_func, name):
             try:

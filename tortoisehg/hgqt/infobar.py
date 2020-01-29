@@ -266,7 +266,7 @@ class InfoBarPlaceholder(QWidget):
         repoagent.busyChanged.connect(self._clearStaleInfo)
 
     def setView(self, view):
-        assert isinstance(view, QTableView)
+        assert isinstance(view, QTableView), repr(view)
         lay = self.layout()
         if self._view:
             lay.removeWidget(self._view)
@@ -383,8 +383,8 @@ class InfoBarPlaceholder(QWidget):
             for label in labelslist:
                 if label.startswith(subrepolabel):
                     # The subrepo "label" is encoded ascii
-                    subrepo = hglib.tounicode(
-                        util.urlreq.unquote(str(label)[len(subrepolabel):]))
+                    subrepo = hglib.tounicode(util.urlreq.unquote(
+                        hglib.fromunicode(label)[len(subrepolabel):]))
                     break
             # Limit the text shown on the info bar to maxlines lines of up to
             # maxwidth chars

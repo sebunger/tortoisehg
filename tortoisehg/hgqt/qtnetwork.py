@@ -12,7 +12,7 @@ from __future__ import absolute_import
 from .qtcore import QT_API
 
 if QT_API == 'PyQt4':
-    from PyQt4.QtNetwork import *
+    from PyQt4.QtNetwork import *  # pytype: disable=import-error
 elif QT_API == 'PyQt5':
     from PyQt5.QtNetwork import *
 else:

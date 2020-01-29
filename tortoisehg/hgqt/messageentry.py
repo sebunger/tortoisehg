@@ -274,5 +274,5 @@ class MessageEntry(qscilib.Scintilla):
 
     def minimumSizeHint(self):
         size = super(MessageEntry, self).minimumSizeHint()
-        size.setHeight(self.fontHeight * 3 / 2)
+        size.setHeight(self.fontHeight * 3 // 2)
         return size

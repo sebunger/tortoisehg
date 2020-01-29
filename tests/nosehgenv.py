@@ -88,6 +88,8 @@ class HgEnvPlugin(plugins.Plugin):
             f.write('mq=\n')
             f.write('delaylock = %s\n'
                     % os.path.join(os.path.dirname(__file__), 'delaylock.py'))
+            # register config defaults
+            f.write('tortoisehg.util.configitems=\n')
         finally:
             f.close()
 

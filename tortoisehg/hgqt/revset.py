@@ -151,7 +151,7 @@ class RevisionSetQuery(QDialog):
         ancestry = _ancestry
 
         repo = repoagent.rawRepo()
-        if 'hgsubversion' in repo.extensions():
+        if b'hgsubversion' in repo.extensions():
             logical = list(logical) + [('fromsvn()',
                     _('all revisions converted from subversion')),]
             ancestry = list(ancestry) + [('svnrev(rev)',

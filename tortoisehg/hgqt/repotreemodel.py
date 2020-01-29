@@ -76,7 +76,9 @@ def iterRepoItemFromXml(source):
         t = xr.readNext()
         if (t == QXmlStreamReader.StartElement
             and xr.name() in ('repo', 'subrepo')):
-            yield repotreeitem.undumpObject(xr)
+            rti = repotreeitem.undumpObject(xr)
+            assert isinstance(rti, repotreeitem.RepoItem)
+            yield rti
 
 def getRepoItemList(root, standalone=False):
     if standalone:

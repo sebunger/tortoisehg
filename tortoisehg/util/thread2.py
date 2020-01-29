@@ -30,17 +30,7 @@ class Thread(threading.Thread):
         if not self.isAlive():
             raise threading.ThreadError("the thread is not active")
 
-        # do we have it cached?
-        if hasattr(self, "_thread_id"):
-            return self._thread_id
-
-        # no, look for it in the _active dict
-        for tid, tobj in threading._active.items():
-            if tobj is self:
-                self._thread_id = tid
-                return tid
-
-        raise AssertionError("could not determine the thread's id")
+        return self.ident
 
     def raise_exc(self, exctype):
         """raises the given exception type in the context of this thread"""

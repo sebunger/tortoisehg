@@ -137,7 +137,7 @@ class _CmdAgentTestBase(unittest.TestCase):
         self.assertEqual(self.hg.path + '\n', sess.readLine())
         self.assertEqual('5', sess.read(1))
         self.assertEqual('3', str(sess.peek(1)))
-        self.assertEqual('3245c60e682\n', str(sess.readAll()))
+        self.assertEqual(b'3245c60e682\n', bytes(sess.readAll()))
 
     def _check_runcommand(self, sess, expectedout, expectedcode=0):
         self.assertFalse(sess.isFinished())
@@ -262,10 +262,10 @@ class CmdAgentServerTest(_CmdAgentTestBase):
                       'from mercurial import registrar\n'
                       'cmdtable = {}\n'
                       'command = registrar.command(cmdtable)\n'
-                      '@command("echoback")\n'
+                      '@command(b"echoback")\n'
                       'def echoback(ui, repo):\n'
                       '    ui.write(ui.fin.read())\n'
-                      '@command("writestdout")\n'
+                      '@command(b"writestdout")\n'
                       'def writestdout(ui, repo, *data):\n'
                       '    stdout = ui.fout.out\n'
                       '    stdout.write("".join(map(unhexlify, data)))\n'

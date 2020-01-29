@@ -62,7 +62,7 @@ class ManifestModelTest(unittest.TestCase):
         hg.update('-R', 'sub', '1')
         hg.commit('-Am', 'update sub')
 
-        os.makedirs(hg.wjoin('deep'))
+        os.makedirs(hg.wjoin(b'deep'))
         hg.clone('-r0', '.', 'deep/sub')
         hg.fappend('.hgsub', 'deep/sub = deep/sub\n')
         hg.commit('-m', 'add deep/sub')

@@ -1,0 +1,9 @@
+Tortoise HG OSX Build scripts
+
+thg and mercurial source repositories are expected under src/thg and src/hg
+
+The build.sh file can be modified to switch between Qt4 and Qt5 versions.
+The build.sh file is expected to be run from the root directory of the project.
+
+It will download the required dependencies and build a dmg file from the current state of the mercurial and thg repositories.
+

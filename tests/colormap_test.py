@@ -5,11 +5,11 @@ from tortoisehg.util import colormap
 
 def setup():
     global _origmaxint
-    _origmaxint = sys.maxint
-    sys.maxint = int((1 << 31) - 1)
+    _origmaxint = sys.maxsize
+    sys.maxsize = int((1 << 31) - 1)
 
 def teardown():
-    sys.maxint = _origmaxint
+    sys.maxsize = _origmaxint
 
 def fakectx(userhash, date, tz=0):
     # AnnotateColorSaturation uses hash() for mapping user to hue
@@ -34,7 +34,7 @@ def test_user_hue():
                0x8: '#aafeff', 0x9: '#aaffdf', 0xa: '#aaffbf', 0xb: '#b4ffaa',
                0xc: '#d4ffaa', 0xd: '#f4ffaa', 0xe: '#ffe9aa', 0xf: '#ffc9aa'}
     for i, c in sorted(samples.items(), key=lambda a: a[0]):
-        assert_equals(c, cm.get_color(fakectx(sys.maxint / 16 * i, 0), 0))
+        assert_equals(c, cm.get_color(fakectx(sys.maxsize // 16 * i, 0), 0))
 
 def test_user_hue_limit():
     cm = colormap.AnnotateColorSaturation(maxhues=8)
@@ -44,7 +44,7 @@ def test_user_hue_limit():
                0x8: '#aabfff', 0x9: '#aaffff', 0xa: '#aaffff', 0xb: '#aaffbf',
                0xc: '#aaffbf', 0xd: '#d4ffaa', 0xe: '#d4ffaa', 0xf: '#ffe9aa'}
     for i, c in sorted(samples.items(), key=lambda a: a[0]):
-        assert_equals(c, cm.get_color(fakectx(sys.maxint / 16 * i, 0), 0))
+        assert_equals(c, cm.get_color(fakectx(sys.maxsize // 16 * i, 0), 0))
 
 SECS_PER_DAY = 24 * 60 * 60
 
@@ -83,7 +83,7 @@ def test_negative_age_calc():
                   '-100 days old')
 
 def test_makeannotatepalette_latest_wins():
-    userstep = sys.maxint / 16
+    userstep = sys.maxsize // 16
     filectxs = [fakectx(0 * userstep, 0), fakectx(1 * userstep, 1),
                 fakectx(2 * userstep, 2), fakectx(3 * userstep, 3),
                 fakectx(4 * userstep, 4)]
@@ -95,7 +95,7 @@ def test_makeannotatepalette_latest_wins():
     assert_equals(set(filectxs[1:]), palfctxs)
 
 def test_makeannotatepalette_fold_same_color():
-    userstep = sys.maxint / 16
+    userstep = sys.maxsize // 16
     filectxs = [fakectx(0 * userstep, 0), fakectx(1 * userstep, 0),
                 fakectx(2 * userstep, 0), fakectx(3 * userstep, 0),
                 fakectx(4 * userstep, 0)]
@@ -120,7 +120,7 @@ def test_makeannotatepalette_mindate_included():
     for _color, fctxs in palette.items():
         palfctxs.update(fctxs)
     for fctx in filectxs[2:]:
-        assert fctx in palfctxs
+        assert fctx in palfctxs, (fctx, palfctxs)
 
 def test_makeannotatepalette_mindate_earlier_than_rev0():
     agestep = 50 * SECS_PER_DAY
@@ -132,4 +132,4 @@ def test_makeannotatepalette_mindate_earlier_than_rev0():
     for _color, fctxs in palette.items():
         palfctxs.update(fctxs)
     for fctx in filectxs:
-        assert fctx in palfctxs
+        assert fctx in palfctxs, (fctx, palfctxs)

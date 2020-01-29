@@ -62,7 +62,7 @@ class Msgfmt:
         """ read po data from self.po and return an iterator """
         output = []
         if isinstance(self.po, str):
-            output = open(self.po, 'rb')
+            output = open(self.po, 'r')
         elif isinstance(self.po, file):
             self.po.seek(0)
             self.openfile = True
@@ -86,15 +86,17 @@ class Msgfmt:
         # the keys are sorted in the .mo file
         keys = sorted(self.messages.keys())
         offsets = []
-        ids = strs = ''
+        ids = strs = b''
         for id in keys:
+            id_bytes = pycompat.sysbytes(id)
+            message_bytes = pycompat.sysbytes(self.messages[id])
             # For each string, we need size and file offset. Each string is
             # NUL terminated; the NUL does not count into the size.
-            offsets.append((len(ids), len(id), len(strs),
-                            len(self.messages[id])))
-            ids += id + '\0'
-            strs += self.messages[id] + '\0'
-        output = ''
+            offsets.append((len(ids), len(id_bytes), len(strs),
+                            len(message_bytes)))
+            ids += id_bytes + b'\0'
+            strs += message_bytes + b'\0'
+        output = b''
         # The header is 7 32-bit unsigned integers. We don't use hash tables,
         # so the keys start right after the index tables.
         keystart = 7*4+16*len(keys)

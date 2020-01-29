@@ -12,7 +12,7 @@ from tortoisehg.util import paths, shlib
 import os
 
 def cachefilepath(repo):
-    return repo.vfs.join("thgstatus")
+    return repo.vfs.join(b"thgstatus")
 
 def run(_ui, *pats, **opts):
 

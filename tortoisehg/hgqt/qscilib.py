@@ -512,7 +512,7 @@ class Scintilla(ScintillaCompat):
     def setIndentationsUseTabs(self, tabs):
         self.autoUseTabs = (tabs == -1)
         if self.autoUseTabs and self.lines():
-            tabs = findTabIndentsInLines(hglib.fromunicode(self.text()))
+            tabs = findTabIndentsInLines(self.text().splitlines())
         super(Scintilla, self).setIndentationsUseTabs(tabs)
 
     @pyqtSlot(bool)
@@ -684,11 +684,11 @@ class KeyPressInterceptor(QObject):
     def __init__(self, parent=None, keys=None, keyseqs=None):
         super(KeyPressInterceptor, self).__init__(parent)
         self._keys = {Qt.Key_Escape}
-        self._keyseqs = {QKeySequence.Refresh}
+        self._keyseqs = [QKeySequence.Refresh]
         if keys:
             self._keys.update(keys)
         if keyseqs:
-            self._keyseqs.update(keyseqs)
+            self._keyseqs.extend(keyseqs)
 
     def eventFilter(self, watched, event):
         if event.type() != QEvent.KeyPress:
@@ -748,14 +748,14 @@ def readFile(editor, filename, encoding=None):
         return False
     try:
         earlybytes = f.read(4096)
-        if '\0' in earlybytes:
+        if b'\0' in earlybytes:
             qtlib.WarningMsgBox(_('Unable to read file'),
                                 _('This appears to be a binary file.'),
                                 parent=editor)
             return False
 
         f.seek(0)
-        data = str(f.readAll())
+        data = bytes(f.readAll())
         if f.error():
             qtlib.WarningMsgBox(_('Unable to read file'),
                                 _('An error occurred while reading the file.'),

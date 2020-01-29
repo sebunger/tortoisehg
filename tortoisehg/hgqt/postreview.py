@@ -380,14 +380,15 @@ class PostReviewDialog(QDialog):
 
         output = hglib.fromunicode(''.join(self._cmdoutputs), 'replace')
 
-        saved = 'saved:' in output
-        published = 'published:' in output
+        saved = b'saved:' in output
+        published = b'published:' in output
         if saved or published:
             if saved:
-                url = output.split('saved: ').pop().strip()
+                url = hglib.tounicode(output.split(b'saved: ').pop().strip())
                 msg = _('Review draft posted to %s\n') % url
             else:
-                url = output.split('published: ').pop().strip()
+                url = output.split(b'published: ').pop().strip()
+                url = hglib.tounicode(url)
                 msg = _('Review published to %s\n') % url
 
             QDesktopServices.openUrl(QUrl(url))
@@ -395,8 +396,8 @@ class PostReviewDialog(QDialog):
             qtlib.InfoMsgBox(_('Review Board'), _('Success'),
                                msg, parent=self)
         else:
-            error = output.split('abort: ').pop().strip()
-            if error[:29] == "HTTP Error: basic auth failed":
+            error = output.split(b'abort: ').pop().strip()
+            if error[:29] == b"HTTP Error: basic auth failed":
                 if self.passwordPrompt():
                     self.accept()
                 else:
@@ -405,7 +406,7 @@ class PostReviewDialog(QDialog):
                     return
             else:
                 qtlib.ErrorMsgBox(_('Review Board'),
-                                  _('Error'), error)
+                                  _('Error'), hglib.tounicode(error))
 
         self.writeSettings()
         super(PostReviewDialog, self).accept()

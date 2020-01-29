@@ -108,7 +108,7 @@ class PruneWidget(cmdui.AbstractCmdWidget):
             # new query is already or about to be running
             return
         if ret == 0:
-            revs = pycompat.maplist(int, str(sess.readAll()).splitlines())
+            revs = pycompat.maplist(int, bytes(sess.readAll()).splitlines())
         else:
             revs = []
         self._cslist.update(revs)

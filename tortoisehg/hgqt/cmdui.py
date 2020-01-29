@@ -47,6 +47,11 @@ from . import (
     qscilib,
 )
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Optional,
+    )
+
 def startProgress(topic, status):
     topic, item, pos, total, unit = topic, '...', status, None, ''
     return topic, pos, item, unit, total
@@ -139,7 +144,7 @@ class ThgStatusBar(QStatusBar):
 
     @pyqtSlot()
     def clearProgress(self):
-        keys = self.topics.keys()
+        keys = list(self.topics)
         for key in keys:
             self._removeProgress(key)
 
@@ -291,11 +296,14 @@ class InteractiveUiHandler(cmdcore.UiHandler):
 
     # Unlike QObject, "uiparent" does not own this handler
     def __init__(self, uiparent=None):
+        # type: (Optional[QWidget]) -> None
         super(InteractiveUiHandler, self).__init__()
         self._prompttext = ''
         self._promptmode = cmdcore.UiHandler.NoInput
         self._promptdefault = ''
-        self._uiparentref = uiparent and weakref.ref(uiparent)
+        self._uiparentref = None  # type: Optional[weakref.ReferenceType[QWidget]]
+        if uiparent:
+            self._uiparentref = weakref.ref(uiparent)
 
     def setPrompt(self, text, mode, default=None):
         self._prompttext = pycompat.unicode(text)
@@ -339,7 +347,7 @@ class InteractiveUiHandler(cmdcore.UiHandler):
             return button.response
 
     def _parentWidget(self):
-        p = self._uiparentref and self._uiparentref()
+        p = self._uiparentref() if self._uiparentref else None
         while p and not p.isWidgetType():
             p = p.parent()
         return p

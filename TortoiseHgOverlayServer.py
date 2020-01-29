@@ -73,7 +73,7 @@ class Logger:
             rename(name, oname)
         except:
             pass
-        self.file = posixfile(name, 'wb')
+        self.file = posixfile(name, b'wb')
         self.msg('%s, Version %s' % (APP_TITLE, version.version()))
         self.msg('Logging to file started')
 
@@ -400,7 +400,7 @@ def remove(args):
         for r in sorted(roots):
             tfn = os.path.join(r, '.hg', 'thgstatus')
             try:
-                f = posixfile(tfn, 'rb')
+                f = posixfile(tfn, b'rb')
                 e = f.readline()
                 f.close()
                 if not e.startswith('@@noicons'):

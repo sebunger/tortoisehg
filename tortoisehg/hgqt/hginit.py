@@ -58,7 +58,7 @@ class InitWidget(cmdui.AbstractCmdWidget):
         form.addRow(_('Destination path:'), destbox)
 
         # options checkboxes
-        if ui.config('tortoisehg', 'initskel'):
+        if ui.config(b'tortoisehg', b'initskel'):
             l = _('Copy working directory files from skeleton')
         else:
             l = _('Create special files (.hgignore, ...)')

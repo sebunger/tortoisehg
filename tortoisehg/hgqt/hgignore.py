@@ -92,7 +92,7 @@ class HgignoreDialog(QDialog):
         repo = repoagent.rawRepo()
         hbox = QHBoxLayout()
         vbox.addLayout(hbox)
-        ignorefiles = [repo.wjoin('.hgignore')]
+        ignorefiles = [repo.wjoin(b'.hgignore')]
         for name, value in repo.ui.configitems('ui'):
             if name == 'ignore' or name.startswith('ignore.'):
                 ignorefiles.append(util.expandpath(value))
@@ -249,22 +249,22 @@ class HgignoreDialog(QDialog):
 
     def addEntry(self):
         newfilter = hglib.fromunicode(self.le.text()).strip()
-        if newfilter == '':
+        if newfilter == b'':
             return
         self.le.clear()
         if self.recombo.currentIndex() == 0:
-            test = 'glob:' + newfilter
+            test = b'glob:' + newfilter
             try:
-                match.match(self.repo.root, '', [], [test])
+                match.match(self.repo.root, b'', [], [test])
                 self.insertFilters([newfilter], False)
             except error.Abort as inst:
                 qtlib.WarningMsgBox(_('Invalid glob expression'), str(inst),
                                     parent=self)
                 return
         else:
-            test = 'relre:' + newfilter
+            test = b'relre:' + newfilter
             try:
-                match.match(self.repo.root, '', [], [test])
+                match.match(self.repo.root, b'', [], [test])
                 re.compile(test)
                 self.insertFilters([newfilter], True)
             except (error.Abort, re.error) as inst:
@@ -276,7 +276,7 @@ class HgignoreDialog(QDialog):
         try:
             with open(self.ignorefile, 'rb') as fp:
                 l = fp.readlines()
-            self.doseoln = l[0].endswith('\r\n')
+            self.doseoln = l[0].endswith(b'\r\n')
         except (IOError, ValueError, IndexError):
             self.doseoln = os.name == 'nt'
             l = []
@@ -290,7 +290,7 @@ class HgignoreDialog(QDialog):
         try:
             self.repo.thginvalidate()
             self.repo.lfstatus = True
-            self.lclunknowns = self.repo.status(unknown=True)[4]
+            self.lclunknowns = self.repo.status(unknown=True).unknown
             self.repo.lfstatus = False
         except (EnvironmentError, error.RepoError) as e:
             qtlib.WarningMsgBox(_('Unable to read repository status'),
@@ -327,7 +327,7 @@ class HgignoreDialog(QDialog):
         hasignore = os.path.exists(self.repo.vfs.join(self.ignorefile))
 
         try:
-            f = util.atomictempfile(self.ignorefile, 'wb', createmode=None)
+            f = util.atomictempfile(self.ignorefile, b'wb', createmode=None)
             f.write(out)
             f.close()
             if not hasignore:

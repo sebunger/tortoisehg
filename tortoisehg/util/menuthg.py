@@ -169,8 +169,9 @@ class thg_menu(object):
             self.sep[pos] = False
             self.menus[pos].append(TortoiseMenuSep())
         self.menus[pos].append(TortoiseMenu(
-                thgcmenu[hgcmd]['label']['str'],
-                thgcmenu[hgcmd]['help']['str'], hgcmd,
+                hglib.tounicode(thgcmenu[hgcmd]['label']['str']),
+                hglib.tounicode(thgcmenu[hgcmd]['help']['str']),
+                hgcmd,
                 thgcmenu[hgcmd]['icon'], state))
 
     def add_sep(self):
@@ -208,9 +209,9 @@ class menuThg:
     def __init__(self, internal=False):
         self.name = "TortoiseHg"
         promoted = []
-        pl = hglib.loadui().config('tortoisehg', 'promoteditems', 'commit,log')
-        for item in pl.split(','):
-            item = item.strip()
+        pl = hglib.loadui().config(b'tortoisehg', b'promoteditems', b'commit,log')
+        for item in pl.split(b','):
+            item = hglib.tounicode(item.strip())
             if item:
                 promoted.append(item)
         if internal:
@@ -290,7 +291,7 @@ class menuThg:
         new = bool(states & {cachethg.UNKNOWN, cachethg.IGNORED})
 
         menu = thg_menu(repo.ui, self.promoted, self.name)
-        if changed or cachethg.UNKNOWN in states or 'qtip' in repo['.'].tags():
+        if changed or cachethg.UNKNOWN in states or b'qtip' in repo[b'.'].tags():
             menu.add_menu('commit')
         if hashgignore or new and len(states) == 1:
             menu.add_menu('hgignore')
@@ -298,7 +299,7 @@ class menuThg:
             menu.add_menu('status')
 
         # Visual Diff (any extdiff command)
-        has_vdiff = repo.ui.config('tortoisehg', 'vdiff', 'vdiff') != ''
+        has_vdiff = repo.ui.config(b'tortoisehg', b'vdiff', b'vdiff') != b''
         if has_vdiff and modified:
             menu.add_menu('vdiff')
 
