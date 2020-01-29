@@ -55,7 +55,7 @@ class MergeDialog(QWizard):
 
     def __init__(self, repoagent, otherrev, parent=None):
         super(MergeDialog, self).__init__(parent)
-        assert isinstance(otherrev, int)
+        assert isinstance(otherrev, int), repr(otherrev)
         self._repoagent = repoagent
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
@@ -203,7 +203,7 @@ class SummaryPage(BasePage):
         ## current revision
         local_sep = qtlib.LabeledSeparator(_('Merge to (working directory)'))
         self.layout().addWidget(local_sep)
-        localCsInfo = create(repo['.'].rev())
+        localCsInfo = create(repo[b'.'].rev())
         self.layout().addWidget(localCsInfo)
         self.localCsInfo = localCsInfo
 
@@ -402,9 +402,9 @@ class MergePage(BasePage):
         ucount = 0
         rcount = 0
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
-            if status == 'u':
+            if status == b'u':
                 ucount += 1
-            if status == 'r':
+            if status == b'r':
                 rcount += 1
         if ucount:
             if self.field('autoresolve'):
@@ -548,7 +548,7 @@ class CommitPage(BasePage):
         self.layout().addWidget(skiplast)
 
         hblayout = QHBoxLayout()
-        self.opts = commit.readopts(self.repo.ui)
+        self.opts = commit.readopts(self._repoagent)
         self.optionsbtn = QPushButton(_('Commit Options'))
         self.optionsbtn.clicked.connect(self.details)
         hblayout.addWidget(self.optionsbtn)
@@ -684,5 +684,5 @@ class ResultPage(BasePage):
 
     def currentPage(self):
         super(ResultPage, self).currentPage()
-        self.mergeCsInfo.update(self.repo['tip'])
+        self.mergeCsInfo.update(self.repo[b'tip'])
         self.wizard().setOption(QWizard.NoCancelButton, True)

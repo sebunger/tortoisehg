@@ -10,7 +10,6 @@ import time
 import sys
 import os
 import shutil
-import cgi
 import tempfile
 import re
 import tarfile
@@ -29,8 +28,8 @@ from distutils.command.clean import clean as _clean_orig
 from distutils.spawn import spawn, find_executable
 from i18n.msgfmt import Msgfmt
 
-thgcopyright = 'Copyright (C) 2010-2019 Steve Borho and others'
-hgcopyright = 'Copyright (C) 2005-2019 Matt Mackall and others'
+thgcopyright = 'Copyright (C) 2010-2020 Steve Borho and others'
+hgcopyright = 'Copyright (C) 2005-2020 Matt Mackall and others'
 
 if sys.version_info[0] >= 3:
     unicode = str  # pycompat.unicode
@@ -288,7 +287,8 @@ class build_ui(Command):
     _wrappeduic = False
     @classmethod
     def _wrapuic(cls):
-        """wrap uic to use gettext's _() in place of tr()"""
+        """wrap uic to use gettext's _() in place of
+        QtGui.QApplication.translate as _translate()"""
         if cls._wrappeduic:
             return
 
@@ -308,7 +308,8 @@ class build_ui(Command):
 
         class _i18n_string(qtproxies.i18n_string):
             def __str__(self):
-                return "_('%s')" % self.string.encode('string-escape')
+                # Note: ignoring self.disambig and qtproxies.i18n_context
+                return '_(%s)' % qtproxies.as_string(self.string)
         qtproxies.i18n_string = _i18n_string
 
         cls._wrappeduic = True
@@ -354,14 +355,16 @@ class build_qrc(Command):
         return os.path.join(os.path.dirname(mod.__file__), rcc)
 
     def _generate_qrc(self, qrc_file, srcfiles, prefix):
+        from tortoisehg.hgqt import qtlib
         basedir = os.path.dirname(qrc_file)
         with open(qrc_file, 'w') as f:
             f.write('<!DOCTYPE RCC><RCC version="1.0">\n')
-            f.write('  <qresource prefix="%s">\n' % cgi.escape(prefix))
+            f.write('  <qresource prefix="%s">\n' % qtlib.htmlescape(prefix))
             for e in srcfiles:
                 relpath = e[len(basedir) + 1:]
                 f.write('    <file>%s</file>\n'
-                        % cgi.escape(relpath.replace(os.path.sep, '/')))
+                        % qtlib.htmlescape(relpath.replace(os.path.sep, '/'),
+                                           False))
             f.write('  </qresource>\n')
             f.write('</RCC>\n')
 
@@ -669,12 +672,18 @@ def setup_osx(version):
                      'PyQt4.QtHelp', 'PyQt4.QtMultimedia', 'PyQt4.QtOpenGL',
                      'PyQt4.QtScript', 'PyQt4.QtScriptTools', 'PyQt4.QtSql',
                      'PyQt4.QtTest', 'PyQt4.QtWebKit', 'PyQt4.QtXmlPatterns',
+                     'PyQt4.QtXmlPatterns', 'PyQt5.QtDBus',
+                     'PyQt5.QtDeclarative', 'PyQt5.QtDesigner', 'PyQt5.QtHelp',
+                     'PyQt5.QtMultimedia', 'PyQt5.QtOpenGL', 'PyQt5.QtScript',
+                     'PyQt5.QtScriptTools', 'PyQt5.QtSql', 'PyQt5.QtTest',
+                     'PyQt5.QtWebKit', 'PyQt5.QtXmlPatterns', 'PyQt5.phonon',
                      'py2app', 'setup', 'setuptools', 'unittest', 'PIL'],
 
         'extra_scripts': ['contrib/hg'],
-        'iconfile': 'contrib/TortoiseHg.icns',
+        'iconfile': 'contrib/packaging/macos/TortoiseHg.icns',
         'includes': ['email.mime.text', 'sip'],
-        'packages': ['hgext', 'mercurial', 'pygments', 'tortoisehg'],
+        'packages': ['certifi', 'hgext', 'iniparse', 'keyring', 'mercurial',
+                     'pygments', 'tortoisehg'],
 
         'plist': {
             'CFBundleDisplayName': 'TortoiseHg',
@@ -688,6 +697,7 @@ def setup_osx(version):
                 # console, the encoding would be set to "ascii" by default
                 'HGENCODING': 'utf-8',
                 'THG_OSX_APP': '1',
+                'QT_API': QT_API,
             },
             'NSHumanReadableCopyright': thgcopyright,
         },

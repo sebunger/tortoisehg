@@ -139,7 +139,7 @@ class QFoldDialog(QDialog):
         self.summ.setText(hglib.tounicode(txt))
 
     def composeMsg(self, patches):
-        descs = [scmutil.revsymbol(self.repo, 'qtip').description()]
+        descs = [scmutil.revsymbol(self.repo, b'qtip').description()]
         # lookup of unapplied patches is handled by thgrepo hack
         descs.extend(self.repo[p].description() for p in patches)
         return u'\n* * *\n'.join(map(hglib.tounicode, descs))

@@ -51,15 +51,16 @@ class GraftDialog(QDialog):
 
         self._repoagent = repoagent
         self._cmdsession = cmdcore.nullCmdSession()
-        self._graftstatefile = self.repo.vfs.join('graftstate')
+        self._graftstatefile = self.repo.vfs.join(b'graftstate')
         self.valid = True
 
-        def cleanrevlist(revlist):
-            return [scmutil.revsymbol(self.repo, rev).rev() for rev in revlist]
-        self.sourcelist = cleanrevlist(opts.get('source', ['.']))
+        self.sourcelist = [
+            scmutil.revsymbol(self.repo, hglib.fromunicode(rev)).rev()
+            for rev in opts.get('source', ['.'])]
         currgraftrevs = self.graftstate()
         if currgraftrevs:
-            currgraftrevs = cleanrevlist(currgraftrevs)
+            currgraftrevs = [scmutil.revsymbol(self.repo, rev).rev()
+                             for rev in currgraftrevs]
             if self.sourcelist != currgraftrevs:
                 res = qtlib.CustomPrompt(_('Interrupted graft operation found'),
                     _('An interrupted graft operation has been found.\n\n'
@@ -89,9 +90,9 @@ class GraftDialog(QDialog):
         self.cslist = cslist.ChangesetList(self.repo)
         self._updateSource(0)
         srcb.layout().addWidget(self.cslist)
-        self.layout().addWidget(srcb)
+        box.addWidget(srcb)
 
-        destrev = self.repo['.'].rev()
+        destrev = self.repo[b'.'].rev()
         style = csinfo.panelstyle(selectable=True)
         destb = QGroupBox(_('To graft destination'))
         destb.setLayout(QVBoxLayout())
@@ -99,10 +100,10 @@ class GraftDialog(QDialog):
         dest = csinfo.create(self.repo, destrev, style, withupdate=True)
         destb.layout().addWidget(dest)
         self.destcsinfo = dest
-        self.layout().addWidget(destb)
+        box.addWidget(destb)
 
         sep = qtlib.LabeledSeparator(_('Options'))
-        self.layout().addWidget(sep)
+        box.addWidget(sep)
 
         self._optchks = {}
         for name, text in [
@@ -113,15 +114,15 @@ class GraftDialog(QDialog):
                 ('autoresolve', _('Automatically resolve merge conflicts '
                                   'where possible'))]:
             self._optchks[name] = w = QCheckBox(text)
-            self.layout().addWidget(w)
+            box.addWidget(w)
 
         self._cmdlog = cmdui.LogWidget(self)
         self._cmdlog.hide()
-        self.layout().addWidget(self._cmdlog, 2)
+        box.addWidget(self._cmdlog, 2)
         self._stbar = cmdui.ThgStatusBar(self)
         self._stbar.setSizeGripEnabled(False)
         self._stbar.linkActivated.connect(self.linkActivated)
-        self.layout().addWidget(self._stbar)
+        box.addWidget(self._stbar)
 
         bbox = QDialogButtonBox()
         self.cancelbtn = bbox.addButton(QDialogButtonBox.Cancel)
@@ -130,7 +131,7 @@ class GraftDialog(QDialog):
         self.graftbtn.clicked.connect(self.graft)
         self.abortbtn = bbox.addButton(_('Abort'), QDialogButtonBox.ActionRole)
         self.abortbtn.clicked.connect(self.abort)
-        self.layout().addWidget(bbox)
+        box.addWidget(bbox)
         self.bbox = bbox
 
         self._wctxcleaner = wctxcleaner.WctxCleaner(repoagent, self)
@@ -154,13 +155,13 @@ class GraftDialog(QDialog):
         return self._repoagent.rawRepo()
 
     def _readSettings(self):
-        ui = self.repo.ui
         qs = QSettings()
         qs.beginGroup('graft')
         for n, w in self._optchks.items():
             if n == 'autoresolve':
-                w.setChecked(ui.configbool('tortoisehg', n,
-                                           qtlib.readBool(qs, n, True)))
+                w.setChecked(
+                    self._repoagent.configBool('tortoisehg', n,
+                                               qtlib.readBool(qs, n, True)))
             else:
                 w.setChecked(qtlib.readBool(qs, n))
         qs.endGroup()
@@ -259,7 +260,7 @@ class GraftDialog(QDialog):
 
     def checkResolve(self):
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
-            if status == 'u':
+            if status == b'u':
                 txt = _('Graft generated merge <b>conflicts</b> that must '
                         'be <a href="resolve"><b>resolved</b></a>')
                 self.graftbtn.setEnabled(False)

@@ -83,7 +83,7 @@ class BaseMenuActions(QObject):
         if ok:
             return pycompat.unicode(newtext)
 
-    def _log(self, msg, label='ui.debug'):
+    def _log(self, msg, label=b'ui.debug'):
         try:
             wb = self._findWorkbench()
             wb.log.output(msg, label=label)

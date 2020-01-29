@@ -270,7 +270,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         if len(text) == 0:
             self.commandChanged.emit()
             return
-        wdrev = str(self.repo['.'].rev())
+        wdrev = str(self.repo[b'.'].rev())
         if text == WD_PARENT:
             text = wdrev
         else:

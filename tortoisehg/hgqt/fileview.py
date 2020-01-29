@@ -831,7 +831,7 @@ class _FileViewControl(_AbstractViewControl):
 
     def display(self, fd):
         if fd.contents:
-            filename = hglib.fromunicode(fd.filePath())
+            filename = fd.filePath()
             lexer = lexers.getlexer(self._ui, filename, fd.contents, self)
             self._sci.setLexer(lexer)
             if lexer is None:
@@ -1117,11 +1117,11 @@ class _AnnotateViewControl(_AbstractViewControl):
         if ret != 0:
             return
         repo = self._repoAgentForFile().rawRepo()
-        data = util.pickle.loads(str(sess.readAll()))
+        data = util.pickle.loads(bytes(sess.readAll()))
         links = []
         fctxcache = {}  # (path, rev): fctx
-        for l in data[0]['lines']:
-            path, rev, lineno = l['path'], l['rev'], l['lineno']
+        for l in data[0][b'lines']:
+            path, rev, lineno = l[b'path'], l[b'rev'], l[b'lineno']
             try:
                 fctx = fctxcache[path, rev]
             except KeyError:
@@ -1385,7 +1385,7 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
             pos = self._sci.positionFromLineIndex(chunk.lineno, llen - mlen - 1)
             self._sci.SendScintilla(qsci.SCI_SETTARGETSTART, pos)
             self._sci.SendScintilla(qsci.SCI_SETTARGETEND, pos + mlen)
-            self._sci.SendScintilla(qsci.SCI_REPLACETARGET, 0, '')
+            self._sci.SendScintilla(qsci.SCI_REPLACETARGET, 0, b'')
             self._sci.setReadOnly(True)
 
         if not chunk.excluded and not inclmarked:

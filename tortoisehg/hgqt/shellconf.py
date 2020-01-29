@@ -232,7 +232,7 @@ class ShellConfigWindow(QDialog):
                 vars[name][0] = evalfunc(v)
             except (WindowsError, EnvironmentError):
                 pass
-            if cbattr != None:
+            if cbattr is not None:
                 checkbutton = getattr(self, cbattr)
                 checkbutton.setChecked(vars[name][0])
 

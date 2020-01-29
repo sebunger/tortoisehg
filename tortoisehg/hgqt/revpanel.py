@@ -8,8 +8,6 @@
 
 from __future__ import absolute_import
 
-import cgi
-
 from mercurial import (
     cmdutil,
     error,
@@ -45,12 +43,13 @@ def revid_markup(revid, **kargs):
 
 def data_func(widget, item, ctx):
     def summary_line(desc):
-        return hglib.longsummary(desc.replace('\0', ''))
+        return hglib.longsummary(desc.replace(b'\0', b''))
     def revline_data(ctx, hl=False, branch=None):
         if hglib.isbasestring(ctx):
             return ctx
         desc = ctx.description()
-        return str(ctx.rev()), str(ctx), summary_line(desc), hl, branch
+        return (str(ctx.rev()), str(ctx), summary_line(desc), hl,
+                hglib.tounicode(branch))
     def format_ctxlist(ctxlist):
         if not ctxlist:
             return None
@@ -115,7 +114,7 @@ def create_markup_func(ui):
         if linkpattern is None:
             return mrevid
 
-        if linkpattern == 'cset:{node|short}':
+        if linkpattern == b'cset:{node|short}':
             # this is the linkpattern for thg internal hyperlinks
             href = 'cset:%s' % revid
         else:
@@ -123,14 +122,14 @@ def create_markup_func(ui):
                 return mrevid
             try:
                 # evaluates a generic mercurial template for changeset.link
-                href = cmdutil.rendertemplate(ctx, linkpattern)
+                href = hglib.tounicode(cmdutil.rendertemplate(ctx, linkpattern))
             except (error.Abort, error.ParseError):
                 return mrevid
 
-        return '<a href="%s">%s</a>' % (cgi.escape(href, True), mrevid)
+        return '<a href="%s">%s</a>' % (qtlib.htmlescape(href), mrevid)
 
     def revline_markup(revnum, revid, summary, highlight=None,
-                       branch=None, linkpattern='cset:{node|short}', ctx=None):
+                       branch=None, linkpattern=b'cset:{node|short}', ctx=None):
         def branch_markup(branch):
             opts = dict(fg='black', bg='#aaffaa')
 
@@ -154,9 +153,9 @@ def create_markup_func(ui):
         if item in ('cset', 'graft', 'transplant', 'mqoriginalparent',
                     'p4', 'svn', 'converted'):
             if item == 'cset':
-                linkpattern = ui.config('tortoisehg', 'changeset.link', None)
+                linkpattern = ui.config(b'tortoisehg', b'changeset.link')
             else:
-                linkpattern = 'cset:{node|short}'
+                linkpattern = b'cset:{node|short}'
             if hglib.isbasestring(value):
                 return revid_markup(value)
             return revline_markup(linkpattern=linkpattern, *value, ctx=widget.ctx)
@@ -198,8 +197,12 @@ def nomarkup(widget, item, value):
     csets = []
     if item == 'ishead':
         if value is False:
-            text = _('Not a head revision!')
-            return qtlib.markup(text, fg='red', weight='bold')
+            if widget.custom['isAmend']:
+                text = _('Not a head revision.')
+                return qtlib.markup(text, weight='bold')
+            else:
+                text = _('Not a head revision!')
+                return qtlib.markup(text, fg='red', weight='bold')
         raise csinfo.UnknownItem(item)
     elif item == 'isclose':
         if value is True:

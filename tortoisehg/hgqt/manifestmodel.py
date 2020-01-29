@@ -77,7 +77,7 @@ class ManifestModel(QAbstractItemModel):
         self._repoagent = repoagent
 
         self._namefilter = pycompat.unicode(namefilter or '')
-        assert all(c in 'MARSC' for c in statusfilter)
+        assert all(c in 'MARSC' for c in statusfilter), repr(statusfilter)
         self._statusfilter = statusfilter
         self._changedfilesonly = False
         self._nodeop = _nodeopmap[bool(flat)]
@@ -332,7 +332,7 @@ class ManifestModel(QAbstractItemModel):
     def setStatusFilter(self, status):
         """Filter file tree by change status 'MARSC'"""
         status = str(status)
-        assert all(c in 'MARSC' for c in status)
+        assert all(c in 'MARSC' for c in status), repr(status)
         if self._statusfilter == status:
             return  # for performance reason
         self._statusfilter = status
@@ -372,7 +372,7 @@ class ManifestModel(QAbstractItemModel):
     def fetchMore(self, parent):
         if parent.isValid() or self._rootpopulated:
             return
-        assert len(self._rootentry) == 0
+        assert len(self._rootentry) == 0, self._rootentry
         newroote = self._rootentry.copyskel()
         self._populateNodes(newroote)
         last = len(newroote) - 1
@@ -497,7 +497,7 @@ class _Entry(object):
         return e
 
     def putchild(self, name, e):
-        assert not e.name and not e.parent
+        assert not e.name and not e.parent, (e.name, e.parent)
         e._name = name
         e._parent = self
         if name not in self._child:
@@ -535,24 +535,24 @@ def _samectx(ctx1, ctx2):
 
 # TODO: visual feedback to denote query type and error as in repofilter
 def _makematcher(repo, ctx, pat, changedonly):
-    cwd = ''  # always relative to repo root
+    cwd = b''  # always relative to repo root
     patterns = []
-    if pat and ':' not in pat and '*' not in pat:
+    if pat and b':' not in pat and b'*' not in pat:
         # mimic case-insensitive partial string match
-        patterns.append('relre:(?i)' + re.escape(pat))
+        patterns.append(b'relre:(?i)' + re.escape(pat))
     elif pat:
         patterns.append(pat)
 
     include = []
     if changedonly:
-        include.extend('path:%s' % p for p in ctx.files())
+        include.extend(b'path:%s' % p for p in ctx.files())
         if not include:
             # no match
             return scmutil.matchfiles(repo, [])  # TODO: use matchmod.never()
 
     try:
         return matchmod.match(repo.root, cwd, patterns, include=include,
-                              default='relglob', auditor=repo.auditor, ctx=ctx)
+                              default=b'relglob', auditor=repo.auditor, ctx=ctx)
     except (error.Abort, error.ParseError):
         # no match
         return scmutil.matchfiles(repo, [])  # TODO: use matchmod.never()
@@ -655,7 +655,7 @@ def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
             try:
                 srepo = ctx.sub(path)._repo
                 e.ctx = scmutil.revsymbol(srepo, substate[1])
-                e.pctx = scmutil.revsymbol(srepo, psubstate[1] or 'null')
+                e.pctx = scmutil.revsymbol(srepo, psubstate[1] or b'null')
                 _populaterepo(e, srepo, nodeop, statusfilter, smatch)
             except (error.RepoError, EnvironmentError):
                 pass

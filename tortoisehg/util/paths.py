@@ -5,22 +5,32 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+
+import os
+import shlex
+import sys
+
+import mercurial
+from mercurial import (
+    encoding,
+    pycompat,
+)
 
 try:
-    from tortoisehg.util.config import (icon_path, bin_path, license_path,
-                                        locale_path)
+    from .config import (
+        bin_path,
+        icon_path,
+        license_path,
+        locale_path,
+    )
 except ImportError:
     icon_path, bin_path, license_path, locale_path = None, None, None, None
 
-import os, sys, shlex
-import mercurial
-
 _hg_command = None
 
-def find_root(path=None):
-    p = path or os.getcwd()
-    while not os.path.isdir(os.path.join(p, ".hg")):
+def _find_root(p, dn):
+    while not os.path.isdir(os.path.join(p, dn)):
         oldp = p
         p = os.path.dirname(p)
         if p == oldp:
@@ -28,6 +38,12 @@ def find_root(path=None):
         if not os.access(p, os.R_OK):
             return None
     return p
+
+def find_root(path=None):
+    return _find_root(path or os.getcwd(), '.hg')
+
+def find_root_bytes(path=None):
+    return _find_root(path or encoding.getcwd(), b'.hg')
 
 def get_tortoise_icon(icon):
     "Find a tortoisehg icon"
@@ -120,8 +136,14 @@ if os.name == 'nt':
         return [sys.executable] + sys.argv[:1]
 
     def is_unc_path(path):
-        unc, rest = os.path.splitunc(path)
-        return bool(unc)
+        # splitdrive() on py2 didn't get UNC support until 2.7.8 in 2014, which
+        # means it may not be available on CentOS 7, for example.
+        if pycompat.ispy3:
+            unc, rest = os.path.splitdrive(path)
+            return len(unc) > 2
+        else:
+            unc, rest = os.path.splitunc(path)
+            return bool(unc)
 
     def is_on_fixed_drive(path):
         if is_unc_path(path):
@@ -129,6 +151,7 @@ if os.name == 'nt':
             return False
         drive, remain = os.path.splitdrive(path)
         if drive:
+            drive = pycompat.fsdecode(drive)
             return win32file.GetDriveType(drive) == win32file.DRIVE_FIXED
         else:
             return False

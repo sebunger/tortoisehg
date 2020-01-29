@@ -526,5 +526,5 @@ class RepoFilterBar(QToolBar):
         self._updateShowHiddenBtnState()
 
     def _updateShowHiddenBtnState(self):
-        hashidden = bool(repoview.filterrevs(self._repo, 'visible'))
+        hashidden = bool(repoview.filterrevs(self._repo, b'visible'))
         self.showHiddenBtn.setEnabled(hashidden)

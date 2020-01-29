@@ -121,9 +121,9 @@ class CompressDialog(QDialog):
 
     def commit(self):
         tip, base = self.revs
-        revs = [c for c in self.repo.revs('%s::%s' % (base, tip)) if c != base]
+        revs = [c for c in self.repo.revs(b'%s::%s' % (base, tip)) if c != base]
         descs = [self.repo[c].description() for c in revs]
-        self.repo.vfs('cur-message.txt', 'w').write('\n* * *\n'.join(descs))
+        self.repo.vfs(b'cur-message.txt', b'w').write(b'\n* * *\n'.join(descs))
 
         dlg = commit.CommitDialog(self._repoagent, [], {}, self)
         dlg.finished.connect(dlg.deleteLater)

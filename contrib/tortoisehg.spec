@@ -13,7 +13,7 @@ BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:  noarch
 BuildRequires:  python, python-devel, gettext, python-sphinx
 BuildRequires:  PyQt4-devel, desktop-file-utils
-Requires:   python >= 2.7, python-iniparse, mercurial >= 5.0
+Requires:   python >= 2.7, python-iniparse, mercurial >= 5.2
 # gconf needed at util/shlib.py for browse_url(url).
 Requires:   gnome-python2-gconf
 Requires:   PyQt4 >= 4.7.5, qscintilla-python, python-pygments

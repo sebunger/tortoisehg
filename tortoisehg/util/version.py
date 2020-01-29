@@ -5,22 +5,26 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-from mercurial import ui, hg, commands, error, pycompat
-from tortoisehg.util.i18n import _ as _gettext
+from __future__ import absolute_import
 
-# TODO: use unicode version globally
-def _(message, context=''):
-    return _gettext(message, context).encode('utf-8')
+import os
+
+from mercurial import (
+    commands,
+    error,
+    hg,
+    pycompat,
+    ui as uimod,
+)
 
 def liveversion():
     'Attempt to read the version from the live repository'
     utilpath = os.path.dirname(os.path.realpath(__file__))
     thgpath = os.path.dirname(os.path.dirname(utilpath))
     if not os.path.isdir(os.path.join(thgpath, '.hg')):
-        raise error.RepoError(_('repository %s not found') % thgpath)
+        raise error.RepoError(b'repository %s not found' % thgpath)
 
-    u = ui.ui()
+    u = uimod.ui()
     # disable color since qtlib inserts color styles and breaks
     # mercurial.color._render_effects()
     u.setconfig(b'ui', b'color', b'never')
@@ -31,7 +35,7 @@ def liveversion():
 
     u.pushbuffer()
     commands.identify(u, repo, id=True, tags=True, rev=b'.')
-    l = u.popbuffer().split()
+    l = pycompat.sysstr(u.popbuffer()).split()
     while len(l) > 1 and l[-1][0].isalpha(): # remove non-numbered tags
         l.pop()
     if len(l) > 1: # tag found
@@ -41,8 +45,8 @@ def liveversion():
     elif len(l) == 1: # no tag found
         u.pushbuffer()
         commands.parents(u, repo, template=b'{latesttag}+{latesttagdistance}-')
-        version = u.popbuffer().rpartition(':')[2] + l[0]
-    return repo[None].branch(), version
+        version = pycompat.sysstr(u.popbuffer()).rpartition(':')[2] + l[0]
+    return pycompat.sysstr(repo[None].branch()), version
 
 def version():
     try:
@@ -51,10 +55,10 @@ def version():
     except:
         pass
     try:
-        import __version__
+        from . import __version__
         return __version__.version
     except ImportError:
-        return _('unknown')
+        return 'unknown'
 
 def package_version():
     try:
@@ -63,10 +67,10 @@ def package_version():
     except:
         pass
     try:
-        import __version__
+        from . import __version__
         return _build_package_version('stable', __version__.version)
     except ImportError:
-        return _('unknown')
+        return 'unknown'
 
 def _build_package_version(branch, version):
     """
@@ -106,7 +110,7 @@ def _build_package_version(branch, version):
         v.append(0)
     major, minor, periodic = v
 
-    if extra != None:
+    if extra is not None:
         tagdistance = int(extra.split('-', 1)[0])
         periodic *= 10000
         if rc:

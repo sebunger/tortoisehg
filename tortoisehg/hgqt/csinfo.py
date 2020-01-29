@@ -97,7 +97,7 @@ class Factory(object):
         if 'type' not in style:
             raise _("must be specified 'type' in style")
         type = style['type']
-        assert type in ('panel', 'label')
+        assert type in ('panel', 'label'), type
 
         # create widget
         args = (target, style, custom, repo, self.info)
@@ -151,10 +151,10 @@ class SummaryInfo(object):
             elif item == 'gitcommit':
                 return hglib.gitcommit(ctx)
             elif item == 'desc':
-                return hglib.tounicode(ctx.description().replace('\0', ''))
+                return hglib.tounicode(ctx.description().replace(b'\0', b''))
             elif item == 'summary':
                 summary = hglib.longsummary(
-                    ctx.description().replace('\0', ''))
+                    ctx.description().replace(b'\0', b''))
                 if len(summary) == 0:
                     return None
                 return summary
@@ -174,7 +174,7 @@ class SummaryInfo(object):
             elif item == 'date':
                 date = ctx.date()
                 if date:
-                    return hglib.displaytime(date)
+                    return hglib.tounicode(hglib.displaytime(date))
                 return None
             elif item == 'age':
                 date = ctx.date()
@@ -182,7 +182,7 @@ class SummaryInfo(object):
                     return hglib.age(date).decode('utf-8')
                 return None
             elif item == 'rawbranch':
-                return ctx.branch() or None
+                return hglib.tounicode(ctx.branch()) or None
             elif item == 'branch':
                 value = self.get_data('rawbranch', *args)
                 if value:
@@ -200,7 +200,7 @@ class SummaryInfo(object):
             elif item == 'close':
                 return ctx.extra().get('close')
             elif item == 'tags':
-                return ctx.thgtags() or None
+                return [hglib.tounicode(tag) for tag in ctx.thgtags()] or None
             elif item == 'graft':
                 extra = ctx.extra()
                 try:
@@ -424,13 +424,16 @@ class SummaryPanel(SummaryBase, QWidget):
     def update(self, target=None, style=None, custom=None, repo=None):
         SummaryBase.update(self, target, custom, repo)
 
+        layout = self.layout()
+        assert isinstance(layout, QHBoxLayout)
+
         if style is not None:
             self.csstyle = style
 
         if self.revlabel is None:
             self.revlabel = QLabel()
             self.revlabel.linkActivated.connect(self.linkActivated)
-            self.layout().addWidget(self.revlabel, 0, Qt.AlignTop)
+            layout.addWidget(self.revlabel, 0, Qt.AlignTop)
 
         if 'expandable' in self.csstyle and self.csstyle['expandable']:
             if self.expand_btn.parentWidget() is None:
@@ -438,7 +441,7 @@ class SummaryPanel(SummaryBase, QWidget):
                 margin = QHBoxLayout()
                 margin.setContentsMargins(3, 3, 3, 3)
                 margin.addWidget(self.expand_btn, 0, Qt.AlignTop)
-                self.layout().insertLayout(0, margin)
+                layout.insertLayout(0, margin)
             self.expand_btn.setVisible(True)
         elif self.expand_btn.parentWidget() is not None:
             self.expand_btn.setHidden(True)
@@ -458,7 +461,7 @@ class SummaryPanel(SummaryBase, QWidget):
 
         if 'margin' in self.csstyle:
             margin = self.csstyle['margin']
-            assert isinstance(margin, (int, pycompat.long))
+            assert isinstance(margin, (int, pycompat.long)), repr(margin)
             buf = '<table style="margin: %spx">' % margin
         else:
             buf = '<table>'

@@ -71,7 +71,7 @@ class TagDialog(QDialog):
         base.addWidget(formwidget)
 
         repo = repoagent.rawRepo()
-        ctx = scmutil.revsymbol(repo, rev)
+        ctx = scmutil.revsymbol(repo, hglib.fromunicode(rev))
         form.addRow(_('Revision:'), QLabel('%d (%s)' % (ctx.rev(), ctx)))
         self.rev = ctx.rev()
 
@@ -107,7 +107,7 @@ class TagDialog(QDialog):
         optbox.addWidget(self.replaceCheckBox)
 
         self.englishCheckBox = QCheckBox(_('Use English commit message'))
-        engmsg = repo.ui.configbool('tortoisehg', 'engmsg', False)
+        engmsg = repoagent.configBool('tortoisehg', 'engmsg')
         self.englishCheckBox.setChecked(engmsg)
         optbox.addWidget(self.englishCheckBox)
 
@@ -166,7 +166,7 @@ class TagDialog(QDialog):
         tags.sort(reverse=True)
         self.tagCombo.clear()
         for tag in tags:
-            if tag in ('tip', 'qbase', 'qtip', 'qparent'):
+            if tag in (b'tip', b'qbase', b'qtip', b'qparent'):
                 continue
             self.tagCombo.addItem(hglib.tounicode(tag))
         if cur:

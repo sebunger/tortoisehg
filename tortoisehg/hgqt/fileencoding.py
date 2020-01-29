@@ -13,7 +13,10 @@ from .qtgui import (
     QActionGroup,
 )
 
-from mercurial import encoding
+from mercurial import (
+    encoding,
+    pycompat,
+)
 
 from ..util.i18n import _
 
@@ -103,13 +106,14 @@ def canonname(name):
 def contentencoding(ui, fallbackenc=None):
     """Preferred encoding of file contents in repository"""
     # assumes web.encoding is the content encoding, not the filename one
-    enc = ui.config('web', 'encoding')
+    enc = pycompat.sysstr(ui.config(b'web', b'encoding'))
     if enc:
         try:
             return canonname(enc)
         except LookupError:
-            ui.debug('ignoring invalid web.encoding: %s\n' % enc)
-    return canonname(fallbackenc or encoding.encoding)
+            ui.debug(b'ignoring invalid web.encoding: %s\n'
+                     % pycompat.sysbytes(enc))
+    return canonname(fallbackenc or pycompat.sysstr(encoding.encoding))
 
 def knownencodings():
     """List of encoding names which are likely used"""
@@ -122,7 +126,7 @@ def _localeencodings():
     else:
         # utf-8 is widely used; also mimics pre-2.11 behavior (007047b54911)
         localeencs.append('utf-8')
-    enc = canonname(encoding.encoding)
+    enc = canonname(pycompat.sysstr(encoding.encoding))
     if enc not in localeencs:
         localeencs.append(enc)
     return localeencs
@@ -134,8 +138,8 @@ def guessencoding(ui, data, fallbackenc=None):
     encodings like utf-8 or CJK's, but won't be possible to distinguish
     iso8859 variant.  iso8859-1 can decode any byte sequence for example.
     """
-    if not isinstance(data, str):
-        raise ValueError('data must be bytes')
+    if not isinstance(data, bytes):
+        raise ValueError('data must be bytes, not %s' % type(data))
     candidateencs = _localeencodings()
     prefenc = contentencoding(ui)
     if prefenc not in candidateencs:

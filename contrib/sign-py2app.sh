@@ -19,6 +19,8 @@ function updateframework()
 	rm -f "${1}/${name}" "${1}/${name}_debug.prl" "${1}/${name}.prl"
 }
 
+# --option=runtime requires 10.13.6 or later, but can be overridden
+OTHER_CODE_SIGN_FLAGS="${OTHER_CODE_SIGN_FLAGS:---option=runtime --timestamp}"
 
 THG_APP="${1:-${PWD}/dist/app/TortoiseHg.app}"
 
@@ -54,10 +56,10 @@ for fw in ${FRAMEWORKS_DIR}/*.dylib ${FRAMEWORKS_DIR}/*.framework ${PLUGINS_DIR}
 		continue
 	fi
 
-	codesign -s "${CODE_SIGN_IDENTITY}" "${fw}"
+	codesign -s "${CODE_SIGN_IDENTITY}" ${OTHER_CODE_SIGN_FLAGS} "${fw}"
 done
 
-codesign -s "${CODE_SIGN_IDENTITY}" "${MACOS_DIR}/python"
+codesign -s "${CODE_SIGN_IDENTITY}" ${OTHER_CODE_SIGN_FLAGS} "${MACOS_DIR}/python"
 
 # This _seems_ to be the equivalent of signing 'TortoiseHg' in the MacOS dir.
-codesign -s "${CODE_SIGN_IDENTITY}" "${THG_APP}"
+codesign -s "${CODE_SIGN_IDENTITY}" ${OTHER_CODE_SIGN_FLAGS} "${THG_APP}"

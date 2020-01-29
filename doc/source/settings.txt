@@ -204,8 +204,8 @@ Workbench
 	in which order.
 	Type a list of the task button names. Add separators by putting "|"
 	between task button names.
-	Valid names are: log commit sync grep and pbranch.
-	Default: log commit grep pbranch | sync
+	Valid names are: log commit sync grep.
+	Default: log commit grep | sync
 
 :guilabel:`Long Summary:`
 	If true, concatenate multiple lines of changeset summary and truncate

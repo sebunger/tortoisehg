@@ -147,23 +147,23 @@ class EmailDialog(QDialog):
 
     def _filldefaults(self):
         """Fill form by default values"""
-        def getfromaddr(ui):
+        repoagent = self._repoagent
+        def getfromaddr():
             """Get sender address in the same manner as patchbomb"""
-            addr = ui.config('email', 'from') or ui.config('patchbomb', 'from')
+            addr = (repoagent.configString('email', 'from')
+                    or repoagent.configString('patchbomb', 'from'))
             if addr:
                 return addr
             try:
-                return ui.username()
+                return hglib.tounicode(self._ui.username())
             except error.Abort:
                 return ''
 
-        self._qui.to_edit.setEditText(
-            hglib.tounicode(self._ui.config('email', 'to', '')))
-        self._qui.cc_edit.setEditText(
-            hglib.tounicode(self._ui.config('email', 'cc', '')))
-        self._qui.from_edit.setEditText(hglib.tounicode(getfromaddr(self._ui)))
+        self._qui.to_edit.setEditText(repoagent.configString('email', 'to'))
+        self._qui.cc_edit.setEditText(repoagent.configString('email', 'cc'))
+        self._qui.from_edit.setEditText(getfromaddr())
 
-        self.setdiffformat(self._ui.configbool('diff', 'git') and 'git' or 'hg')
+        self.setdiffformat(['hg', 'git'][repoagent.configBool('diff', 'git')])
 
     def setdiffformat(self, format):
         """Set diff format, 'hg', 'git' or 'plain'"""
@@ -219,7 +219,7 @@ class EmailDialog(QDialog):
         opts.update(self.getextraopts())
 
         def writetempfile(s):
-            fd, fname = tempfile.mkstemp(prefix='thg_emaildesc_',
+            fd, fname = tempfile.mkstemp(prefix=b'thg_emaildesc_',
                                          dir=qtlib.gettempdir())
             try:
                 os.write(fd, s)

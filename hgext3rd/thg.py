@@ -16,12 +16,13 @@ from __future__ import absolute_import, print_function
 import os
 import sys
 
-from mercurial.i18n import _
 from mercurial import (
     pycompat,
     registrar,
     ui,
 )
+
+from tortoisehg.util.i18n import agettext as _
 
 testedwith = '4.3'
 
@@ -106,7 +107,7 @@ def enforceversion():
         qtrun(run, ui.ui(), **opts)
         sys.exit(1)
 
-@command('view', [], _("hg view"), inferrepo=True)
+@command(b'view', [], _("hg view"), inferrepo=True)
 def cmdview(ui, repo, *pats, **opts):
     """start light interactive history viewer from tortoisehg"""
     enforceversion()

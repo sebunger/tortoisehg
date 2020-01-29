@@ -10,22 +10,22 @@
   > from mercurial import registrar
   > cmdtable = {}
   > command = registrar.command(cmdtable)
-  > @command('testwrite', norepo=True)
+  > @command(b'testwrite', norepo=True)
   > def testwrite(ui):
   >     ui.debug('debug\n')
   >     ui.status('status\n')
   >     ui.warn('warn\n')
-  > @command('testprogress', norepo=True)
+  > @command(b'testprogress', norepo=True)
   > def testprogress(ui):
   >     with ui.makeprogress('topic', unit='unit', total=1) as progress:
   >         progress.update(0, 'item')
-  > @command('testprompt', norepo=True)
+  > @command(b'testprompt', norepo=True)
   > def testprompt(ui):
   >     ui.prompt('prompt:')
-  > @command('testpromptchoice', norepo=True)
+  > @command(b'testpromptchoice', norepo=True)
   > def testpromptchoice(ui):
   >     ui.promptchoice('promptchoice$$ &foo $$ &bar')
-  > @command('testgetpass', norepo=True)
+  > @command(b'testgetpass', norepo=True)
   > def testgetpass(ui):
   >     ui.getpass('getpass: ')
   > EOF

@@ -16,6 +16,7 @@ import subprocess
 
 from mercurial import (
     cmdutil,
+    encoding,
     error,
     extensions,
     fancyopts,
@@ -23,21 +24,26 @@ from mercurial import (
     pycompat,
     registrar,
     scmutil,
+    ui as uimod,
     util,
 )
 from mercurial.utils import (
+    procutil,
     stringutil,
 )
 
 from ..util import (
     hglib,
+    hgversion,
     i18n,
     paths,
     version as thgversion,
 )
 from ..util.i18n import agettext as _
 from . import (
+    bugreport,
     cmdui,
+    hgconfig,
     qtapp,
     qtlib,
     quickop,
@@ -49,24 +55,85 @@ try:
 except ImportError:
     config_nofork = None
 
-shortlicense = '''
-Copyright (C) 2008-2019 Steve Borho <steve@borho.org> and others.
+shortlicense = b'''
+Copyright (C) 2008-2020 Steve Borho <steve@borho.org> and others.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 '''
 
-console_commands = 'help thgstatus version'
-nonrepo_commands = '''userconfig shellconfig clone init debugblockmatcher
+console_commands = b'help thgstatus version'
+nonrepo_commands = b'''userconfig shellconfig clone init debugblockmatcher
 debugbugreport about help version thgstatus serve rejects log'''
+
+def run():
+    argv = pycompat.sysargv[1:]
+    # Remove the -psn argument supplied by launchd (if present - it's not
+    # on 10.9)
+    if 'THG_OSX_APP' in os.environ and argv and argv[0].startswith(b'-psn'):
+        argv = argv[1:]
+
+    # Verify we have an acceptable version of Mercurial
+    errmsg = hgversion.checkhgversion(hgversion.hgversion)
+    if errmsg:
+        opts = {
+            'cmd': b' '.join(argv),
+            'error': b'\n' + errmsg + b'\n',
+            'nofork': True,
+        }
+        qtrun(bugreport.run, uimod.ui(), **opts)
+        sys.exit(1)
+
+    if ('THGDEBUG' in os.environ or b'--profile' in argv
+        or getattr(sys, 'frozen', None) != 'windows_exe'):
+        sys.exit(dispatch(argv))
+    else:
+        origstderr = sys.stderr
+
+        # TODO: Figure out if this hack for py2exe is still needed, and possibly
+        #       wrap this to handle unicode on py3
+        if not pycompat.ispy3:
+            mystderr = pycompat.bytesio()
+            sys.stderr = mystderr
+            sys.__stdout__ = sys.stdout
+            sys.__stderr__ = sys.stderr
+            procutil.stderr = sys.stderr
+        ret = 0
+        try:
+            ret = dispatch(argv)
+            if not pycompat.ispy3:
+                sys.stderr = origstderr
+                stderrout = mystderr.getvalue()
+            else:
+                stderrout = ''
+            errors = ('Traceback', 'TypeError', 'NameError', 'AttributeError',
+                      'NotImplementedError')
+            for l in stderrout.splitlines():
+                if l.startswith(errors):
+                    opts = {
+                        'cmd': b' '.join(argv),
+                        'error': 'Recoverable error (stderr):\n' + stderrout,
+                        'nofork': True,
+                    }
+                    qtrun(bugreport.run, uimod.ui(), **opts)
+                    break
+            sys.exit(ret)
+        except KeyboardInterrupt:
+            sys.exit(-1)
+        except SystemExit:
+            raise
+        except:
+            procutil.stderr = sys.__stderr__ = sys.stderr = origstderr
+            raise
 
 def dispatch(args, u=None):
     """run the command specified in args"""
     try:
         if u is None:
             u = hglib.loadui()
-        if '--traceback' in args:
-            u.setconfig('ui', 'traceback', 'on')
-        if '--debugger' in args:
+        if b'--traceback' in args:
+            u.setconfig(b'tortoisehg', b'traceback', b'on')
+            u.setconfig(b'ui', b'traceback', b'on')
+        if b'--debugger' in args:
             pdb.set_trace()
         return _runcatch(u, args)
     except error.ParseError as e:
@@ -74,8 +141,10 @@ def dispatch(args, u=None):
     except SystemExit as e:
         return e.code
     except Exception as e:
-        if '--debugger' in args:
+        if b'--debugger' in args:
             pdb.post_mortem(sys.exc_info()[2])
+        if u.configbool(b'tortoisehg', b'traceback'):
+            raise
         qtapp.earlyBugReport(e)
         return -1
     except KeyboardInterrupt:
@@ -84,14 +153,14 @@ def dispatch(args, u=None):
 
 def portable_fork(ui, opts):
     if 'THG_GUI_SPAWN' in os.environ or (
-        not opts.get('fork') and opts.get('nofork')):
+        not opts.get(b'fork') and opts.get(b'nofork')):
         os.environ['THG_GUI_SPAWN'] = '1'
         return
     elif 'THG_OSX_APP' in os.environ:
         # guifork seems to break Mac app bundles
         return
-    elif ui.configbool('tortoisehg', 'guifork', None) is not None:
-        if not ui.configbool('tortoisehg', 'guifork'):
+    elif ui.configbool(b'tortoisehg', b'guifork') is not None:
+        if not ui.configbool(b'tortoisehg', b'guifork'):
             return
     elif config_nofork:
         return
@@ -153,8 +222,8 @@ def get_lines_from_listfile(filename, isutf8):
     global _lines
     global _linesutf8
     try:
-        if filename == '-':
-            lines = [ x.replace("\n", "") for x in sys.stdin.readlines() ]
+        if filename == b'-':
+            lines = [ x.replace(b"\n", b"") for x in pycompat.stdin.readlines() ]
         else:
             fd = open(filename, "r")
             lines = [ x.replace("\n", "") for x in fd.readlines() ]
@@ -165,7 +234,7 @@ def get_lines_from_listfile(filename, isutf8):
         else:
             _lines = lines
     except IOError:
-        sys.stderr.write(_('can not read file "%s". Ignored.\n') % filename)
+        sys.stderr.write('can not read file %r. Ignored.\n' % filename)
 
 def get_files_from_listfile():
     global _lines
@@ -174,7 +243,7 @@ def get_files_from_listfile():
     need_to_utf8 = False
     if os.name == 'nt':
         try:
-            fixutf8 = extensions.find("fixutf8")
+            fixutf8 = extensions.find(b"fixutf8")
             if fixutf8:
                 need_to_utf8 = True
         except KeyError:
@@ -190,14 +259,14 @@ def get_files_from_listfile():
             lines.append(hglib.fromutf(l))
 
     # Convert absolute file paths to repo/cwd canonical
-    cwd = os.getcwd()
-    root = paths.find_root(cwd)
+    cwd = encoding.getcwd()
+    root = paths.find_root_bytes(cwd)
     if not root:
         return lines
     if cwd == root:
-        cwd_rel = ''
+        cwd_rel = b''
     else:
-        cwd_rel = cwd[len(root+os.sep):] + os.sep
+        cwd_rel = cwd[len(root + pycompat.ossep):] + pycompat.ossep
     files = []
     for f in lines:
         try:
@@ -219,17 +288,17 @@ def _parse(ui, args):
     try:
         args = fancyopts.fancyopts(args, globalopts, options)
     except getopt.GetoptError as inst:
-        raise error.CommandError(None, inst)
+        raise error.CommandError(None, stringutil.forcebytestr(inst))
 
     if args:
         alias, args = args[0], args[1:]
-    elif options['help']:
+    elif options[b'help']:
         help_(ui, None)
         sys.exit()
     else:
-        alias, args = 'workbench', []
+        alias, args = b'workbench', []
 
-    aliases, i = cmdutil.findcmd(alias, table, ui.config("ui", "strict"))
+    aliases, i = cmdutil.findcmd(alias, table, ui.config(b"ui", b"strict"))
     for a in aliases:
         if a.startswith(alias):
             alias = a
@@ -252,13 +321,13 @@ def _parse(ui, args):
         options[n] = cmdoptions[n]
         del cmdoptions[n]
 
-    listfile = options.get('listfile')
+    listfile = options.get(b'listfile')
     if listfile:
-        del options['listfile']
+        del options[b'listfile']
         get_lines_from_listfile(listfile, False)
-    listfileutf8 = options.get('listfileutf8')
+    listfileutf8 = options.get(b'listfileutf8')
     if listfileutf8:
-        del options['listfileutf8']
+        del options[b'listfileutf8']
         get_lines_from_listfile(listfileutf8, True)
 
     return cmd, cmd and i[0] or None, args, options, cmdoptions, alias
@@ -268,24 +337,24 @@ def _runcatch(ui, args):
         # read --config before doing anything else like Mercurial
         hglib.parseconfigopts(ui, args)
         # register config items specific to TortoiseHg GUI
-        ui.setconfig('extensions', 'tortoisehg.util.configitems', '', 'run')
+        ui.setconfig(b'extensions', b'tortoisehg.util.configitems', b'', b'run')
         try:
             return runcommand(ui, args)
         finally:
             ui.flush()
     except error.AmbiguousCommand as inst:
         ui.warn(_("thg: command '%s' is ambiguous:\n    %s\n") %
-                (inst.args[0], " ".join(inst.args[1])))
-    except error.UnknownCommand as inst:
-        ui.warn(_("thg: unknown command '%s'\n") % inst.args[0])
-        help_(ui, 'shortlist')
+                (inst.args[0], b" ".join(inst.args[1])))
     except error.CommandError as inst:
         if inst.args[0]:
             ui.warn(_("thg %s: %s\n") % (inst.args[0], inst.args[1]))
             help_(ui, inst.args[0])
         else:
             ui.warn(_("thg: %s\n") % inst.args[1])
-            help_(ui, 'shortlist')
+            help_(ui, b'shortlist')
+    except error.UnknownCommand as inst:
+        ui.warn(_("thg: unknown command '%s'\n") % inst.args[0])
+        help_(ui, b'shortlist')
     except error.RepoError as inst:
         ui.warn(_("abort: %s!\n") % inst)
     except error.Abort as inst:
@@ -298,41 +367,43 @@ def _runcatch(ui, args):
 def runcommand(ui, args):
     cmd, func, args, options, cmdoptions, alias = _parse(ui, args)
 
-    if options['config']:
+    if options[b'config']:
         raise error.Abort(_('option --config may not be abbreviated!'))
 
-    cmdoptions['alias'] = alias
-    ui.setconfig("ui", "verbose", str(bool(options["verbose"])))
-    ui.setconfig('ui', 'debug',
-                 str(bool(options['debug'] or 'THGDEBUG' in os.environ)))
-    i18n.setlanguage(ui.config('tortoisehg', 'ui.language'))
+    cmdoptions[b'alias'] = alias
+    config = hgconfig.HgConfig(ui)
+    ui.setconfig(b"ui", b"verbose", pycompat.bytestr(bool(options[b"verbose"])))
+    ui.setconfig(b'ui', b'debug',
+                 pycompat.bytestr(bool(options[b'debug']
+                                       or 'THGDEBUG' in os.environ)))
+    i18n.setlanguage(config.configString('tortoisehg', 'ui.language'))
 
-    if options['help']:
+    if options[b'help']:
         return help_(ui, cmd)
 
-    path = options['repository']
+    path = options[b'repository']
     if path:
-        if path.startswith('bundle:'):
-            s = path[7:].split('+', 1)
+        if path.startswith(b'bundle:'):
+            s = path[7:].split(b'+', 1)
             if len(s) == 1:
                 path, bundle = os.getcwd(), s[0]
             else:
                 path, bundle = s
-            cmdoptions['bundle'] = os.path.abspath(bundle)
+            cmdoptions[b'bundle'] = os.path.abspath(bundle)
         path = ui.expandpath(path)
         # TODO: replace by abspath() if chdir() isn't necessary
         try:
             os.chdir(path)
-            path = os.getcwd()
+            path = encoding.getcwd()
         except OSError:
             pass
-    if options['profile']:
-        options['nofork'] = True
-    path = paths.find_root(path)
+    if options[b'profile']:
+        options[b'nofork'] = True
+    path = paths.find_root_bytes(path)
     if path:
         try:
             lui = ui.copy()
-            lui.readconfig(os.path.join(path, ".hg", "hgrc"))
+            lui.readconfig(os.path.join(path, b".hg", b"hgrc"))
         except IOError:
             pass
     else:
@@ -342,25 +413,26 @@ def runcommand(ui, args):
 
     args += get_files_from_listfile()
 
-    if options['quiet']:
+    if options[b'quiet']:
         ui.quiet = True
 
     # repository existence will be tested in qtrun()
     if cmd not in nonrepo_commands.split():
-        cmdoptions['repository'] = path or options['repository'] or '.'
+        cmdoptions[b'repository'] = path or options[b'repository'] or b'.'
 
-    cmdoptions['mainapp'] = True
+    cmdoptions[b'mainapp'] = True
     checkedfunc = util.checksignature(func)
     if cmd in console_commands.split():
-        d = lambda: checkedfunc(ui, *args, **cmdoptions)
+        d = lambda: checkedfunc(ui, *args, **pycompat.strkwargs(cmdoptions))
     else:
         # disables interaction with tty as it would block GUI events
-        ui.setconfig('ui', 'interactive', 'off', 'qtrun')
-        ui.setconfig('ui', 'paginate', 'off', 'qtrun')
+        ui.setconfig(b'ui', b'interactive', b'off', b'qtrun')
+        ui.setconfig(b'ui', b'paginate', b'off', b'qtrun')
         # ANSI color output is useless in GUI
-        ui.setconfig('ui', 'color', 'off', 'qtrun')
+        ui.setconfig(b'ui', b'color', b'off', b'qtrun')
         portable_fork(ui, options)
-        d = lambda: qtrun(checkedfunc, ui, *args, **cmdoptions)
+        d = lambda: qtrun(checkedfunc, ui, *args,
+                          **pycompat.strkwargs(cmdoptions))
     return _runcommand(lui, options, cmd, d)
 
 def _runcommand(ui, options, cmd, cmdfunc):
@@ -370,16 +442,16 @@ def _runcommand(ui, options, cmd, cmdfunc):
         except error.SignatureError:
             raise error.CommandError(cmd, _("invalid arguments"))
 
-    if options['profile']:
-        format = ui.config('profiling', 'format', default='text')
-        field = ui.config('profiling', 'sort')
+    if options[b'profile']:
+        format = ui.config(b'profiling', b'format')
+        field = ui.config(b'profiling', b'sort')
 
-        if not format in ['text', 'kcachegrind']:
+        if format not in [b'text', b'kcachegrind']:
             ui.warn(_("unrecognized profiling format '%s'"
                         " - Ignored\n") % format)
             format = 'text'
 
-        output = ui.config('profiling', 'output')
+        output = ui.config(b'profiling', b'output')
 
         if output:
             path = ui.expandpath(output)
@@ -423,30 +495,32 @@ command = registrar.command(table)
 # common command options
 
 globalopts = [
-    ('R', 'repository', '',
+    (b'R', b'repository', b'',
      _('repository root directory or symbolic path name')),
-    ('v', 'verbose', None, _('enable additional output')),
-    ('q', 'quiet', None, _('suppress output')),
-    ('h', 'help', None, _('display help and exit')),
-    ('', 'config', [],
+    (b'v', b'verbose', None, _('enable additional output')),
+    (b'q', b'quiet', None, _('suppress output')),
+    (b'h', b'help', None, _('display help and exit')),
+    (b'', b'config', [],
      _("set/override config option (use 'section.name=value')")),
-    ('', 'debug', None, _('enable debugging output')),
-    ('', 'debugger', None, _('start debugger')),
-    ('', 'profile', None, _('print command execution profile')),
-    ('', 'nofork', None, _('do not fork GUI process')),
-    ('', 'fork', None, _('always fork GUI process')),
-    ('', 'listfile', '', _('read file list from file')),
-    ('', 'listfileutf8', '', _('read file list from file encoding utf-8')),
+    (b'', b'debug', None, _('enable debugging output')),
+    (b'', b'debugger', None, _('start debugger')),
+    (b'', b'traceback', None,
+     _("show verbose tracebacks without using bug reporter dialog")),
+    (b'', b'profile', None, _('print command execution profile')),
+    (b'', b'nofork', None, _('do not fork GUI process')),
+    (b'', b'fork', None, _('always fork GUI process')),
+    (b'', b'listfile', b'', _('read file list from file')),
+    (b'', b'listfileutf8', b'', _('read file list from file encoding utf-8')),
 ]
 
 # common command functions
 
 def _formatfilerevset(pats):
-    q = ["file('path:%s')" % f for f in hglib.canonpaths(pats)]
-    return ' or '.join(q)
+    q = [b"file('path:%s')" % f for f in hglib.canonpaths(pats)]
+    return b' or '.join(q)
 
 def _workbench(ui, *pats, **opts):
-    root = opts.get('root') or paths.find_root()
+    root = opts.get('root') or paths.find_root_bytes()
 
     # TODO: unclear that _workbench() is called inside qtrun(). maybe this
     # function should receive factory object instead of using global qtrun.
@@ -471,21 +545,21 @@ def _workbench(ui, *pats, **opts):
 
 # commands start here, listed alphabetically
 
-@command('about', [], _('thg about'))
+@command(b'about', [], _('thg about'))
 def about(ui, *pats, **opts):
     """about dialog"""
     from tortoisehg.hgqt import about as aboutmod
     return aboutmod.AboutDialog()
 
-@command('add', [], _('thg add [FILE]...'))
+@command(b'add', [], _('thg add [FILE]...'))
 def add(ui, repoagent, *pats, **opts):
     """add files"""
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('annotate|blame',
-    [('r', 'rev', '', _('revision to annotate')),
-     ('n', 'line', '', _('open to line')),
-     ('p', 'pattern', '', _('initial search pattern'))],
+@command(b'annotate|blame',
+    [(b'r', b'rev', b'', _('revision to annotate')),
+     (b'n', b'line', b'', _('open to line')),
+     (b'p', b'pattern', b'', _('initial search pattern'))],
     _('thg annotate'),
     helpbasic=True)
 def annotate(ui, repoagent, *pats, **opts):
@@ -503,8 +577,8 @@ def annotate(ui, repoagent, *pats, **opts):
         dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
     return dlg
 
-@command('archive',
-    [('r', 'rev', '', _('revision to archive'))],
+@command(b'archive',
+    [(b'r', b'rev', b'', _('revision to archive'))],
     _('thg archive'))
 def archive(ui, repoagent, *pats, **opts):
     """archive dialog"""
@@ -512,10 +586,10 @@ def archive(ui, repoagent, *pats, **opts):
     rev = opts.get('rev')
     return archivemod.createArchiveDialog(repoagent, rev)
 
-@command('backout',
-    [('', 'merge', None, _('merge with old dirstate parent after backout')),
-     ('', 'parent', '', _('parent to choose when backing out merge')),
-     ('r', 'rev', '', _('revision to backout'))],
+@command(b'backout',
+    [(b'', b'merge', None, _('merge with old dirstate parent after backout')),
+     (b'', b'parent', b'', _('parent to choose when backing out merge')),
+     (b'r', b'rev', b'', _('revision to backout'))],
     _('thg backout [OPTION]... [[-r] REV]'),
     helpbasic=True)
 def backout(ui, repoagent, *pats, **opts):
@@ -534,15 +608,15 @@ def backout(ui, repoagent, *pats, **opts):
         raise error.Abort(hglib.fromunicode(msg))
     return backoutmod.BackoutDialog(repoagent, rev)
 
-@command('bisect', [], _('thg bisect'),
+@command(b'bisect', [], _('thg bisect'),
          helpbasic=True)
 def bisect(ui, repoagent, *pats, **opts):
     """bisect dialog"""
     from tortoisehg.hgqt import bisect as bisectmod
     return bisectmod.BisectDialog(repoagent)
 
-@command('bookmarks|bookmark',
-    [('r', 'rev', '', _('revision'))],
+@command(b'bookmarks|bookmark',
+    [(b'r', b'rev', b'', _('revision'))],
     _('thg bookmarks [-r REV] [NAME]'))
 def bookmark(ui, repoagent, *names, **opts):
     """add or remove a movable marker"""
@@ -556,27 +630,35 @@ def bookmark(ui, repoagent, *names, **opts):
         dlg.setBookmarkName(hglib.tounicode(names[0]))
     return dlg
 
-@command('clone',
-    [('U', 'noupdate', None, _('the clone will include an empty working copy '
-                               '(only a repository)')),
-     ('u', 'updaterev', '', _('revision, tag or branch to check out')),
-     ('r', 'rev', '', _('include the specified changeset')),
-     ('b', 'branch', [], _('clone only the specified branch')),
-     ('', 'pull', None, _('use pull protocol to copy metadata')),
-     ('', 'uncompressed', None, _('use uncompressed transfer '
-                                  '(fast over LAN)'))],
+@command(b'clone',
+    [(b'U', b'noupdate', None, _('the clone will include an empty working copy '
+                                 '(only a repository)')),
+     (b'u', b'updaterev', b'', _('revision, tag or branch to check out')),
+     (b'r', b'rev', b'', _('include the specified changeset')),
+     (b'b', b'branch', [], _('clone only the specified branch')),
+     (b'', b'pull', None, _('use pull protocol to copy metadata')),
+     (b'', b'uncompressed', None, _('an alias to --stream (DEPRECATED)')),
+     (b'', b'stream', None, _('clone with minimal data processing'))],
     _('thg clone [OPTION]... [SOURCE] [DEST]'),
     helpbasic=True)
 def clone(ui, *pats, **opts):
     """clone tool"""
     from tortoisehg.hgqt import clone as clonemod
-    dlg = clonemod.CloneDialog(ui, pats, opts)
+    opts['stream'] = opts['stream'] or opts['uncompressed']
+    dlg = clonemod.CloneDialog(ui, hgconfig.HgConfig(ui))
     dlg.clonedRepository.connect(qtrun.openRepoInWorkbench)
+    if len(pats) >= 1:
+        dlg.setSource(hglib.tounicode(pats[0]))
+    if len(pats) >= 2:
+        dlg.setDestination(hglib.tounicode(pats[1]))
+    dlg.setRevSymbol(hglib.tounicode(opts.get('rev') or b''))
+    for k in ['noupdate', 'pull', 'stream']:
+        dlg.setOption(k, bool(opts[k]))
     return dlg
 
-@command('commit|ci',
-    [('u', 'user', '', _('record user as committer')),
-     ('d', 'date', '', _('record datecode as commit date'))],
+@command(b'commit|ci',
+    [(b'u', b'user', b'', _('record user as committer')),
+     (b'd', b'date', b'', _('record datecode as commit date'))],
     _('thg commit [OPTIONS] [FILE]...'),
     helpbasic=True)
 def commit(ui, repoagent, *pats, **opts):
@@ -587,18 +669,18 @@ def commit(ui, repoagent, *pats, **opts):
     os.chdir(repo.root)
     return commitmod.CommitDialog(repoagent, pats, opts)
 
-@command('debugblockmatcher', [], _('thg debugblockmatcher'))
+@command(b'debugblockmatcher', [], _('thg debugblockmatcher'))
 def debugblockmatcher(ui, *pats, **opts):
     """show blockmatcher widget"""
     from tortoisehg.hgqt import blockmatcher
     return blockmatcher.createTestWidget(ui)
 
-@command('debugbugreport', [], _('thg debugbugreport [TEXT]'))
+@command(b'debugbugreport', [], _('thg debugbugreport [TEXT]'))
 def debugbugreport(ui, *pats, **opts):
     """open bugreport dialog by exception"""
     raise Exception(' '.join(pats))
 
-@command('debugconsole', [], _('thg debugconsole'))
+@command(b'debugconsole', [], _('thg debugconsole'))
 def debugconsole(ui, repoagent, *pats, **opts):
     """open console window"""
     from tortoisehg.hgqt import docklog
@@ -607,12 +689,12 @@ def debugconsole(ui, repoagent, *pats, **opts):
     dlg.resize(700, 400)
     return dlg
 
-@command('debuglighthg', [], _('thg debuglighthg'))
+@command(b'debuglighthg', [], _('thg debuglighthg'))
 def debuglighthg(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import repowidget
     return repowidget.LightRepoWindow(repoagent)
 
-@command('debugruncommand', [],
+@command(b'debugruncommand', [],
     _('thg debugruncommand -- COMMAND [ARGUMENT]...'))
 def debugruncommand(ui, repoagent, *cmdline, **opts):
     """run hg command in dialog"""
@@ -625,20 +707,20 @@ def debugruncommand(ui, repoagent, *cmdline, **opts):
     dlg.setSession(sess)
     return dlg
 
-@command('drag_copy', [], _('thg drag_copy SOURCE... DEST'))
+@command(b'drag_copy', [], _('thg drag_copy SOURCE... DEST'))
 def drag_copy(ui, repoagent, *pats, **opts):
     """copy the selected files to the desired directory"""
     opts.update(alias='copy', headless=True)
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('drag_move', [], _('thg drag_move SOURCE... DEST'))
+@command(b'drag_move', [], _('thg drag_move SOURCE... DEST'))
 def drag_move(ui, repoagent, *pats, **opts):
     """move the selected files to the desired directory"""
     opts.update(alias='move', headless=True)
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('email',
-    [('r', 'rev', [], _('a revision to send'))],
+@command(b'email',
+    [(b'r', b'rev', [], _('a revision to send'))],
     _('thg email [REVS]'),
     helpbasic=True)
 def email(ui, repoagent, *revs, **opts):
@@ -654,9 +736,9 @@ def email(ui, repoagent, *revs, **opts):
     revs = scmutil.revrange(repo, revs)
     return hgemail.EmailDialog(repoagent, revs)
 
-@command('filelog',
-    [('r', 'rev', '', _('select the specified revision')),
-     ('', 'compare', False, _('side-by-side comparison of revisions'))],
+@command(b'filelog',
+    [(b'r', b'rev', b'', _('select the specified revision')),
+     (b'', b'compare', False, _('side-by-side comparison of revisions'))],
     _('thg filelog [OPTION]... FILE'),
     helpbasic=True)
 def filelog(ui, repoagent, *pats, **opts):
@@ -674,13 +756,13 @@ def filelog(ui, repoagent, *pats, **opts):
     dlg.goto(rev)
     return dlg
 
-@command('forget', [], _('thg forget [FILE]...'))
+@command(b'forget', [], _('thg forget [FILE]...'))
 def forget(ui, repoagent, *pats, **opts):
     """forget selected files"""
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('graft',
-    [('r', 'rev', [], _('revisions to graft'))],
+@command(b'graft',
+    [(b'r', b'rev', [], _('revisions to graft'))],
     _('thg graft [-r] REV...'))
 def graft(ui, repoagent, *revs, **opts):
     """graft dialog"""
@@ -688,12 +770,13 @@ def graft(ui, repoagent, *revs, **opts):
     repo = repoagent.rawRepo()
     revs = list(revs)
     revs.extend(opts['rev'])
-    if not os.path.exists(repo.vfs.join('graftstate')) and not revs:
+    if not os.path.exists(repo.vfs.join(b'graftstate')) and not revs:
         raise error.Abort(_('You must provide revisions to graft'))
-    return graftmod.GraftDialog(repoagent, None, source=revs)
+    return graftmod.GraftDialog(repoagent, None,
+        source=[hglib.tounicode(rev) for rev in revs])
 
-@command('grep|search',
-    [('i', 'ignorecase', False, _('ignore case during search'))],
+@command(b'grep|search',
+    [(b'i', b'ignorecase', False, _('ignore case during search'))],
     _('thg grep'),
     helpbasic=True)
 def grep(ui, repoagent, *pats, **opts):
@@ -702,7 +785,7 @@ def grep(ui, repoagent, *pats, **opts):
     upats = [hglib.tounicode(p) for p in pats]
     return grepmod.SearchDialog(repoagent, upats, **opts)
 
-@command('guess', [], _('thg guess'),
+@command(b'guess', [], _('thg guess'),
          helpbasic=True)
 def guess(ui, repoagent, *pats, **opts):
     """guess previous renames or copies"""
@@ -710,7 +793,7 @@ def guess(ui, repoagent, *pats, **opts):
     return guessmod.DetectRenameDialog(repoagent, None, *pats)
 
 ### help management, adapted from mercurial.commands.help_()
-@command('help', [], _('thg help [COMMAND]'))
+@command(b'help', [], _('thg help [COMMAND]'))
 def help_(ui, name=None, with_version=False, **opts):
     """show help for a command, extension, or list of commands
 
@@ -726,16 +809,16 @@ def help_(ui, name=None, with_version=False, **opts):
     def addglobalopts(aliases):
         if ui.verbose:
             option_lists.append((_("global options:"), globalopts))
-            if name == 'shortlist':
+            if name == b'shortlist':
                 option_lists.append((_('use "thg help" for the full list '
                                        'of commands'), ()))
         else:
-            if name == 'shortlist':
+            if name == b'shortlist':
                 msg = _('use "thg help" for the full list of commands '
                         'or "thg -v" for details')
             elif aliases:
                 msg = _('use "thg -v help%s" to show aliases and '
-                        'global options') % (name and " " + name or "")
+                        'global options') % (name and b" " + name or b"")
             else:
                 msg = _('use "thg -v help %s" to show global options') % name
             option_lists.append((msg, ()))
@@ -743,7 +826,7 @@ def help_(ui, name=None, with_version=False, **opts):
     def helpcmd(name):
         if with_version:
             version(ui)
-            ui.write('\n')
+            ui.write(b'\n')
 
         try:
             aliases, i = cmdutil.findcmd(name, table, False)
@@ -753,19 +836,21 @@ def help_(ui, name=None, with_version=False, **opts):
             return
 
         # synopsis
-        ui.write("%s\n" % i[2])
+        ui.write(b"%s\n" % i[2])
 
         # aliases
         if not ui.quiet and len(aliases) > 1:
-            ui.write(_("\naliases: %s\n") % ', '.join(aliases[1:]))
+            ui.write(_("\naliases: %s\n") % b', '.join(aliases[1:]))
 
         # description
         doc = i[0].__doc__
-        if not doc:
+        if doc:
+            doc = hglib.fromunicode(doc)
+            if ui.quiet:
+                doc = doc.splitlines(0)[0]
+        else:
             doc = _("(no help text available)")
-        if ui.quiet:
-            doc = doc.splitlines(0)[0]
-        ui.write("\n%s\n" % doc.rstrip())
+        ui.write(b"\n%s\n" % doc.rstrip())
 
         if not ui.quiet:
             # options
@@ -778,15 +863,15 @@ def help_(ui, name=None, with_version=False, **opts):
         h = {}
         cmds = {}
         for c, e in table.items():
-            f = c.split("|", 1)[0]
+            f = c.split(b"|", 1)[0]
             if select and not select(f):
                 continue
-            if (not select and name != 'shortlist' and
+            if (not select and name != b'shortlist' and
                 e[0].__module__ != __name__):
                 continue
-            if name == "shortlist":
+            if name == b"shortlist":
                 continue
-            if not ui.debugflag and f.startswith("debug"):
+            if not ui.debugflag and f.startswith(b"debug"):
                 continue
             doc = e[0].__doc__
             if doc and 'DEPRECATED' in doc and not ui.verbose:
@@ -794,7 +879,7 @@ def help_(ui, name=None, with_version=False, **opts):
             #doc = gettext(doc)
             if not doc:
                 doc = _("(no help text available)")
-            h[f] = doc.splitlines()[0].rstrip()
+            h[f] = hglib.fromunicode(doc.splitlines()[0].rstrip())
             cmds[f] = c
 
         if not h:
@@ -806,20 +891,21 @@ def help_(ui, name=None, with_version=False, **opts):
         m = max(map(len, fns))
         for f in fns:
             if ui.verbose:
-                commands = cmds[f].replace("|",", ")
-                ui.write(" %s:\n      %s\n"%(commands, h[f]))
+                commands = cmds[f].replace(b"|", b", ")
+                ui.write(b" %s:\n      %s\n" % (commands, h[f]))
             else:
-                ui.write('%s\n'
+                ui.write(b'%s\n'
                          % (stringutil.wrap(h[f], textwidth,
-                                            initindent=' %-*s   ' % (m, f),
-                                            hangindent=' ' * (m + 4))))
+                                            initindent=b' %-*s   ' % (m, f),
+                                            hangindent=b' ' * (m + 4))))
 
         if not ui.quiet:
             addglobalopts(True)
 
     def helptopic(name):
         from mercurial import help
-        for names, header, doc in help.helptable:
+        for topic in help.helptable:
+            names, header, doc = topic[0:3]
             if name in names:
                 break
         else:
@@ -831,10 +917,10 @@ def help_(ui, name=None, with_version=False, **opts):
         if hasattr(doc, '__call__'):
             doc = doc()
 
-        ui.write("%s\n" % header)
-        ui.write("%s\n" % doc.rstrip())
+        ui.write(b"%s\n" % header)
+        ui.write(b"%s\n" % doc.rstrip())
 
-    if name and name != 'shortlist':
+    if name and name != b'shortlist':
         i = None
         for f in (helpcmd, helptopic):
             try:
@@ -852,10 +938,10 @@ def help_(ui, name=None, with_version=False, **opts):
             version(ui)
         else:
             ui.status(_("Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"))
-        ui.status('\n')
+        ui.status(b'\n')
 
         # list of commands
-        if name == "shortlist":
+        if name == b"shortlist":
             header = _('basic commands:\n\n')
         else:
             header = _('list of commands:\n\n')
@@ -865,29 +951,30 @@ def help_(ui, name=None, with_version=False, **opts):
     # list all option lists
     opt_output = []
     for title, options in option_lists:
-        opt_output.append(("\n%s" % title, None))
+        opt_output.append((b"\n%s" % title, None))
         for shortopt, longopt, default, desc in options:
-            if "DEPRECATED" in desc and not ui.verbose: continue
-            opt_output.append(("%2s%s" % (shortopt and "-%s" % shortopt,
-                                          longopt and " --%s" % longopt),
-                               "%s%s" % (desc,
-                                         default
-                                         and _(" (default: %s)") % default
-                                         or "")))
+            if b"DEPRECATED" in desc and not ui.verbose:
+                continue
+            opt_output.append((b"%2s%s" % (shortopt and b"-%s" % shortopt,
+                                           longopt and b" --%s" % longopt),
+                               b"%s%s" % (desc,
+                                          default
+                                          and _(" (default: %s)") % default
+                                          or b"")))
 
     if opt_output:
         opts_len = max([len(line[0]) for line in opt_output if line[1]] or [0])
         for first, second in opt_output:
             if second:
-                initindent = ' %-*s  ' % (opts_len, first)
-                hangindent = ' ' * (opts_len + 3)
-                ui.write('%s\n' % (stringutil.wrap(second, textwidth,
-                                                   initindent=initindent,
-                                                   hangindent=hangindent)))
+                initindent = b' %-*s  ' % (opts_len, first)
+                hangindent = b' ' * (opts_len + 3)
+                ui.write(b'%s\n' % (stringutil.wrap(second, textwidth,
+                                                    initindent=initindent,
+                                                    hangindent=hangindent)))
             else:
-                ui.write("%s\n" % first)
+                ui.write(b"%s\n" % first)
 
-@command('hgignore|ignore|filter', [], _('thg hgignore [FILE]'),
+@command(b'hgignore|ignore|filter', [], _('thg hgignore [FILE]'),
          helpbasic=True)
 def hgignore(ui, repoagent, *pats, **opts):
     """ignore filter editor"""
@@ -896,8 +983,8 @@ def hgignore(ui, repoagent, *pats, **opts):
         pats = []
     return hgignoremod.HgignoreDialog(repoagent, None, *pats)
 
-@command('import',
-    [('', 'mq', False, _('import to the patch queue (MQ)'))],
+@command(b'import',
+    [(b'', b'mq', False, _('import to the patch queue (MQ)'))],
     _('thg import [OPTION] [SOURCE]...'))
 def import_(ui, repoagent, *pats, **opts):
     """import an ordered set of patches"""
@@ -906,7 +993,7 @@ def import_(ui, repoagent, *pats, **opts):
     dlg.setfilepaths(pats)
     return dlg
 
-@command('init', [], _('thg init [DEST]'),
+@command(b'init', [], _('thg init [DEST]'),
          helpbasic=True)
 def init(ui, dest='.', **opts):
     """init dialog"""
@@ -915,18 +1002,18 @@ def init(ui, dest='.', **opts):
     dlg.newRepository.connect(qtrun.openRepoInWorkbench)
     return dlg
 
-@command('lock|unlock', [], _('thg lock'),
+@command(b'lock|unlock', [], _('thg lock'),
          helpbasic=True)
 def lock(ui, repoagent, **opts):
     """lock dialog"""
     from tortoisehg.hgqt import locktool
     return locktool.LockDialog(repoagent)
 
-@command('log|history|explorer|workbench',
-    [('k', 'query', '', _('search for a given text or revset')),
-     ('r', 'rev', '', _('select the specified revision')),
-     ('l', 'limit', '', _('(DEPRECATED)')),
-     ('', 'newworkbench', None, _('open a new workbench window'))],
+@command(b'log|history|explorer|workbench',
+    [(b'k', b'query', b'', _('search for a given text or revset')),
+     (b'r', b'rev', b'', _('select the specified revision')),
+     (b'l', b'limit', b'', _('(DEPRECATED)')),
+     (b'', b'newworkbench', None, _('open a new workbench window'))],
     _('thg log [OPTIONS] [FILE]'),
     helpbasic=True)
 def log(ui, *pats, **opts):
@@ -936,7 +1023,7 @@ def log(ui, *pats, **opts):
         # into revset query that may conflict with user-supplied one.
         raise error.Abort(_('cannot specify both -k/--query and filenames'))
 
-    root = opts.get('root') or paths.find_root()
+    root = opts.get('root') or paths.find_root_bytes()
     if root and len(pats) == 1 and os.path.isfile(pats[0]):
         # TODO: do not instantiate repo here
         repo = thgrepo.repository(ui, root)
@@ -948,7 +1035,7 @@ def log(ui, *pats, **opts):
     # Note that if the "single workbench mode" is enabled, and there is no
     # existing workbench window, we must tell the Workbench object to create
     # the workbench server
-    singleworkbenchmode = ui.configbool('tortoisehg', 'workbench.single', True)
+    singleworkbenchmode = ui.configbool(b'tortoisehg', b'workbench.single')
     mustcreateserver = False
     if singleworkbenchmode:
         newworkbench = opts.get('newworkbench')
@@ -972,10 +1059,10 @@ def log(ui, *pats, **opts):
         qtrun.createWorkbenchServer()
     return w
 
-@command('manifest',
-    [('r', 'rev', '', _('revision to display')),
-     ('n', 'line', '', _('open to line')),
-     ('p', 'pattern', '', _('initial search pattern'))],
+@command(b'manifest',
+    [(b'r', b'rev', b'', _('revision to display')),
+     (b'n', b'line', b'', _('open to line')),
+     (b'p', b'pattern', b'', _('initial search pattern'))],
     _('thg manifest [-r REV] [FILE]'))
 def manifest(ui, repoagent, *pats, **opts):
     """display the current or given revision of the project manifest"""
@@ -996,8 +1083,8 @@ def manifest(ui, repoagent, *pats, **opts):
         dlg.setSearchPattern(hglib.tounicode(opts['pattern']))
     return dlg
 
-@command('merge',
-    [('r', 'rev', '', _('revision to merge'))],
+@command(b'merge',
+    [(b'r', b'rev', b'', _('revision to merge'))],
     _('thg merge [[-r] REV]'),
     helpbasic=True)
 def merge(ui, repoagent, *pats, **opts):
@@ -1012,14 +1099,14 @@ def merge(ui, repoagent, *pats, **opts):
     rev = scmutil.revsingle(repo, rev).rev()
     return mergemod.MergeDialog(repoagent, rev)
 
-@command('postreview',
-    [('r', 'rev', [], _('a revision to post'))],
+@command(b'postreview',
+    [(b'r', b'rev', [], _('a revision to post'))],
     _('thg postreview [-r] REV...'))
 def postreview(ui, repoagent, *pats, **opts):
     """post changesets to reviewboard"""
     from tortoisehg.hgqt import postreview as postreviewmod
     repo = repoagent.rawRepo()
-    if 'reviewboard' not in repo.extensions():
+    if b'reviewboard' not in repo.extensions():
         url = 'https://www.mercurial-scm.org/wiki/ReviewboardExtension'
         raise error.Abort(_('reviewboard extension not enabled'),
                           hint=(_('see <a href="%(url)s">%(url)s</a>')
@@ -1031,8 +1118,8 @@ def postreview(ui, repoagent, *pats, **opts):
         raise error.Abort(_('no revisions specified'))
     return postreviewmod.PostReviewDialog(repo.ui, repoagent, revs)
 
-@command('prune|obsolete',
-    [('r', 'rev', [], _('revisions to prune'))],
+@command(b'prune|obsolete',
+    [(b'r', b'rev', [], _('revisions to prune'))],
     _('thg prune [-r] REV...'),
     helpbasic=True)
 def prune(ui, repoagent, *revs, **opts):
@@ -1046,26 +1133,26 @@ def prune(ui, repoagent, *revs, **opts):
         revspec = hglib.formatrevspec('%lr', revs)
     return prunemod.createPruneDialog(repoagent, hglib.tounicode(revspec))
 
-@command('purge', [], _('thg purge'),
+@command(b'purge', [], _('thg purge'),
          helpbasic=True)
 def purge(ui, repoagent, *pats, **opts):
     """purge unknown and/or ignore files from repository"""
     from tortoisehg.hgqt import purge as purgemod
     return purgemod.PurgeDialog(repoagent)
 
-@command('rebase',
-    [('', 'keep', False, _('keep original changesets')),
-     ('', 'keepbranches', False, _('keep original branch names')),
-     ('', 'detach', False, _('(DEPRECATED)')),
-     ('s', 'source', '', _('rebase from the specified changeset')),
-     ('d', 'dest', '', _('rebase onto the specified changeset'))],
+@command(b'rebase',
+    [(b'', b'keep', False, _('keep original changesets')),
+     (b'', b'keepbranches', False, _('keep original branch names')),
+     (b'', b'detach', False, _('(DEPRECATED)')),
+     (b's', b'source', b'', _('rebase from the specified changeset')),
+     (b'd', b'dest', b'', _('rebase onto the specified changeset'))],
     _('thg rebase -s REV -d REV [--keep]'),
     helpbasic=True)
 def rebase(ui, repoagent, *pats, **opts):
     """rebase dialog"""
     from tortoisehg.hgqt import rebase as rebasemod
     repo = repoagent.rawRepo()
-    if os.path.exists(repo.vfs.join('rebasestate')):
+    if os.path.exists(repo.vfs.join(b'rebasestate')):
         # TODO: move info dialog into RebaseDialog if possible
         qtlib.InfoMsgBox(hglib.tounicode(_('Rebase already in progress')),
                          hglib.tounicode(_('Resuming rebase already in '
@@ -1074,7 +1161,7 @@ def rebase(ui, repoagent, *pats, **opts):
         raise error.Abort(_('You must provide source and dest arguments'))
     return rebasemod.RebaseDialog(repoagent, None, **opts)
 
-@command('rejects', [], _('thg rejects [FILE]'))
+@command(b'rejects', [], _('thg rejects [FILE]'))
 def rejects(ui, *pats, **opts):
     """manually resolve rejected patch chunks"""
     from tortoisehg.hgqt import rejects as rejectsmod
@@ -1085,12 +1172,12 @@ def rejects(ui, *pats, **opts):
         path = path[:-4]
     return rejectsmod.RejectsDialog(ui, path)
 
-@command('remove|rm', [], _('thg remove [FILE]...'))
+@command(b'remove|rm', [], _('thg remove [FILE]...'))
 def remove(ui, repoagent, *pats, **opts):
     """remove selected files"""
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('rename|mv|copy', [], _('thg rename [SOURCE] [DEST]'))
+@command(b'rename|mv|copy', [], _('thg rename [SOURCE] [DEST]'))
 def rename(ui, repoagent, source=None, dest=None, **opts):
     """rename dialog"""
     from tortoisehg.hgqt import rename as renamemod
@@ -1103,8 +1190,8 @@ def rename(ui, repoagent, source=None, dest=None, **opts):
     iscopy = (opts.get('alias') == 'copy')
     return renamemod.RenameDialog(repoagent, None, source, dest, iscopy)
 
-@command('repoconfig',
-    [('', 'focus', '', _('field to give initial focus'))],
+@command(b'repoconfig',
+    [(b'', b'focus', b'', _('field to give initial focus'))],
     _('thg repoconfig'),
     helpbasic=True)
 def repoconfig(ui, repoagent, *pats, **opts):
@@ -1112,14 +1199,14 @@ def repoconfig(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import settings
     return settings.SettingsDialog(True, focus=opts.get('focus'))
 
-@command('resolve', [], _('thg resolve'))
+@command(b'resolve', [], _('thg resolve'))
 def resolve(ui, repoagent, *pats, **opts):
     """resolve dialog"""
     from tortoisehg.hgqt import resolve as resolvemod
     return resolvemod.ResolveDialog(repoagent)
 
-@command('revdetails',
-    [('r', 'rev', '', _('the revision to show'))],
+@command(b'revdetails',
+    [(b'r', b'rev', b'', _('the revision to show'))],
     _('thg revdetails [-r REV]'),
     helpbasic=True)
 def revdetails(ui, repoagent, *pats, **opts):
@@ -1130,28 +1217,16 @@ def revdetails(ui, repoagent, *pats, **opts):
     rev = opts.get('rev', '.')
     return revdetailsmod.RevDetailsDialog(repoagent, rev=rev)
 
-@command('revert', [], _('thg revert [FILE]...'))
+@command(b'revert', [], _('thg revert [FILE]...'))
 def revert(ui, repoagent, *pats, **opts):
     """revert selected files"""
     return quickop.run(ui, repoagent, *pats, **opts)
 
-@command('rupdate',
-    [('r', 'rev', '', _('revision to update'))],
-    _('thg rupdate [[-r] REV]'))
-def rupdate(ui, repoagent, *pats, **opts):
-    """update a remote repository"""
-    from tortoisehg.hgqt import rupdate as rupdatemod
-    rev = None
-    if opts.get('rev'):
-        rev = opts.get('rev')
-    elif len(pats) == 1:
-        rev = pats[0]
-    return rupdatemod.createRemoteUpdateDialog(repoagent, rev)
-
-@command('serve',
-    [('', 'web-conf', '', _('name of the hgweb config file (serve more than '
-                            'one repository)')),
-     ('', 'webdir-conf', '', _('name of the hgweb config file (DEPRECATED)'))],
+@command(b'serve',
+    [(b'', b'web-conf', b'', _('name of the hgweb config file (serve more than '
+                               'one repository)')),
+     (b'', b'webdir-conf', b'',
+      _('name of the hgweb config file (DEPRECATED)'))],
     _('thg serve [--web-conf FILE]'),
     helpbasic=True)
 def serve(ui, *pats, **opts):
@@ -1161,31 +1236,31 @@ def serve(ui, *pats, **opts):
 
 if os.name == 'nt':
     # TODO: extra detection to determine if shell extension is installed
-    @command('shellconfig', [], _('thg shellconfig'))
+    @command(b'shellconfig', [], _('thg shellconfig'))
     def shellconfig(ui, *pats, **opts):
         """explorer extension configuration editor"""
         from tortoisehg.hgqt import shellconf
         return shellconf.ShellConfigWindow()
 
-@command('shelve|unshelve', [], _('thg shelve'))
+@command(b'shelve|unshelve', [], _('thg shelve'))
 def shelve(ui, repoagent, *pats, **opts):
     """move changes between working directory and patches"""
     from tortoisehg.hgqt import shelve as shelvemod
     return shelvemod.ShelveDialog(repoagent)
 
-@command('sign',
-    [('f', 'force', None, _('sign even if the sigfile is modified')),
-     ('l', 'local', None, _('make the signature local')),
-     ('k', 'key', '', _('the key id to sign with')),
-     ('', 'no-commit', None, _('do not commit the sigfile after signing')),
-     ('m', 'message', '', _('use <text> as commit message'))],
+@command(b'sign',
+    [(b'f', b'force', None, _('sign even if the sigfile is modified')),
+     (b'l', b'local', None, _('make the signature local')),
+     (b'k', b'key', b'', _('the key id to sign with')),
+     (b'', b'no-commit', None, _('do not commit the sigfile after signing')),
+     (b'm', b'message', b'', _('use <text> as commit message'))],
     _('thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]'),
     helpbasic=True)
 def sign(ui, repoagent, *pats, **opts):
     """sign tool"""
     from tortoisehg.hgqt import sign as signmod
     repo = repoagent.rawRepo()
-    if 'gpg' not in repo.extensions():
+    if b'gpg' not in repo.extensions():
         raise error.Abort(_('Please enable the Gpg extension first.'))
     kargs = {}
     rev = len(pats) > 0 and pats[0] or None
@@ -1193,9 +1268,9 @@ def sign(ui, repoagent, *pats, **opts):
         kargs['rev'] = rev
     return signmod.SignDialog(repoagent, opts=opts, **kargs)
 
-@command('status|st',
-    [('c', 'clean', False, _('show files without changes')),
-     ('i', 'ignored', False, _('show ignored files'))],
+@command(b'status|st',
+    [(b'c', b'clean', False, _('show files without changes')),
+     (b'i', b'ignored', False, _('show ignored files'))],
     _('thg status [OPTIONS] [FILE]'),
     helpbasic=True)
 def status(ui, repoagent, *pats, **opts):
@@ -1206,11 +1281,11 @@ def status(ui, repoagent, *pats, **opts):
     os.chdir(repo.root)
     return statusmod.StatusDialog(repoagent, pats, opts)
 
-@command('strip',
-    [('f', 'force', None, _('discard uncommitted changes (no backup)')),
-     ('n', 'nobackup', None, _('do not back up stripped revisions')),
-     ('k', 'keep', None, _('do not modify working copy during strip')),
-     ('r', 'rev', '', _('revision to strip'))],
+@command(b'strip',
+    [(b'f', b'force', None, _('discard uncommitted changes (no backup)')),
+     (b'n', b'nobackup', None, _('do not back up stripped revisions')),
+     (b'k', b'keep', None, _('do not modify working copy during strip')),
+     (b'r', b'rev', b'', _('revision to strip'))],
     _('thg strip [-k] [-f] [-n] [[-r] REV]'),
     helpbasic=True)
 def strip(ui, repoagent, *pats, **opts):
@@ -1223,8 +1298,8 @@ def strip(ui, repoagent, *pats, **opts):
         rev = pats[0]
     return thgstrip.createStripDialog(repoagent, rev=rev, opts=opts)
 
-@command('sync|synchronize',
-    [('B', 'bookmarks', False, _('open the bookmark sync window'))],
+@command(b'sync|synchronize',
+    [(b'B', b'bookmarks', False, _('open the bookmark sync window'))],
     _('thg sync [OPTION]... [PEER]'),
     helpbasic=True)
 def sync(ui, repoagent, url=None, **opts):
@@ -1235,18 +1310,18 @@ def sync(ui, repoagent, url=None, **opts):
         return bookmarkmod.SyncBookmarkDialog(repoagent, url)
 
     repo = repoagent.rawRepo()
-    repo.ui.setconfig('tortoisehg', 'defaultwidget', 'sync')
+    repo.ui.setconfig(b'tortoisehg', b'defaultwidget', b'sync')
     w = repowidget.LightRepoWindow(repoagent)
     if url:
         w.setSyncUrl(url)
     return w
 
-@command('tag',
-    [('f', 'force', None, _('replace existing tag')),
-     ('l', 'local', None, _('make the tag local')),
-     ('r', 'rev', '', _('revision to tag')),
-     ('', 'remove', None, _('remove a tag')),
-     ('m', 'message', '', _('use <text> as commit message'))],
+@command(b'tag',
+    [(b'f', b'force', None, _('replace existing tag')),
+     (b'l', b'local', None, _('make the tag local')),
+     (b'r', b'rev', b'', _('revision to tag')),
+     (b'', b'remove', None, _('remove a tag')),
+     (b'm', b'message', b'', _('use <text> as commit message'))],
     _('thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]'),
     helpbasic=True)
 def tag(ui, repoagent, *pats, **opts):
@@ -1258,29 +1333,29 @@ def tag(ui, repoagent, *pats, **opts):
         kargs['tag'] = tag
     rev = opts.get('rev')
     if rev:
-        kargs['rev'] = rev
+        kargs['rev'] = hglib.tounicode(rev)
     return tagmod.TagDialog(repoagent, opts=opts, **kargs)
 
-@command('thgstatus',
-    [('',  'delay', None, _('wait until the second ticks over')),
-     ('n', 'notify', [], _('notify the shell for paths given')),
-     ('',  'remove', None, _('remove the status cache')),
-     ('s', 'show', None, _('show the contents of the status cache '
-                           '(no update)')),
-     ('',  'all', None, _('update all repos in current dir'))],
+@command(b'thgstatus',
+    [(b'',  b'delay', None, _('wait until the second ticks over')),
+     (b'n', b'notify', [], _('notify the shell for paths given')),
+     (b'',  b'remove', None, _('remove the status cache')),
+     (b's', b'show', None, _('show the contents of the status cache '
+                             '(no update)')),
+     (b'',  b'all', None, _('update all repos in current dir'))],
     _('thg thgstatus [OPTION]'))
 def thgstatus(ui, *pats, **opts):
     """update TortoiseHg status cache"""
     from tortoisehg.util import thgstatus as thgstatusmod
     thgstatusmod.run(ui, *pats, **opts)
 
-@command('topics',
-    [('r', 'rev', '', _('revision'))],
+@command(b'topics',
+    [(b'r', b'rev', b'', _('revision'))],
     _('thg topics [-r REV] [NAME]'))
 def topics(ui, repoagent, *names, **opts):
     """add, remove or change a topic"""
     repo = repoagent.rawRepo()
-    if 'topic' not in repo.extensions():
+    if b'topic' not in repo.extensions():
         raise error.Abort(_('Please enable the Topic extension first.'))
     from tortoisehg.hgqt import topics as topicsmod
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
@@ -1291,9 +1366,9 @@ def topics(ui, repoagent, *names, **opts):
         dlg.setTopicName(hglib.tounicode(names[0]))
     return dlg
 
-@command('update|checkout|co',
-    [('C', 'clean', None, _('discard uncommitted changes (no backup)')),
-     ('r', 'rev', '', _('revision to update')),],
+@command(b'update|checkout|co',
+    [(b'C', b'clean', None, _('discard uncommitted changes (no backup)')),
+     (b'r', b'rev', b'', _('revision to update')),],
     _('thg update [-C] [[-r] REV]'),
     helpbasic=True)
 def update(ui, repoagent, *pats, **opts):
@@ -1301,13 +1376,13 @@ def update(ui, repoagent, *pats, **opts):
     from tortoisehg.hgqt import update as updatemod
     rev = None
     if opts.get('rev'):
-        rev = opts.get('rev')
+        rev = hglib.tounicode(opts.get('rev'))
     elif len(pats) == 1:
-        rev = pats[0]
+        rev = hglib.tounicode(pats[0])
     return updatemod.UpdateDialog(repoagent, rev, None, opts)
 
-@command('userconfig',
-    [('', 'focus', '', _('field to give initial focus'))],
+@command(b'userconfig',
+    [(b'', b'focus', b'', _('field to give initial focus'))],
     _('thg userconfig'),
     helpbasic=True)
 def userconfig(ui, *pats, **opts):
@@ -1315,10 +1390,10 @@ def userconfig(ui, *pats, **opts):
     from tortoisehg.hgqt import settings
     return settings.SettingsDialog(False, focus=opts.get('focus'))
 
-@command('vdiff',
-    [('c', 'change', '', _('changeset to view in diff tool')),
-     ('r', 'rev', [], _('revisions to view in diff tool')),
-     ('b', 'bundle', '', _('bundle file to preview'))],
+@command(b'vdiff',
+    [(b'c', b'change', b'', _('changeset to view in diff tool')),
+     (b'r', b'rev', [], _('revisions to view in diff tool')),
+     (b'b', b'bundle', b'', _('bundle file to preview'))],
     _('launch visual diff tool'),
     helpbasic=True)
 def vdiff(ui, repoagent, *pats, **opts):
@@ -1330,14 +1405,15 @@ def vdiff(ui, repoagent, *pats, **opts):
     pats = hglib.canonpaths(pats)
     return visdiff.visualdiff(ui, repo, pats, opts)
 
-@command('version',
-    [('v', 'verbose', None, _('print license'))],
+@command(b'version',
+    [(b'v', b'verbose', None, _('print license'))],
     _('thg version [OPTION]'),
     helpbasic=True)
 def version(ui, **opts):
     """output version and copyright information"""
     ui.write(_('TortoiseHg Dialogs (version %s), '
                'Mercurial (version %s)\n') %
-               (thgversion.version(), hglib.hgversion))
+             (pycompat.sysbytes(thgversion.version()),
+              pycompat.sysbytes(hglib.hgversion)))
     if not ui.quiet:
         ui.write(shortlicense)

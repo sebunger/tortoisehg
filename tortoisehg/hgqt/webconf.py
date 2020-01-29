@@ -332,12 +332,12 @@ class WebconfModel(QAbstractTableModel):
 
     def getpathmapat(self, row):
         """return pair of (path, localpath) at the specified index"""
-        assert 0 <= row and row < self.rowCount()
+        assert 0 <= row and row < self.rowCount(), row
         return tuple(hglib.tounicode(e) for e in self._config.items('paths')[row])
 
     def addpathmap(self, path, localpath):
         """add path mapping to serve"""
-        assert path not in self.paths
+        assert path not in self.paths, path
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         try:
             self._config.set('paths', hglib.fromunicode(path),
@@ -364,5 +364,5 @@ class WebconfModel(QAbstractTableModel):
 
     def _indexofpath(self, path):
         path = hglib.fromunicode(path)
-        assert path in self._config['paths']
+        assert path in self._config['paths'], path
         return list(self._config['paths']).index(path)

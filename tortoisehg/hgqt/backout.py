@@ -66,7 +66,7 @@ class BackoutDialog(QWizard):
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
 
         repo = repoagent.rawRepo()
-        parentbackout = repo[rev] == repo['.']
+        parentbackout = repo[rev] == repo[b'.']
 
         self.setWindowTitle(_('Backout - %s') % repoagent.displayName())
         self.setWindowIcon(qtlib.geticon('hg-revert'))
@@ -92,10 +92,11 @@ class BackoutDialog(QWizard):
         qs.beginGroup('backout')
         for n in ['autoadvance', 'skiplast']:
             self.setField(n, qs.value(n, False))
-        repo = self._repoagent.rawRepo()
         n = 'autoresolve'
-        self.setField(n, repo.ui.configbool('tortoisehg', n,
-                                            qtlib.readBool(qs, n, True)))
+        self.setField(
+            n,
+            self._repoagent.configBool('tortoisehg', n,
+                                       qtlib.readBool(qs, n, True)))
         qs.endGroup()
 
     def _writeSettings(self):
@@ -174,7 +175,7 @@ class SummaryPage(BasePage):
 
         repo = self.repo
         bctx = repo[backoutrev]
-        pctx = repo['.']
+        pctx = repo[b'.']
 
         if parentbackout:
             lbl = _('Backing out a parent revision is a single step operation')
@@ -243,7 +244,7 @@ class SummaryPage(BasePage):
 
     def repositoryChanged(self):
         'repository has detected a change to changelog or parents'
-        pctx = self.repo['.']
+        pctx = self.repo[b'.']
         self.localCsInfo.update(pctx)
 
     def canExit(self):
@@ -320,7 +321,7 @@ class BackoutPage(BasePage):
             return False
         count = 0
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
-            if status == 'u':
+            if status == b'u':
                 count += 1
         if count:
             # if autoresolve is enabled, we know these were real conflicts
@@ -473,7 +474,7 @@ class CommitPage(BasePage):
 
         self.engChk = QCheckBox(_('Use English backout message'))
         self.engChk.toggled.connect(eng_toggled)
-        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
+        engmsg = repoagent.configBool('tortoisehg', 'engmsg')
         self.engChk.setChecked(engmsg)
         self.layout().addWidget(self.engChk)
 
@@ -485,7 +486,7 @@ class CommitPage(BasePage):
         self.msgEntry.saveSettings(s, 'backout/message')
 
     def currentPage(self):
-        engmsg = self.repo.ui.configbool('tortoisehg', 'engmsg', False)
+        engmsg = self._repoagent.configBool('tortoisehg', 'engmsg')
         msgset = i18n.keepgettext()._('Backed out changeset: ')
         msg = engmsg and msgset['id'] or msgset['str']
         self.msgEntry.setText(msg + str(self.repo[self._backoutrev]))
@@ -528,9 +529,9 @@ class CommitPage(BasePage):
             cmdline = hglib.buildcmdargs('commit', verbose=True,
                                          message=message, user=user)
         commandlines = [cmdline]
-        pushafter = self.repo.ui.config('tortoisehg', 'cipushafter')
+        pushafter = self._repoagent.configString('tortoisehg', 'cipushafter')
         if pushafter:
-            cmd = ['push', hglib.tounicode(pushafter)]
+            cmd = ['push', pushafter]
             commandlines.append(cmd)
 
         self._cmdlog.show()
@@ -563,5 +564,5 @@ class ResultPage(BasePage):
         self.layout().addStretch(1)
 
     def currentPage(self):
-        self.bkCsInfo.update(self.repo['tip'])
+        self.bkCsInfo.update(self.repo[b'tip'])
         self.wizard().setOption(QWizard.NoCancelButton, True)

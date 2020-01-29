@@ -77,6 +77,12 @@ from . import (
     thgrepo,
 )
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        List,
+        Text,
+    )
+
 if os.name == 'nt':
     from ..util import bugtraq
     _hasbugtraq = True
@@ -103,7 +109,7 @@ class SettingsCombo(QComboBox):
         self.opts = opts
         self.setEditable(opts.get('canedit', False))
         self.setValidator(opts.get('validator', None))
-        self.defaults = opts.get('defaults', [])
+        self.defaults = opts.get('defaults', [])  # type: List[Text]
         if self.defaults and self.isEditable():
             self.setCompleter(QCompleter(self.defaults, self))
         self.curvalue = None
@@ -149,7 +155,7 @@ class SettingsCombo(QComboBox):
 
     def showPopup(self):
         if self.opts.get('defer') and not self.loaded:
-            self.defaults = self.opts['defer']()
+            self.defaults = self.opts['defer']()  # type: List[Text]
             self.loaded = True
             self.resetList()
         QComboBox.showPopup(self)
@@ -205,9 +211,9 @@ class BoolRBGroup(QWidget):
 
     def value(self):
         if self.trueRB.isChecked():
-            return 'True'
+            return b'True'
         elif self.falseRB.isChecked():
-            return 'False'
+            return b'False'
         else:
             return None
 
@@ -268,9 +274,10 @@ class TextEntry(QTextEdit):
         return self.value() != self.curvalue
 
     def removeEmptyLines(self, text):
+        # type: (pycompat.unicode) -> pycompat.unicode
         if not text:
             return text
-        rawlines = hglib.fromunicode(text).splitlines()
+        rawlines = text.splitlines()
         lines = []
         for line in rawlines:
             if not line.strip():
@@ -318,7 +325,7 @@ class FontEntry(QWidget):
         self.clearButton.clicked.connect(self.onClearClicked)
 
         cpath = self.opts['cpath']
-        assert cpath.startswith('tortoisehg.')
+        assert cpath.startswith('tortoisehg.'), cpath
         self.fname = cpath[11:]
         self.setMinimumWidth(ENTRY_WIDTH)
 
@@ -371,7 +378,7 @@ class SettingsCheckBox(QCheckBox):
         self.setChecked(curvalue)
 
     def value(self):
-        return self.isChecked()
+        return self.isChecked()  # applyChangesForExtensions can handle booleans
 
     def isDirty(self):
         return self.value() != self.curvalue
@@ -574,10 +581,10 @@ def issuePluginVisible():
         return False
 
 def findDiffTools():
-    return hglib.difftools(hglib.loadui())
+    return sorted(hglib.tounicode(t) for t in hglib.difftools(hglib.loadui()))
 
 def findMergeTools():
-    return hglib.mergetools(hglib.loadui())
+    return [hglib.tounicode(t) for t in hglib.mergetools(hglib.loadui())]
 
 def findEditors():
     return editor.findeditors(hglib.loadui())
@@ -750,8 +757,8 @@ INFO = (
         _('Specify which task buttons you want to show on the task toolbar '
           'and in which order.<br>Type a list of the task button names. '
           'Add separators by putting "|" between task button names.<br>'
-          'Valid names are: log commit sync grep and pbranch.<br>'
-          'Default: log commit grep pbranch | sync'),
+          'Valid names are: log commit sync grep.<br>'
+          'Default: log commit grep | sync'),
         restartneeded=True, globalonly=True),
     _fi(_('Long Summary'), 'tortoisehg.longsummary', genBoolRBGroup,
         _('If true, concatenate multiple lines of changeset summary '
@@ -837,7 +844,8 @@ INFO = (
           'This setting is used by the Merge, Tag and Backout dialogs. '
           'Default: False')),
     _fi(_('New Commit Phase'), 'phases.new-commit',
-        (genDefaultCombo, phases.phasenames[:3]),
+        (genDefaultCombo,
+         [pycompat.sysstr(ph) for ph in phases.phasenames[:3]]),
         _('The phase of new commits. Default: draft')),
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
         _('Make MQ patches secret (instead of draft). '
@@ -1316,14 +1324,16 @@ class SettingsDialog(QDialog):
         layout.addWidget(self.conftabs)
         if qtlib.IS_RETINA:
             self.conftabs.setIconSize(qtlib.barRetinaIconSize())
-        utab = SettingsForm(rcpath=hglib.userrcpath(), focus=focus)
+        utab = SettingsForm(
+            rcpath=[hglib.tounicode(rcpath) for rcpath in hglib.userrcpath()],
+            focus=focus)
         self.conftabs.addTab(utab, qtlib.geticon('thg-userconfig'),
                              _("%s's global settings") % username())
         utab.restartRequested.connect(self._pushRestartRequest)
 
         try:
             if root is None:
-                root = paths.find_root()
+                root = paths.find_root_bytes()
             if root:
                 repo = thgrepo.repository(hglib.loadui(), root)
             else:
@@ -1337,18 +1347,19 @@ class SettingsDialog(QDialog):
 
         if repo:
             repoagent = repo._pyqtobj  # TODO
-            if 'projrc' in repo.extensions():
-                projrcpath = os.sep.join([repo.root, '.hg', 'projrc'])
+            if b'projrc' in repo.extensions():
+                projrcpath = os.path.join(hglib.tounicode(repo.root),
+                                          '.hg', 'projrc')
                 if os.path.exists(projrcpath):
-                    rtab = SettingsForm(rcpath=projrcpath, focus=focus,
+                    rtab = SettingsForm(rcpath=[projrcpath], focus=focus,
                                         readonly=True)
                     self.conftabs.addTab(rtab, qtlib.geticon('settings_projrc'),
                                          _('%s project settings (.hg/projrc)')
                                          % repoagent.shortName())
                     rtab.restartRequested.connect(self._pushRestartRequest)
 
-            reporcpath = os.sep.join([repo.root, '.hg', 'hgrc'])
-            rtab = SettingsForm(rcpath=reporcpath, focus=focus)
+            reporcpath = os.path.join(hglib.tounicode(repo.root), '.hg', 'hgrc')
+            rtab = SettingsForm(rcpath=[reporcpath], focus=focus)
             self.conftabs.addTab(rtab, qtlib.geticon('thg-repoconfig'),
                                  _('%s repository settings')
                                  % repoagent.shortName())
@@ -1440,10 +1451,7 @@ class SettingsForm(QWidget):
         # if the corresponding ini file is readonly
         self.forcereadonly = readonly
 
-        if isinstance(rcpath, (list, tuple)):
-            self.rcpath = rcpath
-        else:
-            self.rcpath = [rcpath]
+        self.rcpath = rcpath
 
         layout = QVBoxLayout()
         self.setLayout(layout)
@@ -1546,7 +1554,7 @@ class SettingsForm(QWidget):
                 self.applyChanges()
             elif ret == 2:
                 return
-        qscilib.fileEditor(hglib.tounicode(self.fn), foldable=True)
+        qscilib.fileEditor(self.fn, foldable=True)
         self.refresh()
 
     def refresh(self, *args):
@@ -1555,7 +1563,7 @@ class SettingsForm(QWidget):
         self.readonly = self.forcereadonly or not (hasattr(self.ini, 'write')
                                 and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
-        self.fnedit.setText(hglib.tounicode(self.fn))
+        self.fnedit.setText(self.fn)
         for page in self.pages.values():
             self.refreshPage(page)
 
@@ -1566,7 +1574,7 @@ class SettingsForm(QWidget):
                 key = w.opts['label']
                 for fullkey in (key, 'hgext.%s' % key, 'hgext/%s' % key):
                     val = self.readCPath('extensions.' + fullkey)
-                    if val != None:
+                    if val is not None:
                         break
                 if val == None:
                     curvalue = False
@@ -1651,10 +1659,11 @@ class SettingsForm(QWidget):
             else:
                 func = e.values
                 w = func(opts)
+            rcpath = [hglib.tounicode(rcpath) for rcpath in hglib.userrcpath()]
             if e.globalonly:
-                w.setEnabled(self.rcpath == hglib.userrcpath())
+                w.setEnabled(self.rcpath == rcpath)
             elif e.noglobal:
-                w.setEnabled(self.rcpath != hglib.userrcpath())
+                w.setEnabled(self.rcpath != rcpath)
             lbl = QLabel(e.label)
             lbl.setToolTip(e.tooltip)
             widgets.append(w)
@@ -1665,7 +1674,7 @@ class SettingsForm(QWidget):
 
         # assign the master to widgets that have a master
         for w in widgets:
-            if w.opts['master'] != None:
+            if w.opts['master'] is not None:
                 for dep in widgets:
                     if dep.opts['cpath'] == w.opts['master']:
                         w.opts['master'] = dep
@@ -1681,7 +1690,7 @@ class SettingsForm(QWidget):
         allexts = hglib.allextensions()
         allextslist = list(allexts)
         MAXCOLUMNS = 3
-        maxrows = (len(allextslist) + MAXCOLUMNS - 1) / MAXCOLUMNS
+        maxrows = (len(allextslist) + MAXCOLUMNS - 1) // MAXCOLUMNS
         i = 0
         extsinfo = ()
         for i, name in enumerate(sorted(allexts)):
@@ -1691,7 +1700,7 @@ class SettingsForm(QWidget):
             w.installEventFilter(self)
             w.clicked.connect(self.validateextensions)
 
-            row, col = i / maxrows, i % maxrows
+            row, col = i // maxrows, i % maxrows
             grid.addWidget(w, col, row)
             widgets.append(w)
         return extsinfo, widgets
@@ -1731,7 +1740,7 @@ class SettingsForm(QWidget):
     def readCPath(self, cpath):
         'Retrieve a value from the parsed config file'
         # Presumes single section/key level depth
-        section, key = cpath.split('.', 1)
+        section, key = pycompat.sysbytes(cpath).split(b'.', 1)
         return self.ini.get(section, key)
 
     def loadIniFile(self, rcpath):
@@ -1755,12 +1764,12 @@ class SettingsForm(QWidget):
                 self.fn = rcpath[0]
                 return config.config()
         self.fn = fn
-        return wconfig.readfile(self.fn)
+        return wconfig.readfile(hglib.fromunicode(self.fn))
 
     def recordNewValue(self, cpath, newvalue):
         """Set the given value to ini; returns True if changed"""
         # 'newvalue' is in local encoding
-        section, key = cpath.split('.', 1)
+        section, key = pycompat.sysbytes(cpath).split(b'.', 1)
         if newvalue == self.ini.get(section, key):
             return False
         if newvalue == None:
@@ -1793,7 +1802,7 @@ class SettingsForm(QWidget):
                         self.restartRequested.emit(e.label)
 
         try:
-            wconfig.writefile(self.ini, self.fn)
+            wconfig.writefile(self.ini, hglib.fromunicode(self.fn))
             return True
         except EnvironmentError as e:
             qtlib.WarningMsgBox(_('Unable to write configuration file'),
@@ -1801,6 +1810,7 @@ class SettingsForm(QWidget):
             return False
 
     def applyChangesForExtensions(self):
+        assert 'extensions' in self.pages
         emitChanged = False
         section = 'extensions'
         enabledexts = hglib.enabledextensions()
@@ -1809,12 +1819,13 @@ class SettingsForm(QWidget):
                 self.restartRequested.emit(_('Extensions'))
                 emitChanged = True
             name = chk.opts['label']
-            section, key = chk.opts['cpath'].split('.', 1)
+            cpath = chk.opts['cpath']
+            section, key = pycompat.sysbytes(cpath).split(b'.', 1)
             newvalue = chk.value()
             if newvalue and (name in enabledexts):
                 continue    # unchanged
             if newvalue:
-                self.ini.set(section, key, '')
+                self.ini.set(section, key, b'')
             else:
                 try:
                     del self.ini[section][key]
@@ -1833,7 +1844,7 @@ class SettingsForm(QWidget):
         def getinival(cpath):
             if section not in self.ini:
                 return None
-            sect, key = cpath.split('.', 1)
+            sect, key = pycompat.sysbytes(cpath).split(b'.', 1)
             try:
                 return self.ini[sect][key]
             except KeyError:
@@ -1859,7 +1870,7 @@ class SettingsForm(QWidget):
             if not changable(name, chk.opts['cpath']):
                 chk.setEnabled(False)
                 cpath = chk.opts['cpath']
-                sect, key = cpath.split('.', 1)
+                sect, key = pycompat.sysbytes(cpath).split(b'.', 1)
                 if hglib.loadui().config(sect, key, None) is not None:
                     chk.setValue(True)
                     chk.curvalue = True

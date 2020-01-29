@@ -146,6 +146,7 @@ class RepoTreeView(QTreeView):
 
         if index:
             m = self.model()
+            assert m is not None
             if event.source() is self:
                 # Event is an internal move, so pass it to the model
                 col = 0
@@ -273,7 +274,9 @@ class RepoRegistryView(QDockWidget):
         if not os.path.exists(sfile):
             if not os.path.exists(os.path.dirname(sfile)):
                 os.makedirs(os.path.dirname(sfile))
-            tv.model().write(sfile)
+            m = tv.model()
+            assert m is not None
+            m.write(sfile)
         self.watcher = QFileSystemWatcher(self)
         self.watcher.addPath(sfile)
         self._reloadModelTimer = QTimer(self, interval=2000, singleShot=True)
@@ -346,7 +349,9 @@ class RepoRegistryView(QDockWidget):
     @pyqtSlot()
     def _updateCommonPath(self):
         show = self._isSettingEnabled('showShortPaths')
-        self.tview.model().updateCommonPaths(show)
+        model = self.tview.model()
+        assert model is not None
+        model.updateCommonPaths(show)
         # FIXME: access violation; should be done by model
         self.tview.dataChanged(QModelIndex(), QModelIndex())
 
@@ -357,13 +362,15 @@ class RepoRegistryView(QDockWidget):
         sfile = settingsfilename()
         if self.watcher:
             self.watcher.removePath(sfile)
-        self.tview.model().write(sfile)
+        model = self.tview.model()
+        assert model is not None
+        model.write(sfile)
         if self.watcher:
             self.watcher.addPath(sfile)
 
         # Whenver the settings file must be updated, it is also time to ensure
         # that the commonPaths are up to date
-        QTimer.singleShot(0, self.tview.model().updateCommonPaths)
+        QTimer.singleShot(0, model.updateCommonPaths)
 
     @pyqtSlot()
     def dropAccepted(self):
@@ -374,6 +381,7 @@ class RepoRegistryView(QDockWidget):
     @pyqtSlot()
     def reloadModel(self):
         oldmodel = self.tview.model()
+        assert oldmodel is not None
         activeroot = oldmodel.repoRoot(oldmodel.activeRepoIndex())
         newmodel = repotreemodel.RepoTreeModel(settingsfilename(),
             self._repomanager, self,
@@ -389,11 +397,13 @@ class RepoRegistryView(QDockWidget):
 
     def _readExpandedState(self, s):
         model = self.tview.model()
+        assert model is not None
         for path in qtlib.readStringList(s, 'expanded'):
             self.tview.expand(model.indexFromItemPath(path))
 
     def _writeExpandedState(self, s):
         model = self.tview.model()
+        assert model is not None
         paths = [model.itemPath(i) for i in model.persistentIndexList()
                  if i.column() == 0 and self.tview.isExpanded(i)]
         s.setValue('expanded', paths)
@@ -415,6 +425,7 @@ class RepoRegistryView(QDockWidget):
     def addClonedRepo(self, root, sourceroot):
         """Add repo to the same group as the source"""
         m = self.tview.model()
+        assert m is not None
         src = m.indexFromRepoRoot(sourceroot, standalone=True)
         if src.isValid() and not m.isKnownRepoRoot(root):
             index = m.addRepo(root, parent=src.parent())
@@ -423,6 +434,7 @@ class RepoRegistryView(QDockWidget):
     def setActiveTabRepo(self, root):
         """"The selected tab has changed on the workbench"""
         m = self.tview.model()
+        assert m is not None
         index = m.indexFromRepoRoot(root)
         m.setActiveRepo(index)
         self.tview.scrollTo(index)
@@ -440,7 +452,9 @@ class RepoRegistryView(QDockWidget):
         # We must stop monitoring the settings file and then we can save it
         sfile = settingsfilename()
         self.watcher.removePath(sfile)
-        self.tview.model().write(sfile)
+        model = self.tview.model()
+        assert model is not None
+        model.write(sfile)
         self._saveSettings()
 
     def _action_defs(self):
@@ -533,6 +547,7 @@ class RepoRegistryView(QDockWidget):
     def _currentRepoRoot(self):
         model = self.tview.model()
         index = self.tview.currentIndex()
+        assert model is not None
         return model.repoRoot(index)
 
     def cloneRepo(self):
@@ -545,6 +560,7 @@ class RepoRegistryView(QDockWidget):
         model = self.tview.model()
         index = self.tview.currentIndex()
         repoitem = index.internalPointer()
+        assert model is not None
         qtlib.openshell(hglib.fromunicode(model.repoRoot(index)),
                         hglib.fromunicode(repoitem.shortname()))
 
@@ -556,6 +572,7 @@ class RepoRegistryView(QDockWidget):
                                        options=FD.ShowDirsOnly | FD.ReadOnly)
         if path:
             m = self.tview.model()
+            assert m is not None
             uroot = paths.find_root(pycompat.unicode(path))
             if uroot and not m.isKnownRepoRoot(uroot, standalone=True):
                 index = m.addRepo(uroot, parent=self.tview.currentIndex())
@@ -615,7 +632,7 @@ class RepoRegistryView(QDockWidget):
                         'cannot be open!') % root, parent=self)
                     return
 
-                if hglib.fromunicode(srelroot) in repo['.'].substate:
+                if hglib.fromunicode(srelroot) in repo[b'.'].substate:
                     qtlib.WarningMsgBox(_('Subrepository already exists'),
                         _('The selected repository:<br><br>%s<br><br>'
                         'is already a subrepository of:<br><br>%s<br><br>'
@@ -624,10 +641,10 @@ class RepoRegistryView(QDockWidget):
                 else:
                     # Read the current .hgsub file contents
                     lines = []
-                    hasHgsub = os.path.exists(repo.wjoin('.hgsub'))
+                    hasHgsub = os.path.exists(repo.wjoin(b'.hgsub'))
                     if hasHgsub:
                         try:
-                            fsub = repo.wvfs('.hgsub', 'r')
+                            fsub = repo.wvfs(b'.hgsub', b'r')
                             lines = fsub.readlines()
                             fsub.close()
                         except:
@@ -666,12 +683,12 @@ class RepoRegistryView(QDockWidget):
 
                     # and update the .hgsub file
                     try:
-                        fsub = repo.wvfs('.hgsub', 'w')
+                        fsub = repo.wvfs(b'.hgsub', b'w')
                         fsub.write(linesep.join(lines) + linesep)
                         fsub.close()
                         if not hasHgsub:
                             commands.add(hglib.loadui(),
-                                         repo, repo.wjoin('.hgsub'))
+                                         repo, repo.wjoin(b'.hgsub'))
                         qtlib.InfoMsgBox(
                             _('Subrepo added to .hgsub file'),
                             _('The selected subrepo:<br><br><i>%s</i><br><br>'
@@ -692,6 +709,7 @@ class RepoRegistryView(QDockWidget):
         'menu action handler for removing an existing subrepository'
         model = self.tview.model()
         index = self.tview.currentIndex()
+        assert model is not None
         path = model.repoRoot(index)
         root = model.repoRoot(index.parent())
         relsubpath = os.path.normcase(os.path.normpath(path[1+len(root):]))
@@ -762,6 +780,7 @@ class RepoRegistryView(QDockWidget):
         if not root:
             model = self.tview.model()
             index = self.tview.currentIndex()
+            assert model is not None
             root = model.repoRoot(index)
             repotype = index.internalPointer().repotype()
         else:
@@ -780,6 +799,7 @@ class RepoRegistryView(QDockWidget):
     @pyqtSlot(QModelIndex)
     def _openRepoAt(self, index):
         model = self.tview.model()
+        assert model is not None
         root = model.repoRoot(index)
         if root:
             # We can only open mercurial repositories and subrepositories
@@ -801,7 +821,9 @@ class RepoRegistryView(QDockWidget):
         self.tview.edit(self.tview.currentIndex())
 
     def newGroup(self):
-        self.tview.model().addGroup(_('New Group'))
+        model = self.tview.model()
+        assert model is not None
+        model.addGroup(_('New Group'))
 
     def removeSelected(self):
         root = self._currentRepoRoot()
@@ -823,13 +845,16 @@ class RepoRegistryView(QDockWidget):
                                         labels=labels, parent=self):
                 return
         m = self.tview.model()
+        assert m is not None
         m.removeRows(index.row(), 1, index.parent())
         self.updateSettingsFile()
 
     def sortbyname(self):
         index = self.tview.currentIndex()
         childs = index.internalPointer().childs
-        self.tview.model().sortchilds(childs, lambda x: x.shortname().lower())
+        model = self.tview.model()
+        assert model is not None
+        model.sortchilds(childs, lambda x: x.shortname().lower())
 
     def sortbypath(self):
         index = self.tview.currentIndex()
@@ -837,15 +862,18 @@ class RepoRegistryView(QDockWidget):
         def keyfunc(x):
             l = hglib.fromunicode(x.rootpath())
             return os.path.normcase(util.normpath(l))
-        self.tview.model().sortchilds(childs, keyfunc)
+        model = self.tview.model()
+        assert model is not None
+        model.sortchilds(childs, keyfunc)
 
     def sortbyhgsub(self):
         model = self.tview.model()
         index = self.tview.currentIndex()
         ip = index.internalPointer()
+        assert model is not None
         repo = hg.repository(hglib.loadui(),
                              hglib.fromunicode(model.repoRoot(index)))
-        ctx = repo['.']
+        ctx = repo[b'.']
         wfile = '.hgsub'
         if wfile not in ctx:
             return self.sortbypath()
@@ -861,10 +889,13 @@ class RepoRegistryView(QDockWidget):
             except ValueError:
                 # If an item is not found, place it at the top
                 return 0
-        self.tview.model().sortchilds(ip.childs, keyfunc)
+        model = self.tview.model()
+        assert model is not None
+        model.sortchilds(ip.childs, keyfunc)
 
     def _scanAddedRepo(self, index):
         m = self.tview.model()
+        assert m is not None
         invalidpaths = m.loadSubrepos(index)
         if not invalidpaths:
             return
@@ -887,12 +918,14 @@ class RepoRegistryView(QDockWidget):
     def scanRepo(self, uroot):
         uroot = pycompat.unicode(uroot)
         m = self.tview.model()
+        assert m is not None
         index = m.indexFromRepoRoot(uroot)
         if index.isValid():
             m.loadSubrepos(index)
 
     def _scanAllRepos(self):
         m = self.tview.model()
+        assert m is not None
         indexes = m.indexesOfRepoItems(standalone=True)
         if not self._isSettingEnabled('showNetworkSubrepos'):
             indexes = [idx for idx in indexes

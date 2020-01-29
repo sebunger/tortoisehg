@@ -41,7 +41,7 @@ def loaddata(reponame, rev, path, prev=None):
 
 
 def check_error(fd, message):
-    assert message in fd.error
+    assert message in fd.error, (message, fd.error)
     # no data should be loaded
     assert_false(fd.contents)
     assert_false(fd.olddata)
@@ -55,7 +55,7 @@ def test_error_added():
             yield check_error, fd, msg
 
 def check_flabel(fd, message):
-    assert message in fd.flabel
+    assert message in fd.flabel, (message, fd.flabel)
 
 def test_flabel_added():
     for path in ['text', 'binary', 'text-over1kb']:

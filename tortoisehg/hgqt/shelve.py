@@ -66,13 +66,13 @@ class ShelveDialog(QDialog):
         self.tbarhbox = hbox = QHBoxLayout()
         hbox.setContentsMargins(0, 0, 0, 0)
         hbox.setSpacing(0)
-        self.layout().addLayout(self.tbarhbox)
+        layout.addLayout(self.tbarhbox)
 
         self.splitter = QSplitter(self)
         self.splitter.setOrientation(Qt.Horizontal)
         self.splitter.setChildrenCollapsible(False)
         self.splitter.setObjectName('splitter')
-        self.layout().addWidget(self.splitter, 1)
+        layout.addWidget(self.splitter, 1)
 
         aframe = QFrame(self.splitter)
         avbox = QVBoxLayout()
@@ -211,7 +211,7 @@ class ShelveDialog(QDialog):
         self.browseb.fileModelEmpty.connect(self.allleft.setDisabled)
 
         self.statusbar = cmdui.ThgStatusBar(self)
-        self.layout().addWidget(self.statusbar)
+        layout.addWidget(self.statusbar)
         self.showMessage(_('Backup copies of modified files can be found '
                            'in .hg/Trashcan/'))
 
@@ -295,15 +295,14 @@ class ShelveDialog(QDialog):
 
     def newShelf(self, interactive):
         shelve = time.strftime('%Y-%m-%d_%H-%M-%S') + \
-                 '_parent_rev_%d' % self.repo['.'].rev()
+                 '_parent_rev_%d' % self.repo[b'.'].rev()
         if interactive:
-            name, ok = qtlib.getTextInput(self,
+            shelve, ok = qtlib.getTextInput(self,
                          _('TortoiseHg New Shelf Name'),
                          _('Specify name of new shelf'),
                          text=shelve)
             if not ok:
                 return
-            shelve = hglib.fromunicode(name)
             invalids = (':', '#', '/', '\\')
             bads = [c for c in shelve if c in invalids]
             if bads:
@@ -311,18 +310,18 @@ class ShelveDialog(QDialog):
                                   _('A shelf name cannot contain %s')
                                   % ''.join(bads))
                 return
-            badmsg = util.checkosfilename(shelve)
+            badmsg = util.checkosfilename(hglib.fromunicode(shelve))
             if badmsg:
                 qtlib.ErrorMsgBox(_('Bad filename'), hglib.tounicode(badmsg))
                 return
         try:
             fn = os.path.join('shelves', shelve)
-            shelfpath = self.repo.vfs.join(fn)
+            shelfpath = self.repo.vfs.join(hglib.fromunicode(fn))  # type: bytes
             if os.path.exists(shelfpath):
                 qtlib.ErrorMsgBox(_('File already exists'),
                                   _('A shelf file of that name already exists'))
                 return
-            self.repo.makeshelf(shelve)
+            self.repo.makeshelf(hglib.fromunicode(shelve))
             self.showMessage(_('New shelf created'))
             self.refreshCombos()
             if shelfpath in self.shelves:

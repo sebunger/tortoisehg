@@ -40,6 +40,10 @@ from .qtnetwork import (
     QNetworkRequest,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import (
     hglib,
     paths,
@@ -79,7 +83,7 @@ class AboutDialog(QDialog):
         self.copyright_lbl = QLabel()
         self.copyright_lbl.setAlignment(Qt.AlignCenter)
         self.copyright_lbl.setText('\n'
-                + _('Copyright 2008-2019 Steve Borho and others'))
+                + _('Copyright 2008-2020 Steve Borho and others'))
         self.vbox.addWidget(self.copyright_lbl)
         self.courtesy_lbl = QLabel()
         self.courtesy_lbl.setAlignment(Qt.AlignCenter)
@@ -150,7 +154,7 @@ class AboutDialog(QDialog):
         newverstr = '0.0.0'
         upgradeurl = ''
         try:
-            f = self._newverreply.readAll().data().splitlines()
+            f = pycompat.sysstr(self._newverreply.readAll().data()).splitlines()
             self._newverreply.close()
             self._newverreply = None
             newverstr = f[0]
@@ -158,7 +162,7 @@ class AboutDialog(QDialog):
             upgradeurl = f[1] # generic download URL
             platform = sys.platform
             if platform == 'win32':
-                from win32process import IsWow64Process as IsX64
+                from win32process import IsWow64Process as IsX64  # pytype: disable=import-error
                 platform = IsX64() and 'x64' or 'x86'
             # linux2 for Linux, darwin for OSX
             for line in f[2:]:
@@ -213,7 +217,7 @@ class LicenseDialog(QDialog):
         self.lic_txt.setTextInteractionFlags(
                 Qt.TextSelectableByKeyboard|Qt.TextSelectableByMouse)
         try:
-            with open(paths.get_license_path(), 'rb') as fp:
+            with open(paths.get_license_path(), 'r') as fp:
                 lic = fp.read()
             self.lic_txt.setPlainText(lic)
         except IOError:

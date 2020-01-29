@@ -119,8 +119,11 @@ def test_undumpsubrepos(f):
     """<subrepo> element should be mapped to different classes"""
     root = repotreemodel.readXml(f, 'reporegistry')
     allgroup = root.child(0)
-    assert type(allgroup.child(0)) is repotreeitem.StandaloneSubrepoItem
+    assert type(allgroup.child(0)) is repotreeitem.StandaloneSubrepoItem, \
+        repr(allgroup.child(0))
     subroot = allgroup.child(1)
-    assert type(subroot) is repotreeitem.RepoItem
-    assert type(subroot.child(0)) is repotreeitem.AlienSubrepoItem
-    assert type(subroot.child(1)) is repotreeitem.SubrepoItem
+    assert type(subroot) is repotreeitem.RepoItem, repr(subroot)
+    assert type(subroot.child(0)) is repotreeitem.AlienSubrepoItem, \
+        repr(subroot.child(0))
+    assert type(subroot.child(1)) is repotreeitem.SubrepoItem, \
+        repr(subroot.child(1))

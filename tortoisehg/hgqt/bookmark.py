@@ -89,7 +89,7 @@ class BookmarkDialog(QDialog):
 
         ### Activate checkbox
         self.activateCheckBox = QCheckBox()
-        if self.node == self.repo['.'].node():
+        if self.node == self.repo[b'.'].node():
             self.activateCheckBox.setChecked(True)
         else:
             self.activateCheckBox.setChecked(False)
@@ -264,7 +264,7 @@ class BookmarkDialog(QDialog):
         self._runBookmark(name, newname, rename=True, finishmsg=finishmsg)
 
 
-_extractbookmarknames = re.compile(r'(.*) [0-9a-f]{12,}$',
+_extractbookmarknames = re.compile(br'(.*) [0-9a-f]{12,}$',
                                    re.MULTILINE).findall
 
 class SyncBookmarkDialog(QDialog):
@@ -389,7 +389,7 @@ class SyncBookmarkDialog(QDialog):
     def _onListBookmarksFinished(self, sess, worklist):
         ret = sess.exitCode()
         if ret == 0:
-            bookmarks = _extractbookmarknames(str(sess.readAll()))
+            bookmarks = _extractbookmarknames(bytes(sess.readAll()))
             self._updateBookmarkList(worklist, bookmarks)
         elif ret == 1:
             self._updateBookmarkList(worklist, [])

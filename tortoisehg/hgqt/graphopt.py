@@ -13,8 +13,10 @@ algorithm. The optimised model is both faster to compute and uses less
 memory for repositories with a lot of history.
 """
 
+from __future__ import absolute_import
+
+import collections
 import itertools
-from collections import defaultdict
 
 from mercurial import (
     pycompat,
@@ -22,16 +24,27 @@ from mercurial import (
     util,
 )
 
-from tortoisehg.util import obsoleteutil
-from tortoisehg.hgqt import graph as graphmod
-from tortoisehg.hgqt.graph import (
+from ..util import (
+    hglib,
+    obsoleteutil,
+)
+from . import (
+    graph as graphmod,
+)
+from .graph import (
     LINE_TYPE_PARENT,
     LINE_TYPE_FAMILY,
     LINE_TYPE_OBSOLETE,
 )
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        List,
+        Tuple,
+    )
 
 def _compute_lines(rev, prevs, revs, active_edges):
+    # type: (int, List[int], List[int], List[GraphEdge]) -> List[Tuple[Tuple[int, int], GraphEdge]]
     """Computes current index and next line's index of each active edge
 
     Args:
@@ -94,9 +107,9 @@ class GraphEdge(object):
 
 def _branch_spec(repo, branch, all_parents):
     if all_parents:
-        return repo.revs('::branch(%s)', branch)
+        return repo.revs(b'::branch(%s)', branch)
     else:
-        return repo.revs('branch(%s)', branch)
+        return repo.revs(b'branch(%s)', branch)
 
 
 class Graph(object):
@@ -252,8 +265,8 @@ class Graph(object):
         if not self._revset or not self._show_family_line:
             return None
 
-        anc = defaultdict(set)
-        holders = defaultdict(set)
+        anc = collections.defaultdict(set)
+        holders = collections.defaultdict(set)
 
         revrange = self._get_revision_iterator()
 
@@ -326,7 +339,7 @@ class Graph(object):
         clog = self._repo.changelog
         parentrevs = dict([(r, clog.parentrevs(r)) for r in clog])
         parentrevs[None] = self._workingdir_parents()
-        actedge = defaultdict(list)
+        actedge = collections.defaultdict(list)
         revs = []
         revrange = self._get_revision_iterator()
         family = self._pre_compute_family(parentrevs)

@@ -28,7 +28,7 @@ def _detectapi():
     return candidates[0]
 
 try:
-    from ..util.config import qt_api as QT_API
+    from ..util.config import qt_api as QT_API  # pytype: disable=import-error
 except (AttributeError, ImportError):
     QT_API = _detectapi()
 
@@ -39,8 +39,8 @@ if QT_API == 'PyQt4':
                   'QUrl', 'QVariant']:
             sip.setapi(e, 2)
     _fixapi()
-    from PyQt4.QtCore import *
-    from PyQt4.QtGui import (
+    from PyQt4.QtCore import *  # pytype: disable=import-error
+    from PyQt4.QtGui import (  # pytype: disable=import-error
         QAbstractProxyModel,
         QItemSelection,
         QItemSelectionModel,

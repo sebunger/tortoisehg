@@ -177,6 +177,7 @@ class HgRepoView(QTableView):
 
     def _loadColumnSettings(self):
         model = self.model()
+        assert model is not None
         s = QSettings()
         s.beginGroup(self.colselect[0])
         cols = qtlib.readStringList(s, 'columns')
@@ -203,17 +204,20 @@ class HgRepoView(QTableView):
         s.endGroup()
 
     def visibleColumns(self):
+        model = self.model()
         hh = self.horizontalHeader()
-        return [self.model().allColumns()[hh.logicalIndex(visualindex)]
+        assert model is not None
+        return [model.allColumns()[hh.logicalIndex(visualindex)]
                 for visualindex in pycompat.xrange(hh.count()
                                                    - hh.hiddenSectionCount())]
 
     def setVisibleColumns(self, visiblecols):
-        if not self.model() or visiblecols == self.visibleColumns():
+        model = self.model()
+        if not model or visiblecols == self.visibleColumns():
             return
         hh = self.horizontalHeader()
         hh.sectionMoved.disconnect(self.columnsVisibilityChanged)
-        allcolumns = self.model().allColumns()
+        allcolumns = model.allColumns()
         for logicalindex, colname in enumerate(allcolumns):
             hh.setSectionHidden(logicalindex, colname not in visiblecols)
         for newvisualindex, colname in enumerate(visiblecols):
@@ -274,6 +278,7 @@ class HgRepoView(QTableView):
         hh = self.horizontalHeader()
         model = self.model()
         fontm = QFontMetrics(self.font())
+        assert model is not None
 
         for c in range(model.columnCount()):
             if hh.isSectionHidden(c):
@@ -352,16 +357,20 @@ class HgRepoView(QTableView):
 
     def back(self):
         if self.canGoBack():
+            model = self.model()
+            assert model is not None
             self._rev_pos -= 1
-            idx = self.model().indexFromRev(self._rev_history[self._rev_pos])
+            idx = model.indexFromRev(self._rev_history[self._rev_pos])
             if idx.isValid():
                 self._in_history = True
                 self.setCurrentIndex(idx)
 
     def forward(self):
         if self.canGoForward():
+            model = self.model()
+            assert model is not None
             self._rev_pos += 1
-            idx = self.model().indexFromRev(self._rev_history[self._rev_pos])
+            idx = model.indexFromRev(self._rev_history[self._rev_pos])
             if idx.isValid():
                 self._in_history = True
                 self.setCurrentIndex(idx)
@@ -390,15 +399,15 @@ class HgRepoView(QTableView):
             # look for a mercurial commit hash
             return scmutil.revsymbol(self.repo, symbolic_rev).rev()
         except error.RepoError:
-            if 'hggit' not in self.repo.extensions():
+            if b'hggit' not in self.repo.extensions():
                 # hg-git is not installed, do not try doing a gitnode() lookup
                 raise
             # look for a git commit hash
-            baseset = self.repo.revs('gitnode(%s)', symbolic_rev)
+            baseset = self.repo.revs(b'gitnode(%s)', symbolic_rev)
 
             if len(baseset) == 0:
-                raise error.RepoLookupError("No revision found with gitnode"
-                                            "('%s')" % symbolic_rev)
+                raise error.RepoLookupError(b"No revision found with gitnode"
+                                            b"('%s')" % symbolic_rev)
 
             # There would not be any strict requirement to check for
             # len(baseset) > 1, since hg-git already raises a LookupError if it
@@ -408,7 +417,7 @@ class HgRepoView(QTableView):
             if len(baseset) > 1:
                 raise error.AmbiguousPrefixLookupError(
                     symbolic_rev, self.repo.githandler.map_file,
-                    'Ambiguous commit hash')
+                    b'Ambiguous commit hash')
 
             return baseset.first()
 
@@ -433,7 +442,9 @@ class HgRepoView(QTableView):
             self.showMessage.emit(hglib.tounicode(str(e)))
             return
 
-        idx = self.model().indexFromRev(rev)
+        model = self.model()
+        assert model is not None
+        idx = model.indexFromRev(rev)
         if idx.isValid():
             flags = (QItemSelectionModel.ClearAndSelect
                      | QItemSelectionModel.Rows)
@@ -444,8 +455,10 @@ class HgRepoView(QTableView):
         if not s:
             s = QSettings()
 
+        model = self.model()
+        assert model is not None
         col_widths = []
-        for c in range(self.model().columnCount()):
+        for c in range(model.columnCount()):
             col_widths.append(self.columnWidth(c))
 
         try:
@@ -818,6 +831,7 @@ class LabeledDelegate(QStyledItemDelegate):
 class ColumnSelectDialog(QDialog):
     def __init__(self, name, model, curcolumns, parent=None):
         QDialog.__init__(self, parent)
+        assert model is not None
         all = model.allColumns()
         colnames = dict(model.allColumnHeaders())
 
@@ -864,5 +878,6 @@ class ColumnSelectDialog(QDialog):
         for i in pycompat.xrange(self.list.count()):
             item = self.list.item(i)
             if item.checkState() == Qt.Checked:
-                cols.append(item.columnid)
+                # TODO: better to use data(role) instead
+                cols.append(item.columnid)  # pytype: disable=attribute-error
         return cols

@@ -164,7 +164,7 @@ class messageserver(object):
         self._wndclass = wc = _WNDCLASS()
         wc.lpfnWndProc = _WNDPROC(self._wndproc)
         wc.hInstance = _GetModuleHandle(None)
-        wc.lpszClassName = 'HgMessage'
+        wc.lpszClassName = b'HgMessage'
         _RegisterClass(ctypes.byref(wc))
 
     def start(self):
@@ -183,9 +183,10 @@ class messageserver(object):
             self._thread.join()
 
     def _log(self, msg):
+        # type: (bytes) -> None
         if not self._logfile:
             return
-        self._logfile.write(msg + '\n')
+        self._logfile.write(msg + b'\n')
         self._logfile.flush()
 
     def _mainloop(self):
@@ -205,7 +206,7 @@ class messageserver(object):
         finally:
             self._wndcreated.set()
 
-        self._log('starting message loop (pid = %d)' % os.getpid())
+        self._log(b'starting message loop (pid = %d)' % os.getpid())
         msg = _MSG()
         lpmsg = ctypes.byref(msg)
         while _GetMessage(lpmsg, None, 0, 0):
@@ -214,27 +215,27 @@ class messageserver(object):
 
     def _wndproc(self, hwnd, msg, wparam, lparam):
         if msg == _WM_CLOSE:
-            self._log('received WM_CLOSE')
+            self._log(b'received WM_CLOSE')
             # dwProcessGroupId=0 means all processes sharing the same console,
             # which is the only choice for CTRL_C_EVENT.
             _GenerateConsoleCtrlEvent(_CTRL_C_EVENT, 0)
             return 0
         if msg == _WM_STOPMESSAGELOOP and self._hwnd:
-            self._log('destroying window')
+            self._log(b'destroying window')
             _DestroyWindow(self._hwnd)
             self._hwnd = None
         if msg == _WM_DESTROY:
-            self._log('received WM_DESTROY')
+            self._log(b'received WM_DESTROY')
             _PostQuitMessage(0)
             return 0
         return _DefWindowProc(hwnd, msg, wparam, lparam)
 
 def _openlogfile(ui):
-    log = ui.config('win32ill', 'log')
-    if log == '-':
+    log = ui.config(b'win32ill', b'log')
+    if log == b'-':
         return ui.ferr
     elif log:
-        return open(log, 'a')
+        return open(log, 'ab')
 
 def uisetup(ui):
     if os.name != 'nt':

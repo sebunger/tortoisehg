@@ -305,14 +305,16 @@ class StatusWidget(QWidget):
     def _updatePartials(self, fd):
         # remove files from the partials dictionary if they are not partial
         # selections, in order to simplify refresh.
+        model = self.tv.model()
+        assert model is not None
         dels = []
         for file, oldchanges in self.partials.items():
-            assert file in self.tv.model().checked
+            assert file in model.checked, file
             if oldchanges.excludecount == 0:
-                self.tv.model().checked[file] = True
+                model.checked[file] = True
                 dels.append(file)
             elif oldchanges.excludecount == len(oldchanges.hunks):
-                self.tv.model().checked[file] = False
+                model.checked[file] = False
                 dels.append(file)
         for file in dels:
             del self.partials[file]
@@ -463,8 +465,9 @@ class StatusWidget(QWidget):
 
     def updateModel(self, wctx, wstatus, patchecked):
         self.tv.setSortingEnabled(False)
-        if self.tv.model():
-            checked = self.tv.model().getChecked()
+        oldtm = self.tv.model()
+        if oldtm:
+            checked = oldtm.getChecked()
         else:
             checked = patchecked
             if self.pats and not checked:
@@ -480,7 +483,6 @@ class StatusWidget(QWidget):
             tm.checkCountChanged.connect(self.updateCheckCount)
         self.savechecks = True
 
-        oldtm = self.tv.model()
         self.tv.setModel(tm)
         if oldtm:
             oldtm.deleteLater()
@@ -491,7 +493,7 @@ class StatusWidget(QWidget):
             self.updateCheckCount()
 
         # remove non-existent file from partials table because model changed
-        for file in self.partials.keys():
+        for file in list(self.partials):
             if file not in tm.checked:
                 del self.partials[file]
 
@@ -526,7 +528,9 @@ class StatusWidget(QWidget):
     #@pyqtSlot(QModelIndex)
     def onRowDoubleClicked(self, index):
         'tree view emitted a doubleClicked signal, index guarunteed valid'
-        fd = self.tv.model().fileData(index)
+        model = self.tv.model()
+        assert model is not None
+        fd = model.fileData(index)
         if fd.subrepoType():
             self._fileactions.openSubrepo()
         elif fd.mergeStatus() == 'U':
@@ -634,6 +638,7 @@ class StatusWidget(QWidget):
         'Connected to treeview "currentChanged" signal'
         changeselect = self.fileview.isChangeSelectionEnabled()
         model = self.tv.model()
+        assert model is not None
         fd = model.fileData(index)
         fd.load(changeselect)
         if changeselect and not fd.isNull() and not fd.subrepoType():
@@ -642,6 +647,7 @@ class StatusWidget(QWidget):
 
     def _setCheckStateOfSelectedFiles(self, value):
         model = self.tv.model()
+        assert model is not None
         selmodel = self.tv.selectionModel()
         for index in selmodel.selectedRows(COL_PATH):
             model.setData(index, value, Qt.CheckStateRole)
@@ -703,7 +709,8 @@ class StatusThread(QThread):
                         continue
                     val = statusTypes[stat]
                     if self.opts[val.name]:
-                        d = dict([(fn, precheckfn(i)) for fn in status[i]])
+                        d = dict([(fn, precheckfn(i))
+                                  for fn in getattr(status, val.name)])
                         patchecked.update(d)
                 wctx = context.workingctx(self.repo, changes=status)
                 self.patchecked = patchecked
@@ -763,7 +770,7 @@ class WctxModel(QAbstractTableModel):
         def mkrow(fname, st):
             ext, sizek = '', ''
             try:
-                mst = fname in ms and ms[fname].upper() or ""
+                mst = fname in ms and pycompat.sysstr(ms[fname].upper()) or ""
                 name, ext = os.path.splitext(fname)
                 sizebytes = wctx[fname].size()
                 sizek = (sizebytes + 1023) // 1024
@@ -817,7 +824,7 @@ class WctxModel(QAbstractTableModel):
                 rows.append(mkrow(s, 'S'))
         # include clean unresolved files
         for f in ms:
-            if ms[f] == 'u' and f not in nchecked:
+            if ms[f] == b'u' and f not in nchecked:
                 nchecked[f] = checked.get(f, True)
                 rows.append(mkrow(f, 'C'))
         self.headers = ('*', _('Stat'), _('M'), _('Filename'),
@@ -1135,7 +1142,7 @@ class StatusFilterActionGroup(QObject):
     @pyqtSlot(str)
     def setStatus(self, text):
         """Set the status text"""
-        assert all(c in self._TYPES for c in text)
+        assert all(c in self._TYPES for c in text), repr(text)
         for c in self._TYPES:
             self._actions[c].setChecked(c in text)
 

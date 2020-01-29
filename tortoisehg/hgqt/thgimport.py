@@ -50,13 +50,14 @@ _FILE_FILTER = "%s;;%s" % (_("Patch files (*.diff *.patch)"),
                            _("All files (*)"))
 
 def _writetempfile(text):
-    fd, filename = tempfile.mkstemp(suffix='.patch', prefix='thg-import-',
+    # type: (bytes) -> pycompat.unicode
+    fd, filename = tempfile.mkstemp(suffix=b'.patch', prefix=b'thg-import-',
                                     dir=qtlib.gettempdir())
     try:
         os.write(fd, text)
     finally:
         os.close(fd)
-    return filename
+    return hglib.tounicode(filename)
 
 # TODO: handle --mq options from command line or MQ widget
 
@@ -169,8 +170,8 @@ class ImportDialog(QDialog):
         self.repo.invalidatedirstate()
 
         wctx = self.repo[None]
-        M, A, R = wctx.status()[:3]
-        if M or A or R:
+        status = wctx.status()
+        if status.modified or status.added or status.removed:
             text = _('Working directory is not clean!  '
                      '<a href="view">View changes...</a>')
             self._cmdcontrol.showStatusMessage(text)
@@ -204,7 +205,7 @@ class ImportDialog(QDialog):
     def getcliptext(self):
         mdata = QApplication.clipboard().mimeData()
         if mdata.hasFormat('text/x-diff'):  # lossless
-            text = str(mdata.data('text/x-diff'))
+            text = bytes(mdata.data('text/x-diff'))
         elif mdata.hasText():  # could be encoding damaged
             text = hglib.fromunicode(mdata.text(), errors='ignore')
         else:
@@ -250,12 +251,13 @@ class ImportDialog(QDialog):
         self._updateUi()
 
     def getfilepaths(self):
+        # TODO: maybe better to process things in unicode
         src = hglib.fromunicode(self.src_combo.currentText())
         if not src:
             return []
         files = []
-        for path in src.split(os.pathsep):
-            path = path.strip('\r\n\t ')
+        for path in src.split(pycompat.ospathsep):
+            path = path.strip(b'\r\n\t ')
             if not os.path.exists(path) or path in files:
                 continue
             if os.path.isfile(path):

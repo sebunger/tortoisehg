@@ -70,9 +70,9 @@ class RepoTabWidget(QWidget):
     #
     # tab-index is the master, so do not use stack.setCurrentIndex().
 
-    def __init__(self, ui, repomanager, parent=None):
+    def __init__(self, config, repomanager, parent=None):
         super(RepoTabWidget, self).__init__(parent)
-        self._ui = ui
+        self._config = config
         self._repomanager = repomanager
         # delay until the next event loop so that the current tab won't be
         # gone in the middle of switching tabs (issue #4253)
@@ -154,7 +154,7 @@ class RepoTabWidget(QWidget):
         # must call _onCurrentTabChanged() appropriately
 
     def _newTabIndex(self):
-        if self._ui.configbool('tortoisehg', 'opentabsaftercurrent', True):
+        if self._config.configBool('tortoisehg', 'opentabsaftercurrent'):
             return self.currentIndex() + 1
         else:
             return self.count()
@@ -421,7 +421,7 @@ class RepoTabWidget(QWidget):
     @pyqtSlot(str, object, str, str, object)
     def _mapProgressReceived(self, topic, pos, item, unit, total):
         rw = self.sender()
-        assert isinstance(rw, repowidget.RepoWidget)
+        assert isinstance(rw, repowidget.RepoWidget), repr(rw)
         progress = cmdcore.ProgressMessage(
             pycompat.unicode(topic), pos, pycompat.unicode(item),
             pycompat.unicode(unit), total)
@@ -457,6 +457,6 @@ class RepoTabWidget(QWidget):
             self.currentTitleChanged.emit()
 
     def _updateTabVisibility(self):
-        forcetab = self._ui.configbool('tortoisehg', 'forcerepotab')
+        forcetab = self._config.configBool('tortoisehg', 'forcerepotab')
         self._tabbar.setVisible(self.count() > 1
                                 or (self.count() == 1 and forcetab))
