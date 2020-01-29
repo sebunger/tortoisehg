@@ -3,9 +3,10 @@ Author: Ludovico Cavedon <cavedon@deboan.org>
 
 --- a/contrib/thg.desktop
 +++ b/contrib/thg.desktop
-@@ -8,4 +8,5 @@
+@@ -8,5 +8,6 @@
  Icon=thg_logo
  Exec=thg --nofork
  Categories=Development;RevisionControl;
 +Keywords=thg;hgtk;mercurial;vcs
  X-Desktop-File-Install-Version=0.23
+ StartupWMClass=org.tortoisehg.python3
