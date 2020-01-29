@@ -3,12 +3,12 @@ Section: vcs
 Priority: optional
 Maintainer: Andrej Shadura <andrewsh@debian.org>
 Uploaders: Max Bowsher <maxb@f2s.com>
-Build-Depends: debhelper (>= 9), python (>= 2.6.6-3~), dh-python
+Build-Depends: debhelper (>= 9), python3, dh-python
 Build-Depends-Indep: docbook-xml,
                      docbook-xsl,
                      mercurial (>= 5.0~),
                      pyqt5-dev-tools,
-                     python-pyqt5,
+                     python3-pyqt5,
                      python3-sphinx,
                      xsltproc,
 Standards-Version: 4.1.2
@@ -18,8 +18,8 @@ Vcs-Browser: https://salsa.debian.org/debian/tortoisehg
 
 Package: tortoisehg
 Architecture: all
-Depends: mercurial (>= 5.0~), mercurial (<< 5.2~), python-pyqt5,
- python-pyqt5.qsci, ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+Depends: mercurial (>= 5.2~), mercurial (<< 5.4~), python3-pyqt5,
+ python3-pyqt5.qsci, ${shlibs:Depends}, ${misc:Depends}, ${python3:Depends}
 Recommends: libjs-jquery, libjs-underscore, python-iniparse, python-pygments
 Suggests: tortoisehg-nautilus
 Description: Graphical tool for working with Mercurial
@@ -35,11 +35,11 @@ Description: Graphical tool for working with Mercurial
 Package: tortoisehg-nautilus
 Architecture: all
 Depends: gnome-icon-theme-full | gnome-icon-theme,
-         python-gi,
-         python-nautilus (>= 1.1-2),
+         python3-gi,
+         python3-nautilus (>= 1.1-2),
          tortoisehg (>= ${source:Version}),
          ${misc:Depends},
-         ${python:Depends}
+         ${python3:Depends}
 Recommends: ssh-askpass-gnome | ssh-askpass
 Description: Graphical tool for working with Mercurial (Nautilus extension)
  TortoiseHg provides a graphical tool for interacting with the distributed
@@ -56,11 +56,11 @@ Description: Graphical tool for working with Mercurial (Nautilus extension)
 Package: tortoisehg-caja
 Architecture: all
 Depends: mate-icon-theme | gnome-icon-theme-full | gnome-icon-theme,
-         python-gi,
-         python-caja (>= 1.1-2),
+         python3-gi,
+         python3-caja (>= 1.1-2),
          tortoisehg (>= ${source:Version}),
          ${misc:Depends},
-         ${python:Depends}
+         ${python3:Depends}
 Recommends: ssh-askpass-gnome | ssh-askpass
 Description: Graphical tool for working with Mercurial (Caja extension)
  TortoiseHg provides a graphical tool for interacting with the distributed
