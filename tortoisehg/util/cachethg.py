@@ -8,7 +8,7 @@
 import os
 import sys
 
-from mercurial import hg, node, error, scmutil
+from mercurial import hg, node, error, pycompat, scmutil
 from tortoisehg.util import paths, debugthg, hglib
 
 debugging = False
@@ -18,7 +18,11 @@ includepaths = []
 excludepaths = []
 
 try:
-    from _winreg import HKEY_CURRENT_USER, OpenKey, QueryValueEx
+    from mercurial.windows import winreg
+    HKEY_CURRENT_USER = winreg.HKEY_CURRENT_USER
+    OpenKey = winreg.OpenKey
+    QueryValueEx = winreg.QueryValueEx
+
     from win32api import GetTickCount
     CACHE_TIMEOUT = 5000
     try:
@@ -38,7 +42,7 @@ try:
                 excludepaths.append(path)
     except EnvironmentError:
         pass
-except ImportError:
+except (AttributeError, ImportError):    # AttributeError for winreg.* on Unix
     from time import time as GetTickCount
     CACHE_TIMEOUT = 5.0
     debugging = debugthg.debug('O')
@@ -87,7 +91,7 @@ def get_state(upath, repo=None):
     return states and states[0] or NOT_IN_REPO
 
 
-def get_states(upath, repo=None):
+def get_states(path, repo=None):
     """
     Get the states of a given path in source control.
     """
@@ -99,12 +103,7 @@ def get_states(upath, repo=None):
     #debugf("called: _get_state(%s)", path)
     tc = GetTickCount()
 
-    try:
-        # handle some Asian charsets
-        path = upath.encode('mbcs')
-    except:
-        path = upath
-     # check if path is cached
+    # check if path is cached
     pdir = os.path.dirname(path)
     status = overlay_cache.get(path, '')
     if overlay_cache and (cache_pdir == pdir or cache_pdir and
@@ -183,15 +182,16 @@ def get_states(upath, repo=None):
                 return NOT_IN_REPO
         tc1 = GetTickCount()
         real = os.path.realpath #only test if necessary (symlink in path)
-        if not repo or (repo.root != root and repo.root != real(root)):
-            repo = hg.repository(hglib.loadui(), path=root)
+        hgroot = hglib.fromunicode(root)
+        if not repo or (repo.root != hgroot and repo.root != real(hgroot)):
+            repo = hg.repository(hglib.loadui(), path=hgroot)
             debugf("hg.repository() took %g ticks", (GetTickCount() - tc1))
     except error.RepoError:
         # We aren't in a working tree
         debugf("%s: not in repo", pdir)
         add(pdir + '*', IGNORED)
         return IGNORED
-    except Exception, e:
+    except Exception as e:
         debugf("error while handling %s:", pdir)
         debugf(e)
         add(pdir + '*', UNKNOWN)
@@ -201,10 +201,10 @@ def get_states(upath, repo=None):
     tc1 = GetTickCount()
 
     try:
-        matcher = scmutil.match(repo[None], [pdir])
+        matcher = scmutil.match(repo[None], [hglib.fromunicode(pdir)])
         repostate = repo.status(match=matcher, ignored=True,
                         clean=True, unknown=True)
-    except error.Abort, inst:
+    except error.Abort as inst:
         debugf("abort: %s", inst)
         debugf("treat as unknown : %s", path)
         return UNKNOWN
@@ -220,18 +220,23 @@ def get_states(upath, repo=None):
     states = STATUS_STATES
     if mergestate:
         mstate = hglib.readmergestate(repo)
-        unresolved = [f for f in mstate if mstate[f] == 'u']
+        unresolved = [f for f in mstate if mstate[f] == b'u']
         if unresolved:
-            modified = repostate[0]
-            modified[:] = set(modified) - set(unresolved)
-            repostate.insert(0, unresolved)
-            states = [UNRESOLVED] + states
-    states = zip(repostate, states)
+            repostate = [unresolved,
+                         set(repostate.modified) - set(unresolved),
+                         repostate.added,
+                         repostate.removed,
+                         repostate.deleted,
+                         repostate.unknown,
+                         repostate.ignored,
+                         repostate.clean]
+            states = UNRESOLVED + states
+    states = pycompat.ziplist(repostate, states)
     states[-1], states[-2] = states[-2], states[-1] #clean before ignored
     for grp, st in states:
         add_dirs(grp)
         for f in grp:
-            fpath = os.path.join(root, os.path.normpath(f))
+            fpath = os.path.join(root, os.path.normpath(hglib.tounicode(f)))
             add(fpath, st)
     status = overlay_cache.get(path, UNKNOWN)
     debugf("%s: %s", (path, status))

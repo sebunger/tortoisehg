@@ -30,6 +30,7 @@ from .qtgui import (
 
 from mercurial import (
     commands,
+    pycompat,
     util,
 )
 
@@ -181,7 +182,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
 
     def _ensurePrompt(self, line):
         """Insert prompt string if not available"""
-        s = unicode(self.text(line))
+        s = pycompat.unicode(self.text(line))
         if s.startswith(self._prompt):
             return
         for i, c in enumerate(self._prompt):
@@ -195,7 +196,7 @@ class _LogWidgetForConsole(cmdui.LogWidget):
             return self._savedcommands[-1]
         l = self._findPromptLine()
         if l >= 0:
-            return unicode(self.text(l))[len(self._prompt):].rstrip('\n')
+            return pycompat.unicode(self.text(l))[len(self._prompt):].rstrip('\n')
         else:
             return ''
 
@@ -313,7 +314,8 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(str, int)
     def historySearch(self, text, direction):
-        cmdline, idx = _searchhistory(self._commandHistory, unicode(text),
+        cmdline, idx = _searchhistory(self._commandHistory,
+                                      pycompat.unicode(text),
                                       direction, self._commandIdx)
         if cmdline:
             self._commandIdx = idx
@@ -336,9 +338,6 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
             matchinfo = {}
             for cmdspec in cmdtable:
                 for cmdname in cmdspec.split('|'):
-                    # TODO: switch to hg>=4.8 (fa88170c10bb) syntax
-                    if cmdname[0] == '^':
-                        cmdname = cmdname[1:]
                     if cmdname.startswith(cmdstart):
                         matchinfo[cmdname] = cmdspec
             return matchinfo
@@ -346,15 +345,15 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
         if not matchingcmds:
             return matches
         if len(matchingcmds) > 1:
-            basecmdline = '%s %%s' % (cmdtype)
+            basecmdline = '%s %%s' % cmdtype
             matches = [basecmdline % c for c in matchingcmds]
         else:
-            scmdtype = matchingcmds.keys()[0]
+            scmdtype = list(matchingcmds)[0]
             cmdspec = matchingcmds[scmdtype]
             opts = cmdtable[cmdspec][1]
             def findcmdopt(cmdopt):
                 cmdopt = cmdopt.lower()
-                while(cmdopt.startswith('-')):
+                while cmdopt.startswith('-'):
                     cmdopt = cmdopt[1:]
                 matchingopts = []
                 for opt in opts:
@@ -380,7 +379,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
 
         Also complete the prompt with the common prefix to the matching items
         """
-        text = unicode(text).strip()
+        text = pycompat.unicode(text).strip()
         if not text:
             self._logwidget.flash()
             return
@@ -461,7 +460,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
             return self._agent.rawRepo()
 
     def _workingDirectory(self):
-        return self.repoRootPath() or os.getcwdu()
+        return self.repoRootPath() or hglib.getcwdu()
 
     @pyqtSlot(bool)
     def _suppressPromptOnBusy(self, busy):
@@ -472,13 +471,13 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(str)
     def _runcommand(self, cmdline):
-        cmdline = unicode(cmdline)
+        cmdline = pycompat.unicode(cmdline)
         self._commandIdx = 0
         try:
             args = hglib.parsecmdline(cmdline, self._workingDirectory())
-        except ValueError, e:
+        except ValueError as e:
             self.closePrompt()
-            self._logwidget.appendLog(unicode(e) + '\n', 'ui.error')
+            self._logwidget.appendLog(pycompat.unicode(e) + '\n', 'ui.error')
             self.openPrompt()
             return
         if not args:
@@ -509,7 +508,7 @@ class ConsoleWidget(QWidget, qtlib.TaskWidget):
             if self.repoRootPath():
                 args = ['-R', self.repoRootPath()] + args
             # TODO: show errors
-            run.dispatch(map(hglib.fromunicode, args))
+            run.dispatch(pycompat.maplist(hglib.fromunicode, args))
         finally:
             self.openPrompt()
 
@@ -558,7 +557,7 @@ class LogDockWidget(QDockWidget):
         self.setFocusProxy(w)
 
     def _findConsoleFor(self, root):
-        for i in xrange(self._consoles.count()):
+        for i in pycompat.xrange(self._consoles.count()):
             w = self._consoles.widget(i)
             if w.repoRootPath() == root:
                 return w
@@ -572,14 +571,14 @@ class LogDockWidget(QDockWidget):
 
     @pyqtSlot(str)
     def _createConsoleFor(self, root):
-        root = unicode(root)
+        root = pycompat.unicode(root)
         repoagent = self._repomanager.repoAgent(root)
         assert repoagent
         self._createConsole(repoagent)
 
     @pyqtSlot(str)
     def _destroyConsoleFor(self, root):
-        root = unicode(root)
+        root = pycompat.unicode(root)
         w = self._findConsoleFor(root)
         self._consoles.removeWidget(w)
         w.setParent(None)

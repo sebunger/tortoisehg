@@ -7,7 +7,6 @@
 
 from __future__ import absolute_import
 
-import cgi
 import os
 import re
 
@@ -49,6 +48,7 @@ from mercurial import (
     error,
     hg,
     match,
+    pycompat,
     subrepo,
     ui,
     scmutil,
@@ -344,7 +344,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
                 # re-compile with whole-word wrapping, we know pattern is safe
                 pattern = r'\b(?:%s)\b' % pattern
                 regexp = re.compile(pattern, icase and re.I or 0)
-        except Exception, inst:
+        except Exception as inst:
             msg = _('grep: invalid match pattern: %s\n') % \
                     hglib.tounicode(str(inst))
             self.showMessage.emit(msg)
@@ -355,9 +355,11 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.tv.icase = icase
         self.regexple.selectAll()
         inc = hglib.fromunicode(self.incle.text())
-        if inc: inc = map(str.strip, inc.split(','))
+        if inc:
+            inc = pycompat.maplist(bytes.strip, inc.split(b','))
         exc = hglib.fromunicode(self.excle.text())
-        if exc: exc = map(str.strip, exc.split(','))
+        if exc:
+            exc = pycompat.maplist(bytes.strip, exc.split(b','))
         revstr = hglib.fromunicode(self.revle.text()).strip()
 
         self.addHistory(pattern, inc or [], exc or [])
@@ -372,9 +374,9 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             self.tv.setColumnHidden(COL_REVISION, True)
             self.tv.setColumnHidden(COL_USER, True)
             try:
-                rev = scmutil.revsymbol(self.repo, revstr or '.').rev()
+                rev = scmutil.revsymbol(self.repo, revstr or b'.').rev()
                 ctx = self.repo[rev]
-            except error.RepoError, e:
+            except error.RepoError as e:
                 msg = _('grep: %s\n') % hglib.tounicode(str(e))
                 self.showMessage.emit(msg)
                 return
@@ -405,9 +407,11 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
         self.searchbutton.setEnabled(True)
         self.regexple.setEnabled(True)
         self.regexple.setFocus()
-        count = self.tv.model().rowCount(None)
+        model = self.tv.model()
+        assert model is not None
+        count = model.rowCount()
         if count:
-            for col in xrange(COL_TEXT):
+            for col in pycompat.xrange(COL_TEXT):
                 self.tv.resizeColumnToContents(col)
             self.tv.setSortingEnabled(True)
         if self.thread.completed == False:
@@ -468,7 +472,7 @@ class HistorySearchThread(QThread):
                         if (haslf or haskbf) and thgrepo.isBfStandin(fname):
                             raise ValueError
                         text = hglib.tounicode(text)
-                        text = cgi.escape(text)
+                        text = qtlib.htmlescape(text, False)
                         text = '<b>%s</b> <span>%s</span>' % (addremove, text)
                         fname = hglib.tounicode(fname)
                         user = hglib.tounicode(user)
@@ -490,7 +494,7 @@ class HistorySearchThread(QThread):
                     'exclude':self.exc}
             u = incrui(self.repo.ui)
             commands.grep(u, self.repo, self.pattern, **opts)
-        except Exception, e:
+        except Exception as e:
             self.showMessage.emit(str(e))
         except KeyboardInterrupt:
             self.showMessage.emit(_('Interrupted'))
@@ -526,11 +530,11 @@ class CtxSearchThread(QThread):
         self.hu = htmlui.htmlui(self.repo.ui)
         try:
             # generate match function relative to repo root
-            matchfn = match.match(self.repo.root, '', [], self.inc, self.exc)
+            matchfn = match.match(self.repo.root, b'', [], self.inc, self.exc)
             matchfn.bad = badfn
             self.searchRepo(self.ctx, '', matchfn)
             self.completed = True
-        except Exception, e:
+        except Exception as e:
             self.showMessage.emit(hglib.tounicode(str(e)))
 
     def searchRepo(self, ctx, prefix, matchfn):
@@ -547,7 +551,8 @@ class CtxSearchThread(QThread):
                 continue
             if (haslf or haskbf) and thgrepo.isBfStandin(wfile):
                 continue
-            self.progress.emit(topic, count, wfile, unit, total)
+            self.progress.emit(topic, count, hglib.tounicode(wfile), unit,
+                               total)
             count += 1
             if not matchfn(wfile):
                 continue
@@ -562,13 +567,13 @@ class CtxSearchThread(QThread):
             for i, line in enumerate(data.splitlines()):
                 pos = 0
                 for m in self.regexp.finditer(line): # perform regexp
-                    self.hu.write(line[pos:m.start()], label='ui.status')
-                    self.hu.write(line[m.start():m.end()], label='grep.match')
+                    self.hu.write(line[pos:m.start()], label=b'ui.status')
+                    self.hu.write(line[m.start():m.end()], label=b'grep.match')
                     pos = m.end()
                 if pos:
-                    self.hu.write(line[pos:], label='ui.status')
-                    path = os.path.join(prefix, wfile)
-                    row = [hglib.tounicode(path), i + 1, ctx.rev(), None,
+                    self.hu.write(line[pos:], label=b'ui.status')
+                    path = os.path.join(prefix, hglib.tounicode(wfile))
+                    row = [path, i + 1, ctx.rev(), None,
                            hglib.tounicode(self.hu.getdata()[0])]
                     w = DataWrapper(row)
                     self.matchedRow.emit(w)
@@ -582,7 +587,7 @@ class CtxSearchThread(QThread):
                     continue
                 sub = ctx.sub(s)
                 if isinstance(sub, subrepo.hgsubrepo):
-                    newprefix = os.path.join(prefix, s)
+                    newprefix = os.path.join(prefix, hglib.tounicode(s))
                     self.searchRepo(sub._repo[None], newprefix, lambda x: True)
 
 
@@ -655,7 +660,9 @@ class MatchTree(QTableView):
         wctxonly = True
         allhistory = False
         for index in self.selectionModel().selectedRows():
-            path, line, rev, user, text = self.model().getRow(index)
+            model = self.model()
+            assert model is not None
+            path, line, rev, user, text = model.getRow(index)
             if rev is not None:
                 wctxonly = False
             if user is not None:
@@ -667,7 +674,9 @@ class MatchTree(QTableView):
 
     def onRowActivated(self, index):
         saved = self.selectedRows
-        path, line, rev, user, text = self.model().getRow(index)
+        model = self.model()
+        assert model is not None
+        path, line, rev, user, text = model.getRow(index)
         self.selectedRows = [(rev, path, line)]
         self.onAnnotateFile()
         self.selectedRows = saved
@@ -698,7 +707,7 @@ class MatchTree(QTableView):
     def _openAnnotateDialog(self, repoagent, rev, path, line):
         if rev is None:
             repo = repoagent.rawRepo()
-            rev = repo['.'].rev()
+            rev = repo[b'.'].rev()
 
         dlg = self._filedialogs.open(repoagent, path)
         dlg.setFileViewMode(fileview.AnnMode)
@@ -750,7 +759,8 @@ class MatchTree(QTableView):
                     defer.append([rev, path, line])
             if crev is not None:
                 dlg = visdiff.visualdiff(ui, repo,
-                                         map(hglib.fromunicode, files),
+                                         pycompat.maplist(hglib.fromunicode,
+                                                          files),
                                          {'change':crev})
                 if dlg:
                     dlg.exec_()
@@ -802,10 +812,10 @@ class MatchModel(QAbstractTableModel):
             else:
                 snapshots[rev].append(path)
         urls = []
-        for rev, paths in snapshots.iteritems():
+        for rev, paths in snapshots.items():
             if rev is not None:
                 repo = self._repoagent.rawRepo()
-                lpaths = map(hglib.fromunicode, paths)
+                lpaths = pycompat.maplist(hglib.fromunicode, paths)
                 lbase, _ = visdiff.snapshot(repo, lpaths, repo[rev])
                 base = hglib.tounicode(lbase)
             else:

@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
-"PO-Revision-Date: 2018-05-10 09:49+0000\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
+"PO-Revision-Date: 2019-02-05 20:23+0000\n"
 "Last-Translator: André Sintzoff <Unknown>\n"
 "Language-Team: French <fr@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Launchpad-Export-Date: 2018-05-10 13:52+0000\n"
-"X-Generator: Launchpad (build 18640)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:42+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 "X-Poedit-Country: FRANCE\n"
 "X-Poedit-Language: French\n"
 
@@ -29,8 +29,8 @@ msgstr "Quitter"
 msgid "About"
 msgstr "À propos"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
-msgstr "Copyright 2008-2018 Steve Borho et d'autres"
+msgid "Copyright 2008-2019 Steve Borho and others"
+msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
 msgstr "Plusieurs icônes sont offertes par les projets TortoiseSVN et Tango"
@@ -669,6 +669,12 @@ msgstr "pas de capacité \"runcommand\""
 #, python-format
 msgid "corrupted command result: %r"
 msgstr "résultat de la commande corrompu : %r"
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
+msgstr ""
 
 #, python-format
 msgid "failed to encode input: %s"
@@ -2219,6 +2225,9 @@ msgstr "Tout l'historique"
 msgid "Report only the first match per file"
 msgstr "Signaler uniquement le premier résultat par fichier"
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "Suivre les copies et les changements de noms"
 
@@ -3147,6 +3156,54 @@ msgstr "Date de patch :"
 msgid "Patch user:"
 msgstr "Utilisateur de patch :"
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr "Poster une &revue"
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr "Préférences incorrectes - Le serveur ReviewBoard n'est pas indiqué"
 
@@ -3214,9 +3271,6 @@ msgstr "%p%"
 
 msgid "Connecting to Review Board..."
 msgstr "En cours de connexion à Review Board..."
-
-msgid "Post &Review"
-msgstr "Poster une &revue"
 
 msgid "Target:"
 msgstr "Cible :"
@@ -3318,31 +3372,6 @@ msgstr "Nouveau message de patch :"
 
 msgid "Patches to fold"
 msgstr "Patches à incorporer"
-
-msgid "Rename Error"
-msgstr "Erreur de renommage"
-
-msgid "Could not rename existing patchfile"
-msgstr "Ne peut pas renommer le fichier patch existant"
-
-msgid "Could not delete existing patchfile"
-msgstr "Ne peut pas supprimer le fichier patch existant"
-
-msgid "QRename - Check patchname"
-msgstr "QRename - Vérifier le nom du patch"
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr "Le nom du patch <b>%s</b> existe déjà :"
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr "Ajouter l'extension .OLD au fichier patch existant"
-
-msgid "Overwrite existing patchfile"
-msgstr "Remplacer le fichier patch existant"
-
-msgid "Go back and change new patchname"
-msgstr "Revenir et changer le nouveau nom de patch"
 
 msgid "&Undo"
 msgstr "Ann&uler"
@@ -3713,6 +3742,9 @@ msgstr "Copier source -> destination"
 
 msgid "Copy Error"
 msgstr "Erreur de copie"
+
+msgid "Rename Error"
+msgstr "Erreur de renommage"
 
 msgid "Select Source File"
 msgstr "Sélectionnez un fichier source"
@@ -4478,6 +4510,9 @@ msgstr "&Strip... (supprimer des révisions)"
 msgid "Post to Re&view Board..."
 msgstr "Poster dans Re&view Board..."
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr "Mett&re à jour à distance..."
 
@@ -4543,6 +4578,9 @@ msgstr "Élaguer la sélection (prune)..."
 
 msgid "Post Selected to Review Board..."
 msgstr "Poster la sélection dans Review Board..."
+
+msgid "Post Selected to Phabricator..."
+msgstr ""
 
 msgid "Apply patch"
 msgstr "Appliquer un patch"
@@ -4666,6 +4704,13 @@ msgstr "Plus d'options..."
 
 msgid "Unable to merge"
 msgstr "Impossible de fusionner"
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
 
 msgid "You cannot merge a revision with itself"
 msgstr "Vous ne pouvez pas fusionner une révision avec elle-même"
@@ -6065,6 +6110,15 @@ msgstr ""
 "Si spécifié, les fichiers du répertoire, par exemple .hgignore, sont copiés "
 "vers le dépôt nouvellement créé."
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr "Workbench"
 
@@ -7025,24 +7079,19 @@ msgid "Changeset Link"
 msgstr "Lien de révision"
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
-"Un \"modèle de chaîne de caractères\" qui, quand il est mis, transforme le "
-"numéro de révision et les identifiants courts qui sont affichés dans les "
-"panneaux de révision en liens.<br>Le \"modèle de chaîne de caractères\" "
-"utilise une syntaxe similaire à mercurial qui accepte pour le moment deux "
-"expressions :<ul><li>{node|short} : remplacé par l'identifiant de révision à "
-"12 chiffres (noter que {node} en tant que tel n'est pas géré actuellement)."
-"<li>{rev} : remplacé par le numéro de révision.</ul>Par exemple, pour lier "
-"vers des pages de commit bitbucket, vous pouvez mettre :<br>https://"
-"bitbucket.org/tortoisehg/thg/commits/{node|short}"
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
 msgstr "Chemin vers l'exemple de Review Board \"http://demo.reviewboard.org\""
@@ -7632,7 +7681,7 @@ msgid "%s is deleted by non-hg command, but still tracked"
 msgstr "%s a été supprimé en dehors de Mercurial mais est toujours suivi"
 
 msgid "missing"
-msgstr "manquant(es)"
+msgstr "manquant"
 
 #, python-format
 msgid "%s is ignored"
@@ -10971,13 +11020,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Unapply last patch"
 #~ msgstr "Dé-appliquer le dernier patch"
 
-#~ msgid ""
-#~ "Changesets within the interval, see <a href=\"http://www.selenic.com/"
-#~ "mercurial/hg.1.html#dates\">help dates</a>"
-#~ msgstr ""
-#~ "Révisions dans l'intervalle, voir <a href=\"http://www.selenic.com/"
-#~ "mercurial/hg.1.html#dates\">help dates</a>"
-
 #~ msgid "tag '%s' is not a local tag"
 #~ msgstr "l'étiquette '%s' n'est pas une étiquette locale"
 
@@ -11029,13 +11071,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Restart Merge..."
 #~ msgstr "Redémarrer la fusion..."
 
-#~ msgid ""
-#~ "Changesets affecting files matched by pattern.  See <a href=\"http://www."
-#~ "selenic.com/mercurial/hg.1.html#patterns\">help patterns</a>"
-#~ msgstr ""
-#~ "Révisions touchant les fichiers correspondants au motif. Voir <a href="
-#~ "\"http://www.selenic.com/mercurial/hg.1.html#patterns\">help patterns</a>"
-
 #~ msgid "unable to strip away %d dirs from %s"
 #~ msgstr "impossible de se débarrasser de %d répertoires de %s"
 
@@ -11058,30 +11093,6 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ "parents non triviaux en rouge, les révisions normales en noir. Par "
 #~ "défaut : Faux"
 
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before "
-#~ "removing files in a commit. If True, a confirmation dialog will be "
-#~ "showed. If False, selected deleted files will be included in the commit "
-#~ "with no confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "Détermine si TortoiseHg doit afficher un dialogue de confirmation avant "
-#~ "de retirer de nouveaux fichiers lors d'un commit. Si Vrai, un dialogue de "
-#~ "confirmation sera affiché. Si Faux, les fichiers retirés sélectionnés "
-#~ "seront inclus dans le commit sans dialogue de confirmation. Par défaut : "
-#~ "Vrai"
-
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before adding "
-#~ "new files in a commit. If True, a confirmation dialog will be showed. If "
-#~ "False, selected new files will be included in the commit with no "
-#~ "confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "Détermine si TortoiseHg doit afficher un dialogue de confirmation avant "
-#~ "d'ajouter de nouveaux fichiers lors d'un commit. Si Vrai, un dialogue de "
-#~ "confirmation sera affiché. Si Faux, les nouveaux fichiers sélectionnés "
-#~ "seront inclus dans le commit sans dialogue de confirmation. Par défaut : "
-#~ "Vrai"
-
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr ""
 #~ "Ignorer les changements des lignes qui sont vierges. Par défaut : Faux"
@@ -11096,22 +11107,8 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ msgid "Ignore changes in the amount of white space. Default: False"
 #~ msgstr "Ignorer les changements dans le nombre d'espaces. Par défaut : Faux"
 
-#~ msgid ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
-#~ msgstr ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
-
 #~ msgid "Character encoding name"
 #~ msgstr "Nom de l'encodage des caractères"
-
-#~ msgid "List Font"
-#~ msgstr "Police de liste"
-
-#~ msgid "Font used to display file lists. Default: sans 9"
-#~ msgstr ""
-#~ "Police utilisée pour afficher les listes de fichiers. Par défaut : sans 9"
 
 #~ msgid "Discard all changes from merge target (other) revision"
 #~ msgstr ""
@@ -11191,45 +11188,28 @@ msgstr "win32ill: interrompu en arrêtant la boucle de message\n"
 #~ "premier groupe et ainsi de suite. Si aucun jeton {n} n'est trouvé dans "
 #~ "issue.link, la chaîne complète trouvée est ajoutée."
 
-#~ msgid "Precursors:"
-#~ msgstr "Précurseurs :"
-
 #~ msgid ""
-#~ "The command that will be executed.\n"
-#~ "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
-#~ "executable command.\n"
-#~ "You can use several {VARIABLES} to compose your command:\n"
-#~ "- {ROOT}: The path to the current repository root.\n"
-#~ "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
-#~ "hash respectively.\n"
-#~ "- {SELECTEDFILES}: The list of files selected by the user on the revision "
-#~ "details file list.\n"
-#~ "- {FILES}: The list of files touched by the selected revision.\n"
-#~ "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
+#~ "A \"template string\" that, when set, turns the revision number and short "
+#~ "hashes that are shown on the revision panels into links.<br>The "
+#~ "\"template string\" uses a \"mercurial template\"-like syntax that "
+#~ "currently accepts two template expressions:<ul><li>{node|short} : "
+#~ "replaced by the 12 digit revision id (note that {node} on its own is "
+#~ "currently unsupported).<li>{rev} : replaced by the revision number.</"
+#~ "ul>For example, in order to link to bitbucket commit pages you can set "
+#~ "this to:<br>https://bitbucket.org/tortoisehg/thg/commits/{node|short}"
 #~ msgstr ""
-#~ "La commande qui sera exécutée.\n"
-#~ "Pour exécuter une commande Mercurial, utiliser \"hg\" (plutôt que \"hg.exe"
-#~ "\") comme nom de commande.\n"
-#~ "Vous pouvez utiliser plusieurs {VARIABLES} pour composer votre "
-#~ "commande :\n"
-#~ "- {ROOT} : le chemin de la racine du dépôt actuel.\n"
-#~ "- {REV} / {REVID} : respectivement, le numéro ou l'identifiant "
-#~ "hexadécimal de la révision sélectionnée.\n"
-#~ "- {SELECTEDFILES} : la liste de fichiers sélectionnés par l'utilisateur "
-#~ "dans la liste de fichiers de détails de révision.\n"
-#~ "- {FILES} : la liste des fichiers touchés par la révision sélectionnée.\n"
-#~ "- {ALLFILES} : tous les fichiers suivis par Mercurial dans la révision "
-#~ "sélectionnée."
-
-#~ msgid ""
-#~ "http://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
-#~ "html#tsvn-dug-settings-icon-set"
-#~ msgstr ""
-#~ "http://tortoisesvn.net/docs/release/TortoiseSVN_fr/tsvn-dug-settings."
-#~ "html#tsvn-dug-settings-icon-set"
+#~ "Un \"modèle de chaîne de caractères\" qui, quand il est mis, transforme "
+#~ "le numéro de révision et les identifiants courts qui sont affichés dans "
+#~ "les panneaux de révision en liens.<br>Le \"modèle de chaîne de caractères"
+#~ "\" utilise une syntaxe similaire à mercurial qui accepte pour le moment "
+#~ "deux expressions :<ul><li>{node|short} : remplacé par l'identifiant de "
+#~ "révision à 12 chiffres (noter que {node} en tant que tel n'est pas géré "
+#~ "actuellement).<li>{rev} : remplacé par le numéro de révision.</ul>Par "
+#~ "exemple, pour lier vers des pages de commit bitbucket, vous pouvez "
+#~ "mettre :<br>https://bitbucket.org/tortoisehg/thg/commits/{node|short}"
 
 #~ msgid "udpate all repos in current dir"
 #~ msgstr "mettre à jour tous les dépôts dans le répertoire actuel"
 
-#~ msgid "Copyright 2008-2016 Steve Borho and others"
-#~ msgstr "Copyright 2008-2016 Steve Borho et d'autres"
+#~ msgid "Copyright 2008-2018 Steve Borho and others"
+#~ msgstr "Copyright 2008-2018 Steve Borho et d'autres"

@@ -36,6 +36,7 @@ from .qtgui import (
 
 from mercurial import (
     extensions,
+    pycompat,
     scmutil,
 )
 
@@ -74,7 +75,7 @@ class LoadReviewDataThread(QThread):
                                                     pwd)
                 self.loadCombos()
 
-            except rb.ReviewBoardError, e:
+            except rb.ReviewBoardError as e:
                 msg = e.msg
             except TypeError:
                 msg = _("Invalid reviewboard plugin. Please download the "
@@ -189,17 +190,17 @@ class PostReviewDialog(QDialog):
             qtlib.readStringList(s, 'reviewboard/summary_edit_history'))
 
         try:
-            self.repo_id = int(self.repo.ui.config('reviewboard', 'repoid'))
+            self.repo_id = int(self.repo.ui.config(b'reviewboard', b'repoid'))
         except Exception:
             self.repo_id = None
 
         if not self.repo_id:
             self.repo_id = qtlib.readInt(s, 'reviewboard/repo_id')
 
-        self.server = self.repo.ui.config('reviewboard', 'server')
-        self.user = self.repo.ui.config('reviewboard', 'user')
-        self.password = self.repo.ui.config('reviewboard', 'password')
-        self.browser = self.repo.ui.config('reviewboard', 'browser')
+        self.server = self.repo.ui.config(b'reviewboard', b'server')
+        self.user = self.repo.ui.config(b'reviewboard', b'user')
+        self.password = self.repo.ui.config(b'reviewboard', b'password')
+        self.browser = self.repo.ui.config(b'reviewboard', b'browser')
 
     def writeSettings(self):
         s = QSettings()
@@ -217,7 +218,7 @@ class PostReviewDialog(QDialog):
         def itercombo(w):
             if w.currentText():
                 yield w.currentText()
-            for i in xrange(w.count()):
+            for i in pycompat.xrange(w.count()):
                 if w.itemText(i) != w.currentText():
                     yield w.itemText(i)
 
@@ -276,7 +277,7 @@ class PostReviewDialog(QDialog):
             opts['repoid'] = self.getRepoId()
             opts['summary'] = hglib.fromunicode(self.qui.summary_edit.currentText())
 
-        if (len(self.selectedRevs) > 1):
+        if len(self.selectedRevs) > 1:
             #Set the parent to the revision below the last one on the list
             #so all checked revisions are included in the request
             ctx = self.repo[self.selectedRevs[0]]
@@ -348,12 +349,12 @@ class PostReviewDialog(QDialog):
 
         def cmdargs(opts):
             args = []
-            for k, v in opts.iteritems():
+            for k, v in opts.items():
                 if isinstance(v, bool):
                     if v:
                         args.append('--%s' % k.replace('_', '-'))
                 else:
-                    for e in isinstance(v, basestring) and [v] or v:
+                    for e in hglib.isbasestring(v) and [v] or v:
                         args += ['--%s' % k.replace('_', '-'), e]
 
             return args
@@ -365,8 +366,8 @@ class PostReviewDialog(QDialog):
         self.qui.post_review_button.setEnabled(False)
         self.qui.close_button.setEnabled(False)
 
-        cmdline = map(hglib.tounicode,
-                      ['postreview'] + cmdargs(opts) + [revstr])
+        cmdline = pycompat.maplist(hglib.tounicode,
+                                   ['postreview'] + cmdargs(opts) + [revstr])
         self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
         del self._cmdoutputs[:]
         sess.commandFinished.connect(self.onCompletion)
@@ -379,14 +380,15 @@ class PostReviewDialog(QDialog):
 
         output = hglib.fromunicode(''.join(self._cmdoutputs), 'replace')
 
-        saved = 'saved:' in output
-        published = 'published:' in output
-        if (saved or published):
+        saved = b'saved:' in output
+        published = b'published:' in output
+        if saved or published:
             if saved:
-                url = output.split('saved: ').pop().strip()
+                url = hglib.tounicode(output.split(b'saved: ').pop().strip())
                 msg = _('Review draft posted to %s\n') % url
             else:
-                url = output.split('published: ').pop().strip()
+                url = output.split(b'published: ').pop().strip()
+                url = hglib.tounicode(url)
                 msg = _('Review published to %s\n') % url
 
             QDesktopServices.openUrl(QUrl(url))
@@ -394,8 +396,8 @@ class PostReviewDialog(QDialog):
             qtlib.InfoMsgBox(_('Review Board'), _('Success'),
                                msg, parent=self)
         else:
-            error = output.split('abort: ').pop().strip()
-            if error[:29] == "HTTP Error: basic auth failed":
+            error = output.split(b'abort: ').pop().strip()
+            if error[:29] == b"HTTP Error: basic auth failed":
                 if self.passwordPrompt():
                     self.accept()
                 else:
@@ -404,7 +406,7 @@ class PostReviewDialog(QDialog):
                     return
             else:
                 qtlib.ErrorMsgBox(_('Review Board'),
-                                  _('Error'), error)
+                                  _('Error'), hglib.tounicode(error))
 
         self.writeSettings()
         super(PostReviewDialog, self).accept()
@@ -412,7 +414,7 @@ class PostReviewDialog(QDialog):
     @pyqtSlot(str, str)
     def _captureOutput(self, msg, label):
         if label != 'control':
-            self._cmdoutputs.append(unicode(msg))
+            self._cmdoutputs.append(pycompat.unicode(msg))
 
     @pyqtSlot()
     def onSettingsButtonClicked(self):

@@ -26,16 +26,16 @@ def _createPrompt(parent, files):
 
 def promptForLfiles(parent, ui, repo, files):
     lfiles = []
-    section = 'largefiles'
+    section = b'largefiles'
     try:
-        minsize = float(ui.config(section, 'minsize', default=10))
+        minsize = float(ui.config(section, b'minsize', default=10))
     except ValueError:
         minsize = 10
-    patterns = ui.config(section, 'patterns', default=())
+    patterns = ui.config(section, b'patterns')
     if patterns:
-        patterns = patterns.split(' ')
+        patterns = patterns.split(b' ')
         try:
-            matcher = match.match(repo.root, '', list(patterns))
+            matcher = match.match(repo.root, b'', list(patterns))
         except error.Abort as e:
             qtlib.WarningMsgBox(_('Invalid Patterns'),
                                 _('Failed to process largefiles.patterns.'),

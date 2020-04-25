@@ -18,6 +18,25 @@ of Graph instances that describe a revision set graph. These generators
 are used by repomodel.py which renders them on a widget.
 """
 
+from __future__ import absolute_import
+
+import collections
+import os
+import time
+
+from mercurial.thirdparty import attr
+from mercurial import (
+    error,
+    hg,
+    node,
+    phases,
+    revset as revsetmod,
+)
+
+from ..util import (
+    obsoleteutil,
+)
+
 r"""
 How each edge color is determined
 =================================
@@ -212,15 +231,6 @@ Given such cases, we can determine family line location as below:
        from X
 """
 
-import time
-import os
-import collections
-
-from mercurial import revset as revsetmod
-from mercurial import error, hg, node, phases
-
-from tortoisehg.util import obsoleteutil
-
 LINE_TYPE_PARENT = 0
 LINE_TYPE_FAMILY = 1
 LINE_TYPE_GRAFT = 2
@@ -255,7 +265,10 @@ def hashcolor(data, modulo=None):
     """
     if modulo is None:
         modulo = len(COLORS)
-    idx = sum([ord(c) for c in data])
+    if isinstance(data, str):
+        idx = sum([ord(c) for c in data])
+    else: # Python 3 bytes
+        idx = sum(data)
     idx %= modulo
     return idx
 
@@ -283,7 +296,7 @@ class StandardDag(object):
     """
     def __init__(self, repo, start_rev, stop_rev, branch, allparents,
                  showgraftsource, visiblerev):
-        assert start_rev is None or start_rev >= stop_rev
+        assert start_rev is None or start_rev >= stop_rev, (start_rev, stop_rev)
         self.repo = repo
         self.start_rev = start_rev
         self.stop_rev = stop_rev
@@ -308,16 +321,16 @@ class StandardDag(object):
             curr_rev = len(repo) - 1
         # jump in the branch grouping graph experiment if the user subscribed
         revs = revsetmod.spanset(repo, curr_rev, stop_rev - 1)
-        if revs and repo.ui.configbool('experimental', 'graph-group-branches', False):
+        if revs and repo.ui.configbool(b'experimental', b'graph-group-branches'):
             start, stop = revs.first(), revs.last()
-            revset = 'sort(%d:%d, "topo"'
+            revset = b'sort(%d:%d, "topo"'
             args = [start, stop]
             firstbranchrevset = repo.ui.config(
-                'experimental', 'graph-group-branches.firstbranch', '')
+                b'experimental', b'graph-group-branches.firstbranch')
             if firstbranchrevset:
-                revset += ', topo.firstbranch=%s'
+                revset += b', topo.firstbranch=%s'
                 args.append(firstbranchrevset)
-            revset += ')'
+            revset += b')'
             revs = repo.revs(revset, *args)
 
         for curr_rev in revs:
@@ -325,7 +338,7 @@ class StandardDag(object):
                 yield repo[curr_rev]
 
     def _append_graft_source(self, ctx, parents):
-        src_rev_str = ctx.extra().get('source')
+        src_rev_str = ctx.extra().get(b'source')
         if src_rev_str is not None and src_rev_str in self.repo:
             src = self.repo[src_rev_str]
             src_rev = src.rev()
@@ -438,7 +451,7 @@ class _FamilyLineRev(object):
                                     if kv[0] not in excluded_descendants)
 
         if self.visible:
-            for nd, is_p1 in next_descendants.iteritems():
+            for nd, is_p1 in next_descendants.items():
                 nd.destinations.append((self.rev, LINE_TYPE_FAMILY, is_p1))
 
             # `next_descendants` are also excluded from next_descendants
@@ -461,7 +474,7 @@ class _FamilyLineRev(object):
         self.next_descendants = self.excluded_descendants = None
 
     def add_next_descendants(self, descendants):
-        for d, is_p1 in descendants.iteritems():
+        for d, is_p1 in descendants.items():
             if d in self.next_descendants:
                 self.next_descendants[d] |= is_p1
             else:
@@ -533,7 +546,7 @@ class FamilyLineDag(StandardDag):
                     self._append_graft_source(rctx, parents)
                 yield rctx, parents
 
-        assert not queue
+        assert not queue, queue
 
 
 def revision_grapher(repo, opts):
@@ -772,31 +785,27 @@ class RevColorPalette(object):
                 self._pendingheads.append((p_ctxs, color))
         return self._knowncolors[rev]
 
-class GraphEdge(tuple):
-    __slots__ = ()
-    def __new__(cls, startrev, endrev, color, linktype=LINE_TYPE_PARENT):
-        return tuple.__new__(cls, (startrev, endrev, color, linktype))
-    @property
-    def startrev(self):
-        return self[0]  # int or None (for working rev)
-    @property
-    def endrev(self):
-        return self[1]  # int
-    @property
-    def color(self):
-        return self[2]  # int
-    @property
-    def linktype(self):
-        return self[3]  # one of LINE_TYPE
+
+@attr.s(slots=True, repr=False)
+class GraphEdge(object):
+    startrev = attr.ib()  # int or None (for working rev)
+    endrev = attr.ib()  # int
+    color = attr.ib()  # int
+    linktype = attr.ib()  # one of LINE_TYPE
+
     def __repr__(self):
-        xs = (self.__class__.__name__,) + self
-        return '%s(%r->%r, color=%r, linktype=%r)' % xs
+        return '%s(%r->%r, color=%r, linetype=%r)' % (
+            self.__class__.__name__,
+            self.startrev,
+            self.endrev,
+            self.color,
+            self.linktype)
 
     @property
     def importance(self):
         """Sort key of overlapped edges; highest one should be drawn last"""
         # prefer parent-child relation and younger (i.e. longer) edge
-        return -self[3], -self[2]
+        return -self.linktype, -self.color
 
 class GraphNode(object):
     """Graph node for all actual changesets, as well as the working copy

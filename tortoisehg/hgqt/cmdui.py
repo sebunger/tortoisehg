@@ -9,6 +9,10 @@ from __future__ import absolute_import
 
 import weakref
 
+from mercurial import (
+    pycompat,
+)
+
 from .qsci import (
     QsciScintilla,
 )
@@ -43,13 +47,18 @@ from . import (
     qscilib,
 )
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Optional,
+    )
+
 def startProgress(topic, status):
     topic, item, pos, total, unit = topic, '...', status, None, ''
-    return (topic, pos, item, unit, total)
+    return topic, pos, item, unit, total
 
 def stopProgress(topic):
     topic, item, pos, total, unit = topic, '', None, None, ''
-    return (topic, pos, item, unit, total)
+    return topic, pos, item, unit, total
 
 class ProgressMonitor(QWidget):
     'Progress bar for use in workbench status bar'
@@ -118,7 +127,7 @@ class ThgStatusBar(QStatusBar):
             self.lbl.setStyleSheet('')
 
     def setRepoBusy(self, root, busy):
-        root = unicode(root)
+        root = pycompat.unicode(root)
         if busy:
             self._busyrepos.add(root)
         else:
@@ -135,13 +144,13 @@ class ThgStatusBar(QStatusBar):
 
     @pyqtSlot()
     def clearProgress(self):
-        keys = self.topics.keys()
+        keys = list(self.topics)
         for key in keys:
             self._removeProgress(key)
 
     @pyqtSlot(str)
     def clearRepoProgress(self, root):
-        root = unicode(root)
+        root = pycompat.unicode(root)
         keys = [k for k in self.topics if k[0] == root]
         for key in keys:
             self._removeProgress(key)
@@ -178,7 +187,8 @@ class ThgStatusBar(QStatusBar):
         else:
             pm = self.topics[key]
         if total:
-            fmt = '%s / %s ' % (unicode(pos), unicode(total))
+            fmt = '%s / %s ' % (pycompat.unicode(pos),
+                                pycompat.unicode(total))
             if unit:
                 fmt += unit
             pm.status.setText(fmt)
@@ -186,7 +196,7 @@ class ThgStatusBar(QStatusBar):
         else:
             if item:
                 item = item[-30:]
-            pm.status.setText('%s %s' % (unicode(pos), item))
+            pm.status.setText('%s %s' % (pycompat.unicode(pos), item))
             pm.unknown()
 
     @pyqtSlot(cmdcore.ProgressMessage)
@@ -195,7 +205,7 @@ class ThgStatusBar(QStatusBar):
 
     @pyqtSlot(str, cmdcore.ProgressMessage)
     def setRepoProgress(self, root, progress):
-        self.progress(*(progress + (unicode(root),)))
+        self.progress(*(progress + (pycompat.unicode(root),)))
 
 
 def updateStatusMessage(stbar, session):
@@ -246,8 +256,10 @@ class LogWidget(qscilib.ScintillaCompat):
     def appendLog(self, msg, label):
         """Append log text to the last line; scrolls down to there"""
         self.append(msg)
-        self._setmarker(xrange(self.lines() - unicode(msg).count('\n') - 1,
-                               self.lines() - 1), unicode(label))
+        self._setmarker(pycompat.xrange(self.lines()
+                                        - pycompat.unicode(msg).count('\n')
+                                        - 1,
+                               self.lines() - 1), pycompat.unicode(label))
         self.setCursorPosition(self.lines() - 1, 0)
 
     def _setmarker(self, lines, label):
@@ -284,16 +296,19 @@ class InteractiveUiHandler(cmdcore.UiHandler):
 
     # Unlike QObject, "uiparent" does not own this handler
     def __init__(self, uiparent=None):
+        # type: (Optional[QWidget]) -> None
         super(InteractiveUiHandler, self).__init__()
         self._prompttext = ''
         self._promptmode = cmdcore.UiHandler.NoInput
         self._promptdefault = ''
-        self._uiparentref = uiparent and weakref.ref(uiparent)
+        self._uiparentref = None  # type: Optional[weakref.ReferenceType[QWidget]]
+        if uiparent:
+            self._uiparentref = weakref.ref(uiparent)
 
     def setPrompt(self, text, mode, default=None):
-        self._prompttext = unicode(text)
+        self._prompttext = pycompat.unicode(text)
         self._promptmode = mode
-        self._promptdefault = unicode(default or '')
+        self._promptdefault = pycompat.unicode(default or '')
 
     def getLineInput(self):
         mode = self._promptmode
@@ -332,7 +347,7 @@ class InteractiveUiHandler(cmdcore.UiHandler):
             return button.response
 
     def _parentWidget(self):
-        p = self._uiparentref and self._uiparentref()
+        p = self._uiparentref() if self._uiparentref else None
         while p and not p.isWidgetType():
             p = p.parent()
         return p

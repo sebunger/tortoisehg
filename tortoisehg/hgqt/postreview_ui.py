@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/sborho/repos/thg/tortoisehg/hgqt/postreview.ui'
+# Form implementation generated from reading ui file '/home/yuya/work/hghacks/thg/tortoisehg/hgqt/postreview.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from tortoisehg.util.i18n import _
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_PostReviewDialog(object):
     def setupUi(self, PostReviewDialog):
@@ -161,21 +163,20 @@ class Ui_PostReviewDialog(object):
 
     def retranslateUi(self, PostReviewDialog):
         _translate = QtCore.QCoreApplication.translate
-        PostReviewDialog.setWindowTitle(_('Review Board'))
-        self.repo_id_label.setText(_('Repository ID:'))
-        self.summary_label.setText(_('Summary:'))
-        self.tab_widget.setTabText(self.tab_widget.indexOf(self.post_review_tab), _('Post Review'))
-        self.review_id_label.setText(_('Review ID:'))
-        self.update_fields.setText(_('Update the fields of this existing request'))
-        self.tab_widget.setTabText(self.tab_widget.indexOf(self.update_review_tab), _('Update Review'))
-        self.options_group.setTitle(_('Options'))
-        self.outgoing_changes_check.setText(_('Create diff with all outgoing changes'))
-        self.branch_check.setText(_('Create diff with all changes on this branch'))
-        self.publish_immediately_check.setText(_('Publish request immediately'))
-        self.changesets_box.setTitle(_('Changesets'))
-        self.settings_button.setText(_('&Settings'))
-        self.progress_bar.setFormat(_('%p%'))
-        self.progress_label.setText(_('Connecting to Review Board...'))
-        self.post_review_button.setText(_('Post &Review'))
-        self.close_button.setText(_('&Close'))
-
+        PostReviewDialog.setWindowTitle(_("Review Board"))
+        self.repo_id_label.setText(_("Repository ID:"))
+        self.summary_label.setText(_("Summary:"))
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.post_review_tab), _("Post Review"))
+        self.review_id_label.setText(_("Review ID:"))
+        self.update_fields.setText(_("Update the fields of this existing request"))
+        self.tab_widget.setTabText(self.tab_widget.indexOf(self.update_review_tab), _("Update Review"))
+        self.options_group.setTitle(_("Options"))
+        self.outgoing_changes_check.setText(_("Create diff with all outgoing changes"))
+        self.branch_check.setText(_("Create diff with all changes on this branch"))
+        self.publish_immediately_check.setText(_("Publish request immediately"))
+        self.changesets_box.setTitle(_("Changesets"))
+        self.settings_button.setText(_("&Settings"))
+        self.progress_bar.setFormat(_("%p%"))
+        self.progress_label.setText(_("Connecting to Review Board..."))
+        self.post_review_button.setText(_("Post &Review"))
+        self.close_button.setText(_("&Close"))

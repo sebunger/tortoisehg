@@ -47,6 +47,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     scmutil,
 )
 
@@ -61,6 +62,11 @@ from . import (
     qfold,
     rejects,
 )
+
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Optional,
+    )
 
 def _checkForRejects(repo, rawoutput, parent=None):
     """Parse output of qpush/qpop to resolve hunk failure manually"""
@@ -79,14 +85,14 @@ def _checkForRejects(repo, rawoutput, parent=None):
             rejfiles[wfile] = (r == QDialog.Accepted)
 
     # empty rejfiles means we failed to parse output message
-    return bool(rejfiles) and all(rejfiles.itervalues())
+    return bool(rejfiles) and all(rejfiles.values())
 
 class QueueManagementActions(QObject):
     """Container for patch queue management actions"""
 
     def __init__(self, parent=None):
         super(QueueManagementActions, self).__init__(parent)
-        assert parent is None or isinstance(parent, QWidget)
+        assert parent is None or isinstance(parent, QWidget), repr(parent)
         self._repoagent = None
         self._cmdsession = cmdcore.nullCmdSession()
 
@@ -97,9 +103,15 @@ class QueueManagementActions(QObject):
             'deleteQueue': QAction(_('&Delete Queue...'), self),
             'purgeQueue':  QAction(_('&Purge Queue...'), self),
             }
-        for name, action in self._actions.iteritems():
+        for name, action in self._actions.items():
             action.triggered.connect(getattr(self, '_' + name))
         self._updateActions()
+
+    def _parentWidget(self):
+        # type: () -> Optional[QWidget]
+        p = self.parent()
+        assert p is None or isinstance(p, QWidget)
+        return p
 
     def setRepoAgent(self, repoagent):
         self._repoagent = repoagent
@@ -107,7 +119,7 @@ class QueueManagementActions(QObject):
 
     def _updateActions(self):
         enabled = bool(self._repoagent) and self._cmdsession.isFinished()
-        for action in self._actions.itervalues():
+        for action in self._actions.values():
             action.setEnabled(enabled)
 
     def createMenu(self, parent=None):
@@ -144,7 +156,7 @@ class QueueManagementActions(QObject):
             return
         repo = self._repoagent.rawRepo()
         repoagent = self._repoagent.subRepoAgent(hglib.tounicode(repo.mq.path))
-        dlg = commit.CommitDialog(repoagent, [], {}, self.parent())
+        dlg = commit.CommitDialog(repoagent, [], {}, self._parentWidget())
         dlg.finished.connect(dlg.deleteLater)
         dlg.exec_()
 
@@ -194,7 +206,7 @@ class QueueManagementActions(QObject):
         return hglib.getqqueues(self._repoagent.rawRepo())
 
     def _getNewName(self, title, labeltext, oktext):
-        dlg = QInputDialog(self.parent())
+        dlg = QInputDialog(self._parentWidget())
         dlg.setWindowTitle(title)
         dlg.setLabelText(labeltext)
         dlg.setOkButtonText(oktext)
@@ -202,7 +214,7 @@ class QueueManagementActions(QObject):
             return dlg.textValue()
 
     def _getExistingName(self, title, labeltext, oktext):
-        dlg = QInputDialog(self.parent())
+        dlg = QInputDialog(self._parentWidget())
         dlg.setWindowTitle(title)
         dlg.setLabelText(labeltext)
         dlg.setOkButtonText(oktext)
@@ -257,7 +269,7 @@ class QueueManagementActions(QObject):
     @pyqtSlot(int)
     def _onCommandFinished(self, ret):
         if ret != 0:
-            cmdui.errorMessageBox(self._cmdsession, self.parent())
+            cmdui.errorMessageBox(self._cmdsession, self._parentWidget())
         self._updateActions()
 
 
@@ -266,10 +278,16 @@ class PatchQueueActions(QObject):
 
     def __init__(self, parent=None):
         super(PatchQueueActions, self).__init__(parent)
-        assert parent is None or isinstance(parent, QWidget)
+        assert parent is None or isinstance(parent, QWidget), repr(parent)
         self._repoagent = None
         self._cmdsession = cmdcore.nullCmdSession()
         self._opts = {'force': False, 'keep_changes': False}
+
+    def _parentWidget(self):
+        # type: () -> Optional[QWidget]
+        p = self.parent()
+        assert p is None or isinstance(p, QWidget)
+        return p
 
     def setRepoAgent(self, repoagent):
         self._repoagent = repoagent
@@ -314,14 +332,14 @@ class PatchQueueActions(QObject):
         return self._runCommand('qfinish', [revspec], {})
 
     def deletePatches(self, patches):
-        dlg = qdelete.QDeleteDialog(patches, self.parent())
+        dlg = qdelete.QDeleteDialog(patches, self._parentWidget())
         if not dlg.exec_():
             return cmdcore.nullCmdSession()
         return self._runCommand('qdelete', patches, dlg.options())
 
     def foldPatches(self, patches):
-        lpatches = map(hglib.fromunicode, patches)
-        dlg = qfold.QFoldDialog(self._repoagent, lpatches, self.parent())
+        lpatches = pycompat.maplist(hglib.fromunicode, patches)
+        dlg = qfold.QFoldDialog(self._repoagent, lpatches, self._parentWidget())
         dlg.finished.connect(dlg.deleteLater)
         if not dlg.exec_():
             return cmdcore.nullCmdSession()
@@ -346,13 +364,13 @@ class PatchQueueActions(QObject):
         return self._runCommand('qselect', guards, opts)
 
     def _getNewName(self, title, labeltext, curvalue, oktext):
-        dlg = QInputDialog(self.parent())
+        dlg = QInputDialog(self._parentWidget())
         dlg.setWindowTitle(title)
         dlg.setLabelText(labeltext)
         dlg.setTextValue(curvalue)
         dlg.setOkButtonText(oktext)
         if dlg.exec_():
-            return unicode(dlg.textValue())
+            return pycompat.unicode(dlg.textValue())
 
     def abort(self):
         self._cmdsession.abort()
@@ -371,19 +389,19 @@ class PatchQueueActions(QObject):
         if ret == 2 and self._repoagent:
             repo = self._repoagent.rawRepo()
             output = hglib.fromunicode(self._cmdsession.warningString())
-            if _checkForRejects(repo, output, self.parent()):
+            if _checkForRejects(repo, output, self._parentWidget()):
                 ret = 0  # no further error dialog
         if ret != 0:
-            cmdui.errorMessageBox(self._cmdsession, self.parent())
+            cmdui.errorMessageBox(self._cmdsession, self._parentWidget())
 
     @pyqtSlot(int)
     def _onCommandFinished(self, ret):
         if ret != 0:
-            cmdui.errorMessageBox(self._cmdsession, self.parent())
+            cmdui.errorMessageBox(self._cmdsession, self._parentWidget())
 
     @pyqtSlot()
     def launchOptionsDialog(self):
-        dlg = OptionsDialog(self._opts, self.parent())
+        dlg = OptionsDialog(self._opts, self._parentWidget())
         dlg.finished.connect(dlg.deleteLater)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
@@ -484,7 +502,7 @@ class PatchQueueModel(QAbstractListModel):
         return len(self._series)
 
     def appliedCount(self):
-        return sum(s == 'applied' for s in self._statusmap.itervalues())
+        return sum(s == 'applied' for s in self._statusmap.values())
 
     def patchName(self, index):
         if not index.isValid():
@@ -494,7 +512,8 @@ class PatchQueueModel(QAbstractListModel):
     def patchGuards(self, index):
         if not index.isValid():
             return []
-        return map(hglib.tounicode, self._seriesguards[index.row()])
+        return pycompat.maplist(hglib.tounicode,
+                                self._seriesguards[index.row()])
 
     def isApplied(self, index):
         if not index.isValid():
@@ -554,7 +573,7 @@ class PatchQueueModel(QAbstractListModel):
                    for i in sorted(indexes, reverse=True)]
         data = QMimeData()
         data.setData('application/vnd.thg.mq.series',
-                     QByteArray('\n'.join(patches) + '\n'))
+                     QByteArray(b'\n'.join(patches) + b'\n'))
         data.setUrls([QUrl.fromLocalFile(hglib.tounicode(repo.mq.join(p)))
                       for p in patches])
         return data
@@ -575,7 +594,7 @@ class PatchQueueModel(QAbstractListModel):
             after = None  # next to working rev
         patches = str(data.data('application/vnd.thg.mq.series')).splitlines()
         cmdline = hglib.buildcmdargs('qreorder', after=after, *patches)
-        cmdline = map(hglib.tounicode, cmdline)
+        cmdline = pycompat.maplist(hglib.tounicode, cmdline)
         self._repoagent.runCommand(cmdline)
         return True
 
@@ -735,7 +754,7 @@ class MQPatchesWidget(QDockWidget):
         if self._repoagent:
             self._repoagent.repositoryChanged.disconnect(self.reload)
         self._repoagent = None
-        if repoagent and 'mq' in repoagent.rawRepo().extensions():
+        if repoagent and b'mq' in repoagent.rawRepo().extensions():
             self._repoagent = repoagent
             self._repoagent.repositoryChanged.connect(self.reload)
         self._changePatchQueueModel()
@@ -779,6 +798,7 @@ class MQPatchesWidget(QDockWidget):
 
     def _currentPatchName(self):
         model = self._queueListWidget.model()
+        assert model is not None
         index = self._queueListWidget.currentIndex()
         return model.patchName(index)
 
@@ -794,13 +814,13 @@ class MQPatchesWidget(QDockWidget):
                       text=uguards)
         if not ok or new == uguards:
             return
-        self._patchActions.guardPatch(patch, unicode(new).split())
+        self._patchActions.guardPatch(patch, pycompat.unicode(new).split())
 
     @pyqtSlot()
     def _onDelete(self):
         model = self._queueListWidget.model()
         selmodel = self._queueListWidget.selectionModel()
-        patches = map(model.patchName, selmodel.selectedRows())
+        patches = pycompat.maplist(model.patchName, selmodel.selectedRows())
         self._patchActions.deletePatches(patches)
 
     @pyqtSlot()
@@ -914,7 +934,8 @@ class MQPatchesWidget(QDockWidget):
             newguards.append(guard)
         elif guard in newguards:
             newguards.remove(guard)
-        self._patchActions.selectGuards(map(hglib.tounicode, newguards))
+        self._patchActions.selectGuards(pycompat.maplist(hglib.tounicode,
+                                                         newguards))
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
@@ -966,8 +987,7 @@ class OptionsDialog(QDialog):
                 cb.setChecked(False)
 
     def accept(self):
-        outopts = {}
-        outopts['force'] = self.forcecb.isChecked()
-        outopts['keep_changes'] = self.keepcb.isChecked()
+        outopts = {'force': self.forcecb.isChecked(),
+                   'keep_changes': self.keepcb.isChecked()}
         self.outopts = outopts
         QDialog.accept(self)

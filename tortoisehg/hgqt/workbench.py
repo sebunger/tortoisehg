@@ -36,6 +36,10 @@ from .qtgui import (
     qApp,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import (
     hglib,
     paths,
@@ -56,9 +60,10 @@ from .settings import SettingsDialog
 class Workbench(QMainWindow):
     """hg repository viewer/browser application"""
 
-    def __init__(self, ui, repomanager):
+    def __init__(self, ui, config, repomanager):
         QMainWindow.__init__(self)
         self.ui = ui
+        self._config = config
         self._repomanager = repomanager
         self._repomanager.configChanged.connect(self._setupUrlComboIfCurrent)
 
@@ -128,7 +133,7 @@ class Workbench(QMainWindow):
         self.resize(desktopgeom.size() * 0.8)
 
         self.repoTabsWidget = tw = repotab.RepoTabWidget(
-            self.ui, self._repomanager, self)
+            self._config, self._repomanager, self)
         sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         sp.setHorizontalStretch(1)
         sp.setVerticalStretch(1)
@@ -260,17 +265,15 @@ class Workbench(QMainWindow):
         # note that 'grep' and 'search' are equivalent
         taskdefs = {
             'commit': ('hg-commit', _('&Commit')),
-            'pbranch': ('hg-branch', _('&Patch Branch')),
             'log': ('hg-log', _("Revision &Details")),
             'grep': ('hg-grep', _('&Search')),
             'sync': ('thg-sync', _('S&ynchronize')),
             # 'console' is toggled by "Show Console" action
         }
-        tasklist = self.ui.configlist('tortoisehg', 'workbench.task-toolbar')
+        tasklist = self._config.configStringList(
+            'tortoisehg', 'workbench.task-toolbar')
         if tasklist == []:
-            tasklist = ['log', 'commit', 'grep', 'pbranch', '|', 'sync']
-
-        self.actionSelectTaskPbranch = None
+            tasklist = ['log', 'commit', 'grep', '|', 'sync']
 
         for taskname in tasklist:
             taskname = taskname.strip()
@@ -278,9 +281,7 @@ class Workbench(QMainWindow):
             if taskinfo is None:
                 newseparator(toolbar='task')
                 continue
-            tbar = addtaskview(taskinfo[0], taskinfo[1], taskname)
-            if taskname == 'pbranch':
-                self.actionSelectTaskPbranch = tbar
+            addtaskview(taskinfo[0], taskinfo[1], taskname)
 
         newseparator(menu='view')
 
@@ -390,7 +391,7 @@ class Workbench(QMainWindow):
         newaction(_("&Help"), self.onHelp, menu='help', icon='help-browser')
         newaction(_("E&xplorer Help"), self.onHelpExplorer, menu='help')
         visiblereadme = 'repoopen'
-        if  self.ui.config('tortoisehg', 'readme', None):
+        if self._config.configString('tortoisehg', 'readme'):
             visiblereadme = True
         newaction(_("&Readme"), self.onReadme, menu='help', icon='help-readme',
                   visible=visiblereadme, shortcut='Ctrl+F1')
@@ -424,14 +425,13 @@ class Workbench(QMainWindow):
         self.urlComboAction.setVisible(False)
         self.synctbar.actionTriggered.connect(self._runSyncAction)
 
-    def _setupUrlCombo(self, repo):
+    def _setupUrlCombo(self, repoagent):
         """repository has been switched, fill urlCombo with URLs"""
-        pathdict = dict((hglib.tounicode(alias), hglib.tounicode(path))
-                         for alias, path in repo.ui.configitems('paths'))
-        aliases = pathdict.keys()
+        pathdict = dict(repoagent.configStringItems('paths'))
+        aliases = list(pathdict.keys())
 
-        combo_setting = repo.ui.config('tortoisehg', 'workbench.target-combo',
-                                       'auto')
+        combo_setting = repoagent.configString(
+            'tortoisehg', 'workbench.target-combo')
         self.urlComboAction.setVisible(len(aliases) > 1
                                        or combo_setting == 'always')
 
@@ -461,7 +461,7 @@ class Workbench(QMainWindow):
         aliases = combinedaliases + regularaliases
         # 7. Ensure the first path is a default path (either a
         # combined "default | default-push" path or a regular default path)
-        if not 'default-push' in aliases and 'default' in aliases:
+        if 'default-push' not in aliases and 'default' in aliases:
             aliases.remove('default')
             aliases.insert(0, 'default')
 
@@ -480,7 +480,7 @@ class Workbench(QMainWindow):
             self.urlCombo.addItem(itemtext, itemdata)
             self.urlCombo.setItemData(n, tooltip, Qt.ToolTipRole)
         # Try to select the previously selected path, if any
-        prevpath = self._lastRepoSyncPath.get(hglib.tounicode(repo.root))
+        prevpath = self._lastRepoSyncPath.get(repoagent.rootPath())
         if prevpath:
             idx = self.urlCombo.findText(prevpath)
             if idx >= 0:
@@ -492,7 +492,7 @@ class Workbench(QMainWindow):
     def _setupUrlComboIfCurrent(self, root):
         w = self._currentRepoWidget()
         if w.repoRootPath() == root:
-            self._setupUrlCombo(w.repo)
+            self._setupUrlCombo(self._repomanager.repoAgent(root))
 
     def _syncUrlFor(self, op):
         """Current URL for the given sync operation"""
@@ -706,7 +706,7 @@ class Workbench(QMainWindow):
     @pyqtSlot(str, bool)
     def openRepo(self, root, reuse, bundle=None):
         """Open tab of the specified repo [unicode]"""
-        root = unicode(root)
+        root = pycompat.unicode(root)
         if not root or root.startswith('ssh://'):
             return
         if reuse and self.repoTabsWidget.selectRepo(root):
@@ -728,7 +728,7 @@ class Workbench(QMainWindow):
     def dragEnterEvent(self, event):
         d = event.mimeData()
         for u in d.urls():
-            root = paths.find_root(unicode(u.toLocalFile()))
+            root = paths.find_root(pycompat.unicode(u.toLocalFile()))
             if root:
                 event.setDropAction(Qt.LinkAction)
                 event.accept()
@@ -738,7 +738,7 @@ class Workbench(QMainWindow):
         accept = False
         d = event.mimeData()
         for u in d.urls():
-            root = paths.find_root(unicode(u.toLocalFile()))
+            root = paths.find_root(pycompat.unicode(u.toLocalFile()))
             if root:
                 self.showRepo(root)
                 accept = True
@@ -766,7 +766,9 @@ class Workbench(QMainWindow):
         w = self._currentRepoWidget()
         if not w:
             self.setWindowTitle(_('TortoiseHg Workbench'))
-        elif w.repo.ui.configbool('tortoisehg', 'fullpath'):
+            return
+        repoagent = self._repomanager.repoAgent(w.repoRootPath())
+        if repoagent.configBool('tortoisehg', 'fullpath'):
             self.setWindowTitle(_('%s - TortoiseHg Workbench - %s') %
                                 (w.title(), w.repoRootPath()))
         else:
@@ -785,13 +787,9 @@ class Workbench(QMainWindow):
         if not repoWidget:
             for a in self.actionGroupTaskView.actions():
                 a.setChecked(False)
-            if self.actionSelectTaskPbranch is not None:
-                self.actionSelectTaskPbranch.setVisible(False)
             self.lockToolAction.setVisible(False)
         else:
             exts = repoWidget.repo.extensions()
-            if self.actionSelectTaskPbranch is not None:
-                self.actionSelectTaskPbranch.setVisible('pbranch' in exts)
             name = repoWidget.currentTaskTabName()
             for action in self.actionGroupTaskView.actions():
                 action.setChecked(str(action.data()) == name)
@@ -822,7 +820,7 @@ class Workbench(QMainWindow):
 
     @pyqtSlot(str)
     def _onCurrentRepoChanged(self, curpath):
-        curpath = unicode(curpath)
+        curpath = pycompat.unicode(curpath)
         self._console.setCurrentRepoRoot(curpath or None)
         self.reporegistry.setActiveTabRepo(curpath)
         if curpath:
@@ -830,7 +828,7 @@ class Workbench(QMainWindow):
             repo = repoagent.rawRepo()
             self.mqpatches.setRepoAgent(repoagent)
             self._setupCustomTools(repo.ui)
-            self._setupUrlCombo(repo)
+            self._setupUrlCombo(repoagent)
             self._updateAbortAction(repoagent)
         else:
             self.mqpatches.setRepoAgent(None)
@@ -851,8 +849,13 @@ class Workbench(QMainWindow):
                 getattr(w, name)(checked)
         return forwarder
 
-    def _repofwd(self, name, params=[], namedparams={}):
+    def _repofwd(self, name, params=None, namedparams=None):
         """Return function to forward action to the current repo tab"""
+        if params is None:
+            params = []
+        if namedparams is None:
+            namedparams = {}
+
         def forwarder():
             w = self._currentRepoWidget()
             if w:
@@ -967,14 +970,14 @@ class Workbench(QMainWindow):
 
     def _createCloneDialog(self):
         from tortoisehg.hgqt.clone import CloneDialog
-        dlg = CloneDialog(self.ui, parent=self)
+        dlg = CloneDialog(self.ui, self._config, parent=self)
         dlg.clonedRepository.connect(self._openClonedRepo)
         return dlg
 
     @pyqtSlot(str, str)
     def _openClonedRepo(self, root, sourceroot):
-        root = unicode(root)
-        sourceroot = unicode(sourceroot)
+        root = pycompat.unicode(root)
+        sourceroot = pycompat.unicode(sourceroot)
         self.reporegistry.addClonedRepo(root, sourceroot)
         self.showRepo(root)
 
@@ -985,7 +988,7 @@ class Workbench(QMainWindow):
         if root:
             cwd = os.path.dirname(root)
         else:
-            cwd = os.getcwdu()
+            cwd = hglib.getcwdu()
         FD = QFileDialog
         path = FD.getExistingDirectory(self, caption, cwd,
                                        FD.ShowDirsOnly | FD.ReadOnly)
@@ -1036,11 +1039,11 @@ class Workbench(QMainWindow):
             readme = None
             if repo:
                 # Try to get the README configured for the repo of the current tab
-                readmeglobal = self.ui.config('tortoisehg', 'readme', None)
+                readmeglobal = self.ui.config(b'tortoisehg', b'readme')
                 if readmeglobal:
                     # Note that repo.ui.config() falls back to the self.ui.config()
                     # if the key is not set on the current repo's configuration file
-                    readme = repo.ui.config('tortoisehg', 'readme', None)
+                    readme = repo.ui.config(b'tortoisehg', b'readme')
                     if readmeglobal != readme:
                         # The readme is set on the current repo configuration file
                         return readme
@@ -1049,16 +1052,16 @@ class Workbench(QMainWindow):
                 # repository that matches any of the valid README file names
                 # (in a non case-sensitive way)
                 # Note that we try to match the valid README names in order
-                validreadmes = ['readme.txt', 'read.me', 'readme.html',
-                                'readme.pdf', 'readme.doc', 'readme.docx',
-                                'readme.ppt', 'readme.pptx',
-                                'readme.md', 'readme.markdown', 'readme.mkdn',
-                                'readme.rst', 'readme.textile', 'readme.rdoc',
-                                'readme.asciidoc', 'readme.org', 'readme.creole',
-                                'readme.mediawiki', 'readme.pod', 'readme']
+                validreadmes = [b'readme.txt', b'read.me', b'readme.html',
+                                b'readme.pdf', b'readme.doc', b'readme.docx',
+                                b'readme.ppt', b'readme.pptx',
+                                b'readme.md', b'readme.markdown', b'readme.mkdn',
+                                b'readme.rst', b'readme.textile', b'readme.rdoc',
+                                b'readme.asciidoc', b'readme.org', b'readme.creole',
+                                b'readme.mediawiki', b'readme.pod', b'readme']
 
                 readmefiles = [filename for filename in os.listdir(repo.root)
-                               if filename.lower().startswith('read')]
+                               if filename.lower().startswith(b'read')]
                 for validname in validreadmes:
                     for filename in readmefiles:
                         if filename.lower() == validname:
@@ -1074,7 +1077,7 @@ class Workbench(QMainWindow):
             readme = getCurrentReadme(w.repo)
 
         if readme:
-            qtlib.openlocalurl(os.path.expandvars(os.path.expandvars(readme)))
+            qtlib.openlocalurl(os.path.expanduser(os.path.expandvars(readme)))
         else:
             qtlib.WarningMsgBox(_("README not configured"),
                 _("A README file is not configured for the current repository.<p>"
@@ -1093,7 +1096,7 @@ class Workbench(QMainWindow):
         s.setValue(wb + 'saveLastSyncPaths',
             self.actionSaveLastSyncPaths.isChecked())
         s.setValue(wb + 'lastactiverepo', lastactiverepo)
-        s.setValue(wb + 'openrepos', (',').join(repostosave))
+        s.setValue(wb + 'openrepos', ','.join(repostosave))
         s.beginWriteArray('lastreposyncpaths')
         lastreposyncpaths = {}
         if self.actionSaveLastSyncPaths.isChecked():
@@ -1152,7 +1155,8 @@ class Workbench(QMainWindow):
         lastactiverepo = ''
         if self.actionSaveRepos.isChecked():
             tw = self.repoTabsWidget
-            repostosave = map(tw.repoRootPath, xrange(tw.count()))
+            repostosave = pycompat.maplist(tw.repoRootPath,
+                                           pycompat.xrange(tw.count()))
             lastactiverepo = tw.currentRepoRootPath()
         if not self.repoTabsWidget.closeAllTabs():
             event.ignore()
@@ -1168,7 +1172,7 @@ class Workbench(QMainWindow):
     def explore(self):
         root = self.currentRepoRootPath()
         if root:
-            qtlib.openlocalurl(hglib.fromunicode(root))
+            qtlib.openlocalurl(root)
 
     def terminal(self):
         w = self._currentRepoWidget()

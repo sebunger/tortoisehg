@@ -19,6 +19,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import hglib
 from ..util.i18n import _
 from . import (
@@ -68,10 +72,10 @@ class PruneWidget(cmdui.AbstractCmdWidget):
         self._revedit.setFocus()
 
     def revset(self):
-        return unicode(self._revedit.currentText())
+        return pycompat.unicode(self._revedit.currentText())
 
     def setRevset(self, revspec):
-        if self.revset() == unicode(revspec):
+        if self.revset() == pycompat.unicode(revspec):
             return
         w = self._revedit
         i = w.findText(revspec)
@@ -104,7 +108,7 @@ class PruneWidget(cmdui.AbstractCmdWidget):
             # new query is already or about to be running
             return
         if ret == 0:
-            revs = map(int, str(sess.readAll()).splitlines())
+            revs = pycompat.maplist(int, bytes(sess.readAll()).splitlines())
         else:
             revs = []
         self._cslist.update(revs)
@@ -117,7 +121,7 @@ class PruneWidget(cmdui.AbstractCmdWidget):
 
     def runCommand(self):
         opts = {}
-        opts.update((n, w.isChecked()) for n, w in self._optchks.iteritems())
+        opts.update((n, w.isChecked()) for n, w in self._optchks.items())
         cmdline = hglib.buildcmdargs('prune', rev=self.revset(), **opts)
         return self._repoagent.runCommand(cmdline, self)
 

@@ -40,6 +40,10 @@ from .qtnetwork import (
     QNetworkRequest,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import (
     hglib,
     paths,
@@ -79,7 +83,7 @@ class AboutDialog(QDialog):
         self.copyright_lbl = QLabel()
         self.copyright_lbl.setAlignment(Qt.AlignCenter)
         self.copyright_lbl.setText('\n'
-                + _('Copyright 2008-2018 Steve Borho and others'))
+                + _('Copyright 2008-2020 Steve Borho and others'))
         self.vbox.addWidget(self.copyright_lbl)
         self.courtesy_lbl = QLabel()
         self.courtesy_lbl.setAlignment(Qt.AlignCenter)
@@ -124,8 +128,8 @@ class AboutDialog(QDialog):
             vers = ".".join([str(x) for x in tuple])
             return vers
         thgv = (_('version %s') % version.version())
-        libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') % \
-              (hglib.hgversion, make_version(sys.version_info[0:3]),
+        libv = (_('with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s') %
+                (hglib.hgversion, make_version(sys.version_info[0:3]),
               PYQT_VERSION_STR, QT_VERSION_STR))
         par = ('<p style=\" margin-top:0px; margin-bottom:6px;\">'
                 '<span style=\"font-size:%spt; font-weight:600;\">'
@@ -150,7 +154,7 @@ class AboutDialog(QDialog):
         newverstr = '0.0.0'
         upgradeurl = ''
         try:
-            f = self._newverreply.readAll().data().splitlines()
+            f = pycompat.sysstr(self._newverreply.readAll().data()).splitlines()
             self._newverreply.close()
             self._newverreply = None
             newverstr = f[0]
@@ -158,7 +162,7 @@ class AboutDialog(QDialog):
             upgradeurl = f[1] # generic download URL
             platform = sys.platform
             if platform == 'win32':
-                from win32process import IsWow64Process as IsX64
+                from win32process import IsWow64Process as IsX64  # pytype: disable=import-error
                 platform = IsX64() and 'x64' or 'x86'
             # linux2 for Linux, darwin for OSX
             for line in f[2:]:
@@ -213,9 +217,10 @@ class LicenseDialog(QDialog):
         self.lic_txt.setTextInteractionFlags(
                 Qt.TextSelectableByKeyboard|Qt.TextSelectableByMouse)
         try:
-            lic = open(paths.get_license_path(), 'rb').read()
+            with open(paths.get_license_path(), 'r') as fp:
+                lic = fp.read()
             self.lic_txt.setPlainText(lic)
-        except (IOError):
+        except IOError:
             pass
 
         bbox = QDialogButtonBox(self)

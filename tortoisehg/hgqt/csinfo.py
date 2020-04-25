@@ -21,7 +21,10 @@ from .qtgui import (
     QWidget,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    pycompat,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -94,7 +97,7 @@ class Factory(object):
         if 'type' not in style:
             raise _("must be specified 'type' in style")
         type = style['type']
-        assert type in ('panel', 'label')
+        assert type in ('panel', 'label'), type
 
         # create widget
         args = (target, style, custom, repo, self.info)
@@ -139,7 +142,7 @@ class SummaryInfo(object):
                 revnum = self.get_data('revnum', *args)
                 revid = self.get_data('revid', *args)
                 if revid:
-                    return (revnum, revid)
+                    return revnum, revid
                 return None
             elif item == 'revnum':
                 return ctx.rev()
@@ -148,10 +151,10 @@ class SummaryInfo(object):
             elif item == 'gitcommit':
                 return hglib.gitcommit(ctx)
             elif item == 'desc':
-                return hglib.tounicode(ctx.description().replace('\0', ''))
+                return hglib.tounicode(ctx.description().replace(b'\0', b''))
             elif item == 'summary':
                 summary = hglib.longsummary(
-                    ctx.description().replace('\0', ''))
+                    ctx.description().replace(b'\0', b''))
                 if len(summary) == 0:
                     return None
                 return summary
@@ -166,12 +169,12 @@ class SummaryInfo(object):
                 date = self.get_data('date', *args)
                 age = self.get_data('age', *args)
                 if date and age:
-                    return (date, age)
+                    return date, age
                 return None
             elif item == 'date':
                 date = ctx.date()
                 if date:
-                    return hglib.displaytime(date)
+                    return hglib.tounicode(hglib.displaytime(date))
                 return None
             elif item == 'age':
                 date = ctx.date()
@@ -179,7 +182,7 @@ class SummaryInfo(object):
                     return hglib.age(date).decode('utf-8')
                 return None
             elif item == 'rawbranch':
-                return ctx.branch() or None
+                return hglib.tounicode(ctx.branch()) or None
             elif item == 'branch':
                 value = self.get_data('rawbranch', *args)
                 if value:
@@ -195,22 +198,22 @@ class SummaryInfo(object):
                     return value
                 return None
             elif item == 'close':
-                return ctx.extra().get('close')
+                return hglib.tounicode(ctx.extra().get(b'close'))
             elif item == 'tags':
-                return ctx.thgtags() or None
+                return [hglib.tounicode(tag) for tag in ctx.thgtags()] or None
             elif item == 'graft':
                 extra = ctx.extra()
                 try:
-                    return extra['source']
+                    return hglib.tounicode(extra[b'source'])
                 except KeyError:
                     pass
                 return None
             elif item == 'transplant':
                 extra = ctx.extra()
                 try:
-                    ts = extra['transplant_source']
+                    ts = extra[b'transplant_source']
                     if ts:
-                        return binascii.hexlify(ts)
+                        return hglib.tounicode(binascii.hexlify(ts))
                 except KeyError:
                     pass
                 return None
@@ -220,29 +223,29 @@ class SummaryInfo(object):
                     obsoletestate.append('obsolete')
                 if ctx.extinct():
                     obsoletestate.append('extinct')
-                obsoletestate += ctx.instabilities()
+                obsoletestate += map(hglib.tounicode, ctx.instabilities())
                 if obsoletestate:
                     return obsoletestate
                 return None
             elif item == 'p4':
                 extra = ctx.extra()
-                p4cl = extra.get('p4', None)
-                return p4cl and ('changelist %s' % p4cl)
+                p4cl = extra.get(b'p4', None)
+                return p4cl and hglib.tounicode(b'changelist %s' % p4cl)
             elif item == 'svn':
                 extra = ctx.extra()
-                cvt = extra.get('convert_revision', '')
-                if cvt.startswith('svn:'):
-                    result = cvt.split('/', 1)[-1]
+                cvt = extra.get(b'convert_revision', b'')
+                if cvt.startswith(b'svn:'):
+                    result = cvt.split(b'/', 1)[-1]
                     if cvt != result:
-                        return result
-                    return cvt.split('@')[-1]
+                        return hglib.tounicode(result)
+                    return hglib.tounicode(cvt.split(b'@')[-1])
                 else:
                     return None
             elif item == 'converted':
                 extra = ctx.extra()
-                cvt = extra.get('convert_revision', '')
-                if cvt and not cvt.startswith('svn:'):
-                    return cvt
+                cvt = extra.get(b'convert_revision', b'')
+                if cvt and not cvt.startswith(b'svn:'):
+                    return hglib.tounicode(cvt)
                 else:
                     return None
             elif item == 'ishead':
@@ -308,7 +311,7 @@ class SummaryInfo(object):
                 return str(value)
             elif item == 'svn':
                 # svn is always in utf-8 because ctx.extra() isn't converted
-                return unicode(value, 'utf-8', 'replace')
+                return pycompat.unicode(value, 'utf-8', 'replace')
             elif item in ('rawbranch', 'branch'):
                 opts = dict(fg='black', bg='#aaffaa')
                 return qtlib.markup(' %s ' % value, **opts)
@@ -344,7 +347,7 @@ class SummaryInfo(object):
     def get_widget(self, item, widget, ctx, custom, **kargs):
         args = (widget, ctx, custom)
         def default_func(widget, item, markups):
-            if isinstance(markups, basestring):
+            if hglib.isbasestring(markups):
                 markups = (markups,)
             labels = []
             for text in markups:
@@ -369,7 +372,7 @@ class SummaryBase(object):
         self.custom = custom
         self.repo = repo
         self.info = info
-        self.ctx = repo[self.target]
+        self.update_ctx()
 
     def get_data(self, item, **kargs):
         return self.info.get_data(item, self, self.ctx, self.custom, **kargs)
@@ -397,7 +400,14 @@ class SummaryBase(object):
         if repo is not None:
             self.repo = repo
         if self.ctx is None:
-            self.ctx = repo[self.target]
+            self.update_ctx()
+
+    def update_ctx(self):
+        if isinstance(self.target, pycompat.unicode):
+            target = hglib.fromunicode(self.target)
+        else:
+            target = self.target
+        self.ctx = self.repo[target]
 
 PANEL_TMPL = '<tr><td style="padding-right:6px">%s</td><td>%s</td></tr>'
 
@@ -421,13 +431,16 @@ class SummaryPanel(SummaryBase, QWidget):
     def update(self, target=None, style=None, custom=None, repo=None):
         SummaryBase.update(self, target, custom, repo)
 
+        layout = self.layout()
+        assert isinstance(layout, QHBoxLayout)
+
         if style is not None:
             self.csstyle = style
 
         if self.revlabel is None:
             self.revlabel = QLabel()
             self.revlabel.linkActivated.connect(self.linkActivated)
-            self.layout().addWidget(self.revlabel, 0, Qt.AlignTop)
+            layout.addWidget(self.revlabel, 0, Qt.AlignTop)
 
         if 'expandable' in self.csstyle and self.csstyle['expandable']:
             if self.expand_btn.parentWidget() is None:
@@ -435,7 +448,7 @@ class SummaryPanel(SummaryBase, QWidget):
                 margin = QHBoxLayout()
                 margin.setContentsMargins(3, 3, 3, 3)
                 margin.addWidget(self.expand_btn, 0, Qt.AlignTop)
-                self.layout().insertLayout(0, margin)
+                layout.insertLayout(0, margin)
             self.expand_btn.setVisible(True)
         elif self.expand_btn.parentWidget() is not None:
             self.expand_btn.setHidden(True)
@@ -455,7 +468,7 @@ class SummaryPanel(SummaryBase, QWidget):
 
         if 'margin' in self.csstyle:
             margin = self.csstyle['margin']
-            assert isinstance(margin, (int, long))
+            assert isinstance(margin, (int, pycompat.long)), repr(margin)
             buf = '<table style="margin: %spx">' % margin
         else:
             buf = '<table>'
@@ -465,7 +478,7 @@ class SummaryPanel(SummaryBase, QWidget):
             if not markups:
                 continue
             label = qtlib.markup(self.get_label(item), weight='bold')
-            if isinstance(markups, basestring):
+            if hglib.isbasestring(markups):
                 markups = [markups,]
             buf += PANEL_TMPL % (label, markups.pop(0))
             for markup in markups:
@@ -528,7 +541,7 @@ class SummaryLabel(SummaryBase, QLabel):
                 markups = self.get_markup(item)
                 if not markups:
                     continue
-                if isinstance(markups, basestring):
+                if hglib.isbasestring(markups):
                     markups = (markups,)
                 data[item] = ', '.join(markups)
             if len(data) == 0:

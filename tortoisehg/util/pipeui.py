@@ -38,6 +38,9 @@ import time
 
 from mercurial import (
     error,
+    scmutil,
+    pycompat,
+    util,
 )
 
 from tortoisehg.util import hgversion
@@ -45,18 +48,18 @@ from tortoisehg.util.i18n import agettext as _
 
 testedwith = hgversion.testedwith
 
-class _labeledstr(str):
+class _labeledstr(bytes):
     r"""
-    >>> a = _labeledstr('foo', 'ui.warning')
+    >>> a = _labeledstr(b'foo', b'ui.warning')
     >>> a.packed()
     '\x01ui.warning\nfoo'
-    >>> _labeledstr(a, 'ui.error').packed()
+    >>> _labeledstr(a, b'ui.error').packed()
     '\x01ui.warning ui.error\nfoo'
-    >>> _labeledstr('foo', '').packed()
+    >>> _labeledstr(b'foo', b'').packed()
     'foo'
-    >>> _labeledstr('\1foo', '').packed()
+    >>> _labeledstr(b'\1foo', b'').packed()
     '\x01\n\x01foo'
-    >>> _labeledstr(a, '') is a  # fast path
+    >>> _labeledstr(a, b'') is a  # fast path
     True
     """
 
@@ -65,25 +68,25 @@ class _labeledstr(str):
             if not l:
                 return s
             if s._label:
-                l = s._label + ' ' + l
-        t = str.__new__(cls, s)
+                l = s._label + b' ' + l
+        t = bytes.__new__(cls, s)
         t._label = l
         return t
 
     def packed(self):
-        if not self._label and not self.startswith('\1'):
-            return str(self)
-        return '\1%s\n%s' % (self._label, self)
+        if not self._label and not self.startswith(b'\1'):
+            return bytes(self)
+        return b'\1%s\n%s' % (self._label, self)
 
 def _packmsgs(msgs, label):
     r"""
-    >>> _packmsgs(['foo'], '')
+    >>> _packmsgs([b'foo'], b'')
     ['foo']
-    >>> _packmsgs(['foo ', 'bar'], '')
+    >>> _packmsgs([b'foo ', b'bar'], b'')
     ['foo bar']
-    >>> _packmsgs(['foo ', 'bar'], 'ui.status')
+    >>> _packmsgs([b'foo ', b'bar'], b'ui.status')
     ['\x01ui.status\nfoo bar']
-    >>> _packmsgs(['foo ', _labeledstr('bar', 'log.branch')], '')
+    >>> _packmsgs([b'foo ', _labeledstr(b'bar', b'log.branch')], b'')
     ['foo ', '\x01log.branch\nbar']
     """
     if not any(isinstance(e, _labeledstr) for e in msgs):
@@ -91,7 +94,7 @@ def _packmsgs(msgs, label):
         # channel protocol; also it's convenient for command-server client
         # to receive the whole message at once.
         if len(msgs) > 1:
-            msgs = [''.join(msgs)]
+            msgs = [b''.join(msgs)]
         if not label:
             # fast path
             return msgs
@@ -108,11 +111,11 @@ def splitmsgs(data):
     >>> splitmsgs('foo\x01ui.warning\nbar')
     ['foo', '\x01ui.warning\nbar']
     """
-    msgs = data.split('\1')
+    msgs = data.split(b'\1')
     if msgs[0]:
-        return msgs[:1] + ['\1' + e for e in msgs[1:]]
+        return msgs[:1] + [b'\1' + e for e in msgs[1:]]
     else:
-        return ['\1' + e for e in msgs[1:]]
+        return [b'\1' + e for e in msgs[1:]]
 
 def unpackmsg(data):
     r"""Try to unpack data to original message and label
@@ -124,38 +127,38 @@ def unpackmsg(data):
     >>> unpackmsg('\x01ui.warning')  # immature end
     ('', 'ui.warning')
     """
-    if not data.startswith('\1'):
-        return data, ''
+    if not data.startswith(b'\1'):
+        return data, b''
     try:
-        label, msg = data[1:].split('\n', 1)
+        label, msg = data[1:].split(b'\n', 1)
         return msg, label
     except ValueError:
-        return '', data[1:]
+        return b'', data[1:]
 
 def _packprompt(msg, default):
     r"""
     >>> _packprompt('foo', None)
     'foo\x00'
-    >>> _packprompt(_labeledstr('$$ &Yes', 'ui.promptchoice'), 'y').packed()
+    >>> _packprompt(_labeledstr(b'$$ &Yes', b'ui.promptchoice'), 'y').packed()
     '\x01ui.promptchoice\n$$ &Yes\x00y'
     """
-    s = '\0'.join((msg, default or ''))
+    s = b'\0'.join((msg, default or b''))
     if not isinstance(msg, _labeledstr):
         return s
     return _labeledstr(s, msg._label)
 
 def unpackprompt(msg):
     """Try to unpack prompt message to original message and default value"""
-    args = msg.split('\0', 1)
+    args = msg.split(b'\0', 1)
     if len(args) == 1:
-        return msg, ''
+        return msg, b''
     else:
         return args
 
 def _fromint(n):
     if n is None:
-        return ''
-    return str(n)
+        return b''
+    return b'%d' % n
 
 def _toint(s):
     if not s:
@@ -169,7 +172,7 @@ def _packprogress(topic, pos, item, unit, total):
     >>> _packprogress('updating', None, '', '', None)
     'updating\x00\x00\x00\x00'
     """
-    return '\0'.join((topic, _fromint(pos), item, unit, _fromint(total)))
+    return b'\0'.join((topic, _fromint(pos), item, unit, _fromint(total)))
 
 def unpackprogress(msg):
     r"""Try to unpack progress message to tuple of parameters
@@ -186,12 +189,12 @@ def unpackprogress(msg):
     ('updating', None, '', '', None)
     """
     try:
-        topic, pos, item, unit, total = msg.split('\0')
+        topic, pos, item, unit, total = msg.split(b'\0')
         return topic, _toint(pos), item, unit, _toint(total)
     except ValueError:
         # fall back to termination
-        topic = msg.split('\0', 1)[0]
-        return topic, None, '', '', None
+        topic = msg.split(b'\0', 1)[0]
+        return topic, None, b'', b'', None
 
 _progressrefresh = 0.1  # [sec]
 
@@ -200,15 +203,12 @@ def _extenduiclass(parcls):
         _lastprogresstopic = None
         _lastprogresstime = 0
 
-        def _writenobuf(self, *args, **opts):
-            label = opts.get('label', '')
-            super(pipeui, self)._writenobuf(*_packmsgs(args, label), **opts)
+        def _writenobuf(self, dest, *args, **opts):
+            label = opts.get('label', b'')
+            super(pipeui, self)._writenobuf(dest, *_packmsgs(args, label),
+                                            **opts)
 
-        def write_err(self, *args, **opts):
-            label = opts.get('label', '')
-            super(pipeui, self).write_err(*_packmsgs(args, label), **opts)
-
-        def prompt(self, msg, default='y'):
+        def prompt(self, msg, default=b'y'):
             fullmsg = _packprompt(msg, default)
             return super(pipeui, self).prompt(fullmsg, default)
 
@@ -216,7 +216,7 @@ def _extenduiclass(parcls):
         def promptchoice(self, prompt, default=0):
             _msg, choices = self.extractchoices(prompt)
             resps = [r for r, _t in choices]
-            prompt = self.label(prompt, 'ui.promptchoice')
+            prompt = self.label(prompt, b'ui.promptchoice')
             r = self.prompt(prompt, resps[default])
             try:
                 return resps.index(r.lower())
@@ -224,9 +224,11 @@ def _extenduiclass(parcls):
                 raise error.Abort(_('unrecognized response: %s') % r)
 
         def getpass(self, prompt=None, default=None):
-            prompt = self.label(prompt or _('password: '), 'ui.getpass')
+            prompt = self.label(prompt or _('password: '), b'ui.getpass')
             return super(pipeui, self).getpass(prompt, default)
 
+        # TODO: progress handler can be extracted to new class, and pass its
+        # instance to scmutil.progress() per makeprogress() call.
         def progress(self, topic, pos, item='', unit='', total=None):
             now = time.time()
             if (topic == self._lastprogresstopic and pos is not None
@@ -240,7 +242,10 @@ def _extenduiclass(parcls):
                 self._lastprogresstopic = topic
             self._lastprogresstime = now
             msg = _packprogress(topic, pos, item, unit, total)
-            self.write_err(msg, label='ui.progress')
+            self.write_err(msg, label=b'ui.progress')
+
+        def makeprogress(self, topic, unit='', total=None):
+            return scmutil.progress(self, self.progress, topic, unit, total)
 
         def label(self, msg, label):
             return _labeledstr(msg, label)

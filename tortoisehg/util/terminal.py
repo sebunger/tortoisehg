@@ -7,46 +7,46 @@ def defaultshell():
     if sys.platform == 'darwin':
         shell = None # Terminal.App does not support open-to-folder
     elif os.name == 'nt':
-        shell = 'cmd.exe /K title %(reponame)s'
+        shell = b'cmd.exe /K title %(reponame)s'
     else:
-        shell = 'xterm -T "%(reponame)s"'
+        shell = b'xterm -T "%(reponame)s"'
     return shell
 
 _defaultshell = defaultshell()
 
 def _getplatformexecutablekey():
     if sys.platform == 'darwin':
-        key = 'executable-osx'
+        key = b'executable-osx'
     elif os.name == 'nt':
-        key = 'executable-win'
+        key = b'executable-win'
     else:
-        key = 'executable-unix'
+        key = b'executable-unix'
     return key
 
 _platformexecutablekey = _getplatformexecutablekey()
 
-def _toolstr(ui, tool, part, default=""):
-    return ui.config("terminal-tools", tool + "." + part, default)
+def _toolstr(ui, tool, part, default=b""):
+    return ui.config(b"terminal-tools", tool + b"." + part, default)
 
 toolcache = {}
 def _findtool(ui, tool):
     global toolcache
     if tool in toolcache:
         return toolcache[tool]
-    for kn in ("regkey", "regkeyalt"):
+    for kn in (b"regkey", b"regkeyalt"):
         k = _toolstr(ui, tool, kn)
         if not k:
             continue
-        p = util.lookupreg(k, _toolstr(ui, tool, "regname"))
+        p = util.lookupreg(k, _toolstr(ui, tool, b"regname"))
         if p:
-            p = procutil.findexe(p + _toolstr(ui, tool, "regappend"))
+            p = procutil.findexe(p + _toolstr(ui, tool, b"regappend"))
             if p:
                 toolcache[tool] = p
                 return p
     global _platformexecutablekey
     exe = _toolstr(ui, tool, _platformexecutablekey)
     if not exe:
-        exe = _toolstr(ui, tool, 'executable', tool)
+        exe = _toolstr(ui, tool, b'executable', tool)
     path = procutil.findexe(util.expandpath(exe))
     if path:
         toolcache[tool] = path
@@ -71,33 +71,33 @@ def _findterminal(ui):
 
     # first check for tool specified in terminal-tools
     tools = {}
-    for k, v in ui.configitems("terminal-tools"):
-        t = k.split('.')[0]
+    for k, v in ui.configitems(b"terminal-tools"):
+        t = k.split(b'.')[0]
         if t not in tools:
             try:
-                priority = int(_toolstr(ui, t, "priority", "0"))
-            except ValueError, e:
+                priority = int(_toolstr(ui, t, b"priority", b"0"))
+            except ValueError as e:
                 priority = -100
             tools[t] = priority
-    names = tools.keys()
+    names = list(tools.keys())
     tools = sorted([(-p, t) for t, p in tools.items()])
-    terminal = ui.config('tortoisehg', 'shell')
+    terminal = ui.config(b'tortoisehg', b'shell')
     if terminal:
         if terminal not in names:
             # if tortoisehg.terminal does not match an terminal-tools entry, take
             # the value directly
-            return (None, terminal)
+            return None, terminal
         # else select this terminal as highest priority (may still use another if
         # it is not found on this machine)
         tools.insert(0, (None, terminal))
     for p, t in tools:
         toolpath = _findtool(ui, t)
         if toolpath:
-            return (t, procutil.shellquote(toolpath))
+            return t, procutil.shellquote(toolpath)
 
     # fallback to the default shell
     global _defaultshell
-    return (None, _defaultshell)
+    return None, _defaultshell
 
 def detectterminal(ui_):
     'returns tuple of terminal tool path and arguments'
@@ -105,14 +105,14 @@ def detectterminal(ui_):
         ui_ = hglib.loadui()
     name, pathorconfig = _findterminal(ui_)
     if name is None:
-        return (pathorconfig, None)
+        return pathorconfig, None
     else:
-        args = _toolstr(ui_, name, "args")
-        return (pathorconfig, args)
+        args = _toolstr(ui_, name, b"args")
+        return pathorconfig, args
 
 def findterminals(ui):
     seen = set()
-    for key, value in ui.configitems('terminal-tools'):
-        t = key.split('.')[0]
+    for key, value in ui.configitems(b'terminal-tools'):
+        t = key.split(b'.')[0]
         seen.add(t)
     return [t for t in seen if _findtool(ui, t)]

@@ -83,7 +83,7 @@ class PerforcePending(QDialog):
         try:
             hashes = self.pending[curcl]
             revs = [repo[hash] for hash in hashes]
-        except (error.Abort, error.RepoLookupError), e:
+        except (error.Abort, error.RepoLookupError) as e:
             revs = []
         self.cslist.clear()
         self.cslist.update(revs)

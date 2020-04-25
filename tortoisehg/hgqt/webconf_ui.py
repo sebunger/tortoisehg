@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/sborho/repos/thg/tortoisehg/hgqt/webconf.ui'
+# Form implementation generated from reading ui file '/home/yuya/work/hghacks/thg/tortoisehg/hgqt/webconf.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from tortoisehg.util.i18n import _
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_WebconfForm(object):
     def setupUi(self, WebconfForm):
@@ -71,11 +73,10 @@ class Ui_WebconfForm(object):
 
     def retranslateUi(self, WebconfForm):
         _translate = QtCore.QCoreApplication.translate
-        WebconfForm.setWindowTitle(_('Webconf'))
-        self.path_label.setText(_('Config File:'))
-        self.open_button.setText(_('Open'))
-        self.save_button.setText(_('Save'))
-        self.add_button.setText(_('Add'))
-        self.edit_button.setText(_('Edit'))
-        self.remove_button.setText(_('Remove'))
-
+        WebconfForm.setWindowTitle(_("Webconf"))
+        self.path_label.setText(_("Config File:"))
+        self.open_button.setText(_("Open"))
+        self.save_button.setText(_("Save"))
+        self.add_button.setText(_("Add"))
+        self.edit_button.setText(_("Edit"))
+        self.remove_button.setText(_("Remove"))

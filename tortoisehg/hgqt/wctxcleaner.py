@@ -54,7 +54,7 @@ class CheckThread(QThread):
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
             if self.canceled:
                 return
-            if status == 'u':
+            if status == b'u':
                 unresolved = True
                 break
         wctx = self.repo[None]
@@ -75,7 +75,7 @@ class WctxCleaner(QObject):
 
     def __init__(self, repoagent, parent=None):
         super(WctxCleaner, self).__init__(parent)
-        assert parent is None or isinstance(parent, QWidget)
+        assert parent is None or isinstance(parent, QWidget), parent
         self._repoagent = repoagent
         self._cmdsession = cmdcore.nullCmdSession()
         self._checkth = CheckThread(repoagent.rawRepo(), self)

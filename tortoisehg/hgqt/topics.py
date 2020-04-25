@@ -26,6 +26,10 @@ from .qtgui import (
     QWidget,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import hglib
 from ..util.obsoleteutil import first_known_successors
 from ..util.i18n import _
@@ -113,8 +117,8 @@ class TopicsDialog(QDialog):
         return self._repoagent.rawRepo()
 
     def _allTopics(self):
-        return map(hglib.tounicode, self.repo._topics) if self.repo._topics \
-            else []
+        return (pycompat.maplist(hglib.tounicode, self.repo._topics)
+                if self.repo._topics else [])
 
     @pyqtSlot()
     def refresh(self):
@@ -217,7 +221,7 @@ class TopicsDialog(QDialog):
 
     @pyqtSlot()
     def add_topic(self):
-        topic = unicode(self.topicsCombo.currentText())
+        topic = pycompat.unicode(self.topicsCombo.currentText())
         if topic in self._allTopics():
             self.set_status(_('A topic named "%s" already exists') %
                             topic, False)
@@ -231,7 +235,7 @@ class TopicsDialog(QDialog):
 
     @pyqtSlot()
     def remove_topic(self):
-        topic = unicode(self.topicsCombo.currentText())
+        topic = pycompat.unicode(self.topicsCombo.currentText())
         if topic not in self._allTopics():
             self.set_status(_("Topic '%s' does not exist") % topic, False)
             return
@@ -244,7 +248,7 @@ class TopicsDialog(QDialog):
 
     @pyqtSlot()
     def rename_topic(self):
-        topic = unicode(self.topicsCombo.currentText())
+        topic = pycompat.unicode(self.topicsCombo.currentText())
         finishmsg = (_("Topic '%s' has been renamed to %s")
                      % (self._current_topic, topic))
         rev = None

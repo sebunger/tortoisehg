@@ -10,7 +10,10 @@ import os
 import sys
 import time
 import threading
-from mercurial import hg
+from mercurial import (
+    hg,
+    pycompat,
+)
 
 def get_system_times():
     t = os.times()
@@ -48,7 +51,8 @@ if os.name == 'nt':
         # send notifications to deepest directories first
         for dir in sorted(dirs, key=len, reverse=True):
             try:
-                pidl, ignore = shell.SHILCreateFromPath(dir, 0)
+                pidl, ignore = shell.SHILCreateFromPath(
+                    pycompat.fsdecode(dir), 0)
             except pywintypes.com_error:
                 return
             if pidl is None:
@@ -89,29 +93,28 @@ if os.name == 'nt':
         if wait:
             tref = time.time()
             tdelta = float(int(tref)) + 1.0 - tref
-            if (tdelta > 0.0):
+            if tdelta > 0.0:
                 time.sleep(tdelta)
 
         repo = hg.repository(ui, root) # a fresh repo object is needed
         repo.lfstatus = True
         repostate = repo.status() # will update .hg/dirstate as a side effect
         repo.lfstatus = False
-        modified, added, removed, deleted = repostate[:4]
 
         dirstatus = {}
         def dirname(f):
             return '/'.join(f.split('/')[:-1])
-        for fn in added:
+        for fn in repostate.added:
             dirstatus[dirname(fn)] = 'a'
-        for fn in modified:
+        for fn in repostate.modified:
             dirstatus[dirname(fn)] = 'm'
-        for fn in removed + deleted:
+        for fn in repostate.removed + repostate.deleted:
             dirstatus[dirname(fn)] = 'r'
 
         update = False
         f = None
         try:
-            f = repo.vfs('thgstatus', 'rb')
+            f = repo.vfs(b'thgstatus', b'rb')
             for dn in sorted(dirstatus):
                 s = dirstatus[dn]
                 e = f.readline()
@@ -126,11 +129,11 @@ if os.name == 'nt':
         except IOError:
             update = True
         finally:
-            if f != None:
+            if f is not None:
                 f.close()
 
         if update:
-            f = repo.vfs('thgstatus', 'wb', atomictemp=True)
+            f = repo.vfs(b'thgstatus', b'wb', atomictemp=True)
             for dn in sorted(dirstatus):
                 s = dirstatus[dn]
                 f.write(s + dn + '\n')

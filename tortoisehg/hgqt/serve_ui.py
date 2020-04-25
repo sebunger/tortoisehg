@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/sborho/repos/thg/tortoisehg/hgqt/serve.ui'
+# Form implementation generated from reading ui file '/home/yuya/work/hghacks/thg/tortoisehg/hgqt/serve.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
+
 from tortoisehg.util.i18n import _
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_ServeDialog(object):
     def setupUi(self, ServeDialog):
@@ -80,10 +82,9 @@ class Ui_ServeDialog(object):
 
     def retranslateUi(self, ServeDialog):
         _translate = QtCore.QCoreApplication.translate
-        ServeDialog.setWindowTitle(_('Web Server'))
-        self.port_label.setText(_('Port:'))
-        self.status_label.setText(_('Status:'))
-        self.start_button.setText(_('Start'))
-        self.stop_button.setText(_('Stop'))
-        self.settings_button.setText(_('Settings'))
-
+        ServeDialog.setWindowTitle(_("Web Server"))
+        self.port_label.setText(_("Port:"))
+        self.status_label.setText(_("Status:"))
+        self.start_button.setText(_("Start"))
+        self.stop_button.setText(_("Stop"))
+        self.settings_button.setText(_("Settings"))

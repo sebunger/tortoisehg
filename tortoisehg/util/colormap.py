@@ -49,7 +49,7 @@ class AnnotateColorSaturation(object):
             return int(255 - (saturation / 3 * (1 - hv)))
 
     def committer_angle(self, committer):
-        angle = float(abs(hash(committer))) / sys.maxint * 360.0
+        angle = float(abs(hash(committer))) / sys.maxsize * 360.0
         if self._maxhues is None:
             return angle
         return _rescale(angle, 360.0 / self._maxhues)

@@ -41,6 +41,7 @@ from .qtgui import (
 from mercurial import (
     hg,
     patch,
+    pycompat,
     similar,
 )
 
@@ -224,7 +225,9 @@ class DetectRenameDialog(QDialog):
             self.findbtn.setEnabled(False)
         self.difftb.clear()
         self.pats = []
-        self.matchbtn.setEnabled(len(self.matchtv.model().rows))
+        model = self.matchtv.model()
+        assert model is not None
+        self.matchbtn.setEnabled(bool(model.rows))
 
     def findRenames(self):
         'User pressed "find renames" button'
@@ -233,11 +236,13 @@ class DetectRenameDialog(QDialog):
                                     _('Cannot start a new search'))
             return
 
-        ulist = [it.orig for it in self.unrevlist.selectedItems()]
+        # TODO: better to use data(role) instead
+        ulist = [it.orig
+                 for it in self.unrevlist.selectedItems()]  # pytype: disable=attribute-error
         if not ulist:
             # When no files are selected, look for all files
             ulist = [self.unrevlist.item(n).orig
-                        for n in range(self.unrevlist.count())]
+                     for n in range(self.unrevlist.count())]  # pytype: disable=attribute-error
 
         if not ulist:
             QMessageBox.information(self, _('No files to find'),
@@ -248,7 +253,9 @@ class DetectRenameDialog(QDialog):
         copies = not self.copycheck.isChecked()
         self.findbtn.setEnabled(False)
 
-        self.matchtv.model().clear()
+        model = self.matchtv.model()
+        assert model is not None
+        model.clear()
         self.thread = RenameSearchThread(self.repo, ulist, pct, copies)
         self.thread.match.connect(self.rowReceived)
         self.thread.progress.connect(self.stbar.progress)
@@ -258,26 +265,31 @@ class DetectRenameDialog(QDialog):
 
     def searchfinished(self):
         self.stbar.clearProgress()
-        for col in xrange(3):
+        for col in pycompat.xrange(3):
             self.matchtv.resizeColumnToContents(col)
-        self.findbtn.setEnabled(self.unrevlist.count())
-        self.matchbtn.setEnabled(len(self.matchtv.model().rows))
+        self.findbtn.setEnabled(bool(self.unrevlist.count()))
+        model = self.matchtv.model()
+        assert model is not None
+        self.matchbtn.setEnabled(bool(model.rows))
 
     def rowReceived(self, args):
-        self.matchtv.model().appendRow(*args)
+        model = self.matchtv.model()
+        assert model is not None
+        model.appendRow(*args)
 
     def acceptMatch(self):
         'User pressed "accept match" button'
         remdests = {}
         wctx = self.repo[None]
-        m = self.matchtv.model()
+        model = self.matchtv.model()
+        assert model is not None
 
         # If no rows are selected, ask the user if he'd like to accept all renames
         if self.matchtv.selectionModel().hasSelection():
-            itemList = [self.matchtv.model().getRow(index) \
+            itemList = [model.getRow(index) \
                 for index in self.matchtv.selectionModel().selectedRows()]
         else:
-            itemList = m.rows
+            itemList = model.rows
 
         for item in itemList:
             src, dest, percent = item
@@ -288,11 +300,11 @@ class DetectRenameDialog(QDialog):
                       'destination file:\n%s. Aborting!') % udest)
                 return
             remdests[dest] = src
-        for dest, src in remdests.iteritems():
+        for dest, src in remdests.items():
             if not os.path.exists(self.repo.wjoin(src)):
                 wctx.forget([src]) # !->R
             wctx.copy(src, dest)
-            self.matchtv.model().remove(dest)
+            model.remove(dest)
         self.matchAccepted.emit()
         self.refresh()
 
@@ -302,10 +314,12 @@ class DetectRenameDialog(QDialog):
         if not indexes:
             return
         index = indexes[0]
-        ctx = self.repo['.']
+        ctx = self.repo[b'.']
         hu = htmlui.htmlui(self.repo.ui)
-        row = self.matchtv.model().getRow(index)
-        src, dest, percent = self.matchtv.model().getRow(index)
+        model = self.matchtv.model()
+        assert model is not None
+        row = model.getRow(index)
+        src, dest, percent = model.getRow(index)
         aa = self.repo.wread(dest)
         rr = ctx.filectx(src).data()
         date = hglib.displaytime(ctx.date())
@@ -313,14 +327,16 @@ class DetectRenameDialog(QDialog):
         if not difftext:
             t = _('%s and %s have identical contents\n\n') % \
                     (hglib.tounicode(src), hglib.tounicode(dest))
-            hu.write(t, label='ui.error')
+            hu.write(t, label=b'ui.error')
         else:
             for t, l in patch.difflabel(difftext.splitlines, True):
                 hu.write(t, label=l)
-        self.difftb.setHtml(hu.getdata()[0])
+        self.difftb.setHtml(hglib.tounicode(hu.getdata()[0]))
 
     def onUnrevDoubleClicked(self, index):
-        file = hglib.fromunicode(self.unrevlist.model().data(index))
+        model = self.unrevlist.model()
+        assert model is not None
+        file = hglib.fromunicode(model.data(index))
         qtlib.editfiles(self.repo, [file])
 
     def accept(self):
@@ -456,7 +472,7 @@ class RenameSearchThread(QThread):
             self.search(self.repo)
         except KeyboardInterrupt:
             pass
-        except Exception, e:
+        except Exception as e:
             self.showMessage.emit(hglib.tounicode(str(e)))
         finally:
             self.threadid = None
@@ -472,7 +488,7 @@ class RenameSearchThread(QThread):
 
     def search(self, repo):
         wctx = repo[None]
-        pctx = repo['.']
+        pctx = repo[b'.']
         if self.copies:
             ws = wctx.status(listclean=True)
             srcs = ws.removed + ws.deleted

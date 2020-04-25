@@ -23,6 +23,7 @@ from mercurial import (
     error,
     hg,
     node,
+    pycompat,
     util,
 )
 
@@ -43,7 +44,7 @@ def _dumpChild(xw, parent):
 def undumpObject(xr):
     xmltagname = str(xr.name())
     obj = _xmlUndumpMap[xmltagname](xr)
-    assert obj.xmltagname == xmltagname
+    assert obj.xmltagname == xmltagname, (obj.xmltagname, xmltagname)
     return obj
 
 def _undumpChild(xr, parent, undump=undumpObject):
@@ -291,7 +292,7 @@ class RepoItem(RepoTreeItem):
         self._basenode = basenode
 
     def setShortName(self, uname):
-        uname = unicode(uname)
+        uname = pycompat.unicode(uname)
         if uname != self._shortname:
             self._shortname = uname
 
@@ -346,7 +347,8 @@ class RepoItem(RepoTreeItem):
     def dump(self, xw):
         xw.writeAttribute('root', self._root)
         xw.writeAttribute('shortname', self.shortname())
-        xw.writeAttribute('basenode', node.hex(self.basenode()))
+        xw.writeAttribute('basenode',
+                          pycompat.sysstr(node.hex(self.basenode())))
         if self._sharedpath:
             xw.writeAttribute('sharedpath', self._sharedpath)
         _dumpChild(xw, parent=self)
@@ -354,10 +356,10 @@ class RepoItem(RepoTreeItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(unicode(a.value('', 'root')),
-                  unicode(a.value('', 'shortname')),
+        obj = cls(pycompat.unicode(a.value('', 'root')),
+                  pycompat.unicode(a.value('', 'shortname')),
                   node.bin(str(a.value('', 'basenode'))),
-                  unicode(a.value('', 'sharedpath')))
+                  pycompat.unicode(a.value('', 'sharedpath')))
         _undumpChild(xr, parent=obj, undump=_undumpSubrepoItem)
         return obj
 
@@ -367,8 +369,9 @@ class RepoItem(RepoTreeItem):
     def appendSubrepos(self, repo=None):
         self._sharedpath = ''
         invalidRepoList = []
+        sri = None
+        abssubpath = None
         try:
-            sri = None
             if repo is None:
                 if not os.path.exists(self._root):
                     self._valid = False
@@ -381,12 +384,12 @@ class RepoItem(RepoTreeItem):
                                      hglib.fromunicode(self._root))
             if repo.sharedpath != repo.path:
                 self._sharedpath = hglib.tounicode(repo.sharedpath)
-            wctx = repo['.']
+            wctx = repo[b'.']
             sortkey = lambda x: os.path.basename(util.normpath(repo.wjoin(x)))
             for subpath in sorted(wctx.substate, key=sortkey):
                 sri = None
                 abssubpath = repo.wjoin(subpath)
-                subtype = wctx.substate[subpath][2]
+                subtype = pycompat.sysstr(wctx.substate[subpath][2])
                 sriIsValid = os.path.isdir(abssubpath)
                 sri = _newSubrepoItem(hglib.tounicode(abssubpath),
                                       repotype=subtype)
@@ -407,7 +410,7 @@ class RepoItem(RepoTreeItem):
                         self._valid = False
                         invalidRepoList += invalidSubrepoList
 
-        except (EnvironmentError, error.RepoError, error.Abort), e:
+        except (EnvironmentError, error.RepoError, error.Abort) as e:
             # Add the repo to the list of repos/subrepos
             # that could not be open
             self._valid = False
@@ -415,7 +418,7 @@ class RepoItem(RepoTreeItem):
                 sri._valid = False
                 invalidRepoList.append(abssubpath)
             invalidRepoList.append(hglib.fromunicode(self._root))
-        except Exception, e:
+        except Exception as e:
             # If any other sort of exception happens, show the corresponding
             # error message, but do not crash!
             # Note that we _also_ will mark the offending repos as invalid
@@ -433,11 +436,11 @@ class RepoItem(RepoTreeItem):
                 rootpath = hglib.tounicode(repo.root)
             else:
                 rootpath = self._root
-            warningMessage = (_('An exception happened while loading the ' \
-                'subrepos of:<br><br>"%s"<br><br>') + \
-                _('The exception error message was:<br><br>%s<br><br>') +\
+            warningMessage = (_('An exception happened while loading the '
+                'subrepos of:<br><br>"%s"<br><br>') +
+                _('The exception error message was:<br><br>%s<br><br>') +
                 _('Click OK to continue or Abort to exit.')) \
-                % (rootpath, hglib.tounicode(e.message))
+                % (rootpath, hglib.tounicode(str(e)))
             res = qtlib.WarningMsgBox(_('Error loading subrepos'),
                                 warningMessage,
                                 buttons = QMessageBox.Ok | QMessageBox.Abort)
@@ -450,7 +453,7 @@ class RepoItem(RepoTreeItem):
         if column == 0:
             shortname = hglib.fromunicode(value)
             abshgrcpath = os.path.join(hglib.fromunicode(self.rootpath()),
-                                       '.hg', 'hgrc')
+                                       b'.hg', b'hgrc')
             if not hgrcutil.setConfigValue(abshgrcpath, 'web.name', shortname):
                 qtlib.WarningMsgBox(_('Unable to update repository name'),
                     _('An error occurred while updating the repository hgrc '
@@ -543,7 +546,7 @@ class AlienSubrepoItem(RepoItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(unicode(a.value('', 'root')),
+        obj = cls(pycompat.unicode(a.value('', 'root')),
                   str(a.value('', 'repotype')))
         xr.skipCurrentElement()  # no child
         return obj
@@ -588,7 +591,7 @@ class RepoGroupItem(RepoTreeItem):
 
     def setData(self, column, value):
         if column == 0:
-            self.name = unicode(value)
+            self.name = pycompat.unicode(value)
             return True
         return False
 
@@ -617,7 +620,7 @@ class RepoGroupItem(RepoTreeItem):
     @classmethod
     def undump(cls, xr):
         a = xr.attributes()
-        obj = cls(unicode(a.value('', 'name')))
+        obj = cls(pycompat.unicode(a.value('', 'name')))
         _undumpChild(xr, parent=obj)
         return obj
 

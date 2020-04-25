@@ -7,7 +7,6 @@
 
 from __future__ import absolute_import
 
-import cStringIO
 import os
 import re
 
@@ -40,8 +39,9 @@ from .qtgui import (
 
 from mercurial import (
     commands,
-    match as matchmod,
     patch,
+    pycompat,
+    scmutil,
     util,
 )
 
@@ -168,7 +168,7 @@ class ChunksWidget(QWidget):
             dlg.exec_()
 
     def revertfile(self):
-        filenames = self.getSelectedFiles()
+        filenames = [hglib.tounicode(f) for f in self.getSelectedFiles()]
         if len(filenames) == 0:
             return
         rev = self.ctx.rev()
@@ -214,9 +214,9 @@ class ChunksWidget(QWidget):
         repo = self.repo
         ui.pushbuffer()
         try:
-            eolmode = ui.config('patch', 'eol', 'strict')
+            eolmode = ui.config(b'patch', b'eol')
             if eolmode.lower() not in patch.eolmodes:
-                eolmode = 'strict'
+                eolmode = b'strict'
             else:
                 eolmode = eolmode.lower()
             # 'updatestate' flag has no effect since hg 1.9
@@ -228,10 +228,10 @@ class ChunksWidget(QWidget):
             if ret < 0:
                 ok = False
                 self.showMessage.emit(_('Patch failed to apply'))
-        except (patch.PatchError, EnvironmentError), err:
+        except (patch.PatchError, EnvironmentError) as err:
             ok = False
             self.showMessage.emit(hglib.tounicode(str(err)))
-        rejfilere = re.compile(r'\b%s\.rej\b' % re.escape(wfile))
+        rejfilere = re.compile(br'\b%s\.rej\b' % re.escape(wfile))
         for line in ui.popbuffer().splitlines():
             if rejfilere.search(line):
                 if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
@@ -283,12 +283,12 @@ class ChunksWidget(QWidget):
             revertall = qtlib.QuestionMsgBox(_('No chunks remain'), revertmsg)
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
-            fp = util.atomictempfile(ctx._path, 'wb')
-            buf = cStringIO.StringIO()
+            fp = util.atomictempfile(ctx._path, b'wb')
+            buf = pycompat.bytesio()
             try:
                 if ctx._ph.comments:
-                    buf.write('\n'.join(ctx._ph.comments))
-                    buf.write('\n\n')
+                    buf.write(b'\n'.join(ctx._ph.comments))
+                    buf.write(b'\n\n')
                 needsnewline = False
                 for wfile in ctx._fileorder:
                     if wfile == self.currentFile:
@@ -298,8 +298,8 @@ class ChunksWidget(QWidget):
                         for chunk in kchunks:
                             chunk.write(buf)
                     else:
-                        if buf.tell() and buf.getvalue()[-1] != '\n':
-                            buf.write('\n')
+                        if buf.tell() and not buf.getvalue().endswith(b'\n'):
+                            buf.write(b'\n')
                         for chunk in ctx._files[wfile]:
                             chunk.write(buf)
                 fp.write(buf.getvalue())
@@ -323,10 +323,10 @@ class ChunksWidget(QWidget):
                 wlock = repo.wlock()
                 try:
                     # atomictemp can preserve file permission
-                    wf = repo.wvfs(self.currentFile, 'wb', atomictemp=True)
+                    wf = repo.wvfs(self.currentFile, b'wb', atomictemp=True)
                     wf.write(self.diffbrowse.origcontents)
                     wf.close()
-                    fp = cStringIO.StringIO()
+                    fp = pycompat.bytesio()
                     chunks[0].write(fp)
                     for c in kchunks:
                         c.write(fp)
@@ -376,7 +376,7 @@ class ChunksWidget(QWidget):
                 ctx._files[wfile] = chunks
                 ctx._fileorder.append(wfile)
             repo.thgbackup(ctx._path)
-            fp = util.atomictempfile(ctx._path, 'wb')
+            fp = util.atomictempfile(ctx._path, b'wb')
             try:
                 if ctx._ph.comments:
                     fp.write('\n'.join(ctx._ph.comments))
@@ -393,7 +393,7 @@ class ChunksWidget(QWidget):
         else:
             # Apply chunks to wfile
             repo.thgbackup(repo.wjoin(wfile))
-            fp = cStringIO.StringIO()
+            fp = pycompat.bytesio()
             for c in chunks:
                 c.write(fp)
             fp.seek(0)
@@ -411,7 +411,7 @@ class ChunksWidget(QWidget):
         ctx = self.ctx
         if isinstance(ctx, patchctx):
             repo.thgbackup(ctx._path)
-            fp = util.atomictempfile(ctx._path, 'wb')
+            fp = util.atomictempfile(ctx._path, b'wb')
             try:
                 if ctx._ph.comments:
                     fp.write('\n'.join(ctx._ph.comments))
@@ -430,7 +430,7 @@ class ChunksWidget(QWidget):
             repo.thgbackup(fullpath)
             wasadded = wfile in repo[None].added()
             try:
-                commands.revert(repo.ui, repo, fullpath, rev='.',
+                commands.revert(repo.ui, repo, fullpath, rev=b'.',
                                 no_backup=True)
                 if wasadded and os.path.exists(fullpath):
                     os.unlink(fullpath)
@@ -450,9 +450,9 @@ class ChunksWidget(QWidget):
             else:
                 return []
         else:
-            buf = cStringIO.StringIO()
+            buf = pycompat.bytesio()
             diffopts = patch.diffopts(repo.ui, {'git':True})
-            m = matchmod.exact(repo.root, repo.root, [wfile])
+            m = scmutil.matchfiles(repo, [wfile])
             for p in patch.diff(repo, ctx.p1().node(), None, match=m,
                                 opts=diffopts):
                 buf.write(p)
@@ -466,7 +466,7 @@ class ChunksWidget(QWidget):
 
     @pyqtSlot(str, str)
     def displayFile(self, file, status):
-        if isinstance(file, unicode):
+        if isinstance(file, pycompat.unicode):
             file = hglib.fromunicode(file)
             status = hglib.fromunicode(status)
         if file:
@@ -486,7 +486,9 @@ class ChunksWidget(QWidget):
 
     def setContext(self, ctx):
         self.diffbrowse.setContext(ctx)
-        self.filelist.model().setRawContext(ctx)
+        model = self.filelist.model()
+        assert isinstance(model, manifestmodel.ManifestModel)
+        model.setRawContext(ctx)
         empty = len(ctx.files()) == 0
         self.fileModelEmpty.emit(empty)
         self.fileSelected.emit(not empty)
@@ -670,7 +672,7 @@ class DiffBrowser(QFrame):
                 self.sci.markerAdd(chunk.mline, self.selected)
                 chunk.selected = True
                 self.countselected += 1
-                for i in xrange(*chunk.lrange):
+                for i in pycompat.xrange(*chunk.lrange):
                     self.sci.markerAdd(i, self.selcolor)
         self.updateSummary()
 
@@ -682,7 +684,7 @@ class DiffBrowser(QFrame):
                 self.sci.markerAdd(chunk.mline, self.unselected)
                 chunk.selected = False
                 self.countselected -= 1
-                for i in xrange(*chunk.lrange):
+                for i in pycompat.xrange(*chunk.lrange):
                     self.sci.markerDelete(i, self.selcolor)
         self.updateSummary()
 
@@ -700,13 +702,13 @@ class DiffBrowser(QFrame):
             self.sci.markerAdd(chunk.mline, self.unselected)
             chunk.selected = False
             self.countselected -= 1
-            for i in xrange(*chunk.lrange):
+            for i in pycompat.xrange(*chunk.lrange):
                 self.sci.markerDelete(i, self.selcolor)
         else:
             self.sci.markerAdd(chunk.mline, self.selected)
             chunk.selected = True
             self.countselected += 1
-            for i in xrange(*chunk.lrange):
+            for i in pycompat.xrange(*chunk.lrange):
                 self.sci.markerAdd(i, self.selcolor)
 
     def setContext(self, ctx):
@@ -777,15 +779,15 @@ class DiffBrowser(QFrame):
                     0, linkstart, 0, linkstart+len(forcedisplaymsg),
                     self._forceviewindicator)
             return
-        elif type(self._ctx.rev()) is str:
+        elif isinstance(self._ctx.rev(), str):
             chunks = self._ctx._files[filename]
         else:
-            header = patch.parsepatch(cStringIO.StringIO(fd.diff))[0]
+            header = patch.parsepatch(pycompat.bytesio(fd.diff))[0]
             chunks = [header] + header.hunks
 
         utext = []
         for chunk in chunks[1:]:
-            buf = cStringIO.StringIO()
+            buf = pycompat.bytesio()
             chunk.selected = False
             chunk.write(buf)
             chunk.lines = buf.getvalue().splitlines()
@@ -799,7 +801,7 @@ class DiffBrowser(QFrame):
             chunk.mline = start
             if start:
                 self.sci.markerAdd(start-1, self.divider)
-            for i in xrange(0,len(chunk.lines)):
+            for i in pycompat.xrange(0,len(chunk.lines)):
                 if start + i == chunk.mline:
                     self.sci.markerAdd(chunk.mline, self.unselected)
                 else:

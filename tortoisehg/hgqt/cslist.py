@@ -25,6 +25,7 @@ from .qtgui import (
     QWidget,
 )
 
+from ..util import hglib
 from ..util.i18n import _
 from ..util.patchctx import patchctx
 from . import (
@@ -109,7 +110,7 @@ class ChangesetList(QWidget):
                         return widget.get_markup('rev')
                     return widget.get_markup('revnum')
                 mono = dict(face='monospace', size='9000')
-                if isinstance(value, basestring):
+                if hglib.isbasestring(value):
                     return qtlib.markup(value, **mono)
                 filename = qtlib.markup(value[0])
                 revid = qtlib.markup(value[1], **mono)

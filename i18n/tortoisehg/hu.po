@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
-"PO-Revision-Date: 2018-03-10 15:19+0000\n"
-"Last-Translator: HuBa <Unknown>\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
+"PO-Revision-Date: 2018-09-22 13:55+0000\n"
+"Last-Translator: Zsolt Bölöny <bolony.zsolt@gmail.com>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:26+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:42+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -27,7 +27,7 @@ msgstr "Kilépés"
 msgid "About"
 msgstr "Névjegy"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -37,7 +37,7 @@ msgid "You can visit our site here"
 msgstr "Itt látogathatja meg honlapunkat"
 
 msgid "&License"
-msgstr "&License"
+msgstr "&Licensz"
 
 #, python-format
 msgid "version %s"
@@ -52,25 +52,25 @@ msgid "A new version of TortoiseHg (%s) is ready for download!"
 msgstr "TortoiseHg új verziója (%s) letölthető!"
 
 msgid "License"
-msgstr ""
+msgstr "Licensz"
 
 msgid "= Working Directory Parent ="
-msgstr "Munkakönyvtár szülője"
+msgstr "= Munkakönyvtár szülője ="
 
 msgid "Directory of files"
-msgstr "Könyvtár fájljai"
+msgstr "Fájlok könyvtára"
 
 msgid "Tar archives"
 msgstr "Tar archívumok"
 
 msgid "Uncompressed tar archive"
-msgstr "Tömörítettlen tar archívum"
+msgstr "Tömörítetlen tar archívum"
 
 msgid "Bzip2 tar archives"
 msgstr "Bzip2 tar archívumok"
 
 msgid "Tar archive compressed using bzip2"
-msgstr "Tar acrhívum bzip2-vel tömörítve"
+msgstr "Tar archívum bzip2-vel tömörítve"
 
 msgid "Gzip tar archives"
 msgstr "Gzip tar archívumok"
@@ -82,7 +82,7 @@ msgid "Zip archives"
 msgstr "Zip archívumok"
 
 msgid "Uncompressed zip archive"
-msgstr "Tömörítettlen zip fájl"
+msgstr "Tömörítetlen zip archívum"
 
 msgid "Zip archive compressed using deflate"
 msgstr "Zip archívum deflate tömörítéssel"
@@ -91,16 +91,16 @@ msgid "Revision:"
 msgstr "Revízió:"
 
 msgid "All files in this revision"
-msgstr ""
+msgstr "Minden fájl ebben a revízióban"
 
 msgid "Only files modified/created in this revision"
-msgstr "Csak létrehozott és/vagy módosított fájlok vannak a revizióban."
+msgstr "Csak az ezen revízióban módosított/létrehozott fájlok"
 
 msgid "Only files modified/created since:"
-msgstr "Csak a megadott idő óta szerkesztett/létrehozott fájlok:"
+msgstr "Csak az ekkortól módosított/létrehozott fájlok:"
 
 msgid "Archive Content:"
-msgstr "Archívum tartalom:"
+msgstr "Archívum tartalma:"
 
 msgid "Recurse into subrepositories"
 msgstr ""
@@ -115,7 +115,7 @@ msgid "Archive types:"
 msgstr "Archívum típusok:"
 
 msgid "Hg command:"
-msgstr "Mercurial parancs:"
+msgstr "Hg parancs:"
 
 msgid "Select Destination Folder"
 msgstr "Célkönyvtár kiválasztása"
@@ -131,7 +131,7 @@ msgstr "Duplikált név"
 
 #, python-format
 msgid "The destination \"%s\" already exists as a file!"
-msgstr "A célfájl \"%s\" már létezik!"
+msgstr "A cél \"%s\" már létezik fájlként!"
 
 msgid "Confirm Overwrite"
 msgstr "Felülírás megerősítése"
@@ -142,7 +142,7 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
-"A(z) \"%s\" könyvtár nem üres\n"
+"A(z) \"%s\" könyvtár nem üres!\n"
 "\n"
 "Szeretné felülírni?"
 
@@ -152,7 +152,7 @@ msgid ""
 "\n"
 "Do you want to overwrite it?"
 msgstr ""
-"A fájl \"%s\" létezik!\n"
+"A(z) \"%s\" fájl már létezik!\n"
 "\n"
 "Szeretné felülírni?"
 
@@ -162,41 +162,43 @@ msgstr "A cél \"%s\" már létezik könyvtárként!"
 
 #, python-format
 msgid "Archive - %s"
-msgstr "Archív %s"
+msgstr "Archiválás - %s"
 
 msgid "&Archive"
-msgstr ""
+msgstr "&Archiválás"
 
 msgid "Backout requires a parent revision"
-msgstr ""
+msgstr "A visszavonáshoz szükség van egy szülő revízióra"
 
 msgid "Cannot backout change on a different branch"
-msgstr ""
+msgstr "Más ágon levő változtatást nem lehet visszavonni"
 
 #, python-format
 msgid "Backout - %s"
-msgstr ""
+msgstr "Visszavonás - %s"
 
 msgid "Prepare to backout"
-msgstr ""
+msgstr "Felkészülés visszavonásra"
 
 msgid "Verify backout revision and ensure your working directory is clean."
 msgstr ""
+"Ellenőrizze a visszavonás revízióját és győződjön meg a munkakönyvtár "
+"tisztaságáról."
 
 msgid "Backing out a parent revision is a single step operation"
-msgstr ""
+msgstr "Egy szülő revízió visszavonása egy lépéses művelet"
 
 msgid "Backout revision"
-msgstr ""
+msgstr "Visszavonás revíziója"
 
 msgid "Not a head, backout will create a new head!"
 msgstr ""
 
 msgid "Current local revision"
-msgstr ""
+msgstr "Jelenlegi helyi revízió"
 
 msgid "Working directory status"
-msgstr ""
+msgstr "Munkakönyvtár állapota"
 
 msgid "Checking..."
 msgstr "Ellenőrzés…"
@@ -214,16 +216,18 @@ msgid "<b>Uncommitted local changes are detected</b>"
 msgstr ""
 
 msgid "Clean"
-msgstr "Tisztítás"
+msgstr "Tiszta"
 
 msgid "Backing out, then merging..."
-msgstr ""
+msgstr "Visszavonás, majd összefűzés..."
 
 msgid "All conflicting files will be marked unresolved."
-msgstr ""
+msgstr "Minden ütköző fájl feloldatlanként lesz megjelölve."
 
 msgid "Automatically advance to next page when backout and merge are complete."
 msgstr ""
+"Automatikus továbblépés a következő lapra amikor a visszavonás és összefűzés "
+"elkészül."
 
 #, python-format
 msgid ""
@@ -241,10 +245,10 @@ msgid "Parents"
 msgstr "Szülők"
 
 msgid "Working Directory"
-msgstr ""
+msgstr "Munkakönyvtár"
 
 msgid "Working Directory (merged)"
-msgstr ""
+msgstr "Munkakönyvtár (összefűzött)"
 
 msgid "Commit message"
 msgstr ""
@@ -256,19 +260,19 @@ msgid "Backed out changeset: "
 msgstr ""
 
 msgid "Confirm Discard Message"
-msgstr "Megszakítási üzenet jóváhagyása"
+msgstr "Elvetési üzenet megerősítése"
 
 msgid "Discard current backout message?"
-msgstr ""
+msgstr "Elveti a jelenlegi visszavonási üzenetet?"
 
 msgid "Use English backout message"
-msgstr "Angol megszegési üzenet használata"
+msgstr "Angol visszavonási üzenet használata"
 
 msgid "Backing out and committing..."
 msgstr ""
 
 msgid "Please wait while making backout."
-msgstr ""
+msgstr "Kérjük, várjon a visszavonás elkészültéig."
 
 msgid "Committing..."
 msgstr ""
@@ -284,28 +288,28 @@ msgstr ""
 
 #, python-format
 msgid "Bisect - %s"
-msgstr ""
+msgstr "Felezés - %s"
 
 msgid "Accept"
-msgstr "Elfogad"
+msgstr "Elfogadás"
 
 msgid "Known good revision:"
-msgstr "A jónak titulált revízió:"
+msgstr "Ismert jó revízió:"
 
 msgid "Known bad revision:"
-msgstr "Rossznak titulált revízió:"
+msgstr "Ismert rossz revízió:"
 
 msgid "Discard local changes (revert --all)"
-msgstr ""
+msgstr "Helyi változtatások elvetése (revert --all)"
 
 msgid "Revision is &Good"
-msgstr ""
+msgstr "A revízió &jó"
 
 msgid "Revision is &Bad"
-msgstr ""
+msgstr "A revízió &rossz"
 
 msgid "&Skip this Revision"
-msgstr ""
+msgstr "&Ezen revízió kihagyása"
 
 msgid "Close"
 msgstr "Bezárás"
@@ -314,13 +318,13 @@ msgid "Error encountered."
 msgstr "Hiba történt."
 
 msgid "Culprit found."
-msgstr ""
+msgstr "Megvan a bűnös."
 
 msgid "Revision"
 msgstr "Revízió"
 
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr "Revízió tesztelése és találatok jelentése. (jó/rossz/átugrás)"
+msgstr "Revízió tesztelése és találatok jelentése. (jó/rossz/kihagyás)"
 
 #, python-format
 msgid "%s (hint: %s)"
@@ -345,7 +349,7 @@ msgid "&Remove"
 msgstr "&Törlés"
 
 msgid "&Move"
-msgstr "Át&helyezés"
+msgstr "&Áthelyezés"
 
 #, python-format
 msgid "Bookmark - %s"
@@ -357,48 +361,48 @@ msgstr "A(z) \"%s\" könyvjelző már létezik"
 
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr "A(z) '%s' könyvjelző hozzáadva"
+msgstr "'%s' könyvjelző hozzáadva"
 
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr "A(z) \"%s\" nem létezik"
+msgstr "A(z) \"%s\" könyvjelző nem létezik"
 
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr "A(z) '%s' könyvjelző áthelyezve"
+msgstr "'%s' könyvjelző áthelyezve"
 
 #, python-format
 msgid "Bookmark '%s' does not exist"
-msgstr "Könyvjelző '%s' nem létezik"
+msgstr "'%s' könyvjelző nem létezik"
 
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr "Könyvjelző '%s' eltávolítva"
+msgstr "'%s' könyvjelző eltávolítva"
 
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr "Könyvjelző '%s' átnevezve erre: '%s'"
+msgstr "'%s' könyvjelző átnevezve erre: '%s'"
 
 msgid "TortoiseHg Bookmark Sync"
 msgstr ""
 
 msgid "Outgoing Bookmarks"
-msgstr ""
+msgstr "Kimenő könyvjelzők"
 
 msgid "&Push Bookmark"
 msgstr ""
 
 msgid "&Remove Bookmark"
-msgstr ""
+msgstr "Könyvjelző &eltávolítása"
 
 msgid "Incoming Bookmarks"
-msgstr ""
+msgstr "Bejövő könyvjelzők"
 
 msgid "P&ull Bookmark"
 msgstr ""
 
 msgid "R&emove Bookmark"
-msgstr ""
+msgstr "Könyvjelző &eltávolítása"
 
 #, python-format
 msgid "Pushed local bookmark: %s"
@@ -410,11 +414,11 @@ msgstr ""
 
 #, python-format
 msgid "Removed remote bookmark: %s"
-msgstr ""
+msgstr "Távoli könyvjelző eltávolítva: %s"
 
 #, python-format
 msgid "Removed local bookmark: %s"
-msgstr ""
+msgstr "Helyi könyvjelző eltávolítva: %s"
 
 #, python-format
 msgid "%s - branch operation"
@@ -427,21 +431,21 @@ msgid "Changes take effect on next commit"
 msgstr "Változások hatása a következő kommitkor"
 
 msgid "No branch changes"
-msgstr "Ágnak nincsenek változásai"
+msgstr "Nincsenek változtatások az ágon"
 
 msgid "Open a new named branch"
 msgstr "Nyisson meg egy új elnevezett ágat"
 
 msgid "Close current branch"
-msgstr "A jelen ág bezárása"
+msgstr "Jelenlegi ág lezárása"
 
 #, python-format
 msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
 msgstr ""
-"Kérjük, jelentse ezt a hibát a <a href=\"%s\">hiba kezelő rendszerünkben</a>"
+"Kérjük, jelentse ezt a hibát a <a href=\"%s\">hibakövető rendszerünkben</a>"
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr "Frissítések keresése..."
 
 msgid "Copy"
 msgstr "Másolás"
@@ -450,22 +454,22 @@ msgid "Quit"
 msgstr "Kilépés"
 
 msgid "TortoiseHg Bug Report"
-msgstr "TortoiseHG Hiba Jelentés"
+msgstr "TortoiseHg Hibajelentés"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr ""
+msgstr "Ajánlott egy újabb TortoiseHg verzióra frissíteni."
 
 msgid "Your TortoiseHg is up to date."
-msgstr ""
+msgstr "A TortoiseHg naprakész."
 
 msgid "Save error report to"
-msgstr "Hiba mentése"
+msgstr "Hibajelentés mentése ide:"
 
 msgid "Text files (*.txt)"
 msgstr "Szövegfájlok (*.txt)"
 
 msgid "Error writing file"
-msgstr "Hiba a fájl írása közben"
+msgstr "Hiba a fájl íráskor"
 
 msgid "TortoiseHg Error"
 msgstr "TortoiseHg Hiba"
@@ -474,26 +478,26 @@ msgid ""
 "If you still have trouble, <a href=\"#bugreport\">please file a bug report</"
 "a>."
 msgstr ""
-"Ha továbbra is gond van, <a href=\"#bugreport\">kérjük küldjön egy hiba "
-"jelentést</a>."
+"Ha továbbra is gond van, <a href=\"#bugreport\">kérjük küldjön egy "
+"hibajelentést</a>."
 
 msgid "Visual Diff"
-msgstr ""
+msgstr "Vizuális összehasonlítás"
 
 msgid "View file changes in external diff tool"
-msgstr ""
+msgstr "Fájlváltozások megtekintése külső összehasonlító eszközzel"
 
 msgid "Edit Local"
-msgstr ""
+msgstr "Helyi szerkesztése"
 
 msgid "Edit current file in working copy"
 msgstr ""
 
 msgid "Revert to Revision"
-msgstr ""
+msgstr "Visszaállítás revízióra"
 
 msgid "Revert file(s) to contents at this revision"
-msgstr ""
+msgstr "Fájl(ok) tartalmának visszaállítása erre a revízióra"
 
 msgid "Patch failed to apply"
 msgstr "Nem sikerült alkalmazni a foltot"
@@ -505,22 +509,22 @@ msgid "Edit patched file and rejects?"
 msgstr ""
 
 msgid "No deletable chunks"
-msgstr "Nincs törlendő darab"
+msgstr "Nincsenek törölhető darabok"
 
 msgid "Completely remove file from patch?"
 msgstr ""
 
 msgid "Revert all file changes?"
-msgstr ""
+msgstr "Visszavonja az összes fájlváltoztatást?"
 
 msgid "No chunks remain"
 msgstr "Nem maradt több darab"
 
 msgid "file has been deleted, refresh"
-msgstr "állomány törölve, frissítés"
+msgstr "fájl törölve, frissítés"
 
 msgid "file has been modified, refresh"
-msgstr "állomány módosítva, frissítés"
+msgstr "fájl módosítva, frissítés"
 
 msgid "Unable to merge chunks"
 msgstr "Nem lehet összeolvasztani a darabokat"
@@ -538,14 +542,16 @@ msgid ""
 "Unable to remove file %s,\n"
 "permission denied"
 msgstr ""
+"Nem lehet törölni a(z) %s fájlt,\n"
+"hozzáférés megtagadva"
 
 msgctxt "files"
 msgid "All"
-msgstr "Minden"
+msgstr "Összes"
 
 msgctxt "files"
 msgid "None"
-msgstr "Nincs"
+msgstr "Egyik sem"
 
 msgid "Toggle display of text search bar"
 msgstr ""
@@ -558,7 +564,7 @@ msgid "Chunks selected: %d / %d"
 msgstr "Kiválasztott darabok: %d / %d"
 
 msgid "Please wait while the file is opened ..."
-msgstr ""
+msgstr "Kérjük várjon, amíg megnyílik a fájl..."
 
 msgid "Source:"
 msgstr "Forrás:"
@@ -582,7 +588,7 @@ msgid "Use pull protocol to copy metadata"
 msgstr "Pull protokol alkalmazása a metaadatok másolásához"
 
 msgid "Clone with minimal processing"
-msgstr ""
+msgstr "Klónozás minimális feldolgozással"
 
 msgid "Include patch queue"
 msgstr ""
@@ -609,35 +615,35 @@ msgid "Select destination repository"
 msgstr "Cél tároló kiválasztása"
 
 msgid "Select patch folder"
-msgstr ""
+msgstr "Folt könyvtár kiválasztása"
 
 #, python-format
 msgid "Clone - %s"
-msgstr "Klón - %s"
+msgstr "Klónozás - %s"
 
 msgid "&Clone"
-msgstr "&Klón"
+msgstr "&Klónozás"
 
 msgid "failed to start command\n"
-msgstr ""
+msgstr "nem sikerült elindítani a parancsot\n"
 
 msgid "error while running command\n"
-msgstr ""
+msgstr "hiba a parancs futtatása során\n"
 
 #, python-format
 msgid "process exited unexpectedly with code %d"
-msgstr ""
+msgstr "folyamat váratlanul kilépett a(z) %d kóddal"
 
 #, python-format
 msgid "failed to encode command: %s"
-msgstr ""
+msgstr "nem sikerült kódolni a parancsot: %s"
 
 #, python-format
 msgid "timed out while reading: %r..."
-msgstr ""
+msgstr "időtúllépés olvasáskor: %r..."
 
 msgid "timed out waiting for message"
-msgstr ""
+msgstr "időtúllépés üzenetre várakozás közben"
 
 #, python-format
 msgid "unexpected response on required channel %r"
@@ -645,7 +651,7 @@ msgstr ""
 
 #, python-format
 msgid "invalid \"hello\" message: %r"
-msgstr ""
+msgstr "érvénytelen \"hello\" üzenet: %r"
 
 msgid "no \"runcommand\" capability"
 msgstr ""
@@ -654,16 +660,22 @@ msgstr ""
 msgid "corrupted command result: %r"
 msgstr ""
 
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
+msgstr ""
+
 #, python-format
 msgid "failed to encode input: %s"
 msgstr ""
 
 msgid "Terminated by user"
-msgstr ""
+msgstr "Felhasználó által megszakítva"
 
 #, python-format
 msgid "[command terminated by user %s]"
-msgstr ""
+msgstr "[parancs %s felhasználó által megszakítva]"
 
 #, python-format
 msgid "[command interrupted %s]"
@@ -675,49 +687,51 @@ msgstr "[a parancs a(z) %d %%s kóddal tért vissza]"
 
 #, python-format
 msgid "[command completed successfully %s]"
-msgstr "[a parancs sikeresen végrehajtva %s]"
+msgstr "[parancs sikeresen végrehajtva %s]"
 
 msgid "Running..."
-msgstr ""
+msgstr "Fut..."
 
 msgid "Failed!"
-msgstr ""
+msgstr "Sikertelen!"
 
 msgid "Clea&r Log"
-msgstr ""
+msgstr "Napló &törlése"
 
 msgid "TortoiseHg Prompt"
-msgstr "TortoiseHG parancssor"
+msgstr "TortoiseHG Parancssor"
 
 msgid "Show Detail"
-msgstr ""
+msgstr "Részletek megjelenítése"
 
 msgid "Hide Detail"
-msgstr ""
+msgstr "Részletek elrejtése"
 
 msgid "Confirm Exit"
-msgstr "Kilépés Jóváhagyása"
+msgstr "Kilépés megerősítése"
 
 msgid ""
 "Mercurial command is still running.\n"
 "Are you sure you want to terminate?"
 msgstr ""
+"Egy Mercurial parancs még fut.\n"
+"Biztosan meg akarja szakítani?"
 
 msgid "&Run"
-msgstr ""
+msgstr "&Futtatás"
 
 msgid "TortoiseHg Command Dialog"
 msgstr ""
 
 msgid "Command Error"
-msgstr ""
+msgstr "Parancshiba"
 
 #, python-format
 msgid "[Code: %d]"
-msgstr ""
+msgstr "[Kód: %d]"
 
 msgid "Merge"
-msgstr ""
+msgstr "Összefésülés"
 
 #, python-format
 msgid "Merge with %s"
@@ -745,10 +759,10 @@ msgid "Commit Dialog Toolbar"
 msgstr ""
 
 msgid "Branch: "
-msgstr ""
+msgstr "Ág: "
 
 msgid "Copy message"
-msgstr ""
+msgstr "Üzenet másolása"
 
 msgid "Copy one of the recent commit messages"
 msgstr ""
@@ -757,7 +771,7 @@ msgid "Show Issues"
 msgstr ""
 
 msgid "Please wait..."
-msgstr ""
+msgstr "Kis türelmet…"
 
 #, python-format
 msgid "Failed to load issue tracker '%s': %s"
@@ -782,19 +796,19 @@ msgid "Commit"
 msgstr "Eltárolás (commit)"
 
 msgid "Amend current revision"
-msgstr ""
+msgstr "Jelenlegi revízió módosítása"
 
 msgid "Amend"
-msgstr ""
+msgstr "Módosítás"
 
 msgid "Create a new patch"
-msgstr ""
+msgstr "Új folt létrehozása"
 
 msgid "QNew"
 msgstr "QNew"
 
 msgid "Refresh current patch"
-msgstr ""
+msgstr "Jelenlegi folt frissítése"
 
 msgid "QRefresh"
 msgstr "QRefresh"
@@ -807,7 +821,7 @@ msgid "Named branch \"%s\" already exists, last used in revision %d\n"
 msgstr ""
 
 msgid "Restart &Branch"
-msgstr ""
+msgstr "&Ág újraindítása"
 
 msgid "&Commit to current branch"
 msgstr ""
@@ -823,13 +837,13 @@ msgid "Create new named branch \"%s\" with this commit?\n"
 msgstr ""
 
 msgid "Create &Branch"
-msgstr ""
+msgstr "&Ág létrehozása"
 
 msgid "Close Branch: "
-msgstr ""
+msgstr "Ág lezárása: "
 
 msgid "New Branch: "
-msgstr ""
+msgstr "Új ág: "
 
 #, python-format
 msgid "<b>Selected Options:</b> %s"
@@ -839,11 +853,11 @@ msgid "Parent:"
 msgstr "Szülő:"
 
 msgid "Patch name:"
-msgstr ""
+msgstr "Folt neve:"
 
 #, python-format
 msgid "Close %s branch"
-msgstr ""
+msgstr "%s ág lezárása"
 
 #, python-format
 msgid "Rollback commit to revision %d"
@@ -2039,6 +2053,9 @@ msgstr ""
 msgid "Report only the first match per file"
 msgstr ""
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "Alábbiak másolása és átnevezése"
 
@@ -2922,6 +2939,54 @@ msgstr ""
 msgid "Patch user:"
 msgstr ""
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr ""
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr ""
 
@@ -2984,9 +3049,6 @@ msgid "%p%"
 msgstr ""
 
 msgid "Connecting to Review Board..."
-msgstr ""
-
-msgid "Post &Review"
 msgstr ""
 
 msgid "Target:"
@@ -3088,31 +3150,6 @@ msgid "New patch message:"
 msgstr ""
 
 msgid "Patches to fold"
-msgstr ""
-
-msgid "Rename Error"
-msgstr ""
-
-msgid "Could not rename existing patchfile"
-msgstr ""
-
-msgid "Could not delete existing patchfile"
-msgstr ""
-
-msgid "QRename - Check patchname"
-msgstr ""
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr ""
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr ""
-
-msgid "Overwrite existing patchfile"
-msgstr ""
-
-msgid "Go back and change new patchname"
 msgstr ""
 
 msgid "&Undo"
@@ -3456,6 +3493,9 @@ msgid "Copy source -> destination"
 msgstr ""
 
 msgid "Copy Error"
+msgstr ""
+
+msgid "Rename Error"
 msgstr ""
 
 msgid "Select Source File"
@@ -4184,6 +4224,9 @@ msgstr ""
 msgid "Post to Re&view Board..."
 msgstr ""
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr ""
 
@@ -4248,6 +4291,9 @@ msgid "&Prune Selected..."
 msgstr ""
 
 msgid "Post Selected to Review Board..."
+msgstr ""
+
+msgid "Post Selected to Phabricator..."
 msgstr ""
 
 msgid "Apply patch"
@@ -4359,6 +4405,13 @@ msgid "&More Options..."
 msgstr ""
 
 msgid "Unable to merge"
+msgstr ""
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
 msgstr ""
 
 msgid "You cannot merge a revision with itself"
@@ -5637,6 +5690,15 @@ msgid ""
 "newly-created repository."
 msgstr ""
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr ""
 
@@ -6377,14 +6439,18 @@ msgid "Changeset Link"
 msgstr ""
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -8274,7 +8340,7 @@ msgid "Configure Explorer extension"
 msgstr ""
 
 msgid "About TortoiseHg"
-msgstr ""
+msgstr "TortoiseHg névjegye"
 
 msgid "Show About Dialog"
 msgstr ""
@@ -8298,7 +8364,7 @@ msgid "Detect renames and copies"
 msgstr ""
 
 msgid "Search History"
-msgstr ""
+msgstr "Keresés előzményei"
 
 msgid "Search file revisions for patterns"
 msgstr ""
@@ -8311,7 +8377,7 @@ msgstr ""
 
 #, python-format
 msgid "unrecognized response: %s"
-msgstr ""
+msgstr "ismeretlen válasz: %s"
 
 msgid "password: "
 msgstr "jelszó: "

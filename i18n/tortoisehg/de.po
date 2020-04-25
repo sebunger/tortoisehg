@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
 "PO-Revision-Date: 2016-02-05 20:19+0000\n"
 "Last-Translator: Manuel Stumpf <manuelstumpf@web.de>\n"
 "Language-Team: German <de@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:26+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:42+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHG-Symbolüberblendungsdienst"
@@ -27,7 +27,7 @@ msgstr "Beenden"
 msgid "About"
 msgstr "Über TortoiseHG"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -673,6 +673,12 @@ msgstr "keine \"runcommand\"-Fähigkeit"
 #, python-format
 msgid "corrupted command result: %r"
 msgstr "zerstörtes Anweisungs-Resultat : %s"
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
+msgstr ""
 
 #, python-format
 msgid "failed to encode input: %s"
@@ -2127,6 +2133,9 @@ msgstr "Vollständige Historie"
 msgid "Report only the first match per file"
 msgstr "Nur den ersten Treffer je Datei melden"
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "Kopien und Umbenennungen nachverfolgen"
 
@@ -3065,6 +3074,54 @@ msgstr "Patch-Datum:"
 msgid "Patch user:"
 msgstr "Patch-Benutzer:"
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr "Review Über&mitteln"
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr ""
 "Ungültige Konfiguration - der Review-Board-Server ist nicht eingerichtet"
@@ -3134,9 +3191,6 @@ msgstr "%p%"
 
 msgid "Connecting to Review Board..."
 msgstr "Verbindung zum Review-Board-Server wird aufgenommen..."
-
-msgid "Post &Review"
-msgstr "Review Über&mitteln"
 
 msgid "Target:"
 msgstr "Ziel:"
@@ -3240,31 +3294,6 @@ msgstr "Neuer Patch-Kommentar:"
 
 msgid "Patches to fold"
 msgstr "Zu verschmelzende Patches"
-
-msgid "Rename Error"
-msgstr "Fehler beim Umbenennen"
-
-msgid "Could not rename existing patchfile"
-msgstr "Die bestehende Patch-Datei konnte nicht umbenannt werden"
-
-msgid "Could not delete existing patchfile"
-msgstr "Die bestehende Patchdatei konnte nicht gelöscht werden"
-
-msgid "QRename - Check patchname"
-msgstr "Patch umbennen - Patch-Name prüfen"
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr "Der Patch-Name <b>%s</b> existiert bereits:"
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr "Erweiterung .OLD an die bestehende Patch-Datei anhängen"
-
-msgid "Overwrite existing patchfile"
-msgstr "Bestehende Patch-Datei überschreiben"
-
-msgid "Go back and change new patchname"
-msgstr "Zurück und den neuen Patch-Namen erneut ändern"
 
 msgid "&Undo"
 msgstr "&Rückgängig"
@@ -3633,6 +3662,9 @@ msgstr "Quelle in Ziel kopieren"
 
 msgid "Copy Error"
 msgstr "Kopierfehler"
+
+msgid "Rename Error"
+msgstr "Fehler beim Umbenennen"
 
 msgid "Select Source File"
 msgstr "Quelldatei auswählen"
@@ -4401,6 +4433,9 @@ msgstr "Be&reinigen..."
 msgid "Post to Re&view Board..."
 msgstr "Auf &Review-Board veröffentlichen..."
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr "&Entferntes Archiv aktualisieren..."
 
@@ -4467,6 +4502,9 @@ msgstr "Auswahl &Kürzen..."
 
 msgid "Post Selected to Review Board..."
 msgstr "Auswahl auf Review-Board veröffentlichen..."
+
+msgid "Post Selected to Phabricator..."
+msgstr ""
 
 msgid "Apply patch"
 msgstr "Patch anwenden"
@@ -4590,6 +4628,13 @@ msgstr "Mehr &Einstellungen..."
 
 msgid "Unable to merge"
 msgstr "Das Zusammenführen hat nicht funktioniert"
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
 
 msgid "You cannot merge a revision with itself"
 msgstr "Sie können eine Revision nicht mit sich selbst verschmelzen"
@@ -6000,6 +6045,15 @@ msgstr ""
 "Falls angegeben, werden Dateien in dieses Verzeichnisses in neu erstellte "
 "Projektarchive kopiert, z.B. .hgignore."
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr "Werkbank"
 
@@ -6948,24 +7002,19 @@ msgid "Changeset Link"
 msgstr "Änderungssatz-Verweis"
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
-"Eine \"Schablonenzeichenkette\", welche aus Revisionen und Kurz-Hashes, "
-"welche in Revisionspaneelen dargestellt werden, in Links umwandelt.<br/>Die "
-"Schablone setzt die Syntax von \"mercurial template\" ein, welche zurzeit "
-"zwei Schablonenausdrücke erlaubt:<ul><li>{node|short} : wird durch die "
-"zwölfstellige Revisions-ID ersetzt (Hinweis: \"node\" alleine wird zurzeit "
-"nicht unterstützt).</li><li>{rev} : ersetzt durch die Revisionsnummer.</li></"
-"ul>Beispielweise können Sie, um Übernehmen-Seiten von Bitbucket zu "
-"verlinken, diesen Wert wie folgt einstellen:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
 msgstr ""
@@ -10369,13 +10418,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Bisect"
 #~ msgstr "Aufspüren"
 
-#~ msgid ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
-#~ msgstr ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">Hilfe zu "
-#~ "Revisionsmengen</a>"
-
 #~ msgid "_Help"
 #~ msgstr "_Hilfe"
 
@@ -10794,9 +10836,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "A specific revision up to which you would like to push or pull."
 #~ msgstr ""
 #~ "Eine spezifische Revision, bis zu der Sie ziehen oder verteilen möchten."
-
-#~ msgid "List Font"
-#~ msgstr "Schriftart für Listen"
 
 #~ msgid "&Yes (--force)"
 #~ msgstr "&Ja (--force)"
@@ -12411,21 +12450,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgid "Revert files to revision %s?"
 #~ msgstr "Dateien in Revision %s wiederherstellen?"
 
-#~ msgid ""
-#~ "Changesets within the interval, see <a href=\"http://www.selenic.com/"
-#~ "mercurial/hg.1.html#dates\">help dates</a>"
-#~ msgstr ""
-#~ "Änderungssätze im angegebenen Zeitintervall (vergleiche <a href=\"http://"
-#~ "www.selenic.com/mercurial/hg.1.html#dates\">Hilfe zu Datumsangaben</a>)"
-
-#~ msgid ""
-#~ "Changesets affecting files matched by pattern.  See <a href=\"http://www."
-#~ "selenic.com/mercurial/hg.1.html#patterns\">help patterns</a>"
-#~ msgstr ""
-#~ "Änderungssätze, die von einem Dateinamens-Suchmuster gefundene Dateien "
-#~ "berühren. Siehe auch in der <a href=\"http://www.selenic.com/mercurial/"
-#~ "hg.1.html#patterns\">Hilfe zu Suchmustern</a>"
-
 #~ msgid "backup %r as %r\n"
 #~ msgstr "Sicherheitskopie von %r als %r\n"
 
@@ -12485,28 +12509,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ "Ja bedeutet, dass die ersten Zeilen der Änderungssatz-Zusammenfassung "
 #~ "zusammengefügt werden, bis 80 Zeichen erreicht sind. Standard: nein"
 
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before "
-#~ "removing files in a commit. If True, a confirmation dialog will be "
-#~ "showed. If False, selected deleted files will be included in the commit "
-#~ "with no confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "Bestimmt, ob TortoiseHg einen Bestätigungsdialog zeigt, bevor Dateien bei "
-#~ "einer Übernahme gelöscht werden. Wenn ausgewählt, wird der Dialog "
-#~ "angezeigt, ansonsten werden die ausgewählten Dateien ohne weiter "
-#~ "Nachfrage als gelöscht übernommen. Standard: True"
-
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before adding "
-#~ "new files in a commit. If True, a confirmation dialog will be showed. If "
-#~ "False, selected new files will be included in the commit with no "
-#~ "confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "Bestimmt, ob TortoiseHg einen Bestätigungsdialog zeigt, bevor nicht "
-#~ "versionierten Dateien bei einer Übernahme hinzugefügt werden. Wenn "
-#~ "ausgewählt, wird ein Dialog angezeigt, ansonsten werden die ausgewählten "
-#~ "neuen Dateien ohne weiter Nachfrage mit übernommen. Standard: True"
-
 #~ msgid "Connect to mail server using TLS. Default: False"
 #~ msgstr "Verschlüsselte Verbindung mit dem Mailserver (TLS). Standard: False"
 
@@ -12517,9 +12519,6 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgstr ""
 #~ "Leerraum-Unterschiede beim Zeilenvergleich ignorieren. Standard: nein"
 
-#~ msgid "Font used to display file lists. Default: sans 9"
-#~ msgstr "Schriftart zur Darstellung von Dateilisten. Standard: sans 9"
-
 #~ msgid "Ignore changes whose lines are all blank. Default: False"
 #~ msgstr ""
 #~ "Ignoriere Änderungen, die sich nur auf leere Zeilen auswirken. Standard: "
@@ -12529,6 +12528,26 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ msgstr "Fehlende Datei ansehen"
 
 #~ msgid ""
+#~ "A \"template string\" that, when set, turns the revision number and short "
+#~ "hashes that are shown on the revision panels into links.<br>The "
+#~ "\"template string\" uses a \"mercurial template\"-like syntax that "
+#~ "currently accepts two template expressions:<ul><li>{node|short} : "
+#~ "replaced by the 12 digit revision id (note that {node} on its own is "
+#~ "currently unsupported).<li>{rev} : replaced by the revision number.</"
+#~ "ul>For example, in order to link to bitbucket commit pages you can set "
+#~ "this to:<br>https://bitbucket.org/tortoisehg/thg/commits/{node|short}"
+#~ msgstr ""
+#~ "Eine \"Schablonenzeichenkette\", welche aus Revisionen und Kurz-Hashes, "
+#~ "welche in Revisionspaneelen dargestellt werden, in Links umwandelt.<br/"
+#~ ">Die Schablone setzt die Syntax von \"mercurial template\" ein, welche "
+#~ "zurzeit zwei Schablonenausdrücke erlaubt:<ul><li>{node|short} : wird "
+#~ "durch die zwölfstellige Revisions-ID ersetzt (Hinweis: \"node\" alleine "
+#~ "wird zurzeit nicht unterstützt).</li><li>{rev} : ersetzt durch die "
+#~ "Revisionsnummer.</li></ul>Beispielweise können Sie, um Übernehmen-Seiten "
+#~ "von Bitbucket zu verlinken, diesen Wert wie folgt einstellen:<br>https://"
+#~ "bitbucket.org/tortoisehg/thg/commits/{node|short}"
+
+#~ msgid ""
 #~ "Color changesets by author name.  If not enabled, the changes are colored "
 #~ "green for merge, red for non-trivial parents, black for normal. Default: "
 #~ "False"
@@ -12536,33 +12555,3 @@ msgstr "win32ill: unterbrochen beim Beenden der Nachrichtenschleife\n"
 #~ "Änderungssatz nach Autor einfärben. Im Regelfall werden Änderungen zum "
 #~ "Zusammenführen grün markiert, Änderungen mit nicht-trivialen Vorgängern "
 #~ "rot und gewöhnliche schwarz. Standard: Falsch"
-
-#~ msgid "Precursors:"
-#~ msgstr "Frühere Änderungslisten:"
-
-#~ msgid ""
-#~ "The command that will be executed.\n"
-#~ "To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
-#~ "executable command.\n"
-#~ "You can use several {VARIABLES} to compose your command:\n"
-#~ "- {ROOT}: The path to the current repository root.\n"
-#~ "- {REV} / {REVID}: the selected revision number / hexadecimal revision id "
-#~ "hash respectively.\n"
-#~ "- {SELECTEDFILES}: The list of files selected by the user on the revision "
-#~ "details file list.\n"
-#~ "- {FILES}: The list of files touched by the selected revision.\n"
-#~ "- {ALLFILES}: All the files tracked by Mercurial on the selected revision."
-#~ msgstr ""
-#~ "Die auszuführende Anweisung.\n"
-#~ "Nutzen Sie \"hg\" (statt \"hg.exe\" o.ä.), um Mercurial auszuführen.\n"
-#~ "Sie können verschiedene {PLATZHALTER} einsetzen, um Ihre Anweisung "
-#~ "zusammenzustellen:\n"
-#~ "- {ROOT}: Der Wurzelpfad des aktuellen Archivs.\n"
-#~ "- {REV} / {REVID}: Die ausgewählte Revisionsnummer bzw. hexadezimale "
-#~ "Revisions-Hash-ID.\n"
-#~ "- {SELECTEDFILES}: Die Liste der Dateien, die der Benutzer in der "
-#~ "Revisionsdetails-Dateiliste ausgewählt hat.\n"
-#~ "- {FILES}: Die Liste der Dateien, die von der aktuellen Revision geändert "
-#~ "werden.\n"
-#~ "- {ALLFILES}: Alle Dateien, die von Mercurial in der ausgewählten "
-#~ "Revision verfolgt werden."

@@ -7,14 +7,14 @@
 import os
 
 if os.name == 'nt':
-    import _winreg
+    from mercurial.windows import winreg
 
     def findgpg(ui):
         path = []
         for key in (r"Software\GNU\GnuPG", r"Software\Wow6432Node\GNU\GnuPG"):
             try:
-                hkey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, key)
-                pfx = _winreg.QueryValueEx(hkey, 'Install Directory')[0]
+                hkey = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key)
+                pfx = winreg.QueryValueEx(hkey, 'Install Directory')[0]
                 for dirPath, dirNames, fileNames in os.walk(pfx):
                     for f in fileNames:
                         if f == 'gpg.exe':

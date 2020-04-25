@@ -33,7 +33,6 @@ except ImportError:
 demandimport.enable()
 
 import subprocess
-import urllib
 
 from mercurial import hg, match, util, error
 from mercurial.utils import (
@@ -103,7 +102,7 @@ class HgExtensionDefault(GObject.GObject):
     def get_path_for_vfs_file(self, vfs_file, store=True):
         if vfs_file.get_uri_scheme() != 'file':
             return None
-        path = urllib.unquote(vfs_file.get_uri()[7:])
+        path = hglib.tounicode(util.urlreq.unquote(vfs_file.get_uri()[7:]))
         if vfs_file.is_gone():
             self.allvfs.pop(path, '')
             return None
@@ -123,14 +122,14 @@ class HgExtensionDefault(GObject.GObject):
         Find mercurial repository for vfs_file
         Returns hg.repo
         '''
-        p = paths.find_root(path)
+        p = hglib.fromunicode(paths.find_root(path))
         if not p:
             return None
         try:
             return hg.repository(hglib.loadui(), path=p)
         except error.RepoError:
             return None
-        except StandardError, e:
+        except Exception as e:
             debugf(e)
             return None
 
@@ -154,7 +153,7 @@ class HgExtensionDefault(GObject.GObject):
 
         proc = subprocess.Popen(cmdopts, cwd=cwd, stdin=pipe, shell=False)
         if pipe:
-            proc.stdin.write('\n'.join(files))
+            proc.stdin.write(hglib.fromunicode('\n'.join(files)))
             proc.stdin.close()
 
     def buildMenu(self, vfs_files, bg):
@@ -321,7 +320,7 @@ class HgExtensionDefault(GObject.GObject):
         emblem, status = self._get_file_status(path, repo)
 
         # Get the information from Mercurial
-        ctx = repo['.']
+        ctx = repo[b'.']
         try:
             fctx = ctx.filectx(localpath)
             rev = fctx.filelog().linkrev(fctx.filerev())
@@ -334,7 +333,7 @@ class HgExtensionDefault(GObject.GObject):
         description = ctx.description()
         user = ctx.user()
         user = GLib.markup_escape_text(user)
-        tags = ', '.join(ctx.tags())
+        tags = b', '.join(ctx.tags())
         branch = ctx.branch()
 
         self.property_label = Gtk.Label('Mercurial')
@@ -384,11 +383,11 @@ class HgExtensionIcons(HgExtensionDefault):
             if emblem is not None:
                 vfs_file.add_emblem(emblem)
             vfs_file.add_string_attribute('hg_status', status)
-        except StandardError, e:
+        except Exception as e:
             debugf(e)
         return True
 
-if hglib.loadui().configbool("tortoisehg", "overlayicons", default=True):
+if hglib.loadui().configbool(b"tortoisehg", b"overlayicons", default=True):
     class HgExtension(HgExtensionIcons, Nautilus.MenuProvider, Nautilus.ColumnProvider, Nautilus.PropertyPageProvider, Nautilus.InfoProvider):
         pass
 else:

@@ -12,6 +12,10 @@ import os
 import re
 import weakref
 
+from mercurial import (
+    pycompat,
+)
+
 from .qsci import (
     QSCINTILLA_VERSION,
     QsciLexerProperties,
@@ -428,7 +432,7 @@ class Scintilla(ScintillaCompat):
             flags = 0
             if icase:
                 flags |= re.IGNORECASE
-            pat = re.compile(unicode(match).encode('utf-8'), flags)
+            pat = re.compile(pycompat.unicode(match).encode('utf-8'), flags)
         except re.error:
             return  # it could be partial pattern while user typing
 
@@ -449,7 +453,7 @@ class Scintilla(ScintillaCompat):
         #             p, len(m.group(0).encode('utf-8')))
         #
         # but it doesn't to avoid possible performance issue.
-        for m in pat.finditer(unicode(self.text()).encode('utf-8')):
+        for m in pat.finditer(pycompat.unicode(self.text()).encode('utf-8')):
             self.SendScintilla(self.SCI_INDICATORFILLRANGE,
                                m.start(), m.end() - m.start())
             line = self.lineIndexFromPosition(m.start())[0]
@@ -474,7 +478,7 @@ class Scintilla(ScintillaCompat):
 
     def setDefaultEolMode(self):
         if self.lines():
-            mode = qsciEolModeFromLine(unicode(self.text(0)))
+            mode = qsciEolModeFromLine(pycompat.unicode(self.text(0)))
         else:
             mode = qsciEolModeFromOs()
         self.setEolMode(mode)
@@ -508,7 +512,7 @@ class Scintilla(ScintillaCompat):
     def setIndentationsUseTabs(self, tabs):
         self.autoUseTabs = (tabs == -1)
         if self.autoUseTabs and self.lines():
-            tabs = findTabIndentsInLines(hglib.fromunicode(self.text()))
+            tabs = findTabIndentsInLines(self.text().splitlines())
         super(Scintilla, self).setIndentationsUseTabs(tabs)
 
     @pyqtSlot(bool)
@@ -679,12 +683,12 @@ class KeyPressInterceptor(QObject):
 
     def __init__(self, parent=None, keys=None, keyseqs=None):
         super(KeyPressInterceptor, self).__init__(parent)
-        self._keys = set((Qt.Key_Escape,))
-        self._keyseqs = set((QKeySequence.Refresh,))
+        self._keys = {Qt.Key_Escape}
+        self._keyseqs = [QKeySequence.Refresh]
         if keys:
             self._keys.update(keys)
         if keyseqs:
-            self._keyseqs.update(keyseqs)
+            self._keyseqs.extend(keyseqs)
 
     def eventFilter(self, watched, event):
         if event.type() != QEvent.KeyPress:
@@ -744,14 +748,14 @@ def readFile(editor, filename, encoding=None):
         return False
     try:
         earlybytes = f.read(4096)
-        if '\0' in earlybytes:
+        if b'\0' in earlybytes:
             qtlib.WarningMsgBox(_('Unable to read file'),
                                 _('This appears to be a binary file.'),
                                 parent=editor)
             return False
 
         f.seek(0)
-        data = str(f.readAll())
+        data = bytes(f.readAll())
         if f.error():
             qtlib.WarningMsgBox(_('Unable to read file'),
                                 _('An error occurred while reading the file.'),
@@ -763,7 +767,7 @@ def readFile(editor, filename, encoding=None):
     if encoding:
         try:
             text = data.decode(encoding)
-        except UnicodeDecodeError, inst:
+        except UnicodeDecodeError as inst:
             qtlib.WarningMsgBox(_('Text Translation Failure'),
                                 _('Could not translate the file content from '
                                   'native encoding.'),
@@ -782,10 +786,10 @@ def writeFile(editor, filename, encoding=None):
     text = editor.text()
     try:
         if encoding:
-            data = unicode(text).encode(encoding)
+            data = pycompat.unicode(text).encode(encoding)
         else:
             data = hglib.fromunicode(text)
-    except UnicodeEncodeError, inst:
+    except UnicodeEncodeError as inst:
         qtlib.WarningMsgBox(_('Unable to write file'),
                             _('Could not translate the file content to '
                               'native encoding.'),

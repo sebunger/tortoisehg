@@ -5,30 +5,37 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
-import os
-from mercurial import ui, hg, commands, error
-from tortoisehg.util.i18n import _ as _gettext
+from __future__ import absolute_import
 
-# TODO: use unicode version globally
-def _(message, context=''):
-    return _gettext(message, context).encode('utf-8')
+import os
+
+from mercurial import (
+    commands,
+    error,
+    hg,
+    pycompat,
+    ui as uimod,
+)
 
 def liveversion():
     'Attempt to read the version from the live repository'
     utilpath = os.path.dirname(os.path.realpath(__file__))
     thgpath = os.path.dirname(os.path.dirname(utilpath))
     if not os.path.isdir(os.path.join(thgpath, '.hg')):
-        raise error.RepoError(_('repository %s not found') % thgpath)
+        raise error.RepoError(b'repository %s not found' % thgpath)
 
-    u = ui.ui()
+    u = uimod.ui()
+    # disable color since qtlib inserts color styles and breaks
+    # mercurial.color._render_effects()
+    u.setconfig(b'ui', b'color', b'never')
     # prevent loading additional extensions
-    for k, _v in u.configitems('extensions'):
-        u.setconfig('extensions', k, '!')
-    repo = hg.repository(u, path=thgpath)
+    for k, _v in u.configitems(b'extensions'):
+        u.setconfig(b'extensions', k, b'!')
+    repo = hg.repository(u, path=pycompat.fsencode(thgpath))
 
     u.pushbuffer()
-    commands.identify(u, repo, id=True, tags=True, rev='.')
-    l = u.popbuffer().split()
+    commands.identify(u, repo, id=True, tags=True, rev=b'.')
+    l = pycompat.sysstr(u.popbuffer()).split()
     while len(l) > 1 and l[-1][0].isalpha(): # remove non-numbered tags
         l.pop()
     if len(l) > 1: # tag found
@@ -37,9 +44,9 @@ def liveversion():
             version += '+'
     elif len(l) == 1: # no tag found
         u.pushbuffer()
-        commands.parents(u, repo, template='{latesttag}+{latesttagdistance}-')
-        version = u.popbuffer().rpartition(':')[2] + l[0]
-    return repo[None].branch(), version
+        commands.parents(u, repo, template=b'{latesttag}+{latesttagdistance}-')
+        version = pycompat.sysstr(u.popbuffer()).rpartition(':')[2] + l[0]
+    return pycompat.sysstr(repo[None].branch()), version
 
 def version():
     try:
@@ -48,10 +55,10 @@ def version():
     except:
         pass
     try:
-        import __version__
+        from . import __version__
         return __version__.version
     except ImportError:
-        return _('unknown')
+        return 'unknown'
 
 def package_version():
     try:
@@ -60,10 +67,10 @@ def package_version():
     except:
         pass
     try:
-        import __version__
+        from . import __version__
         return _build_package_version('stable', __version__.version)
     except ImportError:
-        return _('unknown')
+        return 'unknown'
 
 def _build_package_version(branch, version):
     """
@@ -76,13 +83,17 @@ def _build_package_version(branch, version):
     >>> _build_package_version('stable', '4.8.3')
     '4.8.3'
     >>> _build_package_version('stable', '4.8rc1')
-    '4.7.91000'
+    '4.7.61000'
     >>> _build_package_version('stable', '4.8rc1+2')
-    '4.7.91002'
+    '4.7.61002'
+    >>> _build_package_version('stable', '5.0rc0')
+    '4.9.60000'
+    >>> _build_package_version('stable', '5.0.2+1')
+    '5.0.21001'
     >>> _build_package_version('stable', '1.0rc0')
-    '0.9.90000'
+    '0.9.60000'
     >>> _build_package_version('stable', '0.1rc0')
-    '0.0.90000'
+    '0.0.60000'
     """
     extra = rc = None
     if '+' in version:
@@ -99,11 +110,11 @@ def _build_package_version(branch, version):
         v.append(0)
     major, minor, periodic = v
 
-    if extra != None:
+    if extra is not None:
         tagdistance = int(extra.split('-', 1)[0])
         periodic *= 10000
         if rc:
-            periodic += tagdistance + int(rc) * 1000 + 90000
+            periodic += tagdistance + int(rc) * 1000 + 60000
         elif branch == 'default':
             periodic += tagdistance + 5000
         else:

@@ -53,6 +53,7 @@ from .qtgui import (
 )
 
 from mercurial import (
+    pycompat,
     scmutil,
 )
 
@@ -69,6 +70,13 @@ from . import (
     revpanel,
 )
 from .qscilib import Scintilla
+
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Dict,
+        List,
+        Text,
+    )
 
 sides = ('left', 'right')
 otherside = {'left': 'right', 'right': 'left'}
@@ -113,9 +121,9 @@ class _FileDiffScintilla(Scintilla):
 
         start = self.firstVisibleLine()
         scale = self.textHeight(0)  # Currently all lines are the same height
-        n = min(viewport.height() / scale + 1, self.lines() - start)
+        n = min(viewport.height() // scale + 1, self.lines() - start)
         lines = []
-        for i in xrange(0, n):
+        for i in pycompat.xrange(0, n):
             m = self.markersAtLine(start + i)
             if m & (1 << _MARKERPLUSLINE):
                 lines.append((i, _colormap['+'], ))
@@ -167,7 +175,7 @@ class _AbstractFileDialog(QMainWindow):
         self.setupUi()
         self._show_rev = None
 
-        assert not isinstance(filename, unicode)
+        assert not isinstance(filename, pycompat.unicode), repr(filename)
         self.filename = filename
 
         self.setWindowTitle(_('Hg file log viewer [%s] - %s')
@@ -316,7 +324,7 @@ class FileLogDialog(_AbstractFileDialog):
         else:
             texts = {'visualDiff': _('Diff &Changeset to Parent'),
                      'visualDiffFile': _('&Diff to Parent')}
-        for n, t in texts.iteritems():
+        for n, t in texts.items():
             self._fileactions.action(n).setText(t)
 
     @pyqtSlot()
@@ -366,7 +374,7 @@ class FileLogDialog(_AbstractFileDialog):
 
     @pyqtSlot(str)
     def onLinkActivated(self, link):
-        link = unicode(link)
+        link = pycompat.unicode(link)
         if ':' in link:
             scheme, param = link.split(':', 1)
             if scheme == 'cset':
@@ -493,8 +501,11 @@ class FileDiffDialog(_AbstractFileDialog):
         lay.setContentsMargins(0, 0, 0, 0)
 
         try:
-            contents = open(self.repo.wjoin(self.filename), "rb").read(1024)
-            lexer = lexers.getlexer(self.repo.ui, self.filename, contents, self)
+            with open(self.repo.wjoin(self.filename), "rb") as fp:
+                contents = fp.read(1024)
+            lexer = lexers.getlexer(self.repo.ui,
+                                    hglib.tounicode(self.filename),
+                                    contents, self)
         except Exception:
             lexer = None
 
@@ -578,7 +589,10 @@ class FileDiffDialog(_AbstractFileDialog):
         self.timer.timeout.connect(self.idle_fill_files)
 
     def setupModels(self):
-        self.filedata = {'left': None, 'right': None}
+        self.filedata = {
+            'left': [],
+            'right': [],
+        }  # type: Dict[Text, List[pycompat.unicode]]
         self._invbarchanged = False
         self.filerevmodel = repomodel.FileRevModel(
             self._repoagent, self.filename, parent=self)
@@ -760,7 +774,7 @@ class FileDiffDialog(_AbstractFileDialog):
                 pass
 
             else:
-                raise ValueError, 'unknown tag %r' % (tag,)
+                raise ValueError('unknown tag %r' % (tag,))
 
         # ok, let's enable GUI refresh for code viewers and diff-block displayers
         for side in sides:
@@ -832,7 +846,7 @@ class FileDiffDialog(_AbstractFileDialog):
 
         blo, bhi = self._diffmatch[oside][i]
         vbar = self.viewers[oside].verticalScrollBar()
-        if (dv) < (bhi - blo):
+        if dv < (bhi - blo):
             bvalue = blo + dv
         else:
             bvalue = bhi

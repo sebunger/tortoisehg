@@ -26,6 +26,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     scmutil,
 )
 
@@ -144,7 +145,7 @@ class BisectDialog(QDialog):
 
         self.repo.invalidatedirstate()
 
-        ctx = self.repo['.']
+        ctx = self.repo[b'.']
         if ctx.rev() == self.lastrev:
             self._stbar.showMessage(_('Culprit found.'))
             return
@@ -160,9 +161,9 @@ class BisectDialog(QDialog):
         try:
             ctx = scmutil.revsymbol(self.repo, hglib.fromunicode(changeid))
             return ctx.rev()
-        except (error.LookupError, error.RepoLookupError), e:
+        except (error.LookupError, error.RepoLookupError) as e:
             self._stbar.showMessage(hglib.tounicode(str(e)))
-        except error.Abort, e:
+        except error.Abort as e:
             if e.hint:
                 err = _('%s (hint: %s)') % (hglib.tounicode(str(e)),
                                             hglib.tounicode(e.hint))
@@ -172,7 +173,8 @@ class BisectDialog(QDialog):
 
     @pyqtSlot()
     def _verifyGood(self):
-        self.goodrev = self._lookupRevision(unicode(self._gle.text()).strip())
+        self.goodrev = self._lookupRevision(
+                           pycompat.unicode(self._gle.text()).strip())
         if self.goodrev is None:
             return
         self._gb.setEnabled(False)
@@ -183,7 +185,8 @@ class BisectDialog(QDialog):
 
     @pyqtSlot()
     def _verifyBad(self):
-        self.badrev = self._lookupRevision(unicode(self._ble.text()).strip())
+        self.badrev = self._lookupRevision(
+                          pycompat.unicode(self._ble.text()).strip())
         if self.badrev is None:
             return
         self._ble.setEnabled(False)

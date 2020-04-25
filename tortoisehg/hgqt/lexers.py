@@ -10,12 +10,20 @@ from __future__ import absolute_import
 import os
 import re
 
+from mercurial import (
+    pycompat,
+)
+
 from . import (
     qsci as Qsci,
     qtgui as QtGui,
 )
 
 from . import qtlib
+
+from ..util import (
+    hglib,
+)
 
 if hasattr(QtGui.QColor, 'getHslF'):
     def _fixdarkcolors(lexer):
@@ -24,7 +32,7 @@ if hasattr(QtGui.QColor, 'getHslF'):
             return  # fast path
 
         # QsciLexer defines 128 styles by default
-        for style in xrange(128):
+        for style in pycompat.xrange(128):
             h, s, l, a = lexer.color(style).getHslF()
             pl = lexer.paper(style).lightnessF()
             if abs(l - pl) < 0.2:
@@ -81,22 +89,22 @@ class _ScriptLexerSelector(_FilenameLexerSelector):
 class PythonLexerSelector(_ScriptLexerSelector):
     extensions = ('.py', '.pyw')
     _lexer = Qsci.QsciLexerPython
-    regex = re.compile(r'^#[!].*python')
+    regex = re.compile(br'^#[!].*python')
 
 class BashLexerSelector(_ScriptLexerSelector):
     extensions = ('.sh', '.bash')
     _lexer = Qsci.QsciLexerBash
-    regex = re.compile(r'^#[!].*sh')
+    regex = re.compile(br'^#[!].*sh')
 
 class PerlLexerSelector(_ScriptLexerSelector):
     extensions = ('.pl', '.perl')
     _lexer = Qsci.QsciLexerPerl
-    regex = re.compile(r'^#[!].*perl')
+    regex = re.compile(br'^#[!].*perl')
 
 class RubyLexerSelector(_ScriptLexerSelector):
     extensions = ('.rb', '.ruby')
     _lexer = Qsci.QsciLexerRuby
-    regex = re.compile(r'^#[!].*ruby')
+    regex = re.compile(br'^#[!].*ruby')
 
 class LuaLexerSelector(_ScriptLexerSelector):
     extensions = ('.lua', )
@@ -108,7 +116,7 @@ class _LexerCPP(Qsci.QsciLexerCPP):
         super(_LexerCPP, self).refreshProperties()
         # disable grey-out of inactive block, which is hard to read.
         # as of QScintilla 2.7.2, this property isn't mapped to wrapper.
-        self.propertyChanged.emit('lexer.cpp.track.preprocessor', '0')
+        self.propertyChanged.emit(b'lexer.cpp.track.preprocessor', b'0')
 
 class CppLexerSelector(_FilenameLexerSelector):
     extensions = ('.c', '.cpp', '.cc', '.cxx', '.cl', '.cu',
@@ -218,7 +226,7 @@ class PropertyLexerSelector(_FilenameLexerSelector):
 class DiffLexerSelector(_ScriptLexerSelector):
     extensions = ()
     _lexer = Qsci.QsciLexerDiff
-    regex = re.compile(r'^@@ [-]\d+,\d+ [+]\d+,\d+ @@$')
+    regex = re.compile(br'^@@ [-]\d+,\d+ [+]\d+,\d+ @@$')
     def cfg_lexer(self, lexer):
         for label, i in (('diff.inserted', 6),
                          ('diff.deleted', 5),
@@ -236,12 +244,16 @@ class DiffLexerSelector(_ScriptLexerSelector):
         return lexer
 
 
-lexers = []
-for clsname, cls in globals().items():
-    if clsname.startswith('_'):
-        continue
-    if isinstance(cls, type) and issubclass(cls, _LexerSelector):
-        lexers.append(cls())
+def _makelexers():
+    lexers = []
+    for clsname, cls in globals().items():
+        if clsname.startswith('_'):
+            continue
+        if isinstance(cls, type) and issubclass(cls, _LexerSelector):
+            lexers.append(cls())
+    return lexers
+
+lexers = _makelexers()
 
 def difflexer(parent):
     return DiffLexerSelector().lexer(parent)
@@ -250,7 +262,7 @@ def getlexer(ui, filename, filedata, parent):
     _, ext = os.path.splitext(filename)
     if ext and len(ext) > 1:
         ext = ext.lower()[1:]
-        pref = ui.config('thg-lexer', ext)
+        pref = hglib.tounicode(ui.config(b'thg-lexer', hglib.fromunicode(ext)))
         if pref:
             lexer = getattr(Qsci, 'QsciLexer' + pref)
             if lexer and isinstance(lexer, type):

@@ -10,6 +10,11 @@ from __future__ import absolute_import
 
 import os
 
+from mercurial import (
+    error,
+    scmutil,
+)
+
 from .qtcore import (
     QEvent,
     QPoint,
@@ -40,6 +45,10 @@ from .qtgui import (
     QToolButton,
     QVBoxLayout,
     QWidget,
+)
+
+from mercurial import (
+    pycompat,
 )
 
 from ..util import hglib
@@ -92,6 +101,8 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
 
         self._deschtmlize = qtlib.descriptionhtmlizer(repo.ui)
         repoagent.configChanged.connect(self._updatedeschtmlizer)
+
+        repoagent.repositoryChanged.connect(self.reload)
 
     @property
     def repo(self):
@@ -299,9 +310,11 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self.revpanel.set_revision(rev)
         self.revpanel.update(repo = self.repo)
         msg = ctx.description()
-        inlinetags = self.repo.ui.configbool('tortoisehg', 'issue.inlinetags')
+        inlinetags = self._repoagent.configBool(
+            'tortoisehg', 'issue.inlinetags')
         if ctx.tags() and inlinetags:
-            msg = ' '.join(['[%s]' % tag for tag in ctx.tags()]) + ' ' + msg
+            msg = ' '.join('[%s]' % hglib.tounicode(tag)
+                           for tag in ctx.tags()) + ' ' + msg
         # don't use <pre>...</pre>, which also changes font family
         self.message.setHtml('<div style="white-space: pre;">%s</div>'
                              % self._deschtmlize(msg))
@@ -315,6 +328,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         self._actionParentToggle.setVisible(self._parentToggleGroup.isVisible())
 
         m = self.filelist.model()
+        assert m is not None
 
         if len(ctx.parents()) != 2:
             m.setRawContext(ctx)
@@ -350,12 +364,22 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def reload(self):
         'Task tab is reloaded, or repowidget is refreshed'
         rev = self.ctx.rev()
-        if (type(self.ctx.rev()) is int and len(self.repo) <= self.ctx.rev()
-            or (rev is not None  # wctxrev in repo raises TypeError
-                and rev not in self.repo
-                and rev not in self.repo.thgmqunappliedpatches)):
-            rev = 'tip'
-        self.onRevisionSelected(rev)
+        if isinstance(self.ctx.rev(), int):
+            if len(self.repo) <= self.ctx.rev():
+                rev = b'tip'
+        elif rev is not None:  # None in isrevsymbol() raises ProgrammingError
+            if scmutil.isrevsymbol(self.repo, rev):
+                rev = scmutil.revsymbol(self.repo, rev).rev()
+            elif rev not in self.repo.thgmqunappliedpatches:
+                rev = b'tip'
+        try:
+            self.onRevisionSelected(rev)
+        except error.FilteredRepoLookupError:
+            # Perhaps, the widget is reloaded because of filtering mode change
+            # while a hidden changeset was selected. In this cases, the
+            # selection of a different changeset (triggering the update of
+            # revdetails) will happen within short time.
+            pass
 
     @pyqtSlot(QUrl)
     def _forwardAnchorClicked(self, url):
@@ -364,6 +388,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     #@pyqtSlot(QModelIndex)
     def onDoubleClick(self, index):
         model = self.filelist.model()
+        assert model is not None
         if model.subrepoType(index):
             self._fileactions.openSubrepo()
         elif model.isDir(index):
@@ -415,6 +440,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def _setupFileMenu(self, contextmenu):
         index = self.filelist.currentIndex()
         model = self.filelist.model()
+        assert model is not None
 
         # Subrepos and regular items have different context menus
         if model.subrepoType(index):
@@ -433,7 +459,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def updateItemFileActions(self):
         model = self.filelist.model()
         selmodel = self.filelist.selectionModel()
-        selfds = map(model.fileData, selmodel.selectedIndexes())
+        selfds = pycompat.maplist(model.fileData, selmodel.selectedIndexes())
         self._fileactions.setFileDataList(selfds)
 
     @pyqtSlot()
@@ -594,7 +620,11 @@ class RevDetailsDialog(QDialog):
 
     @pyqtSlot(str)
     def linkActivated(self, link):
-        handlers = {'cset': self.setRev,
+        def _torev(cset):
+            return scmutil.revsymbol(self._repoagent.rawRepo(),
+                                     hglib.fromunicode(cset))
+
+        handlers = {'cset': lambda cset: self.setRev(_torev(cset)),
                     'repo': self._showRepoInWorkbench}
         if ':' in link:
             scheme, param = link.split(':', 1)

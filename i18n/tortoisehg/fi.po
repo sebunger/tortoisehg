@@ -1,0 +1,8356 @@
+# Finnish translation for tortoisehg
+# Copyright (c) 2018 Rosetta Contributors and Canonical Ltd 2018
+# This file is distributed under the same license as the tortoisehg package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tortoisehg\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
+"PO-Revision-Date: 2018-07-23 21:54+0000\n"
+"Last-Translator: Nikolay Korotkiy <sikmir@gmail.com>\n"
+"Language-Team: Finnish <fi@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:42+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
+
+msgid "TortoiseHg Overlay Icon Server"
+msgstr ""
+
+msgid "Exit"
+msgstr "Lopeta"
+
+msgid "About"
+msgstr "Tietoja"
+
+msgid "Copyright 2008-2019 Steve Borho and others"
+msgstr ""
+
+msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
+msgstr ""
+
+msgid "You can visit our site here"
+msgstr ""
+
+msgid "&License"
+msgstr "&Lisenssi"
+
+#, python-format
+msgid "version %s"
+msgstr "versio %s"
+
+#, python-format
+msgid "with Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
+msgstr ""
+
+#, python-format
+msgid "A new version of TortoiseHg (%s) is ready for download!"
+msgstr ""
+
+msgid "License"
+msgstr "Lisenssi"
+
+msgid "= Working Directory Parent ="
+msgstr ""
+
+msgid "Directory of files"
+msgstr ""
+
+msgid "Tar archives"
+msgstr ""
+
+msgid "Uncompressed tar archive"
+msgstr ""
+
+msgid "Bzip2 tar archives"
+msgstr ""
+
+msgid "Tar archive compressed using bzip2"
+msgstr ""
+
+msgid "Gzip tar archives"
+msgstr ""
+
+msgid "Tar archive compressed using gzip"
+msgstr ""
+
+msgid "Zip archives"
+msgstr ""
+
+msgid "Uncompressed zip archive"
+msgstr ""
+
+msgid "Zip archive compressed using deflate"
+msgstr ""
+
+msgid "Revision:"
+msgstr ""
+
+msgid "All files in this revision"
+msgstr ""
+
+msgid "Only files modified/created in this revision"
+msgstr ""
+
+msgid "Only files modified/created since:"
+msgstr ""
+
+msgid "Archive Content:"
+msgstr ""
+
+msgid "Recurse into subrepositories"
+msgstr ""
+
+msgid "Browse..."
+msgstr ""
+
+msgid "Destination path:"
+msgstr ""
+
+msgid "Archive types:"
+msgstr ""
+
+msgid "Hg command:"
+msgstr ""
+
+msgid "Select Destination Folder"
+msgstr ""
+
+msgid "Select Destination File"
+msgstr ""
+
+msgid "All files (*)"
+msgstr "Kaikki tiedostot (*)"
+
+msgid "Duplicate Name"
+msgstr ""
+
+#, python-format
+msgid "The destination \"%s\" already exists as a file!"
+msgstr ""
+
+msgid "Confirm Overwrite"
+msgstr ""
+
+#, python-format
+msgid ""
+"The directory \"%s\" is not empty!\n"
+"\n"
+"Do you want to overwrite it?"
+msgstr ""
+
+#, python-format
+msgid ""
+"The file \"%s\" already exists!\n"
+"\n"
+"Do you want to overwrite it?"
+msgstr ""
+
+#, python-format
+msgid "The destination \"%s\" already exists as a folder!"
+msgstr ""
+
+#, python-format
+msgid "Archive - %s"
+msgstr ""
+
+msgid "&Archive"
+msgstr ""
+
+msgid "Backout requires a parent revision"
+msgstr ""
+
+msgid "Cannot backout change on a different branch"
+msgstr ""
+
+#, python-format
+msgid "Backout - %s"
+msgstr ""
+
+msgid "Prepare to backout"
+msgstr ""
+
+msgid "Verify backout revision and ensure your working directory is clean."
+msgstr ""
+
+msgid "Backing out a parent revision is a single step operation"
+msgstr ""
+
+msgid "Backout revision"
+msgstr ""
+
+msgid "Not a head, backout will create a new head!"
+msgstr ""
+
+msgid "Current local revision"
+msgstr ""
+
+msgid "Working directory status"
+msgstr ""
+
+msgid "Checking..."
+msgstr ""
+
+msgid ""
+"Before backout, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
+msgstr ""
+
+msgid "Automatically resolve merge conflicts where possible"
+msgstr ""
+
+msgid "<b>Uncommitted local changes are detected</b>"
+msgstr ""
+
+msgid "Clean"
+msgstr ""
+
+msgid "Backing out, then merging..."
+msgstr ""
+
+msgid "All conflicting files will be marked unresolved."
+msgstr ""
+
+msgid "Automatically advance to next page when backout and merge are complete."
+msgstr ""
+
+#, python-format
+msgid ""
+"%d files have <b>merge conflicts</b> that must be <a href=\"resolve"
+"\"><b>resolved</b></a>"
+msgstr ""
+
+msgid "No merge conflicts, ready to commit"
+msgstr ""
+
+msgid "Commit backout and merge results"
+msgstr ""
+
+msgid "Parents"
+msgstr ""
+
+msgid "Working Directory"
+msgstr ""
+
+msgid "Working Directory (merged)"
+msgstr ""
+
+msgid "Commit message"
+msgstr ""
+
+msgid "Skip final confirmation page, close after commit."
+msgstr ""
+
+msgid "Backed out changeset: "
+msgstr ""
+
+msgid "Confirm Discard Message"
+msgstr ""
+
+msgid "Discard current backout message?"
+msgstr ""
+
+msgid "Use English backout message"
+msgstr ""
+
+msgid "Backing out and committing..."
+msgstr ""
+
+msgid "Please wait while making backout."
+msgstr ""
+
+msgid "Committing..."
+msgstr ""
+
+msgid "Please wait while committing merged files."
+msgstr ""
+
+msgid "Finished"
+msgstr ""
+
+msgid "Backout changeset"
+msgstr ""
+
+#, python-format
+msgid "Bisect - %s"
+msgstr ""
+
+msgid "Accept"
+msgstr "Hyväksy"
+
+msgid "Known good revision:"
+msgstr ""
+
+msgid "Known bad revision:"
+msgstr ""
+
+msgid "Discard local changes (revert --all)"
+msgstr ""
+
+msgid "Revision is &Good"
+msgstr ""
+
+msgid "Revision is &Bad"
+msgstr ""
+
+msgid "&Skip this Revision"
+msgstr ""
+
+msgid "Close"
+msgstr "Sulje"
+
+msgid "Error encountered."
+msgstr ""
+
+msgid "Culprit found."
+msgstr ""
+
+msgid "Revision"
+msgstr ""
+
+msgid "Test this revision and report findings. (good/bad/skip)"
+msgstr ""
+
+#, python-format
+msgid "%s (hint: %s)"
+msgstr "%s (vihje: %s)"
+
+msgid "Bookmark:"
+msgstr ""
+
+msgid "New Name:"
+msgstr "Uusi nimi:"
+
+msgid "Activate:"
+msgstr ""
+
+msgid "&Add"
+msgstr "&Lisää"
+
+msgid "Re&name"
+msgstr ""
+
+msgid "&Remove"
+msgstr "&Poista"
+
+msgid "&Move"
+msgstr "&Siirrä"
+
+#, python-format
+msgid "Bookmark - %s"
+msgstr ""
+
+#, python-format
+msgid "A bookmark named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Bookmark '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Bookmark named \"%s\" does not exist"
+msgstr ""
+
+#, python-format
+msgid "Bookmark '%s' has been moved"
+msgstr ""
+
+#, python-format
+msgid "Bookmark '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Bookmark '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Bookmark '%s' has been renamed to '%s'"
+msgstr ""
+
+msgid "TortoiseHg Bookmark Sync"
+msgstr ""
+
+msgid "Outgoing Bookmarks"
+msgstr ""
+
+msgid "&Push Bookmark"
+msgstr ""
+
+msgid "&Remove Bookmark"
+msgstr ""
+
+msgid "Incoming Bookmarks"
+msgstr ""
+
+msgid "P&ull Bookmark"
+msgstr ""
+
+msgid "R&emove Bookmark"
+msgstr ""
+
+#, python-format
+msgid "Pushed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Pulled remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed remote bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "Removed local bookmark: %s"
+msgstr ""
+
+#, python-format
+msgid "%s - branch operation"
+msgstr ""
+
+msgid "Select branch of merge commit"
+msgstr ""
+
+msgid "Changes take effect on next commit"
+msgstr ""
+
+msgid "No branch changes"
+msgstr ""
+
+msgid "Open a new named branch"
+msgstr ""
+
+msgid "Close current branch"
+msgstr ""
+
+#, python-format
+msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
+msgstr ""
+
+msgid "Checking for updates..."
+msgstr ""
+
+msgid "Copy"
+msgstr "Kopioi"
+
+msgid "Quit"
+msgstr ""
+
+msgid "TortoiseHg Bug Report"
+msgstr ""
+
+msgid "Upgrading to a more recent TortoiseHg is recommended."
+msgstr ""
+
+msgid "Your TortoiseHg is up to date."
+msgstr ""
+
+msgid "Save error report to"
+msgstr ""
+
+msgid "Text files (*.txt)"
+msgstr "Tekstitiedostot (*.txt)"
+
+msgid "Error writing file"
+msgstr ""
+
+msgid "TortoiseHg Error"
+msgstr ""
+
+msgid ""
+"If you still have trouble, <a href=\"#bugreport\">please file a bug report</"
+"a>."
+msgstr ""
+
+msgid "Visual Diff"
+msgstr ""
+
+msgid "View file changes in external diff tool"
+msgstr ""
+
+msgid "Edit Local"
+msgstr ""
+
+msgid "Edit current file in working copy"
+msgstr ""
+
+msgid "Revert to Revision"
+msgstr ""
+
+msgid "Revert file(s) to contents at this revision"
+msgstr ""
+
+msgid "Patch failed to apply"
+msgstr ""
+
+msgid "Manually resolve rejected chunks?"
+msgstr ""
+
+msgid "Edit patched file and rejects?"
+msgstr ""
+
+msgid "No deletable chunks"
+msgstr ""
+
+msgid "Completely remove file from patch?"
+msgstr ""
+
+msgid "Revert all file changes?"
+msgstr ""
+
+msgid "No chunks remain"
+msgstr ""
+
+msgid "file has been deleted, refresh"
+msgstr ""
+
+msgid "file has been modified, refresh"
+msgstr ""
+
+msgid "Unable to merge chunks"
+msgstr ""
+
+msgid "Add or remove patches must be merged in the working directory"
+msgstr ""
+
+msgid "Unable to remove"
+msgstr ""
+
+#, python-format
+msgid ""
+"Unable to remove file %s,\n"
+"permission denied"
+msgstr ""
+
+msgctxt "files"
+msgid "All"
+msgstr "Kaikki"
+
+msgctxt "files"
+msgid "None"
+msgstr ""
+
+msgid "Toggle display of text search bar"
+msgstr ""
+
+msgid "Diff Toolbar"
+msgstr ""
+
+#, python-format
+msgid "Chunks selected: %d / %d"
+msgstr ""
+
+msgid "Please wait while the file is opened ..."
+msgstr ""
+
+msgid "Source:"
+msgstr ""
+
+msgid "Destination:"
+msgstr ""
+
+msgid "Options"
+msgstr ""
+
+msgid "Clone to revision:"
+msgstr ""
+
+msgid "A revision identifier, bookmark, tag or branch name"
+msgstr ""
+
+msgid "Do not update the new working directory"
+msgstr ""
+
+msgid "Use pull protocol to copy metadata"
+msgstr ""
+
+msgid "Clone with minimal processing"
+msgstr ""
+
+msgid "Include patch queue"
+msgstr ""
+
+msgid "Use proxy server"
+msgstr ""
+
+msgid "Do not verify host certificate"
+msgstr ""
+
+msgid "Remote command:"
+msgstr ""
+
+msgid "Use largefiles"
+msgstr ""
+
+msgid "Start revision:"
+msgstr ""
+
+msgid "Select source repository"
+msgstr ""
+
+msgid "Select destination repository"
+msgstr ""
+
+msgid "Select patch folder"
+msgstr ""
+
+#, python-format
+msgid "Clone - %s"
+msgstr ""
+
+msgid "&Clone"
+msgstr ""
+
+msgid "failed to start command\n"
+msgstr ""
+
+msgid "error while running command\n"
+msgstr ""
+
+#, python-format
+msgid "process exited unexpectedly with code %d"
+msgstr ""
+
+#, python-format
+msgid "failed to encode command: %s"
+msgstr ""
+
+#, python-format
+msgid "timed out while reading: %r..."
+msgstr ""
+
+msgid "timed out waiting for message"
+msgstr ""
+
+#, python-format
+msgid "unexpected response on required channel %r"
+msgstr ""
+
+#, python-format
+msgid "invalid \"hello\" message: %r"
+msgstr ""
+
+msgid "no \"runcommand\" capability"
+msgstr ""
+
+#, python-format
+msgid "corrupted command result: %r"
+msgstr ""
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
+msgstr ""
+
+#, python-format
+msgid "failed to encode input: %s"
+msgstr ""
+
+msgid "Terminated by user"
+msgstr ""
+
+#, python-format
+msgid "[command terminated by user %s]"
+msgstr ""
+
+#, python-format
+msgid "[command interrupted %s]"
+msgstr ""
+
+#, python-format
+msgid "[command returned code %d %%s]"
+msgstr ""
+
+#, python-format
+msgid "[command completed successfully %s]"
+msgstr ""
+
+msgid "Running..."
+msgstr ""
+
+msgid "Failed!"
+msgstr ""
+
+msgid "Clea&r Log"
+msgstr ""
+
+msgid "TortoiseHg Prompt"
+msgstr ""
+
+msgid "Show Detail"
+msgstr ""
+
+msgid "Hide Detail"
+msgstr ""
+
+msgid "Confirm Exit"
+msgstr ""
+
+msgid ""
+"Mercurial command is still running.\n"
+"Are you sure you want to terminate?"
+msgstr ""
+
+msgid "&Run"
+msgstr ""
+
+msgid "TortoiseHg Command Dialog"
+msgstr ""
+
+msgid "Command Error"
+msgstr ""
+
+#, python-format
+msgid "[Code: %d]"
+msgstr ""
+
+msgid "Merge"
+msgstr ""
+
+#, python-format
+msgid "Merge with %s"
+msgstr ""
+
+msgid "Patch Name Required"
+msgstr ""
+
+msgid "You must enter a patch name"
+msgstr ""
+
+msgctxt "start progress"
+msgid "Commit"
+msgstr ""
+
+msgctxt "start progress"
+msgid "MQ Action"
+msgstr ""
+
+msgctxt "start progress"
+msgid "Rollback"
+msgstr ""
+
+msgid "Commit Dialog Toolbar"
+msgstr ""
+
+msgid "Branch: "
+msgstr ""
+
+msgid "Copy message"
+msgstr ""
+
+msgid "Copy one of the recent commit messages"
+msgstr ""
+
+msgid "Show Issues"
+msgstr ""
+
+msgid "Please wait..."
+msgstr ""
+
+#, python-format
+msgid "Failed to load issue tracker '%s': %s"
+msgstr ""
+
+msgid "Issue Tracker"
+msgstr ""
+
+msgid "Show Issues..."
+msgstr ""
+
+msgid "Stop"
+msgstr ""
+
+msgid "### patch name ###"
+msgstr ""
+
+msgid "Commit changes"
+msgstr ""
+
+msgid "Commit"
+msgstr ""
+
+msgid "Amend current revision"
+msgstr ""
+
+msgid "Amend"
+msgstr ""
+
+msgid "Create a new patch"
+msgstr ""
+
+msgid "QNew"
+msgstr ""
+
+msgid "Refresh current patch"
+msgstr ""
+
+msgid "QRefresh"
+msgstr ""
+
+msgid "Confirm Branch Change"
+msgstr ""
+
+#, python-format
+msgid "Named branch \"%s\" already exists, last used in revision %d\n"
+msgstr ""
+
+msgid "Restart &Branch"
+msgstr ""
+
+msgid "&Commit to current branch"
+msgstr ""
+
+msgid "Cancel"
+msgstr "Peru"
+
+msgid "Confirm New Branch"
+msgstr ""
+
+#, python-format
+msgid "Create new named branch \"%s\" with this commit?\n"
+msgstr ""
+
+msgid "Create &Branch"
+msgstr ""
+
+msgid "Close Branch: "
+msgstr ""
+
+msgid "New Branch: "
+msgstr ""
+
+#, python-format
+msgid "<b>Selected Options:</b> %s"
+msgstr ""
+
+msgid "Parent:"
+msgstr ""
+
+msgid "Patch name:"
+msgstr ""
+
+#, python-format
+msgid "Close %s branch"
+msgstr ""
+
+#, python-format
+msgid "Rollback commit to revision %d"
+msgstr ""
+
+msgid "Confirm Undo"
+msgstr ""
+
+msgid "Discard current commit message?"
+msgstr ""
+
+msgid "Message Translation Failure"
+msgstr ""
+
+msgid ""
+"Unable to translate message to local encoding.\n"
+"Consider setting HGENCODING environment variable.\n"
+"\n"
+"Replace untranslatable characters with \"?\"?\n"
+msgstr ""
+
+msgid "&Replace"
+msgstr ""
+
+msgid "Nothing Committed"
+msgstr ""
+
+msgid "Please enter commit message"
+msgstr ""
+
+msgid ""
+"No issue link was found in the commit message.  The commit message should "
+"contain an issue link.  Configure this in the 'Issue Tracking' section of "
+"the settings."
+msgstr ""
+
+msgid "No files checked"
+msgstr ""
+
+msgid "No modified files checkmarked for commit"
+msgstr ""
+
+msgid "Confirm Add"
+msgstr ""
+
+msgid "Add selected untracked files?"
+msgstr ""
+
+msgid "Confirm Remove"
+msgstr ""
+
+msgid "Remove selected deleted files?"
+msgstr ""
+
+msgid "Nothing changed."
+msgstr ""
+
+msgctxt "window title"
+msgid "Commit"
+msgstr ""
+
+#, python-format
+msgid "%s - commit options"
+msgstr ""
+
+msgid "Set username:"
+msgstr ""
+
+msgid "Save in Repo"
+msgstr ""
+
+msgid "Save Global"
+msgstr ""
+
+msgid "Set Date:"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Push After Commit:"
+msgstr ""
+
+msgid "Auto Includes:"
+msgstr ""
+
+msgid "Recurse into subrepositories (--subrepos)"
+msgstr ""
+
+msgid "Unable to save username"
+msgstr ""
+
+msgid "Iniparse must be installed."
+msgstr ""
+
+msgid "Unable to write configuration file"
+msgstr ""
+
+msgid "Unable to save after commit push"
+msgstr ""
+
+msgid "Unable to save auto include list"
+msgstr ""
+
+msgid "Unable to save recurse in subrepos."
+msgstr ""
+
+msgid "Invalid date format"
+msgstr ""
+
+msgid "No username configured"
+msgstr ""
+
+#, python-format
+msgid "%s - commit"
+msgstr ""
+
+msgid "TortoiseHg Commit"
+msgstr ""
+
+msgid "Are you sure that you want to cancel the commit operation?"
+msgstr ""
+
+msgid "Compress changesets up to and including"
+msgstr ""
+
+msgid "Onto destination"
+msgstr ""
+
+msgid "Compress"
+msgstr ""
+
+#, python-format
+msgid "Compress - %s"
+msgstr ""
+
+msgid ""
+"Before compress, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
+msgstr ""
+
+msgid "You may continue the compress"
+msgstr ""
+
+msgid "Changes have been moved, you must now commit"
+msgstr ""
+
+msgctxt "action button"
+msgid "Commit"
+msgstr ""
+
+msgid "Compress is complete, old history untouched"
+msgstr ""
+
+msgid "must be specified repository"
+msgstr ""
+
+msgid "must be specified 'type' in style"
+msgstr ""
+
+msgid "Git Commit:"
+msgstr ""
+
+msgid "Summary:"
+msgstr ""
+
+msgid "User:"
+msgstr ""
+
+msgid "Date:"
+msgstr ""
+
+msgid "Age:"
+msgstr ""
+
+msgid "Branch:"
+msgstr ""
+
+msgid "Close:"
+msgstr ""
+
+msgid "Tags:"
+msgstr "Tagit:"
+
+msgid "Graft:"
+msgstr ""
+
+msgid "Transplant:"
+msgstr ""
+
+msgid "Obsolete state:"
+msgstr ""
+
+msgid "Perforce:"
+msgstr ""
+
+msgid "Subversion:"
+msgstr ""
+
+msgid "Converted From:"
+msgstr ""
+
+msgid "Original Parent:"
+msgstr ""
+
+msgid "No items to display"
+msgstr ""
+
+msgid "Use compact view"
+msgstr ""
+
+msgid "Patch:"
+msgstr ""
+
+#, python-format
+msgid "Displaying %(count)d of %(total)d items"
+msgstr ""
+
+msgid "Select a GUI location to edit:"
+msgstr ""
+
+msgid "Select the toolbar or menu to change"
+msgstr ""
+
+msgid "Tools shown on selected location"
+msgstr ""
+
+msgid "Delete from list"
+msgstr ""
+
+msgid "Add to list"
+msgstr ""
+
+msgid "Add separator"
+msgstr ""
+
+msgid "List of all tools"
+msgstr ""
+
+msgid "New Tool ..."
+msgstr ""
+
+msgid "Edit Tool ..."
+msgstr ""
+
+msgid "Delete Tool"
+msgstr ""
+
+msgid "Type"
+msgstr "Tyyppi"
+
+msgid "Name"
+msgstr "Nimi"
+
+msgid "Command"
+msgstr ""
+
+msgid "New hook"
+msgstr ""
+
+msgid "Edit hook"
+msgstr ""
+
+msgid "Delete hook"
+msgstr ""
+
+msgid "Replace existing hook?"
+msgstr ""
+
+#, python-format
+msgid ""
+"There is an existing %s.%s hook.\n"
+"\n"
+"Do you want to replace it?"
+msgstr ""
+
+msgid "OK"
+msgstr ""
+
+msgid "Missing information"
+msgstr ""
+
+msgid "All items"
+msgstr ""
+
+msgid "Working directory"
+msgstr ""
+
+msgid "All revisions"
+msgstr ""
+
+msgid "All contexts"
+msgstr ""
+
+msgid "Fixed revisions"
+msgstr ""
+
+msgid "Applied patches"
+msgstr ""
+
+msgid "Applied patches or qparent"
+msgstr ""
+
+msgid "<default icon>"
+msgstr ""
+
+msgid "Configure Custom Tool"
+msgstr ""
+
+msgid "Tool name"
+msgstr ""
+
+msgid "The tool name. It cannot contain spaces."
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The command that will be executed.\n"
+"To execute a Mercurial command use \"hg\" (rather than \"hg.exe\") as the "
+"executable command.\n"
+"You can use several {VARIABLES} to compose your command.\n"
+"Common variables:\n"
+"- {ROOT}: The path to the current repository root.\n"
+"- {REV} / {REVID}: Selected revisions numbers / hexadecimal revision id "
+"hashes respectively formatted as a revset expression.\n"
+"- {SELECTEDFILES}: The list of files selected by the user on the revision "
+"details file list.\n"
+"- {FILES}: The list of files touched by the selected revisions.\n"
+"- {ALLFILES}: All the files tracked by Mercurial on the selected revisions.\n"
+"Pair selection variables:\n"
+"- {REV_A} / {REVID_A}: the first selected revision number / hexadecimal "
+"revision id hash respectively.\n"
+"- {REV_B} / {REVID_B}: the second selected revision number / hexadecimal "
+"revision id hash respectively.\n"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"The directory where the command will be executed.\n"
+"If this is not set, the root of the current repository will be used "
+"instead.\n"
+"You can use the same {VARIABLES} as on the \"Command\" setting.\n"
+msgstr ""
+
+msgid "Tool label"
+msgstr ""
+
+msgid ""
+"The tool label, which is what will be shown on the repowidget context menu.\n"
+"If no label is set, the tool name will be used as the tool label.\n"
+"If no tooltip is set, the label will be used as the tooltip as well."
+msgstr ""
+
+msgid "Tooltip"
+msgstr ""
+
+msgid ""
+"The tooltip that will be shown on the tool button.\n"
+"This is only shown when the tool button is shown on\n"
+"the workbench toolbar."
+msgstr ""
+
+msgid "Icon"
+msgstr ""
+
+msgid ""
+"The tool icon.\n"
+"You can use any built-in TortoiseHg icon\n"
+"by setting this value to a valid TortoiseHg icon name\n"
+"(e.g. clone, add, remove, sync, thg-logo, hg-update, etc).\n"
+"You can also set this value to the absolute path to\n"
+"any icon on your file system."
+msgstr ""
+
+msgid "On repowidget, show for"
+msgstr ""
+
+msgid ""
+"For which kinds of revisions the tool will be enabled\n"
+"It is only taken into account when the tool is shown on the\n"
+"selected revision context menu."
+msgstr ""
+
+msgid "Show Output Log"
+msgstr ""
+
+msgid ""
+"When enabled, automatically show the Output Log when the command is run.\n"
+"Default: False."
+msgstr ""
+
+msgid "You must set a tool name."
+msgstr ""
+
+msgid "The tool name cannot have any spaces in it."
+msgstr ""
+
+msgid "You must set a command to run."
+msgstr ""
+
+msgid ""
+"Run after a changegroup has been added via push, pull or unbundle. ID of the "
+"first new changeset is in <tt>$HG_NODE</tt> and last in <tt>$HG_NODE_LAST</"
+"tt>. URL from which changes came is in <tt>$HG_URL</tt>."
+msgstr ""
+
+msgid ""
+"Run after a changeset has been created in the local repository. ID of the "
+"newly created changeset is in <tt>$HG_NODE</tt>. Parent changeset IDs are in "
+"<tt>$HG_PARENT1</tt> and <tt>$HG_PARENT2</tt>."
+msgstr ""
+
+msgid ""
+"Run after a changeset has been pulled, pushed, or unbundled into the local "
+"repository. The ID of the newly arrived changeset is in <tt>$HG_NODE</tt>. "
+"URL that was source of changes came is in <tt>$HG_URL</tt>."
+msgstr ""
+
+msgid ""
+"Run after sending changes from local repository to another. ID of first "
+"changeset sent is in <tt>$HG_NODE</tt>. Source of operation is in <tt>"
+"$HG_SOURCE</tt>."
+msgstr ""
+
+msgid ""
+"Run before a changegroup is added via push, pull or unbundle. Exit status 0 "
+"allows the changegroup to proceed. Non-zero status will cause the push, pull "
+"or unbundle to fail. URL from which changes will come is in <tt>$HG_URL</tt>."
+msgstr ""
+
+msgid ""
+"Run before starting a local commit. Exit status 0 allows the commit to "
+"proceed. Non-zero status will cause the commit to fail. Parent changeset IDs "
+"are in <tt>$HG_PARENT1</tt> and <tt>$HG_PARENT2</tt>."
+msgstr ""
+
+msgid ""
+"Run before listing pushkeys (like bookmarks) in the repository. Non-zero "
+"status will cause failure. The key namespace is in <tt>$HG_NAMESPACE</tt>."
+msgstr ""
+
+msgid ""
+"Run before collecting changes to send from the local repository to another. "
+"Non-zero status will cause failure. This lets you prevent pull over HTTP or "
+"SSH. Also prevents against local pull, push (outbound) or bundle commands, "
+"but not effective, since you can just copy files instead then. Source of "
+"operation is in <tt>$HG_SOURCE</tt>. If \"serve\", operation is happening on "
+"behalf of remote SSH or HTTP repository. If \"push\", \"pull\" or \"bundle"
+"\", operation is happening on behalf of repository on same system."
+msgstr ""
+
+msgid ""
+"Run before a pushkey (like a bookmark) is added to the repository. Non-zero "
+"status will cause the key to be rejected. The key namespace is in <tt>"
+"$HG_NAMESPACE</tt>, the key is in <tt>$HG_KEY</tt>, the old value (if any) "
+"is in <tt>$HG_OLD</tt>, and the new value is in <tt>$HG_NEW</tt>."
+msgstr ""
+
+msgid ""
+"Run before creating a tag. Exit status 0 allows the tag to be created. Non-"
+"zero status will cause the tag to fail. ID of changeset to tag is in <tt>"
+"$HG_NODE</tt>. Name of tag is in <tt>$HG_TAG</tt>. Tag is local if <tt>"
+"$HG_LOCAL=1</tt>, in repository if <tt>$HG_LOCAL=0</tt>."
+msgstr ""
+
+msgid ""
+"Run after a changegroup has been added via push, pull or unbundle, but "
+"before the transaction has been committed. Changegroup is visible to hook "
+"program. This lets you validate incoming changes before accepting them. "
+"Passed the ID of the first new changeset in <tt>$HG_NODE</tt> and last in "
+"<tt>$HG_NODE_LAST</tt>. Exit status 0 allows the transaction to commit. Non-"
+"zero status will cause the transaction to be rolled back and the push, pull "
+"or unbundle will fail. URL that was source of changes is in <tt>$HG_URL</tt>."
+msgstr ""
+
+msgid ""
+"Run after a changeset has been created but the transaction not yet "
+"committed. Changeset is visible to hook program. This lets you validate "
+"commit message and changes. Exit status 0 allows the commit to proceed. Non-"
+"zero status will cause the transaction to be rolled back. ID of changeset is "
+"in <tt>$HG_NODE</tt>. Parent changeset IDs are in <tt>$HG_PARENT1</tt> and "
+"<tt>$HG_PARENT2</tt>."
+msgstr ""
+
+msgid ""
+"Run before updating the working directory. Exit status 0 allows the update "
+"to proceed. Non-zero status will prevent the update. Changeset ID of first "
+"new parent is in <tt>$HG_PARENT1</tt>. If merge, ID of second new parent is "
+"in <tt>$HG_PARENT2</tt>."
+msgstr ""
+
+msgid ""
+"Run after listing pushkeys (like bookmarks) in the repository. The key "
+"namespace is in <tt>$HG_NAMESPACE</tt>. <tt>$HG_VALUES</tt> is a dictionary "
+"containing the keys and values."
+msgstr ""
+
+msgid ""
+"Run after a pushkey (like a bookmark) is added to the repository. The key "
+"namespace is in <tt>$HG_NAMESPACE</tt>, the key is in <tt>$HG_KEY</tt>, the "
+"old value (if any) is in <tt>$HG_OLD</tt>, and the new value is in <tt>"
+"$HG_NEW</tt>."
+msgstr ""
+
+msgid ""
+"Run after a tag is created. ID of tagged changeset is in <tt>$HG_NODE</tt>. "
+"Name of tag is in <tt>$HG_TAG</tt>. Tag is local if <tt>$HG_LOCAL=1</tt>, in "
+"repository if <tt>$HG_LOCAL=0</tt>."
+msgstr ""
+
+msgid ""
+"Run after updating the working directory. Changeset ID of first new parent "
+"is in <tt>$HG_PARENT1</tt>. If merge, ID of second new parent is in <tt>"
+"$HG_PARENT2</tt>. If the update succeeded, <tt>$HG_ERROR=0</tt>. If the "
+"update failed (e.g. because conflicts not resolved), <tt>$HG_ERROR=1</tt>."
+msgstr ""
+
+msgid "Configure Hook"
+msgstr ""
+
+msgid "Hook type"
+msgstr ""
+
+msgid "Select when your command will be run"
+msgstr ""
+
+msgid "The hook name. It cannot contain spaces."
+msgstr ""
+
+msgid ""
+"The command that will be executed.\n"
+"To execute a python function prepend the command with \"python:\".\n"
+msgstr ""
+
+msgid "You must set a valid hook type."
+msgstr ""
+
+msgid "The hook name cannot contain any spaces, tabs or '=' characters."
+msgstr ""
+
+msgid "Console"
+msgstr ""
+
+msgid "File &History / Annotate"
+msgstr ""
+
+msgid "Show the history of the selected file"
+msgstr ""
+
+msgid "Co&mpare File Revisions"
+msgstr ""
+
+msgid "Compare revisions of the selected file"
+msgstr ""
+
+msgid "Filter Histor&y"
+msgstr ""
+
+msgid "Query about changesets affecting the selected files"
+msgstr ""
+
+msgid "Diff &Changeset to Parent"
+msgstr ""
+
+msgid "Diff Changeset to Loc&al"
+msgstr ""
+
+msgid "&Diff to Parent"
+msgstr ""
+
+msgid "Diff to &Local"
+msgstr ""
+
+msgid "View changes to current in external diff tool"
+msgstr ""
+
+msgid "&View at Revision"
+msgstr ""
+
+msgid "View file as it appeared at this revision"
+msgstr ""
+
+msgid "&Save at Revision..."
+msgstr ""
+
+msgid "Save file as it appeared at this revision"
+msgstr ""
+
+msgid "Save file to"
+msgstr ""
+
+msgid "&Edit Local"
+msgstr ""
+
+msgid "&Open Local"
+msgstr ""
+
+msgid "E&xplore Local"
+msgstr ""
+
+msgid "Open parent folder of current file in the system file manager"
+msgstr ""
+
+msgid "&Copy Patch"
+msgstr ""
+
+msgid "Copy &Path"
+msgstr ""
+
+msgid "Copy full path of file(s) to the clipboard"
+msgstr ""
+
+msgid "&Revert to Revision..."
+msgstr ""
+
+msgid "Open S&ubrepository"
+msgstr ""
+
+msgid "Open the selected subrepository"
+msgstr ""
+
+msgid "E&xplore Folder"
+msgstr ""
+
+msgid "Open the selected folder in the system file manager"
+msgstr ""
+
+msgid "Open &Terminal"
+msgstr ""
+
+msgid "Open a shell terminal in the selected folder"
+msgstr ""
+
+msgid "Custom Tools"
+msgstr ""
+
+msgid "Diff &Local"
+msgstr ""
+
+msgid "&View Missing"
+msgstr ""
+
+msgid "View O&ther"
+msgstr ""
+
+msgid "Add &Largefiles..."
+msgstr ""
+
+msgid "&Forget"
+msgstr ""
+
+msgid "&Delete Unversioned..."
+msgstr ""
+
+msgid "Confirm Delete Unversioned"
+msgstr ""
+
+msgid "Delete the following unversioned files?"
+msgstr ""
+
+msgid "&Delete"
+msgstr ""
+
+msgid "Re&move Versioned"
+msgstr ""
+
+msgid "&Revert..."
+msgstr ""
+
+msgid "Uncommited merge - please select a parent revision"
+msgstr ""
+
+msgid "Revert files to local or other parent?"
+msgstr ""
+
+msgid "&Local"
+msgstr ""
+
+msgid "&Other"
+msgstr ""
+
+msgid "Confirm Revert"
+msgstr ""
+
+msgid "Revert local file changes?"
+msgstr ""
+
+msgid "&Revert with backup"
+msgstr ""
+
+msgid "&Discard changes"
+msgstr ""
+
+msgid "Revert the following files?"
+msgstr ""
+
+msgid "&Revert"
+msgstr ""
+
+msgid "&Copy..."
+msgstr ""
+
+msgid "Re&name..."
+msgstr ""
+
+msgid "&Ignore..."
+msgstr ""
+
+msgid "Edit Re&jects"
+msgstr ""
+
+msgid "Manually resolve rejected patch chunks"
+msgstr ""
+
+msgid "De&tect Renames..."
+msgstr ""
+
+msgid "&Mark Resolved"
+msgstr ""
+
+msgid "&Mark Unresolved"
+msgstr ""
+
+msgid "Restart Mer&ge"
+msgstr ""
+
+msgid "Was renamed from"
+msgstr ""
+
+msgid "Restart Merge &with"
+msgstr ""
+
+msgid "Display the file anyway"
+msgstr ""
+
+msgid "Diff not displayed: "
+msgstr ""
+
+#, python-format
+msgid ""
+"File is larger than the specified max size.\n"
+"maxdiff = %s KB"
+msgstr ""
+
+msgid "File is binary"
+msgstr ""
+
+msgid "File may be binary (maximum line length exceeded)"
+msgstr ""
+
+msgid "File or diffs not displayed: "
+msgstr ""
+
+msgid " <i>(was added)</i>"
+msgstr ""
+
+#, python-format
+msgid " <i>(copied from %s)</i>"
+msgstr ""
+
+#, python-format
+msgid " <i>(renamed from %s)</i>"
+msgstr ""
+
+msgid " <i>(is a symlink)</i>"
+msgstr ""
+
+#, python-format
+msgid ""
+"File or diffs not displayed: File is larger than the specified max size.\n"
+"maxdiff = %s KB"
+msgstr ""
+
+msgid " <i>(was deleted)</i>"
+msgstr ""
+
+msgid " <i>(was added, now missing)</i>"
+msgstr ""
+
+msgid " <i>(is unversioned)</i>"
+msgstr ""
+
+msgid "exec mode has been <font color='red'>set</font>"
+msgstr ""
+
+msgid "exec mode has been <font color='red'>unset</font>"
+msgstr ""
+
+#, python-format
+msgid "changeset: %s"
+msgstr ""
+
+msgid "Initial revision"
+msgstr ""
+
+#, python-format
+msgid ""
+"[WARNING] Invalid subrepo revision ID:\n"
+"\t%s\n"
+"\n"
+msgstr ""
+
+msgid "Subrepo created and set to initial revision."
+msgstr ""
+
+msgid "Subrepo initialized to revision:"
+msgstr ""
+
+msgid "Subrepo removed from repository."
+msgstr ""
+
+msgid "Previously the subrepository was at the following revision:"
+msgstr ""
+
+msgid "Subrepo was not changed."
+msgstr ""
+
+msgid "[WARNING] Missing subrepo. Update to this revision to clone it."
+msgstr ""
+
+msgid "[WARNING] Incomplete subrepo. Update to this revision to pull it."
+msgstr ""
+
+msgid "Subrepo state is:"
+msgstr ""
+
+msgid "Revision has changed to:"
+msgstr ""
+
+#, python-format
+msgid "changeset: %s (not found on subrepository)"
+msgstr ""
+
+msgid "From:"
+msgstr ""
+
+msgid ""
+"[WARNING] Missing changed subrepository. Update to this revision to clone it."
+msgstr ""
+
+msgid "Subrepository not found in the working directory."
+msgstr ""
+
+msgid ""
+"[WARNING] Incomplete changed subrepository. Update to this revision to pull "
+"it."
+msgstr ""
+
+msgid "Not a Mercurial subrepo, not previewable"
+msgstr ""
+
+#, python-format
+msgid "Error previewing subrepo: %s"
+msgstr ""
+
+msgid "Subrepo may be damaged or inaccessible."
+msgstr ""
+
+msgid "The subrepository is dirty."
+msgstr ""
+
+msgid "File Status:"
+msgstr ""
+
+msgid "(is a changed sub-repository)"
+msgstr ""
+
+msgid "(is an unchanged sub-repository)"
+msgstr ""
+
+msgid "(is a dirty sub-repository)"
+msgstr ""
+
+msgid "(is a new sub-repository)"
+msgstr ""
+
+msgid "(is a removed sub-repository)"
+msgstr ""
+
+msgid "(is a changed and dirty sub-repository)"
+msgstr ""
+
+msgid "(is a new and dirty sub-repository)"
+msgstr ""
+
+msgid "open..."
+msgstr ""
+
+#, python-format
+msgid "Hg file log viewer [%s] - %s"
+msgstr ""
+
+msgid "File History Log Columns"
+msgstr ""
+
+msgid "Back"
+msgstr ""
+
+msgid "Forward"
+msgstr ""
+
+msgid "Diff Selected &Changesets"
+msgstr ""
+
+msgid "&Diff Selected File Revisions"
+msgstr ""
+
+msgid "Show Revision &Details"
+msgstr ""
+
+msgid "Too many rows selected for menu"
+msgstr ""
+
+msgid "File Differences Log Columns"
+msgstr ""
+
+msgid "Next diff"
+msgstr ""
+
+msgid "Previous diff"
+msgstr ""
+
+msgid "Unicode"
+msgstr ""
+
+msgid "Western Europe"
+msgstr ""
+
+msgid "Unified Chinese"
+msgstr ""
+
+msgid "Traditional Chinese"
+msgstr ""
+
+msgid "Korean"
+msgstr "korea"
+
+msgid "Japanese"
+msgstr "japani"
+
+msgid "Thai"
+msgstr "thai"
+
+msgid "Central and Eastern Europe"
+msgstr ""
+
+msgid "Cyrillic"
+msgstr ""
+
+msgid "Russian"
+msgstr "venäjä"
+
+msgid "Ukrainian"
+msgstr "ukraina"
+
+msgid "Greek"
+msgstr "kreikka"
+
+msgid "Turkish"
+msgstr "turkki"
+
+msgid "Arabic"
+msgstr "arabia"
+
+msgid "Hebrew"
+msgstr "heprea"
+
+msgid "Vietnamese"
+msgstr "vietnam"
+
+msgid "Baltic"
+msgstr ""
+
+msgid "Southern Europe"
+msgstr ""
+
+msgid "Nordic"
+msgstr ""
+
+msgid "Celtic"
+msgstr ""
+
+msgid "South-Eastern Europe"
+msgstr ""
+
+#. i18n: comma-separated list of common encoding names in your locale, e.g.
+#. "utf-8,shift_jis,euc_jp,iso2022_jp" for "ja" locale.
+#.
+#. for the best guess, put structured encodings like "utf-8" in front, e.g.
+#. "utf-8,iso8859-1" instead of "iso8859-1,utf-8" because "iso8859-1" can
+#. decode arbitrary byte sequence and never fall back.
+#.
+#. pick from the following encodings:
+#. utf-8, iso8859-1, cp1252, gbk, big5, big5hkscs, euc_kr, cp932, euc_jp,
+#. iso2022_jp, cp874, iso8859-15, mac-roman, iso8859-2, cp1250, iso8859-5,
+#. cp1251, koi8-r, koi8-u, iso8859-7, cp1253, cp1254, cp1256, iso8859-6,
+#. cp1255, iso8859-8, cp1258, iso8859-4, iso8859-13, cp1257, iso8859-3,
+#. iso8859-10, iso8859-14, iso8859-16
+msgid "$FILE_ENCODINGS"
+msgstr ""
+
+msgid "View change as unified diff output"
+msgstr ""
+
+msgid "View change in context of file"
+msgstr ""
+
+msgid "Annotate with revision numbers"
+msgstr ""
+
+msgid "Next Diff"
+msgstr ""
+
+msgid "Previous Diff"
+msgstr ""
+
+msgid "Open shelve tool"
+msgstr ""
+
+msgid "&Auto Detect"
+msgstr ""
+
+msgid "Show changes from first parent"
+msgstr ""
+
+msgid "Show changes from second parent"
+msgstr ""
+
+msgid "E&ncoding"
+msgstr ""
+
+msgid "&Search in Current File"
+msgstr ""
+
+msgid "Search in All &History"
+msgstr ""
+
+msgid "Go to Line"
+msgstr ""
+
+#, python-format
+msgid "Enter line number (1 - %d)"
+msgstr ""
+
+msgid "Show &Author"
+msgstr ""
+
+msgid "Show &Date"
+msgstr ""
+
+msgid "Show &Revision"
+msgstr ""
+
+msgid "Annotate Op&tions"
+msgstr ""
+
+msgid "Search Selected Text"
+msgstr ""
+
+msgid "In Current &File"
+msgstr ""
+
+msgid "In &Current Revision"
+msgstr ""
+
+msgid "In &Original Revision"
+msgstr ""
+
+msgid "In All &History"
+msgstr ""
+
+msgid "Go to"
+msgstr ""
+
+msgid "View File at"
+msgstr ""
+
+msgid "Diff File to"
+msgstr ""
+
+msgid "&Originating Revision"
+msgstr ""
+
+msgid "&Parent Revision"
+msgstr ""
+
+#, python-format
+msgid "&Parent Revision (%d)"
+msgstr ""
+
+msgid "&Mark Excluded Changes"
+msgstr ""
+
+msgid "(excluded from the next commit)"
+msgstr ""
+
+msgid "Interrupted graft operation found"
+msgstr ""
+
+msgid ""
+"An interrupted graft operation has been found.\n"
+"\n"
+"You cannot perform a different graft operation unless you abort the "
+"interrupted graft operation first."
+msgstr ""
+
+msgid "Continue or abort interrupted graft operation?"
+msgstr ""
+
+msgid "To graft destination"
+msgstr ""
+
+msgid "Use my user name instead of graft committer user name"
+msgstr ""
+
+msgid "Use current date"
+msgstr ""
+
+msgid "Append graft info to log message"
+msgstr ""
+
+msgid "Graft"
+msgstr ""
+
+msgid "Abort"
+msgstr ""
+
+#, python-format
+msgid "Graft - %s"
+msgstr ""
+
+msgid "Graft changeset"
+msgstr ""
+
+#, python-format
+msgid "Graft changeset #%d of %d"
+msgstr ""
+
+msgid ""
+"Before graft, you must <a href=\"commit\"><b>commit</b></a>, <a href=\"shelve"
+"\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</b></a> "
+"changes."
+msgstr ""
+
+msgid "You may continue or start the graft"
+msgstr ""
+
+msgid "Graft is complete"
+msgstr ""
+
+msgid "Graft failed"
+msgstr ""
+
+msgid "Graft aborted"
+msgstr ""
+
+msgid ""
+"Graft generated merge <b>conflicts</b> that must be <a href=\"resolve"
+"\"><b>resolved</b></a>"
+msgstr ""
+
+msgid "You may continue the graft"
+msgstr ""
+
+msgid "Exiting with an unfinished graft is not recommended."
+msgstr ""
+
+msgid "Consider aborting the graft first."
+msgstr ""
+
+msgid "&Exit"
+msgstr ""
+
+msgid "### regular expression search pattern ###"
+msgstr ""
+
+msgid "Regexp:"
+msgstr ""
+
+msgid "Ignore case"
+msgstr ""
+
+msgid "Search"
+msgstr ""
+
+msgid "Working Copy"
+msgstr ""
+
+msgid "All History"
+msgstr ""
+
+msgid "Report only the first match per file"
+msgstr ""
+
+msgid "Match whole words only"
+msgstr ""
+
+msgid "Follow copies and renames"
+msgstr ""
+
+msgid "Includes:"
+msgstr ""
+
+msgid "Excludes:"
+msgstr ""
+
+msgid ""
+"Comma separated list of exclusion file patterns. Exclusion patterns are "
+"applied after inclusion patterns."
+msgstr ""
+
+msgid ""
+"Comma separated list of inclusion file patterns. By default, the entire "
+"repository is searched."
+msgstr ""
+
+#, python-format
+msgid "\"%s\" removed from search history"
+msgstr ""
+
+#, python-format
+msgid "\"%s\" removed from path history"
+msgstr ""
+
+#, python-format
+msgid "grep: invalid match pattern: %s\n"
+msgstr ""
+
+#, python-format
+msgid "grep: %s\n"
+msgstr ""
+
+#, python-format
+msgid "%d matches found"
+msgstr ""
+
+msgid "No matches found"
+msgstr ""
+
+msgid "Searching"
+msgstr ""
+
+msgid "history"
+msgstr ""
+
+msgid "Interrupted"
+msgstr ""
+
+msgid "files"
+msgstr ""
+
+#, python-format
+msgid "Skipping %s, unable to read"
+msgstr ""
+
+msgid "Vi&ew File"
+msgstr ""
+
+msgid "&View Changeset"
+msgstr ""
+
+msgid "Annotate &File"
+msgstr ""
+
+msgid "File"
+msgstr "Tiedosto"
+
+msgid "Line"
+msgstr ""
+
+msgid "Rev"
+msgstr ""
+
+msgid "User"
+msgstr ""
+
+msgid "Match Text"
+msgstr ""
+
+msgid "TortoiseHg Search"
+msgstr ""
+
+#, python-format
+msgid "Detect Copies/Renames in %s"
+msgstr ""
+
+msgid "<b>Unrevisioned Files</b>"
+msgstr ""
+
+msgid "Refresh file list"
+msgstr ""
+
+#, python-format
+msgid "Min Similarity: %d%%"
+msgstr ""
+
+msgid "Only consider deleted files"
+msgstr ""
+
+msgid "Uncheck to consider all revisioned files for copy sources"
+msgstr ""
+
+msgid "Find Renames"
+msgstr ""
+
+msgid "Find copy and/or rename sources"
+msgstr ""
+
+msgid "<b>Candidate Matches</b>"
+msgstr ""
+
+msgid "Accept All Matches"
+msgstr ""
+
+msgid "Accept Selected Matches"
+msgstr ""
+
+msgid "<b>Differences from Source to Dest</b>"
+msgstr ""
+
+msgid "Search already in progress"
+msgstr ""
+
+msgid "Cannot start a new search"
+msgstr ""
+
+msgid "No files to find"
+msgstr ""
+
+msgid "There are no files that may have been renamed"
+msgstr ""
+
+msgid "Multiple sources chosen"
+msgstr ""
+
+#, python-format
+msgid ""
+"You have multiple renames selected for destination file:\n"
+"%s. Aborting!"
+msgstr ""
+
+#, python-format
+msgid ""
+"%s and %s have identical contents\n"
+"\n"
+msgstr ""
+
+#. i18n: percent format
+#, python-format
+msgid "%d%%"
+msgstr ""
+
+msgid "Source"
+msgstr ""
+
+msgid "Dest"
+msgstr ""
+
+msgid "% Match"
+msgstr ""
+
+msgid "Sending Email"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "To:"
+msgstr ""
+
+msgid "Cc:"
+msgstr ""
+
+msgid "In-Reply-To:"
+msgstr ""
+
+msgid "Message identifier to reply to, for threading"
+msgstr ""
+
+msgid "Flag:"
+msgstr ""
+
+msgid ""
+"Hg patches (as generated by export command) are compatible with most patch "
+"programs.  They include a header which contains the most important changeset "
+"metadata."
+msgstr ""
+
+msgid "Send changesets as Hg patches"
+msgstr ""
+
+msgid ""
+"Git patches can describe binary files, copies, and permission changes, but "
+"recipients may not be able to use them if they are not using git or "
+"Mercurial."
+msgstr ""
+
+msgid "Use extended (git) patch format"
+msgstr ""
+
+msgid ""
+"Stripping Mercurial header removes username and parent information.  Only "
+"useful if recipient is not using Mercurial (and does not like to see the "
+"headers)."
+msgstr ""
+
+msgid "Plain, do not prepend Hg header"
+msgstr ""
+
+msgid ""
+"Bundles store complete changesets in binary form. Upstream users can pull "
+"from them. This is the safest way to send changes to recipient Mercurial "
+"users."
+msgstr ""
+
+msgid "Send single binary bundle, not patches"
+msgstr ""
+
+msgid "send patches as part of the email body"
+msgstr ""
+
+msgid "body"
+msgstr ""
+
+msgid "send patches as attachments"
+msgstr ""
+
+msgid "attach"
+msgstr ""
+
+msgid "send patches as inline attachments"
+msgstr ""
+
+msgid "inline"
+msgstr ""
+
+msgid "add diffstat output to messages"
+msgstr ""
+
+msgid "diffstat"
+msgstr ""
+
+msgid ""
+"Patch series description is sent in initial summary email with [PATCH 0 of "
+"N] subject.  It should describe the effects of the entire patch series.  "
+"When emailing a bundle, these fields make up the message subject and body. "
+"Flags is a comma separated list of tags which are inserted into the message "
+"subject prefix."
+msgstr ""
+
+msgid "Write patch series (bundle) description"
+msgstr ""
+
+msgid "Subject:"
+msgstr ""
+
+msgid "Changesets"
+msgstr ""
+
+msgid "Select &All"
+msgstr ""
+
+msgid "Select &None"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Preview"
+msgstr ""
+
+msgid "&Settings"
+msgstr "A&setukset"
+
+msgid "Send &Email"
+msgstr ""
+
+msgid "&Close"
+msgstr ""
+
+#, python-format
+msgid "Ignore filter - %s"
+msgstr ""
+
+msgid "Glob"
+msgstr ""
+
+msgid "Regexp"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Edit File"
+msgstr ""
+
+msgid "<b>Ignore Filter</b>"
+msgstr ""
+
+msgid "<b>Untracked Files</b>"
+msgstr ""
+
+msgid "Backspace or Del to remove row(s)"
+msgstr ""
+
+msgid "Add ignore filter..."
+msgstr ""
+
+msgid "selected files"
+msgstr ""
+
+msgid "Ignore "
+msgstr ""
+
+msgid "Invalid glob expression"
+msgstr ""
+
+msgid "Invalid regexp expression"
+msgstr ""
+
+msgid "Unable to read repository status"
+msgstr ""
+
+msgid "New file created"
+msgstr ""
+
+msgid ""
+"TortoiseHg has created a new .hgignore file.  Would you like to add this "
+"file to the source code control repository?"
+msgstr ""
+
+msgid "Unable to write .hgignore file"
+msgstr ""
+
+msgid "Copy working directory files from skeleton"
+msgstr ""
+
+msgid "Create special files (.hgignore, ...)"
+msgstr ""
+
+msgid "Make repo compatible with Mercurial <1.7"
+msgstr ""
+
+msgid "New Repository"
+msgstr ""
+
+msgid "&Create"
+msgstr ""
+
+msgid "Unable to create a config file"
+msgstr ""
+
+msgid "Insufficient access rights."
+msgstr ""
+
+msgid "Show Log"
+msgstr ""
+
+msgid ""
+"Some of the files that you have selected are of a size over 10 MB.  You may "
+"make more efficient use of disk space by adding these files as largefiles, "
+"which will store only the most recent revision of each file in your local "
+"repository, with older revisions available on the server.  Do you wish to "
+"add these files as largefiles?"
+msgstr ""
+
+msgid "Add as &Largefiles"
+msgstr ""
+
+msgid "Add as &Normal Files"
+msgstr ""
+
+msgid "Invalid Patterns"
+msgstr ""
+
+msgid "Failed to process largefiles.patterns."
+msgstr ""
+
+msgid "Word docs (*.doc *.docx)"
+msgstr ""
+
+msgid "PDF docs (*.pdf)"
+msgstr ""
+
+msgid "Excel files (*.xls *.xlsx)"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg Lock Tool - %s"
+msgstr ""
+
+msgid "Refresh lock information"
+msgstr ""
+
+msgid "Lock a file not described in .hglocks"
+msgstr ""
+
+msgid "Stop current operation"
+msgstr ""
+
+msgid "Locked And Lockable Files:"
+msgstr ""
+
+msgid "Path"
+msgstr ""
+
+msgid "Locking User"
+msgstr ""
+
+msgid "Purpose"
+msgstr ""
+
+msgid "Simplelock extension not enabled"
+msgstr ""
+
+msgid "Please enable and configure simplelock"
+msgstr ""
+
+msgid "Open a (nonmergable) file you wish to be locked"
+msgstr ""
+
+msgid "File was not within current repository"
+msgstr ""
+
+#, python-format
+msgid "Locking %s"
+msgstr ""
+
+#, python-format
+msgid "Unlocking %s"
+msgstr ""
+
+msgid "Refreshing locks..."
+msgstr ""
+
+#, python-format
+msgid "Lock of %s successful"
+msgstr ""
+
+#, python-format
+msgid "Lock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s failed, retry"
+msgstr ""
+
+#, python-format
+msgid "Unlock of %s successful"
+msgstr ""
+
+msgid "Ready, double click to lock or unlock"
+msgstr ""
+
+msgid "Ready"
+msgstr ""
+
+msgid "You can only release your own locks"
+msgstr ""
+
+msgid "Find revisions matching fields of:"
+msgstr ""
+
+msgid "Revision to Match:"
+msgstr ""
+
+msgid "Fields to match:"
+msgstr ""
+
+msgid "Summary (first description line)"
+msgstr ""
+
+msgid "Description"
+msgstr "Kuvaus"
+
+msgid "Author"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Files"
+msgstr "Tiedostot"
+
+msgid "Diff contents"
+msgstr ""
+
+msgid "Subrepo states"
+msgstr ""
+
+msgid "Branch"
+msgstr ""
+
+msgid "Phase"
+msgstr ""
+
+msgid "&Match"
+msgstr ""
+
+#, python-format
+msgid "Find matches - %s"
+msgstr ""
+
+msgid "Revisions to Match:"
+msgstr ""
+
+#, python-format
+msgid "Match any of <b><i>%d</i></b> revisions"
+msgstr ""
+
+msgid "<b>Unknown revision!</b>"
+msgstr ""
+
+msgid "<b>Parse Error!</b>"
+msgstr ""
+
+#, python-format
+msgid "Merge - %s"
+msgstr ""
+
+msgid "Do you want to exit?"
+msgstr ""
+
+msgid ""
+"To finish merging, you must commit the working directory.\n"
+"\n"
+"To cancel the merge you can update to one of the merge parent revisions."
+msgstr ""
+
+msgid "Prepare to merge"
+msgstr ""
+
+msgid "Verify merge targets and ensure your working directory is clean."
+msgstr ""
+
+msgid "Not a head revision!"
+msgstr ""
+
+msgid "Merge from (other revision)"
+msgstr ""
+
+msgid "Merge to (working directory)"
+msgstr ""
+
+msgid ""
+"The working directory is already <b>merged</b>. <a href=\"skip"
+"\"><b>Continue</b></a> or <a href=\"discard\"><b>discard</b></a> existing "
+"merge."
+msgstr ""
+
+msgid ""
+"Before merging, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
+msgstr ""
+
+msgid "Or use:"
+msgstr ""
+
+msgid "Force a merge with outstanding changes (-f/--force)"
+msgstr ""
+
+msgid "Discard all changes from the other revision"
+msgstr ""
+
+msgid "&Discard"
+msgstr ""
+
+msgid "Confirm Discard Changes"
+msgstr ""
+
+#, python-format
+msgid ""
+"The changes from revision %s and all unmerged parents will be discarded.\n"
+"\n"
+"Are you sure this is what you want to do?"
+msgstr ""
+
+msgctxt "working dir state"
+msgid "Clean"
+msgstr ""
+
+msgid "Merging..."
+msgstr ""
+
+msgid "Automatically advance to next page when merge is complete."
+msgstr ""
+
+#, python-format
+msgid ""
+"%d files were modified on both branches and must be <a href=\"resolve"
+"\"><b>resolved</b></a>"
+msgstr ""
+
+msgid ""
+"No merge conflicts, ready to commit or <a href=\"resolve\"><b>review</b></a>"
+msgstr ""
+
+msgid "Commit merge results"
+msgstr ""
+
+msgid "Commit Options"
+msgstr ""
+
+msgid "Commit Now"
+msgstr ""
+
+msgid "Commit Later"
+msgstr ""
+
+msgid "Merge changeset"
+msgstr ""
+
+msgid "Syntax Highlighting"
+msgstr ""
+
+msgid "Paste &Filenames"
+msgstr ""
+
+msgid "App&ly Format"
+msgstr ""
+
+msgid "C&onfigure Format"
+msgstr ""
+
+#, python-format
+msgid "%s had rejected chunks, edit patched file together with rejects?"
+msgstr ""
+
+msgid "&Commit to Queue..."
+msgstr ""
+
+msgid "Create &New Queue..."
+msgstr ""
+
+msgid "&Rename Active Queue..."
+msgstr ""
+
+msgid "&Delete Queue..."
+msgstr ""
+
+msgid "&Purge Queue..."
+msgstr ""
+
+msgid "Create Patch Queue"
+msgstr ""
+
+msgid "New patch queue name"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "Rename Patch Queue"
+msgstr ""
+
+#, python-format
+msgid "Rename patch queue '%s' to"
+msgstr ""
+
+msgid "Rename"
+msgstr ""
+
+msgid "Delete Patch Queue"
+msgstr ""
+
+msgid "Delete reference to"
+msgstr ""
+
+msgid "Delete"
+msgstr ""
+
+msgid "Purge Patch Queue"
+msgstr ""
+
+msgid "Remove patch directory of"
+msgstr ""
+
+msgid "Purge"
+msgstr ""
+
+msgid "Rename Patch"
+msgstr ""
+
+#, python-format
+msgid "Rename patch <b>%s</b> to:"
+msgstr ""
+
+msgid "no guards"
+msgstr ""
+
+msgid "Patch Queue"
+msgstr ""
+
+msgctxt "MQ QPush"
+msgid "Push"
+msgstr ""
+
+msgid "Apply one patch"
+msgstr ""
+
+msgctxt "MQ QPush"
+msgid "Push all"
+msgstr ""
+
+msgid "Apply all patches"
+msgstr ""
+
+msgid "Pop"
+msgstr ""
+
+msgid "Unapply one patch"
+msgstr ""
+
+msgid "Pop all"
+msgstr ""
+
+msgid "Unapply all patches"
+msgstr ""
+
+msgid "Go &to Patch"
+msgstr ""
+
+msgid "&Apply Only This Patch"
+msgstr ""
+
+msgid "Apply only the selected patch"
+msgstr ""
+
+msgid "&Finish Patch"
+msgstr ""
+
+msgid "Move applied patches into repository history"
+msgstr ""
+
+msgid "&Delete Patches..."
+msgstr ""
+
+msgid "Delete selected patches"
+msgstr ""
+
+msgid "Re&name Patch..."
+msgstr ""
+
+msgid "Set &Guards..."
+msgstr ""
+
+msgid "Configure guards for selected patch"
+msgstr ""
+
+msgid "Patch Queue Actions Toolbar"
+msgstr ""
+
+msgid "Configure guards"
+msgstr ""
+
+#, python-format
+msgid "Input new guards for %s:"
+msgstr ""
+
+msgid "Confirm patch queue switch"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to activate patch queue '%s' ?"
+msgstr ""
+
+#, python-format
+msgid "Guards: %d/%d"
+msgstr ""
+
+msgid "MQ options"
+msgstr ""
+
+msgid "Force push or pop (--force)"
+msgstr ""
+
+msgid "Tolerate non-conflicting local changes (--keep-changes)"
+msgstr ""
+
+#, python-format
+msgid "Pending Perforce Changelists - %s"
+msgstr ""
+
+msgid "Submitting p4 changelist..."
+msgstr ""
+
+msgid "Reverting p4 changelist..."
+msgstr ""
+
+msgid "Patch Branch Toolbar"
+msgstr ""
+
+msgid "Merge all pending dependencies"
+msgstr ""
+
+msgid "Backout current patch branch"
+msgstr ""
+
+msgid "Backport part of a changeset to a dependency"
+msgstr ""
+
+msgid "Start a new patch branch"
+msgstr ""
+
+msgid "Edit patch dependency graph"
+msgstr ""
+
+msgid "will be closed"
+msgstr ""
+
+#, python-format
+msgid "needs merge of %i heads\n"
+msgstr ""
+
+#, python-format
+msgid "needs merge with %s (through %s)\n"
+msgstr ""
+
+#, python-format
+msgid "needs merge with %s\n"
+msgstr ""
+
+#, python-format
+msgid "needs update of diff base to tip of %s\n"
+msgstr ""
+
+msgid "&Goto (update workdir)"
+msgstr ""
+
+msgid "&Merge"
+msgstr ""
+
+msgid "No patch branch selected"
+msgstr ""
+
+msgid "No editor found"
+msgstr ""
+
+msgid ""
+"Mercurial was unable to find an editor. Please configure Mercurial to use an "
+"editor installed on your system."
+msgstr ""
+
+msgid "Graph"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Title"
+msgstr ""
+
+msgid "Message"
+msgstr ""
+
+msgid "New Patch Branch"
+msgstr ""
+
+msgid "Patch message:"
+msgstr ""
+
+msgid "Patch date:"
+msgstr ""
+
+msgid "Patch user:"
+msgstr ""
+
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr ""
+
+msgid "Invalid Settings - The ReviewBoard server is not setup"
+msgstr ""
+
+msgid "Invalid Settings - Please provide your ReviewBoard username"
+msgstr ""
+
+#, python-format
+msgid ""
+"Invalid reviewboard plugin. Please download the Mercurial reviewboard plugin "
+"version 3.5 or higher from the website below.\n"
+"\n"
+" %s"
+msgstr ""
+
+msgid "Review Board"
+msgstr ""
+
+msgid "Password:"
+msgstr "Salasana:"
+
+msgid "Error"
+msgstr "Virhe"
+
+#, python-format
+msgid "Review draft posted to %s\n"
+msgstr ""
+
+#, python-format
+msgid "Review published to %s\n"
+msgstr ""
+
+msgid "Success"
+msgstr ""
+
+msgid "Repository ID:"
+msgstr ""
+
+msgid "Post Review"
+msgstr ""
+
+msgid "Review ID:"
+msgstr ""
+
+msgid "Update the fields of this existing request"
+msgstr ""
+
+msgid "Update Review"
+msgstr ""
+
+msgid "Create diff with all outgoing changes"
+msgstr ""
+
+msgid "Create diff with all changes on this branch"
+msgstr ""
+
+msgid "Publish request immediately"
+msgstr ""
+
+msgid "%p%"
+msgstr ""
+
+msgid "Connecting to Review Board..."
+msgstr ""
+
+msgid "Target:"
+msgstr ""
+
+msgid "Do not modify working copy (-k/--keep)"
+msgstr ""
+
+#, python-format
+msgid "Prune - %s"
+msgstr ""
+
+msgid "&Prune"
+msgstr ""
+
+msgid "No unknown files found"
+msgstr ""
+
+msgid "No ignored files found"
+msgstr ""
+
+msgid "No trash files found"
+msgstr ""
+
+msgid "Delete empty folders"
+msgstr ""
+
+msgid "Preserve files beginning with .hg"
+msgstr ""
+
+#, python-format
+msgid "%s - purge"
+msgstr ""
+
+msgid "Checking"
+msgstr ""
+
+msgid "Ready to purge."
+msgstr ""
+
+#, python-format
+msgid "Delete %d unknown file"
+msgid_plural "Delete %d unknown files"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Delete %d ignored file"
+msgid_plural "Delete %d ignored files"
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid "Delete %d file in .hg/Trashcan"
+msgid_plural "Delete %d files in .hg/Trashcan"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Confirm file deletions"
+msgstr ""
+
+msgid "Are you sure you want to delete these files and/or folders?"
+msgstr ""
+
+msgid "Deletion failures"
+msgstr ""
+
+#, python-format
+msgid "Unable to delete %d file or folder"
+msgid_plural "Unable to delete %d files or folders"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Deleting trash folder..."
+msgstr ""
+
+#, python-format
+msgid "Deleted %d files"
+msgstr ""
+
+#, python-format
+msgid "Deleted %d files and %d folders"
+msgstr ""
+
+msgid "Delete Patches"
+msgstr ""
+
+msgid "Remove patches from queue?"
+msgstr ""
+
+msgid "Keep patch files"
+msgstr ""
+
+#, python-format
+msgid "Patch fold - %s"
+msgstr ""
+
+msgid "New patch message:"
+msgstr ""
+
+msgid "Patches to fold"
+msgstr ""
+
+msgid "&Undo"
+msgstr ""
+
+msgid "&Redo"
+msgstr ""
+
+msgid "Cu&t"
+msgstr ""
+
+msgid "&Copy"
+msgstr ""
+
+msgid "&Paste"
+msgstr ""
+
+msgid "&Editor Options"
+msgstr ""
+
+msgid "&Wrap"
+msgstr ""
+
+msgctxt "wrap mode"
+msgid "&None"
+msgstr ""
+
+msgid "&Word"
+msgstr ""
+
+msgid "&Character"
+msgstr ""
+
+msgid "White&space"
+msgstr ""
+
+msgid "&Visible"
+msgstr ""
+
+msgid "&Invisible"
+msgstr ""
+
+msgid "&AfterIndent"
+msgstr ""
+
+msgid "&TAB Inserts"
+msgstr ""
+
+msgid "&Auto"
+msgstr ""
+
+msgid "&TAB"
+msgstr ""
+
+msgid "&Spaces"
+msgstr ""
+
+msgid "EOL &Visibility"
+msgstr ""
+
+msgid "EOL &Mode"
+msgstr ""
+
+msgid "&Windows"
+msgstr "&Windows"
+
+msgid "&Unix"
+msgstr "&Unix"
+
+msgid "&Mac"
+msgstr "&Mac"
+
+msgid "&Auto-Complete"
+msgstr ""
+
+msgid "### regular expression ###"
+msgstr ""
+
+msgid "Regular expression search pattern"
+msgstr ""
+
+msgid "Wrap search"
+msgstr ""
+
+msgid "Prev"
+msgstr ""
+
+msgid "Next"
+msgstr ""
+
+msgid "Unable to read file"
+msgstr ""
+
+msgid "Could not open the specified file for reading."
+msgstr ""
+
+msgid "This appears to be a binary file."
+msgstr ""
+
+msgid "An error occurred while reading the file."
+msgstr ""
+
+msgid "Text Translation Failure"
+msgstr ""
+
+msgid "Could not translate the file content from native encoding."
+msgstr ""
+
+msgid "Several characters would be lost."
+msgstr ""
+
+msgid "Unable to write file"
+msgstr ""
+
+msgid "Could not translate the file content to native encoding."
+msgstr ""
+
+msgid "Could not open the specified file for writing."
+msgstr ""
+
+msgid "An error occurred while writing the file."
+msgstr ""
+
+msgid "Try refreshing your repository."
+msgstr ""
+
+#, python-format
+msgid ""
+"Error string \"%(arg0)s\" at %(arg1)s<br>Please <a href=\"#edit:%(arg1)s"
+"\">edit</a> your config"
+msgstr ""
+
+#, python-format
+msgid ""
+"Configuration Error: \"%(arg0)s\",<br>Please <a href=\"#fix:%(arg0)s\">fix</"
+"a> your config"
+msgstr ""
+
+#, python-format
+msgid "Operation aborted:<br><br>%(arg0)s."
+msgstr ""
+
+msgid "Repository is locked"
+msgstr ""
+
+msgid "hint:"
+msgstr ""
+
+msgid "Repository Error"
+msgstr ""
+
+msgid "No visual editor configured"
+msgstr ""
+
+msgid "Please configure a visual editor."
+msgstr ""
+
+msgid "Editor launch failure"
+msgstr ""
+
+msgid "Failed to open path in terminal"
+msgstr ""
+
+#, python-format
+msgid "\"%s\" is not a valid directory"
+msgstr ""
+
+#, python-format
+msgid "Invalid configuration: %s"
+msgstr ""
+
+msgid "Unable to start the following command:"
+msgstr ""
+
+msgid "No shell configured"
+msgstr ""
+
+msgid "A terminal shell must be configured"
+msgstr ""
+
+msgid "Please enter a username"
+msgstr ""
+
+msgid "You must identify yourself to Mercurial"
+msgstr ""
+
+msgid "Unable to translate input to local encoding."
+msgstr ""
+
+msgid "Checkmark files to add"
+msgstr ""
+
+msgid "Checkmark files to forget"
+msgstr ""
+
+msgid "Forget"
+msgstr ""
+
+msgid "Checkmark files to revert"
+msgstr ""
+
+msgid "Revert"
+msgstr ""
+
+msgid "Checkmark files to remove"
+msgstr ""
+
+msgid "Remove"
+msgstr "Poista"
+
+#, python-format
+msgid "%s - hg %s"
+msgstr "%s - hg %s"
+
+msgid "Do not save backup files (*.orig)"
+msgstr ""
+
+msgid "Force removal of modified files (--force)"
+msgstr ""
+
+msgid "Add &Largefiles"
+msgstr ""
+
+msgid "No files selected"
+msgstr ""
+
+msgid "No operation to perform"
+msgstr ""
+
+msgid ""
+"You have selected one or more files that have been modified.  By default, "
+"these files will not be removed.  What would you like to do?"
+msgstr ""
+
+msgid "Remove &Unmodified Files"
+msgstr ""
+
+msgid "Remove &All Selected Files"
+msgstr ""
+
+msgid "Rebase changeset and descendants"
+msgstr ""
+
+msgid "To rebase destination"
+msgstr ""
+
+msgid "Swap source and destination"
+msgstr ""
+
+msgid "Keep original changesets (--keep)"
+msgstr ""
+
+msgid "Keep original branch names (--keepbranches)"
+msgstr ""
+
+msgid "Collapse the rebased changesets (--collapse)"
+msgstr ""
+
+msgid "Rebase entire source branch (-b/--base)"
+msgstr ""
+
+msgid "Rebase unpublished onto Subversion head (override source, destination)"
+msgstr ""
+
+msgid "Rebase"
+msgstr ""
+
+#, python-format
+msgid "Rebase - %s"
+msgstr ""
+
+msgid ""
+"Before rebase, you must <a href=\"commit\"><b>commit</b></a>, <a href="
+"\"shelve\"><b>shelve</b></a> to patch, or <a href=\"discard\"><b>discard</"
+"b></a> changes."
+msgstr ""
+
+msgid "You may continue the rebase"
+msgstr ""
+
+msgid "Rebase is complete"
+msgstr ""
+
+msgid "Rebase failed"
+msgstr ""
+
+msgid "Rebase aborted"
+msgstr ""
+
+msgid ""
+"Rebase generated merge <b>conflicts</b> that must be <a href=\"resolve"
+"\"><b>resolved</b></a>"
+msgstr ""
+
+msgid "Exiting with an unfinished rebase is not recommended."
+msgstr ""
+
+msgid "Consider aborting the rebase first."
+msgstr ""
+
+#, python-format
+msgid "Merge rejected patch chunks into %s"
+msgstr ""
+
+msgid "Mark this chunk as resolved, goto next unresolved"
+msgstr ""
+
+msgid "Mark this chunk as unresolved"
+msgstr ""
+
+msgid "Reload File"
+msgstr ""
+
+msgid "Are you sure you want to reload this file?"
+msgstr ""
+
+msgid "All unsaved changes will be lost."
+msgstr ""
+
+msgid "Warning"
+msgstr ""
+
+msgid ""
+"You have marked all rejected patch chunks as resolved yet you have not "
+"modified the file on the edit panel.\n"
+"\n"
+"This probably means that no code from any of the rejected patch chunks made "
+"it into the file.\n"
+"\n"
+"Are you sure that you want to leave the file as is and consider all the "
+"rejected patch chunks as resolved?\n"
+"\n"
+"Doing so may delete them from a shelve, for example, which would mean that "
+"you would lose them forever!\n"
+"\n"
+"Click Yes to accept the file as is or No to continue resolving the rejected "
+"patch chunks."
+msgstr ""
+
+msgid "Copy source -> destination"
+msgstr ""
+
+msgid "Copy Error"
+msgstr ""
+
+msgid "Rename Error"
+msgstr ""
+
+msgid "Select Source File"
+msgstr ""
+
+msgid "Select Source Folder"
+msgstr ""
+
+msgid "Source does not exist."
+msgstr ""
+
+msgid "The source must be within the repository tree."
+msgstr ""
+
+msgid "The destination must be within the repository tree."
+msgstr ""
+
+msgid "Destination file already exists."
+msgstr ""
+
+msgid "Are you sure you want to overwrite it ?"
+msgstr ""
+
+#, python-format
+msgid "Copy - %s"
+msgstr ""
+
+#, python-format
+msgid "Rename - %s"
+msgstr ""
+
+msgid "Show all"
+msgstr ""
+
+msgid "### revision set query ###"
+msgstr ""
+
+msgid "Clear current query and query text"
+msgstr ""
+
+msgid "Trigger revision set query"
+msgstr ""
+
+msgid "Open advanced query editor"
+msgstr ""
+
+msgid "Delete selected query from history"
+msgstr ""
+
+msgid "filter"
+msgstr ""
+
+msgid "Toggle filtering of non-matched changesets"
+msgstr ""
+
+msgid "Show/Hide hidden changesets"
+msgstr ""
+
+msgid "Toggle graft relations visibility"
+msgstr ""
+
+msgid "Keyword Search"
+msgstr ""
+
+msgid "Revision Set"
+msgstr ""
+
+msgid "(unsaved)"
+msgstr ""
+
+msgid "Display graph the named branch only"
+msgstr ""
+
+msgid "Display only active branches"
+msgstr ""
+
+msgid "Display closed branches"
+msgstr ""
+
+msgid "Include all ancestors"
+msgstr ""
+
+msgctxt "column header"
+msgid "Graph"
+msgstr ""
+
+msgctxt "column header"
+msgid "Rev"
+msgstr ""
+
+msgctxt "column header"
+msgid "Branch"
+msgstr ""
+
+msgctxt "column header"
+msgid "Description"
+msgstr "Kuvaus"
+
+msgctxt "column header"
+msgid "Author"
+msgstr ""
+
+msgctxt "column header"
+msgid "Tags"
+msgstr "Tagit"
+
+msgctxt "column header"
+msgid "Latest tags"
+msgstr ""
+
+msgctxt "column header"
+msgid "Node"
+msgstr ""
+
+msgctxt "column header"
+msgid "Git Commit"
+msgstr ""
+
+msgctxt "column header"
+msgid "Age"
+msgstr ""
+
+msgctxt "column header"
+msgid "Local Time"
+msgstr ""
+
+msgctxt "column header"
+msgid "UTC Time"
+msgstr ""
+
+msgctxt "column header"
+msgid "Changes"
+msgstr ""
+
+msgctxt "column header"
+msgid "Converted From"
+msgstr ""
+
+msgctxt "column header"
+msgid "Phase"
+msgstr ""
+
+msgctxt "column header"
+msgid "Filename"
+msgstr ""
+
+msgid "Searching..."
+msgstr ""
+
+#, python-format
+msgid "filling (%d)"
+msgstr ""
+
+msgid "Mercurial User"
+msgstr ""
+
+msgid "Repository Registry"
+msgstr ""
+
+msgid "Show &Paths"
+msgstr ""
+
+msgid "Show S&hort Paths"
+msgstr ""
+
+msgid "&Scan Repositories at Startup"
+msgstr ""
+
+msgid "Scan &Remote Repositories"
+msgstr ""
+
+msgid "&Refresh Repository List"
+msgstr ""
+
+msgid "Refresh the Repository Registry list"
+msgstr ""
+
+msgid "&Open"
+msgstr ""
+
+msgid "Open the repository in a new tab"
+msgstr ""
+
+msgid "&Open All"
+msgstr ""
+
+msgid "Open all repositories in new tabs"
+msgstr ""
+
+msgid "New &Group"
+msgstr ""
+
+msgid "Create a new group"
+msgstr ""
+
+msgid "Rename the entry"
+msgstr ""
+
+msgid "Settin&gs"
+msgstr ""
+
+msgid "View the repository's settings"
+msgstr ""
+
+msgid "Re&move from Registry"
+msgstr ""
+
+msgid ""
+"Remove the node and all its subnodes. Repositories are not deleted from disk."
+msgstr ""
+
+msgid "Clon&e..."
+msgstr ""
+
+msgid "Clone Repository"
+msgstr ""
+
+msgid "E&xplore"
+msgstr ""
+
+msgid "Open the repository in a file browser"
+msgstr ""
+
+msgid "&Terminal"
+msgstr ""
+
+msgid "Open a shell terminal in the repository root"
+msgstr ""
+
+msgid "&Add Repository..."
+msgstr ""
+
+msgid "Add a repository to this group"
+msgstr ""
+
+msgid "A&dd Subrepository..."
+msgstr ""
+
+msgid "Convert an existing repository into a subrepository"
+msgstr ""
+
+msgid "Remo&ve Subrepository..."
+msgstr ""
+
+msgid "Remove this subrepository from the current revision"
+msgstr ""
+
+msgid "Copy the root path of the repository to the clipboard"
+msgstr ""
+
+msgid "Sort by &Name"
+msgstr ""
+
+msgid "Sort the group by short name"
+msgstr ""
+
+msgid "Sort by &Path"
+msgstr ""
+
+msgid "Sort the group by full path"
+msgstr ""
+
+msgid "&Sort by .hgsub"
+msgstr ""
+
+msgid "Order the subrepos as in .hgsub"
+msgstr ""
+
+msgid "Select repository directory to add"
+msgstr ""
+
+msgid "Select an existing repository to add as a subrepo"
+msgstr ""
+
+msgid "Cannot add subrepository"
+msgstr ""
+
+#, python-format
+msgid "%s is not a valid repository"
+msgstr ""
+
+#, python-format
+msgid "\"%s\" is not a folder"
+msgstr ""
+
+msgid "A repository cannot be added as a subrepo of itself"
+msgstr ""
+
+#, python-format
+msgid ""
+"The selected folder:<br><br>%s<br><br>is not inside the target repository."
+"<br><br>This may be allowed but is greatly discouraged.<br>If you want to "
+"add a non trivial subrepository mapping you must manually edit the <i>."
+"hgsub</i> file"
+msgstr ""
+
+msgid "Cannot open repository"
+msgstr ""
+
+#, python-format
+msgid "The selected repository:<br><br>%s<br><br>cannot be open!"
+msgstr ""
+
+msgid "Subrepository already exists"
+msgstr ""
+
+#, python-format
+msgid ""
+"The selected repository:<br><br>%s<br><br>is already a subrepository of:"
+"<br><br>%s<br><br>as: \"%s\""
+msgstr ""
+
+msgid "Failed to add subrepository"
+msgstr ""
+
+#, python-format
+msgid "Cannot open the .hgsub file in:<br><br>%s"
+msgstr ""
+
+msgid "Failed to add repository"
+msgstr ""
+
+#, python-format
+msgid "The .hgsub file already contains the line:<br><br>%s"
+msgstr ""
+
+msgid "Subrepo added to .hgsub file"
+msgstr ""
+
+#, python-format
+msgid ""
+"The selected subrepo:<br><br><i>%s</i><br><br>has been added to the .hgsub "
+"file of the repository:<br><br><i>%s</i><br><br>Remember that in order to "
+"finish adding the subrepo <i>you must still <u>commit</u></i> the changes to "
+"the .hgsub file in order to confirm the addition of the subrepo."
+msgstr ""
+
+#, python-format
+msgid "Cannot update the .hgsub file in:<br><br>%s"
+msgstr ""
+
+msgid "Could not open .hgsub file"
+msgstr ""
+
+msgid "Cannot read the .hgsub file.<p>Subrepository removal failed."
+msgstr ""
+
+msgid "Subrepository not found"
+msgstr ""
+
+msgid ""
+"The selected subrepository was not found on the .hgsub file.<p>Perhaps it "
+"has already been removed?"
+msgstr ""
+
+msgid "&Yes"
+msgstr ""
+
+msgid "&No"
+msgstr ""
+
+msgid "Remove the selected repository?"
+msgstr ""
+
+#, python-format
+msgid ""
+"Do you really want to remove the repository \"<i>%s</i>\" from its parent "
+"repository \"<i>%s</i>\""
+msgstr ""
+
+msgid "Subrepository removed from .hgsub"
+msgstr ""
+
+msgid ""
+"The selected subrepository has been removed from the .hgsub file.<p>Remember "
+"that you must commit this .hgsub change in order to complete the removal of "
+"the subrepository!"
+msgstr ""
+
+msgid "Could not update .hgsub file"
+msgstr ""
+
+msgid "Cannot update the .hgsub file.<p>Subrepository removal failed."
+msgstr ""
+
+#, python-format
+msgid "Unsupported repository type (%s)"
+msgstr ""
+
+msgid "Cannot open non Mercurial repositories or subrepositories"
+msgstr ""
+
+msgid "New Group"
+msgstr ""
+
+msgid "Confirm Delete"
+msgstr ""
+
+#, python-format
+msgid "Delete Group '%s' and all its entries?"
+msgstr ""
+
+msgid "Could not get subrepository list"
+msgstr ""
+
+#, python-format
+msgid ""
+"It was not possible to get the subrepository list for the repository in:"
+"<br><br><i>%s</i>"
+msgstr ""
+
+msgid "Could not open some subrepositories"
+msgstr ""
+
+#, python-format
+msgid ""
+"It was not possible to fully load the subrepository list for the repository "
+"in:<br><br><i>%s</i><br><br>The following subrepositories may be missing, "
+"broken or on an inconsistent state and cannot be accessed:<br><br><i>%s</i>"
+msgstr ""
+
+msgid "Updating repository registry"
+msgstr ""
+
+#, python-format
+msgid "Loading repository %s"
+msgstr ""
+
+msgid "Repository Registry updated"
+msgstr ""
+
+msgid "Close tab"
+msgstr ""
+
+msgid "Close other tabs"
+msgstr ""
+
+msgid "Undo close tab"
+msgstr ""
+
+msgid "Reopen last closed tab"
+msgstr ""
+
+msgid "Undo close other tabs"
+msgstr ""
+
+msgid "Reopen last closed tab group"
+msgstr ""
+
+msgid "Failed to open repository"
+msgstr ""
+
+msgid "&Sort"
+msgstr ""
+
+#, python-format
+msgid "Local Repository %s"
+msgstr ""
+
+#, python-format
+msgid ""
+"An exception happened while loading the subrepos of:<br><br>\"%s\"<br><br>"
+msgstr ""
+
+#, python-format
+msgid "The exception error message was:<br><br>%s<br><br>"
+msgstr ""
+
+msgid "Click OK to continue or Abort to exit."
+msgstr ""
+
+msgid "Error loading subrepos"
+msgstr ""
+
+msgid "Unable to update repository name"
+msgstr ""
+
+#, python-format
+msgid "An error occurred while updating the repository hgrc file (%s)"
+msgstr ""
+
+msgid "default"
+msgstr ""
+
+msgid "C&hoose Log Columns..."
+msgstr ""
+
+msgid "&Resize Columns"
+msgstr ""
+
+#, python-format
+msgid "Goto ancestor of %s and %s"
+msgstr ""
+
+#, python-format
+msgid "Can't find revision '%s'"
+msgstr ""
+
+msgid "Drag to change order"
+msgstr ""
+
+msgid "Workbench Log Columns"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Revision details"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Commit"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Search"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Console log"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Synchronize"
+msgstr ""
+
+msgctxt "tab tooltip"
+msgid "Patch Branch"
+msgstr ""
+
+#, python-format
+msgid "%s <incoming>"
+msgstr ""
+
+#, python-format
+msgid "Found %d incoming changesets"
+msgstr ""
+
+msgid "Pull"
+msgstr ""
+
+msgid "Pull incoming changesets into your repository"
+msgstr ""
+
+msgid "Reject incoming changesets"
+msgstr ""
+
+#, python-format
+msgid "Push current branch (%s)"
+msgstr ""
+
+#, python-format
+msgid "Push up to current revision (#%d)"
+msgstr ""
+
+#, python-format
+msgid "Push up to revision #%d"
+msgstr ""
+
+msgid "Push all"
+msgstr ""
+
+msgid "no outgoing changesets"
+msgstr ""
+
+#, python-format
+msgid "no outgoing changesets in current branch (%s) / %d in total"
+msgstr ""
+
+#, python-format
+msgid "no outgoing changesets up to current revision (#%d) / %d in total"
+msgstr ""
+
+#, python-format
+msgid "no outgoing changesets up to revision #%d / %d in total"
+msgstr ""
+
+#, python-format
+msgid "%d outgoing changesets"
+msgstr ""
+
+#, python-format
+msgid "%d outgoing changesets in current branch (%s) / %d in total"
+msgstr ""
+
+#, python-format
+msgid "%d outgoing changesets up to current revision (#%d) / %d in total"
+msgstr ""
+
+#, python-format
+msgid "%d outgoing changesets up to revision #%d / %d in total"
+msgstr ""
+
+msgid "Nothing to push"
+msgstr ""
+
+msgid "No revision found"
+msgstr ""
+
+#, python-format
+msgid "%s - verify repository"
+msgstr ""
+
+#, python-format
+msgid "%s - recover repository"
+msgstr ""
+
+msgid "No transaction available"
+msgstr ""
+
+msgid "There is no rollback transaction available"
+msgstr ""
+
+msgid "Undo last commit?"
+msgstr ""
+
+#, python-format
+msgid "Undo most recent commit (%d), preserving file changes?"
+msgstr ""
+
+msgid "Undo last transaction?"
+msgstr ""
+
+#, python-format
+msgid "Rollback to revision %d (undo %s)?"
+msgstr ""
+
+msgid "Unable to determine working copy revision\n"
+msgstr ""
+
+msgid "Remove current working revision?"
+msgstr ""
+
+#, python-format
+msgid ""
+"Your current working revision (%d) will be removed by this rollback, leaving "
+"uncommitted changes.\n"
+" Continue?"
+msgstr ""
+
+msgid "Tab cannot exit"
+msgstr ""
+
+msgid "Pus&h"
+msgstr ""
+
+msgid "Push to &Here"
+msgstr ""
+
+msgid "Push Selected &Branch"
+msgstr ""
+
+msgid "Push &All"
+msgstr ""
+
+msgid "&Update..."
+msgstr ""
+
+msgid "Bro&wse at Revision"
+msgstr ""
+
+msgid "&Merge with Local..."
+msgstr ""
+
+msgid "&Tag..."
+msgstr ""
+
+msgid "Boo&kmark..."
+msgstr ""
+
+msgid "Top&ic..."
+msgstr ""
+
+msgid "Sig&n..."
+msgstr ""
+
+msgid "&Backout..."
+msgstr ""
+
+msgid "Revert &All Files..."
+msgstr ""
+
+msgid "Copy &Hash"
+msgstr ""
+
+msgid "E&xport"
+msgstr ""
+
+msgid "E&xport Patch..."
+msgstr ""
+
+msgid "&Email Patch..."
+msgstr ""
+
+msgid "&Archive..."
+msgstr ""
+
+msgid "&Bundle Rev and Descendants..."
+msgstr ""
+
+msgid "Change &Phase to"
+msgstr ""
+
+msgid "&Graft to Local..."
+msgstr ""
+
+msgid "Modi&fy History"
+msgstr ""
+
+msgid "&Unapply Patch"
+msgstr ""
+
+msgid "Import to &MQ"
+msgstr ""
+
+msgid "MQ &Options"
+msgstr ""
+
+msgid "&Rebase..."
+msgstr ""
+
+msgid "&Prune..."
+msgstr ""
+
+msgid "&Strip..."
+msgstr ""
+
+msgid "Post to Re&view Board..."
+msgstr ""
+
+msgid "Post to Phabricator..."
+msgstr ""
+
+msgid "&Remote Update..."
+msgstr ""
+
+msgid "Write diff file"
+msgstr ""
+
+msgid "Unable to write diff file"
+msgstr ""
+
+msgid "Unable to compress history"
+msgstr ""
+
+msgid "Selected changeset pair not related"
+msgstr ""
+
+msgid "Visual Diff..."
+msgstr ""
+
+msgid "Export Diff..."
+msgstr ""
+
+msgid "Export Selected..."
+msgstr ""
+
+msgid "Email Selected..."
+msgstr ""
+
+msgid "Copy Selected as Patch"
+msgstr ""
+
+msgid "Archive DAG Range..."
+msgstr ""
+
+msgid "Export DAG Range..."
+msgstr ""
+
+msgid "Email DAG Range..."
+msgstr ""
+
+msgid "Bundle DAG Range..."
+msgstr ""
+
+msgid "Bisect - Good, Bad..."
+msgstr ""
+
+msgid "Bisect - Bad, Good..."
+msgstr ""
+
+msgid "Compress History..."
+msgstr ""
+
+msgid "Rebase..."
+msgstr ""
+
+msgid "Goto common ancestor"
+msgstr ""
+
+msgid "Graft Selected to local..."
+msgstr ""
+
+msgid "&Prune Selected..."
+msgstr ""
+
+msgid "Post Selected to Review Board..."
+msgstr ""
+
+msgid "Post Selected to Phabricator..."
+msgstr ""
+
+msgid "Apply patch"
+msgstr ""
+
+msgid "Apply onto original parent"
+msgstr ""
+
+msgid "Apply only this patch"
+msgstr ""
+
+msgid "Fold patches..."
+msgstr ""
+
+msgid "Delete patches..."
+msgstr ""
+
+msgid "Rename patch..."
+msgstr ""
+
+msgid "Pull to here..."
+msgstr ""
+
+msgid "Visual diff..."
+msgstr ""
+
+msgid "Export patch"
+msgstr ""
+
+msgid "Patch Files (*.patch)"
+msgstr ""
+
+msgid "Cannot export revision"
+msgstr ""
+
+#, python-format
+msgid ""
+"Cannot export revision %s into the file named:\n"
+"\n"
+"%s\n"
+msgstr ""
+
+msgid "There is already an existing folder with that same name."
+msgstr ""
+
+msgid "Replace"
+msgstr ""
+
+msgid "Append"
+msgstr ""
+
+#, python-format
+msgid ""
+"There are existing patch files for %d revisions (%s) in the selected "
+"location (%s).\n"
+"\n"
+msgstr ""
+
+msgid "What do you want to do?\n"
+msgstr ""
+
+msgid "Replace the existing patch files.\n"
+msgstr ""
+
+msgid "Append the changes to the existing patch files.\n"
+msgstr ""
+
+msgid "Abort the export operation.\n"
+msgstr ""
+
+msgid "Patch files already exist"
+msgstr ""
+
+msgid "Patch exported"
+msgstr ""
+
+#, python-format
+msgid ""
+"Revision #%d (%s) was exported to:<p><a href=\"file:///%s\">%s</a>%s<a href="
+"\"file:///%s\">%s</a>"
+msgstr ""
+
+msgid "Patches exported"
+msgstr ""
+
+#, python-format
+msgid "%d patches were exported to:<p><a href=\"file:///%s\">%s</a>"
+msgstr ""
+
+msgid ""
+"Reverting all files will discard changes and leave affected files in a "
+"modified state.<br><br>Are you sure you want to use revert?<br><br>(use "
+"update to checkout another revision)"
+msgstr ""
+
+msgid "Filter b&y"
+msgstr ""
+
+msgid "&Ancestors and Descendants"
+msgstr ""
+
+msgid "A&uthor"
+msgstr ""
+
+msgid "&Branch"
+msgstr ""
+
+msgid "&More Options..."
+msgstr ""
+
+msgid "Unable to merge"
+msgstr ""
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
+
+msgid "You cannot merge a revision with itself"
+msgstr ""
+
+msgid "Unable to backout"
+msgstr ""
+
+msgid "Write bundle"
+msgstr ""
+
+msgid "Backwards phase change requested"
+msgstr ""
+
+msgid "Do you really want to make this revision <i>secret</i>?"
+msgstr ""
+
+msgid ""
+"Making a \"<i>draft</i>\" revision \"<i>secret</i>\" is generally a safe "
+"operation.\n"
+"\n"
+"However, there are a few caveats:\n"
+"\n"
+"- \"secret\" revisions are not pushed. This can cause you trouble if you\n"
+"refer to a secret subrepo revision.\n"
+"\n"
+"- If you pulled this revision from a non publishing server it may be\n"
+"moved back to \"<i>draft</i>\" if you pull again from that particular "
+"server.\n"
+"\n"
+"Please be careful!"
+msgstr ""
+
+msgid "&Make secret"
+msgstr ""
+
+msgid "&Cancel"
+msgstr ""
+
+msgid "Do you really want to <i>force</i> a backwards phase transition?"
+msgstr ""
+
+#, python-format
+msgid ""
+"You are trying to move the phase of revision %d backwards,\n"
+"from \"<i>%s</i>\" to \"<i>%s</i>\".\n"
+"\n"
+"However, \"<i>%s</i>\" is a lower phase level than \"<i>%s</i>\".\n"
+"\n"
+"Moving the phase backwards is not recommended.\n"
+"For example, it may result in having multiple heads\n"
+"if you modify a revision that you have already pushed\n"
+"to a server.\n"
+"\n"
+"Please be careful!"
+msgstr ""
+
+msgid "&Force"
+msgstr ""
+
+msgid "Cannot import selected revision"
+msgstr ""
+
+#, python-format
+msgid ""
+"The selected revision (rev #%d) cannot be imported because it is not a "
+"descendant of qparent (rev #%d)"
+msgstr ""
+
+msgid "Invalid command"
+msgstr ""
+
+msgid "The selected command is empty"
+msgstr ""
+
+#, python-format
+msgid ""
+"The following error message was returned:\n"
+"\n"
+"<b>%s</b>"
+msgstr ""
+
+msgid ""
+"\n"
+"\n"
+"Please check that the \"thg\" command is valid."
+msgstr ""
+
+msgid "Failed to execute custom TortoiseHg command"
+msgstr ""
+
+#, python-format
+msgid "The command \"%s\" failed (code %d)."
+msgstr ""
+
+msgid "Failed to execute custom command"
+msgstr ""
+
+#, python-format
+msgid "The command \"%s\" could not be executed."
+msgstr ""
+
+#, python-format
+msgid ""
+"The following error message was returned:\n"
+"\n"
+"\"%s\"\n"
+"\n"
+"Please check that the command path is valid and that it is a valid "
+"application"
+msgstr ""
+
+msgid "&Edit Toolbar"
+msgstr ""
+
+msgid "&Refresh"
+msgstr ""
+
+msgid "&Filter Toolbar"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg: %s"
+msgstr ""
+
+msgid "S&tatus Bar"
+msgstr ""
+
+#, python-format
+msgid "Resolve Conflicts - %s"
+msgstr ""
+
+msgid "Local revision information"
+msgstr ""
+
+msgid "Other revision information"
+msgstr ""
+
+msgid "Unresolved conflicts"
+msgstr ""
+
+msgid "Mercurial Re&solve"
+msgstr ""
+
+msgid "Attempt automatic (trivial) merge"
+msgstr ""
+
+msgid "Tool &Resolve"
+msgstr ""
+
+msgid "Merge using selected merge tool"
+msgstr ""
+
+msgid "&Take Local"
+msgstr ""
+
+msgid "Accept the local file version (yours)"
+msgstr ""
+
+msgid "Take &Other"
+msgstr ""
+
+msgid "Accept the other file version (theirs)"
+msgstr ""
+
+msgid "&Mark as Resolved"
+msgstr ""
+
+msgid "Mark this file as resolved"
+msgstr ""
+
+msgid "Diff &Local to Ancestor"
+msgstr ""
+
+msgid "&Diff Other to Ancestor"
+msgstr ""
+
+msgid "Resolved conflicts"
+msgstr ""
+
+msgid "&Edit File"
+msgstr ""
+
+msgid "Edit resolved file"
+msgstr ""
+
+msgid "3-&Way Diff"
+msgstr ""
+
+msgid "Visual three-way diff"
+msgstr ""
+
+msgid "Visual diff between resolved file and first parent"
+msgstr ""
+
+msgid "&Diff to Other"
+msgstr ""
+
+msgid "Visual diff between resolved file and second parent"
+msgstr ""
+
+msgid "Mark as &Unresolved"
+msgstr ""
+
+msgid "Mark this file as unresolved"
+msgstr ""
+
+msgid "Detected merge/diff tools:"
+msgstr ""
+
+msgid "Command output"
+msgstr ""
+
+msgid "Unable to show subrepository files"
+msgstr ""
+
+msgid ""
+"Visual diffs are not supported for files in subrepositories. They will not "
+"be shown."
+msgstr ""
+
+msgid "There are merge <b>conflicts</b> to be resolved"
+msgstr ""
+
+msgid "All conflicts are resolved."
+msgstr ""
+
+msgid "There are no conflicting file merges."
+msgstr ""
+
+msgid "Exit without finishing resolve?"
+msgstr ""
+
+msgid "Unresolved conflicts remain. Are you sure?"
+msgstr ""
+
+msgid "E&xit"
+msgstr "Lo&peta"
+
+msgid "Ext"
+msgstr ""
+
+msgid "Repository"
+msgstr ""
+
+msgid "<default>"
+msgstr ""
+
+msgid "File List Toolbar"
+msgstr ""
+
+msgid "Ma&nifest Mode"
+msgstr ""
+
+msgid "Show all version-controlled files in tree view"
+msgstr ""
+
+msgid "&Flat List"
+msgstr ""
+
+msgid "### filter text ###"
+msgstr ""
+
+msgid "Changed by &This Commit"
+msgstr ""
+
+msgid "Show files changed by this commit"
+msgstr ""
+
+msgid "Compare to &1st Parent"
+msgstr ""
+
+msgid "Compare to &2nd Parent"
+msgstr ""
+
+msgid "Toggle parent to be used as the base revision"
+msgstr ""
+
+msgid "List Optio&ns"
+msgstr ""
+
+#, python-format
+msgid "%s - Revision Details (%s)"
+msgstr ""
+
+#, python-format
+msgid "Revert - %s"
+msgstr ""
+
+#, python-format
+msgid "<b>Revert %s to its contents at the following revision?</b>"
+msgstr ""
+
+#, python-format
+msgid "<b>Revert %d files to their contents at the following revision?</b>"
+msgstr ""
+
+msgid "Revert all files to this revision"
+msgstr ""
+
+#, python-format
+msgid "revision %d's first parent (i.e. revision %d)"
+msgstr ""
+
+#, python-format
+msgid "revision %d's second parent (i.e. revision %d)"
+msgstr ""
+
+msgid "null revision (i.e. remove file(s))"
+msgstr ""
+
+msgid "Changeset:"
+msgstr ""
+
+msgid "Child:"
+msgstr ""
+
+msgid "Predecessors:"
+msgstr ""
+
+msgid "Successors:"
+msgstr ""
+
+msgid "Head is closed!"
+msgstr ""
+
+msgid "Changesets where username contains string."
+msgstr ""
+
+msgid ""
+"Search commit message, user name, and names of changed files for string."
+msgstr ""
+
+msgid "Like \"keyword(string)\" but accepts a regex."
+msgstr ""
+
+msgid ""
+"Changesets not found in the specified destination repository, or the default "
+"push location."
+msgstr ""
+
+msgid "The named bookmark or all bookmarks."
+msgstr ""
+
+msgid "The named tag or all tags."
+msgstr ""
+
+msgid "Changeset is tagged."
+msgstr ""
+
+msgid "Changeset is a named branch head."
+msgstr ""
+
+msgid "Changeset is a merge changeset."
+msgstr ""
+
+msgid "Changeset is closed."
+msgstr ""
+
+msgid ""
+"Changesets within the interval, see <a href=\"https://www.mercurial-scm.org/"
+"doc/hg.1.html#dates\">help dates</a>"
+msgstr ""
+
+msgid "Greatest common ancestor of the two changesets."
+msgstr ""
+
+msgid ""
+"Find revisions that \"match\" one or more fields of the given set of "
+"revisions."
+msgstr ""
+
+msgid ""
+"Changesets affecting files matched by pattern.  See <a href=\"https://www."
+"mercurial-scm.org/doc/hg.1.html#patterns\">help patterns</a>"
+msgstr ""
+
+msgid "Changesets which modify files matched by pattern."
+msgstr ""
+
+msgid "Changesets which add files matched by pattern."
+msgstr ""
+
+msgid "Changesets which remove files matched by pattern."
+msgstr ""
+
+msgid "Changesets containing files matched by pattern."
+msgstr ""
+
+msgid "All changesets belonging to the branches of changesets in set."
+msgstr ""
+
+msgid "Members of a set with no children in set."
+msgstr ""
+
+msgid "Changesets which are descendants of changesets in set."
+msgstr ""
+
+msgid "Changesets that are ancestors of a changeset in set."
+msgstr ""
+
+msgid "Child changesets of changesets in set."
+msgstr ""
+
+msgid "The set of all parents for all changesets in set."
+msgstr ""
+
+msgid "First parent for all changesets in set, or the working directory."
+msgstr ""
+
+msgid "Second parent for all changesets in set, or the working directory."
+msgstr ""
+
+msgid "Changesets with no parent changeset in set."
+msgstr ""
+
+msgid ""
+"An empty set, if any revision in set isn't found; otherwise, all revisions "
+"in set."
+msgstr ""
+
+msgid "Changeset with lowest revision number in set."
+msgstr ""
+
+msgid "Changeset with highest revision number in set."
+msgstr ""
+
+msgid "First n members of a set."
+msgstr ""
+
+msgid ""
+"Sort set by keys.  The default sort order is ascending, specify a key as \"-"
+"key\" to sort in descending order."
+msgstr ""
+
+msgid "An alias for \"::.\" (ancestors of the working copy's first parent)."
+msgstr ""
+
+msgid "All changesets, the same as 0:tip."
+msgstr ""
+
+msgid "Revision Set Query"
+msgstr ""
+
+msgid "all revisions converted from subversion"
+msgstr ""
+
+msgid "changeset which represents converted svn revision"
+msgstr ""
+
+msgid "Common sets"
+msgstr ""
+
+msgid "File pattern sets"
+msgstr ""
+
+msgid "Set Ancestry"
+msgstr ""
+
+msgid "Set Logic"
+msgstr ""
+
+msgid ""
+"<a href=\"https://www.mercurial-scm.org/doc/hg.1.html#revsets\">help "
+"revsets</a>"
+msgstr ""
+
+msgid ""
+"\n"
+"Caught keyboard interrupt, aborting.\n"
+msgstr ""
+
+#, python-format
+msgid "failed to fork GUI process: %s\n"
+msgstr ""
+
+#, python-format
+msgid "can not read file \"%s\". Ignored.\n"
+msgstr ""
+
+#, python-format
+msgid ""
+"thg: command '%s' is ambiguous:\n"
+"    %s\n"
+msgstr ""
+
+#, python-format
+msgid "thg: unknown command '%s'\n"
+msgstr ""
+
+#, python-format
+msgid "thg %s: %s\n"
+msgstr ""
+
+#, python-format
+msgid "thg: %s\n"
+msgstr ""
+
+#, python-format
+msgid "abort: %s!\n"
+msgstr ""
+
+#, python-format
+msgid "abort: %s\n"
+msgstr ""
+
+#, python-format
+msgid "(%s)\n"
+msgstr ""
+
+msgid "option --config may not be abbreviated!"
+msgstr ""
+
+msgid "invalid arguments"
+msgstr ""
+
+#, python-format
+msgid "unrecognized profiling format '%s' - Ignored\n"
+msgstr ""
+
+msgid ""
+"lsprof not available - install from http://codespeak.net/svn/user/arigo/hack/"
+"misc/lsprof/"
+msgstr ""
+
+msgid "repository root directory or symbolic path name"
+msgstr ""
+
+msgid "enable additional output"
+msgstr ""
+
+msgid "suppress output"
+msgstr ""
+
+msgid "display help and exit"
+msgstr ""
+
+msgid "set/override config option (use 'section.name=value')"
+msgstr ""
+
+msgid "enable debugging output"
+msgstr ""
+
+msgid "start debugger"
+msgstr ""
+
+msgid "print command execution profile"
+msgstr ""
+
+msgid "do not fork GUI process"
+msgstr ""
+
+msgid "always fork GUI process"
+msgstr ""
+
+msgid "read file list from file"
+msgstr ""
+
+msgid "read file list from file encoding utf-8"
+msgstr ""
+
+msgid "thg about"
+msgstr ""
+
+msgid "thg add [FILE]..."
+msgstr ""
+
+msgid "revision to annotate"
+msgstr ""
+
+msgid "open to line"
+msgstr ""
+
+msgid "initial search pattern"
+msgstr ""
+
+msgid "thg annotate"
+msgstr ""
+
+#, python-format
+msgid "invalid line number: %s"
+msgstr ""
+
+msgid "revision to archive"
+msgstr ""
+
+msgid "thg archive"
+msgstr ""
+
+msgid "merge with old dirstate parent after backout"
+msgstr ""
+
+msgid "parent to choose when backing out merge"
+msgstr ""
+
+msgid "revision to backout"
+msgstr ""
+
+msgid "thg backout [OPTION]... [[-r] REV]"
+msgstr ""
+
+msgid "thg bisect"
+msgstr ""
+
+msgid "revision"
+msgstr ""
+
+msgid "thg bookmarks [-r REV] [NAME]"
+msgstr ""
+
+msgid "only one new bookmark name allowed"
+msgstr ""
+
+msgid "the clone will include an empty working copy (only a repository)"
+msgstr ""
+
+msgid "revision, tag or branch to check out"
+msgstr ""
+
+msgid "include the specified changeset"
+msgstr ""
+
+msgid "clone only the specified branch"
+msgstr ""
+
+msgid "use pull protocol to copy metadata"
+msgstr ""
+
+msgid "use uncompressed transfer (fast over LAN)"
+msgstr ""
+
+msgid "thg clone [OPTION]... [SOURCE] [DEST]"
+msgstr ""
+
+msgid "record user as committer"
+msgstr ""
+
+msgid "record datecode as commit date"
+msgstr ""
+
+msgid "thg commit [OPTIONS] [FILE]..."
+msgstr ""
+
+msgid "thg debugblockmatcher"
+msgstr ""
+
+msgid "thg debugbugreport [TEXT]"
+msgstr ""
+
+msgid "thg debugconsole"
+msgstr ""
+
+msgid "thg debuglighthg"
+msgstr ""
+
+msgid "thg debugruncommand -- COMMAND [ARGUMENT]..."
+msgstr ""
+
+msgid "no command specified"
+msgstr ""
+
+msgid "thg drag_copy SOURCE... DEST"
+msgstr ""
+
+msgid "thg drag_move SOURCE... DEST"
+msgstr ""
+
+msgid "a revision to send"
+msgstr ""
+
+msgid "thg email [REVS]"
+msgstr ""
+
+msgid "use only one form to specify the revision"
+msgstr ""
+
+msgid "select the specified revision"
+msgstr ""
+
+msgid "side-by-side comparison of revisions"
+msgstr ""
+
+msgid "thg filelog [OPTION]... FILE"
+msgstr ""
+
+msgid "requires a single filename"
+msgstr ""
+
+msgid "thg forget [FILE]..."
+msgstr ""
+
+msgid "revisions to graft"
+msgstr ""
+
+msgid "thg graft [-r] REV..."
+msgstr ""
+
+msgid "You must provide revisions to graft"
+msgstr ""
+
+msgid "ignore case during search"
+msgstr ""
+
+msgid "thg grep"
+msgstr ""
+
+msgid "thg guess"
+msgstr ""
+
+msgid "thg help [COMMAND]"
+msgstr ""
+
+msgid "global options:"
+msgstr ""
+
+msgid "use \"thg help\" for the full list of commands"
+msgstr ""
+
+msgid ""
+"use \"thg help\" for the full list of commands or \"thg -v\" for details"
+msgstr ""
+
+#, python-format
+msgid "use \"thg -v help%s\" to show aliases and global options"
+msgstr ""
+
+#, python-format
+msgid "use \"thg -v help %s\" to show global options"
+msgstr ""
+
+msgid ""
+"list of commands:\n"
+"\n"
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"aliases: %s\n"
+msgstr ""
+
+msgid "(no help text available)"
+msgstr ""
+
+msgid "options:\n"
+msgstr ""
+
+msgid "no commands defined\n"
+msgstr ""
+
+msgid "Thg - TortoiseHg's GUI tools for Mercurial SCM (Hg)\n"
+msgstr ""
+
+msgid ""
+"basic commands:\n"
+"\n"
+msgstr ""
+
+#, python-format
+msgid " (default: %s)"
+msgstr ""
+
+msgid "thg hgignore [FILE]"
+msgstr ""
+
+msgid "import to the patch queue (MQ)"
+msgstr ""
+
+msgid "thg import [OPTION] [SOURCE]..."
+msgstr ""
+
+msgid "thg init [DEST]"
+msgstr ""
+
+msgid "thg lock"
+msgstr ""
+
+msgid "search for a given text or revset"
+msgstr ""
+
+msgid "(DEPRECATED)"
+msgstr ""
+
+msgid "open a new workbench window"
+msgstr ""
+
+msgid "thg log [OPTIONS] [FILE]"
+msgstr ""
+
+msgid "cannot specify both -k/--query and filenames"
+msgstr ""
+
+msgid "revision to display"
+msgstr ""
+
+msgid "thg manifest [-r REV] [FILE]"
+msgstr ""
+
+msgid "revision to merge"
+msgstr ""
+
+msgid "thg merge [[-r] REV]"
+msgstr ""
+
+msgid "Merge revision not specified or not found"
+msgstr ""
+
+msgid "a revision to post"
+msgstr ""
+
+msgid "thg postreview [-r] REV..."
+msgstr ""
+
+msgid "reviewboard extension not enabled"
+msgstr ""
+
+#, python-format
+msgid "see <a href=\"%(url)s\">%(url)s</a>"
+msgstr ""
+
+msgid "no revisions specified"
+msgstr ""
+
+msgid "revisions to prune"
+msgstr ""
+
+msgid "thg prune [-r] REV..."
+msgstr ""
+
+msgid "thg purge"
+msgstr ""
+
+msgid "keep original changesets"
+msgstr ""
+
+msgid "keep original branch names"
+msgstr ""
+
+msgid "rebase from the specified changeset"
+msgstr ""
+
+msgid "rebase onto the specified changeset"
+msgstr ""
+
+msgid "thg rebase -s REV -d REV [--keep]"
+msgstr ""
+
+msgid "Rebase already in progress"
+msgstr ""
+
+msgid "Resuming rebase already in progress"
+msgstr ""
+
+msgid "You must provide source and dest arguments"
+msgstr ""
+
+msgid "thg rejects [FILE]"
+msgstr ""
+
+msgid "You must provide the path to a file"
+msgstr ""
+
+msgid "thg remove [FILE]..."
+msgstr ""
+
+msgid "thg rename [SOURCE] [DEST]"
+msgstr ""
+
+msgid "field to give initial focus"
+msgstr ""
+
+msgid "thg repoconfig"
+msgstr ""
+
+msgid "thg resolve"
+msgstr ""
+
+msgid "the revision to show"
+msgstr ""
+
+msgid "thg revdetails [-r REV]"
+msgstr ""
+
+msgid "thg revert [FILE]..."
+msgstr ""
+
+msgid "revision to update"
+msgstr ""
+
+msgid "thg rupdate [[-r] REV]"
+msgstr ""
+
+msgid "name of the hgweb config file (serve more than one repository)"
+msgstr ""
+
+msgid "name of the hgweb config file (DEPRECATED)"
+msgstr ""
+
+msgid "thg serve [--web-conf FILE]"
+msgstr ""
+
+msgid "thg shellconfig"
+msgstr ""
+
+msgid "thg shelve"
+msgstr ""
+
+msgid "sign even if the sigfile is modified"
+msgstr ""
+
+msgid "make the signature local"
+msgstr ""
+
+msgid "the key id to sign with"
+msgstr ""
+
+msgid "do not commit the sigfile after signing"
+msgstr ""
+
+msgid "use <text> as commit message"
+msgstr ""
+
+msgid "thg sign [-f] [-l] [-k KEY] [-m TEXT] [REV]"
+msgstr ""
+
+msgid "Please enable the Gpg extension first."
+msgstr ""
+
+msgid "show files without changes"
+msgstr ""
+
+msgid "show ignored files"
+msgstr ""
+
+msgid "thg status [OPTIONS] [FILE]"
+msgstr ""
+
+msgid "discard uncommitted changes (no backup)"
+msgstr ""
+
+msgid "do not back up stripped revisions"
+msgstr ""
+
+msgid "do not modify working copy during strip"
+msgstr ""
+
+msgid "revision to strip"
+msgstr ""
+
+msgid "thg strip [-k] [-f] [-n] [[-r] REV]"
+msgstr ""
+
+msgid "open the bookmark sync window"
+msgstr ""
+
+msgid "thg sync [OPTION]... [PEER]"
+msgstr ""
+
+msgid "replace existing tag"
+msgstr ""
+
+msgid "make the tag local"
+msgstr ""
+
+msgid "revision to tag"
+msgstr ""
+
+msgid "remove a tag"
+msgstr ""
+
+msgid "thg tag [-f] [-l] [-m TEXT] [-r REV] [NAME]"
+msgstr ""
+
+msgid "wait until the second ticks over"
+msgstr ""
+
+msgid "notify the shell for paths given"
+msgstr ""
+
+msgid "remove the status cache"
+msgstr ""
+
+msgid "show the contents of the status cache (no update)"
+msgstr ""
+
+msgid "update all repos in current dir"
+msgstr ""
+
+msgid "thg thgstatus [OPTION]"
+msgstr ""
+
+msgid "thg topics [-r REV] [NAME]"
+msgstr ""
+
+msgid "Please enable the Topic extension first."
+msgstr ""
+
+msgid "only one new topic name allowed"
+msgstr ""
+
+msgid "thg update [-C] [[-r] REV]"
+msgstr ""
+
+msgid "thg userconfig"
+msgstr ""
+
+msgid "changeset to view in diff tool"
+msgstr ""
+
+msgid "revisions to view in diff tool"
+msgstr ""
+
+msgid "bundle file to preview"
+msgstr ""
+
+msgid "launch visual diff tool"
+msgstr ""
+
+msgid "print license"
+msgstr ""
+
+msgid "thg version [OPTION]"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg Dialogs (version %s), Mercurial (version %s)\n"
+msgstr ""
+
+msgid "Location:"
+msgstr ""
+
+msgid "Update to:"
+msgstr ""
+
+msgid "Options:"
+msgstr ""
+
+msgid "Discard remote changes, no backup (-C/--clean)"
+msgstr ""
+
+msgid "Perform a push before updating (-p/--push)"
+msgstr ""
+
+msgid "Allow pushing new branches (--new-branch)"
+msgstr ""
+
+msgid "Force push to remote location (-f/--force)"
+msgstr ""
+
+msgid "remove working directory"
+msgstr ""
+
+msgid "unknown revision!"
+msgstr ""
+
+#, python-format
+msgid "Remote Update - %s"
+msgstr ""
+
+msgid "&Update"
+msgstr ""
+
+msgid "Log"
+msgstr ""
+
+msgid "Repositories"
+msgstr ""
+
+#, python-format
+msgid "Running at %s"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+msgid "TortoiseHg Web Server"
+msgstr ""
+
+msgid "Web Server"
+msgstr ""
+
+msgid "Port:"
+msgstr ""
+
+msgid "Status:"
+msgstr ""
+
+msgid "Start"
+msgstr ""
+
+msgid "Settings"
+msgstr "Asetukset"
+
+msgid "<unspecified>"
+msgstr ""
+
+msgid "&True"
+msgstr ""
+
+msgid "&False"
+msgstr ""
+
+msgid "&Unspecified"
+msgstr ""
+
+#, python-format
+msgid "%dpt"
+msgstr ""
+
+msgid "Bold"
+msgstr ""
+
+msgid "Italic"
+msgstr ""
+
+msgid "Strike"
+msgstr ""
+
+msgid "Underline"
+msgstr ""
+
+msgid "&Set..."
+msgstr ""
+
+msgid "&Clear"
+msgstr ""
+
+#, python-format
+msgid "Failed to load issue tracker: '%s': %s. "
+msgstr ""
+
+msgid "&Browse..."
+msgstr ""
+
+msgid "UI Language"
+msgstr ""
+
+msgid "Specify your preferred user interface language (restart needed)"
+msgstr ""
+
+msgid "Three-way Merge Tool"
+msgstr ""
+
+msgid ""
+"Graphical merge program for resolving merge conflicts.  If left unspecified, "
+"Mercurial will use the first applicable tool it finds on your system or use "
+"its internal merge tool that leaves conflict markers in place.  Choose "
+"internal:merge to force conflict markers, internal:prompt to always select "
+"local or other, or internal:dump to leave files in the working directory for "
+"manual merging"
+msgstr ""
+
+msgid "Visual Diff Tool"
+msgstr ""
+
+msgid ""
+"Specify visual diff tool, as described in the [merge-tools] section of your "
+"Mercurial configuration files.  If left unspecified, TortoiseHg will use the "
+"selected merge tool. Failing that it uses the first applicable tool it finds."
+msgstr ""
+
+msgid "Visual Editor"
+msgstr ""
+
+msgid ""
+"Specify visual editor, as described in the [editor-tools] section of your "
+"Mercurial configuration files.  If left unspecified, TortoiseHg will use the "
+"first applicable tool it finds."
+msgstr ""
+
+msgid "CLI Editor"
+msgstr ""
+
+msgid ""
+"The editor used by Mercurial command line commands to collect multiline "
+"input from the user.  Most notably, commit messages."
+msgstr ""
+
+msgid "Shell"
+msgstr ""
+
+#, python-format
+msgid ""
+"Specify the command to launch your preferred terminal shell application. If "
+"the value includes the string %(reponame)s, the name of the repository will "
+"be substituted in place of %(reponame)s. Similarly, %(root)s will be the "
+"full path to the repository. (restart needed)<br>Default, Windows: cmd.exe /"
+"K title %(reponame)s<br>Default, OS X: not set<br>Default, other: xterm -T "
+"\"%(reponame)s\""
+msgstr ""
+
+msgid "Immediate Operations"
+msgstr ""
+
+msgid ""
+"Space separated list of shell operations you would like to be performed "
+"immediately, without user interaction. Commands are \"add remove revert "
+"forget\". Default: None (leave blank)"
+msgstr ""
+
+msgid "Tab Width"
+msgstr ""
+
+msgid ""
+"Specify the number of spaces that tabs expand to in various TortoiseHg "
+"windows. Default: 8"
+msgstr ""
+
+msgid "Force Repo Tab"
+msgstr ""
+
+msgid "Always show repo tabs, even for a single repo. Default: False"
+msgstr ""
+
+msgid "Monitor Repo Changes"
+msgstr ""
+
+msgid ""
+"Specify the target filesystem where TortoiseHg monitors changes. Default: "
+"localonly"
+msgstr ""
+
+msgid "Max Diff Size"
+msgstr ""
+
+msgid ""
+"The maximum size file (in KB) that TortoiseHg will show changes for in the "
+"changelog, status, and commit windows. A value of zero implies no limit.  "
+"Default: 1024 (1MB)"
+msgstr ""
+
+msgid "Fork GUI"
+msgstr ""
+
+msgid ""
+"When running from the command line, fork a background process to run "
+"graphical dialogs. This setting is ignored when TortoiseHg runs as an OS X "
+"application bundle.  Default: True"
+msgstr ""
+
+msgid "Full Path Title"
+msgstr ""
+
+msgid ""
+"Show a full directory path of the repository in the dialog title instead of "
+"just the root directory name.  Default: False"
+msgstr ""
+
+msgid "Auto-resolve merges"
+msgstr ""
+
+msgid ""
+"Indicates whether TortoiseHg should attempt to automatically resolve changes "
+"from both sides to the same file, and only report merge conflicts when this "
+"is not possible. When False, all files with changes on both sides of the "
+"merge will report as conflicting, even if the edits are to different parts "
+"of the file. In either case, when conflicts occur, the user will be invited "
+"to review and resolve changes manually. Default: True."
+msgstr ""
+
+msgid "New Repo Skeleton"
+msgstr ""
+
+msgid ""
+"If specified, files in the directory, e.g. .hgignore, are copied to the "
+"newly-created repository."
+msgstr ""
+
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
+msgid "Workbench"
+msgstr ""
+
+msgid "Single Workbench Window"
+msgstr ""
+
+msgid ""
+"Select whether you want to have a single workbench window. If you disable "
+"this setting you will get a new workbench window everytime that you use the "
+"\"Hg Workbench\" command on the explorer context menu. Default: True"
+msgstr ""
+
+msgid "Default widget"
+msgstr ""
+
+msgid ""
+"Select the initial widget that will be shown when opening a repository. "
+"Default: revdetails"
+msgstr ""
+
+msgid ""
+"Select the initial revision that will be selected when opening a "
+"repository.  You can select the \"current\" (i.e. the working directory "
+"parent), the current \"tip\" or the working directory (\"workingdir\"). "
+"Default: current"
+msgstr ""
+
+msgid ""
+"Open new tabs next\n"
+"to the current tab"
+msgstr ""
+
+msgid ""
+"Should new tabs be open next to the current tab? If False new tabs will be "
+"open after the last tab. Default: True"
+msgstr ""
+
+msgid "Author Coloring"
+msgstr ""
+
+msgid "Color changesets by author name. Default: False"
+msgstr ""
+
+msgid "Full Authorname"
+msgstr ""
+
+msgid ""
+"Show full authorname in Logview. If not enabled, only a short part, usually "
+"name without email is shown. Default: False"
+msgstr ""
+
+msgid "Task Tabs"
+msgstr ""
+
+msgid ""
+"Show tabs along the side of the bottom half of each repo widget allowing one "
+"to switch task tabs without using the toolbar. Default: off"
+msgstr ""
+
+msgid "Task Toolbar Order"
+msgstr ""
+
+msgid ""
+"Specify which task buttons you want to show on the task toolbar and in which "
+"order.<br>Type a list of the task button names. Add separators by putting \"|"
+"\" between task button names.<br>Valid names are: log commit sync grep and "
+"pbranch.<br>Default: log commit grep pbranch | sync"
+msgstr ""
+
+msgid "Long Summary"
+msgstr ""
+
+msgid ""
+"If true, concatenate multiple lines of changeset summary and truncate them "
+"at 80 characters as necessary. Default: False"
+msgstr ""
+
+msgid "Log Batch Size"
+msgstr ""
+
+msgid ""
+"The number of revisions to read and display in the changelog viewer in a "
+"single batch. Default: 500"
+msgstr ""
+
+msgid "Dead Branches"
+msgstr ""
+
+msgid ""
+"Comma separated list of branch names that should be ignored when building a "
+"list of branch names for a repository. Default: None (leave blank)"
+msgstr ""
+
+msgid "Branch Colors"
+msgstr ""
+
+msgid ""
+"Space separated list of branch names and colors of the form branch:#XXXXXX. "
+"Spaces and colons in the branch name must be escaped using a backslash (\\). "
+"Likewise some other characters can be escaped in this way, e.g. \\u0040 will "
+"be decoded to the @ character, and \\n to a linefeed. Default: None (leave "
+"blank)"
+msgstr ""
+
+msgid "Hide Tags"
+msgstr ""
+
+msgid ""
+"Space separated list of tags that will not be shown. Useful example: Specify "
+"\"qbase qparent qtip\" to hide the standard tags inserted by the Mercurial "
+"Queues Extension. Default: None (leave blank)"
+msgstr ""
+
+msgid "Activate Bookmarks"
+msgstr ""
+
+msgid ""
+"Select when TortoiseHg will show a prompt to activate a bookmark when "
+"updating to a revision that has one or more bookmarks.<ul><li><b>auto</b>: "
+"Try to automatically activate bookmarks. When updating to a revision that "
+"has a single bookmark it will be activated automatically. Show a prompt if "
+"there is more than one bookmark on the revision that is being updated to."
+"<li><b>prompt</b>: The default. Show a prompt when updating to a revision "
+"that has one or more bookmarks.<li><b>never</b>: Never show any prompt to "
+"activate any bookmarks.</ul><p>Default: prompt"
+msgstr ""
+
+msgid "Show Family Line"
+msgstr ""
+
+msgid ""
+"Show indirect revision dependency on the revision graph when filtered by "
+"revset. Default: True<p><b>Note</b>: Calculating family line may be slow in "
+"some cases. This option is expected to be removed if the performance issue "
+"is solved."
+msgstr ""
+
+msgid "Use optimized graph layouter"
+msgstr ""
+
+msgid ""
+"Use alternative graph layouter for large repositories. Default: "
+"False<p><b>Note</b>: This layouter colors edges using branch information and "
+"does not display graft edges, regardless of whether they are requested or "
+"not."
+msgstr ""
+
+msgctxt "config item"
+msgid "Commit"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid ""
+"Name associated with commits.  The common format is:<br>Full Name &lt;"
+"email@example.com&gt;"
+msgstr ""
+
+msgid "Ask Username"
+msgstr ""
+
+msgid ""
+"If no username has been specified, the user will be prompted to enter a "
+"username.  Default: False"
+msgstr ""
+
+msgid "Summary Line Length"
+msgstr ""
+
+msgid ""
+"Suggested length of commit message lines. A red vertical line will mark this "
+"length.  CTRL-E will reflow the current paragraph to the specified line "
+"length. Default: 80"
+msgstr ""
+
+msgid "Close After Commit"
+msgstr ""
+
+msgid "Close the commit tool after every successful commit.  Default: False"
+msgstr ""
+
+msgid "Push After Commit"
+msgstr ""
+
+msgid ""
+"Attempt to push to specified URL or alias after each successful commit.  "
+"Default: No push"
+msgstr ""
+
+msgid "Auto Commit List"
+msgstr ""
+
+msgid ""
+"Comma separated list of files that are automatically included in every "
+"commit.  Intended for use only as a repository setting. Default: None (leave "
+"blank)"
+msgstr ""
+
+msgid "Auto Exclude List"
+msgstr ""
+
+msgid ""
+"Comma separated list of files that are automatically unchecked when the "
+"status, and commit dialogs are opened. Default: None (leave blank)"
+msgstr ""
+
+msgid "English Messages"
+msgstr ""
+
+msgid ""
+"Generate English commit messages even if LANGUAGE or LANG environment "
+"variables are set to a non-English language. This setting is used by the "
+"Merge, Tag and Backout dialogs. Default: False"
+msgstr ""
+
+msgid "New Commit Phase"
+msgstr ""
+
+msgid "The phase of new commits. Default: draft"
+msgstr ""
+
+msgid "Secret MQ Patches"
+msgstr ""
+
+msgid "Make MQ patches secret (instead of draft). Default: False"
+msgstr ""
+
+msgid "Check Subrepo Phase"
+msgstr ""
+
+msgid ""
+"Check the phase of the current revision of each subrepository.  For settings "
+"other than \"ignore\", the phase of the current revision of each "
+"subrepository is checked before committing the parent repository.  Default: "
+"follow"
+msgstr ""
+
+msgid "Monitor working<br>directory changes"
+msgstr ""
+
+msgid ""
+"Select when the working directory status list will be refreshed:<br>- "
+"<b>auto</b>: [<i>default</i>] let TortoiseHg decide when to refresh the "
+"working directory status list.<br>TortoiseHg will refresh the status list "
+"whenever it performs an action that may potentially modify the working "
+"directory. <i>This may miss any changes that happen outside of TortoiseHg's "
+"control;</i><br>- <b>always</b>: in addition to the automatic updates above, "
+"also refresh the status list whenever the user clicks on the \"working dir "
+"revision\" or on the \"Commit icon\" on the workbench task bar;<br>- "
+"<b>alwayslocal</b>: same as \"<b>always</b>\" but restricts forced refreshes "
+"to <i>local repos</i>.<br>Default: auto"
+msgstr ""
+
+msgid "Confirm adding unknown files"
+msgstr ""
+
+msgid ""
+"Determines if TortoiseHg should show a confirmation dialog before adding new "
+"files in a commit. If True, a confirmation dialog will be shown. If False, "
+"selected new files will be included in the commit with no confirmation "
+"dialog.  Default: True"
+msgstr ""
+
+msgid "Confirm deleting files"
+msgstr ""
+
+msgid ""
+"Determines if TortoiseHg should show a confirmation dialog before removing "
+"files in a commit. If True, a confirmation dialog will be shown. If False, "
+"selected deleted files will be included in the commit with no confirmation "
+"dialog.  Default: True"
+msgstr ""
+
+msgid "Sync"
+msgstr ""
+
+msgid "After Pull Operation"
+msgstr ""
+
+msgid ""
+"Operation which is performed directly after a successful pull. update "
+"equates to pull --update, fetch equates to the fetch extension, rebase "
+"equates to pull --rebase, updateorrebase equates to pull -u --rebase.  "
+"Default: none"
+msgstr ""
+
+msgid "Default Push"
+msgstr ""
+
+msgid ""
+"Select the revisions that will be pushed by default, whenever you click the "
+"Push button.<ul><li><b>all</b>: The default. Push all changes in <i>all "
+"branches</i>.<li><b>branch</b>: Push all changes in the <i>current branch</"
+"i>.<li><b>revision</b>: Push the changes in the current branch <i><u>up to</"
+"u> the current revision</i>.</ul><p>Default: all"
+msgstr ""
+
+msgid "Confirm Push"
+msgstr ""
+
+msgid ""
+"Determines if TortoiseHg should show a confirmation dialog before pushing "
+"changesets. If False, push will be performed without any confirmation "
+"dialog. Default: True"
+msgstr ""
+
+msgid "Target Combo"
+msgstr ""
+
+msgid ""
+"Select if TortoiseHg will show a target combo in the sync toolbar."
+"<ul><li><b>auto</b>: The default. Show the combo if more than one target "
+"configured.<li><b>always</b>: Always show the combo.</ul><p>Default: auto"
+msgstr ""
+
+msgid "SSH Command"
+msgstr ""
+
+msgid ""
+"Command to use for SSH connections.<p>Default: \"ssh\" or \"TortoisePlink."
+"exe -ssh -2\" (Windows)"
+msgstr ""
+
+msgid "<b>Subrepository Features:</b>"
+msgstr ""
+
+msgid "Allow Hg Subrepos"
+msgstr ""
+
+msgid ""
+"Whether Mercurial subrepositories are allowed in the working directory. "
+"Default: True"
+msgstr ""
+
+msgid "Allow Git Subrepos"
+msgstr ""
+
+#, python-format
+msgid ""
+"Whether Git subrepositories are allowed in the working directory. Default: "
+"False<p><a href=\"%s\">See the security note</a> before enabling Git "
+"subrepos."
+msgstr ""
+
+msgid "Allow SVN Subrepos"
+msgstr ""
+
+#, python-format
+msgid ""
+"Whether Subversion subrepositories are allowed in the working directory. "
+"Default: False<p><a href=\"%s\">See the security note</a> before enabling "
+"Subversion subrepos."
+msgstr ""
+
+msgid "Server"
+msgstr ""
+
+msgid "<b>Repository Details:</b>"
+msgstr ""
+
+msgid ""
+"Repository name to use in the web interface, and by TortoiseHg as a "
+"shorthand name.  Default is the working directory."
+msgstr ""
+
+msgid "Encoding"
+msgstr ""
+
+msgid ""
+"Character encoding of files in the repository, used by the web interface and "
+"TortoiseHg."
+msgstr ""
+
+msgid "'Publishing' repository"
+msgstr ""
+
+msgid ""
+"Controls draft phase behavior when working as a server. When true, pushed "
+"changesets are set to public in both client and server and pulled or cloned "
+"changesets are set to public in the client. Default: True"
+msgstr ""
+
+msgid "<b>Web Server:</b>"
+msgstr ""
+
+msgid "Textual description of the repository's purpose or contents."
+msgstr ""
+
+msgid "Contact"
+msgstr ""
+
+msgid "Name or email address of the person in charge of the repository."
+msgstr ""
+
+msgid "Style"
+msgstr ""
+
+msgid "Which template map style to use"
+msgstr ""
+
+msgid "Archive Formats"
+msgstr ""
+
+msgid "Comma separated list of archive formats allowed for downloading"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Port to listen on"
+msgstr ""
+
+msgid "Push Requires SSL"
+msgstr ""
+
+msgid ""
+"Whether to require that inbound pushes be transported over SSL to prevent "
+"password sniffing."
+msgstr ""
+
+msgid "Stripes"
+msgstr ""
+
+msgid ""
+"How many lines a \"zebra stripe\" should span in multiline output. Default "
+"is 1; set to 0 to disable."
+msgstr ""
+
+msgid "Max Files"
+msgstr ""
+
+msgid "Maximum number of files to list per changeset. Default: 10"
+msgstr ""
+
+msgid "Max Changes"
+msgstr ""
+
+msgid "Maximum number of changes to list on the changelog. Default: 10"
+msgstr ""
+
+msgid "Allow Push"
+msgstr ""
+
+msgid ""
+"Whether to allow pushing to the repository. If empty or not set, push is not "
+"allowed. If the special value \"*\", any remote user can push, including "
+"unauthenticated users. Otherwise, the remote user must have been "
+"authenticated, and the authenticated user name must be present in this list "
+"(separated by whitespace or \",\"). The contents of the allow_push list are "
+"examined after the deny_push list."
+msgstr ""
+
+msgid "Deny Push"
+msgstr ""
+
+msgid ""
+"Whether to deny pushing to the repository. If empty or not set, push is not "
+"denied. If the special value \"*\", all remote users are denied push. "
+"Otherwise, unauthenticated users are all denied, and any authenticated user "
+"name present in this list (separated by whitespace or \",\") is also denied. "
+"The contents of the deny_push list are examined before the allow_push list."
+msgstr ""
+
+msgid "Proxy"
+msgstr ""
+
+msgid "Host"
+msgstr ""
+
+msgid ""
+"Host name and (optional) port of proxy server, for example \"myproxy:8000\""
+msgstr ""
+
+msgid "Bypass List"
+msgstr ""
+
+msgid ""
+"Optional. Comma-separated list of host names that should bypass the proxy"
+msgstr ""
+
+msgid "Optional. User name to authenticate with at the proxy server"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Optional. Password to authenticate with at the proxy server"
+msgstr ""
+
+msgid "From"
+msgstr ""
+
+msgid "Email address to use in the \"From\" header and for the SMTP envelope"
+msgstr ""
+
+msgid "To"
+msgstr ""
+
+msgid "Comma-separated list of recipient email addresses"
+msgstr ""
+
+msgid "Cc"
+msgstr ""
+
+msgid "Comma-separated list of carbon copy recipient email addresses"
+msgstr ""
+
+msgid "Bcc"
+msgstr ""
+
+msgid "Comma-separated list of blind carbon copy recipient email addresses"
+msgstr ""
+
+msgid "method"
+msgstr ""
+
+msgid ""
+"Optional. Method to use to send email messages. If value is \"smtp"
+"\" (default), use SMTP (configured below).  Otherwise, use as name of "
+"program to run that acts like sendmail (takes \"-f\" option for sender, list "
+"of recipients on command line, message on stdin). Normally, setting this to "
+"\"sendmail\" or \"/usr/sbin/sendmail\" is enough to use sendmail to send "
+"messages."
+msgstr ""
+
+msgid "SMTP Host"
+msgstr ""
+
+msgid "Host name of mail server"
+msgstr ""
+
+msgid "SMTP Port"
+msgstr ""
+
+msgid "Port to connect to on mail server. Default: 25"
+msgstr ""
+
+msgid "SMTP TLS"
+msgstr ""
+
+msgid "Method to enable TLS when connecting to mail server. Default: none"
+msgstr ""
+
+msgid "SMTP Username"
+msgstr ""
+
+msgid "Username to authenticate to mail server with"
+msgstr ""
+
+msgid "SMTP Password"
+msgstr ""
+
+msgid "Password to authenticate to mail server with"
+msgstr ""
+
+msgid "Local Hostname"
+msgstr ""
+
+msgid "Hostname the sender can use to identify itself to the mail server."
+msgstr ""
+
+msgid "Diff and Annotate"
+msgstr ""
+
+msgid "Patch EOL"
+msgstr ""
+
+msgid ""
+"Normalize file line endings during and after patch to lf or crlf.  Strict "
+"does no normalization.  Auto does per-file detection, and is the recommended "
+"setting. Default: strict"
+msgstr ""
+
+msgid "Git Format"
+msgstr ""
+
+msgid "Use git extended diff header format. Default: False"
+msgstr ""
+
+msgid "MQ Git Format"
+msgstr ""
+
+msgid ""
+"When set to 'auto', mq will automatically use git patches when required  to "
+"avoid losing changes to file modes, copy records or binary files. If set to "
+"'keep', mq will obey the [diff] section configuration while preserving "
+"existing git patches upon qrefresh. If set to 'yes' or 'no', mq will "
+"override the [diff] section and always generate git or regular patches, "
+"possibly losing data in the second case. Default: auto"
+msgstr ""
+
+msgid "No Dates"
+msgstr ""
+
+msgid "Do not include modification dates in diff headers. Default: False"
+msgstr ""
+
+msgid "Show Function"
+msgstr ""
+
+msgid "Show which function each change is in. Default: False"
+msgstr ""
+
+msgid "Ignore White Space"
+msgstr ""
+
+msgid "Ignore white space when comparing lines in diff views. Default: False"
+msgstr ""
+
+msgid "Ignore WS Amount"
+msgstr ""
+
+msgid ""
+"Ignore changes in the amount of white space in diff views. Default: False"
+msgstr ""
+
+msgid "Ignore Blank Lines"
+msgstr ""
+
+msgid "Ignore changes whose lines are all blank in diff views. Default: False"
+msgstr ""
+
+msgid "<b>Annotate:</b>"
+msgstr ""
+
+msgid ""
+"Ignore white space when comparing lines in the annotate view. Default: False"
+msgstr ""
+
+msgid ""
+"Ignore changes in the amount of white space in the annotate view. Default: "
+"False"
+msgstr ""
+
+msgid ""
+"Ignore changes whose lines are all blank in the annotate view. Default: False"
+msgstr ""
+
+msgid "Fonts"
+msgstr ""
+
+msgid "Message Font"
+msgstr ""
+
+msgid "Font used to display commit messages. Default: monospace 10"
+msgstr ""
+
+msgid "Diff Font"
+msgstr ""
+
+msgid "Font used to display text differences. Default: monospace 10"
+msgstr ""
+
+msgid "ChangeLog Font"
+msgstr ""
+
+msgid "Font used to display changelog data. Default: monospace 10"
+msgstr ""
+
+msgid "Output Font"
+msgstr ""
+
+msgid "Font used to display output messages. Default: sans 8"
+msgstr ""
+
+msgid "Extensions"
+msgstr ""
+
+msgid "Tools"
+msgstr ""
+
+msgid "Hooks"
+msgstr ""
+
+msgid "Issue Tracking"
+msgstr ""
+
+msgid "Issue Regex"
+msgstr ""
+
+msgid "Defines the regex to match when picking up issue numbers."
+msgstr ""
+
+msgid "Issue Link"
+msgstr ""
+
+#, python-brace-format
+msgid ""
+"Defines the command to run when an issue number is recognized. You may "
+"include groups in issue.regex, and corresponding {n} tokens in issue.link "
+"(where n is a non-negative integer). {0} refers to the entire string matched "
+"by issue.regex, while {1} refers to the first group and so on. If no {n} "
+"tokens are found in issue.link, the entire matched string is appended "
+"instead."
+msgstr ""
+
+msgid "Inline Tags"
+msgstr ""
+
+msgid "Show tags at start of commit message."
+msgstr ""
+
+msgid "Mandatory Issue Reference"
+msgstr ""
+
+msgid ""
+"When committing, require that a reference to an issue be specified. If "
+"enabled, the regex configured in 'Issue Regex' must find a match in the "
+"commit message."
+msgstr ""
+
+msgid "Issue Tracker Plugin"
+msgstr ""
+
+msgid ""
+"Configures a COM IBugTraqProvider or IBugTrackProvider2 issue tracking "
+"plugin."
+msgstr ""
+
+msgid "Configure Issue Tracker"
+msgstr ""
+
+msgid "Configure the selected COM Bug Tracker plugin."
+msgstr ""
+
+msgid "Issue Tracker Trigger"
+msgstr ""
+
+msgid ""
+"Determines when the issue tracker state will be updated by TortoiseHg. Valid "
+"settings values are:<ul><li><b>never</b>: Do not update the Issue Tracker "
+"state automatically.<li><b>commit</b>: Update the Issue Tracker state after "
+"a successful commit.</ul><p>Default: never"
+msgstr ""
+
+msgid "Changeset Link"
+msgstr ""
+
+msgid ""
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
+"link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
+msgstr ""
+
+msgid "Path to review board example \"http://demo.reviewboard.org\""
+msgstr ""
+
+msgid "User name to authenticate with review board"
+msgstr ""
+
+msgid "Password to authenticate with review board"
+msgstr ""
+
+msgid "Server Repository ID"
+msgstr ""
+
+msgid "The default repository id for this repo on the review board server"
+msgstr ""
+
+msgid "Target Groups"
+msgstr ""
+
+msgid "A comma separated list of target groups"
+msgstr ""
+
+msgid "Target People"
+msgstr ""
+
+msgid "A comma separated list of target people"
+msgstr ""
+
+msgid "Kiln Bfiles"
+msgstr ""
+
+msgid "Patterns"
+msgstr ""
+
+msgid ""
+"Files with names meeting the specified patterns will be automatically added "
+"as bfiles"
+msgstr ""
+
+msgid "Size"
+msgstr ""
+
+msgid ""
+"Files of at least the specified size (in megabytes) will be added as bfiles"
+msgstr ""
+
+msgid "System Cache"
+msgstr ""
+
+msgid ""
+"Path to the directory where a system-wide cache of bfiles will be stored"
+msgstr ""
+
+msgid "Simplelock"
+msgstr ""
+
+msgid "Lock Clone"
+msgstr ""
+
+msgid ""
+"Location of local clone of organizational lock repository.<p>This repository "
+"must contain a \"locked\" text file"
+msgstr ""
+
+msgid "Largefiles"
+msgstr ""
+
+msgid ""
+"Files with names meeting the specified patterns will be automatically added "
+"as largefiles"
+msgstr ""
+
+msgid "Minimum Size"
+msgstr ""
+
+msgid ""
+"Files of at least the specified size (in megabytes) will be added as "
+"largefiles"
+msgstr ""
+
+msgid "User Cache"
+msgstr ""
+
+msgid "Path to the directory where a user's cache of largefiles will be stored"
+msgstr ""
+
+msgid "Projrc"
+msgstr ""
+
+msgid "Require confirmation"
+msgstr ""
+
+msgid ""
+"When to ask the user to confirm the update of the local \"projrc\" "
+"configuration file when the remote projrc file changes. Possible values are:"
+"<ul><li><b>always</b>: [<i>default</i>] Always show a confirmation prompt "
+"before updating the local .hg/projrc file.<li><b>first</b>: Show a "
+"confirmation dialog when the repository is cloned or when a remote projrc "
+"file is found for the first time.<li><b>never</b>: Update the local .hg/"
+"projrc file automatically, without requiring any user confirmation.</ul>"
+msgstr ""
+
+msgid "Servers"
+msgstr ""
+
+msgid ""
+"List of Servers from which \"projrc\" configuration files must be pulled. "
+"Set it to \"*\" to pull from all servers. Set it to \"default\" to pull from "
+"the default sync path. Default is pull from NO servers."
+msgstr ""
+
+msgid "Include"
+msgstr ""
+
+msgid ""
+"List of settings that will be pulled from the project configuration file. "
+"Default is include NO settings."
+msgstr ""
+
+msgid "Exclude"
+msgstr ""
+
+msgid ""
+"List of settings that will NOT be pulled from the project configuration "
+"file. Default is exclude none of the included settings."
+msgstr ""
+
+msgid "Update on incoming"
+msgstr ""
+
+msgid ""
+"Let the user update the projrc on incoming:<ul><li><b>never</b>: "
+"[<i>default</i>] Show whether the remote projrc file has changed, but do not "
+"update (nor ask to update) the local projrc file.<li><b>prompt</b>: Look for "
+"changes to the projrc file. If there are changes _always_ show a "
+"confirmation prompt, asking the user if it wants to update its local projrc "
+"file.<li><b>auto</b>: Look for changes to the projrc file. Use the value of "
+"the \"projrc.confirm\" configuration key to determine whether to show a "
+"confirmation dialog or not before updating the local projrc file.</"
+"ul><p>Default: never"
+msgstr ""
+
+msgid "GnuPG"
+msgstr ""
+
+msgid "Specify the path to GPG. Default: gpg"
+msgstr ""
+
+msgid "Key ID"
+msgstr ""
+
+msgid "GPG key ID associated with user. Default: None (leave blank)"
+msgstr ""
+
+msgid "TortoiseHg Settings"
+msgstr ""
+
+msgid "Iniparse package not found"
+msgstr ""
+
+msgid "Can't change settings without iniparse package - view is readonly."
+msgstr ""
+
+#, python-format
+msgid "%s's global settings"
+msgstr ""
+
+msgid "No repository found"
+msgstr ""
+
+msgid "no repo at "
+msgstr ""
+
+#, python-format
+msgid "%s project settings (.hg/projrc)"
+msgstr ""
+
+#, python-format
+msgid "%s repository settings"
+msgstr ""
+
+msgid ""
+"Restart all TortoiseHg applications for the following changes to take effect:"
+msgstr ""
+
+msgid "Apply changes before exit?"
+msgstr ""
+
+msgid "&No (discard changes)"
+msgstr ""
+
+msgid "Reload"
+msgstr ""
+
+msgid "Settings File:"
+msgstr ""
+
+msgid "Confirm Save"
+msgstr ""
+
+msgid "Save changes before editing?"
+msgstr ""
+
+msgid "&Save"
+msgstr ""
+
+msgid "Confirm Reload"
+msgstr ""
+
+msgid ""
+"Unsaved changes will be lost.\n"
+"Do you want to reload?"
+msgstr ""
+
+msgid "Unable to create a Mercurial.ini file"
+msgstr ""
+
+msgid "Insufficient access rights, reverting to read-only mode."
+msgstr ""
+
+msgid "Context Menu"
+msgstr ""
+
+msgid "Top menu items:"
+msgstr ""
+
+msgid "Sub menu items:"
+msgstr ""
+
+msgid "Menu Behavior"
+msgstr ""
+
+msgid "Hide context menu outside repositories"
+msgstr ""
+
+msgid ""
+"Do not show menu items on unversioned folders (use shift + click to override)"
+msgstr ""
+
+msgid "Icons"
+msgstr ""
+
+msgid "Overlays"
+msgstr ""
+
+msgid "Enabled overlays"
+msgstr ""
+
+msgid "Local disks only"
+msgstr ""
+
+msgid "Enabled Overlay Handlers"
+msgstr ""
+
+msgid "Warning: affects all Tortoises, logoff required after change"
+msgstr ""
+
+msgid "Added"
+msgstr ""
+
+msgid "Locked*"
+msgstr ""
+
+msgid "Ignored*"
+msgstr ""
+
+msgid "Unversioned"
+msgstr ""
+
+msgid "Readonly*"
+msgstr ""
+
+msgid "Deleted*"
+msgstr ""
+
+msgid "*: not used by TortoiseHg"
+msgstr ""
+
+msgid "Taskbar"
+msgstr ""
+
+msgid "Show Icon"
+msgstr ""
+
+msgid "Highlight Icon"
+msgstr ""
+
+#. i18n: URL of TortoiseSVN documentation
+msgid ""
+"https://tortoisesvn.net/docs/release/TortoiseSVN_en/tsvn-dug-settings."
+"html#tsvn-dug-settings-icon-set"
+msgstr ""
+
+#, python-format
+msgid ""
+"You can change the icon set from <a href=\"%s\">TortoiseSVN's Settings</a>"
+msgstr ""
+
+msgid "Explorer Extension Settings - TortoiseHg"
+msgstr ""
+
+msgid "Clear"
+msgstr ""
+
+msgid "Clear the current shelf file"
+msgstr ""
+
+msgid "Delete the current shelf file"
+msgstr ""
+
+msgid "Left Toolbar"
+msgstr ""
+
+msgid "Delete selected chunks"
+msgstr ""
+
+msgid "Move all files right"
+msgstr ""
+
+msgid "Move selected file right"
+msgstr ""
+
+msgid "Edit file"
+msgstr ""
+
+msgid "Move selected chunks right"
+msgstr ""
+
+msgid "Refresh Toolbar"
+msgstr ""
+
+msgid "Refresh"
+msgstr ""
+
+msgid "New Shelf"
+msgstr ""
+
+msgid "Right Toolbar"
+msgstr ""
+
+msgid "Move selected chunks left"
+msgstr ""
+
+msgid "Move selected file left"
+msgstr ""
+
+msgid "Move all files left"
+msgstr ""
+
+msgid "Backup copies of modified files can be found in .hg/Trashcan/"
+msgstr ""
+
+#, python-format
+msgid "TortoiseHg Shelve - %s"
+msgstr ""
+
+msgid "Delete selected chunks from working copy?"
+msgstr ""
+
+#, python-format
+msgid "Delete selected chunks from shelf file %s?"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
+msgid "TortoiseHg New Shelf Name"
+msgstr ""
+
+msgid "Specify name of new shelf"
+msgstr ""
+
+msgid "Bad filename"
+msgstr ""
+
+#, python-format
+msgid "A shelf name cannot contain %s"
+msgstr ""
+
+msgid "File already exists"
+msgstr ""
+
+msgid "A shelf file of that name already exists"
+msgstr ""
+
+msgid "New shelf created"
+msgstr ""
+
+#, python-format
+msgid "Delete shelf file %s?"
+msgstr ""
+
+msgid "Shelf deleted"
+msgstr ""
+
+msgid "Revert all working copy changes?"
+msgstr ""
+
+#, python-format
+msgid "Clear contents of shelf file %s?"
+msgstr ""
+
+msgid "Shelf cleared"
+msgstr ""
+
+#, python-format
+msgid "Shelf: %s"
+msgstr ""
+
+#, python-format
+msgid "Patch: %s"
+msgstr ""
+
+msgid "Key:"
+msgstr ""
+
+msgid "Local sign"
+msgstr ""
+
+msgid "Sign even if the sigfile is modified (-f/--force)"
+msgstr ""
+
+msgid "No commit"
+msgstr ""
+
+msgid "Use custom commit message:"
+msgstr ""
+
+msgid "&Sign"
+msgstr ""
+
+#, python-format
+msgid "Sign - %s"
+msgstr ""
+
+msgid "Signature has been added"
+msgstr ""
+
+msgid "Repository command still running"
+msgstr ""
+
+msgid "Filter:"
+msgstr ""
+
+msgid "Check all files"
+msgstr ""
+
+msgid "Uncheck all files"
+msgstr ""
+
+msgid "Status File List Toolbar"
+msgstr ""
+
+msgid "Remove filter, show root"
+msgstr ""
+
+#, python-format
+msgid "%s - status (selection filtered)"
+msgstr ""
+
+#, python-format
+msgid "%s - status"
+msgstr ""
+
+msgid "Check"
+msgstr ""
+
+msgid "Uncheck"
+msgstr ""
+
+msgid "status"
+msgstr ""
+
+msgid "Failed to refresh"
+msgstr ""
+
+msgid "No appropriate files"
+msgstr ""
+
+msgid "No files found for this operation"
+msgstr ""
+
+msgid "Stat"
+msgstr ""
+
+msgid "M"
+msgstr ""
+
+msgid "Filename"
+msgstr ""
+
+msgid "Size (KB)"
+msgstr ""
+
+#, python-format
+msgid "Checked count: %d"
+msgstr ""
+
+msgid ", resolved merge"
+msgstr ""
+
+msgid ", unresolved merge"
+msgstr ""
+
+#, python-format
+msgid "%s is modified"
+msgstr ""
+
+msgid "modified"
+msgstr ""
+
+#, python-format
+msgid "%s is added"
+msgstr ""
+
+msgid "added"
+msgstr ""
+
+#, python-format
+msgid "%s is removed"
+msgstr ""
+
+msgid "removed"
+msgstr ""
+
+#, python-format
+msgid "%s is not tracked (unknown)"
+msgstr ""
+
+msgid "unknown"
+msgstr ""
+
+#, python-format
+msgid "%s is deleted by non-hg command, but still tracked"
+msgstr ""
+
+msgid "missing"
+msgstr ""
+
+#, python-format
+msgid "%s is ignored"
+msgstr ""
+
+msgid "ignored"
+msgstr ""
+
+#, python-format
+msgid "%s is not modified (clean)"
+msgstr ""
+
+msgid "clean"
+msgstr ""
+
+#, python-format
+msgid "%s is a dirty subrepo"
+msgstr ""
+
+msgid "subrepo"
+msgstr ""
+
+msgid "Check for incoming changes from selected URL"
+msgstr ""
+
+msgid "Pull incoming changes from selected URL"
+msgstr ""
+
+msgid "Detect outgoing changes to selected URL"
+msgstr ""
+
+msgid "Push outgoing changes to selected URL"
+msgstr ""
+
+msgid "Sync Bookmarks"
+msgstr ""
+
+msgid "Email outgoing changesets for remote repository"
+msgstr ""
+
+msgid "Manage pending perforce changelists"
+msgstr ""
+
+msgid "Unbundle"
+msgstr ""
+
+msgid "<b>Selected Options:</b>"
+msgstr ""
+
+msgid "Path Edit Toolbar"
+msgstr ""
+
+msgid "Security"
+msgstr ""
+
+msgid "Manage HTTPS connection security and user authentication"
+msgstr ""
+
+msgid "Save"
+msgstr "Tallenna"
+
+msgid "Save current URL under an alias"
+msgstr ""
+
+msgid "Paths in Repository Settings:"
+msgstr ""
+
+msgid "Related Paths:"
+msgstr ""
+
+msgid "branch: "
+msgstr ""
+
+msgid "bookmark: "
+msgstr ""
+
+#, python-format
+msgid "rev: %d (%s)"
+msgstr ""
+
+msgid "Post Pull: "
+msgstr ""
+
+msgid "&Edit..."
+msgstr ""
+
+msgid "&Remove..."
+msgstr "&Poista..."
+
+msgid "Repository not local"
+msgstr ""
+
+msgid "A terminal shell cannot be opened for remote"
+msgstr ""
+
+msgid "Confirm path delete"
+msgstr ""
+
+#, python-format
+msgid "Delete %s from your repo configuration file?"
+msgstr ""
+
+msgid "Select repository"
+msgstr ""
+
+msgid "No host specified"
+msgstr ""
+
+msgid "Please set a valid URL to continue."
+msgstr ""
+
+msgid "No remote repository URL or path set"
+msgstr ""
+
+msgid ""
+"No valid <i>default</i> remote repository URL or path has been configured "
+"for this repository.<p>Please type and save a remote repository path on the "
+"Sync widget."
+msgstr ""
+
+msgid "Redundant authentication info"
+msgstr ""
+
+msgid ""
+"You have authentication info configured for this host and inside this URL.  "
+"Remove authentication info from this URL?"
+msgstr ""
+
+msgid "sync command already running"
+msgstr ""
+
+#, python-format
+msgid "Getting incoming changesets from %s..."
+msgstr ""
+
+#, python-format
+msgid "Found incoming changesets from %s"
+msgstr ""
+
+#, python-format
+msgid "No incoming changesets from %s"
+msgstr ""
+
+#, python-format
+msgid "Incoming from %s aborted, ret %d"
+msgstr ""
+
+#, python-format
+msgid "Pulling from %s..."
+msgstr ""
+
+#, python-format
+msgid "Pull from %s completed"
+msgstr ""
+
+#, python-format
+msgid "Pull from %s aborted, ret %d"
+msgstr ""
+
+msgid "Merge caused file conflicts"
+msgstr ""
+
+msgid "File conflicts need to be resolved"
+msgstr ""
+
+#, python-format
+msgid "Finding outgoing changesets to %s..."
+msgstr ""
+
+#, python-format
+msgid "%d outgoing changesets to %s"
+msgstr ""
+
+#, python-format
+msgid "No outgoing changesets to %s"
+msgstr ""
+
+#, python-format
+msgid "Outgoing to %s aborted, ret %d"
+msgstr ""
+
+msgid "Perforce pending..."
+msgstr ""
+
+#, python-format
+msgid "%s (submitted)"
+msgstr ""
+
+#, python-format
+msgid "%s (pending)"
+msgstr ""
+
+msgid "Unable to parse p4pending output"
+msgstr ""
+
+#, python-format
+msgid "%d pending changelists found"
+msgstr ""
+
+msgid "No pending Perforce changelists"
+msgstr ""
+
+msgid "Aborted p4pending"
+msgstr ""
+
+msgid "Unable to determine pending changesets"
+msgstr ""
+
+msgid "Confirm Push to remote Repository"
+msgstr ""
+
+#, python-format
+msgid ""
+"Push to remote repository\n"
+"%s\n"
+"?"
+msgstr ""
+
+#, python-format
+msgid "Push to %s aborted"
+msgstr ""
+
+#, python-format
+msgid ""
+"Invalid default push revision: %s. Please check your Mercurial configuration "
+"(tortoisehg.defaultpush)"
+msgstr ""
+
+#, python-format
+msgid "Pushing to %s..."
+msgstr ""
+
+#, python-format
+msgid "Push to %s completed"
+msgstr ""
+
+#, python-format
+msgid "Push to %s aborted, ret %d"
+msgstr ""
+
+msgid ""
+"One or more of the changesets that you are attempting to push involve the "
+"creation of a new branch.  Do you want to create a new branch in the remote "
+"repository?"
+msgstr ""
+
+msgid "Determining outgoing changesets to email..."
+msgstr ""
+
+msgid "No outgoing changesets"
+msgstr ""
+
+#, python-format
+msgid "Outgoing aborted, ret %d"
+msgstr ""
+
+msgid "Select bundle file"
+msgstr ""
+
+msgid "Bundle files (*.hg)"
+msgstr ""
+
+msgid "Unable to remove URL"
+msgstr ""
+
+msgid "Post Pull Behavior"
+msgstr ""
+
+msgid "Select post-pull operation for this repository"
+msgstr ""
+
+msgid "None - simply pull changesets"
+msgstr ""
+
+msgid "Update - pull, then try to update"
+msgstr ""
+
+msgid "Fetch - use fetch (auto merge pulled changes)"
+msgstr ""
+
+msgid "Fetch - use fetch extension (fetch is not active!)"
+msgstr ""
+
+msgid "Rebase - rebase local commits above pulled changes"
+msgstr ""
+
+msgid "UpdateOrRebase - pull, then try to update or rebase"
+msgstr ""
+
+msgid "Rebase - use rebase extension (rebase is not active!)"
+msgstr ""
+
+msgid "UpdateOrRebase - use rebase extension (rebase is not active!)"
+msgstr ""
+
+msgid "<a href=\"config\">Launch settings tool...</a>"
+msgstr ""
+
+msgid "Unable to save post pull operation"
+msgstr ""
+
+msgid "Save Path"
+msgstr ""
+
+msgid "Alias"
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Remove authentication data from URL"
+msgstr ""
+
+msgid ""
+"User authentication data should be associated with the hostname using the "
+"security dialog."
+msgstr ""
+
+msgid "Update subrepo paths"
+msgstr ""
+
+#, python-format
+msgid ""
+"Update or create a path alias called '%s' on all subrepos, using this URL as "
+"the base URL, appending the local relative subrepo path to it"
+msgstr ""
+
+msgid "Unable to save an URL"
+msgstr ""
+
+msgid "Confirm URL replace"
+msgstr ""
+
+#, python-format
+msgid "%s already exists, replace URL?"
+msgstr ""
+
+#, python-format
+msgid ""
+"Subrepo '%s' has a non trivial default sync URL:<p>%s<p>Replace it with the "
+"following URL?:<p>%s"
+msgstr ""
+
+msgid "Security: "
+msgstr ""
+
+#, python-format
+msgid "<b>Host:</b> %s"
+msgstr ""
+
+msgid "Secure HTTPS Connection"
+msgstr ""
+
+msgid "Verify with Certificate Authority certificates (best)"
+msgstr ""
+
+msgid "Verify with stored host fingerprint (good)"
+msgstr ""
+
+msgid "No host validation, but still encrypted (bad)"
+msgstr ""
+
+msgid "### host certificate fingerprint ###"
+msgstr ""
+
+msgid "Query"
+msgstr ""
+
+msgid "TLS 1.0"
+msgstr ""
+
+msgid "TLS 1.1"
+msgstr ""
+
+msgid "TLS 1.2"
+msgstr ""
+
+msgid "Minimum Protocol"
+msgstr ""
+
+msgid "User Authentication"
+msgstr ""
+
+msgid ""
+"Optional. Username to authenticate with. If not given, and the remote\n"
+"site requires basic or digest authentication, the user will be prompted for\n"
+"it. Environment variables are expanded in the username letting you do\n"
+"foo.username = $USER."
+msgstr ""
+
+msgid ""
+"Optional. Password to authenticate with. If not given, and the remote\n"
+"site requires basic or digest authentication, the user will be prompted for\n"
+"it."
+msgstr ""
+
+msgid ""
+"Mercurial keyring extension is enabled. Passwords will be stored in a "
+"platform-native secure method."
+msgstr ""
+
+msgid ""
+"Optional. PEM encoded client certificate key file. Environment variables\n"
+"are expanded in the filename."
+msgstr ""
+
+msgid "User Certificate Key"
+msgstr ""
+
+msgid ""
+"Optional. PEM encoded client certificate chain file. Environment variables\n"
+"are expanded in the filename."
+msgstr ""
+
+msgid "User Certificate Chain"
+msgstr ""
+
+msgid "Certificate Query Error"
+msgstr ""
+
+msgid "Select User Certificate Key File"
+msgstr ""
+
+msgid "PEM files (*.pem *.key)"
+msgstr ""
+
+msgid "Select User Certificate Chain File"
+msgstr ""
+
+msgid "PEM files (*.pem *.crt *.cer)"
+msgstr ""
+
+msgid "Unable to save authentication"
+msgstr ""
+
+#, python-format
+msgid "%s - sync options"
+msgstr ""
+
+msgid "Allow push of a new branch (--new-branch)"
+msgstr ""
+
+msgid "Force push or pull (override safety checks, --force)"
+msgstr ""
+
+msgid "Temporarily disable configured HTTP proxy"
+msgstr ""
+
+msgid "Emit debugging output (--debug)"
+msgstr ""
+
+msgid "Work on patch queue (--mq)"
+msgstr ""
+
+#, python-format
+msgid "Tag - %s"
+msgstr ""
+
+msgid "Tag:"
+msgstr ""
+
+msgid "Tagged:"
+msgstr ""
+
+msgid "Local tag"
+msgstr ""
+
+msgid "Replace existing tag (-f/--force)"
+msgstr ""
+
+msgid "Use English commit message"
+msgstr ""
+
+msgid "local"
+msgstr ""
+
+msgid "Move"
+msgstr ""
+
+#, python-format
+msgid "Moved tag %s to changeset %s (from changeset %s)"
+msgstr ""
+
+#, python-format
+msgid "Added tag %s for changeset %s"
+msgstr ""
+
+#, python-format
+msgid "Tag '%s' has been moved"
+msgstr ""
+
+#, python-format
+msgid "Tag '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Removed tag %s"
+msgstr ""
+
+#, python-format
+msgid "Tag '%s' has been removed"
+msgstr ""
+
+msgid "Patch files (*.diff *.patch)"
+msgstr ""
+
+#, python-format
+msgid "Import - %s"
+msgstr ""
+
+msgid "Browse Directory..."
+msgstr ""
+
+msgid "Import from Clipboard"
+msgstr ""
+
+msgid "Do not strip paths (-p0), required for SVN patches"
+msgstr ""
+
+msgid "Preview:"
+msgstr ""
+
+msgid "Shelf"
+msgstr ""
+
+msgid "Checking working directory status..."
+msgstr ""
+
+msgid "&Import"
+msgstr ""
+
+msgid "Working directory is not clean!  <a href=\"view\">View changes...</a>"
+msgstr ""
+
+msgid "Select patches"
+msgstr ""
+
+msgid "Select Directory containing patches"
+msgstr ""
+
+#, python-format
+msgid "%s patches"
+msgstr ""
+
+#, python-format
+msgid "%s will be imported to "
+msgstr ""
+
+msgid "Nothing to import"
+msgstr ""
+
+msgid "Strip:"
+msgstr ""
+
+msgid "Discard local changes, no backup (-f/--force)"
+msgstr ""
+
+msgid "No backup (-n/--nobackup)"
+msgstr ""
+
+msgid "Do not modify working copy during strip (-k/--keep)"
+msgstr ""
+
+#, python-format
+msgid "<b>%d changeset</b> will be stripped"
+msgid_plural "<b>%d changesets</b> will be stripped"
+msgstr[0] ""
+msgstr[1] ""
+
+msgid "Unknown revision!"
+msgstr ""
+
+msgid "Detected uncommitted local changes."
+msgstr ""
+
+msgid "Do you want to keep them or discard them?"
+msgstr ""
+
+msgid "&Keep (--keep)"
+msgstr ""
+
+msgid "&Discard (--force)"
+msgstr ""
+
+msgid "Confirm Strip"
+msgstr ""
+
+#, python-format
+msgid "Strip - %s"
+msgstr ""
+
+msgid "&Strip"
+msgstr ""
+
+msgid "Topic:"
+msgstr ""
+
+msgid "&Rename"
+msgstr ""
+
+#, python-format
+msgid "Topic - %s"
+msgstr ""
+
+#, python-format
+msgid "A topic named \"%s\" already exists"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been added"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' does not exist"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been removed"
+msgstr ""
+
+#, python-format
+msgid "Topic '%s' has been renamed to %s"
+msgstr ""
+
+msgid "Parent 1:"
+msgstr ""
+
+msgid "Parent 2:"
+msgstr ""
+
+msgid "Pull subrepos from:"
+msgstr ""
+
+msgid "List updated files (--verbose)"
+msgstr ""
+
+msgid "Discard local changes, no backup (-C/--clean)"
+msgstr ""
+
+msgid "Always merge (when possible)"
+msgstr ""
+
+msgid "(same as parent)"
+msgstr ""
+
+msgid "Activate bookmark?"
+msgstr ""
+
+#, python-format
+msgid ""
+"The selected revision (%s) has a bookmark on it called \"<i>%s</i>\".<p>Do "
+"you want to activate it?<br></b><i>You can disable this prompt by "
+"configuring Settings/Workbench/Activate Bookmarks</i>"
+msgstr ""
+
+#, python-format
+msgid ""
+"The selected revision (<i>%s</i>) has <i>%d</i> bookmarks on it.<p>Select "
+"the bookmark that you want to activate and click <i>OK</i>.<p>Click "
+"<i>Cancel</i> if you don't want to activate any of them.<p><p><i>You can "
+"disable this prompt by configuring Settings/Workbench/Activate Bookmarks</"
+"i><p>"
+msgstr ""
+
+msgid "Deactivate current bookmark?"
+msgstr ""
+
+#, python-format
+msgid "Do you really want to deactivate the <i>%s</i> bookmark?"
+msgstr ""
+
+msgid ""
+"Detected uncommitted local changes in working tree.\n"
+"Please select to continue:\n"
+msgstr ""
+
+msgid "Discard - discard local changes, no backup"
+msgstr ""
+
+msgid "&Shelve"
+msgstr ""
+
+msgid "Shelve - move local changes to a patch"
+msgstr ""
+
+msgid "Merge - allow to merge with local changes"
+msgstr ""
+
+msgid "Confirm Update"
+msgstr ""
+
+#, python-format
+msgid "Update - %s"
+msgstr ""
+
+msgid "[non-existant]"
+msgstr ""
+
+msgid "Tool launch failure"
+msgstr ""
+
+#, python-format
+msgid "%s : %s"
+msgstr "%s : %s"
+
+msgid "No diff tool found"
+msgstr ""
+
+msgid "No visual diff tools were detected"
+msgstr ""
+
+msgid "[working copy]"
+msgstr ""
+
+msgid "[original]"
+msgstr ""
+
+msgid "Unable to find changeset"
+msgstr ""
+
+msgid "You likely need to refresh this application"
+msgstr ""
+
+msgid "No file changes"
+msgstr ""
+
+msgid "There are no file changes to view"
+msgstr ""
+
+msgid "working changes"
+msgstr ""
+
+#, python-format
+msgid "changeset %d:%s"
+msgstr ""
+
+#, python-format
+msgid "revisions %d:%s to %d:%s"
+msgstr ""
+
+msgid "Visual Diffs - "
+msgstr ""
+
+msgid " filtered"
+msgstr ""
+
+msgid "Temporary files are removed when this dialog is closed"
+msgstr ""
+
+msgid "Select Tool:"
+msgstr ""
+
+msgid "Dir diff to p1"
+msgstr ""
+
+msgid "Dir diff to p2"
+msgstr ""
+
+msgid "3-way dir diff"
+msgstr ""
+
+msgid "Directory diff"
+msgstr ""
+
+msgid "Confirm Discard"
+msgstr ""
+
+msgid "Discard outstanding changes to working directory?"
+msgstr ""
+
+msgid "Config files (*.conf *.config *.ini)"
+msgstr ""
+
+msgid "Open hgweb config"
+msgstr ""
+
+msgid "Save hgweb config"
+msgstr ""
+
+msgid "Path:"
+msgstr ""
+
+msgid "Local Path:"
+msgstr ""
+
+msgid "Select Repository"
+msgstr ""
+
+msgid "Add Path to Serve"
+msgstr ""
+
+msgid "Edit Path to Serve"
+msgstr ""
+
+msgid "Local Path"
+msgstr ""
+
+msgid "Webconf"
+msgstr ""
+
+msgid "Config File:"
+msgstr ""
+
+msgid "Open"
+msgstr "Avaa"
+
+msgid "New &Workbench"
+msgstr ""
+
+msgid "&New Repository..."
+msgstr ""
+
+msgid "Clon&e Repository..."
+msgstr ""
+
+msgid "&Open Repository..."
+msgstr ""
+
+msgid "&File"
+msgstr "&Tiedosto"
+
+msgid "&View"
+msgstr ""
+
+msgid "&Repository"
+msgstr ""
+
+msgid "&Help"
+msgstr "&Ohje"
+
+msgid "&Dock Toolbar"
+msgstr ""
+
+msgid "&Task Toolbar"
+msgstr ""
+
+msgid "&Custom Toolbar"
+msgstr ""
+
+msgid "S&ync Toolbar"
+msgstr ""
+
+msgid "&Close Repository"
+msgstr ""
+
+msgid "Sh&ow Repository Registry"
+msgstr ""
+
+msgid "Show &Patch Queue"
+msgstr ""
+
+msgid "Show Conso&le"
+msgstr ""
+
+msgid "Place Console in Doc&k Area"
+msgstr ""
+
+msgid "R&epository Registry Options"
+msgstr ""
+
+msgid "Save Open Repositories on E&xit"
+msgstr ""
+
+msgid "Sa&ve Current Sync Paths on Exit"
+msgstr ""
+
+msgid "Show Tas&k Tab"
+msgstr ""
+
+msgid "&Commit"
+msgstr ""
+
+msgid "&Patch Branch"
+msgstr ""
+
+msgid "Revision &Details"
+msgstr ""
+
+msgid "&Search"
+msgstr ""
+
+msgid "S&ynchronize"
+msgstr ""
+
+msgid "Refresh current repository"
+msgstr ""
+
+msgid "Refresh &Task Tab"
+msgstr ""
+
+msgid "Refresh only the current task tab"
+msgstr ""
+
+msgid "Load &All Revisions"
+msgstr ""
+
+msgid "Load all revisions into graph"
+msgstr ""
+
+msgid "Go to current revision"
+msgstr ""
+
+msgid "&Goto Revision..."
+msgstr ""
+
+msgid "Go to a specific revision"
+msgstr ""
+
+msgid "Filter graph with revision sets or branches"
+msgstr ""
+
+msgid "&Workbench Toolbars"
+msgstr ""
+
+msgid "&Lock File..."
+msgstr ""
+
+msgid "Lock or unlock files"
+msgstr ""
+
+msgid "Update working directory or switch revisions"
+msgstr ""
+
+msgid "&Shelve..."
+msgstr ""
+
+msgid "&Import Patches..."
+msgstr ""
+
+msgid "U&nbundle..."
+msgstr ""
+
+msgid "&Merge..."
+msgstr ""
+
+msgid "Merge with the other head of the current branch"
+msgstr ""
+
+msgid "&Resolve..."
+msgstr ""
+
+msgid "R&ollback/Undo..."
+msgstr ""
+
+msgid "&Purge..."
+msgstr ""
+
+msgid "&Bisect..."
+msgstr ""
+
+msgid "&Verify"
+msgstr ""
+
+msgid "Re&cover"
+msgstr ""
+
+msgid "&Web Server"
+msgstr ""
+
+msgid "E&xplorer Help"
+msgstr ""
+
+msgid "&Readme"
+msgstr ""
+
+msgid "About &Qt"
+msgstr ""
+
+msgid "&About TortoiseHg"
+msgstr ""
+
+msgid "&Incoming"
+msgstr ""
+
+msgid "&Pull"
+msgstr ""
+
+msgid "&Outgoing"
+msgstr ""
+
+msgid "P&ush"
+msgstr ""
+
+msgid "&Sync Bookmarks..."
+msgstr ""
+
+#, python-format
+msgid ""
+"pull: %s\n"
+"push: %s"
+msgstr ""
+
+msgid ""
+"There are no configured sync paths.\n"
+"Open the Synchronize tab to configure them."
+msgstr ""
+
+msgid "Check for incoming changes"
+msgstr ""
+
+msgid "Pull incoming changes"
+msgstr ""
+
+msgid "Detect outgoing changes"
+msgstr ""
+
+msgid "Push outgoing changes"
+msgstr ""
+
+#, python-format
+msgid ""
+"Check for incoming changes from\n"
+"%s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Pull incoming changes from\n"
+"%s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Detect outgoing changes to\n"
+"%s"
+msgstr ""
+
+#, python-format
+msgid ""
+"Push outgoing changes to\n"
+"%s"
+msgstr ""
+
+#, python-format
+msgid "Execute custom tool '%s'"
+msgstr ""
+
+msgid "Custom Toolbar &Settings"
+msgstr ""
+
+msgid "TortoiseHg Workbench"
+msgstr ""
+
+#, python-format
+msgid "%s - TortoiseHg Workbench - %s"
+msgstr ""
+
+#, python-format
+msgid "%s - TortoiseHg Workbench"
+msgstr ""
+
+msgid "Goto revision"
+msgstr ""
+
+msgid "Enter revision identifier"
+msgstr ""
+
+msgid "Select repository directory to open"
+msgstr ""
+
+msgid "README not configured"
+msgstr ""
+
+msgid ""
+"A README file is not configured for the current repository.<p>To configure a "
+"README file for a repository, open the repository settings file, add a "
+"'<i>readme</i>' key to the '<i>tortoisehg</i>' section, and set it to the "
+"filename or URL of your repository's README file."
+msgstr ""
+
+msgid "Issue Tracker Plugin Error"
+msgstr ""
+
+msgid "Could not instantiate Issue Tracker plugin COM object"
+msgstr ""
+
+msgid "This error will not be shown again until you restart the workbench"
+msgstr ""
+
+msgid "Error getting commit message information from Issue Tracker plugin"
+msgstr ""
+
+msgid "Error executing \"commit finished\" trigger"
+msgstr ""
+
+msgid "Cannot open Plugin Options dialog"
+msgstr ""
+
+msgid "do not verify server certificate (ignoring web.cacerts config)"
+msgstr ""
+
+msgid "[--insecure] [SOURCE]"
+msgstr ""
+
+#, python-format
+msgid "unsupported URL: %s"
+msgstr ""
+
+#, python-format
+msgid "%s certificate error: no certificate received"
+msgstr ""
+
+msgid "move after the specified patch"
+msgstr ""
+
+msgid "[--after PATCH] PATCH..."
+msgstr ""
+
+msgid "unknown patch to move specified"
+msgstr ""
+
+msgid "invalid patch position specified"
+msgstr ""
+
+msgid "cannot move applied patches"
+msgstr ""
+
+#, python-format
+msgid "patch %s not in series"
+msgstr ""
+
+msgid "cannot move into applied patches"
+msgstr ""
+
+msgid "abort: "
+msgstr ""
+
+msgid "hint: "
+msgstr ""
+
+#, python-format
+msgid "HTTP Error: %d (%s)"
+msgstr "HTTP-virhe: %d (%s)"
+
+#, python-format
+msgid "URLError: %s"
+msgstr ""
+
+msgid "SSL: Server certificate verify failed"
+msgstr ""
+
+#, python-format
+msgid "SSL: unknown error %s:%s"
+msgstr "SSL: tuntematon virhe %s:%s"
+
+#, python-format
+msgid "SSL error: %s"
+msgstr "SSL virhe: %s"
+
+msgid "hgsubversion packaged with thg"
+msgstr ""
+
+msgid "hggit packaged with thg"
+msgstr ""
+
+msgid "inotify is not supported on this platform"
+msgstr ""
+
+msgid "eol is incompatible with win32text"
+msgstr ""
+
+msgid "win32text is incompatible with eol"
+msgstr ""
+
+msgid "hgsubversion is incompatible with perfarce"
+msgstr ""
+
+msgid "perfarce is incompatible with hgsubversion"
+msgstr ""
+
+msgid "Workbench custom toolbar"
+msgstr ""
+
+msgid "Revision details context menu"
+msgstr ""
+
+msgid "Pair selection context menu"
+msgstr ""
+
+msgid "Multiple selection context menu"
+msgstr ""
+
+msgid "Commit context menu"
+msgstr ""
+
+msgid "File context menu (on manifest and revision details)"
+msgstr ""
+
+#, python-format
+msgid "%d year"
+msgid_plural "%d years"
+msgstr[0] "%d vuosi"
+msgstr[1] "%d vuotta"
+
+#, python-format
+msgid "%d month"
+msgid_plural "%d months"
+msgstr[0] "%d kuukausi"
+msgstr[1] "%d kuukautta"
+
+#, python-format
+msgid "%d week"
+msgid_plural "%d weeks"
+msgstr[0] "%d viikko"
+msgstr[1] "%d viikkoa"
+
+#, python-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d päivä"
+msgstr[1] "%d päivää"
+
+#, python-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d tunti"
+msgstr[1] "%d tuntia"
+
+#, python-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuutti"
+msgstr[1] "%d minuuttia"
+
+#, python-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d sekunti"
+msgstr[1] "%d sekuntia"
+
+msgid "in the future"
+msgstr ""
+
+msgid "now"
+msgstr "nyt"
+
+#, python-format
+msgid "command parse error: %s"
+msgstr ""
+
+#, python-format
+msgid "no matches found: %s"
+msgstr ""
+
+msgid "Commit..."
+msgstr ""
+
+msgid "Commit changes in repository"
+msgstr ""
+
+msgid "Create Repository Here"
+msgstr ""
+
+msgid "Create a new repository"
+msgstr ""
+
+msgid "Clone..."
+msgstr ""
+
+msgid "Create clone here from source"
+msgstr ""
+
+msgid "File Status"
+msgstr ""
+
+msgid "Repository status & changes"
+msgstr ""
+
+msgid "Add Files..."
+msgstr "Lisää tiedostoja..."
+
+msgid "Add files to version control"
+msgstr ""
+
+msgid "Revert Files..."
+msgstr ""
+
+msgid "Revert file changes"
+msgstr ""
+
+msgid "Forget Files..."
+msgstr ""
+
+msgid "Remove files from version control"
+msgstr ""
+
+msgid "Remove Files..."
+msgstr ""
+
+msgid "Rename File"
+msgstr ""
+
+msgid "Rename file or directory"
+msgstr ""
+
+msgid "View change history in repository"
+msgstr ""
+
+msgid "File History"
+msgstr ""
+
+msgid "View change history of selected files"
+msgstr ""
+
+msgid "Shelve Changes"
+msgstr ""
+
+msgid "Move changes between working dir and patch"
+msgstr ""
+
+msgid "Synchronize"
+msgstr ""
+
+msgid "Synchronize with remote repository"
+msgstr ""
+
+msgid "Start web server for this repository"
+msgstr ""
+
+msgid "Update..."
+msgstr "Päivitä..."
+
+msgid "Update working directory"
+msgstr ""
+
+msgid "Update Icons"
+msgstr ""
+
+msgid "Update icons for this repository"
+msgstr ""
+
+msgid "Global Settings"
+msgstr "Yleisasetukset"
+
+msgid "Configure user wide settings"
+msgstr ""
+
+msgid "Repository Settings"
+msgstr ""
+
+msgid "Configure repository settings"
+msgstr ""
+
+msgid "Explorer Extension Settings"
+msgstr ""
+
+msgid "Configure Explorer extension"
+msgstr ""
+
+msgid "About TortoiseHg"
+msgstr ""
+
+msgid "Show About Dialog"
+msgstr ""
+
+msgid "Diff to parent"
+msgstr ""
+
+msgid "View changes using GUI diff tool"
+msgstr ""
+
+msgid "Edit Ignore Filter"
+msgstr ""
+
+msgid "Edit repository ignore filter"
+msgstr ""
+
+msgid "Guess Renames"
+msgstr ""
+
+msgid "Detect renames and copies"
+msgstr ""
+
+msgid "Search History"
+msgstr ""
+
+msgid "Search file revisions for patterns"
+msgstr ""
+
+msgid "DnD Synchronize"
+msgstr ""
+
+msgid "Synchronize with dragged repository"
+msgstr ""
+
+#, python-format
+msgid "unrecognized response: %s"
+msgstr ""
+
+msgid "password: "
+msgstr ""
+
+#, python-format
+msgid "repository %s not found"
+msgstr ""
+
+msgid "win32ill: cannot create window for messages"
+msgstr ""
+
+#, python-format
+msgid "win32ill: unsupported platform: %s\n"
+msgstr ""
+
+msgid "win32ill: interrupted while stopping message loop\n"
+msgstr ""

@@ -7,8 +7,6 @@
 
 from __future__ import absolute_import
 
-import cStringIO
-
 from . import qsci as Qsci
 from .qtcore import (
     QPoint,
@@ -30,7 +28,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import patch
+from mercurial import (
+    patch,
+    pycompat,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -51,7 +52,8 @@ class RejectsDialog(QDialog):
         self.setWindowFlags(Qt.Window)
         self.path = path
 
-        self.setLayout(QVBoxLayout())
+        layout = QVBoxLayout()
+        self.setLayout(layout)
         editor = qscilib.Scintilla()
         editor.setBraceMatching(qsci.SloppyBraceMatch)
         editor.setFolding(qsci.BoxedTreeFoldStyle)
@@ -60,7 +62,7 @@ class RejectsDialog(QDialog):
         editor.customContextMenuRequested.connect(self._onMenuRequested)
         self.baseLineColor = editor.markerDefine(qsci.Background, -1)
         editor.setMarkerBackgroundColor(QColor('lightblue'), self.baseLineColor)
-        self.layout().addWidget(editor, 3)
+        layout.addWidget(editor, 3)
 
         searchbar = qscilib.SearchToolBar(self)
         searchbar.searchRequested.connect(editor.find)
@@ -71,11 +73,11 @@ class RejectsDialog(QDialog):
             searchbar.setFocus(Qt.OtherFocusReason)
         qtlib.newshortcutsforstdkey(QKeySequence.Find, self, showsearchbar)
         self.addActions(searchbar.editorActions())
-        self.layout().addWidget(searchbar)
+        layout.addWidget(searchbar)
 
         hbox = QHBoxLayout()
         hbox.setContentsMargins(2, 2, 2, 2)
-        self.layout().addLayout(hbox, 1)
+        layout.addLayout(hbox, 1)
         self.chunklist = QListWidget(self)
         self.updating = True
         self.chunklist.currentRowChanged.connect(self.showChunk)
@@ -110,7 +112,7 @@ class RejectsDialog(QDialog):
         bb = QDialogButtonBox(BB.Save|BB.Cancel)
         bb.accepted.connect(self.accept)
         bb.rejected.connect(self.reject)
-        self.layout().addWidget(bb)
+        layout.addWidget(bb)
         self.saveButton = bb.button(BB.Save)
 
         s = QSettings()
@@ -124,30 +126,31 @@ class RejectsDialog(QDialog):
             QTimer.singleShot(0, self.reject)
             return
         earlybytes = hglib.fromunicode(editor.text(), 'replace')[:4096]
-        lexer = lexers.getlexer(ui, path, earlybytes, self)
+        lexer = lexers.getlexer(ui, hglib.tounicode(path), earlybytes, self)
         editor.setLexer(lexer)
         if lexer is None:
             editor.setFont(qtlib.getfont('fontlog').font())
         editor.setMarginLineNumbers(1, True)
         editor.setMarginWidth(1, str(editor.lines())+'X')
 
-        buf = cStringIO.StringIO()
+        buf = pycompat.bytesio()
         try:
-            buf.write('diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % path)
-            buf.write(open(path + '.rej', 'rb').read())
+            buf.write(b'diff -r aaaaaaaaaaaa -r bbbbbbbbbbb %s\n' % path)
+            with open(path + b'.rej', 'rb') as fp:
+                buf.write(fp.read())
             buf.seek(0)
-        except IOError, e:
+        except IOError as e:
             pass
         try:
             header = patch.parsepatch(buf)[0]
             self.chunks = header.hunks
-        except (patch.PatchError, IndexError), e:
+        except (patch.PatchError, IndexError) as e:
             self.chunks = []
 
         for chunk in self.chunks:
             chunk.resolved = False
         self.updateChunkList()
-        self.saveButton.setDisabled(len(self.chunks))
+        self.saveButton.setDisabled(bool(self.chunks))
         self.resolved.setDisabled(True)
         self.unresolved.setDisabled(True)
         QTimer.singleShot(0, lambda: self.chunklist.setCurrentRow(0))
@@ -196,7 +199,7 @@ class RejectsDialog(QDialog):
     def showChunk(self, row):
         if row == -1 or self.updating:
             return
-        buf = cStringIO.StringIO()
+        buf = pycompat.bytesio()
         chunk = self.chunks[row]
         chunk.write(buf)
         chunkstr = buf.getvalue().decode(self._textEncoding(), 'replace')

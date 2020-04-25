@@ -65,7 +65,7 @@ class RebaseDialog(QDialog):
         source = csinfo.create(self.repo, s, style, withupdate=True)
         srcb.layout().addWidget(source)
         self.sourcecsinfo = source
-        self.layout().addWidget(srcb)
+        box.addWidget(srcb)
 
         destb = QGroupBox(_('To rebase destination'))
         destb.setLayout(QVBoxLayout())
@@ -74,49 +74,49 @@ class RebaseDialog(QDialog):
         dest = csinfo.create(self.repo, d, style, withupdate=True)
         destb.layout().addWidget(dest)
         self.destcsinfo = dest
-        self.layout().addWidget(destb)
+        box.addWidget(destb)
 
         self.swaplabel = QLabel('<a href="X">%s</a>'  # don't care href
                                 % _('Swap source and destination'))
         self.swaplabel.linkActivated.connect(self.swap)
-        self.layout().addWidget(self.swaplabel)
+        box.addWidget(self.swaplabel)
 
         sep = qtlib.LabeledSeparator(_('Options'))
-        self.layout().addWidget(sep)
+        box.addWidget(sep)
 
         self.keepchk = QCheckBox(_('Keep original changesets (--keep)'))
         self.keepchk.setChecked(opts.get('keep', False))
-        self.layout().addWidget(self.keepchk)
+        box.addWidget(self.keepchk)
 
         self.keepbrancheschk = QCheckBox(_('Keep original branch names '
                                            '(--keepbranches)'))
         self.keepbrancheschk.setChecked(opts.get('keepbranches', False))
-        self.layout().addWidget(self.keepbrancheschk)
+        box.addWidget(self.keepbrancheschk)
 
         self.collapsechk = QCheckBox(_('Collapse the rebased changesets '
                                        '(--collapse)'))
         self.collapsechk.setChecked(opts.get('collapse', False))
-        self.layout().addWidget(self.collapsechk)
+        box.addWidget(self.collapsechk)
 
         self.basechk = QCheckBox(_('Rebase entire source branch (-b/--base)'))
-        self.layout().addWidget(self.basechk)
+        box.addWidget(self.basechk)
 
         self.autoresolvechk = QCheckBox(_('Automatically resolve merge '
                                           'conflicts where possible'))
-        self.layout().addWidget(self.autoresolvechk)
+        box.addWidget(self.autoresolvechk)
 
         self.svnchk = QCheckBox(_('Rebase unpublished onto Subversion head '
                                   '(override source, destination)'))
-        self.svnchk.setVisible('hgsubversion' in repo.extensions())
-        self.layout().addWidget(self.svnchk)
+        self.svnchk.setVisible(b'hgsubversion' in repo.extensions())
+        box.addWidget(self.svnchk)
 
         self._cmdlog = cmdui.LogWidget(self)
         self._cmdlog.hide()
-        self.layout().addWidget(self._cmdlog, 2)
+        box.addWidget(self._cmdlog, 2)
         self._stbar = cmdui.ThgStatusBar(self)
         self._stbar.setSizeGripEnabled(False)
         self._stbar.linkActivated.connect(self.linkActivated)
-        self.layout().addWidget(self._stbar)
+        box.addWidget(self._stbar)
 
         bbox = QDialogButtonBox()
         self.cancelbtn = bbox.addButton(QDialogButtonBox.Cancel)
@@ -127,7 +127,7 @@ class RebaseDialog(QDialog):
         self.abortbtn = bbox.addButton(_('Abort'),
                                        QDialogButtonBox.ActionRole)
         self.abortbtn.clicked.connect(self.abort)
-        self.layout().addWidget(bbox)
+        box.addWidget(bbox)
         self.bbox = bbox
 
         self._wctxcleaner = wctxcleaner.WctxCleaner(repoagent, self)
@@ -157,8 +157,8 @@ class RebaseDialog(QDialog):
         qs = QSettings()
         qs.beginGroup('rebase')
         self.autoresolvechk.setChecked(
-            self.repo.ui.configbool('tortoisehg', 'autoresolve',
-                                    qtlib.readBool(qs, 'autoresolve', True)))
+            self._repoagent.configBool('tortoisehg', 'autoresolve',
+                                       qtlib.readBool(qs, 'autoresolve', True)))
         qs.endGroup()
 
     def _writeSettings(self):
@@ -191,7 +191,7 @@ class RebaseDialog(QDialog):
 
         itool = self.autoresolvechk.isChecked() and 'merge' or 'fail'
         opts = {'config': 'ui.merge=internal:%s' % itool}
-        if os.path.exists(self.repo.vfs.join('rebasestate')):
+        if os.path.exists(self.repo.vfs.join(b'rebasestate')):
             opts['continue'] = True
         else:
             opts.update({
@@ -261,7 +261,7 @@ class RebaseDialog(QDialog):
 
     def checkResolve(self):
         for root, path, status in thgrepo.recursiveMergeStatus(self.repo):
-            if status == 'u':
+            if status == b'u':
                 txt = _('Rebase generated merge <b>conflicts</b> that must '
                         'be <a href="resolve"><b>resolved</b></a>')
                 self.rebasebtn.setEnabled(False)
@@ -271,7 +271,7 @@ class RebaseDialog(QDialog):
             txt = _('You may continue the rebase')
         self._stbar.showMessage(txt)
 
-        if os.path.exists(self.repo.vfs.join('rebasestate')):
+        if os.path.exists(self.repo.vfs.join(b'rebasestate')):
             self.swaplabel.setVisible(False)
             self.abortbtn.setEnabled(True)
             self.rebasebtn.setText('Continue')
@@ -289,7 +289,7 @@ class RebaseDialog(QDialog):
             self._wctxcleaner.runCleaner(cmd)
 
     def reject(self):
-        if os.path.exists(self.repo.vfs.join('rebasestate')):
+        if os.path.exists(self.repo.vfs.join(b'rebasestate')):
             main = _('Exiting with an unfinished rebase is not recommended.')
             text = _('Consider aborting the rebase first.')
             labels = ((QMessageBox.Yes, _('&Exit')),

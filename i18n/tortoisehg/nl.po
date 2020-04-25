@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
 "PO-Revision-Date: 2016-02-13 18:28+0000\n"
 "Last-Translator: Aldwoni <aldwoni@gmail.com>\n"
 "Language-Team: Dutch <nl@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:25+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:42+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg Overlay Icon Server"
@@ -27,7 +27,7 @@ msgstr "Afsluiten"
 msgid "About"
 msgstr "Info"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
@@ -667,6 +667,12 @@ msgstr ""
 
 #, python-format
 msgid "corrupted command result: %r"
+msgstr ""
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
 msgstr ""
 
 #, python-format
@@ -2108,6 +2114,9 @@ msgstr "Alle historie"
 msgid "Report only the first match per file"
 msgstr "Rapporteer enkel de eerste vondst per bestand"
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr "Volg copiën en naamsveranderingen"
 
@@ -3035,6 +3044,54 @@ msgstr "Patch datum:"
 msgid "Patch user:"
 msgstr "Patch gebruiker:"
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr "&Review Versturen"
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr "Ongeldige Instellingen - De ReviewBoard server is niet ingesteld"
 
@@ -3102,9 +3159,6 @@ msgstr "%p%"
 
 msgid "Connecting to Review Board..."
 msgstr "Bezig met verbinden met Review Board..."
-
-msgid "Post &Review"
-msgstr "&Review Versturen"
 
 msgid "Target:"
 msgstr "Doel:"
@@ -3206,31 +3260,6 @@ msgstr "Nieuw patch bericht:"
 
 msgid "Patches to fold"
 msgstr "Patches om samen te vouwen"
-
-msgid "Rename Error"
-msgstr "Fout bij Hernoemen"
-
-msgid "Could not rename existing patchfile"
-msgstr "Kon bestaand patchbestand niet hernoemen"
-
-msgid "Could not delete existing patchfile"
-msgstr "Kon bestaand patchbestand niet verwijderen"
-
-msgid "QRename - Check patchname"
-msgstr "QRename - Kontroleer patchnaam"
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr "Patch naam <b>%s</b> bestaat al:"
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr "Extensie .OLD toevoegen aan bestaand patchbestand"
-
-msgid "Overwrite existing patchfile"
-msgstr "Bestaand patchbestand overschrijven"
-
-msgid "Go back and change new patchname"
-msgstr "Ga terug en wijzig de nieuwe patchnaam"
 
 msgid "&Undo"
 msgstr "Ongedaan Maken"
@@ -3597,6 +3626,9 @@ msgstr "Kopiëer bron -> doel"
 
 msgid "Copy Error"
 msgstr "Fout bij Kopiëren"
+
+msgid "Rename Error"
+msgstr "Fout bij Hernoemen"
 
 msgid "Select Source File"
 msgstr "Kies Bron bestand"
@@ -4353,6 +4385,9 @@ msgstr "&Strip..."
 msgid "Post to Re&view Board..."
 msgstr "Zend naar Re&view Board..."
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr "Exte&rn Bijwerken..."
 
@@ -4418,6 +4453,9 @@ msgstr ""
 
 msgid "Post Selected to Review Board..."
 msgstr "Verstuur keuzes naar Review Board"
+
+msgid "Post Selected to Phabricator..."
+msgstr ""
 
 msgid "Apply patch"
 msgstr ""
@@ -4541,6 +4579,13 @@ msgstr ""
 
 msgid "Unable to merge"
 msgstr "Kan niet samenvoegen"
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
+msgstr ""
 
 msgid "You cannot merge a revision with itself"
 msgstr "U kunt een revisie niet met zichzelf samenvoegen"
@@ -5893,6 +5938,15 @@ msgid ""
 "newly-created repository."
 msgstr ""
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr "Werkbank"
 
@@ -6767,14 +6821,18 @@ msgid "Changeset Link"
 msgstr ""
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -10140,20 +10198,6 @@ msgstr ""
 #~ msgid "abort: backup restore failed, %s\n"
 #~ msgstr "afbreken: herstellen van backup is mislukt, %s\n"
 
-#~ msgid ""
-#~ "Changesets within the interval, see <a href=\"http://www.selenic.com/"
-#~ "mercurial/hg.1.html#dates\">help dates</a>"
-#~ msgstr ""
-#~ "Changesets binnen het interval, zie <a href=\"http://www.selenic.com/"
-#~ "mercurial/hg.1.html#dates\">help dates</a>"
-
-#~ msgid ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
-#~ msgstr ""
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#revsets\">help "
-#~ "revsets</a>"
-
 #~ msgid "There is no Mercurial repository here (.hg not found)"
 #~ msgstr "Er is hier geen Mercurial repository (.hg niet gevonden)"
 
@@ -10165,9 +10209,6 @@ msgstr ""
 
 #~ msgid "Diff"
 #~ msgstr "Diff"
-
-#~ msgid "List Font"
-#~ msgstr "Lijst Letterytpe"
 
 #~ msgid "Ignore white space when comparing lines. Default: False"
 #~ msgstr "Negeer witruimte bij het vergelijken van regels. Standaard: Uit"
@@ -10212,14 +10253,6 @@ msgstr ""
 #~ msgid "Unable to create new repository"
 #~ msgstr "Kan nieuwe repository niet aanmaken"
 
-#~ msgid ""
-#~ "Changesets affecting files matched by pattern.  See <a href=\"http://www."
-#~ "selenic.com/mercurial/hg.1.html#patterns\">help patterns</a>"
-#~ msgstr ""
-#~ "Changesets die bestanden bevatten die overeenkomen met het patroon.  Zie "
-#~ "<a href=\"http://www.selenic.com/mercurial/hg.1.html#patterns\">help "
-#~ "patterns</a>"
-
 #~ msgid "Character encoding name"
 #~ msgstr "Naam karakter encodering"
 
@@ -10232,33 +10265,6 @@ msgstr ""
 #~ msgid "udpate all repos in current dir"
 #~ msgstr "alle repos in de huidige map bijwerken"
 
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before adding "
-#~ "new files in a commit. If True, a confirmation dialog will be showed. If "
-#~ "False, selected new files will be included in the commit with no "
-#~ "confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "Bepaalt of TortoiseHg een bevestigingsdialoog moet tonen vooraleer nieuwe "
-#~ "bestanden toe te voegen aan een commit. Indien True dan zal een "
-#~ "bevestigingsdialoog getoond worden. Indien False dan zullen de gekozen "
-#~ "nieuwe bestanden aan de commit toegevoegd worden zonder "
-#~ "bevestigngsfialoog. Standaard: Ja"
-
-#~ msgid ""
-#~ "Determines if TortoiseHg should show a confirmation dialog before "
-#~ "removing files in a commit. If True, a confirmation dialog will be "
-#~ "showed. If False, selected deleted files will be included in the commit "
-#~ "with no confirmation dialog.  Default: True"
-#~ msgstr ""
-#~ "Bepaalt of TortoiseHg een bevestigingsdialoog moet tonen vooraleer te "
-#~ "verwijderen bestanden in een commit opgenomen worden. Indien True dan zal "
-#~ "een bevestigingsdialoog getoond worden. Indien false dan zullen gekozen "
-#~ "te verwijderen bestanden aan de commit toegevoegd worden zonder "
-#~ "bevestigingsdialoog. Standaard: Ja"
-
-#~ msgid "Font used to display file lists. Default: sans 9"
-#~ msgstr "Lettertype om bestandslijsten te tonen. Standaard: sans 9"
-
 #~ msgid "Several icons are courtesy of the TortoiseSVN project"
 #~ msgstr ""
 #~ "Verscheidene iconen zijn een vriendendienst van het TortoiseSVN project"
@@ -10268,6 +10274,3 @@ msgstr ""
 
 #~ msgid "Unable to save file"
 #~ msgstr "Kan bestand niet opslaan"
-
-#~ msgid "Copyright 2008-2016 Steve Borho and others"
-#~ msgstr "Copyright 2008-2016 Steve Borho en anderen"

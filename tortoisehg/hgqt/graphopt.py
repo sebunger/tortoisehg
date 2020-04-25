@@ -13,21 +13,38 @@ algorithm. The optimised model is both faster to compute and uses less
 memory for repositories with a lot of history.
 """
 
-import itertools
-from collections import defaultdict
+from __future__ import absolute_import
 
-from mercurial import revset
-from mercurial import util
-from tortoisehg.util import obsoleteutil
-from tortoisehg.hgqt import graph as graphmod
-from tortoisehg.hgqt.graph import (
+import collections
+import itertools
+
+from mercurial import (
+    pycompat,
+    revset,
+    util,
+)
+
+from ..util import (
+    hglib,
+    obsoleteutil,
+)
+from . import (
+    graph as graphmod,
+)
+from .graph import (
     LINE_TYPE_PARENT,
     LINE_TYPE_FAMILY,
     LINE_TYPE_OBSOLETE,
 )
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        List,
+        Tuple,
+    )
 
 def _compute_lines(rev, prevs, revs, active_edges):
+    # type: (int, List[int], List[int], List[GraphEdge]) -> List[Tuple[Tuple[int, int], GraphEdge]]
     """Computes current index and next line's index of each active edge
 
     Args:
@@ -90,9 +107,9 @@ class GraphEdge(object):
 
 def _branch_spec(repo, branch, all_parents):
     if all_parents:
-        return repo.revs('::branch(%s)', branch)
+        return repo.revs(b'::branch(%s)', branch)
     else:
-        return repo.revs('branch(%s)', branch)
+        return repo.revs(b'branch(%s)', branch)
 
 
 class Graph(object):
@@ -138,7 +155,7 @@ class Graph(object):
             if add_none:
                 self._revset.insert(0, None)
                 self._revset_set_pure = self._revset_set
-                self._revset_set = frozenset(self._revset_set | set([None]))
+                self._revset_set = frozenset(self._revset_set | {None})
         self._edge_color_cache = {}
         self._grapher = self._build_nodes()
         self._row_to_rev = dict(
@@ -248,8 +265,8 @@ class Graph(object):
         if not self._revset or not self._show_family_line:
             return None
 
-        anc = defaultdict(set)
-        holders = defaultdict(set)
+        anc = collections.defaultdict(set)
+        holders = collections.defaultdict(set)
 
         revrange = self._get_revision_iterator()
 
@@ -322,7 +339,7 @@ class Graph(object):
         clog = self._repo.changelog
         parentrevs = dict([(r, clog.parentrevs(r)) for r in clog])
         parentrevs[None] = self._workingdir_parents()
-        actedge = defaultdict(list)
+        actedge = collections.defaultdict(list)
         revs = []
         revrange = self._get_revision_iterator()
         family = self._pre_compute_family(parentrevs)
@@ -367,7 +384,7 @@ class Graph(object):
                 revs[rev_index:rev_index + 1] = parents_to_add
             self._graph[rev] = (
                 rev_index, prevs, revs[:],
-                list(itertools.chain(*actedge.values())))
+                list(itertools.chain(*list(actedge.values()))))
 
             yield rev
 
@@ -390,12 +407,12 @@ class Graph(object):
                     if r == -1:
                         self._grapher = None
                         break
-                    if r < rev and r is not None:
+                    if r is not None and r < rev:
                         break
 
         if fillstep is not None:
             if self._grapher:
-                for i in xrange(0, fillstep):
+                for i in pycompat.xrange(0, fillstep):
                     if next(self._grapher, -1) == -1:
                         self._grapher = None
                         break

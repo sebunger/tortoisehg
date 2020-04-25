@@ -5,9 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
-import cgi
 import os
 import re
 import sys
@@ -39,8 +38,8 @@ from .qtnetwork import (
 )
 
 from mercurial import (
-    encoding,
     extensions,
+    pycompat,
 )
 from ..util import (
     hglib,
@@ -78,7 +77,7 @@ class BugReport(QDialog):
 
         tb = QTextBrowser()
         self.text = self.gettext(opts)
-        tb.setHtml('<pre>' + cgi.escape(self.text) + '</pre>')
+        tb.setHtml('<pre>' + qtlib.htmlescape(self.text, False) + '</pre>')
         tb.setWordWrapMode(QTextOption.NoWrap)
         layout.addWidget(tb)
 
@@ -116,14 +115,14 @@ class BugReport(QDialog):
     def uFinished(self):
         newver = (0,0,0)
         try:
-            f = self._newverreply.readAll().data().splitlines()
+            f = pycompat.sysstr(self._newverreply.readAll().data()).splitlines()
             self._newverreply.close()
             self._newverreply = None
             newver = tuple([int(p) for p in f[0].split('.')])
             upgradeurl = f[1] # generic download URL
             platform = sys.platform
             if platform == 'win32':
-                from win32process import IsWow64Process as IsX64
+                from win32process import IsWow64Process as IsX64  # pytype: disable=import-error
                 platform = IsX64() and 'x64' or 'x86'
             # linux2 for Linux, darwin for OSX
             for line in f[2:]:
@@ -154,8 +153,8 @@ class BugReport(QDialog):
                 hglib.hgversion, version.version())
         text += '** Command: %s\n' % (hglib.tounicode(opts.get('cmd', 'N/A')))
         text += '** CWD: %s\n' % hglib.tounicode(_safegetcwd())
-        text += '** Encoding: %s\n' % encoding.encoding
-        extlist = [x[0] for x in extensions.extensions()]
+        text += '** Encoding: %s\n' % hglib._encoding
+        extlist = [hglib.tounicode(x[0]) for x in extensions.extensions()]
         text += '** Extensions loaded: %s\n' % ', '.join(extlist)
         text += '** Python version: %s\n' % sys.version.replace('\n', '')
         if os.name == 'nt':
@@ -177,7 +176,7 @@ class BugReport(QDialog):
         text = '** Windows version: %s\n' % str(sys.getwindowsversion())
         arch = 'unknown (failed to import win32api)'
         try:
-            import win32api
+            import win32api  # pytype: disable=import-error
             arch = 'unknown'
             archval = win32api.GetNativeSystemInfo()[0]
             if archval == 9:
@@ -196,8 +195,9 @@ class BugReport(QDialog):
                         os.path.join(_safegetcwd(), 'bugreport.txt'),
                         _('Text files (*.txt)'))
             if fname:
-                open(fname, 'wb').write(hglib.fromunicode(self.text))
-        except (EnvironmentError), e:
+                with open(fname, 'wb') as fp:
+                    fp.write(hglib.fromunicode(self.text))
+        except EnvironmentError as e:
             QMessageBox.critical(self, _('Error writing file'), str(e))
 
     def accept(self):
@@ -233,13 +233,15 @@ class ExceptionMsgBox(QDialog):
             values = opts.get('values', [])
             msgopts = {}
             for i, val in enumerate(values):
-                msgopts['arg' + str(i)] = cgi.escape(hglib.tounicode(val))
+                msgopts['arg' + str(i)] = qtlib.htmlescape(hglib.tounicode(val),
+                                                           False)
             try:
                 text = text % msgopts
-            except Exception, e:
-                print e, msgopts
+            except Exception as e:
+                print(e, msgopts)
         else:
-            self._mainlabel = QLabel('<b>%s</b>' % cgi.escape(main),
+            self._mainlabel = QLabel('<b>%s</b>'
+                                     % qtlib.htmlescape(main, False),
                                      textInteractionFlags=labelflags)
             self.layout().addWidget(self._mainlabel)
 
@@ -267,14 +269,13 @@ class ExceptionMsgBox(QDialog):
             try:
                 # A chicken-egg problem here, we need a ui to get your
                 # editor in order to repair your ui config file.
-                from tortoisehg.hgqt import qtlib
                 class FakeRepo(object):
                     def __init__(self):
                         self.root = os.getcwd()
                         self.ui = hglib.loadui()
                 fake = FakeRepo()
                 qtlib.editfiles(fake, [fname], lineno, parent=self)
-            except Exception, e:
+            except Exception as e:
                 qtlib.openlocalurl(fname)
         if ref.startswith('#fix:'):
             from tortoisehg.hgqt import settings

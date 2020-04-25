@@ -22,10 +22,10 @@ def partialcommit(orig, ui, repo, *pats, **opts):
         store = patch.filestore()
         try:
             # patch files in tmp directory
-            patch.patchrepo(ui, repo, repo['.'], store, fp, 1, prefix='')
-            store.keys = set(store.files.keys() + store.data.keys())
+            patch.patchrepo(ui, repo, repo[b'.'], store, fp, 1, prefix=b'')
+            store.keys = set(list(store.files.keys()) + list(store.data.keys()))
             repo._filestore = store
-        except patch.PatchError, e:
+        except patch.PatchError as e:
             raise error.Abort(str(e))
         finally:
             fp.close()
@@ -63,7 +63,7 @@ def wfctx_flags(orig, self):
         store = self._repo._filestore
         if self._path in store.keys:
             data, (islink, isexec), copied = store.getfile(self._path)
-            return (islink and 'l' or '') + (isexec and 'x' or '')
+            return (islink and b'l' or b'') + (isexec and b'x' or b'')
     return orig(self)
 
 def wfctx_renamed(orig, self):
@@ -82,6 +82,6 @@ def uisetup(ui):
     extensions.wrapfunction(context.workingfilectx, 'data', wfctx_data)
     extensions.wrapfunction(context.workingfilectx, 'flags', wfctx_flags)
     extensions.wrapfunction(context.workingfilectx, 'renamed', wfctx_renamed)
-    entry = extensions.wrapcommand(commands.table, 'commit', partialcommit)
-    entry[1].append(('', 'partials', '',
-                     'selected patch chunks (internal use only)'))
+    entry = extensions.wrapcommand(commands.table, b'commit', partialcommit)
+    entry[1].append((b'', b'partials', b'',
+                     b'selected patch chunks (internal use only)'))

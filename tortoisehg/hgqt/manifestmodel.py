@@ -31,6 +31,8 @@ from .qtgui import (
 from mercurial import (
     error,
     match as matchmod,
+    pycompat,
+    scmutil,
 )
 
 from ..util import hglib
@@ -74,8 +76,8 @@ class ManifestModel(QAbstractItemModel):
         self._iconcache = {}  # (path, status, subkind): icon
         self._repoagent = repoagent
 
-        self._namefilter = unicode(namefilter or '')
-        assert all(c in 'MARSC' for c in statusfilter)
+        self._namefilter = pycompat.unicode(namefilter or '')
+        assert all(c in 'MARSC' for c in statusfilter), repr(statusfilter)
         self._statusfilter = statusfilter
         self._changedfilesonly = False
         self._nodeop = _nodeopmap[bool(flat)]
@@ -199,7 +201,7 @@ class ManifestModel(QAbstractItemModel):
         ctx = self._rootentry.ctx
         if ctx.rev() is not None:
             repo = self._repoagent.rawRepo()
-            lfiles = map(hglib.fromunicode, files)
+            lfiles = pycompat.maplist(hglib.fromunicode, files)
             lbase, _fns = visdiff.snapshot(repo, lfiles, ctx)
             base = hglib.tounicode(lbase)
         else:
@@ -236,7 +238,7 @@ class ManifestModel(QAbstractItemModel):
             return QModelIndex()
 
         try:
-            e = self._nodeop.findpath(self._rootentry, unicode(path))
+            e = self._nodeop.findpath(self._rootentry, pycompat.unicode(path))
         except KeyError:
             return QModelIndex()
 
@@ -315,7 +317,7 @@ class ManifestModel(QAbstractItemModel):
     @pyqtSlot(str)
     def setNameFilter(self, pattern):
         """Filter file name by partial match of glob pattern"""
-        pattern = unicode(pattern)
+        pattern = pycompat.unicode(pattern)
         if self._namefilter == pattern:
             return
         self._namefilter = pattern
@@ -330,7 +332,7 @@ class ManifestModel(QAbstractItemModel):
     def setStatusFilter(self, status):
         """Filter file tree by change status 'MARSC'"""
         status = str(status)
-        assert all(c in 'MARSC' for c in status)
+        assert all(c in 'MARSC' for c in status), repr(status)
         if self._statusfilter == status:
             return  # for performance reason
         self._statusfilter = status
@@ -370,7 +372,7 @@ class ManifestModel(QAbstractItemModel):
     def fetchMore(self, parent):
         if parent.isValid() or self._rootpopulated:
             return
-        assert len(self._rootentry) == 0
+        assert len(self._rootentry) == 0, self._rootentry
         newroote = self._rootentry.copyskel()
         self._populateNodes(newroote)
         last = len(newroote) - 1
@@ -483,6 +485,8 @@ class _Entry(object):
         # leaf node should not be False because of len(node) == 0
         return True
 
+    __bool__ = __nonzero__
+
     def __getitem__(self, name):
         return self._child[name]
 
@@ -493,7 +497,7 @@ class _Entry(object):
         return e
 
     def putchild(self, name, e):
-        assert not e.name and not e.parent
+        assert not e.name and not e.parent, (e.name, e.parent)
         e._name = name
         e._parent = self
         if name not in self._child:
@@ -511,7 +515,7 @@ class _Entry(object):
 
     def sort(self, reverse=False):
         """Sort the entries recursively; directories first"""
-        for e in self._child.itervalues():
+        for e in self._child.values():
             e.sort(reverse=reverse)
         self._nameindex.sort(
             key=lambda s: (not self[s].isdir, os.path.normcase(s)),
@@ -531,27 +535,27 @@ def _samectx(ctx1, ctx2):
 
 # TODO: visual feedback to denote query type and error as in repofilter
 def _makematcher(repo, ctx, pat, changedonly):
-    cwd = ''  # always relative to repo root
+    cwd = b''  # always relative to repo root
     patterns = []
-    if pat and ':' not in pat and '*' not in pat:
+    if pat and b':' not in pat and b'*' not in pat:
         # mimic case-insensitive partial string match
-        patterns.append('relre:(?i)' + re.escape(pat))
+        patterns.append(b'relre:(?i)' + re.escape(pat))
     elif pat:
         patterns.append(pat)
 
     include = []
     if changedonly:
-        include.extend('path:%s' % p for p in ctx.files())
+        include.extend(b'path:%s' % p for p in ctx.files())
         if not include:
             # no match
-            return matchmod.exact(repo.root, cwd, [])
+            return scmutil.matchfiles(repo, [])  # TODO: use matchmod.never()
 
     try:
         return matchmod.match(repo.root, cwd, patterns, include=include,
-                              default='relglob', auditor=repo.auditor, ctx=ctx)
+                              default=b'relglob', auditor=repo.auditor, ctx=ctx)
     except (error.Abort, error.ParseError):
         # no match
-        return matchmod.exact(repo.root, cwd, [])
+        return scmutil.matchfiles(repo, [])  # TODO: use matchmod.never()
 
 
 class _listnodeop(object):
@@ -650,8 +654,8 @@ def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
             smatch = matchmod.subdirmatcher(path, match)
             try:
                 srepo = ctx.sub(path)._repo
-                e.ctx = srepo[substate[1]]
-                e.pctx = srepo[psubstate[1] or 'null']
+                e.ctx = scmutil.revsymbol(srepo, substate[1])
+                e.pctx = scmutil.revsymbol(srepo, psubstate[1] or b'null')
                 _populaterepo(e, srepo, nodeop, statusfilter, smatch)
             except (error.RepoError, EnvironmentError):
                 pass
@@ -688,7 +692,7 @@ class ManifestCompleter(QCompleter):
         >>> c.splitPath(u'foo/')
         [u'foo', u'']
         """
-        return unicode(path).split('/')
+        return pycompat.unicode(path).split('/')
 
     def pathFromIndex(self, index):
         if not index.isValid():

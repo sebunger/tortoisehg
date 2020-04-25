@@ -7,6 +7,10 @@
 
 from __future__ import absolute_import
 
+from mercurial import (
+    pycompat,
+)
+
 from .qtgui import (
     QComboBox,
     QDialog,
@@ -112,7 +116,8 @@ class BranchOpDialog(QDialog):
         '''
         if self.branchCombo.isEnabled():
             # branch name cannot start/end with whitespace (see dirstate._branch)
-            self.branchop = unicode(self.branchCombo.currentText()).strip()
+            self.branchop = pycompat.unicode(
+                                self.branchCombo.currentText()).strip()
         elif self.closebranch.isChecked():
             self.branchop = False
         else:

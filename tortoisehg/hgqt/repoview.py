@@ -61,7 +61,11 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import error, scmutil
+from mercurial import (
+    error,
+    pycompat,
+    scmutil,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -87,6 +91,7 @@ class HgRepoView(QTableView):
         self.cfgname = cfgname
         self.colselect = colselect
         self.setShowGrid(False)
+        self.setWordWrap(False)
 
         vh = self.verticalHeader()
         vh.hide()
@@ -172,6 +177,7 @@ class HgRepoView(QTableView):
 
     def _loadColumnSettings(self):
         model = self.model()
+        assert model is not None
         s = QSettings()
         s.beginGroup(self.colselect[0])
         cols = qtlib.readStringList(s, 'columns')
@@ -198,16 +204,20 @@ class HgRepoView(QTableView):
         s.endGroup()
 
     def visibleColumns(self):
+        model = self.model()
         hh = self.horizontalHeader()
-        return [self.model().allColumns()[hh.logicalIndex(visualindex)]
-                for visualindex in xrange(hh.count() - hh.hiddenSectionCount())]
+        assert model is not None
+        return [model.allColumns()[hh.logicalIndex(visualindex)]
+                for visualindex in pycompat.xrange(hh.count()
+                                                   - hh.hiddenSectionCount())]
 
     def setVisibleColumns(self, visiblecols):
-        if not self.model() or visiblecols == self.visibleColumns():
+        model = self.model()
+        if not model or visiblecols == self.visibleColumns():
             return
         hh = self.horizontalHeader()
         hh.sectionMoved.disconnect(self.columnsVisibilityChanged)
-        allcolumns = self.model().allColumns()
+        allcolumns = model.allColumns()
         for logicalindex, colname in enumerate(allcolumns):
             hh.setSectionHidden(logicalindex, colname not in visiblecols)
         for newvisualindex, colname in enumerate(visiblecols):
@@ -268,6 +278,7 @@ class HgRepoView(QTableView):
         hh = self.horizontalHeader()
         model = self.model()
         fontm = QFontMetrics(self.font())
+        assert model is not None
 
         for c in range(model.columnCount()):
             if hh.isSectionHidden(c):
@@ -346,38 +357,94 @@ class HgRepoView(QTableView):
 
     def back(self):
         if self.canGoBack():
+            model = self.model()
+            assert model is not None
             self._rev_pos -= 1
-            idx = self.model().indexFromRev(self._rev_history[self._rev_pos])
+            idx = model.indexFromRev(self._rev_history[self._rev_pos])
             if idx.isValid():
                 self._in_history = True
                 self.setCurrentIndex(idx)
 
     def forward(self):
         if self.canGoForward():
+            model = self.model()
+            assert model is not None
             self._rev_pos += 1
-            idx = self.model().indexFromRev(self._rev_history[self._rev_pos])
+            idx = model.indexFromRev(self._rev_history[self._rev_pos])
             if idx.isValid():
                 self._in_history = True
                 self.setCurrentIndex(idx)
+
+    def _symbolic_rev_to_numeric_rev(self, symbolic_rev):
+        """Converts symbolic_rev into a numeric revision number for the local
+        repository.
+
+        symbolic_rev may be either:
+        - a numeric revision
+        - a mercurial commit hash
+        - a git commit hash. This is looked up for only if no matches are found
+          for the preceding cases, and the hg-git extension is loaded
+
+        If no revision is found for symbolic_rev, the function raises an
+        error.RepoError or an error.LookupError, which have to be handled
+        by the caller.
+        """
+        if isinstance(symbolic_rev, int):
+            return symbolic_rev
+
+        if isinstance(symbolic_rev, pycompat.unicode):
+            symbolic_rev = hglib.fromunicode(symbolic_rev)
+
+        try:
+            # look for a mercurial commit hash
+            return scmutil.revsymbol(self.repo, symbolic_rev).rev()
+        except error.RepoError:
+            if b'hggit' not in self.repo.extensions():
+                # hg-git is not installed, do not try doing a gitnode() lookup
+                raise
+            # look for a git commit hash
+            baseset = self.repo.revs(b'gitnode(%s)', symbolic_rev)
+
+            if len(baseset) == 0:
+                raise error.RepoLookupError(b"No revision found with gitnode"
+                                            b"('%s')" % symbolic_rev)
+
+            # There would not be any strict requirement to check for
+            # len(baseset) > 1, since hg-git already raises a LookupError if it
+            # gets passed an ambiguous hash.
+            # However, leaving a case unhandled can always be a source of bugs
+            # later, so let's be exhaustive instead.
+            if len(baseset) > 1:
+                raise error.AmbiguousPrefixLookupError(
+                    symbolic_rev, self.repo.githandler.map_file,
+                    b'Ambiguous commit hash')
+
+            return baseset.first()
 
     def goto(self, rev):
         """
         Select revision 'rev' (can be anything understood by repo[])
         """
-        if isinstance(rev, unicode):
-            rev = hglib.fromunicode(rev)
-        if not isinstance(rev, int):
-            try:
-                rev = scmutil.revsymbol(self.repo, rev).rev()
-            except error.RepoError:
-                self.showMessage.emit(_("Can't find revision '%s'")
-                                      % hglib.tounicode(str(rev)))
-                return
-            except LookupError as e:
-                self.showMessage.emit(hglib.tounicode(str(e)))
-                return
+        try:
+            rev = self._symbolic_rev_to_numeric_rev(rev)
+        except error.RepoError:
+            self.showMessage.emit(_("Can't find revision '%s'")
+                                  % hglib.tounicode(str(rev)))
+            return
+        # When Mercurial is not able to disambiguate commit hash prefixes,
+        # it raises an error.AmbiguousPrefixLookupError, which ultimately
+        # comes from its revlog._partialmatch(). However, in the same
+        # situation hg-git (currently 2135ddef6d6e) raises a less specific
+        # error.LookupError from its revset_gitnode().
+        #
+        # We cannot narrow this clause until hg-git is updated.
+        except error.LookupError as e:
+            self.showMessage.emit(hglib.tounicode(str(e)))
+            return
 
-        idx = self.model().indexFromRev(rev)
+        model = self.model()
+        assert model is not None
+        idx = model.indexFromRev(rev)
         if idx.isValid():
             flags = (QItemSelectionModel.ClearAndSelect
                      | QItemSelectionModel.Rows)
@@ -388,8 +455,10 @@ class HgRepoView(QTableView):
         if not s:
             s = QSettings()
 
+        model = self.model()
+        assert model is not None
         col_widths = []
-        for c in range(self.model().columnCount()):
+        for c in range(model.columnCount()):
             col_widths.append(self.columnWidth(c))
 
         try:
@@ -518,7 +587,7 @@ class GraphDelegate(QStyledItemDelegate):
             lines = [((start, end), e) for (start, end), e in lines
                      if start < visibleend or end < visibleend]
             # remove hidden lines that can be partly visible due to antialiasing
-            lines = dict(sorted(lines, key=lineimportance)).items()
+            lines = list(dict(sorted(lines, key=lineimportance)).items())
             # still necessary to sort by importance because lines can partially
             # overlap near contact point
             lines.sort(key=lineimportance)
@@ -762,6 +831,7 @@ class LabeledDelegate(QStyledItemDelegate):
 class ColumnSelectDialog(QDialog):
     def __init__(self, name, model, curcolumns, parent=None):
         QDialog.__init__(self, parent)
+        assert model is not None
         all = model.allColumns()
         colnames = dict(model.allColumnHeaders())
 
@@ -805,8 +875,9 @@ class ColumnSelectDialog(QDialog):
 
     def selectedColumns(self):
         cols = []
-        for i in xrange(self.list.count()):
+        for i in pycompat.xrange(self.list.count()):
             item = self.list.item(i)
             if item.checkState() == Qt.Checked:
-                cols.append(item.columnid)
+                # TODO: better to use data(role) instead
+                cols.append(item.columnid)  # pytype: disable=attribute-error
         return cols

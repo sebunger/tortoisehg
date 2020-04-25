@@ -5,6 +5,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2, incorporated herein by reference.
 
+from __future__ import print_function
+
 import os
 
 from mercurial import hg, node, error
@@ -112,8 +114,10 @@ class TortoiseMenu(object):
 
 class TortoiseSubmenu(TortoiseMenu):
 
-    def __init__(self, menutext, helptext, menus=[], icon=None):
+    def __init__(self, menutext, helptext, menus=None, icon=None):
         TortoiseMenu.__init__(self, menutext, helptext, None, icon)
+        if menus is None:
+            menus = []
         self.menus = menus[:]
 
     def add_menu(self, menutext, helptext, hgcmd, icon=None, state=True):
@@ -165,8 +169,9 @@ class thg_menu(object):
             self.sep[pos] = False
             self.menus[pos].append(TortoiseMenuSep())
         self.menus[pos].append(TortoiseMenu(
-                thgcmenu[hgcmd]['label']['str'],
-                thgcmenu[hgcmd]['help']['str'], hgcmd,
+                hglib.tounicode(thgcmenu[hgcmd]['label']['str']),
+                hglib.tounicode(thgcmenu[hgcmd]['help']['str']),
+                hgcmd,
                 thgcmenu[hgcmd]['icon'], state))
 
     def add_sep(self):
@@ -191,9 +196,9 @@ def open_repo(path):
             return repo
         except error.RepoError:
             pass
-        except StandardError, e:
-            print "error while opening repo %s:" % path
-            print e
+        except Exception as e:
+            print("error while opening repo %s:" % path)
+            print(e)
 
     return None
 
@@ -204,9 +209,9 @@ class menuThg:
     def __init__(self, internal=False):
         self.name = "TortoiseHg"
         promoted = []
-        pl = hglib.loadui().config('tortoisehg', 'promoteditems', 'commit,log')
-        for item in pl.split(','):
-            item = item.strip()
+        pl = hglib.loadui().config(b'tortoisehg', b'promoteditems', b'commit,log')
+        for item in pl.split(b','):
+            item = hglib.tounicode(item.strip())
             if item:
                 promoted.append(item)
         if internal:
@@ -279,14 +284,14 @@ class menuThg:
             if cachethg.ROOT in states and len(states) == 1:
                 states.add(cachethg.MODIFIED)
 
-        changed = bool(states & set([cachethg.ADDED, cachethg.MODIFIED]))
+        changed = bool(states & {cachethg.ADDED, cachethg.MODIFIED})
         modified = cachethg.MODIFIED in states
         clean = cachethg.UNCHANGED in states
         tracked = changed or modified or clean
-        new = bool(states & set([cachethg.UNKNOWN, cachethg.IGNORED]))
+        new = bool(states & {cachethg.UNKNOWN, cachethg.IGNORED})
 
         menu = thg_menu(repo.ui, self.promoted, self.name)
-        if changed or cachethg.UNKNOWN in states or 'qtip' in repo['.'].tags():
+        if changed or cachethg.UNKNOWN in states or b'qtip' in repo[b'.'].tags():
             menu.add_menu('commit')
         if hashgignore or new and len(states) == 1:
             menu.add_menu('hgignore')
@@ -294,7 +299,7 @@ class menuThg:
             menu.add_menu('status')
 
         # Visual Diff (any extdiff command)
-        has_vdiff = repo.ui.config('tortoisehg', 'vdiff', 'vdiff') != ''
+        has_vdiff = repo.ui.config(b'tortoisehg', b'vdiff', b'vdiff') != b''
         if has_vdiff and modified:
             menu.add_menu('vdiff')
 

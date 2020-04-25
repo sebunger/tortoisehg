@@ -10,9 +10,9 @@ import time
 import sys
 import os
 import shutil
-import cgi
 import tempfile
 import re
+import subprocess
 import tarfile
 from fnmatch import fnmatch
 from distutils import log
@@ -29,8 +29,11 @@ from distutils.command.clean import clean as _clean_orig
 from distutils.spawn import spawn, find_executable
 from i18n.msgfmt import Msgfmt
 
-thgcopyright = 'Copyright (C) 2010-2018 Steve Borho and others'
-hgcopyright = 'Copyright (C) 2005-2018 Matt Mackall and others'
+thgcopyright = 'Copyright (C) 2010-2020 Steve Borho and others'
+hgcopyright = 'Copyright (C) 2005-2020 Matt Mackall and others'
+
+if sys.version_info[0] >= 3:
+    unicode = str  # pycompat.unicode
 
 def _walklocales():
     podir = 'i18n/tortoisehg'
@@ -44,7 +47,8 @@ def _walklocales():
 
 def _msgfmt(pofile, mofile):
     modata = Msgfmt(pofile).get()
-    open(mofile, "wb").write(modata)
+    with open(mofile, "wb") as fp:
+        fp.write(modata)
 
 class build_mo(Command):
     description = "build translations (.mo files)"
@@ -81,14 +85,13 @@ class import_po(Command):
             self.lang = self.lang.upper().split(',')
 
     def _untar(self, name, path='.'):
-        tar = tarfile.open(name, 'r')
-        path = os.path.abspath(path)
-        for tarinfo in tar.getmembers():
-            # Extract the safe file only
-            p = os.path.abspath(os.path.join(path, tarinfo.name))
-            if p.startswith(path):
-                tar.extract(tarinfo, path)
-        tar.close()
+        with tarfile.open(name, 'r') as tar:
+            path = os.path.abspath(path)
+            for tarinfo in tar.getmembers():
+                # Extract the safe file only
+                p = os.path.abspath(os.path.join(path, tarinfo.name))
+                if p.startswith(path):
+                    tar.extract(tarinfo, path)
 
     def run(self):
         if not find_executable('msgcat'):
@@ -221,12 +224,9 @@ class build_config(Command):
             'qt_api': qtcore._detectapi(),
             }
         # Distributions will need to supply their own
-        f = open(cfgfile, "w")
-        try:
-            for k, v in sorted(data.iteritems()):
+        with open(cfgfile, "w") as f:
+            for k, v in sorted(data.items()):
                 f.write('%s = %r\n' % (k, v))
-        finally:
-            f.close()
 
     def run(self):
         cfgdir = os.path.join(self.build_lib, 'tortoisehg', 'util')
@@ -252,17 +252,14 @@ class build_py2app_config(build_config):
         }
         rsrc_dir = 'os.environ["RESOURCEPATH"]'
 
-        f = open(cfgfile, "w")
-        try:
+        with open(cfgfile, "w") as f:
             f.write("import os, sys\n"
                     "\n"
                     "if 'THG_OSX_APP' in os.environ:\n"
                     "    nofork = True\n")
-            for k, v in sorted(data.iteritems()):
+            for k, v in sorted(data.items()):
                 f.write("    %s = os.path.join(%s, '%s')\n" % (k, rsrc_dir, v))
             f.write("    bin_path = os.path.dirname(sys.executable)\n")
-        finally:
-            f.close()
 
 class build_ui(Command):
     description = 'build PyQt user interfaces (.ui)'
@@ -279,9 +276,8 @@ class build_ui(Command):
 
     def _compile_ui(self, ui_file, py_file):
         uic = self._impuic()
-        fp = open(py_file, 'w')
-        uic.compileUi(ui_file, fp)
-        fp.close()
+        with open(py_file, 'w') as fp:
+            uic.compileUi(ui_file, fp)
 
     @staticmethod
     def _impuic():
@@ -292,7 +288,8 @@ class build_ui(Command):
     _wrappeduic = False
     @classmethod
     def _wrapuic(cls):
-        """wrap uic to use gettext's _() in place of tr()"""
+        """wrap uic to use gettext's _() in place of
+        QtGui.QApplication.translate as _translate()"""
         if cls._wrappeduic:
             return
 
@@ -312,7 +309,8 @@ class build_ui(Command):
 
         class _i18n_string(qtproxies.i18n_string):
             def __str__(self):
-                return "_('%s')" % self.string.encode('string-escape')
+                # Note: ignoring self.disambig and qtproxies.i18n_context
+                return '_(%s)' % qtproxies.as_string(self.string)
         qtproxies.i18n_string = _i18n_string
 
         cls._wrappeduic = True
@@ -358,19 +356,18 @@ class build_qrc(Command):
         return os.path.join(os.path.dirname(mod.__file__), rcc)
 
     def _generate_qrc(self, qrc_file, srcfiles, prefix):
+        from tortoisehg.hgqt import qtlib
         basedir = os.path.dirname(qrc_file)
-        f = open(qrc_file, 'w')
-        try:
+        with open(qrc_file, 'w') as f:
             f.write('<!DOCTYPE RCC><RCC version="1.0">\n')
-            f.write('  <qresource prefix="%s">\n' % cgi.escape(prefix))
+            f.write('  <qresource prefix="%s">\n' % qtlib.htmlescape(prefix))
             for e in srcfiles:
                 relpath = e[len(basedir) + 1:]
                 f.write('    <file>%s</file>\n'
-                        % cgi.escape(relpath.replace(os.path.sep, '/')))
+                        % qtlib.htmlescape(relpath.replace(os.path.sep, '/'),
+                                           False))
             f.write('  </qresource>\n')
             f.write('</RCC>\n')
-        finally:
-            f.close()
 
     def _build_rc(self, srcfiles, py_file, basedir, prefix):
         """Generate compiled resource including any files under basedir"""
@@ -378,7 +375,18 @@ class build_qrc(Command):
         qrc_file = os.path.join(basedir, '%s.qrc' % os.path.basename(basedir))
         try:
             self._generate_qrc(qrc_file, srcfiles, prefix)
-            spawn([self._findrcc(), qrc_file, '-o', py_file])
+            env = os.environ.copy()
+            if os.name == 'nt' and 'VIRTUAL_ENV' in env:
+                # pyrcc5.bat gets installed to the root of the virtualenv, not
+                # in the Scripts directory with the binaries on PATH.
+                env['PATH'] = '%s%s%s' % (
+                    env.get('PATH'), os.pathsep, env.get('VIRTUAL_ENV')
+                )
+            subprocess.check_call(
+                [self._findrcc(), qrc_file, '-o', py_file],
+                env=env,
+                shell=os.name == 'nt'
+            )
         finally:
             os.unlink(qrc_file)
 
@@ -559,18 +567,18 @@ def setup_windows(version):
                              if f.endswith('.ico') or f == 'README.txt']))
 
     # for PyQt, see http://www.py2exe.org/index.cgi/Py2exeAndPyQt
-    includes = ['sip']
+    includes = ['PyQt5.sip']
 
     # Qt4 plugins, see http://stackoverflow.com/questions/2206406/
     def qt4_plugins(subdir, *dlls):
         import PyQt4
         pluginsdir = os.path.join(os.path.dirname(PyQt4.__file__), 'plugins')
-        return (subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls])
+        return subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls]
 
     def qt5_plugins(subdir, *dlls):
         import PyQt5
         pluginsdir = os.path.join(os.path.dirname(PyQt5.__file__), 'plugins')
-        return (subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls])
+        return subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls]
 
     from tortoisehg.hgqt.qtcore import QT_API
     if QT_API == 'PyQt4':
@@ -648,24 +656,14 @@ def setup_osx(version):
     _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg', 'hgext3rd']
     _data_files = []
 
-    def qt4_plugins(subdir, *libs):
-        from PyQt4.QtCore import QLibraryInfo
-        pluginsdir = unicode(QLibraryInfo.location(QLibraryInfo.PluginsPath))
-
-        return ('qt_plugins/' + subdir,
-                [os.path.join(pluginsdir, subdir, e) for e in libs])
-
     def qt5_plugins(subdir, *dlls):
         import PyQt5
         pluginsdir = os.path.join(os.path.dirname(PyQt5.__file__), 'plugins')
-        return (subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls])
+        return subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls]
 
     from tortoisehg.hgqt.qtcore import QT_API
-    if QT_API == 'PyQt4':
-        _data_files.append(qt4_plugins('imageformats', 'libqsvg.dylib'))
-    else:
-        _data_files.append(qt5_plugins('platforms', 'libqcocoa.dylib'))
-        _data_files.append(qt5_plugins('imageformats', 'libqsvg.dylib'))
+    _data_files.append(qt5_plugins('platforms', 'libqcocoa.dylib'))
+    _data_files.append(qt5_plugins('imageformats', 'libqsvg.dylib'))
 
     _py2app_options = {
         'arch': 'x86_64',
@@ -676,12 +674,18 @@ def setup_osx(version):
                      'PyQt4.QtHelp', 'PyQt4.QtMultimedia', 'PyQt4.QtOpenGL',
                      'PyQt4.QtScript', 'PyQt4.QtScriptTools', 'PyQt4.QtSql',
                      'PyQt4.QtTest', 'PyQt4.QtWebKit', 'PyQt4.QtXmlPatterns',
+                     'PyQt4.QtXmlPatterns', 'PyQt5.QtDBus',
+                     'PyQt5.QtDeclarative', 'PyQt5.QtDesigner', 'PyQt5.QtHelp',
+                     'PyQt5.QtMultimedia', 'PyQt5.QtOpenGL', 'PyQt5.QtScript',
+                     'PyQt5.QtScriptTools', 'PyQt5.QtSql', 'PyQt5.QtTest',
+                     'PyQt5.QtWebKit', 'PyQt5.QtXmlPatterns', 'PyQt5.phonon',
                      'py2app', 'setup', 'setuptools', 'unittest', 'PIL'],
 
         'extra_scripts': ['contrib/hg'],
-        'iconfile': 'contrib/TortoiseHg.icns',
+        'iconfile': 'contrib/packaging/macos/TortoiseHg.icns',
         'includes': ['email.mime.text', 'sip'],
-        'packages': ['hgext', 'mercurial', 'pygments', 'tortoisehg'],
+        'packages': ['certifi', 'hgext', 'iniparse', 'keyring', 'mercurial',
+                     'pygments', 'tortoisehg'],
 
         'plist': {
             'CFBundleDisplayName': 'TortoiseHg',
@@ -695,6 +699,7 @@ def setup_osx(version):
                 # console, the encoding would be set to "ascii" by default
                 'HGENCODING': 'utf-8',
                 'THG_OSX_APP': '1',
+                'QT_API': QT_API,
             },
             'NSHumanReadableCopyright': thgcopyright,
         },
@@ -736,8 +741,8 @@ if __name__ == '__main__':
         if version.endswith('+'):
             version += time.strftime('%Y%m%d')
     elif os.path.exists('.hg_archival.txt'):
-        kw = dict([t.strip() for t in l.split(':', 1)]
-                  for l in open('.hg_archival.txt'))
+        with open('.hg_archival.txt') as fp:
+            kw = dict([t.strip() for t in l.split(':', 1)] for l in fp)
         if 'tag' in kw:
             version = kw['tag']
         elif 'latesttag' in kw:
@@ -746,10 +751,9 @@ if __name__ == '__main__':
             version = kw.get('node', '')[:12]
 
     if version:
-        f = open("tortoisehg/util/__version__.py", "w")
-        f.write('# this file is autogenerated by setup.py\n')
-        f.write('version = "%s"\n' % version)
-        f.close()
+        with open("tortoisehg/util/__version__.py", "w") as f:
+            f.write('# this file is autogenerated by setup.py\n')
+            f.write('version = "%s"\n' % version)
 
     try:
         import tortoisehg.util.__version__

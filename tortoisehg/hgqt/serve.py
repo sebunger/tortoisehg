@@ -21,6 +21,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     util,
 )
 
@@ -97,7 +98,8 @@ class ServeDialog(QDialog):
         if self.isstarted():
             return
 
-        self._agent.runCommand(map(hglib.tounicode, self._cmdargs()))
+        self._agent.runCommand(pycompat.maplist(hglib.tounicode,
+                                                self._cmdargs()))
 
     def _cmdargs(self):
         """Build command args to run server"""
@@ -113,7 +115,8 @@ class ServeDialog(QDialog):
         if not hasattr(self._webconf, 'write'):
             return self._webconf.path
 
-        fd, fname = tempfile.mkstemp(prefix='webconf_', dir=qtlib.gettempdir())
+        fd, fname = tempfile.mkstemp(prefix=b'webconf_',
+                                     dir=qtlib.gettempdir())
         f = os.fdopen(fd, 'w')
         try:
             self._webconf.write(f)
@@ -208,18 +211,18 @@ class ServeDialog(QDialog):
 
 def _asconfigliststr(value):
     r"""
-    >>> _asconfigliststr('foo')
+    >>> _asconfigliststr(b'foo')
     'foo'
-    >>> _asconfigliststr('foo bar')
+    >>> _asconfigliststr(b'foo bar')
     '"foo bar"'
-    >>> _asconfigliststr('foo,bar')
+    >>> _asconfigliststr(b'foo,bar')
     '"foo,bar"'
-    >>> _asconfigliststr('foo "bar"')
+    >>> _asconfigliststr(b'foo "bar"')
     '"foo \\"bar\\""'
     """
     # ui.configlist() uses isspace(), which is locale-dependent
-    if any(c.isspace() or c == ',' for c in value):
-        return '"' + value.replace('"', '\\"') + '"'
+    if any(c.isspace() or c == b',' for c in pycompat.iterbytestr(value)):
+        return b'"' + value.replace(b'"', b'\\"') + b'"'
     else:
         return value
 
@@ -233,20 +236,20 @@ def _readconfig(ui, repopath, webconfpath):
         c.path = os.path.abspath(webconfpath)
         return lui, c
     elif repopath:  # imitate webconf for single repo
-        lui.readconfig(os.path.join(repopath, '.hg', 'hgrc'), repopath)
+        lui.readconfig(os.path.join(repopath, b'.hg', b'hgrc'), repopath)
         c = wconfig.config()
         try:
-            if not os.path.exists(os.path.join(repopath, '.hgsub')):
+            if not os.path.exists(os.path.join(repopath, b'.hgsub')):
                 # no _asconfigliststr(repopath) for now, because ServeDialog
                 # cannot parse it as a list in single-repo mode.
-                c.set('paths', '/', repopath)
+                c.set(b'paths', b'/', repopath)
             else:
                 # since hg 8cbb59124e67, path entry is parsed as a list
                 base = hglib.shortreponame(lui) or os.path.basename(repopath)
-                c.set('paths', base,
-                      _asconfigliststr(os.path.join(repopath, '**')))
+                c.set(b'paths', base,
+                      _asconfigliststr(os.path.join(repopath, b'**')))
         except (EnvironmentError, error.Abort, error.RepoError):
-            c.set('paths', '/', repopath)
+            c.set(b'paths', b'/', repopath)
         return lui, c
     else:
         return lui, None
@@ -258,7 +261,7 @@ def run(ui, *pats, **opts):
     lui, webconf = _readconfig(ui, repopath, webconfpath)
     dlg = ServeDialog(lui, webconf=webconf)
     try:
-        dlg.setport(int(lui.config('web', 'port', '8000')))
+        dlg.setport(int(lui.config(b'web', b'port')))
     except ValueError:
         pass
 

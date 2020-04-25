@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tortoisehg\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2018-05-03 10:57-0300\n"
-"PO-Revision-Date: 2013-04-18 11:34+0000\n"
-"Last-Translator: NO vCJD <Unknown>\n"
+"POT-Creation-Date: 2019-07-16 12:01-0300\n"
+"PO-Revision-Date: 2019-02-07 05:08+0000\n"
+"Last-Translator: JK Kim <Unknown>\n"
 "Language-Team: Korean <ko@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Launchpad-Export-Date: 2018-05-04 05:27+0000\n"
-"X-Generator: Launchpad (build 18623)\n"
+"X-Launchpad-Export-Date: 2019-07-17 05:43+0000\n"
+"X-Generator: Launchpad (build 19009)\n"
 
 msgid "TortoiseHg Overlay Icon Server"
 msgstr "TortoiseHg 오버레이 아이콘 서버"
@@ -27,11 +27,11 @@ msgstr "종료"
 msgid "About"
 msgstr "소개"
 
-msgid "Copyright 2008-2018 Steve Borho and others"
+msgid "Copyright 2008-2019 Steve Borho and others"
 msgstr ""
 
 msgid "Several icons are courtesy of the TortoiseSVN and Tango projects"
-msgstr ""
+msgstr "일부 아이콘은 TortoiseSVN과 Tango projects에서 무료로 제공했습니다."
 
 msgid "You can visit our site here"
 msgstr "개발자 웹사이트 방문"
@@ -49,10 +49,10 @@ msgstr ", Mercurial-%s, Python-%s, PyQt-%s, Qt-%s"
 
 #, python-format
 msgid "A new version of TortoiseHg (%s) is ready for download!"
-msgstr ""
+msgstr "TortoiseHg (%s)의 새로운 버전을 다운로드할 수 있습니다!"
 
 msgid "License"
-msgstr ""
+msgstr "라이선스"
 
 msgid "= Working Directory Parent ="
 msgstr "= 작업 디렉토리의 상위  ="
@@ -91,7 +91,7 @@ msgid "Revision:"
 msgstr "리비전:"
 
 msgid "All files in this revision"
-msgstr ""
+msgstr "이 리비전의 모든 파일"
 
 msgid "Only files modified/created in this revision"
 msgstr "이 리비전에서 수정/생성된 파일"
@@ -103,7 +103,7 @@ msgid "Archive Content:"
 msgstr ""
 
 msgid "Recurse into subrepositories"
-msgstr ""
+msgstr "하위 저장소를 포함"
 
 msgid "Browse..."
 msgstr "찾아보기..."
@@ -124,7 +124,7 @@ msgid "Select Destination File"
 msgstr "대상 파일 선택"
 
 msgid "All files (*)"
-msgstr ""
+msgstr "모든 파일 (*)"
 
 msgid "Duplicate Name"
 msgstr "이름 중복"
@@ -184,7 +184,7 @@ msgid "Verify backout revision and ensure your working directory is clean."
 msgstr "백아웃할 리비전과 작업 디렉토리의 상태를 확인해주십시오."
 
 msgid "Backing out a parent revision is a single step operation"
-msgstr ""
+msgstr "부모 리비전을 철회하는 것은 단계별 작업입니다."
 
 msgid "Backout revision"
 msgstr "백아웃 대상 리비전"
@@ -240,7 +240,7 @@ msgid "No merge conflicts, ready to commit"
 msgstr "머지 충돌이 없습니다. 커밋할 수 있습니다."
 
 msgid "Commit backout and merge results"
-msgstr ""
+msgstr "커밋 철회 및 결과 병합"
 
 msgid "Parents"
 msgstr "부모 리비전"
@@ -255,7 +255,7 @@ msgid "Commit message"
 msgstr "커밋 메시지"
 
 msgid "Skip final confirmation page, close after commit."
-msgstr ""
+msgstr "최종 확인 페이지를 건너뛰고, 커밋 후에 창을 닫습니다."
 
 msgid "Backed out changeset: "
 msgstr "백아웃한 변경사항: "
@@ -267,50 +267,50 @@ msgid "Discard current backout message?"
 msgstr "현재 백아웃 메시지를 파기하시겠습니까?"
 
 msgid "Use English backout message"
-msgstr ""
+msgstr "영문 철회 메시지 사용"
 
 msgid "Backing out and committing..."
-msgstr ""
+msgstr "철회 후 커밋 중..."
 
 msgid "Please wait while making backout."
-msgstr ""
+msgstr "철회하는 동안 기다려주십시오."
 
 msgid "Committing..."
 msgstr "커밋중..."
 
 msgid "Please wait while committing merged files."
-msgstr ""
+msgstr "병합된 파일을 커밋하는 동안 기다려주십시오."
 
 msgid "Finished"
 msgstr "완료"
 
 msgid "Backout changeset"
-msgstr ""
+msgstr "철회된 체인지셋"
 
 #, python-format
 msgid "Bisect - %s"
-msgstr ""
+msgstr "이진 탐색 - %s"
 
 msgid "Accept"
 msgstr "수락"
 
 msgid "Known good revision:"
-msgstr ""
+msgstr "알려진 정상 리비전:"
 
 msgid "Known bad revision:"
-msgstr ""
+msgstr "알려진 문제 리비전:"
 
 msgid "Discard local changes (revert --all)"
-msgstr ""
+msgstr "로컬 변경사항을 무시 (revert --all)"
 
 msgid "Revision is &Good"
-msgstr ""
+msgstr "리비전에 문제 없음(&G)"
 
 msgid "Revision is &Bad"
-msgstr ""
+msgstr "리비전에 문제 있음(&B)"
 
 msgid "&Skip this Revision"
-msgstr ""
+msgstr "리비전을 건너뛴다(&S)"
 
 msgid "Close"
 msgstr "닫기"
@@ -319,17 +319,17 @@ msgid "Error encountered."
 msgstr "오류가 발생하였습니다."
 
 msgid "Culprit found."
-msgstr ""
+msgstr "문제를 발생시킨 리비전이 발견됨."
 
 msgid "Revision"
 msgstr "개정 번호"
 
 msgid "Test this revision and report findings. (good/bad/skip)"
-msgstr ""
+msgstr "이 리비전을 테스트하고 결과를 보고합니다. (정상/문제/건너뜀)"
 
 #, python-format
 msgid "%s (hint: %s)"
-msgstr ""
+msgstr "%s (힌트: %s)"
 
 msgid "Bookmark:"
 msgstr "책갈피:"
@@ -338,7 +338,7 @@ msgid "New Name:"
 msgstr "새 이름:"
 
 msgid "Activate:"
-msgstr ""
+msgstr "활성화:"
 
 msgid "&Add"
 msgstr "추가(&A)"
@@ -354,23 +354,23 @@ msgstr "이동(&M)"
 
 #, python-format
 msgid "Bookmark - %s"
-msgstr ""
+msgstr "책갈피 - %s"
 
 #, python-format
 msgid "A bookmark named \"%s\" already exists"
-msgstr ""
+msgstr "이름이 \"%s\"인 책갈피가 이미 있습니다"
 
 #, python-format
 msgid "Bookmark '%s' has been added"
-msgstr ""
+msgstr "'%s' 책갈피가 추가되었습니다"
 
 #, python-format
 msgid "Bookmark named \"%s\" does not exist"
-msgstr ""
+msgstr "이름이 \"%s\"인 책갈피가 없습니다"
 
 #, python-format
 msgid "Bookmark '%s' has been moved"
-msgstr ""
+msgstr "'%s' 책갈피가 이동되었습니다"
 
 #, python-format
 msgid "Bookmark '%s' does not exist"
@@ -378,58 +378,58 @@ msgstr "'%s' 책갈피가 없습니다"
 
 #, python-format
 msgid "Bookmark '%s' has been removed"
-msgstr ""
+msgstr "'%s' 책갈피가 삭제되었습니다"
 
 #, python-format
 msgid "Bookmark '%s' has been renamed to '%s'"
-msgstr ""
+msgstr "책갈피의 이름을 '%s'에서 '%s'로 변경했습니다"
 
 msgid "TortoiseHg Bookmark Sync"
-msgstr ""
+msgstr "TortoiseHg 책갈피 동기화"
 
 msgid "Outgoing Bookmarks"
-msgstr ""
+msgstr "보낼 책갈피"
 
 msgid "&Push Bookmark"
-msgstr ""
+msgstr "책갈피 발행(&P)"
 
 msgid "&Remove Bookmark"
-msgstr ""
+msgstr "책갈피 제거(&R)"
 
 msgid "Incoming Bookmarks"
-msgstr ""
+msgstr "받아올 수 있는 책갈피"
 
 msgid "P&ull Bookmark"
-msgstr ""
+msgstr "책갈피 갱신(&U)"
 
 msgid "R&emove Bookmark"
-msgstr ""
+msgstr "책갈피 제거(&E)"
 
 #, python-format
 msgid "Pushed local bookmark: %s"
-msgstr ""
+msgstr "발행한 로컬 책갈피: %s"
 
 #, python-format
 msgid "Pulled remote bookmark: %s"
-msgstr ""
+msgstr "받아온 원격 책갈피: %s"
 
 #, python-format
 msgid "Removed remote bookmark: %s"
-msgstr ""
+msgstr "삭제된 원격 책갈피: %s"
 
 #, python-format
 msgid "Removed local bookmark: %s"
-msgstr ""
+msgstr "삭제된 로컬 책갈피: %s"
 
 #, python-format
 msgid "%s - branch operation"
-msgstr ""
+msgstr "%s - 분기 작업"
 
 msgid "Select branch of merge commit"
-msgstr ""
+msgstr "Select branch of merge commit"
 
 msgid "Changes take effect on next commit"
-msgstr ""
+msgstr "변경한 내용은 다음 커밋에 반영됩니다."
 
 msgid "No branch changes"
 msgstr "분기에 대한 변경이 없음"
@@ -442,10 +442,10 @@ msgstr "현재의 분기를 종료합니다."
 
 #, python-format
 msgid "Please report this bug to our <a href=\"%s\">bug tracker</a>"
-msgstr ""
+msgstr "이 버그를 <a href=\"%s\">버그 트래커</a>에 제보해 주십시오."
 
 msgid "Checking for updates..."
-msgstr ""
+msgstr "업데이트 확인 중..."
 
 msgid "Copy"
 msgstr "복사"
@@ -454,16 +454,16 @@ msgid "Quit"
 msgstr "종료"
 
 msgid "TortoiseHg Bug Report"
-msgstr ""
+msgstr "TortoiseHg 버그 리포트"
 
 msgid "Upgrading to a more recent TortoiseHg is recommended."
-msgstr ""
+msgstr "최신 버전의 TortoiseHg로 업그레이드하는 것을 권장합니다."
 
 msgid "Your TortoiseHg is up to date."
-msgstr ""
+msgstr "TortoiseHg가 최신 버전입니다."
 
 msgid "Save error report to"
-msgstr ""
+msgstr "오류 보고를 저장"
 
 msgid "Text files (*.txt)"
 msgstr "텍스트 파일 (*.txt)"
@@ -484,7 +484,7 @@ msgid "Visual Diff"
 msgstr "시각적 비교"
 
 msgid "View file changes in external diff tool"
-msgstr ""
+msgstr "외부 비교 도구로 파일 변경점 보기"
 
 msgid "Edit Local"
 msgstr "지역(Local) 수정"
@@ -496,19 +496,19 @@ msgid "Revert to Revision"
 msgstr "개정판을 되돌리기"
 
 msgid "Revert file(s) to contents at this revision"
-msgstr ""
+msgstr "파일을 이 리비전의 내용으로 복구"
 
 msgid "Patch failed to apply"
-msgstr ""
+msgstr "패치 적용 실패"
 
 msgid "Manually resolve rejected chunks?"
-msgstr ""
+msgstr "실패한 청크를 직접 해결하시겠습니까?"
 
 msgid "Edit patched file and rejects?"
-msgstr ""
+msgstr "패치가 성공한 파일과 실패한 파일을 편집하겠습니까?"
 
 msgid "No deletable chunks"
-msgstr ""
+msgstr "삭제할 청크가 없습니다."
 
 msgid "Completely remove file from patch?"
 msgstr ""
@@ -653,6 +653,12 @@ msgstr ""
 
 #, python-format
 msgid "corrupted command result: %r"
+msgstr ""
+
+msgid "error while reading from data input"
+msgstr ""
+
+msgid "asynchronous read is not implement yet"
 msgstr ""
 
 #, python-format
@@ -2043,6 +2049,9 @@ msgstr "전체 기록"
 msgid "Report only the first match per file"
 msgstr ""
 
+msgid "Match whole words only"
+msgstr ""
+
 msgid "Follow copies and renames"
 msgstr ""
 
@@ -2914,6 +2923,54 @@ msgstr ""
 msgid "Patch user:"
 msgstr ""
 
+msgid "Posting Review"
+msgstr ""
+
+msgid "Phabricator"
+msgstr ""
+
+msgid "Reviewers"
+msgstr ""
+
+msgid "Available"
+msgstr ""
+
+msgid "Fetch the reviewer list from the server"
+msgstr ""
+
+msgid "Rescan"
+msgstr ""
+
+msgid "Filter the available reviewers"
+msgstr ""
+
+msgid "Reviewer Filter"
+msgstr ""
+
+msgid "Reviewers available on the server"
+msgstr ""
+
+msgid "Chose the selected available reviewers"
+msgstr ""
+
+msgid ">"
+msgstr ""
+
+msgid "Remove the selected reviewers"
+msgstr ""
+
+msgid "<"
+msgstr ""
+
+msgid "Selected"
+msgstr ""
+
+msgid "These users will be notified of the review"
+msgstr ""
+
+msgid "Post &Review"
+msgstr ""
+
 msgid "Invalid Settings - The ReviewBoard server is not setup"
 msgstr ""
 
@@ -2976,9 +3033,6 @@ msgid "%p%"
 msgstr ""
 
 msgid "Connecting to Review Board..."
-msgstr ""
-
-msgid "Post &Review"
 msgstr ""
 
 msgid "Target:"
@@ -3080,31 +3134,6 @@ msgid "New patch message:"
 msgstr ""
 
 msgid "Patches to fold"
-msgstr ""
-
-msgid "Rename Error"
-msgstr "이름변경 오류"
-
-msgid "Could not rename existing patchfile"
-msgstr ""
-
-msgid "Could not delete existing patchfile"
-msgstr ""
-
-msgid "QRename - Check patchname"
-msgstr ""
-
-#, python-format
-msgid "Patch name <b>%s</b> already exists:"
-msgstr ""
-
-msgid "Add .OLD extension to existing patchfile"
-msgstr ""
-
-msgid "Overwrite existing patchfile"
-msgstr ""
-
-msgid "Go back and change new patchname"
 msgstr ""
 
 msgid "&Undo"
@@ -3463,6 +3492,9 @@ msgstr ""
 
 msgid "Copy Error"
 msgstr "복사 오류"
+
+msgid "Rename Error"
+msgstr "이름변경 오류"
 
 msgid "Select Source File"
 msgstr "원본(Source) 파일 선택"
@@ -4190,6 +4222,9 @@ msgstr ""
 msgid "Post to Re&view Board..."
 msgstr ""
 
+msgid "Post to Phabricator..."
+msgstr ""
+
 msgid "&Remote Update..."
 msgstr ""
 
@@ -4254,6 +4289,9 @@ msgid "&Prune Selected..."
 msgstr ""
 
 msgid "Post Selected to Review Board..."
+msgstr ""
+
+msgid "Post Selected to Phabricator..."
 msgstr ""
 
 msgid "Apply patch"
@@ -4365,6 +4403,13 @@ msgid "&More Options..."
 msgstr ""
 
 msgid "Unable to merge"
+msgstr ""
+
+msgid "Please select a revision to merge."
+msgstr ""
+
+#, python-format
+msgid "Cannot merge with a pseudo revision %r."
 msgstr ""
 
 msgid "You cannot merge a revision with itself"
@@ -5633,6 +5678,15 @@ msgid ""
 "newly-created repository."
 msgstr ""
 
+msgid "Default Clone Destination"
+msgstr ""
+
+msgid ""
+"If specified, the destination field in the clone widget will be pre-filled "
+"with this path. Otherwise, it will be pre-filled with the current working "
+"directory."
+msgstr ""
+
 msgid "Workbench"
 msgstr ""
 
@@ -6373,14 +6427,18 @@ msgid "Changeset Link"
 msgstr ""
 
 msgid ""
-"A \"template string\" that, when set, turns the revision number and short "
-"hashes that are shown on the revision panels into links.<br>The \"template "
-"string\" uses a \"mercurial template\"-like syntax that currently accepts "
-"two template expressions:<ul><li>{node|short} : replaced by the 12 digit "
-"revision id (note that {node} on its own is currently unsupported)."
-"<li>{rev} : replaced by the revision number.</ul>For example, in order to "
+"A template string that, when set, turns the revision number and short hashes "
+"that are shown on the revision panels into links.<br>The template string "
+"uses a normal <a href=\"https://www.mercurial-scm.org/repo/hg/help/templates"
+"\">mercurial template syntax</a>, such as:<ul><li>{node|short} : replaced by "
+"the 12 digit revision id.<li>{rev} : replaced by the revision number."
+"<li>{gitnode} : if the hg-git extension is enabled, and the repo is a git "
+"clone, this is replaced by the git commit hash.</ul>For example, in order to "
 "link to bitbucket commit pages you can set this to:<br>https://bitbucket.org/"
-"tortoisehg/thg/commits/{node|short}"
+"tortoisehg/thg/commits/{node|short}<br>You can also to link to a GitHub/"
+"GitLab repo (provided hg-git is installed): <br>https://github.com/torvalds/"
+"linux/commit/{gitnode}<br>https://gitlab.com/tortoisegit/tortoisegit/commit/"
+"{gitnode}<br>"
 msgstr ""
 
 msgid "Path to review board example \"http://demo.reviewboard.org\""
@@ -8589,3 +8647,6 @@ msgstr ""
 
 #~ msgid "Shelve"
 #~ msgstr "임시보관함"
+
+#~ msgid "Copyright 2008-2018 Steve Borho and others"
+#~ msgstr "Copyright 2008-2018 Steve Borho 외"

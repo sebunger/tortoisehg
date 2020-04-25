@@ -38,8 +38,10 @@ from . import (
 class StripWidget(cmdui.AbstractCmdWidget):
     """Command widget to strip changesets"""
 
-    def __init__(self, repoagent, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts=None):
         super(StripWidget, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self._repoagent = repoagent
 
@@ -130,7 +132,6 @@ class StripWidget(cmdui.AbstractCmdWidget):
         striprevs = list(self.repo.changelog.descendants([rev]))
         striprevs.append(rev)
         striprevs.sort()
-        self.cslist.clear()
         self.cslist.update(striprevs)
         return True
 
@@ -156,7 +157,7 @@ class StripWidget(cmdui.AbstractCmdWidget):
 
     def runCommand(self):
         opts = {'verbose': True}
-        opts.update((n, w.isChecked()) for n, w in self._optchks.iteritems())
+        opts.update((n, w.isChecked()) for n, w in self._optchks.items())
 
         wc = self.repo[None]
         wcparents = wc.parents()
@@ -189,7 +190,9 @@ class StripWidget(cmdui.AbstractCmdWidget):
         return self._repoagent.runCommand(cmdline, self)
 
 
-def createStripDialog(repoagent, rev=None, parent=None, opts={}):
+def createStripDialog(repoagent, rev=None, parent=None, opts=None):
+    if opts is None:
+        opts = {}
     dlg = cmdui.CmdControlDialog(parent)
     dlg.setWindowIcon(qtlib.geticon('hg-strip'))
     dlg.setWindowTitle(_('Strip - %s') % repoagent.displayName())

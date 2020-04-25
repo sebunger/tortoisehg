@@ -9,6 +9,10 @@ from __future__ import absolute_import
 
 import os
 
+from mercurial import (
+    pycompat,
+)
+
 from .qtcore import (
     QAbstractTableModel,
     QModelIndex,
@@ -79,7 +83,7 @@ class WebconfForm(QWidget):
     def _getlocalpath_from_dropevent(event):
         m = event.mimeData()
         if m.hasFormat('text/uri-list') and len(m.urls()) == 1:
-            return unicode(m.urls()[0].toLocalFile())
+            return pycompat.unicode(m.urls()[0].toLocalFile())
 
     def setwebconf(self, webconf):
         """set current webconf object"""
@@ -95,7 +99,7 @@ class WebconfForm(QWidget):
         """current webconf object"""
         def curconf(w):
             i = w.currentIndex()
-            _path, conf = unicode(w.itemText(i)), w.itemData(i)
+            _path, conf = pycompat.unicode(w.itemText(i)), w.itemData(i)
             return conf
 
         return curconf(self._qui.path_edit)
@@ -170,7 +174,7 @@ class WebconfForm(QWidget):
         origpath, origlocalpath = self._webconfmodel.getpathmapat(index.row())
         path, localpath = _PathDialog.geteditpathmap(
             self, path=origpath, localpath=origlocalpath,
-            invalidpaths=set(self._webconfmodel.paths) - set([origpath]))
+            invalidpaths=set(self._webconfmodel.paths) - {origpath})
         if not path:
             return
         if path != origpath:
@@ -238,12 +242,12 @@ class _PathDialog(QDialog):
     @property
     def path(self):
         """value of path field"""
-        return unicode(self._path_edit.text())
+        return pycompat.unicode(self._path_edit.text())
 
     @property
     def localpath(self):
         """value of localpath field"""
-        return unicode(self._localpath_edit.text())
+        return pycompat.unicode(self._localpath_edit.text())
 
     @pyqtSlot()
     def _browse_localpath(self):
@@ -252,7 +256,7 @@ class _PathDialog(QDialog):
         if not path:
             return
 
-        path = unicode(path)
+        path = pycompat.unicode(path)
         if os.path.exists(os.path.join(path, '.hgsub')):
             self._localpath_edit.setText(os.path.join(path, '**'))
         else:
@@ -328,12 +332,12 @@ class WebconfModel(QAbstractTableModel):
 
     def getpathmapat(self, row):
         """return pair of (path, localpath) at the specified index"""
-        assert 0 <= row and row < self.rowCount()
+        assert 0 <= row and row < self.rowCount(), row
         return tuple(hglib.tounicode(e) for e in self._config.items('paths')[row])
 
     def addpathmap(self, path, localpath):
         """add path mapping to serve"""
-        assert path not in self.paths
+        assert path not in self.paths, path
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         try:
             self._config.set('paths', hglib.fromunicode(path),
@@ -360,5 +364,5 @@ class WebconfModel(QAbstractTableModel):
 
     def _indexofpath(self, path):
         path = hglib.fromunicode(path)
-        assert path in self._config['paths']
+        assert path in self._config['paths'], path
         return list(self._config['paths']).index(path)

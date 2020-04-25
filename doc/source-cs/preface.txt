@@ -45,6 +45,8 @@ na neomezené množství počítačů a šířit ve shodě s licencí GPLv2.
 Komunita
 ========
 
+`Developers <thg-dev@googlegroups.com>`_ - Patches, bug reports, development discussions.
+
 Naše Wiki na stránkách Bitbucket je `zde <https://bitbucket.org/tortoisehg/thg/wiki/Home>`_ .
 
 Poděkování

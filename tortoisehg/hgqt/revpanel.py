@@ -9,6 +9,7 @@
 from __future__ import absolute_import
 
 from mercurial import (
+    cmdutil,
     error,
     scmutil,
 )
@@ -22,7 +23,7 @@ from . import (
 
 def label_func(widget, item, ctx):
     if item == 'cset':
-        if type(ctx.rev()) is str:
+        if isinstance(ctx.rev(), str):
             return _('Patch:')
         return _('Changeset:')
     elif item == 'parents':
@@ -42,12 +43,13 @@ def revid_markup(revid, **kargs):
 
 def data_func(widget, item, ctx):
     def summary_line(desc):
-        return hglib.longsummary(desc.replace('\0', ''))
+        return hglib.longsummary(desc.replace(b'\0', b''))
     def revline_data(ctx, hl=False, branch=None):
-        if isinstance(ctx, basestring):
+        if hglib.isbasestring(ctx):
             return ctx
         desc = ctx.description()
-        return (str(ctx.rev()), str(ctx), summary_line(desc), hl, branch)
+        return (str(ctx.rev()), str(ctx), summary_line(desc), hl,
+                hglib.tounicode(branch))
     def format_ctxlist(ctxlist):
         if not ctxlist:
             return None
@@ -84,7 +86,7 @@ def data_func(widget, item, ctx):
         if not ts:
             return None
         try:
-            tctx = scmutil.revsymbol(ctx.repo(), ts)
+            tctx = scmutil.revsymbol(ctx.repo(), hglib.fromunicode(ts))
             return revline_data(tctx)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             return ts
@@ -96,7 +98,7 @@ def data_func(widget, item, ctx):
     elif item == 'isclose':
         if ctx.rev() is None:
             ctx = ctx.p1()
-        return ctx.extra().get('close') is not None
+        return ctx.extra().get(b'close') is not None
     elif item == 'predecessors':
         ctxlist = obsoleteutil.first_known_predecessors(ctx)
         return format_ctxlist(ctxlist)
@@ -107,22 +109,37 @@ def data_func(widget, item, ctx):
     raise csinfo.UnknownItem(item)
 
 def create_markup_func(ui):
-    def link_markup(revnum, revid, linkpattern=None):
+    def link_markup(revnum, revid, linkpattern=None, ctx=None):
         mrevid = revid_markup('%s (%s)' % (revnum, revid))
         if linkpattern is None:
             return mrevid
-        link = linkpattern.replace('{node|short}', revid).replace('{rev}', revnum)
-        return '<a href="%s">%s</a>' % (link, mrevid)
+
+        if linkpattern == b'cset:{node|short}':
+            # this is the linkpattern for thg internal hyperlinks
+            href = 'cset:%s' % revid
+        else:
+            if ctx is None:
+                return mrevid
+            try:
+                # evaluates a generic mercurial template for changeset.link
+                href = hglib.tounicode(cmdutil.rendertemplate(ctx, linkpattern))
+            except (error.Abort, error.ParseError):
+                return mrevid
+
+        return '<a href="%s">%s</a>' % (qtlib.htmlescape(href), mrevid)
+
     def revline_markup(revnum, revid, summary, highlight=None,
-                       branch=None, linkpattern='cset:{node|short}'):
+                       branch=None, linkpattern=b'cset:{node|short}', ctx=None):
         def branch_markup(branch):
             opts = dict(fg='black', bg='#aaffaa')
+
             return qtlib.markup(' %s ' % branch, **opts)
+
         summary = qtlib.markup(summary)
         if branch:
             branch = branch_markup(branch)
         if revid:
-            rev = link_markup(revnum, revid, linkpattern=linkpattern)
+            rev = link_markup(revnum, revid, linkpattern=linkpattern, ctx=ctx)
             if branch:
                 return '%s %s %s' % (rev, branch, summary)
             return '%s %s' % (rev, summary)
@@ -131,25 +148,27 @@ def create_markup_func(ui):
             if branch:
                 return '%s - %s %s' % (revnum, branch, summary)
             return '%s - %s' % (revnum, summary)
+
     def markup_func(widget, item, value):
         if item in ('cset', 'graft', 'transplant', 'mqoriginalparent',
                     'p4', 'svn', 'converted'):
             if item == 'cset':
-                linkpattern = ui.config('tortoisehg', 'changeset.link', None)
+                linkpattern = ui.config(b'tortoisehg', b'changeset.link')
             else:
-                linkpattern = 'cset:{node|short}'
-            if isinstance(value, basestring):
+                linkpattern = b'cset:{node|short}'
+            if hglib.isbasestring(value):
                 return revid_markup(value)
-            return revline_markup(linkpattern=linkpattern, *value)
+            return revline_markup(linkpattern=linkpattern, *value, ctx=widget.ctx)
         elif item in ('parents', 'children', 'predecessors', 'successors'):
             csets = []
             for cset in value:
-                if isinstance(cset, basestring):
+                if hglib.isbasestring(cset):
                     csets.append(revid_markup(cset))
                 else:
                     csets.append(revline_markup(*cset))
             return csets
         raise csinfo.UnknownItem(item)
+
     return markup_func
 
 def RevPanelWidget(repo):
@@ -178,8 +197,12 @@ def nomarkup(widget, item, value):
     csets = []
     if item == 'ishead':
         if value is False:
-            text = _('Not a head revision!')
-            return qtlib.markup(text, fg='red', weight='bold')
+            if widget.custom['isAmend']:
+                text = _('Not a head revision.')
+                return qtlib.markup(text, weight='bold')
+            else:
+                text = _('Not a head revision!')
+                return qtlib.markup(text, fg='red', weight='bold')
         raise csinfo.UnknownItem(item)
     elif item == 'isclose':
         if value is True:
@@ -187,7 +210,7 @@ def nomarkup(widget, item, value):
             return qtlib.markup(text, fg='red', weight='bold')
         raise csinfo.UnknownItem(item)
     for cset in value:
-        if isinstance(cset, basestring):
+        if hglib.isbasestring(cset):
             csets.append(revid_markup(cset))
         else:
             csets.append(revline_markup(*cset))

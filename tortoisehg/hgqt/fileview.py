@@ -7,7 +7,6 @@
 
 from __future__ import absolute_import
 
-import cPickle as pickle
 import difflib
 import os
 import re
@@ -42,7 +41,11 @@ from .qtgui import (
     QVBoxLayout,
 )
 
-from mercurial import util
+from mercurial import (
+    pycompat,
+    util,
+)
+
 from mercurial.utils import (
     dateutil,
 )
@@ -370,7 +373,7 @@ class HgFileView(QFrame):
     def _restrictModes(self, available):
         'Disable modes based on content constraints'
         available.add(_NullMode)
-        for m, a in self._modeActionMap.iteritems():
+        for m, a in self._modeActionMap.items():
             a.setEnabled(m in available)
         self._fallBackToAvailableMode()
 
@@ -382,9 +385,9 @@ class HgFileView(QFrame):
         curmode = self._effectiveMode()
         if curmode and self._modeActionMap[curmode].isEnabled():
             return
-        fallbackmode = iter(a.data()
+        fallbackmode = next(iter(a.data()
                             for a in self._modeToggleGroup.actions()
-                            if a.isEnabled()).next()
+                            if a.isEnabled()))
         if not self._lostMode:
             self._lostMode = curmode
         self._changeEffectiveMode(fallbackmode)
@@ -559,7 +562,7 @@ class HgFileView(QFrame):
 
         fm = QFontMetrics(font)
         self.maxWidth = fm.maxWidth()
-        lines = unicode(self.sci.text()).splitlines()
+        lines = pycompat.unicode(self.sci.text()).splitlines()
         if lines:
             # assume that the longest line has the largest width;
             # fm.width() is too slow to apply to each line.
@@ -752,7 +755,7 @@ class _DiffViewControl(_AbstractViewControl):
         self._startBuildMarker()
 
     def _startBuildMarker(self):
-        self._linestoprocess = unicode(self._sci.text()).splitlines()
+        self._linestoprocess = pycompat.unicode(self._sci.text()).splitlines()
         self._firstlinetoprocess = 0
         self._buildtimer.start()
 
@@ -828,7 +831,7 @@ class _FileViewControl(_AbstractViewControl):
 
     def display(self, fd):
         if fd.contents:
-            filename = hglib.fromunicode(fd.filePath())
+            filename = fd.filePath()
             lexer = lexers.getlexer(self._ui, filename, fd.contents, self)
             self._sci.setLexer(lexer)
             if lexer is None:
@@ -873,7 +876,7 @@ class _FileViewControl(_AbstractViewControl):
             elif tag in ('equal', 'delete'):
                 pass
             else:
-                raise ValueError, 'unknown tag %r' % (tag,)
+                raise ValueError('unknown tag %r' % (tag,))
         self._opcodes = self._opcodes[30:]
 
         self._sci.setUpdatesEnabled(True)
@@ -1114,15 +1117,11 @@ class _AnnotateViewControl(_AbstractViewControl):
         if ret != 0:
             return
         repo = self._repoAgentForFile().rawRepo()
-        data = pickle.loads(str(sess.readAll()))
+        data = util.pickle.loads(bytes(sess.readAll()))
         links = []
         fctxcache = {}  # (path, rev): fctx
-        for l in data[0]['lines']:
-            try:
-                path, rev, lineno = l['path'], l['rev'], l['lineno']
-            except KeyError:
-                # hg<4.8 (34ba47117164, 47cb6750dea3)
-                path, rev, lineno = l['file'], l['rev'], l['line_number']
+        for l in data[0][b'lines']:
+            path, rev, lineno = l[b'path'], l[b'rev'], l[b'lineno']
             try:
                 fctx = fctxcache[path, rev]
             except KeyError:
@@ -1149,7 +1148,7 @@ class _AnnotateViewControl(_AbstractViewControl):
                                 s.style(), s.paper())
         self._sci.SendScintilla(qsci.SCI_STYLESETFONT,
                                 s.style(),
-                                unicode(s.font().family()).encode('utf-8'))
+                                pycompat.unicode(s.font().family()).encode('utf-8'))
         self._sci.SendScintilla(qsci.SCI_STYLESETSIZE,
                                 s.style(), s.font().pointSize())
         for i, (fctx, _origline) in enumerate(self._links):
@@ -1178,7 +1177,7 @@ class _AnnotateViewControl(_AbstractViewControl):
                                                maxsaturations=16,
                                                mindate=mindate,
                                                isdarktheme=self._isdarktheme)
-        for i, (color, fctxs) in enumerate(palette.iteritems()):
+        for i, (color, fctxs) in enumerate(palette.items()):
             m = _FirstAnnotateLineMarker + i
             self._sci.markerDefine(qsci.Background, m)
             self._sci.setMarkerBackgroundColor(QColor(color), m)
@@ -1196,7 +1195,7 @@ class _AnnotateViewControl(_AbstractViewControl):
     def _updatemarginwidth(self, revtexts):
         self._sci.setMarginsFont(self._sci.font())
         # add 2 for margin
-        maxwidth = 2 + max(len(s) for s in revtexts.itervalues())
+        maxwidth = 2 + max(len(s) for s in revtexts.values())
         self._sci.setMarginWidth(_AnnotateMargin, 'M' * maxwidth)
 
     def setupContextMenu(self, menu, line):
@@ -1373,7 +1372,7 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
 
             self._sci.markerDelete(chunk.lineno, _IncludedChunkStartMarker)
             self._sci.markerAdd(chunk.lineno, _ExcludedChunkStartMarker)
-            for i in xrange(chunk.linecount - 1):
+            for i in pycompat.xrange(chunk.linecount - 1):
                 self._sci.markerAdd(chunk.lineno + i + 1, _ExcludedLineMarker)
             self._sci.fillIndicatorRange(chunk.lineno + 1, 0,
                                          chunk.lineno + chunk.linecount, 0,
@@ -1386,13 +1385,13 @@ class _ChunkSelectionViewControl(_AbstractViewControl):
             pos = self._sci.positionFromLineIndex(chunk.lineno, llen - mlen - 1)
             self._sci.SendScintilla(qsci.SCI_SETTARGETSTART, pos)
             self._sci.SendScintilla(qsci.SCI_SETTARGETEND, pos + mlen)
-            self._sci.SendScintilla(qsci.SCI_REPLACETARGET, 0, '')
+            self._sci.SendScintilla(qsci.SCI_REPLACETARGET, 0, b'')
             self._sci.setReadOnly(True)
 
         if not chunk.excluded and not inclmarked:
             self._sci.markerDelete(chunk.lineno, _ExcludedChunkStartMarker)
             self._sci.markerAdd(chunk.lineno, _IncludedChunkStartMarker)
-            for i in xrange(chunk.linecount - 1):
+            for i in pycompat.xrange(chunk.linecount - 1):
                 self._sci.markerDelete(chunk.lineno + i + 1,
                                        _ExcludedLineMarker)
             self._sci.clearIndicatorRange(chunk.lineno + 1, 0,

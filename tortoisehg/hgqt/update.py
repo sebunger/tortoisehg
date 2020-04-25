@@ -24,6 +24,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     scmutil,
 )
 
@@ -39,8 +40,10 @@ from . import (
 
 class UpdateWidget(cmdui.AbstractCmdWidget):
 
-    def __init__(self, repoagent, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts=None):
         super(UpdateWidget, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._repoagent = repoagent
         repo = repoagent.rawRepo()
@@ -60,23 +63,24 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
 
         # always include integer revision
         if rev:
-            assert not isinstance(rev, unicode)
+            assert isinstance(rev, pycompat.unicode), repr(rev)
             try:
-                ctx = scmutil.revsymbol(self.repo, rev)
+                ctx = scmutil.revsymbol(self.repo, hglib.fromunicode(rev))
                 if isinstance(ctx.rev(), int):  # could be patch name
                     combo.addItem(str(ctx.rev()))
             except error.RepoLookupError:
                 pass
 
-        combo.addItems(map(hglib.tounicode, hglib.namedbranches(repo)))
-        tags = list(self.repo.tags()) + repo._bookmarks.keys()
+        combo.addItems(pycompat.maplist(hglib.tounicode,
+                                        hglib.namedbranches(repo)))
+        tags = list(self.repo.tags()) + list(repo._bookmarks.keys())
         tags.sort(reverse=True)
-        combo.addItems(map(hglib.tounicode, tags))
+        combo.addItems(pycompat.maplist(hglib.tounicode, tags))
 
         if rev is None:
             selecturev = hglib.tounicode(self.repo.dirstate.branch())
         else:
-            selecturev = hglib.tounicode(str(rev))
+            selecturev = hglib.tounicode(rev)
         selectindex = combo.findText(selecturev)
         if selectindex >= 0:
             combo.setCurrentIndex(selectindex)
@@ -105,16 +109,15 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         # default path as the first (and default) path
         self.path_combo_label = QLabel(_('Pull subrepos from:'))
         self.path_combo = QComboBox(self)
-        syncpaths = dict(repo.ui.configitems('paths'))
+        syncpaths = dict(repoagent.configStringItems('paths'))
         aliases = sorted(syncpaths)
         # make sure that the default path is the first one
         if 'default' in aliases:
             aliases.remove('default')
             aliases.insert(0, 'default')
         for n, alias in enumerate(aliases):
-            self.path_combo.addItem(hglib.tounicode(alias))
-            self.path_combo.setItemData(
-                n, hglib.tounicode(syncpaths[alias]))
+            self.path_combo.addItem(alias)
+            self.path_combo.setItemData(n, syncpaths[alias])
         self.path_combo.currentIndexChanged.connect(
             self._updatePathComboTooltip)
         self._updatePathComboTooltip(0)
@@ -155,8 +158,8 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
     def readSettings(self, qs):
         self.merge_chk.setChecked(qtlib.readBool(qs, 'merge'))
         self.autoresolve_chk.setChecked(
-            self.repo.ui.configbool('tortoisehg', 'autoresolve',
-                                    qtlib.readBool(qs, 'autoresolve', True)))
+            self._repoagent.configBool('tortoisehg', 'autoresolve',
+                                       qtlib.readBool(qs, 'autoresolve', True)))
         self.verbose_chk.setChecked(qtlib.readBool(qs, 'verbose'))
 
         # expand options if a hidden one is checked
@@ -222,8 +225,8 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                     (self.autoresolve_chk.isChecked() and 'merge' or 'fail')]
         rev = hglib.fromunicode(self.rev_combo.currentText())
 
-        activatebookmarkmode = self.repo.ui.config(
-            'tortoisehg', 'activatebookmarks', 'prompt')
+        activatebookmarkmode = self._repoagent.configString(
+            'tortoisehg', 'activatebookmarks')
         if activatebookmarkmode != 'never':
             bookmarks = scmutil.revsymbol(self.repo, rev).bookmarks()
             if bookmarks and rev not in bookmarks:
@@ -264,22 +267,23 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                         self, bookmarks, hglib.activebookmark(self.repo)).run()
                 if selectedbookmark:
                     rev = selectedbookmark
-                elif (scmutil.revsymbol(self.repo, rev)
-                      == scmutil.revsymbol(self.repo,
-                                           hglib.activebookmark(self.repo))):
-                    deactivatebookmark = qtlib.QuestionMsgBox(
-                        _('Deactivate current bookmark?'),
-                        _('Do you really want to deactivate the <i>%s</i> '
-                          'bookmark?')
-                        % hglib.tounicode(hglib.activebookmark(self.repo)))
-                    if deactivatebookmark:
-                        cmdline = ['bookmark']
-                        if self.verbose_chk.isChecked():
-                            cmdline += ['--verbose']
-                        cmdline += ['-i',
-                                    hglib.tounicode(hglib.activebookmark(self.repo))]
-                        return self._repoagent.runCommand(cmdline, self)
-                    return cmdcore.nullCmdSession()
+                else:
+                    activebookmark = hglib.activebookmark(self.repo)
+                    if (activebookmark and scmutil.revsymbol(self.repo, rev)
+                        == scmutil.revsymbol(self.repo, activebookmark)):
+                        deactivatebookmark = qtlib.QuestionMsgBox(
+                            _('Deactivate current bookmark?'),
+                            _('Do you really want to deactivate the <i>%s</i> '
+                              'bookmark?')
+                            % hglib.tounicode(activebookmark))
+                        if deactivatebookmark:
+                            cmdline = ['bookmark']
+                            if self.verbose_chk.isChecked():
+                                cmdline += ['--verbose']
+                            cmdline += ['-i',
+                                        hglib.tounicode(activebookmark)]
+                            return self._repoagent.runCommand(cmdline, self)
+                        return cmdcore.nullCmdSession()
 
         cmdline.append('--rev')
         cmdline.append(rev)
@@ -298,7 +302,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
         if self.discard_chk.isChecked():
             cmdline.append('--clean')
         else:
-            cur = self.repo.hgchangectx('.')
+            cur = self.repo.hgchangectx(b'.')
             try:
                 node = self.repo.hgchangectx(
                     scmutil.revsymbol(self.repo, rev).rev())
@@ -326,10 +330,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                 pa = p1.ancestor(p2)
                 return not clean \
                     and (p1.rev() == pa.rev() or p2.rev() == pa.rev())
-            def confirmupdate(clean=None):
-                if clean is None:
-                    clean = isclean()
-
+            def confirmupdate():
                 msg = _('Detected uncommitted local changes in working tree.\n'
                         'Please select to continue:\n')
                 data = {'discard': (_('&Discard'),
@@ -344,8 +345,8 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                 opts = ['discard']
                 if not ismergedchange():
                     opts.append('shelve')
-                if islocalmerge(cur, node, clean):
-                    opts.append('merge')
+
+                opts.append('merge')
 
                 dlg = QMessageBox(QMessageBox.Question, _('Confirm Update'),
                                   '', QMessageBox.Cancel, self)
@@ -368,8 +369,8 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
             clean = isclean()
             if clean:
                 cmdline.append('--check')
-            elif not (defaultmerge and islocalmerge(cur, node, clean)):
-                clicked = confirmupdate(clean)
+            elif not defaultmerge:
+                clicked = confirmupdate()
                 if clicked == 'discard':
                     cmdline.append('--clean')
                 elif clicked == 'shelve':
@@ -379,11 +380,13 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
                     dlg.exec_()
                     return cmdcore.nullCmdSession()
                 elif clicked == 'merge':
-                    pass # no args
+                    cmdline.append('--merge')
                 else:
                     return cmdcore.nullCmdSession()
+            elif not islocalmerge(cur, node, clean):
+                cmdline.append('--merge')
 
-        cmdline = map(hglib.tounicode, cmdline)
+        cmdline = pycompat.maplist(hglib.tounicode, cmdline)
         return self._repoagent.runCommand(cmdline, self)
 
     @pyqtSlot(bool)
@@ -398,8 +401,10 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
 
 class UpdateDialog(cmdui.CmdControlDialog):
 
-    def __init__(self, repoagent, rev=None, parent=None, opts={}):
+    def __init__(self, repoagent, rev=None, parent=None, opts=None):
         super(UpdateDialog, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self._repoagent = repoagent
 
         self.setWindowTitle(_('Update - %s') % repoagent.displayName())

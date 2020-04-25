@@ -8,11 +8,9 @@
 from __future__ import absolute_import
 
 import atexit
-import cgi
 import os
 import posixpath
 import re
-import shlex
 import shutil
 import sip
 import stat
@@ -67,6 +65,7 @@ from .qtgui import (
 from mercurial import (
     color,
     extensions,
+    pycompat,
     util,
 )
 from mercurial.utils import (
@@ -83,29 +82,38 @@ from ..util import (
 from ..util.i18n import _
 
 try:
-    import win32con
-    openflags = win32con.CREATE_NO_WINDOW
+    import win32con  # pytype: disable=import-error
+    openflags = win32con.CREATE_NO_WINDOW  # type: int
 except ImportError:
     openflags = 0
+
+if pycompat.ispy3:
+    from html import escape as htmlescape
+else:
+    import cgi
+    def htmlescape(s, quote=True):
+        return cgi.escape(s, quote)
 
 # largest allowed size for widget, defined in <src/gui/kernel/qwidget.h>
 QWIDGETSIZE_MAX = (1 << 24) - 1
 
 tmproot = None
 def gettempdir():
+    """Return the byte string path of a temporary directory, static for the
+    application lifetime, removed recursively atexit."""
     global tmproot
     def cleanup():
-        def writeable(arg, dirname, names):
-            for name in names:
-                fullname = os.path.join(dirname, name)
-                os.chmod(fullname, os.stat(fullname).st_mode | stat.S_IWUSR)
         try:
-            os.path.walk(tmproot, writeable, None)
+            os.chmod(tmproot, os.stat(tmproot).st_mode | stat.S_IWUSR)
+            for top, dirs, files in os.walk(tmproot):
+                for name in dirs + files:
+                    fullname = os.path.join(top, name)
+                    os.chmod(fullname, os.stat(fullname).st_mode | stat.S_IWUSR)
             shutil.rmtree(tmproot)
-        except:
+        except OSError:
             pass
     if not tmproot:
-        tmproot = tempfile.mkdtemp(prefix='thg.')
+        tmproot = tempfile.mkdtemp(prefix=b'thg.')
         atexit.register(cleanup)
     return tmproot
 
@@ -132,7 +140,7 @@ def openlocalurl(path):
     if isinstance(path, str):
         path = hglib.tounicode(path)
     else:
-        path = unicode(path)
+        path = pycompat.unicode(path)
     if os.name == 'nt' and path.startswith('\\\\'):
         # network share, special handling because of qt bug 13359
         # see https://bugreports.qt.io/browse/QTBUG-13359
@@ -141,10 +149,6 @@ def openlocalurl(path):
     else:
         qurl = QUrl.fromLocalFile(path)
     return QDesktopServices.openUrl(qurl)
-
-def openfiles(repo, files, parent=None):
-    for filename in files:
-        openlocalurl(repo.wjoin(filename))
 
 def editfiles(repo, files, lineno=None, search=None, parent=None):
     if len(files) == 1:
@@ -161,7 +165,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         cwd = repo.root
 
     toolpath, args, argsln, argssearch = editor.detecteditor(repo, files)
-    if os.path.basename(toolpath) in ('vi', 'vim', 'hgeditor'):
+    if os.path.basename(toolpath) in (b'vi', b'vim', b'hgeditor'):
         res = QMessageBox.critical(parent,
                     _('No visual editor configured'),
                     _('Please configure a visual editor.'))
@@ -171,75 +175,75 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         return
 
     files = [procutil.shellquote(util.localpath(f)) for f in files]
-    assert len(files) == 1 or lineno == None
+    assert len(files) == 1 or lineno == None, (files, lineno)
 
     cmdline = None
     if search:
         assert lineno is not None
         if argssearch:
-            cmdline = ' '.join([toolpath, argssearch])
-            cmdline = cmdline.replace('$LINENUM', str(lineno))
-            cmdline = cmdline.replace('$SEARCH', search)
+            cmdline = b' '.join([toolpath, argssearch])
+            cmdline = cmdline.replace(b'$LINENUM', b'%d' % lineno)
+            cmdline = cmdline.replace(b'$SEARCH', search)
         elif argsln:
-            cmdline = ' '.join([toolpath, argsln])
-            cmdline = cmdline.replace('$LINENUM', str(lineno))
+            cmdline = b' '.join([toolpath, argsln])
+            cmdline = cmdline.replace(b'$LINENUM', b'%d' % lineno)
         elif args:
-            cmdline = ' '.join([toolpath, args])
+            cmdline = b' '.join([toolpath, args])
     elif lineno:
         if argsln:
-            cmdline = ' '.join([toolpath, argsln])
-            cmdline = cmdline.replace('$LINENUM', str(lineno))
+            cmdline = b' '.join([toolpath, argsln])
+            cmdline = cmdline.replace(b'$LINENUM', b'%d' % lineno)
         elif args:
-            cmdline = ' '.join([toolpath, args])
+            cmdline = b' '.join([toolpath, args])
     else:
         if args:
-            cmdline = ' '.join([toolpath, args])
+            cmdline = b' '.join([toolpath, args])
 
     if cmdline is None:
         # editor was not specified by editor-tools configuration, fall
         # back to older tortoisehg.editor OpenAtLine parsing
-        cmdline = ' '.join([toolpath] + files) # default
+        cmdline = b' '.join([toolpath] + files) # default
         try:
-            regexp = re.compile('\[([^\]]*)\]')
+            regexp = re.compile(b'\[([^\]]*)\]')
             expanded = []
             pos = 0
             for m in regexp.finditer(toolpath):
                 expanded.append(toolpath[pos:m.start()-1])
                 phrase = toolpath[m.start()+1:m.end()-1]
                 pos = m.end()+1
-                if '$LINENUM' in phrase:
+                if b'$LINENUM' in phrase:
                     if lineno is None:
                         # throw away phrase
                         continue
-                    phrase = phrase.replace('$LINENUM', str(lineno))
-                elif '$SEARCH' in phrase:
+                    phrase = phrase.replace(b'$LINENUM', b'%d' % lineno)
+                elif b'$SEARCH' in phrase:
                     if search is None:
                         # throw away phrase
                         continue
-                    phrase = phrase.replace('$SEARCH', search)
-                if '$FILE' in phrase:
-                    phrase = phrase.replace('$FILE', files[0])
+                    phrase = phrase.replace(b'$SEARCH', search)
+                if b'$FILE' in phrase:
+                    phrase = phrase.replace(b'$FILE', files[0])
                     files = []
                 expanded.append(phrase)
             expanded.append(toolpath[pos:])
-            cmdline = ' '.join(expanded + files)
-        except ValueError, e:
+            cmdline = b' '.join(expanded + files)
+        except ValueError as e:
             # '[' or ']' not found
             pass
-        except TypeError, e:
+        except TypeError as e:
             # variable expansion failed
             pass
 
-    shell = not (len(cwd) >= 2 and cwd[0:2] == r'\\')
+    shell = not (len(cwd) >= 2 and cwd[0:2] == br'\\')
     try:
-        if '$FILES' in cmdline:
-            cmdline = cmdline.replace('$FILES', ' '.join(files))
+        if b'$FILES' in cmdline:
+            cmdline = cmdline.replace(b'$FILES', b' '.join(files))
             cmdline = procutil.quotecommand(cmdline)
             subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
                              stderr=None, stdout=None, stdin=None, cwd=cwd)
-        elif '$FILE' in cmdline:
+        elif b'$FILE' in cmdline:
             for file in files:
-                cmd = cmdline.replace('$FILE', file)
+                cmd = cmdline.replace(b'$FILE', file)
                 cmd = procutil.quotecommand(cmd)
                 subprocess.Popen(cmd, shell=shell, creationflags=openflags,
                                  stderr=None, stdout=None, stdin=None, cwd=cwd)
@@ -248,7 +252,7 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
             cmdline = procutil.quotecommand(cmdline)
             subprocess.Popen(cmdline, shell=shell, creationflags=openflags,
                              stderr=None, stdout=None, stdin=None, cwd=cwd)
-    except (OSError, EnvironmentError), e:
+    except (OSError, EnvironmentError) as e:
         QMessageBox.warning(parent,
                 _('Editor launch failure'),
                 u'%s : %s' % (hglib.tounicode(cmdline),
@@ -263,18 +267,18 @@ def openshell(root, reponame, ui=None):
     shell, args = terminal.detectterminal(ui)
     if shell:
         if args:
-            shell = shell + ' ' + util.expandpath(args)
+            shell = shell + b' ' + util.expandpath(args)
         # check invalid expression in tortoisehg.shell.  we shouldn't apply
         # string formatting to untrusted value, but too late to change syntax.
         try:
-            shell % {'root': '', 'reponame': ''}
+            shell % {b'root': b'', b'reponame': b''}
         except (KeyError, TypeError, ValueError):
             # KeyError: "%(invalid)s", TypeError: "%(root)d", ValueError: "%"
             ErrorMsgBox(_('Failed to open path in terminal'),
                         _('Invalid configuration: %s')
                         % hglib.tounicode(shell))
             return
-        shellcmd = shell % {'root': root, 'reponame': reponame}
+        shellcmd = shell % {b'root': root, b'reponame': reponame}
 
         cwd = os.getcwd()
         try:
@@ -288,13 +292,15 @@ def openshell(root, reponame, ui=None):
                 # can't parse shellcmd in POSIX way
                 started = QProcess.startDetached(hglib.tounicode(shellcmd))
             else:
-                fullargs = map(hglib.tounicode, shlex.split(shellcmd))
+                fullargs = pycompat.maplist(hglib.tounicode,
+                                            pycompat.shlexsplit(shellcmd))
                 started = QProcess.startDetached(fullargs[0], fullargs[1:])
         finally:
             os.chdir(cwd)
         if not started:
             ErrorMsgBox(_('Failed to open path in terminal'),
-                        _('Unable to start the following command:'), shellcmd)
+                        _('Unable to start the following command:'),
+                        hglib.tounicode(shellcmd))
     else:
         InfoMsgBox(_('No shell configured'),
                    _('A terminal shell must be configured'))
@@ -307,7 +313,7 @@ def openshell(root, reponame, ui=None):
 def readBool(qs, key, default=False):
     """Read the specified value from QSettings and coerce into bool"""
     v = qs.value(key, default)
-    if isinstance(v, basestring):
+    if hglib.isbasestring(v):
         # qvariant.cpp:qt_convertToBool()
         return not (v == '0' or v == 'false' or v == '')
     return bool(v)
@@ -336,22 +342,22 @@ def readString(qs, key, default=''):
     """Read the specified value from QSettings and coerce into string"""
     v = qs.value(key, default)
     if v is None:
-        return unicode(default)
+        return pycompat.unicode(default)
     try:
-        return unicode(v)
+        return pycompat.unicode(v)
     except ValueError:
-        return unicode(default)
+        return pycompat.unicode(default)
 
 def readStringList(qs, key, default=()):
     """Read the specified value from QSettings and coerce into string list"""
     v = qs.value(key, default)
     if v is None:
         return list(default)
-    if isinstance(v, basestring):
+    if hglib.isbasestring(v):
         # qvariant.cpp:convert()
         return [v]
     try:
-        return [unicode(e) for e in v]
+        return [pycompat.unicode(e) for e in v]
     except (TypeError, ValueError):
         return list(default)
 
@@ -368,7 +374,7 @@ def isDarkTheme(palette=None):
 # effect programatically.
 
 # TODO: update ui._styles instead of color._defaultstyles
-_styles = color._defaultstyles
+_styles = pycompat.rapply(pycompat.sysstr, color._defaultstyles)
 
 _effects = {
     'bold': 'font-weight: bold',
@@ -401,23 +407,24 @@ tbstylesheet = 'QToolBar { border: 0px }'
 def configstyles(ui):
     # extensions may provide more labels and default effects
     for name, ext in extensions.extensions():
-        _styles.update(getattr(ext, 'colortable', {}))
+        extstyle = getattr(ext, 'colortable', {})
+        _styles.update(pycompat.rapply(pycompat.sysstr, extstyle))
 
     # tortoisehg defines a few labels and default effects
     _styles.update(_thgstyles)
 
     # allow the user to override
-    for status, cfgeffects in ui.configitems('color'):
-        if '.' not in status:
+    for status, cfgeffects in ui.configitems(b'color'):
+        if b'.' not in status:
             continue
-        cfgeffects = ui.configlist('color', status)
-        _styles[status] = ' '.join(cfgeffects)
+        cfgeffects = ui.configlist(b'color', status)
+        _styles[status] = b' '.join(cfgeffects)
 
-    for status, cfgeffects in ui.configitems('thg-color'):
-        if '.' not in status:
+    for status, cfgeffects in ui.configitems(b'thg-color'):
+        if b'.' not in status:
             continue
-        cfgeffects = ui.configlist('thg-color', status)
-        _styles[status] = ' '.join(cfgeffects)
+        cfgeffects = ui.configlist(b'thg-color', status)
+        _styles[status] = b' '.join(cfgeffects)
 
 # See https://doc.qt.io/qt-4.8/richtext-html-subset.html
 # and https://www.w3.org/TR/SVG/types.html#ColorKeywords
@@ -483,7 +490,7 @@ def markup(msg, **styles):
         style[name] = value
     style = ';'.join(['%s: %s' % t for t in style.items()])
     msg = hglib.tounicode(msg)
-    msg = cgi.escape(msg)
+    msg = htmlescape(msg, False)
     msg = msg.replace('\n', '<br />')
     return u'<span style="%s">%s</span>' % (style, msg)
 
@@ -545,8 +552,8 @@ def descriptionhtmlizer(ui):
     regexp = r'%s|%s' % (csmatch, httpmatch)
     bodyre = re.compile(regexp)
 
-    issuematch = hglib.tounicode(ui.config('tortoisehg', 'issue.regex'))
-    issuerepl = hglib.tounicode(ui.config('tortoisehg', 'issue.link'))
+    issuematch = hglib.tounicode(ui.config(b'tortoisehg', b'issue.regex'))
+    issuerepl = hglib.tounicode(ui.config(b'tortoisehg', b'issue.link'))
     if issuematch and issuerepl:
         regexp += '|(%s)' % issuematch
         try:
@@ -563,29 +570,29 @@ def descriptionhtmlizer(ui):
         for m in bodyre.finditer(desc):
             a, b = m.span()
             if a >= pos:
-                buf += cgi.escape(desc[pos:a])
+                buf += htmlescape(desc[pos:a], False)
                 pos = b
             groups = m.groups()
             if groups[0]:
-                cslink = cgi.escape(groups[0])
+                cslink = htmlescape(groups[0])
                 buf += '<a href="cset:%s">%s</a>' % (cslink, cslink)
             if groups[1]:
-                urllink = cgi.escape(groups[1])
+                urllink = htmlescape(groups[1])
                 buf += '<a href="%s">%s</a>' % (urllink, urllink)
             if len(groups) > 4 and groups[4]:
-                issue = cgi.escape(groups[4])
+                issue = htmlescape(groups[4])
                 issueparams = groups[4:]
                 try:
                     link = re.sub(r'\{(\d+)\}',
                                   lambda m: issueparams[int(m.group(1))],
                                   issuerepl)
-                    link = cgi.escape(link)
+                    link = htmlescape(link)
                     buf += '<a href="%s">%s</a>' % (link, issue)
                 except IndexError:
                     buf += issue
 
         if pos < len(desc):
-            buf += cgi.escape(desc[pos:])
+            buf += htmlescape(desc[pos:], False)
 
         return buf
 
@@ -637,7 +644,7 @@ def getallicons():
         d = QDir(path)
         d.setNameFilters(['*%s' % sfx])
         for iconname in d.entryList():
-            iconset.add(unicode(iconname).rsplit('.', 1)[0])
+            iconset.add(pycompat.unicode(iconname).rsplit('.', 1)[0])
     return sorted(iconset)
 
 def _findscalableicon(name):
@@ -660,7 +667,7 @@ def geticon(name):
     named as 'name.(svg|png|ico)'.
     """
     try:
-        return _iconcache[name]
+        return _iconcache[name]  # pytype: disable=key-error
     except KeyError:
         _iconcache[name] = (_findthemeicon(name)
                             or _findscalableicon(name)
@@ -774,15 +781,18 @@ _fontcache = {}
 
 def initfontcache(ui):
     for name in _fontdefaults:
-        fname = ui.config('tortoisehg', name, _fontdefaults[name])
+        fname = ui.config(b'tortoisehg', pycompat.sysbytes(name),
+                          pycompat.sysbytes(_fontdefaults[name]))
         _fontcache[name] = ThgFont(hglib.tounicode(fname))
 
 def getfont(name):
-    assert name in _fontdefaults
+    assert name in _fontdefaults, (name, _fontdefaults)
     return _fontcache[name]
 
 def CommonMsgBox(icon, title, main, text='', buttons=QMessageBox.Ok,
-                 labels=[], parent=None, defaultbutton=None):
+                 labels=None, parent=None, defaultbutton=None):
+    if labels is None:
+        labels = []
     msg = QMessageBox(parent)
     msg.setIcon(icon)
     msg.setWindowTitle(title)
@@ -820,7 +830,7 @@ class CustomPrompt(QMessageBox):
         self.setWindowTitle(hglib.tounicode(title))
         self.setText(hglib.tounicode(message))
         if files:
-            self.setDetailedText(hglib.tounicode('\n'.join(files)))
+            self.setDetailedText('\n'.join(hglib.tounicode(f) for f in files))
         self.hotkeys = {}
         for i, s in enumerate(choices):
             btn = self.addButton(s, QMessageBox.AcceptRole)
@@ -838,7 +848,7 @@ class CustomPrompt(QMessageBox):
         return self.exec_()
 
     def keyPressEvent(self, event):
-        for k, btn in self.hotkeys.iteritems():
+        for k, btn in self.hotkeys.items():
             if event.text() == k:
                 btn.clicked.emit(False)
         super(CustomPrompt, self).keyPressEvent(event)
@@ -1099,10 +1109,10 @@ class StatusLabel(QWidget):
         else:
             if isinstance(icon, bool):
                 icon = geticon(icon and 'thg-success' or 'thg-error')
-            elif isinstance(icon, basestring):
+            elif hglib.isbasestring(icon):
                 icon = geticon(icon)
             elif not isinstance(icon, QIcon):
-                raise TypeError, '%s: bool, str or QIcon' % type(icon)
+                raise TypeError('%s: bool, str or QIcon' % type(icon))
             self.status_icon.setVisible(True)
             self.status_icon.setPixmap(icon.pixmap(16, 16))
 
@@ -1118,7 +1128,7 @@ class LabeledSeparator(QWidget):
         box.setContentsMargins(*(0,)*4)
 
         if label:
-            if isinstance(label, basestring):
+            if hglib.isbasestring(label):
                 label = QLabel(label)
             box.addWidget(label)
 
@@ -1261,7 +1271,7 @@ class DialogKeeper(QObject):
 
     def _preparedlg(self, key, args, kwargs):
         if key in self._keytodlgs:
-            assert len(self._keytodlgs[key]) > 0
+            assert len(self._keytodlgs[key]) > 0, key
             return self._keytodlgs[key][-1]  # prefer latest
         else:
             return self._populatedlg(key, args, kwargs)
@@ -1278,7 +1288,7 @@ class DialogKeeper(QObject):
     # "destroyed" is emitted soon after Python wrapper is deleted
     @pyqtSlot()
     def _cleanupdlgs(self):
-        for key, dialogs in self._keytodlgs.items():
+        for key, dialogs in list(self._keytodlgs.items()):
             livedialogs = [dlg for dlg in dialogs if not sip.isdeleted(dlg)]
             if livedialogs:
                 self._keytodlgs[key] = livedialogs
@@ -1286,7 +1296,7 @@ class DialogKeeper(QObject):
                 del self._keytodlgs[key]
 
     def count(self):
-        return sum(len(dlgs) for dlgs in self._keytodlgs.itervalues())
+        return sum(len(dlgs) for dlgs in self._keytodlgs.values())
 
     @staticmethod
     def _defaultgenkey(_parent, *args, **_kwargs):

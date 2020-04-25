@@ -4,37 +4,37 @@ from mercurial.utils import procutil
 
 def _getplatformexecutablekey():
     if sys.platform == 'darwin':
-        key = 'executable-osx'
+        key = b'executable-osx'
     elif os.name == 'nt':
-        key = 'executable-win'
+        key = b'executable-win'
     else:
-        key = 'executable-unix'
+        key = b'executable-unix'
     return key
 
 _platformexecutablekey = _getplatformexecutablekey()
 
-def _toolstr(ui, tool, part, default=""):
-    return ui.config("editor-tools", tool + "." + part, default)
+def _toolstr(ui, tool, part, default=b""):
+    return ui.config(b"editor-tools", tool + b"." + part, default)
 
 toolcache = {}
 def _findtool(ui, tool):
     global toolcache
     if tool in toolcache:
         return toolcache[tool]
-    for kn in ("regkey", "regkeyalt"):
+    for kn in (b"regkey", b"regkeyalt"):
         k = _toolstr(ui, tool, kn)
         if not k:
             continue
-        p = util.lookupreg(k, _toolstr(ui, tool, "regname"))
+        p = util.lookupreg(k, _toolstr(ui, tool, b"regname"))
         if p:
-            p = procutil.findexe(p + _toolstr(ui, tool, "regappend"))
+            p = procutil.findexe(p + _toolstr(ui, tool, b"regappend"))
             if p:
                 toolcache[tool] = p
                 return p
     global _platformexecutablekey
     exe = _toolstr(ui, tool, _platformexecutablekey)
     if not exe:
-        exe = _toolstr(ui, tool, 'executable', tool)
+        exe = _toolstr(ui, tool, b'executable', tool)
     path = procutil.findexe(util.expandpath(exe))
     if path:
         toolcache[tool] = path
@@ -61,56 +61,56 @@ def _findeditor(repo, files):
 
     # first check for tool specified by file patterns.  The first file pattern
     # which matches one of the files being edited selects the editor
-    for pat, tool in ui.configitems("editor-patterns"):
-        mf = match.match(repo.root, '', [pat])
+    for pat, tool in ui.configitems(b"editor-patterns"):
+        mf = match.match(repo.root, b'', [pat])
         toolpath = _findtool(ui, tool)
         if mf(files[0]) and toolpath:
-            return (tool, procutil.shellquote(toolpath))
+            return tool, procutil.shellquote(toolpath)
 
     # then editor-tools
     tools = {}
-    for k, v in ui.configitems("editor-tools"):
-        t = k.split('.')[0]
+    for k, v in ui.configitems(b"editor-tools"):
+        t = k.split(b'.')[0]
         if t not in tools:
             try:
-                priority = int(_toolstr(ui, t, "priority", "0"))
-            except ValueError, e:
+                priority = int(_toolstr(ui, t, b"priority", b"0"))
+            except ValueError as e:
                 priority = -100
             tools[t] = priority
-    names = tools.keys()
+    names = list(tools.keys())
     tools = sorted([(-p, t) for t, p in tools.items()])
-    editor = ui.config('tortoisehg', 'editor')
+    editor = ui.config(b'tortoisehg', b'editor')
     if editor:
         if editor not in names:
             # if tortoisehg.editor does not match an editor-tools entry, take
             # the value directly
-            return (None, editor)
+            return None, editor
         # else select this editor as highest priority (may still use another if
         # it is not found on this machine)
         tools.insert(0, (None, editor))
     for p, t in tools:
         toolpath = _findtool(ui, t)
         if toolpath:
-            return (t, procutil.shellquote(toolpath))
+            return t, procutil.shellquote(toolpath)
 
     # fallback to potential CLI editor
     editor = ui.geteditor()
-    return (None, editor)
+    return None, editor
 
 def detecteditor(repo, files):
     'returns tuple of editor tool path and arguments'
     name, pathorconfig = _findeditor(repo, files)
     if name is None:
-        return (pathorconfig, None, None, None)
+        return pathorconfig, None, None, None
     else:
-        args = _toolstr(repo.ui, name, "args")
-        argsln = _toolstr(repo.ui, name, "argsln")
-        argssearch = _toolstr(repo.ui, name, "argssearch")
-        return (pathorconfig, args, argsln, argssearch)
+        args = _toolstr(repo.ui, name, b"args")
+        argsln = _toolstr(repo.ui, name, b"argsln")
+        argssearch = _toolstr(repo.ui, name, b"argssearch")
+        return pathorconfig, args, argsln, argssearch
 
 def findeditors(ui):
     seen = set()
-    for key, value in ui.configitems('editor-tools'):
-        t = key.split('.')[0]
+    for key, value in ui.configitems(b'editor-tools'):
+        t = key.split(b'.')[0]
         seen.add(t)
     return [t for t in seen if _findtool(ui, t)]

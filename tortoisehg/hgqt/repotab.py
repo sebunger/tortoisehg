@@ -20,14 +20,19 @@ from .qtcore import (
 from .qtgui import (
     QAction,
     QActionGroup,
+    QKeySequence,
     QMenu,
+    QShortcut,
     QStackedLayout,
     QTabBar,
     QVBoxLayout,
     QWidget,
 )
 
-from mercurial import error
+from mercurial import (
+    error,
+    pycompat,
+)
 
 from ..util import hglib
 from ..util.i18n import _
@@ -65,9 +70,9 @@ class RepoTabWidget(QWidget):
     #
     # tab-index is the master, so do not use stack.setCurrentIndex().
 
-    def __init__(self, ui, repomanager, parent=None):
+    def __init__(self, config, repomanager, parent=None):
         super(RepoTabWidget, self).__init__(parent)
-        self._ui = ui
+        self._config = config
         self._repomanager = repomanager
         # delay until the next event loop so that the current tab won't be
         # gone in the middle of switching tabs (issue #4253)
@@ -85,6 +90,7 @@ class RepoTabWidget(QWidget):
         tabbar.setDocumentMode(True)
         tabbar.setExpanding(False)
         tabbar.setTabsClosable(True)
+        tabbar.setUsesScrollButtons(True)
         tabbar.setMovable(True)
         tabbar.currentChanged.connect(self._onCurrentTabChanged)
         tabbar.tabCloseRequested.connect(self.closeTab)
@@ -111,6 +117,9 @@ class RepoTabWidget(QWidget):
         self._titlemapper.mapped[QWidget].connect(self._updateTitle)
 
         self._updateTabSwitchActions()
+
+        QShortcut(QKeySequence.NextChild, self, self._next_tab)
+        QShortcut(QKeySequence.PreviousChild, self, self._prev_tab)
 
     def openRepo(self, root, bundle=None):
         """Open the specified repository in new tab"""
@@ -145,7 +154,7 @@ class RepoTabWidget(QWidget):
         # must call _onCurrentTabChanged() appropriately
 
     def _newTabIndex(self):
-        if self._ui.configbool('tortoisehg', 'opentabsaftercurrent', True):
+        if self._config.configBool('tortoisehg', 'opentabsaftercurrent'):
             return self.currentIndex() + 1
         else:
             return self.count()
@@ -163,12 +172,12 @@ class RepoTabWidget(QWidget):
         return False
 
     def closeAllTabs(self):
-        return self._closeTabs(range(self.count()))
+        return self._closeTabs(list(range(self.count())))
 
     def _closeTabs(self, indexes):
         if not self._checkTabsClosable(indexes):
             return False
-        self._lastclosedpaths = map(self.repoRootPath, indexes)
+        self._lastclosedpaths = pycompat.maplist(self.repoRootPath, indexes)
         self._removeTabs(indexes)
         return True
 
@@ -262,7 +271,7 @@ class RepoTabWidget(QWidget):
     @pyqtSlot()
     def _closeNotLastClickedTabs(self):
         if self._lastclickedindex >= 0:
-            self._closeTabs([i for i in xrange(self.count())
+            self._closeTabs([i for i in pycompat.xrange(self.count())
                              if i != self._lastclickedindex])
 
     @pyqtSlot()
@@ -281,7 +290,7 @@ class RepoTabWidget(QWidget):
     def _initTabSwitchActions(self):
         self._swactions = QActionGroup(self)
         self._swactions.triggered.connect(self._setCurrentTabByAction)
-        for i in xrange(9):
+        for i in pycompat.xrange(9):
             a = self._swactions.addAction('')
             a.setCheckable(True)
             a.setData(i)
@@ -304,14 +313,22 @@ class RepoTabWidget(QWidget):
         index = action.data()
         self.setCurrentIndex(index)
 
+    @pyqtSlot()
+    def _prev_tab(self):
+        self._tabbar.setCurrentIndex(self._tabbar.currentIndex() - 1)
+
+    @pyqtSlot()
+    def _next_tab(self):
+        self._tabbar.setCurrentIndex(self._tabbar.currentIndex() + 1)
+
     def currentRepoRootPath(self):
         return self.repoRootPath(self.currentIndex())
 
     def repoRootPath(self, index):
-        return unicode(self._tabbar.tabToolTip(index))
+        return pycompat.unicode(self._tabbar.tabToolTip(index))
 
     def _findIndexesByRepoRootPath(self, root):
-        for i in xrange(self.count()):
+        for i in pycompat.xrange(self.count()):
             if self.repoRootPath(i) == root:
                 yield i
 
@@ -370,7 +387,7 @@ class RepoTabWidget(QWidget):
     def _indexOf(self, rw):
         if self.currentWidget() is rw:
             return self.currentIndex()  # fast path
-        for i in xrange(self.count()):
+        for i in pycompat.xrange(self.count()):
             if self._widget(i) is rw:
                 return i
         return -1
@@ -381,7 +398,7 @@ class RepoTabWidget(QWidget):
     def _createRepoWidget(self, root, bundle=None):
         try:
             repoagent = self._repomanager.openRepoAgent(root)
-        except (error.Abort, error.RepoError), e:
+        except (error.Abort, error.RepoError) as e:
             qtlib.WarningMsgBox(_('Failed to open repository'),
                                 hglib.tounicode(str(e)), parent=self)
             return
@@ -404,14 +421,15 @@ class RepoTabWidget(QWidget):
     @pyqtSlot(str, object, str, str, object)
     def _mapProgressReceived(self, topic, pos, item, unit, total):
         rw = self.sender()
-        assert isinstance(rw, repowidget.RepoWidget)
+        assert isinstance(rw, repowidget.RepoWidget), repr(rw)
         progress = cmdcore.ProgressMessage(
-            unicode(topic), pos, unicode(item), unicode(unit), total)
+            pycompat.unicode(topic), pos, pycompat.unicode(item),
+            pycompat.unicode(unit), total)
         self.progressReceived.emit(rw.repoRootPath(), progress)
 
     @pyqtSlot(str)
     def _openLinkedRepo(self, path):
-        uri = unicode(path).split('?', 1)
+        uri = pycompat.unicode(path).split('?', 1)
         path = hglib.normreporoot(uri[0])
         rev = None
         if len(uri) > 1:
@@ -439,6 +457,6 @@ class RepoTabWidget(QWidget):
             self.currentTitleChanged.emit()
 
     def _updateTabVisibility(self):
-        forcetab = self._ui.configbool('tortoisehg', 'forcerepotab')
+        forcetab = self._config.configBool('tortoisehg', 'forcerepotab')
         self._tabbar.setVisible(self.count() > 1
                                 or (self.count() == 1 and forcetab))

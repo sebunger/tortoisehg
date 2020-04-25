@@ -40,15 +40,14 @@ class RevertDialog(QDialog):
 
         f = self.windowFlags()
         self.setWindowFlags(f & ~Qt.WindowContextHelpButtonHint)
-        repo = repoagent.rawRepo()
-        self.wfiles = [repo.wjoin(wfile) for wfile in wfiles]
+        self.wfiles = wfiles
 
         self.setLayout(QVBoxLayout())
 
-        if len(wfile) == 1:
+        if len(wfiles) == 1:
             lblText = _('<b>Revert %s to its contents'
                         ' at the following revision?</b>') % (
-                      hglib.tounicode(wfiles[0]))
+                      wfiles[0])
         else:
             lblText = _('<b>Revert %d files to their contents'
                         ' at the following revision?</b>') % (
@@ -92,7 +91,7 @@ class RevertDialog(QDialog):
         self.revcombo.addItems(revnames)
         reverttargets = [ctx] + parents
         for n, ctx in enumerate(reverttargets):
-            self.revcombo.setItemData(n, ctx.hex())
+            self.revcombo.setItemData(n, hglib.tounicode(ctx.hex()))
         self.layout().addWidget(self.revcombo)
 
     def accept(self):
@@ -107,8 +106,7 @@ class RevertDialog(QDialog):
                 return
             cmdline = hglib.buildcmdargs('revert', all=True, rev=rev)
         else:
-            files = map(hglib.tounicode, self.wfiles)
-            cmdline = hglib.buildcmdargs('revert', rev=rev, *files)
+            cmdline = hglib.buildcmdargs('revert', rev=rev, *self.wfiles)
         self.bbox.button(QDialogButtonBox.Ok).setEnabled(False)
         self._cmdsession = sess = self._repoagent.runCommand(cmdline, self)
         sess.commandFinished.connect(self._onCommandFinished)

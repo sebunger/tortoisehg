@@ -6,10 +6,18 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os, posixpath
-import cStringIO
 
-from mercurial import commands, error, match, patch, subrepo, util
-from mercurial import copies
+from mercurial import (
+    commands,
+    copies,
+    error,
+    patch,
+    pycompat,
+    scmutil,
+    subrepo,
+    util,
+)
+
 from mercurial.utils import (
     dateutil,
 )
@@ -38,7 +46,7 @@ def _checkdifferror(data, maxdiff):
     if size > maxdiff:
         return p + _('File is larger than the specified max size.\n'
                      'maxdiff = %s KB') % (maxdiff // 1024)
-    elif '\0' in data:
+    elif b'\0' in data:
         return p + _('File is binary')
     elif _exceedsMaxLineLength(data):
         # it's incredibly slow to render long line by QScintilla
@@ -64,7 +72,7 @@ class _AbstractFileData(object):
         self._pctx = ctx2
         self._wfile = wfile
         self._status = status
-        self._rpath = rpath or ''
+        self._rpath = rpath or b''
         self.contents = None
         self.ucontents = None
         self.error = None
@@ -188,7 +196,7 @@ class _AbstractFileData(object):
         ui = self._ctx._repo.ui
         # use file content for better guess; diff may be mixed encoding or
         # have immature multi-byte sequence
-        data = self.contents or self.diff or ''
+        data = self.contents or self.diff or b''
         fallbackenc = self._textencoding
         self._textencoding = fileencoding.guessencoding(ui, data, fallbackenc)
 
@@ -196,10 +204,10 @@ class _AbstractFileData(object):
         return s.decode(self._textencoding, 'replace')
 
     def diffText(self):
-        return self._textToUnicode(self.diff or '')
+        return self._textToUnicode(self.diff or b'')
 
     def fileText(self):
-        return self._textToUnicode(self.contents or '')
+        return self._textToUnicode(self.contents or b'')
 
 
 class FileData(_AbstractFileData):
@@ -218,9 +226,9 @@ class FileData(_AbstractFileData):
         errorprefix = _('File or diffs not displayed: ')
         try:
             self._readStatus(ctx, ctx2, wfile, status, changeselect, force)
-        except _BadContent, e:
+        except _BadContent as e:
             self.error = errorprefix + e.args[0] + '\n\n' + forcedisplaymsg
-        except (EnvironmentError, error.LookupError, error.Abort), e:
+        except (EnvironmentError, error.LookupError, error.Abort) as e:
             self.error = errorprefix + hglib.tounicode(str(e))
 
     def _checkMaxDiff(self, ctx, wfile, maxdiff, force):
@@ -233,7 +241,7 @@ class FileData(_AbstractFileData):
 
         data = fctx.data()
         if not force:
-            if '\0' in data or ctx.isStandin(wfile):
+            if b'\0' in data or ctx.isStandin(wfile):
                 raise _BadContent(_('File is binary'))
             elif _exceedsMaxLineLength(data):
                 # it's incredibly slow to render long line by QScintilla
@@ -242,7 +250,7 @@ class FileData(_AbstractFileData):
         return fctx, data
 
     def _checkRenamed(self, repo, ctx, pctx, wfile):
-        m = match.exact(repo, '', [wfile])
+        m = scmutil.matchfiles(repo, [wfile])
         copy = copies.pathcopies(pctx, ctx, match=m)
         oldname = copy.get(wfile)
         if not oldname:
@@ -257,13 +265,13 @@ class FileData(_AbstractFileData):
 
     def _readStatus(self, ctx, ctx2, wfile, status, changeselect, force):
         def getstatus(repo, n1, n2, wfile):
-            m = match.exact(repo.root, repo.getcwd(), [wfile])
-            modified, added, removed = repo.status(n1, n2, match=m)[:3]
-            if wfile in modified:
+            m = scmutil.matchfiles(repo, [wfile])
+            st = repo.status(n1, n2, match=m)
+            if wfile in st.modified:
                 return 'M'
-            if wfile in added:
+            if wfile in st.added:
                 return 'A'
-            if wfile in removed:
+            if wfile in st.removed:
                 return 'R'
             if wfile in ctx:
                 return 'C'
@@ -284,7 +292,7 @@ class FileData(_AbstractFileData):
                     ctx2 = sctx2
 
         absfile = repo.wjoin(wfile)
-        if (wfile in ctx and 'l' in ctx.flags(wfile)) or \
+        if (wfile in ctx and b'l' in ctx.flags(wfile)) or \
            os.path.islink(absfile):
             if wfile in ctx:
                 data = ctx[wfile].data()
@@ -310,7 +318,7 @@ class FileData(_AbstractFileData):
                     self.error = mde
                 else:
                     olddata = fctx.data()
-                    if '\0' in olddata:
+                    if b'\0' in olddata:
                         self.error = 'binary file'
                     else:
                         self.contents = olddata
@@ -328,8 +336,8 @@ class FileData(_AbstractFileData):
             if os.path.getsize(absfile) > maxdiff:
                 self.error = mde
                 return
-            data = util.posixfile(absfile, 'r').read()
-            if not force and '\0' in data:
+            data = util.posixfile(absfile, b'rb').read()
+            if not force and b'\0' in data:
                 self.error = 'binary file'
             else:
                 self.contents = data
@@ -350,10 +358,10 @@ class FileData(_AbstractFileData):
                 # no further comparison is necessary
                 return
             for pctx in ctx.parents():
-                if 'x' in fctx.flags() and 'x' not in pctx.flags(wfile):
+                if b'x' in fctx.flags() and b'x' not in pctx.flags(wfile):
                     self.elabel = _("exec mode has been "
                                     "<font color='red'>set</font>")
-                elif 'x' not in fctx.flags() and 'x' in pctx.flags(wfile):
+                elif b'x' not in fctx.flags() and b'x' in pctx.flags(wfile):
                     self.elabel = _("exec mode has been "
                                     "<font color='red'>unset</font>")
 
@@ -376,8 +384,8 @@ class FileData(_AbstractFileData):
         if changeselect:
             diffopts = patch.difffeatureopts(repo.ui)
             diffopts.git = True
-            m = match.exact(repo.root, repo.root, [wfile])
-            fp = cStringIO.StringIO()
+            m = scmutil.matchfiles(repo, [wfile])
+            fp = pycompat.bytesio()
 
             copy = {}
             if oldname != wfile:
@@ -395,13 +403,13 @@ class FileData(_AbstractFileData):
             if filediffs and filediffs[0].hunks:
                 self.changes = filediffs[0]
             else:
-                self.diff = ''
+                self.diff = b''
                 return
             self.changes.excludecount = 0
             values = []
             lines = 0
             for chunk in self.changes.hunks:
-                buf = cStringIO.StringIO()
+                buf = pycompat.bytesio()
                 chunk.write(buf)
                 chunk.excluded = False
                 val = buf.getvalue()
@@ -409,34 +417,34 @@ class FileData(_AbstractFileData):
                 chunk.lineno = lines
                 chunk.linecount = len(val.splitlines())
                 lines += chunk.linecount
-            self.diff = ''.join(values)
+            self.diff = b''.join(values)
         else:
             diffopts = patch.diffopts(repo.ui, {})
             diffopts.git = False
             newdate = dateutil.datestr(ctx.date())
             olddate = dateutil.datestr(ctx2.date())
             if isbfile:
-                olddata += '\0'
-                newdata += '\0'
+                olddata += b'\0'
+                newdata += b'\0'
             difftext = hglib.unidifftext(olddata, olddate, newdata, newdate,
                                          oldname, wfile, opts=diffopts)
             if difftext:
-                self.diff = ('diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
+                self.diff = (b'diff -r %s -r %s %s\n' % (ctx, ctx2, oldname)
                              + difftext)
             else:
-                self.diff = ''
+                self.diff = b''
 
     def mergeStatus(self):
         return self._mstatus
 
     def diffText(self):
-        udiff = self._textToUnicode(self.diff or '')
+        udiff = self._textToUnicode(self.diff or b'')
         if self.changes:
             return udiff
         return _trimdiffheader(udiff)
 
     def setChunkExcluded(self, chunk, exclude):
-        assert chunk in self.changes.hunks
+        assert chunk in self.changes.hunks, repr(chunk)
         if chunk.excluded == exclude:
             return
         if exclude:
@@ -457,9 +465,9 @@ class DirData(_AbstractFileData):
         ctx = self._ctx
         pctx = self._pctx
         try:
-            m = ctx.match(['path:%s' % self._wfile])
-            self.diff = ''.join(ctx.diff(pctx, m))
-        except (EnvironmentError, error.Abort), e:
+            m = ctx.match([b'path:%s' % self._wfile])
+            self.diff = b''.join(ctx.diff(pctx, m))
+        except (EnvironmentError, error.Abort) as e:
             self.error = hglib.tounicode(str(e))
             return
 
@@ -485,17 +493,17 @@ class PatchFileData(_AbstractFileData):
         try:
             self.diff = ctx.thgmqpatchdata(wfile)
             flags = ctx.flags(wfile)
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.error = hglib.tounicode(str(e))
             return
 
-        if flags == 'x':
+        if flags == b'x':
             self.elabel = _("exec mode has been "
                             "<font color='red'>set</font>")
-        elif flags == '-':
+        elif flags == b'-':
             self.elabel = _("exec mode has been "
                             "<font color='red'>unset</font>")
-        elif flags == 'l':
+        elif flags == b'l':
             self.flabel += _(' <i>(is a symlink)</i>')
 
         # Do not show patches that are too big or may be binary
@@ -513,7 +521,7 @@ class PatchFileData(_AbstractFileData):
         return nullrev
 
     def diffText(self):
-        return _trimdiffheader(self._textToUnicode(self.diff or ''))
+        return _trimdiffheader(self._textToUnicode(self.diff or b''))
 
 
 class PatchDirData(_AbstractFileData):
@@ -526,7 +534,7 @@ class PatchDirData(_AbstractFileData):
         try:
             self.diff = ''.join([ctx.thgmqpatchdata(f) for f in ctx.files()
                                  if f.startswith(self._wfile + '/')])
-        except EnvironmentError, e:
+        except EnvironmentError as e:
             self.error = hglib.tounicode(str(e))
             return
 
@@ -555,7 +563,8 @@ class SubrepoData(_AbstractFileData):
 
     def createRebased(self, pctx):
         # new status should be unknown, but currently it is 'S'
-        assert self._status == 'S'  # TODO: replace 'S' by subrepo's status
+        # TODO: replace 'S' by subrepo's status
+        assert self._status == 'S', self._status
         return self.__class__(self._ctx, pctx, self._wfile, status=self._status,
                               rpath=self._rpath, subkind=self._subkind)
 
@@ -578,13 +587,13 @@ class SubrepoData(_AbstractFileData):
                     if srepo is None:
                         return _('changeset: %s') % opts['rev'][0][:12]
                     _ui.pushbuffer()
-                    logOutput = ''
+                    logOutput = b''
                     try:
                         commands.log(_ui, srepo, **opts)
                         logOutput = _ui.popbuffer()
                         if not logOutput:
                             return _('Initial revision') + u'\n'
-                    except error.ParseError, e:
+                    except error.ParseError as e:
                         # Some mercurial versions have a bug that results in
                         # saving a subrepo node id in the .hgsubstate file
                         # which ends with a "+" character. If that is the
@@ -592,8 +601,9 @@ class SubrepoData(_AbstractFileData):
                         # get the revision information anyway
                         for n, rev in enumerate(opts['rev']):
                             if rev.endswith('+'):
-                                logOutput += _('[WARNING] Invalid subrepo '
-                                    'revision ID:\n\t%s\n\n') % rev
+                                logOutput += hglib.fromunicode(
+                                    _('[WARNING] Invalid subrepo '
+                                      'revision ID:\n\t%s\n\n') % rev)
                                 opts['rev'][n] = rev[:-1]
                         commands.log(_ui, srepo, **opts)
                         logOutput += _ui.popbuffer()
@@ -700,25 +710,25 @@ class SubrepoData(_AbstractFileData):
                     if isinstance(sub, subrepo.hgsubrepo):
                         srepo = sub._repo
                         if srepo is not None:
-                            sactual = srepo['.'].hex()
+                            sactual = srepo[b'.'].hex()
                     else:
                         self.error = _('Not a Mercurial subrepo, not '
                                        'previewable')
                         return
-                except error.Abort, e:
+                except error.Abort as e:
                     self.error = (_('Error previewing subrepo: %s')
                                   % hglib.tounicode(str(e))) + u'\n\n'
                     self.error += _('Subrepo may be damaged or '
                                     'inaccessible.')
                     return
-                except KeyError, e:
+                except KeyError as e:
                     # Missing, incomplete or removed subrepo.
                     # Will be handled later as such below
                     pass
             out = []
             # TODO: should be copied from the baseui
             _ui = hglib.loadui()
-            _ui.setconfig('ui', 'paginate', 'off', 'subrepodata')
+            _ui.setconfig(b'ui', b'paginate', b'off', b'subrepodata')
 
             if srepo is None or ctx.rev() is not None:
                 data = []
@@ -768,7 +778,7 @@ class SubrepoData(_AbstractFileData):
             if sactual:
                 lbl = ' <a href="repo:%%s">%s</a>' % _('open...')
                 self.flabel += lbl % hglib.tounicode(srepo.root)
-        except (EnvironmentError, error.RepoError, error.Abort), e:
+        except (EnvironmentError, error.RepoError, error.Abort) as e:
             self.error = _('Error previewing subrepo: %s') % \
                     hglib.tounicode(str(e))
 
@@ -799,5 +809,5 @@ def createSubrepoData(ctx, pctx, path, status=None, rpath=None, subkind=None):
 
 def createNullData(repo):
     ctx = repo[nullrev]
-    fd = FileData(ctx, ctx.p1(), '', 'C')
+    fd = FileData(ctx, ctx.p1(), b'', 'C')
     return fd

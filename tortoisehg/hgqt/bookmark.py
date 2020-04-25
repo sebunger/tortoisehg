@@ -34,6 +34,10 @@ from .qtgui import (
     QWidget,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util import hglib
 from ..util.i18n import _
 from . import (
@@ -85,7 +89,7 @@ class BookmarkDialog(QDialog):
 
         ### Activate checkbox
         self.activateCheckBox = QCheckBox()
-        if self.node == self.repo['.'].node():
+        if self.node == self.repo[b'.'].node():
             self.activateCheckBox.setChecked(True)
         else:
             self.activateCheckBox.setChecked(False)
@@ -136,7 +140,7 @@ class BookmarkDialog(QDialog):
         return self._repoagent.rawRepo()
 
     def _allBookmarks(self):
-        return map(hglib.tounicode, self.repo._bookmarks)
+        return pycompat.maplist(hglib.tounicode, self.repo._bookmarks)
 
     @pyqtSlot()
     def refresh(self):
@@ -206,7 +210,7 @@ class BookmarkDialog(QDialog):
 
     @pyqtSlot()
     def add_bookmark(self):
-        bookmark = unicode(self.bookmarkCombo.currentText())
+        bookmark = pycompat.unicode(self.bookmarkCombo.currentText())
         if bookmark in self._allBookmarks():
             self.set_status(_('A bookmark named "%s" already exists') %
                             bookmark, False)
@@ -220,7 +224,7 @@ class BookmarkDialog(QDialog):
 
     @pyqtSlot()
     def move_bookmark(self):
-        bookmark = unicode(self.bookmarkCombo.currentText())
+        bookmark = pycompat.unicode(self.bookmarkCombo.currentText())
         if bookmark not in self._allBookmarks():
             self.set_status(_('Bookmark named "%s" does not exist') %
                             bookmark, False)
@@ -234,7 +238,7 @@ class BookmarkDialog(QDialog):
 
     @pyqtSlot()
     def remove_bookmark(self):
-        bookmark = unicode(self.bookmarkCombo.currentText())
+        bookmark = pycompat.unicode(self.bookmarkCombo.currentText())
         if bookmark not in self._allBookmarks():
             self.set_status(_("Bookmark '%s' does not exist") % bookmark, False)
             return
@@ -244,12 +248,12 @@ class BookmarkDialog(QDialog):
 
     @pyqtSlot()
     def rename_bookmark(self):
-        name = unicode(self.bookmarkCombo.currentText())
+        name = pycompat.unicode(self.bookmarkCombo.currentText())
         if name not in self._allBookmarks():
             self.set_status(_("Bookmark '%s' does not exist") % name, False)
             return
 
-        newname = unicode(self.newNameEdit.text())
+        newname = pycompat.unicode(self.newNameEdit.text())
         if newname in self._allBookmarks():
             self.set_status(_('A bookmark named "%s" already exists') %
                             newname, False)
@@ -260,7 +264,7 @@ class BookmarkDialog(QDialog):
         self._runBookmark(name, newname, rename=True, finishmsg=finishmsg)
 
 
-_extractbookmarknames = re.compile(r'(.*) [0-9a-f]{12,}$',
+_extractbookmarknames = re.compile(br'(.*) [0-9a-f]{12,}$',
                                    re.MULTILINE).findall
 
 class SyncBookmarkDialog(QDialog):
@@ -385,7 +389,7 @@ class SyncBookmarkDialog(QDialog):
     def _onListBookmarksFinished(self, sess, worklist):
         ret = sess.exitCode()
         if ret == 0:
-            bookmarks = _extractbookmarknames(str(sess.readAll()))
+            bookmarks = _extractbookmarknames(bytes(sess.readAll()))
             self._updateBookmarkList(worklist, bookmarks)
         elif ret == 1:
             self._updateBookmarkList(worklist, [])
@@ -394,10 +398,12 @@ class SyncBookmarkDialog(QDialog):
         self._updateActions()
 
     def selectedOutgoingBookmarks(self):
-        return [unicode(x.text()) for x in self.outgoingList.selectedItems()]
+        return [pycompat.unicode(x.text())
+                for x in self.outgoingList.selectedItems()]
 
     def selectedIncomingBookmarks(self):
-        return [unicode(x.text()) for x in self.incomingList.selectedItems()]
+        return [pycompat.unicode(x.text())
+                for x in self.incomingList.selectedItems()]
 
     @pyqtSlot()
     def push_bookmark(self):

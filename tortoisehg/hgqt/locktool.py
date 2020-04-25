@@ -31,6 +31,7 @@ from .qtgui import (
 
 from mercurial import (
     extensions,
+    pycompat,
     util,
 )
 
@@ -172,7 +173,7 @@ class LockDialog(QDialog):
             self, _('Open a (nonmergable) file you wish to be locked'),
             self.repo.root, _FILE_FILTER)
 
-        wfile = util.normpath(unicode(wfile))
+        wfile = util.normpath(pycompat.unicode(wfile))
         pathprefix = util.normpath(hglib.tounicode(self.repo.root)) + '/'
         if not os.path.normcase(wfile).startswith(os.path.normcase(pathprefix)):
             self.showMessage.emit(_('File was not within current repository'))
@@ -209,7 +210,7 @@ class LockDialog(QDialog):
         if op == 'lock':
             if wfile in locks and locks[wfile][1]:
                 self.showMessage.emit(_('Lock of %s successful') % wfile)
-                qtlib.openlocalurl(self.operation[1])
+                qtlib.openlocalurl(wfile)
             else:
                 self.showMessage.emit(_('Lock of %s failed, retry') % wfile)
         elif op == 'unlock':

@@ -29,6 +29,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    pycompat,
     util,
 )
 
@@ -106,7 +107,7 @@ class QuickOpDialog(QDialog):
         defcheck = checktypes[self.command]
 
         opts = {}
-        for s, val in status.statusTypes.iteritems():
+        for s, val in status.statusTypes.items():
             opts[val.name] = s in filetypes
 
         opts['checkall'] = True # pre-check all matching files
@@ -142,7 +143,7 @@ class QuickOpDialog(QDialog):
         self.bb = bb
 
         if self.command == 'add':
-            if 'largefiles' in self.repo.extensions():
+            if b'largefiles' in self.repo.extensions():
                 self.addLfilesButton = QPushButton(_('Add &Largefiles'))
             else:
                 self.addLfilesButton = None
@@ -179,13 +180,13 @@ class QuickOpDialog(QDialog):
         if files:
             cmdlines.append(hglib.buildcmdargs(self.command, *files, **opts))
         if lfiles:
-            assert self.command == 'add'
+            assert self.command == 'add', self.command
             lopts = opts.copy()
             lopts['large'] = True
             cmdlines.append(hglib.buildcmdargs(self.command, *lfiles, **lopts))
         self.files = files + lfiles
 
-        ucmdlines = [map(hglib.tounicode, xs) for xs in cmdlines]
+        ucmdlines = [pycompat.maplist(hglib.tounicode, xs) for xs in cmdlines]
         self._cmdsession = sess = self._repoagent.runCommandSequence(ucmdlines,
                                                                      self)
         sess.commandFinished.connect(self.commandFinished)
@@ -219,17 +220,16 @@ class QuickOpDialog(QDialog):
             self.repo.lfstatus = True
             try:
                 repostate = self.repo.status()
-            except (EnvironmentError, error.Abort), e:
+            except (EnvironmentError, error.Abort) as e:
                 qtlib.WarningMsgBox(_('Unable to read repository status'),
                                     hglib.tounicode(str(e)), parent=self)
                 return
             finally:
                 self.repo.lfstatus = False
             if not self.chk.isChecked():
-                modified = repostate[0]
                 selmodified = []
                 for wfile in files:
-                    if wfile in modified:
+                    if wfile in repostate.modified:
                         selmodified.append(wfile)
                 if selmodified:
                     prompt = qtlib.CustomPrompt(
@@ -247,16 +247,15 @@ class QuickOpDialog(QDialog):
                         cmdopts['force'] = True
                     elif ret == 2:
                         return
-            unknown, ignored = repostate[4:6]
             for wfile in files:
-                if wfile in unknown or wfile in ignored:
+                if wfile in repostate.unknown or wfile in repostate.ignored:
                     try:
                         util.unlink(wfile)
                     except EnvironmentError:
                         pass
                     files.remove(wfile)
         elif self.command == 'add':
-            if 'largefiles' in self.repo.extensions():
+            if b'largefiles' in self.repo.extensions():
                 self.addWithPrompt(files)
                 return
         if files:
@@ -301,7 +300,7 @@ class HeadlessQuickop(QObject):
         QObject.__init__(self)
         self.files = cmdline[1:]
         self._cmddialog = cmdui.CmdSessionDialog()
-        sess = repoagent.runCommand(map(hglib.tounicode, cmdline))
+        sess = repoagent.runCommand(pycompat.maplist(hglib.tounicode, cmdline))
         sess.commandFinished.connect(self.commandFinished)
         self._cmddialog.setSession(sess)
 
@@ -322,7 +321,7 @@ def run(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     pats = hglib.canonpaths(pats)
     command = opts['alias']
-    imm = repo.ui.config('tortoisehg', 'immediate', '')
+    imm = repo.ui.config(b'tortoisehg', b'immediate')
     if opts.get('headless') or command in imm.lower():
         cmdline = [command] + pats
         return HeadlessQuickop(repoagent, cmdline)

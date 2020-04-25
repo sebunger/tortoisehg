@@ -24,6 +24,10 @@ from .qtgui import (
     QFontMetrics,
 )
 
+from mercurial import (
+    pycompat,
+)
+
 from ..util.i18n import _
 from . import (
     qscilib,
@@ -136,7 +140,7 @@ class MessageEntry(qscilib.Scintilla):
         self.summarylen = repo.summarylen
 
     def reflowBlock(self, line):
-        lines = unicode(self.text()).splitlines()
+        lines = pycompat.unicode(self.text()).splitlines()
         if line >= len(lines):
             return None
         if not len(lines[line]) > 1:
@@ -148,7 +152,7 @@ class MessageEntry(qscilib.Scintilla):
             # or are empty
             if not linetext:
                 return True
-            if (linetext[0] in '#-*+'):
+            if linetext[0] in '#-*+':
                 return True
             if len(linetext) >= 2:
                 if linetext[:2] in ('> ', '| '):
@@ -195,7 +199,7 @@ class MessageEntry(qscilib.Scintilla):
         if b == e == 0:
             return line + 1
 
-        group = [lines[l] for l in xrange(b, e+1)]
+        group = [lines[l] for l in pycompat.xrange(b, e+1)]
         MARKER = u'\033\033\033\033\033'
         curlinenum, curcol = self.getCursorPosition()
         if b <= curlinenum <= e:
@@ -270,5 +274,5 @@ class MessageEntry(qscilib.Scintilla):
 
     def minimumSizeHint(self):
         size = super(MessageEntry, self).minimumSizeHint()
-        size.setHeight(self.fontHeight * 3 / 2)
+        size.setHeight(self.fontHeight * 3 // 2)
         return size

@@ -7,8 +7,8 @@
 
 from __future__ import absolute_import
 
-import cStringIO
 import glob
+import io
 import os
 import re
 import shlex
@@ -23,11 +23,12 @@ from mercurial import (
     extensions,
     fancyopts,
     filemerge,
-    fileset,
+    filesetlang,
     mdiff,
     merge as mergemod,
     patch as patchmod,
     pathutil,
+    pycompat,
     rcutil,
     revset as revsetmod,
     revsetlang,
@@ -41,27 +42,46 @@ from mercurial.utils import (
     dateutil,
     stringutil,
 )
-
-from tortoisehg.util import paths
-
 from mercurial.node import nullrev
-from tortoisehg.util.hgversion import hgversion
-from tortoisehg.util.i18n import (
+
+from . import (
+    hgversion as hgversionmod,
+    paths,
+)
+from .i18n import (
     _ as _gettext,
     ngettext as _ngettext,
 )
 
+TYPE_CHECKING = getattr(pycompat, 'TYPE_CHECKING', False)
+
+if TYPE_CHECKING:
+    from typing import (
+        AbstractSet,
+        Any,
+        Callable,
+        Dict,
+        Iterable,
+        List,
+        Optional,
+        Text,
+        Tuple,
+        Union,
+        overload,
+    )
+
 nullsubrepostate = subrepoutil.nullstate
-_encoding = encoding.encoding
-_fallbackencoding = encoding.fallbackencoding
+_encoding = pycompat.sysstr(encoding.encoding)
+_fallbackencoding = pycompat.sysstr(encoding.fallbackencoding)
+hgversion = pycompat.sysstr(hgversionmod.hgversion)
 
 # extensions which can cause problem with TortoiseHg
 _extensions_blacklist = (
-    'blackbox',  # mucks uimod.ui (hg 851c41a21869, issue #4489)
-    'color',
-    'pager',
-    'progress',
-    'zeroconf',
+    b'blackbox',  # mucks uimod.ui (hg 851c41a21869, issue #4489)
+    b'color',
+    b'pager',
+    b'progress',
+    b'zeroconf',
 )
 
 extractpatch = patchmod.extract
@@ -74,6 +94,16 @@ def _(message, context=''):
 def ngettext(singular, plural, n):
     return _ngettext(singular, plural, n).encode('utf-8')
 
+if TYPE_CHECKING:
+    @overload
+    def tounicode(s):
+        # type: (Union[bytes, pycompat.unicode]) -> pycompat.unicode
+        pass
+    @overload
+    def tounicode(s):
+        # type: (None) -> None
+        pass
+
 def tounicode(s):
     """
     Convert the encoding of string from MBCS to Unicode.
@@ -83,7 +113,7 @@ def tounicode(s):
     """
     if s is None:
         return None
-    if isinstance(s, unicode):
+    if isinstance(s, pycompat.unicode):
         return s
     if isinstance(s, encoding.localstr):
         return s._utf8.decode('utf-8')
@@ -92,6 +122,16 @@ def tounicode(s):
     except UnicodeDecodeError:
         pass
     return s.decode(_fallbackencoding, 'replace')
+
+if TYPE_CHECKING:
+    @overload
+    def fromunicode(s, errors='strict'):
+        # type: (Text, Text) -> bytes
+        pass
+    @overload
+    def fromunicode(s, errors='strict'):
+        # type: (None, Text) -> None
+        pass
 
 def fromunicode(s, errors='strict'):
     """
@@ -104,7 +144,7 @@ def fromunicode(s, errors='strict'):
     """
     if s is None:
         return None
-    s = unicode(s)  # s can be QtCore.QString
+    s = pycompat.unicode(s)  # s can be QtCore.QString
     for enc in (_encoding, _fallbackencoding):
         try:
             l = s.encode(enc)
@@ -117,6 +157,16 @@ def fromunicode(s, errors='strict'):
     l = s.encode(_encoding, errors)  # last ditch
     return encoding.localstr(s.encode('utf-8'), l)
 
+if TYPE_CHECKING:
+    @overload
+    def toutf(s):
+        # type: (bytes) -> bytes
+        pass
+    @overload
+    def toutf(s):
+        # type: (None) -> None
+        pass
+
 def toutf(s):
     """
     Convert the encoding of string from MBCS to UTF-8.
@@ -127,7 +177,17 @@ def toutf(s):
         return None
     if isinstance(s, encoding.localstr):
         return s._utf8
-    return tounicode(s).encode('utf-8').replace('\0','')
+    return tounicode(s).encode('utf-8').replace(b'\0', b'')
+
+if TYPE_CHECKING:
+    @overload
+    def fromutf(s):
+        # type: (bytes) -> bytes
+        pass
+    @overload
+    def fromutf(s):
+        # type: (None) -> None
+        pass
 
 def fromutf(s):
     """
@@ -144,10 +204,23 @@ def fromutf(s):
         return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
 
+getcwdb = encoding.getcwd
+
+if pycompat.ispy3:
+    def isbasestring(x):
+        return isinstance(x, str)
+    getcwdu = os.getcwd
+else:
+    def isbasestring(x):
+        return isinstance(x, basestring)  # pytype: disable=name-error
+    getcwdu = os.getcwdu  # pytype: disable=module-attr
+
 def activebookmark(repo):
+    # type: (...) -> bytes
     return repo._activebookmark
 
 def namedbranches(repo):
+    # type: (...) -> List[bytes]
     branchmap = repo.branchmap()
     dead = repo.deadbranches
     return sorted(br for br, _heads, _tip, isclosed
@@ -165,10 +238,12 @@ def _firstchangectx(repo):
     return repo[nullrev]
 
 def shortrepoid(repo):
+    # type: (...) -> str
     """Short hash of the first root changeset; can be used for settings key"""
     return str(_firstchangectx(repo))
 
 def repoidnode(repo):
+    # type: (...) -> bytes
     """Hash of the first root changeset in binary form"""
     return _firstchangectx(repo).node()
 
@@ -194,6 +269,7 @@ def _getfirstrevisionlabel(repo, ctx):
         return branch
 
 def getrevisionlabel(repo, rev):
+    # type: (Any, Optional[int]) -> Optional[bytes]
     """Return symbolic name for the specified revision or stringfy it"""
     if rev is None:
         return None  # no symbol for working revision
@@ -203,9 +279,10 @@ def getrevisionlabel(repo, rev):
     if label and ctx == scmutil.revsymbol(repo, label):
         return label
 
-    return str(rev)
+    return b'%d' % rev
 
 def getmqpatchtags(repo):
+    # type: (...) -> List[bytes]
     '''Returns all tag names used by MQ patches, or []'''
     if hasattr(repo, 'mq'):
         repo.mq.parseseries()
@@ -214,15 +291,17 @@ def getmqpatchtags(repo):
         return []
 
 def getcurrentqqueue(repo):
+    # type: (...) -> Optional[bytes]
     """Return the name of the current patch queue."""
     if not hasattr(repo, 'mq'):
         return None
-    cur = os.path.basename(repo.mq.path)
-    if cur.startswith('patches-'):
+    cur = os.path.basename(repo.mq.path)  # type: bytes
+    if cur.startswith(b'patches-'):
         cur = cur[8:]
     return cur
 
 def gitcommit(ctx):
+    # type: (...) -> Optional[bytes]
     """
     If the hggit extension is loaded, and the repository is a git clone,
     returns the git commit hash of the current revision
@@ -230,7 +309,7 @@ def gitcommit(ctx):
 
     repo = ctx._repo
 
-    if 'hggit' not in repo.extensions():
+    if b'hggit' not in repo.extensions():
         return None
 
     fullgitnode = repo.githandler.map_git_get(ctx.hex())
@@ -240,6 +319,7 @@ def gitcommit(ctx):
     return fullgitnode[:12]
 
 def getqqueues(repo):
+    # type: (...) -> List[Text]
     ui = repo.ui.copy()
     ui.quiet = True  # don't append "(active)"
     ui.pushbuffer()
@@ -252,53 +332,59 @@ def getqqueues(repo):
     return qqueues
 
 def readgraftstate(repo):
+    # type: (...) -> Optional[List[bytes]]
     """Read a list of nodes from graftstate; or None if nothing in progress"""
-    graftstatefile = repo.vfs.join('graftstate')
+    graftstatefile = repo.vfs.join(b'graftstate')
     if not os.path.exists(graftstatefile):
         return
-    with open(graftstatefile, 'r') as f:
+    with open(graftstatefile, 'rb') as f:
         info = f.readlines()
-    if info and info[0] == '1\n':
+    if info and info[0] == b'1\n':
         # doesn't look like a list of nodes
-        return statemod.cmdstate(repo, 'graftstate').read()['nodes']
+        return statemod.cmdstate(repo, b'graftstate').read()[b'nodes']
     if len(info):
         revlist = [rev.strip() for rev in info]
-        revlist = [rev for rev in revlist if rev != '']
+        revlist = [rev for rev in revlist if rev != b'']
         if revlist:
             return revlist
 
 readmergestate = mergemod.mergestate.read
 
 def readundodesc(repo):
+    # type: (...) -> Tuple[Text, int]
     """Read short description and changelog size of last transaction"""
-    if os.path.exists(repo.sjoin('undo')):
+    if os.path.exists(repo.sjoin(b'undo')):
         try:
-            args = repo.vfs('undo.desc', 'r').read().splitlines()
-            return args[1], int(args[0])
+            args = repo.vfs(b'undo.desc', b'r').read().splitlines()
+            return tounicode(args[1]), int(args[0])
         except (IOError, IndexError, ValueError):
             pass
     return '', len(repo)
 
 def unidifftext(a, ad, b, bd, fn1, fn2, opts=mdiff.defaultopts):
+    # type: (bytes, bytes, bytes, bytes, bytes, bytes, mdiff.diffopts) -> bytes
     binary = stringutil.binary(a) or stringutil.binary(b)
     headers, hunks = mdiff.unidiff(a, ad, b, bd, fn1, fn2,
                                    binary=binary, opts=opts)
     if not hunks:
-        return ''
-    text = ''.join(sum((list(hlines) for _hrange, hlines in hunks), []))
-    return '\n'.join(headers) + '\n' + text
+        return b''
+    text = b''.join(sum((list(hlines) for _hrange, hlines in hunks), []))
+    return b'\n'.join(headers) + b'\n' + text
 
 def enabledextensions():
+    # type: () -> Dict[Text, bytes]
     """Return the {name: shortdesc} dict of enabled extensions
 
     shortdesc is in local encoding.
     """
-    return extensions.enabled()
+    return {pycompat.sysstr(k): v for k, v in extensions.enabled().items()}
 
 def disabledextensions():
-    return extensions.disabled()
+    # type: () -> Dict[Text, bytes]
+    return {pycompat.sysstr(k): v for k, v in extensions.disabled().items()}
 
 def allextensions():
+    # type: () -> Dict[Text, bytes]
     """Return the {name: shortdesc} dict of known extensions
 
     shortdesc is in local encoding.
@@ -317,6 +403,7 @@ def allextensions():
     return exts
 
 def validateextensions(enabledexts):
+    # type: (AbstractSet[Text]) -> Dict[Text, bytes]
     """Report extensions which should be disabled
 
     Returns the dict {name: message} of extensions expected to be disabled.
@@ -336,7 +423,7 @@ def validateextensions(enabledexts):
     return exts
 
 def _loadextensionwithblacklist(orig, ui, name, path, *args, **kwargs):
-    if name.startswith('hgext.') or name.startswith('hgext/'):
+    if name.startswith(b'hgext.') or name.startswith(b'hgext/'):
         shortname = name[6:]
     else:
         shortname = name
@@ -351,18 +438,20 @@ def _wrapextensionsloader():
                             _loadextensionwithblacklist)
 
 def loadextensions(ui):
+    # type: (uimod.ui) -> None
     """Load and setup extensions for GUI process"""
     _wrapextensionsloader()  # enable blacklist of extensions
     extensions.loadall(ui)
 
 # TODO: provide singular canonpath() wrapper instead?
 def canonpaths(list):
+    # type: (Iterable[bytes]) -> List[bytes]
     'Get canonical paths (relative to root) for list of files'
     # This is a horrible hack.  Please remove this when HG acquires a
     # decent case-folding solution.
     canonpats = []
-    cwd = os.getcwd()
-    root = paths.find_root(cwd)
+    cwd = getcwdb()
+    root = paths.find_root_bytes(cwd)
     for f in list:
         try:
             canonpats.append(pathutil.canonpath(root, cwd, f))
@@ -379,6 +468,7 @@ def canonpaths(list):
     return canonpats
 
 def normreporoot(path):
+    # type: (Text) -> Text
     """Normalize repo root path in the same manner as localrepository"""
     # see localrepo.localrepository and scmutil.vfs
     lpath = fromunicode(path)
@@ -386,74 +476,78 @@ def normreporoot(path):
     return tounicode(lpath)
 
 
-def mergetools(ui, values=None):
-    'returns the configured merge tools and the internal ones'
-    if values == None:
-        values = []
-    seen = values[:]
-    for key, value in ui.configitems('merge-tools'):
-        t = key.split('.')[0]
+def mergetools(ui):
+    # type: (uimod.ui) -> List[bytes]
+    '''returns a list of bytestring names of the configured and internal merge
+    tools'''
+    values = []
+    seen = set()
+    for key, value in ui.configitems(b'merge-tools'):
+        t = key.split(b'.')[0]
         if t not in seen:
-            seen.append(t)
+            seen.add(t)
             # Ensure the tool is installed
             if filemerge._findtool(ui, t):
                 values.append(t)
-    values.append('internal:merge')
-    values.append('internal:prompt')
-    values.append('internal:dump')
-    values.append('internal:local')
-    values.append('internal:other')
-    values.append('internal:fail')
+    values.append(b'internal:merge')
+    values.append(b'internal:prompt')
+    values.append(b'internal:dump')
+    values.append(b'internal:local')
+    values.append(b'internal:other')
+    values.append(b'internal:fail')
     return values
 
 
 _difftools = None
 def difftools(ui):
+    # TODO: type annotation
+    '''Return mapping from tool name to tuples with tool name,
+    diff args, and merge args, all as bytecode strings'''
     global _difftools
     if _difftools:
         return _difftools
 
     def fixup_extdiff(diffopts):
-        if '$child' not in diffopts:
-            diffopts.append('$parent1')
-            diffopts.append('$child')
-        if '$parent2' in diffopts:
+        if b'$child' not in diffopts:
+            diffopts.append(b'$parent1')
+            diffopts.append(b'$child')
+        if b'$parent2' in diffopts:
             mergeopts = diffopts[:]
-            diffopts.remove('$parent2')
+            diffopts.remove(b'$parent2')
         else:
             mergeopts = []
         return diffopts, mergeopts
 
     tools = {}
-    for cmd, path in ui.configitems('extdiff'):
-        if cmd.startswith('cmd.'):
+    for cmd, path in ui.configitems(b'extdiff'):
+        if cmd.startswith(b'cmd.'):
             cmd = cmd[4:]
             if not path:
                 path = cmd
-            diffopts = ui.config('extdiff', 'opts.' + cmd, '')
-            diffopts = shlex.split(diffopts)
+            diffopts = ui.config(b'extdiff', b'opts.' + cmd)
+            diffopts = pycompat.shlexsplit(diffopts)
             diffopts, mergeopts = fixup_extdiff(diffopts)
             tools[cmd] = [path, diffopts, mergeopts]
-        elif cmd.startswith('opts.'):
+        elif cmd.startswith(b'opts.'):
             continue
         else:
             # command = path opts
             if path:
-                diffopts = shlex.split(path)
+                diffopts = pycompat.shlexsplit(path)
                 path = diffopts.pop(0)
             else:
                 path, diffopts = cmd, []
             diffopts, mergeopts = fixup_extdiff(diffopts)
             tools[cmd] = [path, diffopts, mergeopts]
-    mt = []
-    mergetools(ui, mt)
-    for t in mt:
-        if t.startswith('internal:'):
+    for t in mergetools(ui):
+        if t.startswith(b'internal:'):
             continue
-        dopts = ui.config('merge-tools', t + '.diffargs', '')
-        mopts = ui.config('merge-tools', t + '.diff3args', '')
-        dopts, mopts = shlex.split(dopts), shlex.split(mopts)
-        tools[t] = [filemerge._findtool(ui, t), dopts, mopts]
+        dopts = ui.config(b'merge-tools', t + b'.diffargs')
+        mopts = ui.config(b'merge-tools', t + b'.diff3args')
+        tools[t] = (
+            filemerge._findtool(ui, t),
+            pycompat.shlexsplit(dopts or b''),
+            pycompat.shlexsplit(mopts or b''))
     _difftools = tools
     return tools
 
@@ -469,6 +563,7 @@ tortoisehgtoollocations = (
 )
 
 def tortoisehgtools(uiorconfig, selectedlocation=None):
+    # TODO: type annotation
     """Parse 'tortoisehg-tools' section of ini file.
 
     >>> from pprint import pprint
@@ -580,11 +675,11 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
     else:
         configitems = uiorconfig.items
         def configlist(section, name):
-            return uiorconfig.get(section, name, '').split()
+            return uiorconfig.get(section, name, b'').split()
 
     tools = {}
-    for key, value in configitems('tortoisehg-tools'):
-        toolname, field = key.split('.', 1)
+    for key, value in configitems(b'tortoisehg-tools'):
+        toolname, field = key.split(b'.', 1)
         if toolname not in tools:
             tools[toolname] = {}
         bvalue = stringutil.parsebool(value)
@@ -599,11 +694,12 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
     if selectedlocation not in dict(tortoisehgtoollocations):
         raise ValueError('invalid location %r' % selectedlocation)
 
-    guidef = configlist('tortoisehg', selectedlocation) or []
+    guidef = configlist(b'tortoisehg',
+                        pycompat.sysbytes(selectedlocation)) or []
     toollist = []
     selectedtools = {}
     for name in guidef:
-        if name != '|':
+        if name != b'|':
             info = tools.get(name, None)
             if info is None:
                 continue
@@ -611,44 +707,47 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         toollist.append(name)
     return selectedtools, toollist
 
-loadui = uimod.ui.load
+loadui = uimod.ui.load  # type: Callable[[], uimod.ui]
 
 def copydynamicconfig(srcui, destui):
+    # type: (uimod.ui, uimod.ui) -> None
     """Copy config values that come from command line or code
 
     >>> srcui = uimod.ui()
-    >>> srcui.setconfig('paths', 'default', 'http://example.org/',
-    ...                 '/repo/.hg/hgrc:2')
-    >>> srcui.setconfig('patch', 'eol', 'auto', 'eol')
+    >>> srcui.setconfig(b'paths', b'default', b'http://example.org/',
+    ...                 b'/repo/.hg/hgrc:2')
+    >>> srcui.setconfig(b'patch', b'eol', b'auto', b'eol')
     >>> destui = uimod.ui()
     >>> copydynamicconfig(srcui, destui)
-    >>> destui.config('paths', 'default') is None
+    >>> destui.config(b'paths', b'default') is None
     True
-    >>> destui.config('patch', 'eol'), destui.configsource('patch', 'eol')
+    >>> destui.config(b'patch', b'eol'), destui.configsource(b'patch', b'eol')
     ('auto', 'eol')
     """
     for section, name, value in srcui.walkconfig():
         source = srcui.configsource(section, name)
-        if ':' in source:
+        if b':' in source:
             # path:line
             continue
-        if source == 'none':
+        if source == b'none':
             # ui.configsource returns 'none' by default
-            source = ''
+            source = b''
         destui.setconfig(section, name, value, source)
 
 def shortreponame(ui):
-    name = ui.config('web', 'name', None)
+    # type: (uimod.ui) -> Optional[bytes]
+    name = ui.config(b'web', b'name', None)
     if not name:
         return
-    src = ui.configsource('web', 'name')  # path:line
-    if '/.hg/hgrc:' not in util.pconvert(src):
+    src = ui.configsource(b'web', b'name')  # path:line
+    if b'/.hg/hgrc:' not in util.pconvert(src):
         # global web.name will set the same name to all repositories
-        ui.debug('ignoring global web.name defined at %s\n' % src)
+        ui.debug(b'ignoring global web.name defined at %s\n' % src)
         return
     return name
 
 def extractchoices(prompttext):
+    # type: (Text) -> Tuple[Text, List[Tuple[Text, Text]]]
     """Extract prompt message and list of choice (char, label) pairs
 
     This is slightly different from ui.extractchoices() in that
@@ -663,15 +762,18 @@ def extractchoices(prompttext):
     ('want lots of $$money$$?', [('s', 'Ye&s'), ('o', 'N&o')])
     """
     m = re.match(r'(?s)(.+?)\$\$([^\$]*&[^ \$].*)', prompttext)
+    assert m is not None, 'invalid prompt message'
     msg = m.group(1)
     choices = [p.strip(' ') for p in m.group(2).split('$$')]
     resps = [p[p.index('&') + 1].lower() for p in choices]
-    return msg, zip(resps, choices)
+    return msg, pycompat.ziplist(resps, choices)
 
 def displaytime(date):
-    return dateutil.datestr(date, '%Y-%m-%d %H:%M:%S %1%2')
+    # type: (Optional[Tuple[int, int]]) -> bytes
+    return dateutil.datestr(date, b'%Y-%m-%d %H:%M:%S %1%2')
 
 def utctime(date):
+    # type: (Tuple[int, int]) -> str
     return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(date[0]))
 
 agescales = [
@@ -685,6 +787,7 @@ agescales = [
     ]
 
 def age(date):
+    # type: (Tuple[int, int]) -> bytes
     '''turn a (timestamp, tzoff) tuple into an age string.'''
     # This is i18n-ed version of mercurial.templatefilters.age().
 
@@ -704,11 +807,14 @@ def age(date):
         if n >= 2 or s == 1:
             return t(n) % n
 
+    assert False, 'unreachable'
+
 def configuredusername(ui):
+    # type: (uimod.ui) -> Optional[bytes]
     # need to check the existence before calling ui.username(); otherwise it
     # may fall back to the system default.
     if (not os.environ.get('HGUSER')
-        and not ui.config('ui', 'username')
+        and not ui.config(b'ui', b'username')
         and not os.environ.get('EMAIL')):
         return None
     try:
@@ -717,12 +823,14 @@ def configuredusername(ui):
         return None
 
 def username(user):
+    # type: (bytes) -> bytes
     author = stringutil.person(user)
     if not author:
         author = stringutil.shortuser(user)
     return author
 
 def user(ctx):
+    # type: (...) -> bytes
     '''
     Get the username of the change context. Does not abort and just returns
     an empty string if ctx is a working context and no username has been set
@@ -735,10 +843,11 @@ def user(ctx):
             raise
         # ctx is a working context and probably no username has
         # been configured in mercurial's config
-        user = ''
+        user = b''
     return user
 
 def getestimatedsize(fctx):
+    # type: (...) -> int
     """Return the size of the given fctx without loading the revision text"""
     if fctx.rev() is None:
         return fctx.size()
@@ -749,6 +858,7 @@ def getestimatedsize(fctx):
         return fctx._filelog._revlog.rawsize(fctx.filerev())
 
 def get_revision_desc(fctx, curpath=None):
+    # type: (Any, Optional[bytes]) -> pycompat.unicode
     """return the revision description as a string"""
     author = tounicode(username(fctx.user()))
     rev = fctx.linkrev()
@@ -763,6 +873,7 @@ def get_revision_desc(fctx, curpath=None):
     return u'%s@%s%s:%s "%s"' % (author, rev, source, date, summary)
 
 def longsummary(description, limit=None):
+    # type: (Union[bytes, Text], Optional[int]) -> Text
     summary = tounicode(description)
     lines = summary.splitlines()
     if not lines:
@@ -786,6 +897,7 @@ def longsummary(description, limit=None):
     return summary
 
 def getDeepestSubrepoContainingFile(wfile, ctx):
+    # TODO: type annotation
     """
     Given a filename and context, get the deepest subrepo that contains the file
 
@@ -821,6 +933,7 @@ def getDeepestSubrepoContainingFile(wfile, ctx):
     return None, wfile, ctx
 
 def getLineSeparator(line):
+    # type: (Text) -> Text
     """Get the line separator used on a given line"""
     # By default assume the default OS line separator
     linesep = os.linesep
@@ -832,6 +945,7 @@ def getLineSeparator(line):
     return linesep
 
 def parseconfigopts(ui, args):
+    # type: (uimod.ui, List[bytes]) -> List[Tuple[bytes, bytes, bytes]]
     """Pop the --config options from the command line and apply them
 
     >>> u = uimod.ui()
@@ -843,9 +957,9 @@ def parseconfigopts(ui, args):
     >>> u.config('extensions', 'mq')
     '!'
     """
-    config = dispatchmod._earlyparseopts(ui, args)['config']
+    config = dispatchmod._earlyparseopts(ui, args)[b'config']
     # drop --config from args
-    args[:] = fancyopts.earlygetopt(args, '', ['config='],
+    args[:] = fancyopts.earlygetopt(args, b'', [b'config='],
                                     gnu=True, keepsep=True)[1]
     return dispatchmod._parseconfig(ui, config)
 
@@ -855,8 +969,8 @@ _stringify = '%s'.__mod__
 
 # ASCII code -> escape sequence (see PyString_Repr())
 _escapecharmap = []
-_escapecharmap.extend('\\x%02x' % x for x in xrange(32))
-_escapecharmap.extend(chr(x) for x in xrange(32, 127))
+_escapecharmap.extend('\\x%02x' % x for x in pycompat.xrange(32))
+_escapecharmap.extend(chr(x) for x in pycompat.xrange(32, 127))
 _escapecharmap.append('\\x7f')
 _escapecharmap[0x09] = '\\t'
 _escapecharmap[0x0a] = '\\n'
@@ -869,6 +983,7 @@ def _escapecharrepl(m):
     return _escapecharmap[ord(m.group(0))]
 
 def escapeascii(s):
+    # type: (Text) -> Text
     r"""Escape string to be embedded as a literal; like Python string_escape,
     but keeps 8bit characters and can process unicode
 
@@ -881,6 +996,7 @@ def escapeascii(s):
     return _escapecharre.sub(_escapecharrepl, s)
 
 def escapepath(path):
+    # type: (Text) -> Text
     r"""Convert path to command-line-safe string; path must be relative to
     the repository root
 
@@ -897,6 +1013,7 @@ def escapepath(path):
         return p
 
 def escaperev(rev, default=None):
+    # type: (int, Optional[Text]) -> Text
     """Convert revision number to command-line-safe string"""
     if rev is None:
         return default
@@ -912,6 +1029,7 @@ def _escaperevrange(a, b):
         return '%s:%s' % (escaperev(a), escaperev(b))
 
 def compactrevs(revs):
+    # type: (List[int]) -> Text
     """Build command-line-safe revspec from list of revision numbers; revs
     should be sorted in ascending order to get compact form
 
@@ -948,7 +1066,7 @@ def _formatspec(expr, args, lparse, listfuncs):
             return "'%s'" % escapeascii(arg)
         elif c == 'r':
             s = _stringify(arg)
-            if isinstance(s, unicode):
+            if isinstance(s, pycompat.unicode):
                 # 8-bit characters aren't important; just avoid encoding error
                 s = s.encode('utf-8')
             lparse(s)  # make sure syntax errors are confined
@@ -997,6 +1115,7 @@ def _formatspec(expr, args, lparse, listfuncs):
     return ''.join(ret)
 
 def formatfilespec(expr, *args):
+    # type: (Text, Any) -> Text
     """Build fileset expression by template and positional arguments
 
     Supported arguments:
@@ -1010,9 +1129,10 @@ def formatfilespec(expr, *args):
     but the list must not be empty.
     """
     listfuncs = {}
-    return _formatspec(expr, args, fileset.parse, listfuncs)
+    return _formatspec(expr, args, filesetlang.parse, listfuncs)
 
 def formatrevspec(expr, *args):
+    # type: (Text, Any) -> Text
     r"""Build revset expression by template and positional arguments
 
     Supported arguments:
@@ -1039,6 +1159,7 @@ def formatrevspec(expr, *args):
     return _formatspec(expr, args, revsetlang.parse, listfuncs)
 
 def buildcmdargs(name, *args, **opts):
+    # type: (Text, Any, Any) -> List[Text]
     r"""Build list of command-line arguments
 
     >>> buildcmdargs('push', branch='foo')
@@ -1079,7 +1200,7 @@ def buildcmdargs(name, *args, **opts):
     ['tag', u'--message=\xc1', u'\xc0']
     """
     fullargs = [_stringify(name)]
-    for k, v in opts.iteritems():
+    for k, v in opts.items():
         if v is None:
             continue
 
@@ -1129,6 +1250,7 @@ def _reprcmdarg(arg):
         return arg
 
 def prettifycmdline(cmdline):
+    # type: (List[Text]) -> Text
     r"""Build pretty command-line string for display
 
     >>> prettifycmdline(['log', 'foo\\bar', '', 'foo bar', 'foo"bar'])
@@ -1146,6 +1268,7 @@ def prettifycmdline(cmdline):
     return ' '.join(_reprcmdarg(e) for e in cmdline)
 
 def parsecmdline(cmdline, cwd):
+    # type: (Text, Text) -> List[Text]
     r"""Split command line string to imitate a unix shell
 
     >>> origfuncs = glob.glob, os.path.expanduser, os.path.expandvars
@@ -1174,10 +1297,18 @@ def parsecmdline(cmdline, cwd):
     >>> glob.glob, os.path.expanduser, os.path.expandvars = origfuncs
     """
     _ = _gettext  # TODO: use unicode version globally
-    # shlex can't process unicode on Python < 2.7.3
-    cmdline = cmdline.encode('utf-8')
-    src = cStringIO.StringIO(cmdline)
-    lex = shlex.shlex(src, posix=True)
+    if pycompat.ispy3:
+        # shlex can't process bytes on Python 3
+        src = io.StringIO(cmdline)
+        lex = shlex.shlex(src, posix=True)
+        decode_token = pycompat.identity
+    else:
+        # shlex can't process unicode on Python < 2.7.3
+        cmdline = cmdline.encode('utf-8')
+        src = pycompat.bytesio(cmdline)
+        lex = shlex.shlex(src, posix=True)  # pytype: disable=wrong-arg-types
+        def decode_token(e):
+            return e.decode('utf-8')  # pytype: disable=attribute-error
     lex.whitespace_split = True
     lex.commenters = ''
     args = []
@@ -1191,7 +1322,7 @@ def parsecmdline(cmdline, cwd):
             raise ValueError(_('command parse error: %s') % err)
         if e == lex.eof:
             return args
-        e = e.decode('utf-8')
+        e = decode_token(e)  # type: pycompat.unicode
         if q not in lex.quotes or q in lex.escapedquotes:
             e = os.path.expandvars(e)  # $var or "$var"
         if q not in lex.quotes:

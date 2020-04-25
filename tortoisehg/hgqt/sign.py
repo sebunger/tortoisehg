@@ -35,8 +35,10 @@ from . import (
 
 class SignDialog(QDialog):
 
-    def __init__(self, repoagent, rev='tip', parent=None, opts={}):
+    def __init__(self, repoagent, rev='tip', parent=None, opts=None):
         super(SignDialog, self).__init__(parent)
+        if opts is None:
+            opts = {}
         self.setWindowFlags(self.windowFlags() &
                             ~Qt.WindowContextHelpButtonHint)
 
@@ -124,7 +126,7 @@ class SignDialog(QDialog):
         self.clear_status()
         key = opts.get('key', '')
         if not key:
-            key = repo.ui.config("gpg", "key", '')
+            key = repo.ui.config(b"gpg", b"key", b'')
         self.keyLineEdit.setText(hglib.tounicode(key))
         self.replaceCheckBox.setChecked(bool(opts.get('force')))
         self.localCheckBox.setChecked(bool(opts.get('local')))

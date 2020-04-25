@@ -29,6 +29,7 @@ from .qtgui import (
 
 from hgext import mq
 from mercurial import (
+    pycompat,
     scmutil,
 )
 
@@ -83,7 +84,7 @@ class QFoldDialog(QDialog):
                 spp.msgte.setText(spp.composeMsg(self.getPatchList()))
             def getPatchList(self):
                 return [hglib.fromunicode(self.item(i).text()) \
-                        for i in xrange(0, self.count())]
+                        for i in pycompat.xrange(0, self.count())]
 
         ugb = QGroupBox(_('Patches to fold'))
         ugb.setLayout(QVBoxLayout())
@@ -138,7 +139,7 @@ class QFoldDialog(QDialog):
         self.summ.setText(hglib.tounicode(txt))
 
     def composeMsg(self, patches):
-        descs = [scmutil.revsymbol(self.repo, 'qtip').description()]
+        descs = [scmutil.revsymbol(self.repo, b'qtip').description()]
         # lookup of unapplied patches is handled by thgrepo hack
         descs.extend(self.repo[p].description() for p in patches)
         return u'\n* * *\n'.join(map(hglib.tounicode, descs))
@@ -150,10 +151,10 @@ class QFoldDialog(QDialog):
 
     def options(self):
         return {'keep': self.keepchk.isChecked(),
-                'message': unicode(self.msgte.text())}
+                'message': pycompat.unicode(self.msgte.text())}
 
     def patches(self):
-        return map(hglib.tounicode, self.ulw.getPatchList())
+        return pycompat.maplist(hglib.tounicode, self.ulw.getPatchList())
 
     def accept(self):
         self._writesettings()
