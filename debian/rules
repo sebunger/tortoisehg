@@ -1,20 +1,7 @@
 #!/usr/bin/make -f
 
-export PYTHONPATH = debian/fake-python-path
-
 %:
 	dh $@ --with python3 --buildsystem=pybuild
-
-override_dh_auto_configure:
-	mkdir -p debian/fake-python-path
-	[ -d /usr/lib/python3/dist-packages/hgdemandimport ] || \
-	[ -d /usr/lib/python2.7/dist-packages/hgdemandimport ] && \
-	ln -sf /usr/lib/python2.7/dist-packages/hgdemandimport debian/fake-python-path/
-	[ -d /usr/lib/python3/dist-packages/mercurial ] || \
-	[ -d /usr/lib/python2.7/dist-packages/mercurial ] && \
-	ln -sf /usr/lib/python2.7/dist-packages/mercurial debian/fake-python-path/
-	dh_auto_configure
-
 
 override_dh_auto_build: debian/thg.1
 	dh_auto_build
@@ -33,7 +20,7 @@ override_dh_auto_install:
 
 ## drop automatically created file
 override_dh_auto_clean:
-	-dh_auto_clean
+	dh_auto_clean
 	rm -f debian/pycompat
 	rm -f debian/thg.1
 	rm -fr locale doc/build
