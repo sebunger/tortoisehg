@@ -1,6 +1,0 @@
-repo: bac32db38e52fd49acb62b94730a55f4f4b0cdee
-node: 5fd4161f1eaa3f288e4f68ddf0b947eafc9a4e72
-branch: default
-latesttag: 5.1
-latesttagdistance: 332
-changessincelatesttag: 395

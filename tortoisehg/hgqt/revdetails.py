@@ -308,7 +308,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         'called by repowidget when repoview changes revisions'
         self.ctx = ctx = self.repo[rev]
         self.revpanel.set_revision(rev)
-        self.revpanel.update(repo = self.repo)
+        self.revpanel.update(repo=self.repo)
         msg = ctx.description()
         inlinetags = self._repoagent.configBool(
             'tortoisehg', 'issue.inlinetags')
@@ -366,12 +366,12 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
         rev = self.ctx.rev()
         if isinstance(self.ctx.rev(), int):
             if len(self.repo) <= self.ctx.rev():
-                rev = 'tip'
+                rev = b'tip'
         elif rev is not None:  # None in isrevsymbol() raises ProgrammingError
             if scmutil.isrevsymbol(self.repo, rev):
                 rev = scmutil.revsymbol(self.repo, rev).rev()
             elif rev not in self.repo.thgmqunappliedpatches:
-                rev = 'tip'
+                rev = b'tip'
         try:
             self.onRevisionSelected(rev)
         except error.FilteredRepoLookupError:

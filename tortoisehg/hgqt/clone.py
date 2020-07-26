@@ -47,6 +47,7 @@ from . import (
 
 if hglib.TYPE_CHECKING:
     from typing import (
+        Any,
         Optional,
         Text,
         Tuple,
@@ -155,9 +156,11 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             else:
                 return chk, text
         def chktext3(chklabel, btnlabel, btnslot, stretch=None):
-            # type: (Text, Text, pyqtSlot, Optional[int]) -> Tuple[QCheckBox, QLineEdit, QPushButton]
+            # type: (Text, Text, Any, Optional[int]) -> Tuple[QCheckBox, QLineEdit, QPushButton]
             assert btnlabel
-            return chktext(chklabel, btnlabel, btnslot, stretch)
+            ret = chktext(chklabel, btnlabel, btnslot, stretch)
+            assert isinstance(ret[2], QPushButton)
+            return ret
 
         self.rev_chk, self.rev_text = chktext(_('Clone to revision:'),
                                               stretch=40)

@@ -215,10 +215,7 @@ class GraftDialog(QDialog):
 
     def abort(self):
         self.abortbtn.setDisabled(True)
-        if os.path.exists(self._graftstatefile):
-            # Remove the existing graftstate file!
-            os.remove(self._graftstatefile)
-        cmdline = hglib.buildcmdargs('update', clean=True, rev='p1()')
+        cmdline = hglib.buildcmdargs('graft', abort=True)
         sess = self._runCommand(cmdline)
         sess.commandFinished.connect(self._abortFinished)
 

@@ -190,17 +190,17 @@ class PostReviewDialog(QDialog):
             qtlib.readStringList(s, 'reviewboard/summary_edit_history'))
 
         try:
-            self.repo_id = int(self.repo.ui.config('reviewboard', 'repoid'))
+            self.repo_id = int(self.repo.ui.config(b'reviewboard', b'repoid'))
         except Exception:
             self.repo_id = None
 
         if not self.repo_id:
             self.repo_id = qtlib.readInt(s, 'reviewboard/repo_id')
 
-        self.server = self.repo.ui.config('reviewboard', 'server')
-        self.user = self.repo.ui.config('reviewboard', 'user')
-        self.password = self.repo.ui.config('reviewboard', 'password')
-        self.browser = self.repo.ui.config('reviewboard', 'browser')
+        self.server = self.repo.ui.config(b'reviewboard', b'server')
+        self.user = self.repo.ui.config(b'reviewboard', b'user')
+        self.password = self.repo.ui.config(b'reviewboard', b'password')
+        self.browser = self.repo.ui.config(b'reviewboard', b'browser')
 
     def writeSettings(self):
         s = QSettings()

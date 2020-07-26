@@ -21,6 +21,7 @@ from mercurial import (
 
 from mercurial.utils import (
     dateutil,
+    stringutil,
 )
 from mercurial.util import propertycache
 from hgext import mq
@@ -44,12 +45,12 @@ class patchctx(object):
         else:
             self._patchname = os.path.basename(patchpath)
         self._repo = repo
-        self._rev = rev or 'patch'
+        self._rev = rev or b'patch'
         self._status = [[], [], []]
         self._fileorder = []
-        self._user = ''
-        self._desc = ''
-        self._branch = ''
+        self._user = b''
+        self._desc = b''
+        self._branch = b''
         self._node = node.nullid
         self._mtime = None
         self._fsize = 0
@@ -66,15 +67,15 @@ class patchctx(object):
             return
 
         try:
-            self._branch = ph.branch or ''
+            self._branch = ph.branch or b''
             self._node = binascii.unhexlify(ph.nodeid)
-            if self._repo.ui.configbool('mq', 'secret'):
+            if self._repo.ui.configbool(b'mq', b'secret'):
                 self._phase = b'secret'
         except TypeError:
             pass
         except AttributeError:
             # hacks to try to deal with older versions of mq.py
-            self._branch = ''
+            self._branch = b''
             ph.diffstartline = len(ph.comments)
             if ph.message:
                 ph.diffstartline += 1
@@ -139,24 +140,24 @@ class patchctx(object):
 
     def flags(self, wfile):
         if wfile == self._parseErrorFileName:
-            return ''
+            return b''
         if wfile in self._files:
             for gp in patch.readgitpatch(self._files[wfile][0].header):
                 if gp.mode:
                     islink, isexec = gp.mode
                     if islink:
-                        return 'l'
+                        return b'l'
                     elif wfile in self._status[1]:
                         # Do not report exec mode change if file is added
-                        return ''
+                        return b''
                     elif isexec:
-                        return 'x'
+                        return b'x'
                     else:
                         # techincally, this case could mean the file has had its
                         # exec bit cleared OR its symlink state removed
                         # TODO: change readgitpatch() to differentiate
-                        return '-'
-        return ''
+                        return b'-'
+        return b''
 
     # TortoiseHg methods
     def thgtags(self):              return []
@@ -169,7 +170,7 @@ class patchctx(object):
     def isStandin(self, path):      return False
 
     def longsummary(self):
-        if self._repo.ui.configbool('tortoisehg', 'longsummary'):
+        if self._repo.ui.configbool(b'tortoisehg', b'longsummary'):
             limit = 80
         else:
             limit = None
@@ -191,13 +192,14 @@ class patchctx(object):
     def thgmqpatchdata(self, wfile):
         'called by fileview to get diff data'
         if wfile == self._parseErrorFileName:
-            return '\n\n\nErrors while parsing patch:\n'+str(self._parseerror)
+            return (b'\n\n\nErrors while parsing patch:\n'
+                    + stringutil.forcebytestr(self._parseerror))
         if wfile in self._files:
             buf = pycompat.bytesio()
             for chunk in self._files[wfile]:
                 chunk.write(buf)
             return buf.getvalue()
-        return ''
+        return b''
 
     def phasestr(self):
         return self._phase

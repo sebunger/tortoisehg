@@ -207,14 +207,15 @@ bcompare.dirdiff=True
 winmergeu.regkey=Software\Thingamahoochie\WinMerge\
 winmergeu.regkeyalt=Software\Wow6432Node\Thingamahoochie\WinMerge\
 winmergeu.regname=Executable
-winmergeu.args=/e /x /wl /ub /dl other /dr local $other $local $output
+winmergeu.args=/e /x /u /wl /wr /dl local /dr other $local $output $other
 winmergeu.fixeol=True
 winmergeu.checkchanged=True
 winmergeu.gui=True
 winmergeu.priority=-10
-winmergeu.diffargs=/r /e /x /ub /wl /dl '$plabel1' /dr '$clabel' $parent $child
-winmergeu.diff3args=
+winmergeu.diffargs=/r /e /x /u /wl /dl '$plabel1' /dr '$clabel' $parent $child
+winmergeu.diff3args=/r /e /x /u /wl /wr /dl '$plabel1' /dm '$clabel' /dr '$plabel2' $parent1 $child $parent2
 winmergeu.dirdiff=True
+winmergeu.dir3diff=True
 
 ; The Araxis Merge tool is configured to work with newer versions of Araxis Merge
 ; if you are using Araxis Merge 2008 or earlier, create a [merge-tools] section

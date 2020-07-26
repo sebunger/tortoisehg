@@ -357,7 +357,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
             s = QSettings()
             for opt, val in self.opts.items():
-                if isinstance(val, str):
+                if isinstance(val, bytes):
                     val = hglib.tounicode(val)
                 s.setValue('sync/' + opt, val)
 
@@ -367,9 +367,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.paths = {}
         fn = self.repo.vfs.join(b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
-        if 'paths' in cfg:
-            for alias in cfg['paths']:
-                self.paths[ alias ] = cfg['paths'][ alias ]
+        if b'paths' in cfg:
+            for alias in cfg[b'paths']:
+                self.paths[ alias ] = cfg[b'paths'][ alias ]
         tm = PathsModel(self.paths.items(), self)
         self.hgrctv.setModel(tm)
         sm = self.hgrctv.selectionModel()
@@ -437,8 +437,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             if value is True:
                 opts.append('--'+opt)
             elif value:
-                opts.append('--'+opt+'='+value)
-        self.optionslabel.setText(hglib.tounicode(' '.join(opts)))
+                opts.append('--'+opt+'='+hglib.tounicode(value))
+        self.optionslabel.setText(' '.join(opts))
         self.optionslabel.setVisible(bool(opts))
         self.optionshdrlabel.setVisible(bool(opts))
 
@@ -1061,8 +1061,8 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             return
         if fn is None:
             return
-        if alias in cfg['paths']:
-            del cfg['paths'][alias]
+        if alias in cfg[b'paths']:
+            del cfg[b'paths'][alias]
         try:
             wconfig.writefile(cfg, fn)
             self._repoagent.pollStatus()
@@ -1164,8 +1164,8 @@ class PostPullDialog(QDialog):
         if fn is None:
             return
         try:
-            cfg.set('tortoisehg', 'postpull', self.getValue())
-            cfg.set('tortoisehg', 'autoresolve',
+            cfg.set(b'tortoisehg', b'postpull', self.getValue())
+            cfg.set(b'tortoisehg', b'autoresolve',
                     self.autoresolve_chk.isChecked())
             wconfig.writefile(cfg, fn)
             self._repoagent.pollStatus()
@@ -1248,14 +1248,14 @@ class SaveDialog(QDialog):
         if fn is None:
             return
         if (confirm and (not self.edit or path != self.origurl)
-            and alias in cfg['paths']):
+            and alias in cfg[b'paths']):
             if not qtlib.QuestionMsgBox(_('Confirm URL replace'),
                 _('%s already exists, replace URL?') % hglib.tounicode(alias),
                 parent=self):
                 return
-        cfg.set('paths', alias, path)
+        cfg.set(b'paths', alias, path)
         if self.edit and alias != self.origalias:
-            cfg.remove('paths', self.origalias)
+            cfg.remove(b'paths', self.origalias)
         try:
             wconfig.writefile(cfg, fn)
         except EnvironmentError as e:
@@ -1375,7 +1375,7 @@ class SecureDialog(QDialog):
             fprint = repo.ui.config(b'hostfingerprints', u.host, b'')
             if fprint:
                 fprint = b'sha1:' + fprint
-        self.fprintentry = le = QLineEdit(fprint)
+        self.fprintentry = le = QLineEdit(hglib.tounicode(fprint))
         self.fprintradio.toggled.connect(self.fprintentry.setEnabled)
         self.fprintentry.setEnabled(False)
         if hasattr(le, 'setPlaceholderText'): # Qt >= 4.7
@@ -1417,8 +1417,9 @@ class SecureDialog(QDialog):
         authbox.setLayout(form)
         self.layout().addWidget(authbox)
 
-        k = 'username'
-        self._authentries[k] = e = QLineEdit(u.user or auth.get(k, ''))
+        k = b'username'
+        c = hglib.tounicode(u.user or auth.get(k, b''))
+        self._authentries[k] = e = QLineEdit(c)
         e.setToolTip(
 _('''Optional. Username to authenticate with. If not given, and the remote
 site requires basic or digest authentication, the user will be prompted for
@@ -1426,8 +1427,9 @@ it. Environment variables are expanded in the username letting you do
 foo.username = $USER.'''))
         form.addRow(_('Username'), e)
 
-        k = 'password'
-        self._authentries[k] = e = QLineEdit(u.passwd or auth.get(k, ''))
+        k = b'password'
+        c = hglib.tounicode(u.passwd or auth.get(k, b''))
+        self._authentries[k] = e = QLineEdit(c)
         e.setEchoMode(QLineEdit.Password)
         e.setToolTip(
 _('''Optional. Password to authenticate with. If not given, and the remote
@@ -1441,16 +1443,18 @@ it.'''))
                            'Passwords will be stored in a platform-native '
                            'secure method.'))
 
-        k = 'key'
-        self._authentries[k] = e = QLineEdit(auth.get(k, ''))
+        k = b'key'
+        c = hglib.tounicode(auth.get(k, b''))
+        self._authentries[k] = e = QLineEdit(c)
         e.setToolTip(
 _('''Optional. PEM encoded client certificate key file. Environment variables
 are expanded in the filename.'''))
         form.addRow(_('User Certificate Key'),
                     _addBrowseButton(e, self._browseClientKey))
 
-        k = 'cert'
-        self._authentries[k] = e = QLineEdit(auth.get(k, ''))
+        k = b'cert'
+        c = hglib.tounicode(auth.get(k, b''))
+        self._authentries[k] = e = QLineEdit(c)
         e.setToolTip(
 _('''Optional. PEM encoded client certificate chain file. Environment variables
 are expanded in the filename.'''))
@@ -1466,7 +1470,7 @@ are expanded in the filename.'''))
         self.layout().addWidget(bb)
 
         self._updateUi()
-        e = self._authentries['username']
+        e = self._authentries[b'username']
         e.selectAll()
         QTimer.singleShot(0, e.setFocus)
 
@@ -1534,19 +1538,19 @@ are expanded in the filename.'''))
             insecure = None
         else:
             fprint = None
-            insecure = '1'
-        setorclear('hostsecurity', '%s:fingerprints' % self.host, fprint)
-        setorclear('insecurehosts', self.host, insecure)
+            insecure = b'1'
+        setorclear(b'hostsecurity', b'%s:fingerprints' % self.host, fprint)
+        setorclear(b'insecurehosts', self.host, insecure)
 
         e = self._protocolcombo
         protocol = hglib.fromunicode(e.itemData(e.currentIndex()))
-        setorclear('hostsecurity', '%s:minimumprotocol' % self.host, protocol)
+        setorclear(b'hostsecurity', b'%s:minimumprotocol' % self.host, protocol)
 
-        cfg.set('auth', self.alias+'.prefix', self.host)
-        for k in ['username', 'password', 'key', 'cert']:
-            setorclear('auth', '%s.%s' % (self.alias, k),
+        cfg.set(b'auth', b'%s.prefix' % self.alias, self.host)
+        for k in [b'username', b'password', b'key', b'cert']:
+            setorclear(b'auth', b'%s.%s' % (self.alias, k),
                        hglib.fromunicode(self._authentries[k].text()))
-        setorclear('auth', self.alias+'.schemes', self.schemes)
+        setorclear(b'auth', b'%s.schemes' % self.alias, self.schemes)
 
         try:
             wconfig.writefile(cfg, fn)

@@ -202,9 +202,9 @@ class BoolRBGroup(QWidget):
     ## common APIs for all edit widgets
     def setValue(self, curvalue):
         self.curvalue = curvalue
-        if curvalue == 'True':
+        if curvalue == b'True':
             self.trueRB.setChecked(True)
-        elif curvalue == 'False':
+        elif curvalue == b'False':
             self.falseRB.setChecked(True)
         else:
             self.unspecRB.setChecked(True)

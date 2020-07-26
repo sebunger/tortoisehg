@@ -40,6 +40,7 @@ from mercurial import (
 )
 from mercurial.utils import (
     procutil,
+    stringutil,
 )
 
 from ..util import hglib
@@ -72,17 +73,17 @@ def snapshotset(repo, ctxs, sa, sb, copies, copyworkingdir = False):
     # Always make a copy of ctx1a
     files1a = sources | mod_a | rem_a | ((mod_b | add_b) - add_a)
     dir1a, fns_mtime1a = snapshot(repo, files1a, ctx1a)
-    label1a = '@%d:%s' % (ctx1a.rev(), ctx1a)
+    label1a = b'@%d:%s' % (ctx1a.rev(), ctx1a)
 
     # Make a copy of ctx1b if relevant
     if ctx1b:
         files1b = sources | mod_b | rem_b | ((mod_a | add_a) - add_b)
         dir1b, fns_mtime1b = snapshot(repo, files1b, ctx1b)
-        label1b = '@%d:%s' % (ctx1b.rev(), ctx1b)
+        label1b = b'@%d:%s' % (ctx1b.rev(), ctx1b)
     else:
         dir1b = None
         fns_mtime1b = []
-        label1b = ''
+        label1b = b''
 
     # Either make a copy of ctx2, or use working dir directly if relevant.
     files2 = mod_a | add_a | mod_b | add_b
@@ -93,10 +94,10 @@ def snapshotset(repo, ctxs, sa, sb, copies, copyworkingdir = False):
             dir2 = repo.root
             fns_mtime2 = []
         # If ctx2 is working copy, use empty label.
-        label2 = ''
+        label2 = b''
     else:
         dir2, fns_mtime2 = snapshot(repo, files2, ctx2)
-        label2 = '@%d:%s' % (ctx2.rev(), ctx2)
+        label2 = b'@%d:%s' % (ctx2.rev(), ctx2)
 
     dirs = [dir1a, dir1b, dir2]
     labels = [label1a, label1b, label2]
@@ -162,7 +163,7 @@ def launchtool(cmd, opts, replace, block):
     cmdline = procutil.shellquote(cmd) + b' ' + args
     cmdline = procutil.quotecommand(cmdline)
     try:
-        proc = subprocess.Popen(cmdline, shell=True,
+        proc = subprocess.Popen(procutil.tonativestr(cmdline), shell=True,
                                 creationflags=qtlib.openflags,
                                 stderr=subprocess.PIPE,
                                 stdout=subprocess.PIPE,
@@ -172,7 +173,7 @@ def launchtool(cmd, opts, replace, block):
     except (OSError, EnvironmentError) as e:
         QMessageBox.warning(None,
                 _('Tool launch failure'),
-                _('%s : %s') % (cmd, str(e)))
+                _('%s : %s') % (hglib.tounicode(cmd), hglib.tounicode(str(e))))
 
 def filemerge(ui, fname, patchedfname):
     'Launch the preferred visual diff tool for two text files'
@@ -194,7 +195,7 @@ def filemerge(ui, fname, patchedfname):
 def besttool(ui, tools, force=None):
     'Select preferred or highest priority tool from dictionary'
     preferred = force or ui.config(b'tortoisehg', b'vdiff') or \
-                         ui.config(b'ui', 'merge')
+                         ui.config(b'ui', b'merge')
     if preferred and preferred in tools:
         return preferred
     pris = []
@@ -202,7 +203,7 @@ def besttool(ui, tools, force=None):
         try:
             p = ui.configint(b'merge-tools', t + b'.priority')
         except error.ConfigError as inst:
-            ui.warn('visdiff: %s\n' % inst)
+            ui.warn(b'visdiff: %s\n' % stringutil.forcebytestr(inst))
             p = 0
         pris.append((-p, t))
     tools = sorted(pris)
@@ -253,6 +254,8 @@ def visualdiff(ui, repo, pats, opts):
     if ctx1b:
         mod_b, add_b, rem_b = pycompat.maplist(set, _status(ctx1b))
         cpy = copies.mergecopies(repo, ctx1a, ctx1b, ctx1a.ancestor(ctx1b))[0]
+        if util.safehasattr(copies, "branch_copies"):
+            cpy = cpy.copy  # hg 5.4 >= 7f8bdee0034e
     else:
         cpy = copies.pathcopies(ctx1a, ctx2)
         mod_b, add_b, rem_b = set(), set(), set()
@@ -345,11 +348,10 @@ def visualdiff(ui, repo, pats, opts):
         label1a, label1b, label2 = labels
         fns_and_mtime = fns_and_mtimes[2]
 
-        if len(MAR) > 1 and label2 == '':
-            label2 = 'working files'
+        if len(MAR) > 1 and label2 == b'':
+            label2 = b'working files'
 
         def getfile(fname, dir, label):
-            label = hglib.fromunicode(label)
             file = os.path.join(qtlib.gettempdir(), dir, fname)
             if os.path.isfile(file):
                 return fname+label, file
@@ -373,9 +375,9 @@ def visualdiff(ui, repo, pats, opts):
                 label1b, dir1b = getfile(file1, dir1b, label1b)
             label2, dir2 = getfile(file2local, dir2, label2)
         if do3way:
-            label1a += '[local]'
-            label1b += '[other]'
-            label2 += '[merged]'
+            label1a += b'[local]'
+            label1b += b'[other]'
+            label2 += b'[merged]'
 
         repoagent = repo._pyqtobj  # TODO
         replace = dict(parent=dir1a, parent1=dir1a, parent2=dir1b,
@@ -389,8 +391,9 @@ def visualdiff(ui, repo, pats, opts):
         for copy_fn, working_fn, mtime in fns_and_mtime:
             try:
                 if os.lstat(copy_fn).st_mtime != mtime:
-                    ui.debug('file changed while diffing. '
-                            'Overwriting: %s (src: %s)\n' % (working_fn, copy_fn))
+                    ui.debug(b'file changed while diffing. '
+                             b'Overwriting: %s (src: %s)\n'
+                             % (working_fn, copy_fn))
                     util.copyfile(copy_fn, working_fn)
             except EnvironmentError:
                 pass # Ignore I/O errors or missing files
@@ -400,7 +403,7 @@ def visualdiff(ui, repo, pats, opts):
             dodiff()
         finally:
             # cleanup happens atexit
-            ui.note('cleaning up temp directory\n')
+            ui.note(b'cleaning up temp directory\n')
 
     if opts.get('mainapp'):
         dodiffwrapper()
@@ -468,7 +471,7 @@ class FileSelectionDialog(QDialog):
             hbox.addWidget(combo, 1)
             layout.addLayout(hbox)
             for i, name in enumerate(tools.keys()):
-                combo.addItem(name)
+                combo.addItem(hglib.tounicode(name))
                 if name == preferred:
                     defrow = i
             combo.setCurrentIndex(defrow)
@@ -610,9 +613,9 @@ class FileSelectionDialog(QDialog):
         label1b = other+rev1b
         label2 = fname+rev2
         if ctx1b:
-            label1a += '[local]'
-            label1b += '[other]'
-            label2 += '[merged]'
+            label1a += b'[local]'
+            label1b += b'[other]'
+            label2 += b'[merged]'
 
         # Function to quote file/dir names in the argument string
         replace = dict(parent=file1a, parent1=file1a, plabel1=label1a,

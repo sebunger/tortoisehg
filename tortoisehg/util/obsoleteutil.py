@@ -25,7 +25,13 @@ def first_known_predecessors_rev(repo, rev):
         return
 
     clog = repo.changelog
-    nm = clog.nodemap
+
+    try:
+        # Added in 5.3
+        get_rev = clog.index.get_rev
+    except AttributeError:
+        get_rev = clog.nodemap.get
+
     start = clog.node(rev)
     markers = predecessorsmarkers(obsstore, start)
     candidates = set(mark[0] for mark in markers)
@@ -36,7 +42,7 @@ def first_known_predecessors_rev(repo, rev):
         seen.add(start)
     while candidates:
         current = candidates.pop()
-        crev = nm.get(current)
+        crev = get_rev(current)
         if crev is not None:
             try:
                 repo[crev]  # filter out filtered revisions
@@ -56,7 +62,12 @@ def first_known_predecessors(ctx):
 def first_known_successors(ctx):
     obsstore = getattr(ctx._repo, 'obsstore', None)
     startnode = ctx.node()
-    nm = ctx._repo.changelog.nodemap
+    try:
+        # Added in 5.3
+        get_rev = ctx._repo.changelog.index.get_rev
+    except AttributeError:
+        get_rev = ctx._repo.changelog.nodemap.get
+
     if obsstore is not None:
         markers = successorsmarkers(obsstore, startnode)
         # consider all predecessors
@@ -71,7 +82,7 @@ def first_known_successors(ctx):
         while candidates:
             current = candidates.pop()
             # is this changeset in the displayed set ?
-            crev = nm.get(current)
+            crev = get_rev(current)
             if crev is not None:
                 try:
                     yield ctx._repo[crev]

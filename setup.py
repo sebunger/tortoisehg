@@ -12,6 +12,7 @@ import os
 import shutil
 import tempfile
 import re
+import subprocess
 import tarfile
 from fnmatch import fnmatch
 from distutils import log
@@ -374,7 +375,18 @@ class build_qrc(Command):
         qrc_file = os.path.join(basedir, '%s.qrc' % os.path.basename(basedir))
         try:
             self._generate_qrc(qrc_file, srcfiles, prefix)
-            spawn([self._findrcc(), qrc_file, '-o', py_file])
+            env = os.environ.copy()
+            if os.name == 'nt' and 'VIRTUAL_ENV' in env:
+                # pyrcc5.bat gets installed to the root of the virtualenv, not
+                # in the Scripts directory with the binaries on PATH.
+                env['PATH'] = '%s%s%s' % (
+                    env.get('PATH'), os.pathsep, env.get('VIRTUAL_ENV')
+                )
+            subprocess.check_call(
+                [self._findrcc(), qrc_file, '-o', py_file],
+                env=env,
+                shell=os.name == 'nt'
+            )
         finally:
             os.unlink(qrc_file)
 
@@ -555,7 +567,7 @@ def setup_windows(version):
                              if f.endswith('.ico') or f == 'README.txt']))
 
     # for PyQt, see http://www.py2exe.org/index.cgi/Py2exeAndPyQt
-    includes = ['sip']
+    includes = ['PyQt5.sip']
 
     # Qt4 plugins, see http://stackoverflow.com/questions/2206406/
     def qt4_plugins(subdir, *dlls):
@@ -644,24 +656,14 @@ def setup_osx(version):
     _packages = ['tortoisehg.hgqt', 'tortoisehg.util', 'tortoisehg', 'hgext3rd']
     _data_files = []
 
-    def qt4_plugins(subdir, *libs):
-        from PyQt4.QtCore import QLibraryInfo
-        pluginsdir = unicode(QLibraryInfo.location(QLibraryInfo.PluginsPath))
-
-        return ('qt_plugins/' + subdir,
-                [os.path.join(pluginsdir, subdir, e) for e in libs])
-
     def qt5_plugins(subdir, *dlls):
         import PyQt5
         pluginsdir = os.path.join(os.path.dirname(PyQt5.__file__), 'plugins')
         return subdir, [os.path.join(pluginsdir, subdir, e) for e in dlls]
 
     from tortoisehg.hgqt.qtcore import QT_API
-    if QT_API == 'PyQt4':
-        _data_files.append(qt4_plugins('imageformats', 'libqsvg.dylib'))
-    else:
-        _data_files.append(qt5_plugins('platforms', 'libqcocoa.dylib'))
-        _data_files.append(qt5_plugins('imageformats', 'libqsvg.dylib'))
+    _data_files.append(qt5_plugins('platforms', 'libqcocoa.dylib'))
+    _data_files.append(qt5_plugins('imageformats', 'libqsvg.dylib'))
 
     _py2app_options = {
         'arch': 'x86_64',

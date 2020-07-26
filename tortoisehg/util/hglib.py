@@ -17,6 +17,7 @@ import time
 
 from hgext import mq as mqmod
 from mercurial import (
+    cmdutil,
     dispatch as dispatchmod,
     encoding,
     error,
@@ -334,19 +335,11 @@ def getqqueues(repo):
 def readgraftstate(repo):
     # type: (...) -> Optional[List[bytes]]
     """Read a list of nodes from graftstate; or None if nothing in progress"""
-    graftstatefile = repo.vfs.join(b'graftstate')
-    if not os.path.exists(graftstatefile):
-        return
-    with open(graftstatefile, 'rb') as f:
-        info = f.readlines()
-    if info and info[0] == b'1\n':
-        # doesn't look like a list of nodes
-        return statemod.cmdstate(repo, b'graftstate').read()[b'nodes']
-    if len(info):
-        revlist = [rev.strip() for rev in info]
-        revlist = [rev for rev in revlist if rev != b'']
-        if revlist:
-            return revlist
+    graftstate = statemod.cmdstate(repo, b'graftstate')
+    if graftstate.exists():
+        return cmdutil.readgraftstate(repo, graftstate)[b'nodes']
+
+    return None
 
 readmergestate = mergemod.mergestate.read
 
@@ -519,12 +512,12 @@ def difftools(ui):
         return diffopts, mergeopts
 
     tools = {}
-    for cmd, path in ui.configitems('extdiff'):
+    for cmd, path in ui.configitems(b'extdiff'):
         if cmd.startswith(b'cmd.'):
             cmd = cmd[4:]
             if not path:
                 path = cmd
-            diffopts = ui.config('extdiff', b'opts.' + cmd)
+            diffopts = ui.config(b'extdiff', b'opts.' + cmd)
             diffopts = pycompat.shlexsplit(diffopts)
             diffopts, mergeopts = fixup_extdiff(diffopts)
             tools[cmd] = [path, diffopts, mergeopts]
@@ -714,14 +707,14 @@ def copydynamicconfig(srcui, destui):
     """Copy config values that come from command line or code
 
     >>> srcui = uimod.ui()
-    >>> srcui.setconfig('paths', 'default', 'http://example.org/',
-    ...                 '/repo/.hg/hgrc:2')
-    >>> srcui.setconfig('patch', 'eol', 'auto', 'eol')
+    >>> srcui.setconfig(b'paths', b'default', b'http://example.org/',
+    ...                 b'/repo/.hg/hgrc:2')
+    >>> srcui.setconfig(b'patch', b'eol', b'auto', b'eol')
     >>> destui = uimod.ui()
     >>> copydynamicconfig(srcui, destui)
-    >>> destui.config('paths', 'default') is None
+    >>> destui.config(b'paths', b'default') is None
     True
-    >>> destui.config('patch', 'eol'), destui.configsource('patch', 'eol')
+    >>> destui.config(b'patch', b'eol'), destui.configsource(b'patch', b'eol')
     ('auto', 'eol')
     """
     for section, name, value in srcui.walkconfig():
@@ -731,7 +724,7 @@ def copydynamicconfig(srcui, destui):
             continue
         if source == b'none':
             # ui.configsource returns 'none' by default
-            source = ''
+            source = b''
         destui.setconfig(section, name, value, source)
 
 def shortreponame(ui):

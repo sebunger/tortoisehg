@@ -7,8 +7,6 @@
 
 from __future__ import absolute_import
 
-import json
-
 from mercurial import (
     pycompat,
 )
@@ -82,6 +80,8 @@ class PhabReviewDialog(QDialog):
         self._repoagent = repoagent
         self._cmdsession = cmdcore.nullCmdSession()
         self._rescansession = cmdcore.nullCmdSession()
+        self._namesession = cmdcore.nullCmdSession()
+        self._my_username = None
 
         self._qui = Ui_PhabReviewDialog()
         self._qui.setupUi(self)
@@ -363,7 +363,7 @@ class PhabReviewDialog(QDialog):
     @pyqtSlot()
     def _updatepreview(self):
         preview = self._qui.preview_edit
-        exported = hglib.tounicode(str(self._cmdsession.readAll()))
+        exported = hglib.tounicode(bytes(self._cmdsession.readAll()))
 
         callsign = self._ui.config(b'phabricator', b'callsign')
         if not callsign:
@@ -432,7 +432,9 @@ class PhabReviewDialog(QDialog):
             username = fields.get('username')
             roles = fields.get('roles', [])
 
-            if not realname or not username:
+            # An error is raised when a user self assigns a review, so skip the
+            # current user.
+            if not realname or not username or username == self._my_username:
                 continue
 
             u = user(username, realname, roles)
@@ -484,7 +486,36 @@ class PhabReviewDialog(QDialog):
         availablereviewers.clear()
         self._qui.rescan_button.setEnabled(False)
 
+        # On the first click, fetch the current user's name for the purpose of
+        # excluding them from the list.  If the username is known, trust it.
+        if self._my_username is None:
+            self._get_my_username()
+
         self._queryreviewers(None)
+
+    def _get_my_username(self):
+        """Spawns the phabricator command to return the current user's info."""
+        buf = QBuffer()
+
+        buf.setData(b'{}')
+        buf.open(QIODevice.ReadOnly)
+
+        cmdline = hglib.buildcmdargs("debugcallconduit", "user.whoami")
+        self._namesession = sess = self._repoagent.runCommand(cmdline)
+        sess.setCaptureOutput(True)
+        sess.setInputDevice(buf)
+        sess.commandFinished.connect(self._update_self_username)
+
+    @pyqtSlot()
+    def _update_self_username(self):
+        """Handles the completion of the current user info fetch."""
+        exitcode = self._namesession.exitCode()
+
+        if exitcode == 0:
+            output = bytes(self._namesession.readAll())
+            results = pycompat.json_loads(output)
+
+            self._my_username = results.get("userName")
 
     @pyqtSlot()
     def _updateavailablereviewers(self):
@@ -492,9 +523,9 @@ class PhabReviewDialog(QDialog):
         exitcode = self._rescansession.exitCode()
 
         if exitcode == 0:
-            output = hglib.tounicode(str(self._rescansession.readAll()))
+            output = bytes(self._rescansession.readAll())
 
-            results = json.loads(output)
+            results = pycompat.json_loads(output)
             self._appendavailablereviewers(results)
 
             # The default behavior is to batch 100 users at a time, and requires

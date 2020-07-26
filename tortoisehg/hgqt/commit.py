@@ -152,7 +152,7 @@ def _getUserOptions(opts, *optionlist):
 
 def _mqNewRefreshCommand(repo, isnew, stwidget, pnwidget, message, opts, olist):
     if isnew:
-        name = hglib.fromunicode(pnwidget.text())
+        name = pnwidget.text()
         if not name:
             qtlib.ErrorMsgBox(_('Patch Name Required'),
                               _('You must enter a patch name'))
@@ -162,7 +162,7 @@ def _mqNewRefreshCommand(repo, isnew, stwidget, pnwidget, message, opts, olist):
     else:
         cmdline = ['qrefresh']
     if message:
-        cmdline += ['--message=' + hglib.fromunicode(message)]
+        cmdline += ['--message=' + hglib.tounicode(message)]
     cmdline += _getUserOptions(opts, *olist)
     files = ['--'] + [repo.wjoin(x) for x in stwidget.getChecked()]
     addrem = [repo.wjoin(x) for x in stwidget.getChecked('!?')]
@@ -964,7 +964,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                    'issue.linkmandatory')
         if linkmandatory:
             issueregex = None
-            s = self.repo.ui.config('tortoisehg', 'issue.regex')
+            s = self.repo.ui.config(b'tortoisehg', b'issue.regex')
             if s:
                 try:
                     issueregex = re.compile(s)
@@ -1007,6 +1007,7 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                 if c.excludecount > 0 and c.excludecount < len(c.hunks):
                     partials.append(fname)
             self.files = set(files + partials)
+            self.files.update(self.stwidget.getCheckedAmends())
         canemptycommit = bool(brcmd or newbranch or amend)
         if not (self.files or canemptycommit or merge):
             qtlib.WarningMsgBox(_('No files checked'),
@@ -1327,7 +1328,7 @@ class DetailsDialog(QDialog):
         return self._repoagent.rawRepo()
 
     def saveInRepo(self):
-        fn = os.path.join(self.repo.root, '.hg', 'hgrc')
+        fn = os.path.join(self.repo.root, b'.hg', b'hgrc')
         self.saveToPath([fn])
 
     def saveGlobal(self):
@@ -1344,10 +1345,10 @@ class DetailsDialog(QDialog):
         try:
             user = hglib.fromunicode(self.usercombo.currentText())
             if user:
-                cfg.set('ui', 'username', user)
+                cfg.set(b'ui', b'username', user)
             else:
                 try:
-                    del cfg['ui']['username']
+                    del cfg[b'ui'][b'username']
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
@@ -1356,7 +1357,7 @@ class DetailsDialog(QDialog):
                                 hglib.tounicode(str(e)), parent=self)
 
     def savePushAfter(self):
-        path = os.path.join(self.repo.root, '.hg', 'hgrc')
+        path = os.path.join(self.repo.root, b'.hg', b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save after commit push'),
@@ -1367,10 +1368,10 @@ class DetailsDialog(QDialog):
         try:
             remote = hglib.fromunicode(self.pushafterle.text())
             if remote:
-                cfg.set('tortoisehg', 'cipushafter', remote)
+                cfg.set(b'tortoisehg', b'cipushafter', remote)
             else:
                 try:
-                    del cfg['tortoisehg']['cipushafter']
+                    del cfg[b'tortoisehg'][b'cipushafter']
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
@@ -1379,7 +1380,7 @@ class DetailsDialog(QDialog):
                                 hglib.tounicode(str(e)), parent=self)
 
     def saveAutoInc(self):
-        path = os.path.join(self.repo.root, '.hg', 'hgrc')
+        path = os.path.join(self.repo.root, b'.hg', b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save auto include list'),
@@ -1390,10 +1391,10 @@ class DetailsDialog(QDialog):
         try:
             list = hglib.fromunicode(self.autoincle.text())
             if list:
-                cfg.set('tortoisehg', 'autoinc', list)
+                cfg.set(b'tortoisehg', b'autoinc', list)
             else:
                 try:
-                    del cfg['tortoisehg']['autoinc']
+                    del cfg[b'tortoisehg'][b'autoinc']
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
@@ -1402,7 +1403,7 @@ class DetailsDialog(QDialog):
                                 hglib.tounicode(str(e)), parent=self)
 
     def saveRecurseInSubrepos(self):
-        path = os.path.join(self.repo.root, '.hg', 'hgrc')
+        path = os.path.join(self.repo.root, b'.hg', b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([path], self)
         if not hasattr(cfg, 'write'):
             qtlib.WarningMsgBox(_('Unable to save recurse in subrepos.'),
@@ -1413,10 +1414,10 @@ class DetailsDialog(QDialog):
         try:
             state = self.recursecb.isChecked()
             if state:
-                cfg.set('tortoisehg', 'recurseinsubrepos', state)
+                cfg.set(b'tortoisehg', b'recurseinsubrepos', b'True')
             else:
                 try:
-                    del cfg['tortoisehg']['recurseinsubrepos']
+                    del cfg[b'tortoisehg'][b'recurseinsubrepos']
                 except KeyError:
                     pass
             wconfig.writefile(cfg, fn)
@@ -1564,7 +1565,7 @@ class CommitDialog(QDialog):
 
     def postcommit(self):
         repo = self.commit.stwidget.repo
-        if repo.ui.configbool('tortoisehg', 'closeci'):
+        if repo.ui.configbool(b'tortoisehg', b'closeci'):
             if self.commit.canExit():
                 self.reject()
             else:

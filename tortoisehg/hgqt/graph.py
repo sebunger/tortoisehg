@@ -983,14 +983,26 @@ class Graph(object):
     def isfilled(self):
         return self.grapher is None
 
+    def _bottom_rev(self):
+        """Returns the known lowest revision number
+
+        If nodes == {} or {wctx}, the lowest revision is not yet known, so
+        returns None.
+        """
+        if not self.nodes:
+            return None
+        return self.nodes[-1].rev
+
     def index(self, rev):
-        if len(self) == 0:
+        brev = self._bottom_rev()
+        if brev is None:
             # graph is empty, let's build some nodes.  nodes for unapplied
             # patches are built at once because they don't have comparable
             # revision numbers, which makes build_nodes() go wrong.
             self.build_nodes(10, len(self.repo) - 1)
-        if isinstance(rev, int) and len(self) > 0 and rev < self.nodes[-1].rev:
-            self.build_nodes(self.nodes[-1].rev - rev)
+            brev = self._bottom_rev()
+        if isinstance(rev, int) and brev is not None and rev < brev:
+            self.build_nodes(brev - rev)
         try:
             return self.nodes.index(self.nodesdict[rev])
         except KeyError:

@@ -33,6 +33,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
+from hgext.largefiles import (
+    lfutil,
+)
+
 from mercurial import (
     commands,
     error,
@@ -93,8 +97,8 @@ class HgignoreDialog(QDialog):
         hbox = QHBoxLayout()
         vbox.addLayout(hbox)
         ignorefiles = [repo.wjoin(b'.hgignore')]
-        for name, value in repo.ui.configitems('ui'):
-            if name == 'ignore' or name.startswith('ignore.'):
+        for name, value in repo.ui.configitems(b'ui'):
+            if name == b'ignore' or name.startswith(b'ignore.'):
                 ignorefiles.append(util.expandpath(value))
 
         filecombo = QComboBox()
@@ -200,6 +204,7 @@ class HgignoreDialog(QDialog):
                 dirname = os.path.dirname(dirname)
             base, ext = os.path.splitext(local)
             if ext:
+                ext = hglib.tounicode(ext)
                 filters.append(['*'+ext])
                 filters.append(['**'+ext])
         else:
@@ -217,11 +222,11 @@ class HgignoreDialog(QDialog):
     def insertFilters(self, pats=False, isregexp=False):
         if pats is False:
             pats = self.sender()._patterns
-        h = isregexp and 'syntax: regexp' or 'syntax: glob'
+        h = isregexp and b'syntax: regexp' or b'syntax: glob'
         if h in self.ignorelines:
             l = self.ignorelines.index(h)
             for i, line in enumerate(self.ignorelines[l+1:]):
-                if line.startswith('syntax:'):
+                if line.startswith(b'syntax:'):
                     for pat in pats:
                         self.ignorelines.insert(l+i+1, pat)
                     break
@@ -244,7 +249,8 @@ class HgignoreDialog(QDialog):
         self.refresh()
 
     def editClicked(self):
-        if qscilib.fileEditor(self.ignorefile) == QDialog.Accepted:
+        ignfile = hglib.tounicode(self.ignorefile)
+        if qscilib.fileEditor(ignfile) == QDialog.Accepted:
             self.refresh()
 
     def addEntry(self):
@@ -289,9 +295,8 @@ class HgignoreDialog(QDialog):
 
         try:
             self.repo.thginvalidate()
-            self.repo.lfstatus = True
-            self.lclunknowns = self.repo.status(unknown=True).unknown
-            self.repo.lfstatus = False
+            with lfutil.lfstatus(self.repo):
+                self.lclunknowns = self.repo.status(unknown=True).unknown
         except (EnvironmentError, error.RepoError) as e:
             qtlib.WarningMsgBox(_('Unable to read repository status'),
                                 uni(str(e)), parent=self)
@@ -318,11 +323,11 @@ class HgignoreDialog(QDialog):
                 item = self.unknownlist.item(i)
                 item.setSelected(True)
                 self.unknownlist.setCurrentItem(item)
-                self.le.setText(u)
+                self.le.setText(hglib.tounicode(u))
         self.pats = []
 
     def writeIgnoreFile(self):
-        eol = self.doseoln and '\r\n' or '\n'
+        eol = self.doseoln and b'\r\n' or b'\n'
         out = eol.join(self.ignorelines) + eol
         hasignore = os.path.exists(self.repo.vfs.join(self.ignorefile))
 

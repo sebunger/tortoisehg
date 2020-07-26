@@ -48,7 +48,8 @@ def data_func(widget, item, ctx):
         if hglib.isbasestring(ctx):
             return ctx
         desc = ctx.description()
-        return (str(ctx.rev()), str(ctx), summary_line(desc), hl,
+        rev = str(ctx.rev()) if isinstance(ctx.rev(), int) else hglib.tounicode(ctx.rev())
+        return (rev, str(ctx), summary_line(desc), hl,
                 hglib.tounicode(branch))
     def format_ctxlist(ctxlist):
         if not ctxlist:
@@ -86,7 +87,7 @@ def data_func(widget, item, ctx):
         if not ts:
             return None
         try:
-            tctx = scmutil.revsymbol(ctx.repo(), ts)
+            tctx = scmutil.revsymbol(ctx.repo(), hglib.fromunicode(ts))
             return revline_data(tctx)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             return ts
@@ -98,7 +99,7 @@ def data_func(widget, item, ctx):
     elif item == 'isclose':
         if ctx.rev() is None:
             ctx = ctx.p1()
-        return ctx.extra().get('close') is not None
+        return ctx.extra().get(b'close') is not None
     elif item == 'predecessors':
         ctxlist = obsoleteutil.first_known_predecessors(ctx)
         return format_ctxlist(ctxlist)

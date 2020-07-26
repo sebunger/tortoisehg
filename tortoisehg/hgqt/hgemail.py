@@ -353,7 +353,7 @@ class EmailDialog(QDialog):
 
     @pyqtSlot()
     def _updatepreview(self):
-        msg = hglib.tounicode(str(self._cmdsession.readAll()))
+        msg = hglib.tounicode(bytes(self._cmdsession.readAll()))
         self._qui.preview_edit.append(msg)
 
     def _previewtabindex(self):

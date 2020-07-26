@@ -198,22 +198,22 @@ class SummaryInfo(object):
                     return value
                 return None
             elif item == 'close':
-                return ctx.extra().get('close')
+                return hglib.tounicode(ctx.extra().get(b'close'))
             elif item == 'tags':
                 return [hglib.tounicode(tag) for tag in ctx.thgtags()] or None
             elif item == 'graft':
                 extra = ctx.extra()
                 try:
-                    return extra['source']
+                    return hglib.tounicode(extra[b'source'])
                 except KeyError:
                     pass
                 return None
             elif item == 'transplant':
                 extra = ctx.extra()
                 try:
-                    ts = extra['transplant_source']
+                    ts = extra[b'transplant_source']
                     if ts:
-                        return binascii.hexlify(ts)
+                        return hglib.tounicode(binascii.hexlify(ts))
                 except KeyError:
                     pass
                 return None
@@ -223,29 +223,29 @@ class SummaryInfo(object):
                     obsoletestate.append('obsolete')
                 if ctx.extinct():
                     obsoletestate.append('extinct')
-                obsoletestate += ctx.instabilities()
+                obsoletestate += map(hglib.tounicode, ctx.instabilities())
                 if obsoletestate:
                     return obsoletestate
                 return None
             elif item == 'p4':
                 extra = ctx.extra()
-                p4cl = extra.get('p4', None)
-                return p4cl and ('changelist %s' % p4cl)
+                p4cl = extra.get(b'p4', None)
+                return p4cl and hglib.tounicode(b'changelist %s' % p4cl)
             elif item == 'svn':
                 extra = ctx.extra()
-                cvt = extra.get('convert_revision', '')
-                if cvt.startswith('svn:'):
-                    result = cvt.split('/', 1)[-1]
+                cvt = extra.get(b'convert_revision', b'')
+                if cvt.startswith(b'svn:'):
+                    result = cvt.split(b'/', 1)[-1]
                     if cvt != result:
-                        return result
-                    return cvt.split('@')[-1]
+                        return hglib.tounicode(result)
+                    return hglib.tounicode(cvt.split(b'@')[-1])
                 else:
                     return None
             elif item == 'converted':
                 extra = ctx.extra()
-                cvt = extra.get('convert_revision', '')
-                if cvt and not cvt.startswith('svn:'):
-                    return cvt
+                cvt = extra.get(b'convert_revision', b'')
+                if cvt and not cvt.startswith(b'svn:'):
+                    return hglib.tounicode(cvt)
                 else:
                     return None
             elif item == 'ishead':
@@ -260,7 +260,7 @@ class SummaryInfo(object):
                     return None
                 if target not in ctx._repo:
                     return None
-                return target
+                return hglib.tounicode(target)
             raise UnknownItem(item)
         if 'data' in custom and not kargs.get('usepreset', False):
             try:
@@ -372,7 +372,7 @@ class SummaryBase(object):
         self.custom = custom
         self.repo = repo
         self.info = info
-        self.ctx = repo[self.target]
+        self.update_ctx()
 
     def get_data(self, item, **kargs):
         return self.info.get_data(item, self, self.ctx, self.custom, **kargs)
@@ -400,7 +400,14 @@ class SummaryBase(object):
         if repo is not None:
             self.repo = repo
         if self.ctx is None:
-            self.ctx = repo[self.target]
+            self.update_ctx()
+
+    def update_ctx(self):
+        if isinstance(self.target, pycompat.unicode):
+            target = hglib.fromunicode(self.target)
+        else:
+            target = self.target
+        self.ctx = self.repo[target]
 
 PANEL_TMPL = '<tr><td style="padding-right:6px">%s</td><td>%s</td></tr>'
 

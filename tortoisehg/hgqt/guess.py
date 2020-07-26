@@ -38,6 +38,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
+from hgext.largefiles import (
+    lfutil,
+)
+
 from mercurial import (
     hg,
     patch,
@@ -203,10 +207,9 @@ class DetectRenameDialog(QDialog):
 
     def refresh(self):
         self.repo.thginvalidate()
-        self.repo.lfstatus = True
-        wctx = self.repo[None]
-        ws = wctx.status(listunknown=True)
-        self.repo.lfstatus = False
+        with lfutil.lfstatus(self.repo):
+            wctx = self.repo[None]
+            ws = wctx.status(listunknown=True)
         self.unrevlist.clear()
         dests = []
         for u in ws.unknown:
@@ -327,7 +330,7 @@ class DetectRenameDialog(QDialog):
         if not difftext:
             t = _('%s and %s have identical contents\n\n') % \
                     (hglib.tounicode(src), hglib.tounicode(dest))
-            hu.write(t, label=b'ui.error')
+            hu.write(hglib.fromunicode(t), label=b'ui.error')
         else:
             for t, l in patch.difflabel(difftext.splitlines, True):
                 hu.write(t, label=l)

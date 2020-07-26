@@ -116,7 +116,7 @@ class _LexerCPP(Qsci.QsciLexerCPP):
         super(_LexerCPP, self).refreshProperties()
         # disable grey-out of inactive block, which is hard to read.
         # as of QScintilla 2.7.2, this property isn't mapped to wrapper.
-        self.propertyChanged.emit('lexer.cpp.track.preprocessor', '0')
+        self.propertyChanged.emit(b'lexer.cpp.track.preprocessor', b'0')
 
 class CppLexerSelector(_FilenameLexerSelector):
     extensions = ('.c', '.cpp', '.cc', '.cxx', '.cl', '.cu',

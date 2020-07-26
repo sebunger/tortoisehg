@@ -339,9 +339,9 @@ class ChunksWidget(QWidget):
     def mergeChunks(self, wfile, chunks):
         def isAorR(header):
             for line in header:
-                if line.startswith('--- /dev/null'):
+                if line.startswith(b'--- /dev/null'):
                     return True
-                if line.startswith('+++ /dev/null'):
+                if line.startswith(b'+++ /dev/null'):
                     return True
             return False
         repo = self.repo
@@ -379,8 +379,8 @@ class ChunksWidget(QWidget):
             fp = util.atomictempfile(ctx._path, b'wb')
             try:
                 if ctx._ph.comments:
-                    fp.write('\n'.join(ctx._ph.comments))
-                    fp.write('\n\n')
+                    fp.write(b'\n'.join(ctx._ph.comments))
+                    fp.write(b'\n\n')
                 for file in ctx._fileorder:
                     for chunk in ctx._files[file]:
                         chunk.write(fp)
@@ -414,8 +414,8 @@ class ChunksWidget(QWidget):
             fp = util.atomictempfile(ctx._path, b'wb')
             try:
                 if ctx._ph.comments:
-                    fp.write('\n'.join(ctx._ph.comments))
-                    fp.write('\n\n')
+                    fp.write(b'\n'.join(ctx._ph.comments))
+                    fp.write(b'\n\n')
                 for file in ctx._fileorder:
                     if file == wfile:
                         continue
@@ -468,7 +468,8 @@ class ChunksWidget(QWidget):
     def displayFile(self, file, status):
         if isinstance(file, pycompat.unicode):
             file = hglib.fromunicode(file)
-            status = hglib.fromunicode(status)
+        if not isinstance(file, pycompat.unicode):
+            status = hglib.tounicode(status)
         if file:
             self.currentFile = file
             path = self.repo.wjoin(file)

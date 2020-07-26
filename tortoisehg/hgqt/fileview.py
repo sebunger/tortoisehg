@@ -1049,7 +1049,7 @@ class _AnnotateViewControl(_AbstractViewControl):
         def getauthor(fctx):
             return hglib.tounicode(hglib.username(fctx.user()))
         def getdate(fctx):
-            return dateutil.shortdate(fctx.date())
+            return hglib.tounicode(dateutil.shortdate(fctx.date()))
         if self._fd.rev() is None:
             p1rev = self._fd.parentRevs()[0]
             revfmt = '%%%dd%%c' % len(str(p1rev))
