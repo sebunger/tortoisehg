@@ -73,6 +73,61 @@ Copyright: 2009, Steve Borho <steve@borho.org>
            Tango Desktop Project
 License: GPL-2
 
+Files: icons/svg/*
+Copyright: 2007—2009 Peer Sommerlund
+License: GPL-2
+Comment:
+ Some icons were originally licensed as CC-PDDC or public-domain,
+ but the license statement in icons/README.txt overrides that.
+
+Files:
+ icons/scalable/actions/hg-qdelete.svg
+ icons/scalable/actions/hg-qfold.svg
+ icons/scalable/actions/hg-qgoto.svg
+ icons/scalable/actions/hg-qpop-all.svg
+ icons/scalable/actions/hg-qpush-all.svg
+ icons/scalable/actions/hg-qpush-move.svg
+ icons/scalable/actions/thg-mq.svg
+ icons/scalable/actions/thg-qreorder.svg
+Copyright: 2011 Peer Sommerlund, Patrice LACOUTURE, Richard Marti
+License: CC-BY-SA-3.0 or GPL-2
+
+Files:
+ icons/scalable/actions/edit-file.svg
+ icons/scalable/actions/hg-annotate.svg
+ icons/scalable/actions/hg-bundle.svg
+ icons/scalable/actions/hg-incoming.svg
+ icons/scalable/actions/hg-outgoing.svg
+ icons/scalable/actions/hg-pull.svg
+ icons/scalable/actions/hg-pull-to-here.svg
+ icons/scalable/actions/hg-push.svg
+ icons/scalable/actions/hg-qpop.svg
+ icons/scalable/actions/hg-qpush.svg
+ icons/scalable/actions/hg-unbundle.svg
+ icons/scalable/actions/settings_projrc.svg
+Copyright: 2011 Peer Sommerlund
+License: CC-BY-SA-3.0 or GPL-2
+
+Files:
+ scalable/apps/help-readme.svg
+ scalable/apps/tools-hooks.svg
+ scalable/apps/tools-spanner-hammer.svg
+ scalable/status/hg-sharedrepo.svg
+ scalable/actions/view-filter.svg
+ scalable/actions/go-previous.svg
+ scalable/actions/go-home.svg
+ scalable/actions/go-next.svg
+ scalable/actions/go-down.svg
+ scalable/actions/go-up.svg
+Copyright: Jakub Steiner, Tango Desktop Project
+License: CC-BY-SA-2.0 or public-domain or GPL-2
+Comment:
+ These icons are derived from Tango icons, which were originally
+ licensed under CC-BY-SA-2.0, but have been later relicensed as
+ public domain. They are identical to the current versions of the
+ corresponding icons in the public domain Tango except for minor
+ changes e.g. in colours.
+
 Files: icons/16x16/apps/reviewboard.png
 Copyright: Review Board project
 License: MIT
