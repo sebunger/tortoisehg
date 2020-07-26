@@ -250,7 +250,8 @@ class ExceptionCatcher(QObject):
             try:
                 os.read(rfd, 1)
             except OSError as inst:
-                self._ui.debug('failed to read wakeup fd: %s\n' % inst)
+                self._ui.debug(b'failed to read wakeup fd: %s\n'
+                               % stringutil.forcebytestr(inst))
             self._wakeupsn.setEnabled(True)
 
     else:
@@ -492,7 +493,7 @@ class QtRunner(QObject):
             self._server.close()
         if self._tryQuit():
             return
-        self._ui.debug('repositories are closing asynchronously\n')
+        self._ui.debug(b'repositories are closing asynchronously\n')
         self._repomanager.repositoryClosed.connect(self._tryQuit)
         QTimer.singleShot(5000, self._mainapp.quit)  # in case of bug
 

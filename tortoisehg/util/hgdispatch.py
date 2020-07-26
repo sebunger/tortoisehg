@@ -6,7 +6,7 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
-from mercurial import error, extensions, subrepo, util
+from mercurial import encoding, error, extensions, subrepo, util
 from mercurial import dispatch as dispatchmod
 
 from tortoisehg.util import hgversion
@@ -34,25 +34,25 @@ def _dispatch(orig, req):
     except error.RepoError as e:
         ui.write_err(bytes(e) + b'\n', label=b'ui.error')
     except util.urlerr.httperror as e:
-        err = _('HTTP Error: %d (%s)') % (e.code, e.msg)
-        ui.write_err(err + '\n', label=b'ui.error')
+        err = _('HTTP Error: %d (%s)') % (e.code, encoding.strtolocal(e.msg))
+        ui.write_err(err + b'\n', label=b'ui.error')
     except util.urlerr.urlerror as e:
-        err = _('URLError: %s') % str(e.reason)
+        err = _('URLError: %s') % encoding.strtolocal(str(e.reason))
         try:
             import ssl  # Python 2.6 or backport for 2.5
             if isinstance(e.args[0], ssl.SSLError):
-                parts = e.args[0].strerror.split(':')
+                parts = encoding.strtolocal(e.args[0].strerror).split(b':')
                 if len(parts) == 7:
                     file, line, level, _errno, lib, func, reason = parts
-                    if func == 'SSL3_GET_SERVER_CERTIFICATE':
+                    if func == b'SSL3_GET_SERVER_CERTIFICATE':
                         err = _('SSL: Server certificate verify failed')
-                    elif _errno == '00000000':
+                    elif _errno == b'00000000':
                         err = _('SSL: unknown error %s:%s') % (file, line)
                     else:
                         err = _('SSL error: %s') % reason
         except ImportError:
             pass
-        ui.write_err(err + '\n', label=b'ui.error')
+        ui.write_err(err + b'\n', label=b'ui.error')
 
     return -1
 

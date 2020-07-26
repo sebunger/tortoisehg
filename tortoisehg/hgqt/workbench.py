@@ -1039,11 +1039,11 @@ class Workbench(QMainWindow):
             readme = None
             if repo:
                 # Try to get the README configured for the repo of the current tab
-                readmeglobal = self.ui.config('tortoisehg', 'readme')
+                readmeglobal = self.ui.config(b'tortoisehg', b'readme')
                 if readmeglobal:
                     # Note that repo.ui.config() falls back to the self.ui.config()
                     # if the key is not set on the current repo's configuration file
-                    readme = repo.ui.config('tortoisehg', 'readme')
+                    readme = repo.ui.config(b'tortoisehg', b'readme')
                     if readmeglobal != readme:
                         # The readme is set on the current repo configuration file
                         return readme

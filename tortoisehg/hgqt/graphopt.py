@@ -407,7 +407,7 @@ class Graph(object):
                     if r == -1:
                         self._grapher = None
                         break
-                    if r < rev and r is not None:
+                    if r is not None and r < rev:
                         break
 
         if fillstep is not None:

@@ -95,7 +95,7 @@ class RepoTreeView(QTreeView):
 
         d = event.mimeData()
         for u in d.urls():
-            root = paths.find_root(hglib.fromunicode(u.toLocalFile()))
+            root = paths.find_root(u.toLocalFile())
             if root:
                 event.setDropAction(Qt.LinkAction)
                 event.accept()

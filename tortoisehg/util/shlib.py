@@ -10,6 +10,11 @@ import os
 import sys
 import time
 import threading
+
+from hgext.largefiles import (
+    lfutil,
+)
+
 from mercurial import (
     hg,
     pycompat,
@@ -97,9 +102,8 @@ if os.name == 'nt':
                 time.sleep(tdelta)
 
         repo = hg.repository(ui, root) # a fresh repo object is needed
-        repo.lfstatus = True
-        repostate = repo.status() # will update .hg/dirstate as a side effect
-        repo.lfstatus = False
+        with lfutil.lfstatus(repo):
+            repostate = repo.status() # will update dirstate as a side effect
 
         dirstatus = {}
         def dirname(f):

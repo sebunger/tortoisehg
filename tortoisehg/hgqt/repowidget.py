@@ -62,6 +62,7 @@ from . import (
     backout,
     bisect,
     bookmark,
+    close_branch,
     cmdcore,
     cmdui,
     compress,
@@ -71,6 +72,7 @@ from . import (
     matching,
     merge,
     mq,
+    pick,
     phabreview,
     postreview,
     prune,
@@ -697,7 +699,7 @@ class RepoWidget(QWidget):
             try:
                 pf = open(p, 'rb')
                 earlybytes = pf.read(4096)
-                if '\0' in earlybytes:
+                if b'\0' in earlybytes:
                     continue
                 pf.seek(0)
                 with hglib.extractpatch(self.repo.ui, pf) as data:
@@ -1216,6 +1218,7 @@ class RepoWidget(QWidget):
 
         entry = self._createMenuEntry
         enablefuncs = _ENABLE_MENU_FUNCS
+        exs = self.repo.extensions()
 
         menu = QMenu(self)
         if mode == 'outgoing':
@@ -1249,6 +1252,9 @@ class RepoWidget(QWidget):
         entry(items, menu)
         entry(items, menu, None, enablefuncs['fixed'],
               _('&Merge with Local...'), 'hg-merge', self.mergeWithRevision)
+        if b'closehead' in exs:
+            entry(items, menu, None, enablefuncs['isrev'],
+                  _('&Close Branch'), 'hg-close-head', self.closeRevision)
         entry(items, menu)
         entry(items, menu, None, enablefuncs['fixed'], _('&Tag...'), 'hg-tag',
               self.tagToRevision)
@@ -1293,9 +1299,6 @@ class RepoWidget(QWidget):
 
         entry(items, menu, None, enablefuncs['isrev'], _('&Graft to Local...'),
               'hg-transplant', self.graftRevisions)
-
-        exs = self.repo.extensions()
-
         if (b'mq' in exs or b'rebase' in exs or b'strip' in exs
             or b'evolve' in exs):
             submenu = menu.addMenu(_('Modi&fy History'))
@@ -1313,6 +1316,9 @@ class RepoWidget(QWidget):
                       _('MQ &Options'), None,
                       self._mqActions.launchOptionsDialog)
                 entry(items, submenu, 'mq')
+
+            entry(items, submenu, 'evolve', enablefuncs['isrev'],
+                  _('Pick...'), None, self._pickRevision)
             entry(items, submenu, 'rebase', enablefuncs['isrev'],
                   _('&Rebase...'), 'hg-rebase', self.rebaseRevision)
             entry(items, submenu, 'rebase')
@@ -1355,15 +1361,15 @@ class RepoWidget(QWidget):
             else:
                 A, B = self.menuselection
             # simply disable lazy evaluation as we won't handle slow query
-            return list(self.repo.revs(b'%s::%s' % (A, B)))
+            return list(self.repo.revs(b'%d::%d', A, B))
 
         def exportPair():
             self.exportRevisions(self.menuselection)
         def exportDiff():
             root = self.repo.root
-            filename = '%s_%d_to_%d.diff' % (os.path.basename(root),
-                                             self.menuselection[0],
-                                             self.menuselection[1])
+            filename = b'%s_%d_to_%d.diff' % (os.path.basename(root),
+                                              self.menuselection[0],
+                                              self.menuselection[1])
             file, _filter = QFileDialog.getSaveFileName(
                 self, _('Write diff file'),
                 hglib.tounicode(os.path.join(root, filename)))
@@ -1843,6 +1849,11 @@ class RepoWidget(QWidget):
         dlg = tag.TagDialog(self._repoagent, rev=str(self.rev), parent=self)
         dlg.exec_()
 
+    def closeRevision(self):
+        dlg = close_branch.createCloseBranchDialog(self._repoagent, self.rev,
+                                                   parent=self)
+        dlg.exec_()
+
     def bookmarkRevision(self):
         dlg = bookmark.BookmarkDialog(self._repoagent, self.rev, self)
         dlg.exec_()
@@ -1981,7 +1992,7 @@ class RepoWidget(QWidget):
             output = sess.readAll()
             mdata = QMimeData()
             mdata.setData('text/x-diff', output)  # for lossless import
-            mdata.setText(hglib.tounicode(str(output)))
+            mdata.setText(hglib.tounicode(bytes(output)))
             QApplication.clipboard().setMimeData(mdata)
 
     def copyHash(self):
@@ -2043,6 +2054,12 @@ class RepoWidget(QWidget):
         phasenum = action.data()
         self.changePhase(phasenum)
 
+    def _pickRevision(self):
+        """Pick selected revision on top of working directory parent"""
+        opts = {'rev': self.rev}
+        dlg = pick.PickDialog(self._repoagent, self, **opts)
+        dlg.exec_()
+
     def rebaseRevision(self):
         """Rebase selected revision on top of working directory parent"""
         opts = {'source' : self.rev, 'dest': self.repo[b'.'].rev()}
@@ -2059,7 +2076,7 @@ class RepoWidget(QWidget):
         # Check whether there are existing patches in the MQ queue whose name
         # collides with the revisions that are going to be imported
         revList = self.repo.revs(b'%s::%s and not hidden()' %
-                                 (self.rev, endrev))
+                                 (hglib.fromunicode(str(self.rev)), endrev))
 
         if endrev and not revList:
             # There is a qparent but the revision list is empty
@@ -2071,7 +2088,7 @@ class RepoWidget(QWidget):
                 % (self.rev, scmutil.revsymbol(self.repo, b'qparent').rev()))
             return
 
-        patchdir = self.repo.vfs.join(b'patches')
+        patchdir = hglib.tounicode(self.repo.vfs.join(b'patches'))
         def patchExists(p):
             return os.path.exists(os.path.join(patchdir, p))
 
@@ -2111,7 +2128,8 @@ class RepoWidget(QWidget):
         else:
             # There were no collisions with existing patch names, we can
             # simply qimport the whole revision set in a single go
-            cmdline = ['qimport', '--rev', '%s::%s' % (self.rev, endrev)]
+            cmdline = ['qimport', '--rev',
+                       '%s::%s' % (self.rev, hglib.tounicode(endrev))]
             self._runCommand(cmdline)
 
     def qfinishRevision(self):
@@ -2322,9 +2340,9 @@ class LightRepoWindow(QMainWindow):
         self.setIconSize(qtlib.smallIconSize())
 
         repo = repoagent.rawRepo()
-        val = repo.ui.config('tortoisehg', 'tasktabs').lower()
-        if val not in ('east', 'west'):
-            repo.ui.setconfig('tortoisehg', 'tasktabs', 'east')
+        val = repo.ui.config(b'tortoisehg', b'tasktabs').lower()
+        if val not in (b'east', b'west'):
+            repo.ui.setconfig(b'tortoisehg', b'tasktabs', b'east')
         rw = RepoWidget(repoagent, self)
         self.setCentralWidget(rw)
 

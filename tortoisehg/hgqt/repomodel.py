@@ -726,7 +726,7 @@ class HgRepoListModel(QAbstractTableModel):
             tags = [hglib.tounicode(t) for t in ctx.tags()
                     if repo.tagtype(t) and repo.tagtype(t) != b'local']
             if tags:
-                self._latesttags[rev] = ctx.date()[0], 0, b':'.join(sorted(tags))
+                self._latesttags[rev] = ctx.date()[0], 0, ':'.join(sorted(tags))
                 continue
             try:
                 # The tuples are laid out so the right one can be found by
@@ -830,7 +830,8 @@ class HgRepoListModel(QAbstractTableModel):
             # we will use the templatename as the color name since those
             # two should be the same
             for name in ns.names(self.repo, ctx.node()):
-                labels.append((hglib.tounicode(name), 'log.%s' % ns.colorname))
+                labels.append((hglib.tounicode(name),
+                               'log.%s' % hglib.tounicode(ns.colorname)))
 
         return labels
 
@@ -936,7 +937,7 @@ class FileRevModel(HgRepoListModel):
         # as of Mercurial 2.6, workingfilectx.linkrev() does not work, and
         # this model has no virtual working-dir revision.
         if rev is None:
-            rev = '.'
+            rev = b'.'
         try:
             fctx = self.repo[rev][self._filename]
         except error.LookupError:

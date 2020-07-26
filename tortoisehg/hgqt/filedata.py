@@ -533,7 +533,7 @@ class PatchDirData(_AbstractFileData):
         ctx = self._ctx
         try:
             self.diff = ''.join([ctx.thgmqpatchdata(f) for f in ctx.files()
-                                 if f.startswith(self._wfile + '/')])
+                                 if f.startswith(self._wfile + b'/')])
         except EnvironmentError as e:
             self.error = hglib.tounicode(str(e))
             return
@@ -728,7 +728,7 @@ class SubrepoData(_AbstractFileData):
             out = []
             # TODO: should be copied from the baseui
             _ui = hglib.loadui()
-            _ui.setconfig('ui', 'paginate', 'off', 'subrepodata')
+            _ui.setconfig(b'ui', b'paginate', b'off', b'subrepodata')
 
             if srepo is None or ctx.rev() is not None:
                 data = []

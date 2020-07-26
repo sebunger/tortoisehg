@@ -48,6 +48,10 @@ from .qtgui import (
     QWidget,
 )
 
+from hgext.largefiles import (
+    lfutil,
+)
+
 from mercurial import (
     context,
     error,
@@ -267,7 +271,7 @@ class StatusWidget(QWidget):
 
     def __set_defcheck(self, newdefcheck):
         if newdefcheck.lower() == 'amend':
-            newdefcheck = 'MAS'
+            newdefcheck = 'MARS'
         elif newdefcheck.lower() in ('commit', 'qnew', 'qrefresh'):
             newdefcheck = 'MAR!S'
         self._defcheck = newdefcheck
@@ -443,7 +447,7 @@ class StatusWidget(QWidget):
         if self.refthread.wctx is not None:
             assert self.refthread.wstatus is not None
             self.updateModel(self.refthread.wctx, self.refthread.wstatus,
-                             self.refthread.patchecked)
+                             self.refthread.patchecked, self.refthread.amending)
         self.refthread = None
         if len(self.repo[None].parents()) > 1:
             # nuke partial selections if wctx has a merge in-progress
@@ -463,7 +467,7 @@ class StatusWidget(QWidget):
     def canExit(self):
         return not self.isRefreshingWctx()
 
-    def updateModel(self, wctx, wstatus, patchecked):
+    def updateModel(self, wctx, wstatus, patchecked, amending):
         self.tv.setSortingEnabled(False)
         oldtm = self.tv.model()
         if oldtm:
@@ -477,7 +481,8 @@ class StatusWidget(QWidget):
         ms = hglib.readmergestate(self.repo)
         tm = WctxModel(self._repoagent, wctx, wstatus, ms, self.pctx,
                        self.savechecks, self.opts, checked, self,
-                       checkable=self.checkable, defcheck=self.defcheck)
+                       checkable=self.checkable, defcheck=self.defcheck,
+                       amending=amending)
         if self.checkable:
             tm.checkToggled.connect(self.checkToggled)
             tm.checkCountChanged.connect(self.updateCheckCount)
@@ -596,6 +601,15 @@ class StatusWidget(QWidget):
         if model:
             model.checkAll(False)
 
+    def getCheckedAmends(self):
+        files = []
+        model = self.tv.model()
+        if model and model.amending:
+            for f, v in model.getChecked().items():
+                if f in model.amending:
+                    files.append(f)
+        return files
+
     def getChecked(self, types=None):
         model = self.tv.model()
         if model:
@@ -686,6 +700,7 @@ class StatusThread(QThread):
         self.wctx = None
         self.wstatus = None
         self.patchecked = {}
+        self.amending = set()
 
     def run(self):
         extract = lambda x, y: dict(zip(x, pycompat.maplist(y.get, x)))
@@ -700,9 +715,8 @@ class StatusThread(QThread):
                     # status and commit only pre-check MAR files
                     precheckfn = lambda x: x < 4
                 m = scmutil.match(self.repo[None], self.pats)
-                self.repo.lfstatus = True
-                status = self.repo.status(match=m, **stopts)
-                self.repo.lfstatus = False
+                with lfutil.lfstatus(self.repo):
+                    status = self.repo.status(match=m, **stopts)
                 # Record all matched files as initially checked
                 for i, stat in enumerate(StatusType.preferredOrder):
                     if stat == 'S':
@@ -715,14 +729,31 @@ class StatusThread(QThread):
                 wctx = context.workingctx(self.repo, changes=status)
                 self.patchecked = patchecked
             elif self.pctx:
-                self.repo.lfstatus = True
-                status = self.repo.status(node1=self.pctx.p1().node(), **stopts)
-                self.repo.lfstatus = False
+                with lfutil.lfstatus(self.repo):
+                    status = self.repo.status(node1=self.pctx.p1().node(), **stopts)
+                    wstatus = self.repo.status(**stopts)
+
+                # Even though `clean` isn't requested in the status call,
+                # the dirty files in wdir that are clean against p1('.') are in
+                # the clean list.  Those need to be forced to show, so they
+                # aren't excluded from the amend command.
+                self.amending = set(status.clean)
+
+                # For a file that is newly added and then renamed, the status
+                # of wdir against p1 will show nothing (not present to not
+                # present).  Amending in this state breaks the rename, as only
+                # the added file is visible.  Forcing it into the R list will
+                # let is show as R.  Adding it to the amending list would make
+                # it show C, which is consistent with the revert to p1(.) case,
+                # but very confusing for a rename.
+                for r in wstatus.removed:
+                    if r not in self.pctx.p1():
+                        status.removed.append(r)
+
                 wctx = context.workingctx(self.repo, changes=status)
             else:
-                self.repo.lfstatus = True
-                status = self.repo.status(**stopts)
-                self.repo.lfstatus = False
+                with lfutil.lfstatus(self.repo):
+                    status = self.repo.status(**stopts)
                 wctx = context.workingctx(self.repo, changes=status)
             self.wctx = wctx
             self.wstatus = status
@@ -758,7 +789,8 @@ class WctxModel(QAbstractTableModel):
     checkToggled = pyqtSignal(str, bool)
 
     def __init__(self, repoagent, wctx, wstatus, ms, pctx, savechecks, opts,
-                 checked, parent, checkable=True, defcheck='MAR!S'):
+                 checked, parent, checkable=True, defcheck='MAR!S',
+                 amending=None):
         QAbstractTableModel.__init__(self, parent)
         self._repoagent = repoagent
         self._pctx = pctx
@@ -767,6 +799,9 @@ class WctxModel(QAbstractTableModel):
         rows = []
         nchecked = {}
         excludes = [f.strip() for f in opts.get('ciexclude', '').split(',')]
+        if amending is None:
+            amending = set()
+
         def mkrow(fname, st):
             ext, sizek = '', ''
             try:
@@ -783,7 +818,14 @@ class WctxModel(QAbstractTableModel):
             # Currently, having a patch context means it's a qrefresh, so only
             # auto-check files in pctx.files()
             pctxfiles = pctx.files()
-            pctxmatch = lambda f: f in pctxfiles
+
+            def pctxmatch(f):
+                if f in pctxfiles:
+                    return True
+                if f in wctx:  # auto select copy/rename sources too
+                    return wctx[f].copysource() in pctxfiles
+                return False
+
         else:
             pctxmatch = lambda f: True
         if opts['modified']:
@@ -820,19 +862,31 @@ class WctxModel(QAbstractTableModel):
                 rows.append(mkrow(c, 'C'))
         if opts['subrepo']:
             for s in wctx.dirtySubrepos:
-                nchecked[s] = checked.get(s, 'S' in defcheck)
+                nchecked[s] = checked.get(s, 'S' in defcheck and
+                                          s not in excludes)
                 rows.append(mkrow(s, 'S'))
         # include clean unresolved files
         for f in ms:
             if ms[f] == b'u' and f not in nchecked:
                 nchecked[f] = checked.get(f, True)
                 rows.append(mkrow(f, 'C'))
+
+        # In the amend case, files reverted to p1('.') look clean because the
+        # status is calculated against that node for amends.  But they are
+        # really modified.  So force those clean files to show, and to be in
+        # the checked state.
+        for f in amending:
+            if f not in nchecked:
+                nchecked[f] = checked.get(f, True)
+                rows.append(mkrow(f, 'C'))
+
         self.headers = ('*', _('Stat'), _('M'), _('Filename'),
                         _('Type'), _('Size (KB)'))
         self.checked = nchecked
         self.unfiltered = rows
         self.rows = rows
         self.checkable = checkable
+        self.amending = amending
 
     def rowCount(self, parent):
         if parent.isValid():

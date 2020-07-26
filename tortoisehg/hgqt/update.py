@@ -290,7 +290,7 @@ class UpdateWidget(cmdui.AbstractCmdWidget):
 
         pullpathname = hglib.fromunicode(
             self.path_combo.currentText())
-        if pullpathname and pullpathname != 'default':
+        if pullpathname and pullpathname != b'default':
             # We must tell mercurial to pull any missing repository
             # revisions from the selected path. The only way to do so is
             # to temporarily set the default path to the selected path URL

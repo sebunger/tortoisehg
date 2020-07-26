@@ -978,7 +978,7 @@ class CmdAgent(QObject):
 
     def _createWorker(self, cwd, name):
         # type: (Optional[Text], Text) -> CmdWorker
-        self._ui.debug("creating cmdworker '%s'\n" % name)
+        self._ui.debug(b"creating cmdworker '%s'\n" % pycompat.sysbytes(name))
         worker = _workertypes[name](self._ui, self, cwd)
         worker.serviceStateChanged.connect(self._tryEmitServiceStopped)
         worker.outputReceived.connect(self.outputReceived)

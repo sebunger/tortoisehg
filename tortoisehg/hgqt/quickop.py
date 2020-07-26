@@ -27,6 +27,10 @@ from .qtgui import (
     QVBoxLayout,
 )
 
+from hgext.largefiles import (
+    lfutil,
+)
+
 from mercurial import (
     error,
     pycompat,
@@ -217,15 +221,14 @@ class QuickOpDialog(QDialog):
                                 parent=self)
             return
         if self.command == 'remove':
-            self.repo.lfstatus = True
-            try:
-                repostate = self.repo.status()
-            except (EnvironmentError, error.Abort) as e:
-                qtlib.WarningMsgBox(_('Unable to read repository status'),
-                                    hglib.tounicode(str(e)), parent=self)
-                return
-            finally:
-                self.repo.lfstatus = False
+            with lfutil.lfstatus(self.repo):
+                try:
+                    repostate = self.repo.status()
+                except (EnvironmentError, error.Abort) as e:
+                    qtlib.WarningMsgBox(_('Unable to read repository status'),
+                                        hglib.tounicode(str(e)), parent=self)
+                    return
+
             if not self.chk.isChecked():
                 selmodified = []
                 for wfile in files:
@@ -321,7 +324,7 @@ def run(ui, repoagent, *pats, **opts):
     repo = repoagent.rawRepo()
     pats = hglib.canonpaths(pats)
     command = opts['alias']
-    imm = repo.ui.config('tortoisehg', 'immediate')
+    imm = repo.ui.config(b'tortoisehg', b'immediate')
     if opts.get('headless') or command in imm.lower():
         cmdline = [command] + pats
         return HeadlessQuickop(repoagent, cmdline)

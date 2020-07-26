@@ -1049,7 +1049,7 @@ def log(ui, *pats, **opts):
             # there is no pre-existing workbench server
             serverexists = False
         else:
-            serverexists = qtapp.connectToExistingWorkbench('[echo]')
+            serverexists = qtapp.connectToExistingWorkbench(b'[echo]')
         # When in " single workbench mode", we must create a server if there
         # is not one already
         mustcreateserver = not serverexists

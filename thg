@@ -23,6 +23,14 @@ if hasattr(sys, "frozen"):
     if sys.frozen == 'windows_exe':
         # sys.stdin is invalid, should be None.  Fixes svn, git subrepos
         sys.stdin = None
+
+        # Make `pip install --user` packages visible, because py2exe doesn't
+        # process sitecustomize.py.
+        vi = sys.version_info
+        sys.path.append(os.path.join(os.environ['APPDATA'], 'Python',
+                                     'Python%d%d' % (vi[0], vi[1]),
+                                     'site-packages'))
+
         if 'THGDEBUG' in os.environ:
             import win32traceutil
             print('starting')

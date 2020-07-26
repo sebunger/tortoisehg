@@ -27,6 +27,10 @@ from .qtgui import (
     qApp,
 )
 
+from hgext.largefiles import (
+    lfutil,
+)
+
 from mercurial import (
     hg,
     scmutil,
@@ -126,9 +130,8 @@ class PurgeDialog(QDialog):
 
             def run(self):
                 try:
-                    repo.lfstatus = True
-                    stat = repo.status(ignored=True, unknown=True)
-                    repo.lfstatus = False
+                    with lfutil.lfstatus(repo):
+                        stat = repo.status(ignored=True, unknown=True)
                     trashcan = repo.vfs.join(b'Trashcan')
                     if os.path.isdir(trashcan):
                         trash = os.listdir(trashcan)
@@ -249,10 +252,9 @@ class PurgeThread(QThread):
         self.showMessage.emit('')
         match = scmutil.matchall(repo)
         match.explicitdir = match.traversedir = directories.append
-        repo.lfstatus = True
-        status = repo.status(match=match, ignored=opts['ignored'],
-                             unknown=opts['unknown'], clean=False)
-        repo.lfstatus = False
+        with lfutil.lfstatus(repo):
+            status = repo.status(match=match, ignored=opts['ignored'],
+                                 unknown=opts['unknown'], clean=False)
         files = []
         if opts['unknown']:
             files.extend(status.unknown)

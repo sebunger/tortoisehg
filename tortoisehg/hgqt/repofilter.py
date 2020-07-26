@@ -55,7 +55,7 @@ def _firstword(query):
     lquery = hglib.fromunicode(query)
     try:
         for token, value, _pos in hglib.tokenizerevspec(lquery):
-            if token == 'symbol' or token == 'string':
+            if token == b'symbol' or token == b'string':
                 return value  # localstr
     except error.ParseError:
         pass
@@ -65,7 +65,7 @@ def _querytype(repo, query):
     >>> # TODO: maybe replace with real repo
     >>> origisrevsymbol = scmutil.isrevsymbol
     >>> scmutil.isrevsymbol = lambda repo, changeid: changeid in repo
-    >>> repo = set('0 1 2 3 . stable'.split())
+    >>> repo = set(b'0 1 2 3 . stable'.split())
     >>> _querytype(repo, u'') is None
     True
     >>> _querytype(repo, u'quick fox')

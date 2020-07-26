@@ -72,17 +72,17 @@ def _checkForRejects(repo, rawoutput, parent=None):
     """Parse output of qpush/qpop to resolve hunk failure manually"""
     rejre = re.compile(r'saving rejects to file (.*)\.rej')
     rejfiles = dict((m.group(1), False) for m in rejre.finditer(rawoutput))
-    for wfile in sorted(rejfiles):
+    for ufile in sorted(rejfiles):
+        wfile = hglib.fromunicode(ufile)
         if not os.path.exists(repo.wjoin(wfile)):
             continue
-        ufile = hglib.tounicode(wfile)
         if qtlib.QuestionMsgBox(_('Manually resolve rejected chunks?'),
                                 _('%s had rejected chunks, edit patched '
                                   'file together with rejects?') % ufile,
                                 parent=parent):
             dlg = rejects.RejectsDialog(repo.ui, repo.wjoin(wfile), parent)
             r = dlg.exec_()
-            rejfiles[wfile] = (r == QDialog.Accepted)
+            rejfiles[ufile] = (r == QDialog.Accepted)
 
     # empty rejfiles means we failed to parse output message
     return bool(rejfiles) and all(rejfiles.values())
@@ -388,7 +388,7 @@ class PatchQueueActions(QObject):
     def _onPushFinished(self, ret):
         if ret == 2 and self._repoagent:
             repo = self._repoagent.rawRepo()
-            output = hglib.fromunicode(self._cmdsession.warningString())
+            output = self._cmdsession.warningString()
             if _checkForRejects(repo, output, self._parentWidget()):
                 ret = 0  # no further error dialog
         if ret != 0:
@@ -754,7 +754,7 @@ class MQPatchesWidget(QDockWidget):
         if self._repoagent:
             self._repoagent.repositoryChanged.disconnect(self.reload)
         self._repoagent = None
-        if repoagent and 'mq' in repoagent.rawRepo().extensions():
+        if repoagent and b'mq' in repoagent.rawRepo().extensions():
             self._repoagent = repoagent
             self._repoagent.repositoryChanged.connect(self.reload)
         self._changePatchQueueModel()

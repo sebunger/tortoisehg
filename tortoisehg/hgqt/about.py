@@ -13,6 +13,8 @@ TortoiseHg About dialog - PyQt4 version
 
 from __future__ import absolute_import
 
+import platform
+import re
 import sys
 
 from .qtcore import (
@@ -101,7 +103,25 @@ class AboutDialog(QDialog):
                                        _('You can visit our site here')))
         self.vbox.addWidget(self.download_url_lbl)
 
-        # Let's have some space between the url and the buttons.
+        # Extra space between the URL and hosting credits
+        self.vbox.addWidget(QLabel())
+
+        self.hosting_lbl = QLabel()
+        self.hosting_lbl.setAlignment(Qt.AlignCenter)
+        self.hosting_lbl.setText(
+            _('Hosting donated by %s and %s') % (
+                '<a href=https://clever-cloud.com>Clever Cloud</a>',
+                '<a href=https://octobus.net>Octobus</a>'
+            )
+        )
+        self.hosting_lbl.setMouseTracking(True)
+        self.hosting_lbl.setTextInteractionFlags(
+            Qt.LinksAccessibleByMouse
+        )
+        self.hosting_lbl.setOpenExternalLinks(True)
+        self.vbox.addWidget(self.hosting_lbl)
+
+        # Let's have some space between the hosting and the buttons.
         self.blancline_lbl = QLabel()
         self.vbox.addWidget(self.blancline_lbl)
 
@@ -141,7 +161,7 @@ class AboutDialog(QDialog):
 
     @pyqtSlot()
     def getUpdateInfo(self):
-        verurl = 'https://tortoisehg.bitbucket.io/curversion.txt'
+        verurl = 'https://www.mercurial-scm.org/release/tortoisehg/latest.dat'
         # If we use QNetworkAcessManager elsewhere, it should be shared
         # through the application.
         self._netmanager = QNetworkAccessManager(self)
@@ -151,28 +171,73 @@ class AboutDialog(QDialog):
     @pyqtSlot()
     def uFinished(self):
         newver = (0,0,0)
-        newverstr = '0.0.0'
-        upgradeurl = ''
+
         try:
-            f = pycompat.sysstr(self._newverreply.readAll().data()).splitlines()
+            data = self._newverreply.readAll().data()
+        finally:
             self._newverreply.close()
             self._newverreply = None
-            newverstr = f[0]
-            newver = tuple([int(p) for p in newverstr.split('.')])
-            upgradeurl = f[1] # generic download URL
-            platform = sys.platform
-            if platform == 'win32':
-                from win32process import IsWow64Process as IsX64  # pytype: disable=import-error
-                platform = IsX64() and 'x64' or 'x86'
-            # linux2 for Linux, darwin for OSX
-            for line in f[2:]:
-                p, _url = line.split(':', 1)
-                if platform == p:
-                    upgradeurl = _url.strip()
-                    break
-        except (IndexError, ImportError, ValueError):
-            pass
+
+        # Simulate a User-Agent string for platforms with an entry in the file.
+        # https://developers.whatismybrowser.com/useragents/explore/operating_system_name
+        useragent = "unknown"
+        if sys.platform == 'win32':
+            from win32process import \
+                IsWow64Process as IsX64  # pytype: disable=import-error
+            if IsX64():
+                useragent = "Windows WOW64"
+            else:
+                import struct
+                width = struct.calcsize("P") * 8
+                useragent = width == 64 and 'Windows x64' or 'Windows'
+        elif sys.platform == 'darwin':
+            # Mac packages will be universal binaries, but try to include the
+            # architecture so that older architectures can eventually be
+            # dropped from the current installer, and the last of the older
+            # architecture offered independently.
+            useragent = "Macintosh"
+            arch = platform.processor()
+            if arch == 'i386':
+                useragent += "; Intel"
+
+        candidates = {}
+
+        # Extra check to ensure the regex returned from the server is safe
+        # before using it.
+        def _check_regex(p):
+            # Clear any simple groups.  Example: ``.*Windows.*(WOW|x)64.*``
+            p = re.sub(r"\([0-9A-Za-z|]+\)", "", p)
+
+            # Now the regex should be a simple alphanumeric or wildcards
+            return re.match("^[A-Za-z0-9.*]+$", p)
+
+        # https://www.mercurial-scm.org/wiki/Packaging#Version_information_protocol
+        # priority \t version \t user-agent-regex \t download url \t desc
+        for line in pycompat.sysstr(data).splitlines():
+            try:
+                parts = line.strip().split("\t")
+                pattern = parts[2]
+
+                if not _check_regex(pattern):
+                    print("Ignoring upgrade pattern %s" % pattern)
+                    continue
+
+                if not re.match(pattern, useragent):
+                    continue
+
+                prio = int(parts[0].strip())
+                candidates[prio] = (parts[1].strip(), parts[3].strip())
+            except (IndexError, ValueError):
+                pass
+
+        if not candidates:
+            return
+
+        prio = [p for p in sorted(candidates.keys())][0]
+        newverstr, upgradeurl = candidates[prio]
+
         try:
+            newver = tuple([int(p) for p in newverstr.split('.')])
             thgv = version.package_version()
             curver = tuple([int(p) for p in thgv.split('.')])
         except ValueError:

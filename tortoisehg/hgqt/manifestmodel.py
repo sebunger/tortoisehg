@@ -28,6 +28,10 @@ from .qtgui import (
     QIcon,
 )
 
+from hgext.largefiles import (
+    lfutil,
+)
+
 from mercurial import (
     error,
     match as matchmod,
@@ -609,11 +613,10 @@ def _populaterepo(roote, repo, nodeop, statusfilter, match):
 
     ctx = roote.ctx
     pctx = roote.pctx
-    repo.lfstatus = True
-    try:
+
+    with lfutil.lfstatus(repo):
         stat = repo.status(pctx, ctx, match, clean='C' in statusfilter)
-    finally:
-        repo.lfstatus = False
+
     for st, files in zip('MAR!?IC', stat):
         if st not in statusfilter:
             continue

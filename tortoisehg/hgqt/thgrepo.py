@@ -158,7 +158,7 @@ class RepoWatcher(QObject):
         # ".hg/store" from the list, but actually they are not watched.
         # Thus, they cannot be watched again by the same fswatcher instance.
         if self._fswatcher.directories() or self._fswatcher.files():
-            self._ui.debug('failed to remove paths - destroying watcher\n')
+            self._ui.debug(b'failed to remove paths - destroying watcher\n')
             self._fswatcher.setParent(None)
             self._fswatcher = None
 
@@ -189,7 +189,7 @@ class RepoWatcher(QObject):
     @pyqtSlot()
     def _onFsChanged(self):
         if self._deferredpoll:
-            self._ui.debug('filesystem change detected, but poll deferred\n')
+            self._ui.debug(b'filesystem change detected, but poll deferred\n')
             self._deferredpoll |= _PollFsChangesPending
             return
         self._pollFsChanges()
@@ -209,11 +209,11 @@ class RepoWatcher(QObject):
         files = [pycompat.unicode(f) for f in self._fswatcher.files()]
         for f in existing:
             if hglib.tounicode(f) not in files:
-                self._ui.debug('add file to watcher: %s\n' % f)
+                self._ui.debug(b'add file to watcher: %s\n' % f)
                 self._fswatcher.addPath(hglib.tounicode(f))
         for f in self._repo.uifiles():
             if f and os.path.exists(f) and hglib.tounicode(f) not in files:
-                self._ui.debug('add ui file to watcher: %s\n' % f)
+                self._ui.debug(b'add ui file to watcher: %s\n' % f)
                 self._fswatcher.addPath(hglib.tounicode(f))
 
     def clearStatus(self):
@@ -222,28 +222,28 @@ class RepoWatcher(QObject):
 
     def pollStatus(self):
         if self._deferredpoll:
-            self._ui.debug('poll request deferred\n')
+            self._ui.debug(b'poll request deferred\n')
             self._deferredpoll |= _PollStatusPending
             return
         self._pollStatus()
 
     def _pollStatus(self):
         if not os.path.exists(self._repo.path):
-            self._ui.debug('repository destroyed: %s\n' % self._repo.root)
+            self._ui.debug(b'repository destroyed: %s\n' % self._repo.root)
             self.repositoryDestroyed.emit()
             return
         if self._locked():
-            self._ui.debug('locked, aborting\n')
+            self._ui.debug(b'locked, aborting\n')
             return
         curstats, curdata = self._readState()
         changeflags = self._calculateChangeFlags(curstats, curdata)
         if self._locked():
-            self._ui.debug('lock still held - ignoring for now\n')
+            self._ui.debug(b'lock still held - ignoring for now\n')
             return
         self._laststats = curstats
         self._lastdata = curdata
         if changeflags:
-            self._ui.debug('change found (flags = 0x%x)\n' % changeflags)
+            self._ui.debug(b'change found (flags = 0x%x)\n' % changeflags)
             self.repositoryChanged.emit(changeflags)  # may update repo paths
             self._fixState()
         self._checkuimtime()
@@ -263,6 +263,7 @@ class RepoWatcher(QObject):
             repo.vfs.join(b'bookmarks'): (LogChanged, False),
             repo.vfs.join(b'bookmarks.current'): (LogChanged, False),
             repo.vfs.join(b'branch'): (0, False),
+            repo.vfs.join(b'topic'): (LogChanged, False),
             repo.vfs.join(b'dirstate'): (WorkingStateChanged, False),
             repo.vfs.join(b'localtags'): (LogChanged, False),
             repo.svfs.join(b'00changelog.i'): (LogChanged, False),
@@ -327,14 +328,15 @@ class RepoWatcher(QObject):
             last = self._laststats.get(path)
             cur = curstats.get(path)
             if last != cur:
-                self._ui.debug(' stat: %s (%r -> %r)\n' % (path, last, cur))
+                self._ui.debug(b' stat: %s (%r -> %r)\n' % (path, last, cur))
                 changeflags |= flag
         for readmeth, (flag, _path) in self._datamap.items():
             last = self._lastdata.get(readmeth)
             cur = curdata.get(readmeth)
             if last != cur:
-                self._ui.debug(' data: %s (%r -> %r)\n'
-                               % (readmeth.__name__, last, cur))
+                self._ui.debug(b' data: %s (%r -> %r)\n'
+                               % (pycompat.sysbytes(readmeth.__name__), last,
+                                  cur))
                 changeflags |= flag
         return changeflags
 
@@ -350,7 +352,7 @@ class RepoWatcher(QObject):
             files = self._repo.uifiles()
             mtime = max(os.path.getmtime(f) for f in files if os.path.isfile(f))
             if mtime > self._uimtime:
-                self._ui.debug('config change detected\n')
+                self._ui.debug(b'config change detected\n')
                 self._uimtime = mtime
                 self.configChanged.emit()
         except (EnvironmentError, ValueError):
@@ -408,10 +410,10 @@ class RepoAgent(QObject):
         ui = repo.ui
         monitorrepo = self.configString('tortoisehg', 'monitorrepo')
         if monitorrepo == 'never':
-            ui.debug('watching of F/S events is disabled by configuration\n')
+            ui.debug(b'watching of F/S events is disabled by configuration\n')
         elif (monitorrepo == 'localonly'
               and not paths.is_on_fixed_drive(repo.path)):
-            ui.debug('not watching F/S events for network drive\n')
+            ui.debug(b'not watching F/S events for network drive\n')
         else:
             self._watcher.startMonitoring()
 
@@ -698,7 +700,7 @@ class RepoManager(QObject):
             return agent
 
         # TODO: move repository creation from thgrepo.repository()
-        self._ui.debug('opening repo: %s\n' % hglib.fromunicode(path))
+        self._ui.debug(b'opening repo: %s\n' % hglib.fromunicode(path))
         agent = repository(self._ui, hglib.fromunicode(path))._pyqtobj
         assert agent.parent() is None
         agent.setParent(self)
@@ -727,7 +729,7 @@ class RepoManager(QObject):
         agent.releaseSubRepoAgents()
 
         if agent.isServiceRunning():
-            self._ui.debug('stopping service: %s\n' % hglib.fromunicode(path))
+            self._ui.debug(b'stopping service: %s\n' % hglib.fromunicode(path))
             agent.stopService()
         else:
             self._tryCloseRepoAgent(path)
@@ -739,7 +741,7 @@ class RepoManager(QObject):
         if refcount > 0:
             # repo may be reopen before its services stopped
             return
-        self._ui.debug('closing repo: %s\n' % hglib.fromunicode(path))
+        self._ui.debug(b'closing repo: %s\n' % hglib.fromunicode(path))
         del self._openagents[path]
         # TODO: disconnected automatically if _repocache does not exist
         for (sig, _slot), mapper in zip(self._SIGNALMAP, self._sigmappers):
@@ -802,7 +804,7 @@ def _extendrepo(repo):
             if changeid in self.thgmqunappliedpatches:
                 q = self.mq # must have mq to pass the previous if
                 return genPatchContext(self, q.join(changeid), rev=changeid)
-            elif isinstance(changeid, str) and '\0' not in changeid and \
+            elif isinstance(changeid, bytes) and b'\0' not in changeid and \
                     os.path.isabs(changeid) and os.path.isfile(changeid):
                 return genPatchContext(repo, changeid)
 
