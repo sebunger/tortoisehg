@@ -91,15 +91,20 @@ def data_func(widget, item, ctx):
             return revline_data(tctx)
         except (error.LookupError, error.RepoLookupError, error.RepoError):
             return ts
-    elif item == 'ishead':
-        if ctx.rev() is None:
-            ctx = ctx.p1()
-        childbranches = [cctx.branch() for cctx in ctx.children()]
-        return ctx.branch() not in childbranches
-    elif item == 'isclose':
-        if ctx.rev() is None:
-            ctx = ctx.p1()
-        return ctx.extra().get(b'close') is not None
+    elif item == 'createsnewhead':
+        # Strictly speaking, amend can create a new head in the case when
+        # amending a revision which is not a topological head, as then the
+        # original amended revision is kept alive by its orphan ancestors.
+        # However, as the original amended revision along with its orphan
+        # ancestors are eventually going to be evolved, we should not warn the
+        # user. Instead, we should show that the amend will create orphans.
+        return not widget.custom['isAmend'] and hglib.createsnewhead(ctx)
+    elif item == 'createsorphans':
+        return widget.custom['isAmend'] and any(p.children()
+                                                for p in ctx.parents())
+    elif item == 'reopensbranchhead':
+        return any(p.closesbranch() and p.branch() == ctx.branch()
+                   for p in ctx.parents())
     elif item == 'predecessors':
         ctxlist = obsoleteutil.first_known_predecessors(ctx)
         return format_ctxlist(ctxlist)
@@ -196,18 +201,19 @@ def nomarkup(widget, item, value):
             revnum = qtlib.markup(revnum)
             return '%s - %s' % (revnum, summary)
     csets = []
-    if item == 'ishead':
-        if value is False:
-            if widget.custom['isAmend']:
-                text = _('Not a head revision.')
-                return qtlib.markup(text, weight='bold')
-            else:
-                text = _('Not a head revision!')
-                return qtlib.markup(text, fg='red', weight='bold')
-        raise csinfo.UnknownItem(item)
-    elif item == 'isclose':
+    if item == 'createsnewhead':
         if value is True:
-            text = _('Head is closed!')
+            text = _('Creates new head!')
+            return qtlib.markup(text, fg='red', weight='bold')
+        raise csinfo.UnknownItem(item)
+    elif item == 'createsorphans':
+        if value is True:
+            text = _('Creates orphans.')
+            return qtlib.markup(text, weight='bold')
+        raise csinfo.UnknownItem(item)
+    elif item == 'reopensbranchhead':
+        if value is True:
+            text = _('Reopens closed branch head!')
             return qtlib.markup(text, fg='red', weight='bold')
         raise csinfo.UnknownItem(item)
     for cset in value:
@@ -217,9 +223,10 @@ def nomarkup(widget, item, value):
             csets.append(revline_markup(*cset))
     return csets
 
-def ParentWidget(repo):
-    'creates a parent rev widget and returns it'
+def WDirInfoWidget(repo):
+    'creates a wdir info widget and returns it'
     custom = csinfo.custom(data=data_func, label=label_func, markup=nomarkup)
-    style = csinfo.panelstyle(contents=('parents', 'ishead', 'isclose'),
-                             selectable=True)
+    style = csinfo.panelstyle(contents=('parents', 'createsnewhead',
+                                        'createsorphans', 'reopensbranchhead'),
+                              selectable=True)
     return csinfo.create(repo, style=style, custom=custom)

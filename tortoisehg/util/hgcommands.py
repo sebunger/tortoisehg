@@ -119,7 +119,7 @@ def _applymovemqpatches(q, after, patches):
     _('[--after PATCH] PATCH...'))
 def qreorder(ui, repo, *patches, **opts):
     """move patches to the beginning or after the specified patch"""
-    after = opts[b'after'] or None
+    after = opts['after'] or None
     q = repo.mq
     if any(n not in q.series for n in patches):
         raise error.Abort(_('unknown patch to move specified'))

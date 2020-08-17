@@ -1068,7 +1068,7 @@ class WctxModel(QAbstractTableModel):
         # However, for files which have the same status or extension, etc,
         # we want them to be sorted alphabetically (without taking into account
         # the case)
-        # Since Python 2.3 the sort function is guaranteed to be stable.
+        # The sort function is guaranteed to be stable.
         # Thus we can perform the sort in two passes:
         # 1.- Perform a secondary sort by path
         # 2.- Perform a primary sort by the actual column that we are sorting on

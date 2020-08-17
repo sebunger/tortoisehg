@@ -183,11 +183,11 @@ class SummaryPage(BasePage):
         self.setLayout(QVBoxLayout())
 
         repo = self.repo
-        contents = ('ishead',) + csinfo.PANEL_DEFAULT
+        contents = ('createsnewhead',) + csinfo.PANEL_DEFAULT
         style = csinfo.panelstyle(contents=contents)
         def markup_func(widget, item, value):
-            if item == 'ishead' and value is False:
-                text = _('Not a head revision!')
+            if item == 'createsnewhead' and value is True:
+                text = _('Creates new head!')
                 return qtlib.markup(text, fg='red', weight='bold')
             raise csinfo.UnknownItem(item)
         custom = csinfo.custom(markup=markup_func)

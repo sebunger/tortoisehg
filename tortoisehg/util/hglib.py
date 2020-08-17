@@ -341,7 +341,13 @@ def readgraftstate(repo):
 
     return None
 
-readmergestate = mergemod.mergestate.read
+try:
+    from mercurial import mergestate as mergestatemod
+    mergestate = mergestatemod.mergestate
+except (AttributeError, ImportError):
+    # hg<5.5 b7808443ed6a
+    mergestate = mergemod.mergestate
+readmergestate = mergestate.read
 
 def readundodesc(repo):
     # type: (...) -> Tuple[Text, int]
@@ -1296,7 +1302,7 @@ def parsecmdline(cmdline, cwd):
         lex = shlex.shlex(src, posix=True)
         decode_token = pycompat.identity
     else:
-        # shlex can't process unicode on Python < 2.7.3
+        # shlex can't process non-ASCII unicode on Python 2
         cmdline = cmdline.encode('utf-8')
         src = pycompat.bytesio(cmdline)
         lex = shlex.shlex(src, posix=True)  # pytype: disable=wrong-arg-types
@@ -1330,3 +1336,12 @@ def parsecmdline(cmdline, cwd):
                 args.extend(p[len(cwd) + 1:] for p in expanded)
         else:
             args.append(e)
+
+
+def createsnewhead(ctx, branchheads=None):
+    branch = ctx.branch()
+    if branchheads is None:
+        branchheads = set(ctx.repo().branchheads(branch))
+    return branchheads and not any(
+        p.node() in branchheads and p.branch() == branch for p in ctx.parents()
+    )
