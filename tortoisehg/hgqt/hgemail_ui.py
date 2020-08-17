@@ -2,14 +2,12 @@
 
 # Form implementation generated from reading ui file '/home/yuya/work/hghacks/thg/tortoisehg/hgqt/hgemail.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from tortoisehg.util.i18n import _
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_EmailDialog(object):
     def setupUi(self, EmailDialog):
@@ -301,4 +299,5 @@ class Ui_EmailDialog(object):
         self.settings_button.setText(_("&Settings"))
         self.send_button.setText(_("Send &Email"))
         self.close_button.setText(_("&Close"))
+
 from PyQt5 import Qsci

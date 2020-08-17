@@ -162,10 +162,8 @@ class TagDialog(QDialog):
         """ update display on dialog with recent repo data """
         cur = self.tagCombo.currentText()
 
-        tags = list(self.repo.tags())
-        tags.sort(reverse=True)
         self.tagCombo.clear()
-        for tag in tags:
+        for tag in sorted(self.repo.tags(), reverse=True):
             if tag in (b'tip', b'qbase', b'qtip', b'qparent'):
                 continue
             self.tagCombo.addItem(hglib.tounicode(tag))

@@ -238,7 +238,6 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
     try:
         if b'$FILES' in cmdline:
             cmdline = cmdline.replace(b'$FILES', b' '.join(files))
-            cmdline = procutil.quotecommand(cmdline)
             subprocess.Popen(procutil.tonativestr(cmdline), shell=shell,
                              creationflags=openflags,
                              stderr=None, stdout=None, stdin=None,
@@ -246,14 +245,12 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         elif b'$FILE' in cmdline:
             for file in files:
                 cmd = cmdline.replace(b'$FILE', file)
-                cmd = procutil.quotecommand(cmd)
                 subprocess.Popen(procutil.tonativestr(cmd), shell=shell,
                                  creationflags=openflags,
                                  stderr=None, stdout=None, stdin=None,
                                  cwd=procutil.tonativestr(cwd))
         else:
             # assume filenames were expanded already
-            cmdline = procutil.quotecommand(cmdline)
             subprocess.Popen(procutil.tonativestr(cmdline), shell=shell,
                              creationflags=openflags,
                              stderr=None, stdout=None, stdin=None,

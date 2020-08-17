@@ -71,7 +71,7 @@ class BugReport(QDialog):
 
         lbl = QLabel(_('Please report this bug to our '
             '<a href="%s">bug tracker</a>') %
-            u'https://bitbucket.org/tortoisehg/thg/wiki/BugReport')
+            u'https://foss.heptapod.net/mercurial/tortoisehg/thg/-/issues')
         lbl.setOpenExternalLinks(True)
         self.layout().addWidget(lbl)
 

@@ -12,7 +12,7 @@ https://www.reviewboard.org
 This dialog requires a fork of the review board mercurial plugin, maintained
 by mdelagra, that can be downloaded from:
 
-https://bitbucket.org/mdelagra/mercurial-reviewboard/
+https://foss.heptapod.net/mercurial/tortoisehg/thg-build-deps/mercurial-reviewboard
 
 More information can be found at http://www.mikeyd.com.au/tortoisehg-reviewboard
 """
@@ -81,7 +81,7 @@ class LoadReviewDataThread(QThread):
                 msg = _("Invalid reviewboard plugin. Please download the "
                         "Mercurial reviewboard plugin version 3.5 or higher "
                         "from the website below.\n\n %s") % \
-                        u'https://bitbucket.org/mdelagra/mercurial-reviewboard/'
+                        u'https://foss.heptapod.net/mercurial/tortoisehg/thg-build-deps/mercurial-reviewboard'
 
         self.dialog.error_message = msg
 

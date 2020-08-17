@@ -2,14 +2,12 @@
 
 # Form implementation generated from reading ui file '/home/yuya/work/hghacks/thg/tortoisehg/hgqt/serve.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from tortoisehg.util.i18n import _
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_ServeDialog(object):
     def setupUi(self, ServeDialog):
@@ -88,3 +86,4 @@ class Ui_ServeDialog(object):
         self.start_button.setText(_("Start"))
         self.stop_button.setText(_("Stop"))
         self.settings_button.setText(_("Settings"))
+

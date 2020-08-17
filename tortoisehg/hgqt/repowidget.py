@@ -88,7 +88,7 @@ from . import (
     tag,
     thgimport,
     thgstrip,
-    topics,
+    topic,
     update,
     visdiff,
 )
@@ -1261,7 +1261,7 @@ class RepoWidget(QWidget):
         entry(items, menu, None, enablefuncs['isrev'], _('Boo&kmark...'),
               'hg-bookmarks', self.bookmarkRevision)
         entry(items, menu, 'topic', enablefuncs['isdraftorwd'], _('Top&ic...'),
-              'topic', self.topicsRevision)
+              'topic', self.topicRevision)
         entry(items, menu, 'gpg', enablefuncs['fixed'], _('Sig&n...'),
               'hg-sign', self.signRevision)
         entry(items, menu)
@@ -1290,7 +1290,7 @@ class RepoWidget(QWidget):
         submenu = menu.addMenu(_('Change &Phase to'))
         submenu.triggered.connect(self._changePhaseByMenu)
         # TODO: filter out hidden names better
-        for pnum, pname in enumerate(phases.phasenames[:3]):
+        for pnum, pname in enumerate(phases.cmdphasenames):
             a = entry(items, submenu, None, enablefuncs['isrev'],
                       pycompat.sysstr(pname))
             assert a is not None  # help pytype
@@ -1858,8 +1858,8 @@ class RepoWidget(QWidget):
         dlg = bookmark.BookmarkDialog(self._repoagent, self.rev, self)
         dlg.exec_()
 
-    def topicsRevision(self):
-        dlg = topics.TopicsDialog(self._repoagent, self.rev, self)
+    def topicRevision(self):
+        dlg = topic.TopicDialog(self._repoagent, self.rev, self)
         dlg.exec_()
 
     def signRevision(self):

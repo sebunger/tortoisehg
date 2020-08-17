@@ -647,8 +647,9 @@ class HgRepoListModel(QAbstractTableModel):
         destrow = parent.row()
         if destrow < 0:
             return False
-        unapplied = self.repo.thgmqunappliedpatches[::-1]
-        applied = [p.name for p in self.repo.mq.applied[::-1]]
+        unapplied = pycompat.maplist(hglib.tounicode,
+                                     self.repo.thgmqunappliedpatches[::-1])
+        applied = [hglib.tounicode(p.name) for p in self.repo.mq.applied[::-1]]
         if max(dragrows) >= len(unapplied):
             return False
         dragpatches = [unapplied[d] for d in dragrows]
@@ -659,7 +660,6 @@ class HgRepoListModel(QAbstractTableModel):
             destpatch = None  # next to working rev
 
         cmdline = hglib.buildcmdargs('qreorder', after=destpatch, *dragpatches)
-        cmdline = pycompat.maplist(hglib.tounicode, cmdline)
         self._repoagent.runCommand(cmdline)
         return True
 
@@ -794,9 +794,8 @@ class HgRepoListModel(QAbstractTableModel):
             self._branchheads[branch] = branchheads
 
         if ctx.rev() is None:
-            for pctx in ctx.parents():
-                if branchheads and pctx.node() not in branchheads:
-                    labels.append((_('Not a head revision!'), 'log.warning'))
+            if hglib.createsnewhead(ctx, branchheads):
+                labels.append((_('Creates new head!'), 'log.warning'))
             return labels
 
         if self._show_branch_head_label:

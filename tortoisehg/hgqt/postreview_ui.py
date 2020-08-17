@@ -2,14 +2,12 @@
 
 # Form implementation generated from reading ui file '/home/yuya/work/hghacks/thg/tortoisehg/hgqt/postreview.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
-
 from tortoisehg.util.i18n import _
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_PostReviewDialog(object):
     def setupUi(self, PostReviewDialog):
@@ -180,3 +178,4 @@ class Ui_PostReviewDialog(object):
         self.progress_label.setText(_("Connecting to Review Board..."))
         self.post_review_button.setText(_("Post &Review"))
         self.close_button.setText(_("&Close"))
+

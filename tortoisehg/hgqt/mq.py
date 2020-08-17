@@ -589,12 +589,12 @@ class PatchQueueModel(QAbstractListModel):
         if row > qtiprow:
             return False
         if row < len(self._series):
-            after = self._series[row]
+            after = hglib.tounicode(self._series[row])
         else:
             after = None  # next to working rev
-        patches = str(data.data('application/vnd.thg.mq.series')).splitlines()
+        patches = hglib.tounicode(
+            bytes(data.data('application/vnd.thg.mq.series'))).splitlines()
         cmdline = hglib.buildcmdargs('qreorder', after=after, *patches)
-        cmdline = pycompat.maplist(hglib.tounicode, cmdline)
         self._repoagent.runCommand(cmdline)
         return True
 
