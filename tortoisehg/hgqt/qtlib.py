@@ -87,12 +87,18 @@ try:
 except ImportError:
     openflags = 0
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Dict,
+        Tuple,
+    )
+
 if pycompat.ispy3:
     from html import escape as htmlescape
 else:
     import cgi
     def htmlescape(s, quote=True):
-        return cgi.escape(s, quote)
+        return cgi.escape(s, quote)  # pytype: disable=module-attr
 
 # largest allowed size for widget, defined in <src/gui/kernel/qwidget.h>
 QWIDGETSIZE_MAX = (1 << 24) - 1
@@ -377,7 +383,7 @@ def isDarkTheme(palette=None):
 # effect programatically.
 
 # TODO: update ui._styles instead of color._defaultstyles
-_styles = pycompat.rapply(pycompat.sysstr, color._defaultstyles)
+_styles = pycompat.rapply(pycompat.sysstr, color._defaultstyles)  # type: Dict[str, str]
 
 _effects = {
     'bold': 'font-weight: bold',
@@ -417,17 +423,17 @@ def configstyles(ui):
     _styles.update(_thgstyles)
 
     # allow the user to override
-    for status, cfgeffects in ui.configitems(b'color'):
+    for status, cfgeffects in ui.configitems(b'color'):  # type: Tuple[bytes, bytes]
         if b'.' not in status:
             continue
         cfgeffects = ui.configlist(b'color', status)
-        _styles[status] = b' '.join(cfgeffects)
+        _styles[pycompat.sysstr(status)] = pycompat.sysstr(b' '.join(cfgeffects))
 
-    for status, cfgeffects in ui.configitems(b'thg-color'):
+    for status, cfgeffects in ui.configitems(b'thg-color'):  # type: Tuple[bytes, bytes]
         if b'.' not in status:
             continue
         cfgeffects = ui.configlist(b'thg-color', status)
-        _styles[status] = b' '.join(cfgeffects)
+        _styles[pycompat.sysstr(status)] = pycompat.sysstr(b' '.join(cfgeffects))
 
 # See https://doc.qt.io/qt-4.8/richtext-html-subset.html
 # and https://www.w3.org/TR/SVG/types.html#ColorKeywords
@@ -523,26 +529,26 @@ def descriptionhtmlizer(ui):
     u'&lt;<a href="https://example/">https://example/</a>&gt;'
 
     issue links:
-    >>> u.setconfig('tortoisehg', 'issue.regex', r'#(\\d+)\\b')
-    >>> u.setconfig('tortoisehg', 'issue.link', 'http://example/issue/{1}/')
+    >>> u.setconfig(b'tortoisehg', b'issue.regex', br'#(\\d+)\\b')
+    >>> u.setconfig(b'tortoisehg', b'issue.link', b'http://example/issue/{1}/')
     >>> htmlize = descriptionhtmlizer(u)
     >>> htmlize('foo #123')
     u'foo <a href="http://example/issue/123/">#123</a>'
 
     missing issue.link setting:
-    >>> u.setconfig('tortoisehg', 'issue.link', '')
+    >>> u.setconfig(b'tortoisehg', b'issue.link', b'')
     >>> htmlize = descriptionhtmlizer(u)
     >>> htmlize('foo #123')
     u'foo #123'
 
     too many replacements in issue.link:
-    >>> u.setconfig('tortoisehg', 'issue.link', 'http://example/issue/{1}/{2}')
+    >>> u.setconfig(b'tortoisehg', b'issue.link', b'http://example/issue/{1}/{2}')
     >>> htmlize = descriptionhtmlizer(u)
     >>> htmlize('foo #123')
     u'foo #123'
 
     invalid regexp in issue.regex:
-    >>> u.setconfig('tortoisehg', 'issue.regex', '(')
+    >>> u.setconfig(b'tortoisehg', b'issue.regex', b'(')
     >>> htmlize = descriptionhtmlizer(u)
     >>> htmlize('foo #123')
     u'foo #123'

@@ -18,6 +18,7 @@ import time
 from hgext import mq as mqmod
 from mercurial import (
     cmdutil,
+    config,
     dispatch as dispatchmod,
     encoding,
     error,
@@ -69,6 +70,10 @@ if TYPE_CHECKING:
         Tuple,
         Union,
         overload,
+    )
+
+    from .typelib import (
+        IniConfig,
     )
 
 nullsubrepostate = subrepoutil.nullstate
@@ -202,7 +207,7 @@ def fromutf(s):
         return fromunicode(s.decode('utf-8'), 'replace')
     except UnicodeDecodeError:
         # can't round-trip
-        return str(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
+        return bytes(fromunicode(s.decode('utf-8', 'replace'), 'replace'))
 
 
 getcwdb = encoding.getcwd
@@ -346,7 +351,7 @@ try:
     mergestate = mergestatemod.mergestate
 except (AttributeError, ImportError):
     # hg<5.5 b7808443ed6a
-    mergestate = mergemod.mergestate
+    mergestate = mergemod.mergestate  # pytype: disable=module-attr
 readmergestate = mergestate.read
 
 def readundodesc(repo):
@@ -562,7 +567,7 @@ tortoisehgtoollocations = (
 )
 
 def tortoisehgtools(uiorconfig, selectedlocation=None):
-    # TODO: type annotation
+    # type: (IniConfig, Optional[Text]) -> Tuple[Dict[Text, Dict[Text, Union[Text, bool]]], List[Text]]
     """Parse 'tortoisehg-tools' section of ini file.
 
     >>> from pprint import pprint
@@ -574,14 +579,14 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
 
     Changes:
 
-    >>> hgrctext = '''
+    >>> hgrctext = b'''
     ... [tortoisehg-tools]
     ... update_to_tip.icon = hg-update
     ... update_to_tip.command = hg update tip
     ... update_to_tip.tooltip = Update to tip
     ... '''
     >>> uiobj = memui()
-    >>> uiobj._tcfg.parse('<hgrc>', hgrctext)
+    >>> uiobj._tcfg.parse(b'<hgrc>', hgrctext)
 
     into the following dictionary
 
@@ -600,7 +605,7 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
     format as the workbench.task-toolbar setting, i.e. a list of tool names,
     separated by spaces or "|" to indicate separators.
 
-    >>> hgrctext_full = hgrctext + '''
+    >>> hgrctext_full = hgrctext + b'''
     ... update_to_null.icon = hg-update
     ... update_to_null.command = hg update null
     ... update_to_null.tooltip = Update to null
@@ -614,7 +619,7 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
     ... workbench.revdetails.custom-menu = update_to_tip update_to_null
     ... '''
     >>> uiobj = memui()
-    >>> uiobj._tcfg.parse('<hgrc>', hgrctext_full)
+    >>> uiobj._tcfg.parse(b'<hgrc>', hgrctext_full)
 
     >>> tools, toollist = tortoisehgtools(
     ...     uiobj, selectedlocation='workbench.custom-toolbar')
@@ -642,17 +647,17 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
     This function can take a ui object or a config object as its input.
 
     >>> cfg = config.config()
-    >>> cfg.parse('<hgrc>', hgrctext)
+    >>> cfg.parse(b'<hgrc>', hgrctext)
     >>> tools, toollist = tortoisehgtools(cfg)
     >>> pprint(tools) #doctest: +NORMALIZE_WHITESPACE
     {'update_to_tip': {'command': 'hg update tip',
-                       'icon': 'hg-update',
-                       'tooltip': 'Update to tip'}}
+                        'icon': 'hg-update',
+                        'tooltip': 'Update to tip'}}
     >>> toollist
     ['update_to_tip']
 
     >>> cfg = config.config()
-    >>> cfg.parse('<hgrc>', hgrctext_full)
+    >>> cfg.parse(b'<hgrc>', hgrctext_full)
     >>> tools, toollist = tortoisehgtools(
     ...     cfg, selectedlocation='workbench.custom-toolbar')
     >>> sorted(tools.keys())
@@ -673,17 +678,24 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
         configlist = uiorconfig.configlist
     else:
         configitems = uiorconfig.items
+        assert not isinstance(uiorconfig, uimod.ui)  # help pytype
+
         def configlist(section, name):
             return uiorconfig.get(section, name, b'').split()
 
-    tools = {}
+    tools = {}  # type: Dict[Text, Dict[Text, Union[Text, bool]]]
     for key, value in configitems(b'tortoisehg-tools'):
-        toolname, field = key.split(b'.', 1)
+        toolname, field = tounicode(key).split('.', 1)
         if toolname not in tools:
             tools[toolname] = {}
-        bvalue = stringutil.parsebool(value)
-        if bvalue is not None:
-            value = bvalue
+        if field == 'showoutput':
+            bvalue = stringutil.parsebool(value)
+            if bvalue is not None:
+                value = bvalue
+            else:
+                value = True
+        else:
+            value = tounicode(value)
         tools[toolname][field] = value
 
     if selectedlocation is None:
@@ -695,10 +707,11 @@ def tortoisehgtools(uiorconfig, selectedlocation=None):
 
     guidef = configlist(b'tortoisehg',
                         pycompat.sysbytes(selectedlocation)) or []
-    toollist = []
-    selectedtools = {}
+    toollist = []  # type: List[Text]
+    selectedtools = {}  # type: Dict[Text, Dict[Text, Union[Text, bool]]]
     for name in guidef:
-        if name != b'|':
+        name = tounicode(name)
+        if name != '|':
             info = tools.get(name, None)
             if info is None:
                 continue
@@ -721,7 +734,7 @@ def copydynamicconfig(srcui, destui):
     >>> destui.config(b'paths', b'default') is None
     True
     >>> destui.config(b'patch', b'eol'), destui.configsource(b'patch', b'eol')
-    ('auto', 'eol')
+    (b'auto', b'eol')
     """
     for section, name, value in srcui.walkconfig():
         source = srcui.configsource(section, name)
@@ -948,13 +961,13 @@ def parseconfigopts(ui, args):
     """Pop the --config options from the command line and apply them
 
     >>> u = uimod.ui()
-    >>> args = ['log', '--config', 'extensions.mq=!']
+    >>> args = [b'log', b'--config', b'extensions.mq=!']
     >>> parseconfigopts(u, args)
-    [('extensions', 'mq', '!')]
+    [(b'extensions', b'mq', b'!')]
     >>> args
-    ['log']
-    >>> u.config('extensions', 'mq')
-    '!'
+    [b'log']
+    >>> u.config(b'extensions', b'mq')
+    b'!'
     """
     config = dispatchmod._earlyparseopts(ui, args)[b'config']
     # drop --config from args

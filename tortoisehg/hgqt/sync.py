@@ -1208,7 +1208,7 @@ class SaveDialog(QDialog):
 
         u = parseurl(urlu)
         clearable = bool(not edit and (u.user or u.passwd)
-                         and u.scheme in ('http', 'https'))
+                         and u.scheme in (b'http', b'https'))
         self.clearcb = QCheckBox(_('Remove authentication data from URL'))
         self.clearcb.setToolTip(
             _('User authentication data should be associated with the '

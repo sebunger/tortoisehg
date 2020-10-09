@@ -281,7 +281,7 @@ class ExceptionMsgBox(QDialog):
             from tortoisehg.hgqt import settings
             errtext = ref[5:].split(' ')[0]
             sd = settings.SettingsDialog(configrepo=False, focus=errtext,
-                                parent=self, root='')
+                                parent=self, root=b'')
             sd.exec_()
 
 def run(ui, *pats, **opts):

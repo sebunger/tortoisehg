@@ -210,7 +210,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
             filter = ';;'.join(['%s (%s)' % (select['label'], ext),
                                 _('All files (*)')])
         response, _filter = FD.getSaveFileName(
-            self, caption, dest, filter, None, FD.ReadOnly)
+            self, caption, dest, filter, '', FD.ReadOnly)
         if response:
             self.dest_edit.setText(response)
             self.update_path()

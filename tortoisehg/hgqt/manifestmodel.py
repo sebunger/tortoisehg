@@ -646,9 +646,9 @@ def _populatesubrepos(roote, repo, nodeop, statusfilter, match):
         e.status = _comparesubstate(psubstate, substate)
         if e.status == 'R':
             # denotes the original subrepo has been removed
-            e.subkind = psubstate[2]
+            e.subkind = pycompat.sysstr(psubstate[2])
         else:
-            e.subkind = substate[2]
+            e.subkind = pycompat.sysstr(substate[2])
 
         # do not call ctx.sub() unnecessarily, which may raise Abort or OSError
         # if git or svn executable not found

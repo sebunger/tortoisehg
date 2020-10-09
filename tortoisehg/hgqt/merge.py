@@ -478,7 +478,8 @@ class CommitPage(BasePage):
                     branch = None
                     if hasattr(pctx, 'branch') and pctx.branch() != cbranch:
                         branch = pctx.branch()
-                    parents.append((str(pctx.rev()), str(pctx), branch, pctx))
+                    parents.append((str(pctx.rev()), str(pctx),
+                                    hglib.tounicode(branch), pctx))
                 return parents
             raise csinfo.UnknownItem()
         def markup_func(widget, item, value):

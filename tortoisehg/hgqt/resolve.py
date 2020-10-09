@@ -37,6 +37,7 @@ from .qtgui import (
 )
 
 from mercurial import (
+    encoding,
     pycompat,
 )
 
@@ -281,9 +282,11 @@ class ResolveDialog(QDialog):
     def merge(self, tool=False):
         if not tool:
             tool = self.tcombo.readValue()
+            if tool:
+                tool = encoding.strfromlocal(tool)
         cmd = ['resolve']
         if tool:
-            cmd += ['--tool='+tool]
+            cmd += ['--tool=' + tool]
         self.runCommand(self.utree, cmd)
 
     @pyqtSlot(QAction)
