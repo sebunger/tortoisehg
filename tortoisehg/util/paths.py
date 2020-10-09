@@ -18,6 +18,8 @@ from mercurial import (
 )
 
 try:
+    # TODO: These are generated a str on non Windows platforms, but can be
+    #       filesystem encoded on Windows.
     from .config import (
         bin_path,
         icon_path,
@@ -28,6 +30,23 @@ except ImportError:
     icon_path, bin_path, license_path, locale_path = None, None, None, None
 
 _hg_command = None
+
+if pycompat.TYPE_CHECKING:
+    from typing import (
+        List,
+        Optional,
+        overload,
+    )
+
+    @overload
+    def _find_root(p, dn):
+        # type: (str, str) -> str
+        pass
+    @overload
+    def _find_root(p, dn):
+        # type: (bytes, bytes) -> bytes
+        pass
+
 
 def _find_root(p, dn):
     while not os.path.isdir(os.path.join(p, dn)):
@@ -40,12 +59,15 @@ def _find_root(p, dn):
     return p
 
 def find_root(path=None):
+    # type: (Optional[str]) -> str
     return _find_root(path or os.getcwd(), '.hg')
 
 def find_root_bytes(path=None):
+    # type: (Optional[bytes]) -> bytes
     return _find_root(path or encoding.getcwd(), b'.hg')
 
 def get_tortoise_icon(icon):
+    # type: (str) -> Optional[str]
     "Find a tortoisehg icon"
     icopath = os.path.join(get_icon_path(), icon)
     if os.path.isfile(icopath):
@@ -55,21 +77,26 @@ def get_tortoise_icon(icon):
         return None
 
 def get_icon_path():
+    # type: () -> str
     global icon_path
     return icon_path or os.path.join(get_prog_root(), 'icons')
 
 def get_license_path():
+    # type: () -> str
     global license_path
     return license_path or os.path.join(get_prog_root(), 'COPYING.txt')
 
 def get_locale_path():
+    # type: () -> str
     global locale_path
     return locale_path or os.path.join(get_prog_root(), 'locale')
 
 def _get_hg_path():
+    # type: () -> str
     return os.path.abspath(os.path.join(mercurial.__file__, '..', '..'))
 
 def get_hg_command():
+    # type: () -> List[str]
     """List of command to execute hg (equivalent to mercurial.util.hgcmd)"""
     global _hg_command
     if _hg_command is None:
@@ -87,6 +114,7 @@ if os.name == 'nt':
     import win32file
 
     def find_in_path(pgmname):
+        # type: (str) -> Optional[str]
         "return first executable found in search path"
         global bin_path
         ospath = os.environ['PATH'].split(os.pathsep)
@@ -101,6 +129,7 @@ if os.name == 'nt':
         return None
 
     def _find_hg_command():
+        # type: () -> List[str]
         if hasattr(sys, 'frozen'):
             progdir = get_prog_root()
             exe = os.path.join(progdir, 'hg.exe')
@@ -126,16 +155,19 @@ if os.name == 'nt':
         return [exe]
 
     def get_prog_root():
+        # type: () -> str
         if getattr(sys, 'frozen', False):
             return os.path.dirname(sys.executable)
         return os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
     def get_thg_command():
+        # type: () -> List[str]
         if getattr(sys, 'frozen', False):
             return [sys.executable]
         return [sys.executable] + sys.argv[:1]
 
     def is_unc_path(path):
+        # type: (bytes) -> bool
         # splitdrive() on py2 didn't get UNC support until 2.7.8 in 2014, which
         # means it may not be available on CentOS 7, for example.
         if pycompat.ispy3:
@@ -146,6 +178,7 @@ if os.name == 'nt':
             return bool(unc)
 
     def is_on_fixed_drive(path):
+        # type: (bytes) -> bool
         if is_unc_path(path):
             # All UNC paths (\\host\mount) are considered not-fixed
             return False
@@ -159,6 +192,7 @@ if os.name == 'nt':
 else: # Not Windows
 
     def find_in_path(pgmname):
+        # type: (str) -> Optional[str]
         """ return first executable found in search path """
         global bin_path
         ospath = os.environ['PATH'].split(os.pathsep)
@@ -170,6 +204,7 @@ else: # Not Windows
         return None
 
     def _find_hg_command():
+        # type: () -> List[str]
         # look for in-place build, i.e. "make local"
         exe = os.path.join(_get_hg_path(), 'hg')
         if os.path.exists(exe):
@@ -181,15 +216,19 @@ else: # Not Windows
         return [exe]
 
     def get_prog_root():
+        # type: () -> str
         path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
         return path
 
     def get_thg_command():
+        # type: () -> List[str]
         return sys.argv[:1]
 
     def is_unc_path(path):
+        # type: (bytes) -> bool
         return False
 
     def is_on_fixed_drive(path):
+        # type: (bytes) -> bool
         return True
 

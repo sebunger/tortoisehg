@@ -1203,7 +1203,7 @@ class RepoWidget(QWidget):
             showoutput = info.get('showoutput', False)
             label = info.get('label', name)
             icon = info.get('icon', 'tools-spanner-hammer')
-            enable = info.get('enable', 'istrue').lower()
+            enable = info.get('enable', 'istrue').lower()  # pytype: disable=attribute-error
             if enable in _ENABLE_MENU_FUNCS:
                 enable = _ENABLE_MENU_FUNCS[enable]
             else:
@@ -2184,11 +2184,15 @@ class RepoWidget(QWidget):
         # Perform variable expansion
         # This is done in two steps:
         # 1. Expand environment variables
+        if not pycompat.ispy3:
+            command = hglib.fromunicode(command)
         command = os.path.expandvars(command).strip()
         if not command:
             InfoMsgBox(_('Invalid command'),
                        _('The selected command is empty'))
             return
+        if not pycompat.ispy3:
+            workingdir = hglib.fromunicode(workingdir)
         if workingdir:
             workingdir = os.path.expandvars(workingdir).strip()
 
@@ -2257,7 +2261,13 @@ class RepoWidget(QWidget):
             _ui.ferr = pycompat.bytesio()
             # avoid circular import of hgqt.run by importing it inplace
             from . import run
-            res = run.dispatch(cmd, u=_ui)
+            cmdb = []
+            for part in cmd:
+                if isinstance(part, pycompat.unicode):
+                    cmdb.append(hglib.fromunicode(part))
+                else:
+                    cmdb.append(part)
+            res = run.dispatch(cmdb, u=_ui)
             if res:
                 errormsg = _ui.ferr.getvalue().strip()
                 if errormsg:

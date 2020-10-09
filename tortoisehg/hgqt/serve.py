@@ -212,13 +212,13 @@ class ServeDialog(QDialog):
 def _asconfigliststr(value):
     r"""
     >>> _asconfigliststr(b'foo')
-    'foo'
+    b'foo'
     >>> _asconfigliststr(b'foo bar')
-    '"foo bar"'
+    b'"foo bar"'
     >>> _asconfigliststr(b'foo,bar')
-    '"foo,bar"'
+    b'"foo,bar"'
     >>> _asconfigliststr(b'foo "bar"')
-    '"foo \\"bar\\""'
+    b'"foo \\"bar\\""'
     """
     # ui.configlist() uses isspace(), which is locale-dependent
     if any(c.isspace() or c == b',' for c in pycompat.iterbytestr(value)):

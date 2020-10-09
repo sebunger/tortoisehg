@@ -31,7 +31,6 @@ from .qtgui import (
     QFrame,
     QGridLayout,
     QHBoxLayout,
-    QIcon,
     QIntValidator,
     QLabel,
     QLineEdit,
@@ -81,6 +80,10 @@ if hglib.TYPE_CHECKING:
     from typing import (
         List,
         Text,
+    )
+
+    from ..util.typelib import (
+        IniConfig,
     )
 
 if os.name == 'nt':
@@ -1559,7 +1562,7 @@ class SettingsForm(QWidget):
 
     def refresh(self, *args):
         # refresh config values
-        self.ini = self.loadIniFile(self.rcpath)
+        self.ini = self.loadIniFile(self.rcpath)  # TODO: type this attr
         self.readonly = self.forcereadonly or not (hasattr(self.ini, 'write')
                                 and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
@@ -1744,6 +1747,7 @@ class SettingsForm(QWidget):
         return self.ini.get(section, key)
 
     def loadIniFile(self, rcpath):
+        # type: (List[pycompat.unicode]) -> IniConfig
         for fn in rcpath:
             if os.path.exists(fn):
                 break
