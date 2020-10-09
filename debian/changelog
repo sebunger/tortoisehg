@@ -1,3 +1,9 @@
+tortoisehg (5.5.2-1ppa1) unstable; urgency=medium
+
+  * New upstream version
+
+ -- Sebastian Unger <sebunger44@gmail.com>  Fri, 09 Oct 2020 22:52:48 +1300
+
 tortoisehg (5.5-0ppa2) unstable; urgency=medium
 
   * Updated dependencies to python3 versions of iniparse and pygments
