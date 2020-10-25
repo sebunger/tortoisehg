@@ -1,9 +1,12 @@
-tortoisehg (5.1-1) unstable; urgency=medium
+tortoisehg (5.5.2-1) unstable; urgency=medium
 
   * New maintainer (Closes: #922565).
   * New upstream version (Closes: #921704).
+  * Refresh patches.
+  * Switch over to Python 3.
+  * Bump Mercurial dependency.
 
- -- Andrej Shadura <andrewsh@debian.org>  Tue, 17 Sep 2019 14:12:10 +0200
+ -- Andrej Shadura <andrewsh@debian.org>  Sun, 25 Oct 2020 14:32:49 +0100
 
 tortoisehg (4.8.1-0.1) unstable; urgency=medium
 
