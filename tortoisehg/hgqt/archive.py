@@ -161,9 +161,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         self.rev_combo.addItem(WD_PARENT)
         self.rev_combo.addItems(pycompat.maplist(hglib.tounicode,
                                     hglib.namedbranches(self.repo)))
-        tags = list(self.repo.tags())
-        tags.sort(reverse=True)
-        for t in tags:
+        for t in sorted(self.repo.tags(), reverse=True):
             self.rev_combo.addItem(hglib.tounicode(t))
         if rev:
             text = hglib.tounicode(str(rev))
@@ -212,7 +210,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
             filter = ';;'.join(['%s (%s)' % (select['label'], ext),
                                 _('All files (*)')])
         response, _filter = FD.getSaveFileName(
-            self, caption, dest, filter, None, FD.ReadOnly)
+            self, caption, dest, filter, '', FD.ReadOnly)
         if response:
             self.dest_edit.setText(response)
             self.update_path()

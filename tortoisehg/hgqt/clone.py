@@ -154,7 +154,15 @@ class CloneWidget(cmdui.AbstractCmdWidget):
                 hbox.addWidget(btn)
                 return chk, text, btn
             else:
-                return chk, text
+                return chk, text, None
+
+        def chktext2(chklabel, stretch=None):
+            # type: (Text, Optional[int]) -> Tuple[QCheckBox, QLineEdit]
+            # pytype gets confused if the returned tuple is sliced and returned
+            # without unpacking.
+            chk, text, _unused = chktext(chklabel, stretch=stretch)
+            return chk, text
+
         def chktext3(chklabel, btnlabel, btnslot, stretch=None):
             # type: (Text, Text, Any, Optional[int]) -> Tuple[QCheckBox, QLineEdit, QPushButton]
             assert btnlabel
@@ -162,8 +170,8 @@ class CloneWidget(cmdui.AbstractCmdWidget):
             assert isinstance(ret[2], QPushButton)
             return ret
 
-        self.rev_chk, self.rev_text = chktext(_('Clone to revision:'),
-                                              stretch=40)
+        self.rev_chk, self.rev_text = chktext2(_('Clone to revision:'),
+                                               stretch=40)
         self.rev_text.setToolTip(_('A revision identifier, bookmark, tag or '
                                    'branch name'))
 
@@ -193,14 +201,14 @@ class CloneWidget(cmdui.AbstractCmdWidget):
         optbox.addWidget(self.insecure_chk)
         self.insecure_chk.setEnabled(False)
 
-        self.remote_chk, self.remote_text = chktext(_('Remote command:'))
+        self.remote_chk, self.remote_text = chktext2(_('Remote command:'))
 
         self.largefiles_chk = QCheckBox(_('Use largefiles'))
         optbox.addWidget(self.largefiles_chk)
 
         # allow to specify start revision for p4 & svn repos.
-        self.startrev_chk, self.startrev_text = chktext(_('Start revision:'),
-                                                        stretch=40)
+        self.startrev_chk, self.startrev_text = chktext2(_('Start revision:'),
+                                                         stretch=40)
 
         self.hgcmd_txt = QLineEdit()
         self.hgcmd_txt.setReadOnly(True)

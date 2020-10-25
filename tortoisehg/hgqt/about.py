@@ -182,8 +182,9 @@ class AboutDialog(QDialog):
         # https://developers.whatismybrowser.com/useragents/explore/operating_system_name
         useragent = "unknown"
         if sys.platform == 'win32':
-            from win32process import \
-                IsWow64Process as IsX64  # pytype: disable=import-error
+            from win32process import (  # pytype: disable=import-error
+                IsWow64Process as IsX64
+            )
             if IsX64():
                 useragent = "Windows WOW64"
             else:

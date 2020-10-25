@@ -225,7 +225,7 @@ class RepoTreeModel(QAbstractItemModel):
 
     def dropMimeData(self, data, action, row, column, parent):
         group = parent.internalPointer()
-        d = str(data.data(repoRegMimeType))
+        d = bytes(data.data(repoRegMimeType))
         if not data.hasUrls():
             # The source is a group
             if row < 0:

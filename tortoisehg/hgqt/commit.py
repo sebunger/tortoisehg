@@ -326,8 +326,8 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                         QSizePolicy.Preferred)
         vbox.addWidget(self.optionslabel, 0)
 
-        self.pcsinfo = revpanel.ParentWidget(repo)
-        vbox.addWidget(self.pcsinfo, 0)
+        self.wdirinfo = revpanel.WDirInfoWidget(repo)
+        vbox.addWidget(self.wdirinfo, 0)
 
         msgte = MessageEntry(self, self.stwidget.getChecked)
         msgte.installEventFilter(qscilib.KeyPressInterceptor(self))
@@ -551,9 +551,9 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             self.stwidget.partials = {}
         if refreshwctx:
             self.stwidget.refreshWctx()
-        custom = self.pcsinfo.custom.copy()
+        custom = self.wdirinfo.custom.copy()
         custom['isAmend'] = curraction._name == 'amend'
-        self.pcsinfo.update(custom=custom)
+        self.wdirinfo.update(custom=custom)
         self.committb.setText(curraction._text)
         self.lastAction = curraction._name
 
@@ -781,18 +781,18 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                                      False))
         self.optionslabel.setVisible(bool(opts))
 
-        # Update parent csinfo widget
-        self.pcsinfo.set_revision(None)
-        self.pcsinfo.update()
+        # Update wdir csinfo widget
+        self.wdirinfo.set_revision(None)
+        self.wdirinfo.update()
 
         # This is ugly, but want pnlabel to have the same alignment/style/etc
-        # as pcsinfo, so extract the needed parts of pcsinfo's markup.  Would
+        # as wdirinfo, so extract the needed parts of wdirinfo's markup.  Would
         # be nicer if csinfo exposed this information, or if csinfo could hold
         # widgets like pnlabel.
         if self.hasmqbutton:
             parent = _('Parent:')
             patchname = _('Patch name:')
-            text = pycompat.unicode(self.pcsinfo.revlabel.text())
+            text = pycompat.unicode(self.wdirinfo.revlabel.text())
             cellend = '</td>'
             firstidx = text.find(cellend) + len(cellend)
             secondidx = text[firstidx:].rfind('</tr>')

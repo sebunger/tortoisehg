@@ -249,8 +249,7 @@ class SummaryInfo(object):
                 else:
                     return None
             elif item == 'ishead':
-                childbranches = [cctx.branch() for cctx in ctx.children()]
-                return ctx.branch() not in childbranches
+                return ctx.node() in ctx.repo().branchheads(ctx.branch())
             elif item == 'mqoriginalparent':
                 target = ctx.thgmqoriginalparent()
                 if not target:

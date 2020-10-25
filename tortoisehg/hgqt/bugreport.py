@@ -71,7 +71,7 @@ class BugReport(QDialog):
 
         lbl = QLabel(_('Please report this bug to our '
             '<a href="%s">bug tracker</a>') %
-            u'https://bitbucket.org/tortoisehg/thg/wiki/BugReport')
+            u'https://foss.heptapod.net/mercurial/tortoisehg/thg/-/issues')
         lbl.setOpenExternalLinks(True)
         self.layout().addWidget(lbl)
 
@@ -281,7 +281,7 @@ class ExceptionMsgBox(QDialog):
             from tortoisehg.hgqt import settings
             errtext = ref[5:].split(' ')[0]
             sd = settings.SettingsDialog(configrepo=False, focus=errtext,
-                                parent=self, root='')
+                                parent=self, root=b'')
             sd.exec_()
 
 def run(ui, *pats, **opts):

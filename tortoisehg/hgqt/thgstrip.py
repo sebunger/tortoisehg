@@ -68,9 +68,7 @@ class StripWidget(cmdui.AbstractCmdWidget):
         for name in hglib.namedbranches(self.repo):
             combo.addItem(hglib.tounicode(name))
 
-        tags = list(self.repo.tags())
-        tags.sort(reverse=True)
-        for tag in tags:
+        for tag in sorted(self.repo.tags(), reverse=True):
             combo.addItem(hglib.tounicode(tag))
 
         ### preview box, contained in scroll area, contains preview grid

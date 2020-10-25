@@ -223,7 +223,7 @@ def get_lines_from_listfile(filename, isutf8):
     global _linesutf8
     try:
         if filename == b'-':
-            lines = [ x.replace(b"\n", b"") for x in pycompat.stdin.readlines() ]
+            lines = [x.replace(b"\n", b"") for x in procutil.stdin.readlines()]
         else:
             fd = open(filename, "r")
             lines = [ x.replace("\n", "") for x in fd.readlines() ]
@@ -1353,15 +1353,15 @@ def thgstatus(ui, *pats, **opts):
     [(b'r', b'rev', b'', _('revision'))],
     _('thg topics [-r REV] [NAME]'))
 def topics(ui, repoagent, *names, **opts):
-    """add, remove or change a topic"""
+    """set or clear a topic"""
     repo = repoagent.rawRepo()
     if b'topic' not in repo.extensions():
         raise error.Abort(_('Please enable the Topic extension first.'))
-    from tortoisehg.hgqt import topics as topicsmod
+    from tortoisehg.hgqt import topic as topicmod
     rev = scmutil.revsingle(repo, opts.get('rev')).rev()
     if len(names) > 1:
         raise error.Abort(_('only one new topic name allowed'))
-    dlg = topicsmod.TopicsDialog(repoagent, rev)
+    dlg = topicmod.TopicDialog(repoagent, rev)
     if names:
         dlg.setTopicName(hglib.tounicode(names[0]))
     return dlg

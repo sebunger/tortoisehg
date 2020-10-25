@@ -31,7 +31,6 @@ from .qtgui import (
     QFrame,
     QGridLayout,
     QHBoxLayout,
-    QIcon,
     QIntValidator,
     QLabel,
     QLineEdit,
@@ -81,6 +80,10 @@ if hglib.TYPE_CHECKING:
     from typing import (
         List,
         Text,
+    )
+
+    from ..util.typelib import (
+        IniConfig,
     )
 
 if os.name == 'nt':
@@ -845,7 +848,7 @@ INFO = (
           'Default: False')),
     _fi(_('New Commit Phase'), 'phases.new-commit',
         (genDefaultCombo,
-         [pycompat.sysstr(ph) for ph in phases.phasenames[:3]]),
+         [pycompat.sysstr(ph) for ph in phases.cmdphasenames]),
         _('The phase of new commits. Default: draft')),
     _fi(_('Secret MQ Patches'), 'mq.secret', genBoolRBGroup,
         _('Make MQ patches secret (instead of draft). '
@@ -1170,9 +1173,9 @@ INFO = (
           '<li>{gitnode} : if the hg-git extension is enabled, and the repo is '
           'a git clone, this is replaced by the git commit hash.'
           '</ul>'
-          'For example, in order to link to bitbucket commit pages you can '
+          'For example, in order to link to Heptapod commit pages you can '
           'set this to:<br>'
-          'https://bitbucket.org/tortoisehg/thg/commits/{node|short}<br>'
+          'https://foss.heptapod.net/mercurial/tortoisehg/thg/-/commit/{node}<br>'
           'You can also to link to a GitHub/GitLab repo (provided hg-git is '
           'installed): <br>'
           'https://github.com/torvalds/linux/commit/{gitnode}<br>'
@@ -1559,7 +1562,7 @@ class SettingsForm(QWidget):
 
     def refresh(self, *args):
         # refresh config values
-        self.ini = self.loadIniFile(self.rcpath)
+        self.ini = self.loadIniFile(self.rcpath)  # TODO: type this attr
         self.readonly = self.forcereadonly or not (hasattr(self.ini, 'write')
                                 and os.access(self.fn, os.W_OK))
         self.stack.setDisabled(self.readonly)
@@ -1744,6 +1747,7 @@ class SettingsForm(QWidget):
         return self.ini.get(section, key)
 
     def loadIniFile(self, rcpath):
+        # type: (List[pycompat.unicode]) -> IniConfig
         for fn in rcpath:
             if os.path.exists(fn):
                 break

@@ -422,9 +422,6 @@ class RepoItem(RepoTreeItem):
             # If any other sort of exception happens, show the corresponding
             # error message, but do not crash!
             # Note that we _also_ will mark the offending repos as invalid
-            # It is unfortunate that Python 2.4, which we target does not
-            # support combined try/except/finally clauses, forcing us
-            # to duplicate some code here
             self._valid = False
             if sri:
                 sri._valid = False

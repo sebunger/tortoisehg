@@ -182,7 +182,7 @@ class _wconfig(object):
         for s in src:
             self[s]._logupdate(src[s])
 
-    def set(self, section, item, value, source=''):
+    def set(self, section, item, value, source=b''):
         assert isinstance(section, bytes), (section, item, value)
         assert isinstance(item, bytes), (section, item, value)
         assert isinstance(value, bytes), (section, item, value)
@@ -240,7 +240,14 @@ class _wconfig(object):
 
         if fp:
             fp.seek(0)
-            return newini(fp)
+            if pycompat.ispy3:
+                try:
+                    fp_data = pycompat.io.StringIO(hglib.tounicode(fp.read()))
+                    return newini(fp_data)
+                finally:
+                    fp.close()
+            else:
+                return newini(fp)
         else:
             fp_data = fp_file = util.posixfile(path, b'rb')
             if pycompat.ispy3:

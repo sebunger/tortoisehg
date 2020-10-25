@@ -8,15 +8,18 @@
 import re
 
 try:
-    # post 1.1.2
-    from mercurial import util
-    hgversion = util.version()
-except AttributeError:
-    # <= 1.1.2
-    from mercurial import version
-    hgversion = version.get_version()
+    try:
+        # post 1.1.2
+        from mercurial import util
+        hgversion = util.version()
+    except AttributeError:
+        # <= 1.1.2
+        from mercurial import version
+        hgversion = version.get_version()
+except ImportError:
+    hgversion = None
 
-testedwith = b'5.3 5.4'
+testedwith = b'5.4 5.5'
 
 def checkhgversion(v):
     """range check the Mercurial version"""

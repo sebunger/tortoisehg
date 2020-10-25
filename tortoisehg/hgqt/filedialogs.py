@@ -589,10 +589,7 @@ class FileDiffDialog(_AbstractFileDialog):
         self.timer.timeout.connect(self.idle_fill_files)
 
     def setupModels(self):
-        self.filedata = {
-            'left': [],
-            'right': [],
-        }  # type: Dict[Text, List[pycompat.unicode]]
+        self.filedata = {'left': [], 'right': []}  # type: Dict[Text, List[pycompat.unicode]]
         self._invbarchanged = False
         self.filerevmodel = repomodel.FileRevModel(
             self._repoagent, self.filename, parent=self)

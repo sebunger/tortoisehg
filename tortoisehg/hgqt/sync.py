@@ -778,7 +778,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         link = self.linkifyWithTarget(self._lasturl)
         if ret == 0:
             self.showMessage.emit(_('Found incoming changesets from %s') % link)
-            if self._lastbfile and os.path.exists(self._lastbfile):
+            # hg-git 'incoming' gives no data for bundle
+            if (self._lastbfile and os.path.exists(self._lastbfile)
+                and os.path.getsize(self._lastbfile) > 0):
                 self.incomingBundle.emit(self._lastbfile, self._lasturl)
         elif ret == 1:
             self.showMessage.emit(_('No incoming changesets from %s') % link)
@@ -1206,7 +1208,7 @@ class SaveDialog(QDialog):
 
         u = parseurl(urlu)
         clearable = bool(not edit and (u.user or u.passwd)
-                         and u.scheme in ('http', 'https'))
+                         and u.scheme in (b'http', b'https'))
         self.clearcb = QCheckBox(_('Remove authentication data from URL'))
         self.clearcb.setToolTip(
             _('User authentication data should be associated with the '

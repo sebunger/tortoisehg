@@ -14,6 +14,7 @@ import socket
 from mercurial import (
     error,
     extensions,
+    node as nodemod,
     pycompat,
     registrar,
     sslutil,
@@ -53,7 +54,7 @@ def debuggethostfingerprint(ui, repo, source=b'default', **opts):
     scheme = (u.scheme or b'').split(b'+')[-1]
     host = u.host
     port = util.getport(u.port or scheme or b'-1')
-    if scheme != 'https' or not host or not (0 <= port <= 65535):
+    if scheme != b'https' or not host or not (0 <= port <= 65535):
         raise error.Abort(_('unsupported URL: %s') % source)
 
     sock = socket.socket()
@@ -67,10 +68,10 @@ def debuggethostfingerprint(ui, repo, source=b'default', **opts):
     finally:
         sock.close()
 
-    s = hashlib.sha256(peercert).hexdigest()
-    ui.write('sha256:', ':'.join([s[x:x + 2] for x
-                                  in pycompat.xrange(0, len(s), 2)]),
-             '\n')
+    s = nodemod.hex(hashlib.sha256(peercert).digest())
+    ui.write(b'sha256:', b':'.join([s[x:x + 2] for x
+                                    in pycompat.xrange(0, len(s), 2)]),
+             b'\n')
 
 def postinitskel(ui, repo, hooktype, result, pats, **kwargs):
     """create common files in new repository"""
@@ -115,11 +116,11 @@ def _applymovemqpatches(q, after, patches):
     q.seriesdirty = True
 
 @mqcommand(b'qreorder',
-    [(b'', b'after', '', _('move after the specified patch'))],
+    [(b'', b'after', b'', _('move after the specified patch'))],
     _('[--after PATCH] PATCH...'))
 def qreorder(ui, repo, *patches, **opts):
     """move patches to the beginning or after the specified patch"""
-    after = opts[b'after'] or None
+    after = opts['after'] or None
     q = repo.mq
     if any(n not in q.series for n in patches):
         raise error.Abort(_('unknown patch to move specified'))

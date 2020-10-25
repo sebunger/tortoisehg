@@ -52,13 +52,13 @@ class _labeledstr(bytes):
     r"""
     >>> a = _labeledstr(b'foo', b'ui.warning')
     >>> a.packed()
-    '\x01ui.warning\nfoo'
+    b'\x01ui.warning\nfoo'
     >>> _labeledstr(a, b'ui.error').packed()
-    '\x01ui.warning ui.error\nfoo'
+    b'\x01ui.warning ui.error\nfoo'
     >>> _labeledstr(b'foo', b'').packed()
-    'foo'
+    b'foo'
     >>> _labeledstr(b'\1foo', b'').packed()
-    '\x01\n\x01foo'
+    b'\x01\n\x01foo'
     >>> _labeledstr(a, b'') is a  # fast path
     True
     """
@@ -81,13 +81,13 @@ class _labeledstr(bytes):
 def _packmsgs(msgs, label):
     r"""
     >>> _packmsgs([b'foo'], b'')
-    ['foo']
+    [b'foo']
     >>> _packmsgs([b'foo ', b'bar'], b'')
-    ['foo bar']
+    [b'foo bar']
     >>> _packmsgs([b'foo ', b'bar'], b'ui.status')
-    ['\x01ui.status\nfoo bar']
+    [b'\x01ui.status\nfoo bar']
     >>> _packmsgs([b'foo ', _labeledstr(b'bar', b'log.branch')], b'')
-    ['foo ', '\x01log.branch\nbar']
+    [b'foo ', b'\x01log.branch\nbar']
     """
     if not any(isinstance(e, _labeledstr) for e in msgs):
         # pack into single message to avoid overhead of label header and
@@ -104,12 +104,12 @@ def splitmsgs(data):
     r"""Split data to list of packed messages assuming that original messages
     contain no '\1' character
 
-    >>> splitmsgs('')
+    >>> splitmsgs(b'')
     []
-    >>> splitmsgs('\x01ui.warning\nfoo\x01\nbar')
-    ['\x01ui.warning\nfoo', '\x01\nbar']
-    >>> splitmsgs('foo\x01ui.warning\nbar')
-    ['foo', '\x01ui.warning\nbar']
+    >>> splitmsgs(b'\x01ui.warning\nfoo\x01\nbar')
+    [b'\x01ui.warning\nfoo', b'\x01\nbar']
+    >>> splitmsgs(b'foo\x01ui.warning\nbar')
+    [b'foo', b'\x01ui.warning\nbar']
     """
     msgs = data.split(b'\1')
     if msgs[0]:
@@ -120,12 +120,12 @@ def splitmsgs(data):
 def unpackmsg(data):
     r"""Try to unpack data to original message and label
 
-    >>> unpackmsg('foo')
-    ('foo', '')
-    >>> unpackmsg('\x01ui.warning\nfoo')
-    ('foo', 'ui.warning')
-    >>> unpackmsg('\x01ui.warning')  # immature end
-    ('', 'ui.warning')
+    >>> unpackmsg(b'foo')
+    (b'foo', b'')
+    >>> unpackmsg(b'\x01ui.warning\nfoo')
+    (b'foo', b'ui.warning')
+    >>> unpackmsg(b'\x01ui.warning')  # immature end
+    (b'', b'ui.warning')
     """
     if not data.startswith(b'\1'):
         return data, b''
@@ -137,10 +137,10 @@ def unpackmsg(data):
 
 def _packprompt(msg, default):
     r"""
-    >>> _packprompt('foo', None)
-    'foo\x00'
-    >>> _packprompt(_labeledstr(b'$$ &Yes', b'ui.promptchoice'), 'y').packed()
-    '\x01ui.promptchoice\n$$ &Yes\x00y'
+    >>> _packprompt(b'foo', None)
+    b'foo\x00'
+    >>> _packprompt(_labeledstr(b'$$ &Yes', b'ui.promptchoice'), b'y').packed()
+    b'\x01ui.promptchoice\n$$ &Yes\x00y'
     """
     s = b'\0'.join((msg, default or b''))
     if not isinstance(msg, _labeledstr):
@@ -167,26 +167,26 @@ def _toint(s):
 
 def _packprogress(topic, pos, item, unit, total):
     r"""
-    >>> _packprogress('updating', 1, 'foo', 'files', 5)
-    'updating\x001\x00foo\x00files\x005'
-    >>> _packprogress('updating', None, '', '', None)
-    'updating\x00\x00\x00\x00'
+    >>> _packprogress(b'updating', 1, b'foo', b'files', 5)
+    b'updating\x001\x00foo\x00files\x005'
+    >>> _packprogress(b'updating', None, b'', b'', None)
+    b'updating\x00\x00\x00\x00'
     """
     return b'\0'.join((topic, _fromint(pos), item, unit, _fromint(total)))
 
 def unpackprogress(msg):
     r"""Try to unpack progress message to tuple of parameters
 
-    >>> unpackprogress('updating\x001\x00foo\x00files\x005')
-    ('updating', 1, 'foo', 'files', 5)
-    >>> unpackprogress('updating\x00\x00\x00\x00')
-    ('updating', None, '', '', None)
-    >>> unpackprogress('updating\x001\x00foo\x00files')  # immature end
-    ('updating', None, '', '', None)
-    >>> unpackprogress('')  # no separator
-    ('', None, '', '', None)
-    >>> unpackprogress('updating\x00a\x00foo\x00files\x005')  # invalid pos
-    ('updating', None, '', '', None)
+    >>> unpackprogress(b'updating\x001\x00foo\x00files\x005')
+    (b'updating', 1, b'foo', b'files', 5)
+    >>> unpackprogress(b'updating\x00\x00\x00\x00')
+    (b'updating', None, b'', b'', None)
+    >>> unpackprogress(b'updating\x001\x00foo\x00files')  # immature end
+    (b'updating', None, b'', b'', None)
+    >>> unpackprogress(b'')  # no separator
+    (b'', None, b'', b'', None)
+    >>> unpackprogress(b'updating\x00a\x00foo\x00files\x005')  # invalid pos
+    (b'updating', None, b'', b'', None)
     """
     try:
         topic, pos, item, unit, total = msg.split(b'\0')
