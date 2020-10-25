@@ -93,6 +93,7 @@ Copyright: 2011 Peer Sommerlund, Patrice LACOUTURE, Richard Marti
 License: CC-BY-SA-3.0 or GPL-2
 
 Files:
+ icons/scalable/apps/system-file-manager.svg
  icons/scalable/actions/edit-file.svg
  icons/scalable/actions/hg-annotate.svg
  icons/scalable/actions/hg-bundle.svg
@@ -105,20 +106,25 @@ Files:
  icons/scalable/actions/hg-qpush.svg
  icons/scalable/actions/hg-unbundle.svg
  icons/scalable/actions/settings_projrc.svg
-Copyright: 2011 Peer Sommerlund
+Copyright: 2008, 2011 Peer Sommerlund
 License: CC-BY-SA-3.0 or GPL-2
 
 Files:
- scalable/apps/help-readme.svg
- scalable/apps/tools-hooks.svg
- scalable/apps/tools-spanner-hammer.svg
- scalable/status/hg-sharedrepo.svg
- scalable/actions/view-filter.svg
- scalable/actions/go-previous.svg
- scalable/actions/go-home.svg
- scalable/actions/go-next.svg
- scalable/actions/go-down.svg
- scalable/actions/go-up.svg
+ icons/scalable/apps/preferences-desktop-font.svg
+License: public-domain or GPL-2
+Copyright: 2010 Johan Samyn, TortoiseHg project
+
+Files:
+ icons/scalable/apps/help-readme.svg
+ icons/scalable/apps/tools-hooks.svg
+ icons/scalable/apps/tools-spanner-hammer.svg
+ icons/scalable/status/hg-sharedrepo.svg
+ icons/scalable/actions/view-filter.svg
+ icons/scalable/actions/go-previous.svg
+ icons/scalable/actions/go-home.svg
+ icons/scalable/actions/go-next.svg
+ icons/scalable/actions/go-down.svg
+ icons/scalable/actions/go-up.svg
 Copyright: Jakub Steiner, Tango Desktop Project
 License: CC-BY-SA-2.0 or public-domain or GPL-2
 Comment:
