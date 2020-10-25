@@ -88,7 +88,7 @@ from . import (
     tag,
     thgimport,
     thgstrip,
-    topics,
+    topic,
     update,
     visdiff,
 )
@@ -1203,7 +1203,7 @@ class RepoWidget(QWidget):
             showoutput = info.get('showoutput', False)
             label = info.get('label', name)
             icon = info.get('icon', 'tools-spanner-hammer')
-            enable = info.get('enable', 'istrue').lower()
+            enable = info.get('enable', 'istrue').lower()  # pytype: disable=attribute-error
             if enable in _ENABLE_MENU_FUNCS:
                 enable = _ENABLE_MENU_FUNCS[enable]
             else:
@@ -1261,7 +1261,7 @@ class RepoWidget(QWidget):
         entry(items, menu, None, enablefuncs['isrev'], _('Boo&kmark...'),
               'hg-bookmarks', self.bookmarkRevision)
         entry(items, menu, 'topic', enablefuncs['isdraftorwd'], _('Top&ic...'),
-              'topic', self.topicsRevision)
+              'topic', self.topicRevision)
         entry(items, menu, 'gpg', enablefuncs['fixed'], _('Sig&n...'),
               'hg-sign', self.signRevision)
         entry(items, menu)
@@ -1290,7 +1290,7 @@ class RepoWidget(QWidget):
         submenu = menu.addMenu(_('Change &Phase to'))
         submenu.triggered.connect(self._changePhaseByMenu)
         # TODO: filter out hidden names better
-        for pnum, pname in enumerate(phases.phasenames[:3]):
+        for pnum, pname in enumerate(phases.cmdphasenames):
             a = entry(items, submenu, None, enablefuncs['isrev'],
                       pycompat.sysstr(pname))
             assert a is not None  # help pytype
@@ -1858,8 +1858,8 @@ class RepoWidget(QWidget):
         dlg = bookmark.BookmarkDialog(self._repoagent, self.rev, self)
         dlg.exec_()
 
-    def topicsRevision(self):
-        dlg = topics.TopicsDialog(self._repoagent, self.rev, self)
+    def topicRevision(self):
+        dlg = topic.TopicDialog(self._repoagent, self.rev, self)
         dlg.exec_()
 
     def signRevision(self):
@@ -2184,11 +2184,15 @@ class RepoWidget(QWidget):
         # Perform variable expansion
         # This is done in two steps:
         # 1. Expand environment variables
+        if not pycompat.ispy3:
+            command = hglib.fromunicode(command)
         command = os.path.expandvars(command).strip()
         if not command:
             InfoMsgBox(_('Invalid command'),
                        _('The selected command is empty'))
             return
+        if not pycompat.ispy3:
+            workingdir = hglib.fromunicode(workingdir)
         if workingdir:
             workingdir = os.path.expandvars(workingdir).strip()
 
@@ -2257,7 +2261,13 @@ class RepoWidget(QWidget):
             _ui.ferr = pycompat.bytesio()
             # avoid circular import of hgqt.run by importing it inplace
             from . import run
-            res = run.dispatch(cmd, u=_ui)
+            cmdb = []
+            for part in cmd:
+                if isinstance(part, pycompat.unicode):
+                    cmdb.append(hglib.fromunicode(part))
+                else:
+                    cmdb.append(part)
+            res = run.dispatch(cmdb, u=_ui)
             if res:
                 errormsg = _ui.ferr.getvalue().strip()
                 if errormsg:

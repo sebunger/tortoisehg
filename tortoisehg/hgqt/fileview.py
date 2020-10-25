@@ -566,10 +566,7 @@ class HgFileView(QFrame):
         if lines:
             # assume that the longest line has the largest width;
             # fm.width() is too slow to apply to each line.
-            try:
-                longestline = max(lines, key=len)
-            except TypeError:  # Python<2.5 has no key support
-                longestline = max((len(l), l) for l in lines)[1]
+            longestline = max(lines, key=len)
             self.maxWidth += fm.width(longestline)
         self._updateScrollBar()
 
@@ -620,8 +617,10 @@ class HgFileView(QFrame):
 
     def _findPrevChunk(self):
         mask = 1 << _ChunkStartMarker
-        line = self.sci.getCursorPosition()[0]
-        return self.sci.markerFindPrevious(line - 1, mask)
+        line = self.sci.getCursorPosition()[0] - 1
+        if line < 0:
+            return -1
+        return self.sci.markerFindPrevious(line, mask)
 
     @pyqtSlot()
     def _nextDiff(self):

@@ -947,7 +947,7 @@ class Graph(object):
         usetimer = nnodes is None and rev is None
         if usetimer:
             if os.name == "nt":
-                timer = time.clock
+                timer = time.clock  # pytype: disable=module-attr
             else:
                 timer = time.time
             startsec = timer()
@@ -1048,7 +1048,7 @@ class GraphWithMq(object):
 
     def index(self, rev):
         """Get row number for specified revision"""
-        if isinstance(rev, str):
+        if isinstance(rev, bytes):
             return self._patchnames.index(rev)
         i = self.graph.index(rev)
         return len(self._patchnames) + i

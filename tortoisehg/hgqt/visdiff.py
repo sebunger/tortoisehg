@@ -161,7 +161,6 @@ def launchtool(cmd, opts, replace, block):
     args = b' '.join(lopts)
     args = re.sub(_regex, quote, args)
     cmdline = procutil.shellquote(cmd) + b' ' + args
-    cmdline = procutil.quotecommand(cmdline)
     try:
         proc = subprocess.Popen(procutil.tonativestr(cmdline), shell=True,
                                 creationflags=qtlib.openflags,

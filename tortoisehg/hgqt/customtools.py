@@ -20,6 +20,8 @@ from __future__ import absolute_import
 
 import re
 
+from mercurial import pycompat
+
 from .qtcore import (
     QSettings,
     Qt,
@@ -38,17 +40,29 @@ from .qtgui import (
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
+    QWidget,
 )
 
 from ..util import hglib
 from ..util.i18n import _
 from . import qtlib
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Any,
+        Optional,
+    )
+
+    from ..util.typelib import (
+        IniConfig,
+    )
+
 DEFAULTICONNAME = 'tools-spanner-hammer'
 
 
 class ToolsFrame(QFrame):
     def __init__(self, ini, parent=None, **opts):
+        # type: (IniConfig, Optional[QWidget], Any) -> None
         QFrame.__init__(self, parent, **opts)
         self.widgets = []
         self.ini = ini
@@ -259,8 +273,7 @@ class ToolsFrame(QFrame):
                     pass
 
         tools = self.value()
-        for uname in tools:
-            name = hglib.fromunicode(uname)
+        for name in tools:
             if name[0] in '|-':
                 continue
             for field in sorted(tools[name]):
@@ -268,7 +281,8 @@ class ToolsFrame(QFrame):
                 value = tools[name][field]
                 # value may be bool if originating from hglib.tortoisehgtools()
                 if value != '':
-                    ini.set(section, keyname, str(value))
+                    updateIniValue(section, keyname,
+                                   hglib.fromunicode(pycompat.unicode(value)))
 
         # 2. Save the new guidefs
         for n, toollistwidget in enumerate(self.widgets):
@@ -278,7 +292,8 @@ class ToolsFrame(QFrame):
             emitChanged = True
             toollist = toollistwidget.value()
 
-            updateIniValue('tortoisehg', toollocation, ' '.join(toollist))
+            updateIniValue('tortoisehg', toollocation,
+                           hglib.fromunicode(' '.join(toollist)))
 
         return emitChanged
 
@@ -307,6 +322,7 @@ class ToolsFrame(QFrame):
 
 class HooksFrame(QFrame):
     def __init__(self, ini, parent=None, **opts):
+        # type: (IniConfig, Optional[QWidget], Any) -> None
         super(HooksFrame, self).__init__(parent, **opts)
         self.ini = ini
         # The frame is created empty, and will be populated on 'refresh',
@@ -531,6 +547,7 @@ class ToolListBox(QListWidget):
     SEPARATOR = '------'
     def __init__(self, ini, parent=None, location=None, minimumwidth=None,
                  **opts):
+        # type: (IniConfig, Optional[QWidget], Optional[str], Optional[int], Any) -> None
         QListWidget.__init__(self, parent, **opts)
         self.opts = opts
         self.curvalue = None
@@ -567,7 +584,7 @@ class ToolListBox(QListWidget):
                 if [name] == toollist[-1:]:
                     continue
             else:
-                name = hglib.fromunicode(uname)
+                name = uname
             guidef.append(name)
         return guidef
 
@@ -577,7 +594,7 @@ class ToolListBox(QListWidget):
         else:
             if not icon:
                 icon = DEFAULTICONNAME
-            if isinstance(icon, str):
+            if hglib.isbasestring(icon):
                 icon = qtlib.geticon(icon)
             item = QListWidgetItem(icon, text)
         row = self.currentIndex().row()

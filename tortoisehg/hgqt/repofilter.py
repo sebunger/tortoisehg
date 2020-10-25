@@ -460,14 +460,14 @@ class RepoFilterBar(QToolBar):
         if self._abranchAction.isChecked():
             branches = sorted(set([self._repo[n].branch()
                 for n in self._repo.heads()
-                if not self._repo[n].extra().get('close')]))
+                if not self._repo[n].extra().get(b'close')]))
         elif self._cbranchAction.isChecked():
             branches = sorted(self._repo.branchmap())
         else:
             branches = hglib.namedbranches(self._repo)
 
         # easy access to common branches (Python sorted() is stable)
-        priomap = {self._repo.dirstate.branch(): -2, 'default': -1}
+        priomap = {self._repo.dirstate.branch(): -2, b'default': -1}
         branches = sorted(branches, key=lambda e: priomap.get(e, 0))
 
         branches = pycompat.maplist(hglib.tounicode, branches)

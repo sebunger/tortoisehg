@@ -256,6 +256,9 @@ def _proccmdline(ui, exts):
                for section, name, value in ui.walkconfig()
                if ui.configsource(section, name) == b'--config']
     configs.extend(('extensions', e, '') for e in exts)
+    # Override user aliases (for example "alias.log=log --graph") that could
+    # break searching through the filter toolbar (CTRL+S).
+    configs.append(('alias', 'log', 'log'))
     cmdline = list(paths.get_hg_command())
     for section, name, value in configs:
         cmdline.extend(('--config', '%s.%s=%s' % (section, name, value)))

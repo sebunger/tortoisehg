@@ -60,13 +60,13 @@ def setlanguage(lang=None):
                             fallback=True, **opts)
     global _ugettext, _ungettext
     try:
-        _ugettext = t.ugettext
-        _ungettext = t.ungettext
+        _ugettext = t.ugettext  # pytype: disable=attribute-error
+        _ungettext = t.ungettext  # pytype: disable=attribute-error
     except AttributeError:
         _ugettext = t.gettext
         _ungettext = t.ngettext
 
-    language = lang or locale.getdefaultlocale(_localeenvs)[0]  # type: Text
+    language = lang or locale.getdefaultlocale(_localeenvs)[0]  # type: Optional[Text]
 setlanguage()
 
 def availablelanguages():

@@ -3,7 +3,19 @@ from mercurial import util
 from mercurial.utils import procutil
 from tortoisehg.util import hglib
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        List,
+        Optional,
+        Tuple,
+    )
+    from mercurial import (
+        ui as uimod,
+    )
+
+
 def defaultshell():
+    # type: () -> Optional[bytes]
     if sys.platform == 'darwin':
         shell = None # Terminal.App does not support open-to-folder
     elif os.name == 'nt':
@@ -15,6 +27,7 @@ def defaultshell():
 _defaultshell = defaultshell()
 
 def _getplatformexecutablekey():
+    # type: () -> bytes
     if sys.platform == 'darwin':
         key = b'executable-osx'
     elif os.name == 'nt':
@@ -26,10 +39,12 @@ def _getplatformexecutablekey():
 _platformexecutablekey = _getplatformexecutablekey()
 
 def _toolstr(ui, tool, part, default=b""):
+    # type: (uimod.ui, bytes, bytes, Optional[bytes]) -> bytes
     return ui.config(b"terminal-tools", tool + b"." + part, default)
 
 toolcache = {}
 def _findtool(ui, tool):
+    # type: (uimod.ui, bytes) -> Optional[bytes]
     global toolcache
     if tool in toolcache:
         return toolcache[tool]
@@ -59,6 +74,7 @@ def _findtool(ui, tool):
     return None
 
 def _findterminal(ui):
+    # type: (uimod.ui) -> Tuple[Optional[bytes], bytes]
     '''returns tuple of terminal name and terminal path.
 
     tools matched by pattern are returned as (name, toolpath)
@@ -100,6 +116,7 @@ def _findterminal(ui):
     return None, _defaultshell
 
 def detectterminal(ui_):
+    # type: (uimod.ui) -> Tuple[bytes, Optional[bytes]]
     'returns tuple of terminal tool path and arguments'
     if ui_ is None:
         ui_ = hglib.loadui()
@@ -111,6 +128,7 @@ def detectterminal(ui_):
         return pathorconfig, args
 
 def findterminals(ui):
+    # type: (uimod.ui) -> List[bytes]
     seen = set()
     for key, value in ui.configitems(b'terminal-tools'):
         t = key.split(b'.')[0]

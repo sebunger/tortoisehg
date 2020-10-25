@@ -129,7 +129,7 @@ class RenameWidget(cmdui.AbstractCmdWidget):
         FD = QFileDialog
         if os.path.isfile(self._sourceFile()):
             caption = _('Select Source File')
-            path, _filter = FD.getOpenFileName(self, caption, '', '', None,
+            path, _filter = FD.getOpenFileName(self, caption, '', '', '',
                                                FD.ReadOnly)
         else:
             caption = _('Select Source Folder')

@@ -6,6 +6,8 @@
 # This software may be used and distributed according to the terms of the
 # GNU General Public License version 2 or any later version.
 
+import ssl
+
 from mercurial import encoding, error, extensions, subrepo, util
 from mercurial import dispatch as dispatchmod
 
@@ -38,20 +40,16 @@ def _dispatch(orig, req):
         ui.write_err(err + b'\n', label=b'ui.error')
     except util.urlerr.urlerror as e:
         err = _('URLError: %s') % encoding.strtolocal(str(e.reason))
-        try:
-            import ssl  # Python 2.6 or backport for 2.5
-            if isinstance(e.args[0], ssl.SSLError):
-                parts = encoding.strtolocal(e.args[0].strerror).split(b':')
-                if len(parts) == 7:
-                    file, line, level, _errno, lib, func, reason = parts
-                    if func == b'SSL3_GET_SERVER_CERTIFICATE':
-                        err = _('SSL: Server certificate verify failed')
-                    elif _errno == b'00000000':
-                        err = _('SSL: unknown error %s:%s') % (file, line)
-                    else:
-                        err = _('SSL error: %s') % reason
-        except ImportError:
-            pass
+        if isinstance(e.args[0], ssl.SSLError):
+            parts = encoding.strtolocal(e.args[0].strerror).split(b':')
+            if len(parts) == 7:
+                file, line, level, _errno, lib, func, reason = parts
+                if func == b'SSL3_GET_SERVER_CERTIFICATE':
+                    err = _('SSL: Server certificate verify failed')
+                elif _errno == b'00000000':
+                    err = _('SSL: unknown error %s:%s') % (file, line)
+                else:
+                    err = _('SSL error: %s') % reason
         ui.write_err(err + b'\n', label=b'ui.error')
 
     return -1

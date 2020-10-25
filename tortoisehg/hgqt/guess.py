@@ -240,11 +240,11 @@ class DetectRenameDialog(QDialog):
             return
 
         # TODO: better to use data(role) instead
-        ulist = [it.orig
+        ulist = [it.orig  # pytype: disable=attribute-error
                  for it in self.unrevlist.selectedItems()]  # pytype: disable=attribute-error
         if not ulist:
             # When no files are selected, look for all files
-            ulist = [self.unrevlist.item(n).orig
+            ulist = [self.unrevlist.item(n).orig  # pytype: disable=attribute-error
                      for n in range(self.unrevlist.count())]  # pytype: disable=attribute-error
 
         if not ulist:

@@ -1,8 +1,24 @@
 import os, sys
-from mercurial import util, match
+from mercurial import (
+    match,
+    pycompat,
+    util,
+)
+
 from mercurial.utils import procutil
 
+if pycompat.TYPE_CHECKING:
+    from typing import (
+        Optional,
+    )
+    from mercurial import (
+        localrepo,
+        ui as uimod,
+    )
+
+
 def _getplatformexecutablekey():
+    # type: () -> bytes
     if sys.platform == 'darwin':
         key = b'executable-osx'
     elif os.name == 'nt':
@@ -14,10 +30,12 @@ def _getplatformexecutablekey():
 _platformexecutablekey = _getplatformexecutablekey()
 
 def _toolstr(ui, tool, part, default=b""):
+    # type: (uimod.ui, bytes, bytes, Optional[bytes]) -> bytes
     return ui.config(b"editor-tools", tool + b"." + part, default)
 
 toolcache = {}
 def _findtool(ui, tool):
+    # type: (uimod.ui, bytes) -> Optional[bytes]
     global toolcache
     if tool in toolcache:
         return toolcache[tool]
@@ -47,6 +65,7 @@ def _findtool(ui, tool):
     return None
 
 def _findeditor(repo, files):
+    # type: (localrepo.repository, List[bytes]) -> Tuple[Optional[bytes], bytes]
     '''returns tuple of editor name and editor path.
 
     tools matched by pattern are returned as (name, toolpath)
@@ -98,6 +117,7 @@ def _findeditor(repo, files):
     return None, editor
 
 def detecteditor(repo, files):
+    # type: (localrepo.repository, List[bytes]) -> Tuple[bytes, Optional[bytes], Optional[bytes], Optional[bytes]]
     'returns tuple of editor tool path and arguments'
     name, pathorconfig = _findeditor(repo, files)
     if name is None:
@@ -109,6 +129,7 @@ def detecteditor(repo, files):
         return pathorconfig, args, argsln, argssearch
 
 def findeditors(ui):
+    # type: (uimod.ui) -> List[bytes]
     seen = set()
     for key, value in ui.configitems(b'editor-tools'):
         t = key.split(b'.')[0]
