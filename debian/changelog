@@ -1,3 +1,11 @@
+tortoisehg (5.5.2-2) unstable; urgency=medium
+
+  * Fix the copyrights.
+  * Bump debhelper from deprecated 9 to 13.
+  * Set debhelper-compat version in Build-Depends.
+
+ -- Andrej Shadura <andrewsh@debian.org>  Wed, 02 Dec 2020 15:27:51 +0100
+
 tortoisehg (5.5.2-1) unstable; urgency=medium
 
   * New maintainer (Closes: #922565).
