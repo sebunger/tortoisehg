@@ -1,11 +1,19 @@
-Description: provide config file with installation paths
-Author: Ludovico Cavedon <ludovico.cavedon@gmail.com>, Max Bowsher <maxb@f2s.com>
-Forwarded: not-needed
+From: Ludovico Cavedon <ludovico.cavedon@gmail.com>
+Date: Sat, 5 Dec 2020 18:07:26 +0100
+Subject: provide config file with installation paths
 
-Index: tortoisehg/tortoisehg/util/config.py
-===================================================================
---- /dev/null	1970-01-01 00:00:00.000000000 +0000
-+++ tortoisehg/tortoisehg/util/config.py	2009-11-21 01:57:20.000000000 -0800
+Co-Authored-By: Max Bowsher <maxb@f2s.com>
+Forwarded: not-needed
+---
+ tortoisehg/util/config.py | 5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100644 tortoisehg/util/config.py
+
+diff --git a/tortoisehg/util/config.py b/tortoisehg/util/config.py
+new file mode 100644
+index 0000000..8d59a6f
+--- /dev/null
++++ b/tortoisehg/util/config.py
 @@ -0,0 +1,5 @@
 +bin_path     = "/usr/bin"
 +license_path = "/usr/share/common-licenses/GPL-2"

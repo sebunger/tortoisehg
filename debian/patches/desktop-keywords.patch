@@ -1,9 +1,16 @@
-Description: add keywords to desktop file
-Author: Ludovico Cavedon <cavedon@deboan.org>
+From: Ludovico Cavedon <cavedon@deboan.org>
+Date: Sat, 5 Dec 2020 18:07:26 +0100
+Subject: add keywords to desktop file
 
+---
+ contrib/thg.desktop | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/contrib/thg.desktop b/contrib/thg.desktop
+index c451bf3..17facb0 100644
 --- a/contrib/thg.desktop
 +++ b/contrib/thg.desktop
-@@ -8,5 +8,6 @@
+@@ -8,5 +8,6 @@ Comment[ru]=Графический интерфейс для Mercurial
  Icon=thg_logo
  Exec=thg --nofork
  Categories=Development;RevisionControl;
