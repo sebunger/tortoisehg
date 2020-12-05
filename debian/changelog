@@ -1,3 +1,9 @@
+tortoisehg (5.5.2-3) unstable; urgency=medium
+
+  * Replace the deprecated tostring() with tobytes() (Closes: #976599).
+
+ -- Andrej Shadura <andrewsh@debian.org>  Sat, 05 Dec 2020 18:18:58 +0100
+
 tortoisehg (5.5.2-2) unstable; urgency=medium
 
   * Fix the copyrights.
