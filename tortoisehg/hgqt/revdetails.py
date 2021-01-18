@@ -65,14 +65,17 @@ from .fileview import HgFileView
 from .revpanel import RevPanelWidget
 
 _fileactionsbytype = {
-    'subrepo': ['openSubrepo', 'explore', 'terminal', 'copyPath', None,
+    'subrepo': ['openSubrepo', 'explore', 'terminal', 'copyPath',
+                'copyRelativePath', None,
                 'revertFile'],
     'file': ['visualDiffFile', 'visualDiffFileToLocal', None, 'editFile',
              'saveFile', None, 'editLocalFile', 'openLocalFile',
-             'exploreLocalFile', 'copyPath', None, 'revertFile', None,
+             'exploreLocalFile', 'copyPath', 'copyRelativePath', None,
+             'revertFile', None,
              'navigateFileLog', 'navigateFileDiff', 'filterFile'],
     'dir': ['visualDiffFile', 'visualDiffFileToLocal', None, 'revertFile',
-            None, 'filterFile', None, 'explore', 'terminal', 'copyPath'],
+            None, 'filterFile', None, 'explore', 'terminal', 'copyPath',
+            'copyRelativePath'],
     }
 
 class RevDetailsWidget(QWidget, qtlib.TaskWidget):
@@ -415,6 +418,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def _onFileSelected(self):
         index = self.filelist.currentIndex()
         model = self.filelist.model()
+        assert model is not None
         self.fileview.display(model.fileData(index))
 
     @pyqtSlot(QPoint)
@@ -459,6 +463,8 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def updateItemFileActions(self):
         model = self.filelist.model()
         selmodel = self.filelist.selectionModel()
+        assert model is not None
+        assert selmodel is not None
         selfds = pycompat.maplist(model.fileData, selmodel.selectedIndexes())
         self._fileactions.setFileDataList(selfds)
 
@@ -504,6 +510,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     def _applyFlatFileList(self, flat):
         view = self.filelist
         model = view.model()
+        assert model is not None
         model.setFlat(flat)
         view.setRootIsDecorated(not flat)
         if flat:
@@ -521,6 +528,7 @@ class RevDetailsWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot(str)
     def _applyFileStatusFilter(self, statustext):
         model = self.filelist.model()
+        assert model is not None
         model.setStatusFilter(statustext)
         self._expandShortFileList()
 

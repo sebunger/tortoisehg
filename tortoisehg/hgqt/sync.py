@@ -54,6 +54,7 @@ from .qtgui import (
 )
 
 from mercurial import (
+    encoding,
     hg,
     httpconnection,
     pycompat,
@@ -78,16 +79,35 @@ from . import (
     thgrepo,
 )
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Dict,
+        Iterable,
+        List,
+        Set,
+        Tuple,
+        Union,
+        Optional,
+    )
+    from mercurial import (
+        localrepo,
+    )
+
+
 def parseurl(url):
+    # type: (pycompat.unicode) -> util.url
     assert isinstance(url, pycompat.unicode), repr(url)
     return util.url(hglib.fromunicode(url))
 
 def linkify(url):
+    # type: (pycompat.unicode) -> pycompat.unicode
     assert isinstance(url, pycompat.unicode), repr(url)
     u = util.url(hglib.fromunicode(url))
-    if u.scheme in ('local', 'http', 'https'):
+    if u.scheme in (b'http', b'https'):
         safe = util.hidepassword(hglib.fromunicode(url))
         return u'<a href="%s">%s</a>' % (url, hglib.tounicode(safe))
+    elif u.scheme is None or u.scheme == b'file':
+        return u'<a href="%s">%s</a>' % (url, hglib.tounicode(u.path))
     else:
         return url
 
@@ -116,9 +136,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
         self._repoagent = repoagent
         self._cmdsession = cmdcore.nullCmdSession()
-        self._lasturl = None  # peer repository of last command
+        # peer repository of last command
+        self._lasturl = None  # type: Optional[pycompat.unicode]
         self._lastbfile = None  # output bundle of last incoming command
-        self.opts = {}
+        self.opts = {}  # type: Dict[str, Union[bool, bytes]]
         self.cmenu = None
 
         s = QSettings()
@@ -284,9 +305,9 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self._dialogs = qtlib.DialogKeeper(
             lambda self, dlgmeth, *args: dlgmeth(self, *args), parent=self)
 
-        self.curalias = None
+        self.curalias = None  # type: Optional[bytes]
         self.reload()
-        if 'default' in self.paths:
+        if b'default' in self.paths:
             self.setUrl('default')
         else:
             self.setEditUrl('')
@@ -364,7 +385,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     @pyqtSlot()
     def reload(self):
         # Refresh configured paths
-        self.paths = {}
+        self.paths = {}  # type: Dict[bytes, bytes]
         fn = self.repo.vfs.join(b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if b'paths' in cfg:
@@ -381,14 +402,14 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.postpullbutton.setText(name)
 
         # Refresh related paths
-        known = set()
+        known = set()  # type: Set[bytes]
         known.add(os.path.abspath(self.repo.root).lower())
         for path in self.paths.values():
             if not util.hasscheme(path):
                 known.add(os.path.abspath(util.localpath(path)).lower())
             else:
                 known.add(path)
-        related = {}
+        related = {}  # type: Dict[bytes, bytes]
         repoid = hglib.repoidnode(self.repo)
         for root, shortname in thgrepo.relatedRepositories(repoid):
             if root == self.repo.root:
@@ -423,6 +444,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         sm.currentRowChanged.connect(self.pathSelected)
 
     def currentUrl(self):
+        # type: () -> pycompat.unicode
         return pycompat.unicode(self.urlentry.text())
 
     def urlChanged(self):
@@ -450,11 +472,13 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.setEditUrl(hglib.tounicode(path))
 
     def setEditUrl(self, newurl):
+        # type: (pycompat.unicode) -> None
         'Set the current URL without changing the alias [unicode]'
         self.urlentry.setText(newurl)
         self.refreshUrl()
 
     def setUrl(self, newurl):
+        # type: (pycompat.unicode) -> None
         'Set the current URL to the given alias or URL [unicode]'
         model = self.hgrctv.model()
         assert model is not None
@@ -501,6 +525,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
 
     @pyqtSlot(QPoint, str, str, bool)
     def menuRequest(self, point, url, alias, editable):
+        # type: (QPoint, str, str, bool) -> None
         'menu event emitted by one of the two URL lists'
         if not self.cmenu:
             separator = (None, None, None)
@@ -534,7 +559,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def exploreurl(self):
         url = pycompat.unicode(self.menuurl)
         u = parseurl(url)
-        if not u.scheme or u.scheme == 'file':
+        if not u.scheme or u.scheme == b'file':
             qtlib.openlocalurl(u.path)
         else:
             QDesktopServices.openUrl(QUrl(url))
@@ -542,11 +567,11 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def terminalurl(self):
         url = pycompat.unicode(self.menuurl)
         u = parseurl(url)
-        if u.scheme and u.scheme != 'file':
+        if u.scheme and u.scheme != b'file':
             qtlib.InfoMsgBox(_('Repository not local'),
                         _('A terminal shell cannot be opened for remote'))
             return
-        qtlib.openshell(u.path, 'repo ' + u.path)
+        qtlib.openshell(u.path, b'repo ' + u.path)
 
     def editurl(self):
         alias = hglib.fromunicode(self.menualias)
@@ -583,10 +608,10 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def saveclicked(self):
         if self.curalias:
             alias = self.curalias
-        elif 'default' not in self.paths:
-            alias = 'default'
+        elif b'default' not in self.paths:
+            alias = b'default'
         else:
-            alias = 'new'
+            alias = b'new'
         dlg = SaveDialog(self._repoagent, alias, self.currentUrl(), self)
         dlg.setWindowFlags(Qt.Sheet)
         dlg.setWindowModality(Qt.WindowModal)
@@ -621,6 +646,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         self.stopAction.setEnabled(not sess.isFinished())
 
     def run(self, cmdline, details):
+        # type: (List[Union[str, bytes]], Iterable[str]) -> cmdcore.CmdSession
         if not self._cmdsession.isFinished():
             return cmdcore.nullCmdSession()
         self.lastcmdline = list(cmdline)
@@ -661,7 +687,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                     parent=self)
             return cmdcore.nullCmdSession()
 
-        if u.scheme == 'https':
+        if u.scheme == b'https':
             if self.repo.ui.configbool(b'insecurehosts', u.host):
                 cmdline.append('--insecure')
             if u.user:
@@ -670,7 +696,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                                     u.user)
                 if res:
                     group, auth = res
-                    if auth.get('username'):
+                    if auth.get(b'username'):
                         if qtlib.QuestionMsgBox(
                             _('Redundant authentication info'),
                             _('You have authentication info configured for '
@@ -722,6 +748,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
             self.pushclicked(confirm, **kwargs)
 
     def pullBundle(self, bundle, rev, bsource=None):
+        # type: (pycompat.unicode, Optional[bytes], Optional[pycompat.unicode]) -> None
         'accept bundle changesets'
         if not self._cmdsession.isFinished():
             self.showMessage.emit(_('sync command already running'))
@@ -733,7 +760,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
         # go on default branch.
         self.setEditUrl(bsource or bundle)
         if rev is not None:
-            self.opts['rev'] = str(rev)
+            self.opts['rev'] = rev
         self.pullclicked(bsource)
         self.setEditUrl(save)
         self.opts['rev'] = orev
@@ -743,6 +770,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     ##
 
     def linkifyWithTarget(self, url):
+        # type: (pycompat.unicode) -> pycompat.unicode
         link = linkify(url)
         if self.targetcheckbox.isChecked():
             link += u" (%s)" % self.targetcombo.currentText()
@@ -789,6 +817,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                                   % (link, ret))
 
     def pullclicked(self, url=None):
+        # type: (Optional[pycompat.unicode]) -> None
         link = self.linkifyWithTarget(url or self.currentUrl())
 
         cmdline = ['pull', '--verbose']
@@ -870,7 +899,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
     def _onP4pendingFinished(self, ret):
         pending = {}
         if ret == 0:
-            output = str(self._cmdsession.readAll())
+            output = str(self._cmdsession.readAll())  # decode?
             for line in output.splitlines():
                 try:
                     hashes = line.split(' ')
@@ -886,6 +915,7 @@ class SyncWidget(QWidget, qtlib.TaskWidget):
                             raise ValueError
                         pending[changelist] = hashes
                 except (ValueError, IndexError):
+                    # XXX: This is unconditionally overwritten before use
                     text = _('Unable to parse p4pending output')
             if pending:
                 text = _('%d pending changelists found') % len(pending)
@@ -1146,6 +1176,7 @@ class PostPullDialog(QDialog):
         return self._repoagent.rawRepo()
 
     def linkactivated(self, command):
+        # type: (pycompat.unicode) -> None
         if command == 'config':
             from tortoisehg.hgqt.settings import SettingsDialog
             sd = SettingsDialog(configrepo=False, focus='tortoisehg.postpull',
@@ -1153,6 +1184,7 @@ class PostPullDialog(QDialog):
             sd.exec_()
 
     def getValue(self):
+        # type: () -> str
         return next(iter(op for op, chk in self._opchecks.items()
                     if chk.isChecked()))
 
@@ -1166,9 +1198,10 @@ class PostPullDialog(QDialog):
         if fn is None:
             return
         try:
-            cfg.set(b'tortoisehg', b'postpull', self.getValue())
+            cfg.set(b'tortoisehg', b'postpull',
+                    encoding.strtolocal(self.getValue()))
             cfg.set(b'tortoisehg', b'autoresolve',
-                    self.autoresolve_chk.isChecked())
+                    self.autoresolve_chk.isChecked() and b'True' or b'False')
             wconfig.writefile(cfg, fn)
             self._repoagent.pollStatus()
         except EnvironmentError as e:
@@ -1241,6 +1274,7 @@ class SaveDialog(QDialog):
         self._updateUi()
 
     def savePath(self, repo, alias, path, confirm=True):
+        # type: (localrepo.localrepository, bytes, bytes, bool) -> None
         fn = repo.vfs.join(b'hgrc')
         fn, cfg = hgrcutil.loadIniFile([fn], self)
         if not hasattr(cfg, 'write'):
@@ -1265,15 +1299,15 @@ class SaveDialog(QDialog):
                                 hglib.tounicode(str(e)), parent=self)
         if self.updatesubpaths.isChecked():
             ctx = repo[b'.']
-            for subname in ctx.substate:
-                if ctx.substate[subname][2] != 'hg':
+            for subname in ctx.substate:  # type: bytes
+                if ctx.substate[subname][2] != b'hg':
                     continue
                 if not os.path.exists(repo.wjoin(subname)):
                     continue
                 defaultsubpath = ctx.substate[subname][0]
                 pathurl = util.url(path)
                 if pathurl.scheme:
-                    subpath = str(pathurl).rstrip('/') + '/' + subname
+                    subpath = bytes(pathurl).rstrip(b'/') + b'/' + subname
                 else:
                     subpath = os.path.normpath(os.path.join(path, subname))
                 if defaultsubpath != subname:
@@ -1331,6 +1365,7 @@ def _addBrowseButton(edit, slot):
 
 class SecureDialog(QDialog):
     def __init__(self, repoagent, urlu, parent):
+        # type: (thgrepo.RepoAgent, pycompat.unicode, QWidget) -> None
         super(SecureDialog, self).__init__(parent)
         self._repoagent = repoagent
         self._querysess = cmdcore.nullCmdSession()
@@ -1345,14 +1380,15 @@ class SecureDialog(QDialog):
 
         # if the already user has an [auth] configuration for this URL, use it
         cleanurl = util.removeauth(hglib.fromunicode(urlu))
-        res = httpconnection.readauthforuri(repo.ui, cleanurl, u.user)
+        res = httpconnection.readauthforuri(repo.ui, cleanurl, u.user)  # type: Optional[Tuple[bytes, Dict[bytes, bytes]]]
+        self.schemes = None  # type: Optional[bytes]
         if res:
             self.alias, auth = res
         else:
             self.alias, auth = u.host, {}
-        self.host = u.host
+        self.host = u.host  # type: bytes
         if cleanurl.startswith(b'svn+https://'):
-            self.schemes = 'svn+https'
+            self.schemes = b'svn+https'
         else:
             self.schemes = None
 
@@ -1413,7 +1449,7 @@ class SecureDialog(QDialog):
         hbox.addWidget(self._protocolcombo)
         vbox.addLayout(hbox)
 
-        self._authentries = {}  # key: QLineEdit
+        self._authentries = {}  # type: Dict[bytes, QLineEdit]
         authbox = QGroupBox(_('User Authentication'))
         form = QFormLayout()
         authbox.setLayout(form)
@@ -1500,7 +1536,7 @@ are expanded in the filename.'''))
 
     @pyqtSlot()
     def _browseClientKey(self):
-        e = self._authentries['key']
+        e = self._authentries[b'key']
         n, _f = QFileDialog.getOpenFileName(
             self, _('Select User Certificate Key File'), e.text(),
             ';;'.join([_('PEM files (*.pem *.key)'), _('All files (*)')]))
@@ -1509,7 +1545,7 @@ are expanded in the filename.'''))
 
     @pyqtSlot()
     def _browseClientCert(self):
-        e = self._authentries['cert']
+        e = self._authentries[b'cert']
         n, _f = QFileDialog.getOpenFileName(
             self, _('Select User Certificate Chain File'), e.text(),
             ';;'.join([_('PEM files (*.pem *.crt *.cer)'), _('All files (*)')]))
@@ -1527,6 +1563,7 @@ are expanded in the filename.'''))
             return
 
         def setorclear(section, item, value):
+            # type: (bytes, bytes, Optional[bytes]) -> None
             if value:
                 cfg.set(section, item, value)
             elif not value and item in cfg[section]:
@@ -1606,6 +1643,7 @@ class PathsTree(QTreeView):
 
 class PathsModel(QAbstractTableModel):
     def __init__(self, pathlist, parent=None):
+        # type: (Iterable[Tuple[bytes, bytes]], Optional[QWidget]) -> None
         QAbstractTableModel.__init__(self, parent)
         self.headers = (_('Alias'), _('URL'))
         self.rows = []
@@ -1664,6 +1702,7 @@ class PathsModel(QAbstractTableModel):
 class OptionsDialog(QDialog):
     'Utility dialog for configuring uncommon options'
     def __init__(self, repoagent, opts, parent):
+        # type: (thgrepo.RepoAgent, Dict[str, bytes], QWidget) -> None
         QDialog.__init__(self, parent)
         self.setWindowTitle(_('%s - sync options') % repoagent.displayName())
 
@@ -1721,7 +1760,7 @@ class OptionsDialog(QDialog):
         layout.addWidget(bb)
 
     def accept(self):
-        outopts = {}
+        outopts = {}  # type: Dict[str, Union[bool, bytes]]
         for name, le in (('remotecmd', self.remotele),
                          ('branch', self.branchle)):
             outopts[name] = hglib.fromunicode(le.text()).strip()

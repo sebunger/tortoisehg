@@ -16,12 +16,14 @@ from .qtcore import (
     pyqtSlot,
 )
 from .qtgui import (
+    QButtonGroup,
     QCheckBox,
     QDialog,
     QDialogButtonBox,
     QGroupBox,
     QLabel,
     QMessageBox,
+    QRadioButton,
     QVBoxLayout,
 )
 
@@ -38,6 +40,13 @@ from . import (
 )
 
 BB = QDialogButtonBox
+
+_SOURCE_SPECS = [
+    # name, title, option label
+    ('source', _('Rebase source and descendants'), '-s/--source'),
+    ('base', _('Rebase entire source branch'), '-b/--base'),
+    ('rev', _('Rebase exact revision'), '-r/--rev'),
+]
 
 class RebaseDialog(QDialog):
 
@@ -58,7 +67,7 @@ class RebaseDialog(QDialog):
 
         style = csinfo.panelstyle(selectable=True)
 
-        srcb = QGroupBox(_('Rebase changeset and descendants'))
+        self._sourcebox = srcb = QGroupBox(self)
         srcb.setLayout(QVBoxLayout())
         srcb.layout().setContentsMargins(*(2,)*4)
         s = opts.get('source', '.')
@@ -84,6 +93,14 @@ class RebaseDialog(QDialog):
         sep = qtlib.LabeledSeparator(_('Options'))
         box.addWidget(sep)
 
+        self._sourcegroup = QButtonGroup(self)
+        self._sourcegroup.buttonClicked.connect(self._updateSourceSelector)
+        for i, (name, title, oplabel) in enumerate(_SOURCE_SPECS):
+            w = QRadioButton('%s (%s)' % (title, oplabel), self)
+            w.setChecked(name == 'source')
+            self._sourcegroup.addButton(w, i)
+            box.addWidget(w)
+
         self.keepchk = QCheckBox(_('Keep original changesets (--keep)'))
         self.keepchk.setChecked(opts.get('keep', False))
         box.addWidget(self.keepchk)
@@ -97,9 +114,6 @@ class RebaseDialog(QDialog):
                                        '(--collapse)'))
         self.collapsechk.setChecked(opts.get('collapse', False))
         box.addWidget(self.collapsechk)
-
-        self.basechk = QCheckBox(_('Rebase entire source branch (-b/--base)'))
-        box.addWidget(self.basechk)
 
         self.autoresolvechk = QCheckBox(_('Automatically resolve merge '
                                           'conflicts where possible'))
@@ -147,6 +161,7 @@ class RebaseDialog(QDialog):
         self.setMaximumHeight(800)
         self.resize(0, 340)
         self.setWindowTitle(_('Rebase - %s') % repoagent.displayName())
+        self._updateSourceSelector()
         self._readSettings()
 
     @property
@@ -180,12 +195,18 @@ class RebaseDialog(QDialog):
             txt = _('You may continue the rebase')
         self._stbar.showMessage(txt)
 
+    @pyqtSlot()
+    def _updateSourceSelector(self):
+        _name, title, _oplabel = _SOURCE_SPECS[self._sourcegroup.checkedId()]
+        self._sourcebox.setTitle(title)
+
     def rebase(self):
         self.rebasebtn.setEnabled(False)
         self.cancelbtn.setVisible(False)
         self.keepchk.setEnabled(False)
         self.keepbrancheschk.setEnabled(False)
-        self.basechk.setEnabled(False)
+        for w in self._sourcegroup.buttons():
+            w.setEnabled(False)
         self.collapsechk.setEnabled(False)
         self.swaplabel.setVisible(False)
 
@@ -202,9 +223,7 @@ class RebaseDialog(QDialog):
             if self.svnchk.isChecked():
                 opts['svn'] = True
             else:
-                sourcearg = 'source'
-                if self.basechk.isChecked():
-                    sourcearg = 'base'
+                sourcearg = _SOURCE_SPECS[self._sourcegroup.checkedId()][0]
                 opts[sourcearg] = hglib.tounicode(str(self.opts.get('source')))
                 opts['dest'] = hglib.tounicode(str(self.opts.get('dest')))
         cmdline = hglib.buildcmdargs('rebase', **opts)

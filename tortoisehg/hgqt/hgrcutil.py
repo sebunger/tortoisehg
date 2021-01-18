@@ -10,8 +10,25 @@ import os
 from tortoisehg.hgqt import qtlib
 from tortoisehg.util import wconfig
 from tortoisehg.util.i18n import _
+from tortoisehg.util import (
+    hglib,
+)
+
+if hglib.TYPE_CHECKING:
+    from typing import (
+        List,
+        Optional,
+        Tuple,
+    )
+    from tortoisehg.util.typelib import (
+        IniConfig,
+    )
+    from tortoisehg.hgqt.qtgui import (
+        QWidget,
+    )
 
 def loadIniFile(rcpath, parent=None):
+    # type: (List[bytes], Optional[QWidget]) -> Tuple[Optional[bytes], IniConfig]
     for fn in rcpath:
         if os.path.exists(fn):
             break
@@ -27,11 +44,12 @@ def loadIniFile(rcpath, parent=None):
         else:
             qtlib.WarningMsgBox(_('Unable to create a config file'),
                    _('Insufficient access rights.'), parent=parent)
-            return None, {}
+            return None, wconfig.config()
 
     return fn, wconfig.readfile(fn)
 
 def setConfigValue(rcfilepath, cfgpath, value):
+    # type: (bytes, bytes, bytes) -> bool
     '''
     Set a value on a config file, such as an hgrc or a .ini file
 
@@ -45,7 +63,7 @@ def setConfigValue(rcfilepath, cfgpath, value):
         return False
     if fn is None:
         return False
-    cfgFullKey = cfgpath.split('.')
+    cfgFullKey = cfgpath.split(b'.')
     if len(cfgFullKey) < 2:
         return False
     cfg.set(cfgFullKey[0], cfgFullKey[1], value)

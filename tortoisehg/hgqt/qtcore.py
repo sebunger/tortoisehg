@@ -13,7 +13,7 @@ import os
 import sys
 
 def _detectapi():
-    candidates = ['PyQt5', 'PyQt4']
+    candidates = ['PyQt5']
     if not getattr(sys, 'frozen', False):
         api = os.environ.get('THG_QT_API')
         if api:
@@ -32,24 +32,7 @@ try:
 except (AttributeError, ImportError):
     QT_API = _detectapi()
 
-if QT_API == 'PyQt4':
-    def _fixapi():
-        import sip
-        for e in ['QDate', 'QDateTime', 'QString', 'QTextStream', 'QTime',
-                  'QUrl', 'QVariant']:
-            sip.setapi(e, 2)
-    _fixapi()
-    from PyQt4.QtCore import *  # pytype: disable=import-error
-    from PyQt4.QtGui import (  # pytype: disable=import-error
-        QAbstractProxyModel,
-        QItemSelection,
-        QItemSelectionModel,
-        QItemSelectionRange,
-        QSortFilterProxyModel,
-        QStringListModel,
-    )
-    del SIGNAL, SLOT
-elif QT_API == 'PyQt5':
+if QT_API == 'PyQt5':
     from PyQt5.QtCore import *
 else:
     raise RuntimeError('unsupported Qt API: %s' % QT_API)

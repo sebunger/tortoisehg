@@ -27,7 +27,7 @@ from mercurial import (
     filemerge,
     filesetlang,
     mdiff,
-    merge as mergemod,
+    mergestate as mergestatemod,
     patch as patchmod,
     pathutil,
     pycompat,
@@ -71,7 +71,9 @@ if TYPE_CHECKING:
         Union,
         overload,
     )
-
+    from mercurial import (
+        localrepo,
+    )
     from .typelib import (
         IniConfig,
     )
@@ -254,6 +256,7 @@ def repoidnode(repo):
     return _firstchangectx(repo).node()
 
 def _getfirstrevisionlabel(repo, ctx):
+    # type: (...) -> Optional[bytes]
     # see context.changectx for look-up order of labels
 
     bookmarks = ctx.bookmarks()
@@ -275,7 +278,7 @@ def _getfirstrevisionlabel(repo, ctx):
         return branch
 
 def getrevisionlabel(repo, rev):
-    # type: (Any, Optional[int]) -> Optional[bytes]
+    # type: (Any, Optional[int]) -> Optional[Text]
     """Return symbolic name for the specified revision or stringfy it"""
     if rev is None:
         return None  # no symbol for working revision
@@ -283,9 +286,9 @@ def getrevisionlabel(repo, rev):
     ctx = repo[rev]
     label = _getfirstrevisionlabel(repo, ctx)
     if label and ctx == scmutil.revsymbol(repo, label):
-        return label
+        return tounicode(label)
 
-    return b'%d' % rev
+    return '%d' % rev
 
 def getmqpatchtags(repo):
     # type: (...) -> List[bytes]
@@ -346,12 +349,8 @@ def readgraftstate(repo):
 
     return None
 
-try:
-    from mercurial import mergestate as mergestatemod
-    mergestate = mergestatemod.mergestate
-except (AttributeError, ImportError):
-    # hg<5.5 b7808443ed6a
-    mergestate = mergemod.mergestate  # pytype: disable=module-attr
+
+mergestate = mergestatemod.mergestate
 readmergestate = mergestate.read
 
 def readundodesc(repo):
@@ -446,6 +445,19 @@ def loadextensions(ui):
     """Load and setup extensions for GUI process"""
     _wrapextensionsloader()  # enable blacklist of extensions
     extensions.loadall(ui)
+
+
+def hastopicext(repo):
+    # type: (localrepo.localrepository) -> bool
+    """Indicate is the topic extension is enabled for ``repo``."""
+    hastopicext = False
+
+    try:
+        hastopicext = extensions.find(b'topic').hastopicext(repo)
+    except (KeyError, AttributeError):
+        pass
+
+    return hastopicext
 
 # TODO: provide singular canonpath() wrapper instead?
 def canonpaths(list):

@@ -333,6 +333,7 @@ class SearchWidget(QWidget, qtlib.TaskWidget):
             return
 
         model = self.tv.model()
+        assert model is not None
         model.reset()
         pattern = hglib.fromunicode(self.regexple.text())
         if not pattern:

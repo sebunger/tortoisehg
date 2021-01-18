@@ -19,7 +19,7 @@ try:
 except ImportError:
     hgversion = None
 
-testedwith = b'5.4 5.5'
+testedwith = b'5.5 5.6'
 
 def checkhgversion(v):
     """range check the Mercurial version"""

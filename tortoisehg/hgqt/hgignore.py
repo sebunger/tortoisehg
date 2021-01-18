@@ -219,8 +219,8 @@ class HgignoreDialog(QDialog):
     def unknownDoubleClicked(self, item):
         self.insertFilters([hglib.fromunicode(item.text())])
 
-    def insertFilters(self, pats=False, isregexp=False):
-        if pats is False:
+    def insertFilters(self, pats=None, isregexp=False):
+        if not pats:
             pats = self.sender()._patterns
         h = isregexp and b'syntax: regexp' or b'syntax: glob'
         if h in self.ignorelines:

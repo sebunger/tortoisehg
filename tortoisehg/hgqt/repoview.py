@@ -427,6 +427,10 @@ class HgRepoView(QTableView):
         """
         try:
             rev = self._symbolic_rev_to_numeric_rev(rev)
+        except error.FilteredRepoLookupError:
+            self.showMessage.emit(_("Revision '%s' is hidden")
+                                  % hglib.tounicode(str(rev)))
+            return
         except error.RepoError:
             self.showMessage.emit(_("Can't find revision '%s'")
                                   % hglib.tounicode(str(rev)))
@@ -479,6 +483,7 @@ class HgRepoView(QTableView):
         # is re-sized according to the total widget size.
         if self.resized and e.oldSize().width() != e.size().width():
             model = self.model()
+            assert model is not None
             total_width = stretch_col = 0
 
             for c in range(model.columnCount()):

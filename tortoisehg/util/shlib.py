@@ -7,9 +7,7 @@
 # GNU General Public License version 2, incorporated herein by reference.
 
 import os
-import sys
 import time
-import threading
 
 from hgext.largefiles import (
     lfutil,
@@ -20,6 +18,13 @@ from mercurial import (
     pycompat,
 )
 
+if pycompat.TYPE_CHECKING:
+    from typing import (
+        Dict,
+        List,
+        Optional,
+    )
+
 def get_system_times():
     t = os.times()
     if t[4] == 0.0: # Windows leaves this as zero, so use time.clock()
@@ -27,19 +32,8 @@ def get_system_times():
     return t
 
 if os.name == 'nt':
-    def browse_url(url):
-        try:
-            import win32api
-        except ImportError:
-            return
-        def start_browser():
-            try:
-                win32api.ShellExecute(0, 'open', url, None, None, 0)
-            except Exception:
-                pass
-        threading.Thread(target=start_browser).start()
-
     def shell_notify(paths, noassoc=False):
+        # type: (List[bytes], bool) -> None
         try:
             from win32com.shell import shell, shellcon
             import pywintypes
@@ -73,7 +67,7 @@ if os.name == 'nt':
     def update_thgstatus(ui, root, wait=False):
         '''Rewrite the file .hg/thgstatus
 
-        Caches the information provided by repo.status() in the file 
+        Caches the information provided by repo.status() in the file
         .hg/thgstatus, which can then be read by the overlay shell extension
         to display overlay icons for directories.
 
@@ -105,54 +99,46 @@ if os.name == 'nt':
         with lfutil.lfstatus(repo):
             repostate = repo.status() # will update dirstate as a side effect
 
-        dirstatus = {}
+        dirstatus = {}  # type: Dict[bytes, bytes]
         def dirname(f):
-            return '/'.join(f.split('/')[:-1])
+            # type: (bytes) -> bytes
+            return b'/'.join(f.split(b'/')[:-1])
         for fn in repostate.added:
-            dirstatus[dirname(fn)] = 'a'
+            dirstatus[dirname(fn)] = b'a'
         for fn in repostate.modified:
-            dirstatus[dirname(fn)] = 'm'
+            dirstatus[dirname(fn)] = b'm'
         for fn in repostate.removed + repostate.deleted:
-            dirstatus[dirname(fn)] = 'r'
+            dirstatus[dirname(fn)] = b'r'
 
         update = False
-        f = None
+
         try:
-            f = repo.vfs(b'thgstatus', b'rb')
-            for dn in sorted(dirstatus):
-                s = dirstatus[dn]
-                e = f.readline()
-                if e.startswith('@@noicons'):
-                    break
-                if e == '' or e[0] != s or e[1:-1] != dn:
+            with repo.vfs(b'thgstatus', b'rb') as f:
+                for dn in sorted(dirstatus):
+                    s = dirstatus[dn]
+                    e = f.readline()  # type: bytes
+                    if e.startswith(b'@@noicons'):
+                        break
+                    if e == b'' or e[0] != s or e[1:-1] != dn:
+                        update = True
+                        break
+                if f.readline() != b'':
+                    # extra line in f, needs update
                     update = True
-                    break
-            if f.readline() != '':
-                # extra line in f, needs update
-                update = True
         except IOError:
             update = True
-        finally:
-            if f is not None:
-                f.close()
 
         if update:
-            f = repo.vfs(b'thgstatus', b'wb', atomictemp=True)
-            for dn in sorted(dirstatus):
-                s = dirstatus[dn]
-                f.write(s + dn + '\n')
-                ui.note("%s %s\n" % (s, dn))
-            if hasattr(f, 'rename'):
-                # On Mercurial 1.9 and earlier, there was a rename() function
-                # that served the purpose now served by close(), while close()
-                # served the purpose now served by discard().
-                f.rename()
-            else:
-                f.close()
+            with repo.vfs(b'thgstatus', b'wb', atomictemp=True) as f:
+                for dn in sorted(dirstatus):
+                    s = dirstatus[dn]
+                    f.write(s + dn + b'\n')
+                    ui.note(b"%s %s\n" % (s, dn))
         return update
 
 else:
     def shell_notify(paths, noassoc=False):
+        # type: (List[bytes], bool) -> None
         if not paths:
             return
         notify = os.environ.get('THG_NOTIFY', '.tortoisehg/notify')
@@ -162,33 +148,14 @@ else:
         if not os.path.isfile(notify):
             return
         try:
-            f_notify = open(notify, 'w')
+            f_notify = open(notify, 'wb')
         except IOError:
             return
         try:
             abspaths = [os.path.abspath(path) for path in paths if path]
-            f_notify.write('\n'.join(abspaths))
+            f_notify.write(b'\n'.join(abspaths))
         finally:
             f_notify.close()
 
     def update_thgstatus(*args, **kws):
         pass
-
-    def browse_url(url):
-        def start_browser():
-            if sys.platform == 'darwin':
-                # use Mac OS X internet config module (removed in Python 3.0)
-                import ic
-                ic.launchurl(url)
-            else:
-                try:
-                    import gconf
-                    client = gconf.client_get_default()
-                    browser = client.get_string(
-                            '/desktop/gnome/url-handlers/http/command') + '&'
-                    os.system(browser % url)
-                except ImportError:
-                    # If gconf is not found, fall back to old standard
-                    os.system('firefox ' + url)
-        threading.Thread(target=start_browser).start()
-

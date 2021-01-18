@@ -43,6 +43,7 @@ from .qtgui import (
 
 from mercurial import (
     error,
+    node as nodemod,
     phases,
     pycompat,
     scmutil,
@@ -105,6 +106,19 @@ from .repofilter import RepoFilterBar
 from .repoview import HgRepoView
 from .sync import SyncWidget
 
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Callable,
+        Dict,
+        List,
+        Optional,
+        Text,
+        Union,
+    )
+
+    _ActionEnabledForDataFunc = Callable[[bool, bool, List[bytes], int], bool]
+
+
 # iswd = working directory
 # isrev = the changeset has an integer revision number
 # isctx = changectx or workingctx
@@ -122,7 +136,7 @@ _ENABLE_MENU_FUNCS = {
     'qgoto'  : lambda ap, wd, tags, ph: (b'qparent' in tags) or ap,
     'istrue' : lambda ap, wd, tags, ph: True,
     'isdraftorwd': lambda ap, wd, tags, ph: bool(ph > 0 or wd),
-}
+}  # type: Dict[Text, _ActionEnabledForDataFunc]
 
 
 class RepoWidget(QWidget):
@@ -645,10 +659,6 @@ class RepoWidget(QWidget):
     def _onGotoRevQueryFinished(self, ret):
         sess = self.sender()
         if ret != 0:
-            # warnings (e.g. "ambiguous identifier") aren't captured by
-            # showOutput(), so we have to set the error explicitly.
-            self.setInfoBar(infobar.CommandErrorInfoBar,
-                            sess.errorString() or sess.warningString())
             return
         output = bytes(sess.readAll())
         if not output:
@@ -852,6 +862,8 @@ class RepoWidget(QWidget):
     def _updateRepoViewForModel(self):
         model = self.repoview.model()
         selmodel = self.repoview.selectionModel()
+        assert model is not None
+        assert selmodel is not None
         index = selmodel.currentIndex()
         if not (index.flags() & Qt.ItemIsEnabled):
             index = model.defaultIndex()
@@ -1106,10 +1118,10 @@ class RepoWidget(QWidget):
 
     def _selectionMenuExec(self, point, selection, menu, menuitems):
         ctxs = [self.repo[rev] for rev in selection]
-        applied = [ctx.thgmqappliedpatch() for ctx in ctxs]
-        working = [ctx.rev() is None for ctx in ctxs]
-        tags = [ctx.tags() for ctx in ctxs]
-        phases = [ctx.phase() for ctx in ctxs]
+        applied = [ctx.thgmqappliedpatch() for ctx in ctxs]  # type: List[bool]
+        working = [ctx.rev() is None for ctx in ctxs]  # type: List[bool]
+        tags = [ctx.tags() for ctx in ctxs]  # type: List[List[bytes]]
+        phases = [ctx.phase() for ctx in ctxs]  # type: List[int]
 
         for item in menuitems:
             enabled = all(item.enableFunc(*args)
@@ -1270,8 +1282,11 @@ class RepoWidget(QWidget):
         entry(items, menu, None, enablefuncs['isctx'],
               _('Revert &All Files...'), 'hg-revert', self.revertToRevision)
         entry(items, menu)
-        entry(items, menu, None, enablefuncs['isrev'], _('Copy &Hash'),
+        submenu = menu.addMenu(_('Copy &Hash'))
+        entry(items, submenu, None, enablefuncs['isrev'], _('Full &Hash'),
               'copy-hash', self.copyHash)
+        entry(items, submenu, None, enablefuncs['isrev'], _('Short Hash'),
+              None, self.copyShortHash)
         entry(items, menu)
         submenu = menu.addMenu(_('E&xport'))
         entry(items, submenu, None, enablefuncs['isrev'], _('E&xport Patch...'),
@@ -1711,7 +1726,7 @@ class RepoWidget(QWidget):
     def updateToRevision(self):
         rev = None
         if isinstance(self.rev, int):
-            rev = hglib.tounicode(hglib.getrevisionlabel(self.repo, self.rev))
+            rev = hglib.getrevisionlabel(self.repo, self.rev)
         dlg = update.UpdateDialog(self._repoagent, rev, self)
         r = dlg.exec_()
         if r in (0, 1):
@@ -1929,8 +1944,8 @@ class RepoWidget(QWidget):
         dlg.exec_()
 
     def archiveRevisions(self, revs):
-        rev = max(revs)
-        minrev = min(revs)
+        rev = hglib.getrevisionlabel(self.repo, max(revs))
+        minrev = '%d' % min(revs)
         dlg = archive.createArchiveDialog(self._repoagent, rev=rev, minrev=minrev,
                                           parent=self)
         dlg.exec_()
@@ -1999,6 +2014,11 @@ class RepoWidget(QWidget):
         clip = QApplication.clipboard()
         clip.setText(
             hglib.tounicode(binascii.hexlify(self.repo[self.rev].node())))
+
+    def copyShortHash(self):
+        clip = QApplication.clipboard()
+        clip.setText(
+            hglib.tounicode(nodemod.short(self.repo[self.rev].node())))
 
     def changePhase(self, phase):
         currentphase = self.repo[self.rev].phase()
@@ -2180,6 +2200,7 @@ class RepoWidget(QWidget):
 
     def runCustomCommand(self, command, showoutput=False, workingdir='',
             files=None):
+        # type: (Text, bool, Text, Optional[List[Text]]) -> Optional[Union[int, subprocess.Popen]]
         """Execute 'custom commands', on the selected repository"""
         # Perform variable expansion
         # This is done in two steps:

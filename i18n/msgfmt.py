@@ -120,7 +120,10 @@ class Msgfmt:
                              7*4,               # start of key index
                              7*4+len(keys)*8,   # start of value index
                              0, keystart)       # size and offset of hash table
-        output += array.array("i", offsets).tostring()
+        if pycompat.ispy3:
+            output += array.array("i", offsets).tobytes()
+        else:
+            output += array.array("i", offsets).tostring()
         output += ids
         output += strs
         return output

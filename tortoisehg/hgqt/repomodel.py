@@ -583,7 +583,8 @@ class HgRepoListModel(QAbstractTableModel):
             elif column == AuthorColumn and self._authorcolor:
                 color = QColor(self._user_color(ctx.user()))
             elif column in (GraphColumn, BranchColumn):
-                color = QColor(self._namedbranch_color(ctx.branch()))
+                branch = hglib.tounicode(ctx.branch())
+                color = QColor(self._namedbranch_color(branch))
             if index.column() != GraphColumn:
                 if gnode.faded:
                     if color is None:
@@ -796,6 +797,9 @@ class HgRepoListModel(QAbstractTableModel):
         if ctx.rev() is None:
             if hglib.createsnewhead(ctx, branchheads):
                 labels.append((_('Creates new head!'), 'log.warning'))
+            topic = self._gettopic(ctx)
+            if topic:
+                labels.append((topic, 'topic.active'))
             return labels
 
         if self._show_branch_head_label:

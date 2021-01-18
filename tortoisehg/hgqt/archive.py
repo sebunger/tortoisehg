@@ -25,6 +25,7 @@ from .qtgui import (
     QRadioButton,
     QSizePolicy,
     QVBoxLayout,
+    QWidget,
 )
 
 from mercurial import (
@@ -40,6 +41,18 @@ from . import (
     cmdui,
     qtlib,
 )
+
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Optional,
+        Text,
+        Union,
+    )
+
+    from . import (
+        thgrepo,
+    )
+
 
 WD_PARENT = _('= Working Directory Parent =')
 
@@ -66,18 +79,20 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
     _archive_content_touched_since = 2
 
     def __init__(self, repoagent, rev, parent=None, minrev=None):
+        # type: (thgrepo.RepoAgent, Optional[Union[Text]], Optional[QWidget], Optional[Union[Text]]) -> None
         super(ArchiveWidget, self).__init__(parent)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self._repoagent = repoagent
-        if minrev is None:
+        if not minrev:
             minrev = rev
             archive_since = False
         else:
             archive_since = True
 
         possibleroots = []
-        if minrev is not None:
-            parents = scmutil.revsymbol(self.repo, str(minrev)).parents()
+        if minrev:
+            parents = scmutil.revsymbol(self.repo,
+                                        hglib.fromunicode(minrev)).parents()
             if parents:
                 for p in parents:
                     possibleroots.append(u'%d' % p.rev())
@@ -112,7 +127,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         self.rootrev_combo = QComboBox(self)
         self.rootrev_combo.setEditable(True)
         self.rootrev_combo.setSizeAdjustPolicy(QComboBox.AdjustToContents)
-        if minrev is not None:
+        if minrev:
             for text in possibleroots:
                 self.rootrev_combo.addItem(text)
             self.rootrev_combo.setCurrentIndex(0)
@@ -164,7 +179,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         for t in sorted(self.repo.tags(), reverse=True):
             self.rev_combo.addItem(hglib.tounicode(t))
         if rev:
-            text = hglib.tounicode(str(rev))
+            text = rev
             selectindex = self.rev_combo.findText(text)
             if selectindex >= 0:
                 self.rev_combo.setCurrentIndex(selectindex)
@@ -224,9 +239,10 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
         return '.hgsubstate' in ctx
 
     def get_selected_rev(self):
+        # type: () -> bytes
         rev = self.rev_combo.currentText()
         if rev == WD_PARENT:
-            rev = '.'
+            rev = b'.'
         else:
             rev = hglib.fromunicode(rev)
         return rev
@@ -353,6 +369,7 @@ class ArchiveWidget(cmdui.AbstractCmdWidget):
 
 
 def createArchiveDialog(repoagent, rev=None, parent=None, minrev=None):
+    # type: (thgrepo.RepoAgent, Optional[Union[Text]], Optional[QWidget], Optional[Union[Text]]) -> cmdui.CmdControlDialog
     dlg = cmdui.CmdControlDialog(parent)
     dlg.setWindowTitle(_('Archive - %s') % repoagent.displayName())
     dlg.setWindowIcon(qtlib.geticon('hg-archive'))

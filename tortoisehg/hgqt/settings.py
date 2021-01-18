@@ -129,7 +129,7 @@ class SettingsCombo(QComboBox):
         self.clear()
         ucur = hglib.tounicode(self.curvalue)
         if self.opts.get('defer') and not self.loaded:
-            if self.curvalue == None: # unspecified
+            if self.curvalue is None:  # unspecified
                 self.addItem(_unspecstr)
             else:
                 self.addItem(ucur or '...')
@@ -376,7 +376,7 @@ class SettingsCheckBox(QCheckBox):
         self.setText(opts['label'])
 
     def setValue(self, curvalue):
-        if self.curvalue == None:
+        if self.curvalue is None:
             self.curvalue = curvalue
         self.setChecked(curvalue)
 
@@ -425,9 +425,9 @@ class BugTraqConfigureEntry(QPushButton):
 
     def master_updated(self):
         self.setEnabled(False)
-        if self.master == None:
+        if self.master is None:
             return
-        if self.master.value() == None:
+        if self.master.value() is None:
             return
         if len(self.master.value()) == 0:
             return
@@ -452,7 +452,7 @@ class BugTraqConfigureEntry(QPushButton):
 
     ## common APIs for all edit widgets
     def setValue(self, curvalue):
-        if self.master == None:
+        if self.master is None:
             self.master = self.opts['master']
             self.master.currentIndexChanged.connect(self.master_updated)
         self.master_updated()
@@ -622,7 +622,7 @@ class _fi(object):
         self.visible = visible
 
     def isVisible(self):
-        if self.visible == None:
+        if self.visible is None:
             return True
         else:
             return self.visible()
@@ -1579,14 +1579,14 @@ class SettingsForm(QWidget):
                     val = self.readCPath('extensions.' + fullkey)
                     if val is not None:
                         break
-                if val == None:
+                if val is None:
                     curvalue = False
                 elif len(val) and val[0] == '!':
                     curvalue = False
                 else:
                     curvalue = True
                 w.setValue(curvalue)
-                if val == None:
+                if val is None:
                     w.opts['cpath'] = 'extensions.' + key
                 else:
                     w.opts['cpath'] = 'extensions.' + fullkey
@@ -1776,7 +1776,7 @@ class SettingsForm(QWidget):
         section, key = pycompat.sysbytes(cpath).split(b'.', 1)
         if newvalue == self.ini.get(section, key):
             return False
-        if newvalue == None:
+        if newvalue is None:
             try:
                 del self.ini[section][key]
             except KeyError:

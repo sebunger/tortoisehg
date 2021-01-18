@@ -13,6 +13,7 @@ import os
 import re
 
 from .qtcore import (
+    QDir,
     QMimeData,
     QObject,
     Qt,
@@ -400,10 +401,16 @@ class FilectxActions(QObject):
         mdata.setText(hglib.tounicode(str(output)))
         QApplication.clipboard().setMimeData(mdata)
 
-    @actionSlot(_('Copy &Path'), None, 'Shift+Ctrl+C',
+    @actionSlot(_('Copy Absolute &Path'), None, 'Shift+Ctrl+C',
                 _('Copy full path of file(s) to the clipboard'))
     def copyPath(self, fds):
         paths = [e.absoluteFilePath() for e in fds]
+        QApplication.clipboard().setText(os.linesep.join(paths))
+
+    @actionSlot(_('Copy Relative Path'), None, None,
+                _('Copy repository relative path of file(s) to the clipboard'))
+    def copyRelativePath(self, fds):
+        paths = [QDir.toNativeSeparators(e.filePath()) for e in fds]
         QApplication.clipboard().setText(os.linesep.join(paths))
 
     @actionSlot(_('&Revert to Revision...'), 'hg-revert', 'Shift+Ctrl+R',

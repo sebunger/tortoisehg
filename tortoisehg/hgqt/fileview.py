@@ -39,6 +39,7 @@ from .qtgui import (
     QToolBar,
     QHBoxLayout,
     QVBoxLayout,
+    QWidget,
 )
 
 from mercurial import (
@@ -65,6 +66,11 @@ from . import (
     qtlib,
     visdiff,
 )
+
+if hglib.TYPE_CHECKING:
+    from typing import (
+        Optional,
+    )
 
 qsci = qscilib.Scintilla
 
@@ -718,6 +724,12 @@ class _AbstractViewControl(QObject):
     def setupContextMenu(self, menu, line):
         pass
 
+    def _parentWidget(self):
+        # type: () -> Optional[QWidget]
+        p = self.parent()
+        assert p is None or isinstance(p, QWidget)
+        return p
+
 
 _diffHeaderRegExp = re.compile("^@@ -[0-9]+,[0-9]+ \+[0-9]+,[0-9]+ @@")
 
@@ -894,7 +906,7 @@ class _FileViewControl(_AbstractViewControl):
         if last == 0:
             return
         cur = self._sci.getCursorPosition()[0] + 1
-        line, ok = QInputDialog.getInt(self.parent(), _('Go to Line'),
+        line, ok = QInputDialog.getInt(self._parentWidget(), _('Go to Line'),
                                        _('Enter line number (1 - %d)') % last,
                                        cur, 1, last)
         if ok:

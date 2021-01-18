@@ -30,6 +30,7 @@ from mercurial import (
     hg,
     node,
     phases,
+    pycompat,
     revset as revsetmod,
 )
 
@@ -265,7 +266,7 @@ def hashcolor(data, modulo=None):
     """
     if modulo is None:
         modulo = len(COLORS)
-    if isinstance(data, str):
+    if isinstance(data, (str, pycompat.unicode)):
         idx = sum([ord(c) for c in data])
     else: # Python 3 bytes
         idx = sum(data)

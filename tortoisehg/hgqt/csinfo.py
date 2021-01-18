@@ -31,7 +31,7 @@ from ..util.i18n import _
 from . import qtlib
 
 PANEL_DEFAULT = ('rev', 'summary', 'user', 'dateage', 'branch', 'close',
-                 'tags', 'graft', 'transplant', 'obsolete',
+                 'topic', 'tags', 'graft', 'transplant', 'obsolete',
                  'p4', 'svn', 'converted',)
 
 def create(repo, target=None, style=None, custom=None, **kargs):
@@ -120,7 +120,7 @@ class SummaryInfo(object):
               'revid': _('Revision:'), 'summary': _('Summary:'),
               'user': _('User:'), 'date': _('Date:'),'age': _('Age:'),
               'dateage': _('Date:'), 'branch': _('Branch:'),
-              'close': _('Close:'),
+              'close': _('Close:'), 'topic': _('Topic:'),
               'tags': _('Tags:'), 'rawbranch': _('Branch:'),
               'graft': _('Graft:'),
               'transplant': _('Transplant:'),
@@ -199,6 +199,9 @@ class SummaryInfo(object):
                 return None
             elif item == 'close':
                 return hglib.tounicode(ctx.extra().get(b'close'))
+            elif item == 'topic':
+                topic = getattr(ctx, 'topic', lambda: None)()
+                return topic and hglib.tounicode(topic) or None
             elif item == 'tags':
                 return [hglib.tounicode(tag) for tag in ctx.thgtags()] or None
             elif item == 'graft':
@@ -313,6 +316,12 @@ class SummaryInfo(object):
                 return pycompat.unicode(value, 'utf-8', 'replace')
             elif item in ('rawbranch', 'branch'):
                 opts = dict(fg='black', bg='#aaffaa')
+                return qtlib.markup(' %s ' % value, **opts)
+            elif item == 'topic':
+                opts = {
+                    'fg': qtlib.gettextcoloreffect('log.topic').name(),
+                    'bg': qtlib.getbgcoloreffect('log.topic').name(),
+                }
                 return qtlib.markup(' %s ' % value, **opts)
             elif item == 'tags':
                 opts = dict(fg='black', bg='#ffffaa')
