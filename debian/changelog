@@ -1,3 +1,13 @@
+tortoisehg (5.6.1-1) unstable; urgency=medium
+
+  * New upstream release
+    - Drop a patch applied upstream
+    - Bump Mercurial dependencies (Closes: #980232).
+  * Remove Max from Uploaders, add the Debian Python team instead.
+  * Bump Standards-Version to 4.5.1.
+
+ -- Andrej Shadura <andrewsh@debian.org>  Mon, 18 Jan 2021 13:59:50 +0100
+
 tortoisehg (5.5.2-3) unstable; urgency=medium
 
   * Replace the deprecated tostring() with tobytes() (Closes: #976599).
