@@ -16,7 +16,6 @@ import sys
 
 from .qtcore import (
     QSettings,
-    QT_VERSION,
     Qt,
     pyqtSlot,
 )
@@ -114,16 +113,7 @@ class Workbench(QMainWindow):
                                     self.cloneRepository)
             self.dockMenu.addAction(_('&Open Repository...'),
                                     self.openRepository)
-            if QT_VERSION < 0x50000:
-                from .qtgui import (
-                    qt_mac_set_dock_menu,
-                    qt_mac_set_menubar_icons,
-                )
-                qt_mac_set_dock_menu(self.dockMenu)
-                # On Mac OS X, we do not want icons on menus
-                qt_mac_set_menubar_icons(False)
-            else:
-                self.dockMenu.setAsDockMenu()
+            self.dockMenu.setAsDockMenu()
 
         self._dialogs = qtlib.DialogKeeper(
             lambda self, dlgmeth: dlgmeth(self), parent=self)

@@ -232,31 +232,28 @@ class _wconfig(object):
         if not self._readfiles:
             return newini()
 
-        path, fp, sections, remap = self._readfiles[0]
-        if sections:
-            raise NotImplementedError("wconfig does not support 'sections'")
-        if remap:
-            raise NotImplementedError("wconfig does not support 'remap'")
+        def _read_new_ini(fp):
+            if pycompat.ispy3:
+                fp = pycompat.io.StringIO(hglib.tounicode(fp.read()))
+            return newini(fp)
 
-        if fp:
-            fp.seek(0)
-            if pycompat.ispy3:
-                try:
-                    fp_data = pycompat.io.StringIO(hglib.tounicode(fp.read()))
-                    return newini(fp_data)
-                finally:
-                    fp.close()
+        path, fp, sections, remap = self._readfiles[0]
+
+        try:
+            if sections:
+                raise NotImplementedError("wconfig does not support 'sections'")
+            if remap:
+                raise NotImplementedError("wconfig does not support 'remap'")
+
+            if fp:
+                fp.seek(0)
             else:
-                return newini(fp)
-        else:
-            fp_data = fp_file = util.posixfile(path, b'rb')
-            if pycompat.ispy3:
-                data = hglib.tounicode(fp_data.read())
-                fp_data = pycompat.io.StringIO(data)
-            try:
-                return newini(fp_data)
-            finally:
-                fp_file.close()
+                fp = util.posixfile(path, b'rb')
+
+            return _read_new_ini(fp)
+        finally:
+            if fp:
+                fp.close()
 
     def _replaylogs(self, ini):
         def getsection(ini, section):

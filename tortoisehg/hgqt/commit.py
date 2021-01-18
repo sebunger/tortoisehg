@@ -71,7 +71,6 @@ from ..util import (
 from ..util.i18n import _
 from . import (
     branchop,
-    csinfo,
     cmdcore,
     cmdui,
     hgrcutil,
@@ -80,6 +79,7 @@ from . import (
     qtlib,
     revpanel,
     status,
+    topic,
     thgrepo,
 )
 from .messageentry import MessageEntry
@@ -251,6 +251,15 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
         self.branchbutton.setFont(font)
         self.branchbutton.triggered.connect(self.branchOp)
         self.branchop = None
+
+        if hglib.hastopicext(repo):
+            self.topicbutton = tbar.addAction(_('Topic: '))
+            font = self.topicbutton.font()
+            font.setBold(True)
+            self.topicbutton.setFont(font)
+            self.topicbutton.triggered.connect(self.topicOp)
+        else:
+            self.topicbutton = None
 
         self.recentMessagesButton = QToolButton(
             text=_('Copy message'),
@@ -773,6 +782,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
             title = _('New Branch: ') + self.branchop
         self.branchbutton.setText(title)
 
+        if self.topicbutton:
+            topic = getattr(self.repo, 'currenttopic')
+            if topic:
+                topic = hglib.tounicode(topic)
+            else:
+                topic = u"None"
+            self.topicbutton.setText(_('Topic: ') + topic)
+
         # Update options label, showing only whitelisted options.
         opts = commitopts2str(self.opts)
         self.optionslabelfmt = _('<b>Selected Options:</b> %s')
@@ -819,6 +836,14 @@ class CommitWidget(QWidget, qtlib.TaskWidget):
                                     hglib.tounicode(self.repo[None].branch()))
             self.msgte.setFocus()
             self.refresh()
+
+    def topicOp(self):
+        d = topic.TopicDialog(self._repoagent, self.branchop, self)
+        d.setWindowFlags(Qt.Sheet)
+        d.setWindowModality(Qt.WindowModal)
+        d.exec_()
+        self.msgte.setFocus()
+        self.refresh()
 
     def canUndo(self):
         'Returns undo description or None if not valid'

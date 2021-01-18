@@ -145,7 +145,11 @@ class RepoFilterBar(QToolBar):
         username = hglib.configuredusername(repo.ui)
         if username:
             self._permanent_queries.insert(0,
-                hglib.formatrevspec('author(%s)', os.path.expandvars(username)))
+                hglib.formatrevspec(
+                    'author(%s)',
+                    hglib.tounicode(os.path.expandvars(username))
+                )
+            )
         self.filterEnabled = True
 
         #Check if the font contains the glyph needed by the branch combo

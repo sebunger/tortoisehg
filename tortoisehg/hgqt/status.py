@@ -643,6 +643,8 @@ class StatusWidget(QWidget):
     def onSelectionChange(self):
         model = self.tv.model()
         selmodel = self.tv.selectionModel()
+        assert model is not None
+        assert selmodel is not None
         selfds = pycompat.maplist(model.fileData, selmodel.selectedRows())
         self._fileactions.setFileDataList(selfds)
 
@@ -678,6 +680,8 @@ class StatusWidget(QWidget):
     def _toggleSelectedFiles(self):
         model = self.tv.model()
         selmodel = self.tv.selectionModel()
+        assert model is not None
+        assert selmodel is not None
         for index in selmodel.selectedRows(COL_PATH):
             if model.data(index, Qt.CheckStateRole) == Qt.Checked:
                 newvalue = Qt.Unchecked
@@ -798,7 +802,9 @@ class WctxModel(QAbstractTableModel):
         self.checkCount = 0
         rows = []
         nchecked = {}
-        excludes = [f.strip() for f in opts.get('ciexclude', '').split(',')]
+        excludestr = opts.get('ciexclude', '')
+        assert isinstance(excludestr, (str, pycompat.unicode))
+        excludes = [f.strip() for f in excludestr.split(',')]
         if amending is None:
             amending = set()
 

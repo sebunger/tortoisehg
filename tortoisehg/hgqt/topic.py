@@ -113,15 +113,15 @@ class TopicDialog(QDialog):
         self.topicTextChanged()
 
     def revUpdated(self):
-        if self.rev is not None:
-            revText = '%d (%s)' % (self.rev, self.repo[self.rev])
-        else:
+        if self.rev is None:
             hasunicodestar = QFontMetrics(self.font()).inFont(u'\u2605')
             if hasunicodestar:
                 # The Unicode symbol is a black star:
                 revText = u'\u2605 ' + _('Working Directory') + u' \u2605'
             else:
                 revText = '*** ' + _('Working Directory') + ' ***'
+        else:
+            revText = '%d (%s)' % (self.rev, self.repo[self.rev])
         self.revLabel.setText(revText)
         self.topicsCombo.setEditText(self._current_topic)
 

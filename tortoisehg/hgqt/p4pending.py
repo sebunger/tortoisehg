@@ -87,13 +87,13 @@ class PerforcePending(QDialog):
             revs = []
         self.cslist.clear()
         self.cslist.update(revs)
-        sensitive = not curcl.endswith('(submitted)')
+        sensitive = not curcl.endswith(b'(submitted)')
         self.bb.button(QDialogButtonBox.Ok).setEnabled(sensitive)
         self.bb.button(QDialogButtonBox.Discard).setEnabled(sensitive)
         self.curcl = curcl
 
     def submit(self):
-        assert(self.curcl.endswith('(pending)'))
+        assert(self.curcl.endswith(b'(pending)'))
         cmdline = ['p4submit', '--verbose',
                    '--config', 'extensions.perfarce=',
                    '--repository', hglib.tounicode(self.url),
@@ -105,7 +105,7 @@ class PerforcePending(QDialog):
         sess.commandFinished.connect(self.commandFinished)
 
     def revert(self):
-        assert(self.curcl.endswith('(pending)'))
+        assert(self.curcl.endswith(b'(pending)'))
         cmdline = ['p4revert', '--verbose',
                    '--config', 'extensions.perfarce=',
                    '--repository', hglib.tounicode(self.url),

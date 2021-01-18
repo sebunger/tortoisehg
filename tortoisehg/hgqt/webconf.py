@@ -106,8 +106,11 @@ class WebconfForm(QWidget):
 
     @property
     def _webconfmodel(self):
+        # type: () -> WebconfModel
         """current model object of webconf"""
-        return self._qui.repos_view.model()
+        m = self._qui.repos_view.model()
+        assert isinstance(m, WebconfModel)
+        return m
 
     @pyqtSlot()
     def _updateview(self):
@@ -306,14 +309,14 @@ class WebconfModel(QAbstractTableModel):
         if not index.isValid():
             return None
         if role == Qt.DisplayRole:
-            v = self._config.items('paths')[index.row()][index.column()]
+            v = self._config.items(b'paths')[index.row()][index.column()]
             return hglib.tounicode(v)
         return None
 
     def rowCount(self, parent=QModelIndex()):
         if parent.isValid():
             return 0  # no child
-        return len(self._config['paths'])
+        return len(self._config[b'paths'])
 
     def columnCount(self, parent=QModelIndex()):
         if parent.isValid():
@@ -328,26 +331,27 @@ class WebconfModel(QAbstractTableModel):
     @property
     def paths(self):
         """return list of known paths"""
-        return [hglib.tounicode(e) for e in self._config['paths']]
+        return [hglib.tounicode(e) for e in self._config[b'paths']]
 
     def getpathmapat(self, row):
         """return pair of (path, localpath) at the specified index"""
         assert 0 <= row and row < self.rowCount(), row
-        return tuple(hglib.tounicode(e) for e in self._config.items('paths')[row])
+        return tuple(hglib.tounicode(e)
+                     for e in self._config.items(b'paths')[row])
 
     def addpathmap(self, path, localpath):
         """add path mapping to serve"""
         assert path not in self.paths, path
         self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
         try:
-            self._config.set('paths', hglib.fromunicode(path),
+            self._config.set(b'paths', hglib.fromunicode(path),
                              hglib.fromunicode(localpath))
         finally:
             self.endInsertRows()
 
     def setpathmap(self, path, localpath):
         """change path mapping at the specified index"""
-        self._config.set('paths', hglib.fromunicode(path),
+        self._config.set(b'paths', hglib.fromunicode(path),
                          hglib.fromunicode(localpath))
         row = self._indexofpath(path)
         self.dataChanged.emit(self.index(row, 0),
@@ -358,11 +362,11 @@ class WebconfModel(QAbstractTableModel):
         row = self._indexofpath(path)
         self.beginRemoveRows(QModelIndex(), row, row)
         try:
-            del self._config['paths'][hglib.fromunicode(path)]
+            del self._config[b'paths'][hglib.fromunicode(path)]
         finally:
             self.endRemoveRows()
 
     def _indexofpath(self, path):
         path = hglib.fromunicode(path)
-        assert path in self._config['paths'], path
-        return list(self._config['paths']).index(path)
+        assert path in self._config[b'paths'], path
+        return list(self._config[b'paths']).index(path)

@@ -139,14 +139,12 @@ def openhelpcontents(url):
 def openlocalurl(path):
     '''open the given path with the default application
 
-    takes str, unicode or QString as argument
+    takes bytes or unicode as argument
     returns True if open was successfull
     '''
 
-    if isinstance(path, str):
+    if isinstance(path, bytes):
         path = hglib.tounicode(path)
-    else:
-        path = pycompat.unicode(path)
     if os.name == 'nt' and path.startswith('\\\\'):
         # network share, special handling because of qt bug 13359
         # see https://bugreports.qt.io/browse/QTBUG-13359
@@ -162,7 +160,6 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
         filename = files[0].strip()
         if not filename:
             return
-        files = [filename]
         path = repo.wjoin(filename)
         cwd = os.path.dirname(path)
         files = [os.path.basename(path)]
@@ -172,16 +169,15 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
 
     toolpath, args, argsln, argssearch = editor.detecteditor(repo, files)
     if os.path.basename(toolpath) in (b'vi', b'vim', b'hgeditor'):
-        res = QMessageBox.critical(parent,
-                    _('No visual editor configured'),
-                    _('Please configure a visual editor.'))
+        QMessageBox.critical(parent, _('No visual editor configured'),
+                             _('Please configure a visual editor.'))
         from tortoisehg.hgqt.settings import SettingsDialog
         dlg = SettingsDialog(False, focus='tortoisehg.editor')
         dlg.exec_()
         return
 
     files = [procutil.shellquote(util.localpath(f)) for f in files]
-    assert len(files) == 1 or lineno == None, (files, lineno)
+    assert len(files) == 1 or lineno is None, (files, lineno)
 
     cmdline = None
     if search:
@@ -233,10 +229,10 @@ def editfiles(repo, files, lineno=None, search=None, parent=None):
                 expanded.append(phrase)
             expanded.append(toolpath[pos:])
             cmdline = b' '.join(expanded + files)
-        except ValueError as e:
+        except ValueError:
             # '[' or ']' not found
             pass
-        except TypeError as e:
+        except TypeError:
             # variable expansion failed
             pass
 
@@ -392,21 +388,25 @@ _effects = {
 }
 
 _thgstyles = {
-   # Styles defined by TortoiseHg
-   'log.branch': 'black #aaffaa_background',
-   'log.patch': 'black #aaddff_background',
-   'log.unapplied_patch': 'black #dddddd_background',
-   'log.tag': 'black #ffffaa_background',
-   'log.bookmark': 'blue #ffffaa_background',
-   'log.curbookmark': 'black #ffdd77_background',
-   'log.modified': 'black #ffddaa_background',
-   'log.added': 'black #aaffaa_background',
-   'log.removed': 'black #ffcccc_background',
-   'log.warning': 'black #ffcccc_background',
-   'status.deleted': 'red bold',
-   'ui.error': 'red bold #ffcccc_background',
-   'ui.warning': 'black bold #ffffaa_background',
-   'control': 'black bold #dddddd_background',
+    # Styles defined by TortoiseHg
+    'log.branch': 'black #aaffaa_background',
+    'log.patch': 'black #aaddff_background',
+    'log.unapplied_patch': 'black #dddddd_background',
+    'log.tag': 'black #ffffaa_background',
+    'log.bookmark': 'blue #ffffaa_background',
+    'log.curbookmark': 'black #ffdd77_background',
+    'log.modified': 'black #ffddaa_background',
+    'log.added': 'black #aaffaa_background',
+    'log.removed': 'black #ffcccc_background',
+    'log.warning': 'black #ffcccc_background',
+    'status.deleted': 'red bold',
+    'ui.error': 'red bold #ffcccc_background',
+    'ui.warning': 'black bold #ffffaa_background',
+    'control': 'black bold #dddddd_background',
+
+    # Topic related styles
+    'log.topic': 'black bold #2ecc71_background',
+    'topic.active': 'black bold #2ecc71_background',
 }
 
 thgstylesheet = '* { white-space: pre; font-family: monospace;' \
@@ -483,10 +483,19 @@ def getbgcoloreffect(labels):
                 return QColor(e[:-11])
     return QColor()
 
+# TortoiseHg uses special names for the properties controlling the appearance of
+# its interface elements.
+#
+# This dict maps internal style names to corresponding CSS property names.
 NAME_MAP = {
-    'fg': 'color', 'bg': 'background-color', 'family': 'font-family',
-    'size': 'font-size', 'weight': 'font-weight', 'space': 'white-space',
-    'style': 'font-style', 'decoration': 'text-decoration',
+    'fg': 'color',
+    'bg': 'background-color',
+    'family': 'font-family',
+    'size': 'font-size',
+    'weight': 'font-weight',
+    'space': 'white-space',
+    'style': 'font-style',
+    'decoration': 'text-decoration',
 }
 
 def markup(msg, **styles):

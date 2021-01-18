@@ -60,6 +60,9 @@ def data_func(widget, item, ctx):
     elif item == 'branch':
         value = hglib.tounicode(ctx.branch())
         return value != 'default' and value or None
+    elif item == 'topic':
+        topic = getattr(ctx, 'topic', lambda: None)()
+        return topic and hglib.tounicode(topic) or None
     elif item == 'parents':
         # TODO: need to put 'diff to other' checkbox
         #pindex = self.diff_other_parent() and 1 or 0
@@ -182,7 +185,8 @@ def RevPanelWidget(repo):
     custom = csinfo.custom(data=data_func, label=label_func,
                            markup=create_markup_func(repo.ui))
     style = csinfo.panelstyle(contents=(
-                   'cset', 'gitcommit', 'branch', 'obsolete', 'close', 'user',
+                   'cset', 'gitcommit', 'branch', 'topic', 'obsolete', 'close',
+                   'user',
                    'dateage', 'parents', 'children', 'tags', 'graft', 'transplant',
                    'mqoriginalparent',
                    'predecessors', 'successors',

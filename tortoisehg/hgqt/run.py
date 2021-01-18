@@ -583,7 +583,7 @@ def annotate(ui, repoagent, *pats, **opts):
 def archive(ui, repoagent, *pats, **opts):
     """archive dialog"""
     from tortoisehg.hgqt import archive as archivemod
-    rev = opts.get('rev')
+    rev = hglib.tounicode(opts.get('rev'))
     return archivemod.createArchiveDialog(repoagent, rev)
 
 @command(b'backout',
@@ -1358,7 +1358,7 @@ def topics(ui, repoagent, *names, **opts):
     if b'topic' not in repo.extensions():
         raise error.Abort(_('Please enable the Topic extension first.'))
     from tortoisehg.hgqt import topic as topicmod
-    rev = scmutil.revsingle(repo, opts.get('rev')).rev()
+    rev = scmutil.revsingle(repo, opts.get('rev'), default=None).rev()
     if len(names) > 1:
         raise error.Abort(_('only one new topic name allowed'))
     dlg = topicmod.TopicDialog(repoagent, rev)

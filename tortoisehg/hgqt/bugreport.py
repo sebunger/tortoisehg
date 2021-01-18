@@ -16,7 +16,6 @@ from .qtcore import (
     QSettings,
     QT_VERSION_STR,
     QTimer,
-    QUrl,
     Qt,
     pyqtSlot,
 )
@@ -32,21 +31,19 @@ from .qtgui import (
     QVBoxLayout,
     qApp,
 )
-from .qtnetwork import (
-    QNetworkAccessManager,
-    QNetworkRequest,
-)
 
 from mercurial import (
     extensions,
-    pycompat,
 )
 from ..util import (
     hglib,
     version,
 )
 from ..util.i18n import _
-from . import qtlib
+from . import (
+    qtlib,
+    updatecheck,
+)
 
 try:
     from .qsci import QSCINTILLA_VERSION_STR
@@ -102,49 +99,21 @@ class BugReport(QDialog):
                             ~Qt.WindowContextHelpButtonHint)
         self.resize(650, 400)
         self._readsettings()
-        QTimer.singleShot(0, self.getUpdateInfo)
 
-    def getUpdateInfo(self):
-        verurl = 'https://tortoisehg.bitbucket.io/curversion.txt'
-        # If we use QNetworkAcessManager elsewhere, it should be shared
-        # through the application.
-        self._netmanager = QNetworkAccessManager(self)
-        self._newverreply = self._netmanager.get(QNetworkRequest(QUrl(verurl)))
-        self._newverreply.finished.connect(self.uFinished)
+        self._updatechecker = updatecheck.Checker()
+        self._updatechecker.updateAvailable.connect(self.updateAvailable)
+        self._updatechecker.updateUnavailable.connect(self.updateUnavailable)
+        QTimer.singleShot(0, self._updatechecker.query)
 
-    def uFinished(self):
-        newver = (0,0,0)
-        try:
-            f = pycompat.sysstr(self._newverreply.readAll().data()).splitlines()
-            self._newverreply.close()
-            self._newverreply = None
-            newver = tuple([int(p) for p in f[0].split('.')])
-            upgradeurl = f[1] # generic download URL
-            platform = sys.platform
-            if platform == 'win32':
-                from win32process import IsWow64Process as IsX64  # pytype: disable=import-error
-                platform = IsX64() and 'x64' or 'x86'
-            # linux2 for Linux, darwin for OSX
-            for line in f[2:]:
-                p, _url = line.split(':', 1)
-                if platform == p:
-                    upgradeurl = _url.strip()
-                    break
-        except (IndexError, ImportError, ValueError):
-            pass
-        try:
-            thgv = version.version()
-            if '+' in thgv:
-                thgv = thgv[:thgv.index('+')]
-            curver = tuple([int(p) for p in thgv.split('.')])
-        except ValueError:
-            curver = (0,0,0)
-        if newver > curver:
-            url_lbl = _('Upgrading to a more recent TortoiseHg is recommended.')
-            urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
-            self.download_url_lbl.setText(urldata)
-        else:
-            self.download_url_lbl.setText(_('Your TortoiseHg is up to date.'))
+    @pyqtSlot(str, str)
+    def updateAvailable(self, newverstr, upgradeurl):
+        url_lbl = _('Upgrading to a more recent TortoiseHg is recommended.')
+        urldata = ('<a href=%s>%s</a>' % (upgradeurl, url_lbl))
+        self.download_url_lbl.setText(urldata)
+
+    @pyqtSlot()
+    def updateUnavailable(self):
+        self.download_url_lbl.setText(_('Your TortoiseHg is up to date.'))
 
     def gettext(self, opts):
         # TODO: make this more uniformly unicode safe
@@ -199,6 +168,10 @@ class BugReport(QDialog):
                     fp.write(hglib.fromunicode(self.text))
         except EnvironmentError as e:
             QMessageBox.critical(self, _('Error writing file'), str(e))
+
+    def closeEvent(self, event):
+        self._updatechecker.close()
+        super(BugReport, self).closeEvent(event)
 
     def accept(self):
         self._writesettings()

@@ -134,7 +134,7 @@ class QueueManagementActions(QObject):
     def _commitQueue(self):
         assert self._repoagent
         repo = self._repoagent.rawRepo()
-        if os.path.isdir(repo.mq.join('.hg')):
+        if os.path.isdir(repo.mq.join(b'.hg')):
             self._launchCommitDialog()
             return
         if not self._cmdsession.isFinished():
@@ -805,6 +805,7 @@ class MQPatchesWidget(QDockWidget):
     @pyqtSlot()
     def _onGuardConfigure(self):
         model = self._queueListWidget.model()
+        assert model is not None
         index = self._queueListWidget.currentIndex()
         patch = model.patchName(index)
         uguards = ' '.join(model.patchGuards(index))
@@ -820,6 +821,8 @@ class MQPatchesWidget(QDockWidget):
     def _onDelete(self):
         model = self._queueListWidget.model()
         selmodel = self._queueListWidget.selectionModel()
+        assert model is not None
+        assert selmodel is not None
         patches = pycompat.maplist(model.patchName, selmodel.selectedRows())
         self._patchActions.deletePatches(patches)
 
@@ -853,6 +856,8 @@ class MQPatchesWidget(QDockWidget):
     def _updatePatchActions(self):
         model = self._queueListWidget.model()
         selmodel = self._queueListWidget.selectionModel()
+        assert model is not None
+        assert selmodel is not None
 
         appliedcnt = model.appliedCount()
         seriescnt = model.rowCount()

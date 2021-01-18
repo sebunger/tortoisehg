@@ -272,7 +272,7 @@ class ShellConfigWindow(QDialog):
 
         for name, info in vars.items():
             default, regkey, regtype, evalfunc, wrfunc, cbattr = info
-            if cbattr == None:
+            if cbattr is None:
                 continue
             checkbutton = getattr(self, cbattr)
             v = wrfunc(checkbutton.isChecked())

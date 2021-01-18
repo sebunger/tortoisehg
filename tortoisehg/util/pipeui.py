@@ -229,7 +229,7 @@ def _extenduiclass(parcls):
 
         # TODO: progress handler can be extracted to new class, and pass its
         # instance to scmutil.progress() per makeprogress() call.
-        def progress(self, topic, pos, item='', unit='', total=None):
+        def progress(self, topic, pos, item=b'', unit=b'', total=None):
             now = time.time()
             if (topic == self._lastprogresstopic and pos is not None
                 and now - self._lastprogresstime < _progressrefresh):
@@ -244,7 +244,7 @@ def _extenduiclass(parcls):
             msg = _packprogress(topic, pos, item, unit, total)
             self.write_err(msg, label=b'ui.progress')
 
-        def makeprogress(self, topic, unit='', total=None):
+        def makeprogress(self, topic, unit=b'', total=None):
             return scmutil.progress(self, self.progress, topic, unit, total)
 
         def label(self, msg, label):
