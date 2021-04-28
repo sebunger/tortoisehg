@@ -3,7 +3,7 @@ Section: vcs
 Priority: optional
 Maintainer: Andrej Shadura <andrewsh@debian.org>
 Uploaders: Debian Python Team <team+python@tracker.debian.org>
-Build-Depends: debhelper-compat (= 13), python3, dh-python
+Build-Depends: debhelper-compat (= 11), python3, dh-python
 Build-Depends-Indep: docbook-xml,
                      docbook-xsl,
                      mercurial (>= 5.0~),
